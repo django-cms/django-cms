@@ -7,4 +7,6 @@ class AboveStaticAnalysisCodeTest(TestCase):
     Name is pretty lame, but ensure it's executed before every other test
     """
     def test_pyflakes(self):
-        self.assertEqual(pyflakes(), 0)
+        import cms
+        import menus
+        self.assertEqual(pyflakes((cms, menus)), 0)

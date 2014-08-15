@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
 from django.core.cache import cache
@@ -174,7 +175,7 @@ class PublishingTests(TestCase):
         self.assertEqual(Page.objects.all().count(), 1)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+            response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'], "http://testserver/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
 
@@ -213,7 +214,7 @@ class PublishingTests(TestCase):
         page = self.create_page("test_admin", published=False)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+            response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 
@@ -228,7 +229,7 @@ class PublishingTests(TestCase):
             ):
             with self.login_user_context(superuser):
                 with force_language('de'):
-                    response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+                    response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 

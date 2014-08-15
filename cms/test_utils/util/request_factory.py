@@ -1,11 +1,12 @@
-from cms.utils.compat.type_checks import string_types
-from cms.utils.compat.string_io import StringIO
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import SimpleCookie
 from django.test.client import (FakePayload, MULTIPART_CONTENT, encode_multipart, 
     BOUNDARY, CONTENT_TYPE_RE)
+from django.utils import six
 from django.utils.encoding import smart_str
+from django.utils.six.moves import StringIO
+
 from cms.utils.compat.urls import urlencode, urlparse, unquote
 
 
@@ -145,7 +146,7 @@ class RequestFactory(object):
         # Make `data` into a querystring only if it's not already a string. If
         # it is a string, we'll assume that the caller has already encoded it.
         query_string = None
-        if not isinstance(data, string_types):
+        if not isinstance(data, six.string_types):
             query_string = urlencode(data, doseq=True)
 
         parsed = urlparse(path)

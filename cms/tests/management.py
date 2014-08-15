@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import uuid
-from django.contrib.sites.models import Site
-from django.core.management import CommandError
-from cms.models import Page, StaticPlaceholder
-from django.core import management
-from cms.test_utils.fixtures.navextenders import NavextendersFixture
 
-from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
+from django.contrib.sites.models import Site
+from django.core import management
+from django.core.management import CommandError
+from django.utils.six.moves import StringIO
+
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands import cms
 from cms.management.commands.subcommands.list import plugin_report
-from cms.models.pluginmodel import CMSPlugin
+from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
+from cms.models.pluginmodel import CMSPlugin
+from cms.test_utils.fixtures.navextenders import NavextendersFixture
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import SettingsOverride
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from cms.utils.compat.string_io import StringIO
 
 
 APPHOOK = "SampleApp"

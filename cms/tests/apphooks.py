@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
-from cms.utils.conf import get_cms_setting
 
 from django.core.urlresolvers import clear_url_caches, reverse
+from django.utils import six
 
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
@@ -13,8 +13,9 @@ from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.utils.compat.dj import get_user_model
-from cms.utils.compat.type_checks import string_types
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
+
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
@@ -83,7 +84,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, string_types):
+        if isinstance(title_langs, six.string_types):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
             titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
@@ -117,7 +118,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
             hooks = apphook_pool.get_apphooks()
             app_names = [hook[0] for hook in hooks]
-            self.assertEqual(len(hooks), 3)
+            self.assertEqual(len(hooks), 4)
             self.assertIn(NS_APP_NAME, app_names)
             self.assertIn(APP_NAME, app_names)
             apphook_pool.clear()
@@ -199,8 +200,10 @@ class ApphooksTestCase(CMSTestCase):
 
             with force_language("en"):
                 path = reverse('sample-settings')
+
             response = self.client.get(path)
             self.assertEqual(response.status_code, 200)
+
             page = en_title.page.publisher_public
             page.login_required = True
             page.save()
@@ -208,6 +211,26 @@ class ApphooksTestCase(CMSTestCase):
 
             response = self.client.get(path)
             self.assertEqual(response.status_code, 302)
+            apphook_pool.clear()
+
+    def test_apphooks_with_excluded_permissions(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            en_title = self.create_base_structure('SampleAppWithExcludedPermissions', 'en')
+
+            with force_language("en"):
+                excluded_path = reverse('excluded:example')
+                not_excluded_path = reverse('not_excluded:example')
+
+            page = en_title.page.publisher_public
+            page.login_required = True
+            page.save()
+            page.publish('en')
+
+            excluded_response = self.client.get(excluded_path)
+            not_excluded_response = self.client.get(not_excluded_path)
+            self.assertEqual(excluded_response.status_code, 200)
+            self.assertEqual(not_excluded_response.status_code, 302)
+
             apphook_pool.clear()
 
     def test_get_page_for_apphook_on_preview_or_edit(self):

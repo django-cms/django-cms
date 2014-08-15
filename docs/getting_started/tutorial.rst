@@ -1,5 +1,5 @@
-###################
-django CMS Tutorial
-###################
+##################################
+Installing django CMS from scratch
+##################################
 
-The new tutorial is hosted at https://github.com/divio/django-cms-tutorial.
+Start from scratch by following the tutorial on https://github.com/divio/django-cms-tutorial.
