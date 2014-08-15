@@ -118,6 +118,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         permissions = (
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
+            ('edit_static_placeholder', 'Can edit static placeholders'),
         )
         unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')

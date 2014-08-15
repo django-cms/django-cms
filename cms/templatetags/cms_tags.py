@@ -33,7 +33,8 @@ from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticP
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
-from cms.utils import get_language_from_request, get_cms_setting, get_site_id
+from cms.utils import get_language_from_request, get_site_id
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
@@ -345,24 +346,26 @@ class RenderPlugin(InclusionTag):
         # Prepend frontedit toolbar output if applicable. Moved to its own
         # method to aide subclassing the whole RenderPlugin if required.
         #
-
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
-        placeholder = plugin.placeholder
-
-        if toolbar and toolbar.edit_mode and placeholder.has_change_permission(request):
+        placeholder = context.get('cms_placeholder_instance', None)
+        if toolbar and toolbar.edit_mode and placeholder.has_change_permission(request) and getattr(placeholder, 'is_editable', True):
             from cms.middleware.toolbar import toolbar_plugin_processor
-            return toolbar_plugin_processor,
-
-        return None
+            processors = (toolbar_plugin_processor,)
+        else:
+            processors = None
+        return processors
 
     def get_context(self, context, plugin):
+
+        # Prepend frontedit toolbar output if applicable
         if not plugin:
             return {'content': ''}
 
+        placeholder = context.get('cms_placeholder_instance', None)
         processors = self.get_processors(context, plugin)
 
-        return {'content': plugin.render_plugin(context, processors=processors)}
+        return {'content': plugin.render_plugin(context, placeholder=placeholder, processors=processors)}
 
 
 register.tag(RenderPlugin)
@@ -1074,10 +1077,15 @@ class StaticPlaceholderNode(Tag):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
         if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            placeholder = static_placeholder.draft
+            if not request.user.has_perm('cms.edit_static_placeholder'):
+                placeholder = static_placeholder.public
+                placeholder.is_editable = False
+            else:
+                placeholder = static_placeholder.draft
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
+        context.update({'cms_placeholder_instance': placeholder})
         content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
         return content
 register.tag(StaticPlaceholderNode)
