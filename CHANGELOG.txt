@@ -251,3 +251,13 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Removed file cms/utils/compat/string_io.py, use django.utils.six module instead
 - Removed file cms/utils/compat/input.py, use django.utils.six module instead
 - Use PY3 from django.utils.six instead of PY2 from cms.utils.compat to check Python version
+- Staticplaceholders have not their own permissions
+- Apphooks support now nested namespaces
+- Apphooks can now exclude module for page permission checking
+- fixed the permissions for plugins on apphook pages
+- Allow the use of custom admin sites that do not reside under the 'admin' namespace
+- Added django 1.7 migrations
+- updated docs
+- slots for placeholders can now be 255 characters long
+- Plugin pool initialises incorrectly if database is down during first request
+- some refactoring and simplifications
