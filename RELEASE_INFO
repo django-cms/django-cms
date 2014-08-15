@@ -20,7 +20,7 @@
 - Publish blog post
 - Tweet blog post
 - Post notice on django-users, django-cms and django-cms-developers mailing lists
-- Update IRC channel topic
+- Update IRC channel topic (/topic this is the new topic)
 - Add current version to RTD versions.
 - Set new version as default version on RTD
 - Make sure tutorials on the website still work
