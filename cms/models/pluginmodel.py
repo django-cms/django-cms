@@ -11,7 +11,8 @@ from cms.utils.compat import DJANGO_1_5
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.helpers import reversion_register
-from django.core.urlresolvers import reverse, NoReverseMatch
+from cms.utils.urlutils import admin_reverse
+from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
@@ -148,6 +149,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return plugin_class(plugin_class.model, admin)
 
     def get_plugin_instance(self, admin=None):
+        '''
+        Given a plugin instance (usually as a CMSPluginBase), this method
+        returns a tuple containing:
+
+            instance - The instance AS THE APPROPRIATE SUBCLASS OF
+                       CMSPluginBase and not necessarily just 'self', which is
+                       often just a CMSPluginBase,
+
+            plugin   - the associated plugin class instance (subclass
+                       of CMSPlugin)
+        '''
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
@@ -353,22 +365,22 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         if not self.parent_id:
             try:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
                             args=[self.pk]))
             except NoReverseMatch:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
                             args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
             try:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
                             args=[parent.pk]))
             except NoReverseMatch:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
                             args=[parent.pk]))
             breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb
@@ -437,6 +449,19 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
 
 reversion_register(CMSPlugin)
+
+
+def get_plugin_media_path(instance, filename):
+    """
+    Django 1.7 requires that unbound function used in fields' definitions are defined outside the parent class
+     (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
+    This function is used withing field definition:
+
+        file = models.FileField(_("file"), upload_to=get_plugin_media_path)
+
+    and it invokes the bounded method on the given instance at runtime
+    """
+    return instance.get_media_path(filename)
 
 
 def deferred_class_factory(model, attrs):

@@ -16,7 +16,6 @@ from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
-from django.core.urlresolvers import reverse
 from django.db import router
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
@@ -32,7 +31,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import force_unicode, is_installed
 from cms.utils.compat.urls import unquote
 from cms.utils.helpers import find_placeholder_relation
-from cms.utils.urlutils import add_url_parameters
+from cms.utils.urlutils import add_url_parameters, admin_reverse
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
@@ -146,7 +145,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return url_patterns
 
     def redirect_jsi18n(self, request):
-        return HttpResponseRedirect(reverse('admin:jsi18n'))
+        return HttpResponseRedirect(admin_reverse('jsi18n'))
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""
@@ -711,7 +710,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             'cl': cl,
             'opts': opts,
             'has_add_permission': self.has_add_permission(request),
-            'root_path': reverse('admin:index'),
+            'root_path': admin_reverse('index'),
             'app_label': app_label,
             'preview_language': language,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
@@ -1096,10 +1095,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseRedirect(request.GET['redirect'])
         referrer = request.META.get('HTTP_REFERER', '')
 
-        path = reverse("admin:cms_page_changelist")
+        path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
-        if reverse('admin:index') not in referrer:
+        if admin_reverse('index') not in referrer:
             if all_published:
                 if page:
                     if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
@@ -1171,7 +1170,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         except ValidationError:
             exc = sys.exc_info()[1]
             messages.error(request, exc.message)
-        path = reverse("admin:cms_page_changelist")
+        path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         return HttpResponseRedirect(path)
@@ -1193,7 +1192,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
-        if reverse('admin:index') not in referer:
+        if admin_reverse('index') not in referer:
             path = '%s?%s' % (referer.split('?')[0], get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         return HttpResponseRedirect(path)
 
@@ -1286,7 +1285,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
             "opts": opts,
-            "root_path": reverse('admin:index'),
+            "root_path": admin_reverse('index'),
             "app_label": app_label,
         }
         context.update(extra_context or {})
@@ -1343,7 +1342,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         type_title, created = Title.objects.get_or_create(page=type_root, language=language, slug=PAGE_TYPES_ID,
                                                           defaults={'title': _('Page Types')})
 
-        url = add_url_parameters(reverse('admin:cms_page_add'), target=type_root.pk, position='first-child',
+        url = add_url_parameters(admin_reverse('cms_page_add'), target=type_root.pk, position='first-child',
                                  add_page_type=1, copy_target=target, language=language)
 
         return HttpResponseRedirect(url)

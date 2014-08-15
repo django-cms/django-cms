@@ -9,6 +9,20 @@ an icon for every page) by using the extension models:
 ``cms.extensions.PageExtension`` and ``cms.extensions.TitleExtension``,
 respectively.
 
+
+What's the difference?
+======================
+
+The difference between a page extension and a title extension is related to
+the difference between the Page and Title models. Titles support pages by
+providing a storage mechanism, among other things, for language-specific
+properties of Pages. So, if you find that you need to extend the page model in
+a language-specific manner, for example, if you need to create language-
+specific keywords for each language of your pages, then you may need to use a
+TitleExtension. If the extension you'd like to create is the same for all of
+the different languages of the page, then you may be fine using a
+PageExtension.
+
 ******
 How To
 ******
@@ -73,7 +87,8 @@ Note that the field that holds the relationship between the extension and a
 CMS Page is non-editable, so it will not appear in the admin views. This,
 unfortunately, leaves the operator without a means of "attaching" the page
 extension to the correct pages. The way to address this is to use a
-CMSToolbar.
+CMSToolbar. Note that creating the admin hook is still required, because it
+creates the add and change admin forms that are required for the next step.
 
 
 Adding a Toolbar Menu Item for your Page extension
@@ -160,22 +175,23 @@ Using extensions in templates
 To access a page extension in page templates you can simply access the
 approriate related_name field that is now available on the Page object.
 
-As per normal Django defaul related_name naming mechanism, the appropriate
-field to access is the same as your PageExtension model name, but lowercased.
-Assuming your Page Extension model class is ``IconExtension``, the
-relationship to the page extension will be available on
-``page.iconextension``, so you can use something like::
+As per the normal related_name naming mechanism, the appropriate field to
+access is the same as your PageExtension model name, but lowercased. Assuming
+your Page Extension model class is ``IconExtension``, the relationship to the
+page extension model will be available on ``page.iconextension``. From there
+you can access the extra fields you defined in your extension, so you can use
+something like::
 
     {% load staticfiles %}
 
     {# rest of template omitted ... #}
 
     {% if request.current_page.iconextension %}
-        <img src="{% static request.current_page.iconextension.url %}">
+        <img src="{% static request.current_page.iconextension.image.url %}">
     {% endif %}
 
-Where ``request.current_page`` is the way to access the current page that is
-rendering the template.
+Where ``request.current_page`` is the normal way to access the current page
+that is rendering the template.
 
 It is important to remember that unless the operator has already assigned a
 page extension to every page, a page may not have the iconextension

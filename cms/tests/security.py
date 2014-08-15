@@ -1,7 +1,7 @@
 from __future__ import with_statement
+from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
@@ -134,7 +134,7 @@ class SecurityTests(CMSTestCase):
             'plugin_language': settings.LANGUAGES[0][0],
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
-        url = reverse('admin:placeholderapp_example1_add_plugin')
+        url = admin_reverse('placeholderapp_example1_add_plugin')
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # log the user out and try to add a plugin using PlaceholderAdmin
         self.client.logout()
@@ -161,7 +161,7 @@ class SecurityTests(CMSTestCase):
         """
         page, placeholder, superuser, staff = self.get_data()
         plugin = add_plugin(placeholder, 'TextPlugin', 'en', body='body')
-        url = reverse('admin:placeholderapp_example1_edit_plugin', args=(plugin.pk,))
+        url = admin_reverse('placeholderapp_example1_edit_plugin', args=(plugin.pk,))
         plugin_data = {
             'body': 'newbody',
             'language': 'en',
@@ -198,7 +198,7 @@ class SecurityTests(CMSTestCase):
         }
         plugin = self.reload(plugin)
         self.assertEqual(plugin.body, 'body')
-        url = reverse('admin:placeholderapp_example1_delete_plugin', args=[plugin.pk])
+        url = admin_reverse('placeholderapp_example1_delete_plugin', args=[plugin.pk])
         # log the user out and try to remove a plugin using PlaceholderAdmin
         self.client.logout()
         response = self.client.post(url, plugin_data)

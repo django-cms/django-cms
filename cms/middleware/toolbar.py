@@ -38,7 +38,9 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
             'move_url': placeholder.get_move_url(),
         }
     original_context.update(data)
-    output = render_to_string(instance.get_plugin_class().frontend_edit_template, original_context)
+    plugin_class = instance.get_plugin_class()
+    template = plugin_class.frontend_edit_template
+    output = render_to_string(template, original_context).strip()
     original_context.pop()
     return output
 

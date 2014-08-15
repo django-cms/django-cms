@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.models.placeholderpluginmodel import PlaceholderReference
+from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
 import json
@@ -26,7 +27,6 @@ from django.template.response import TemplateResponse
 
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.db import router
 from django.http import HttpResponseRedirect
 
@@ -264,10 +264,10 @@ class PlaceholderAdminMixin(object):
         self.post_add_plugin(request, placeholder, plugin)
         response = {
             'url': force_unicode(
-                reverse("admin:%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                admin_reverse("%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
                         args=[plugin.pk])),
             'delete': force_unicode(
-                reverse("admin:%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                admin_reverse("%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
                         args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
@@ -501,7 +501,7 @@ class PlaceholderAdminMixin(object):
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
             self.post_delete_plugin(request, plugin)
-            return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
         plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": plugin_name}
@@ -541,7 +541,7 @@ class PlaceholderAdminMixin(object):
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
                 'obj': force_unicode(obj_display)})
             self.post_clear_placeholder(request, placeholder)
-            return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": obj_display}
         else:
