@@ -8,14 +8,14 @@ import cms.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '__first__'),
+        ('cms', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='MainModel',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
             ],
             options={
             },
@@ -24,10 +24,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Translations',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('language_code', models.CharField(max_length=15, db_index=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('language_code', models.CharField(db_index=True, max_length=15)),
                 ('master', models.ForeignKey(to='fakemlng.MainModel')),
-                ('placeholder', cms.models.fields.PlaceholderField(slotname=b'translated', editable=False, to='cms.Placeholder', null=True)),
+                ('placeholder', cms.models.fields.PlaceholderField(editable=False, to='cms.Placeholder', null=True, slotname='translated')),
             ],
             options={
             },
@@ -35,6 +35,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='translations',
-            unique_together=set([(b'master', b'language_code')]),
+            unique_together=set([('master', 'language_code')]),
         ),
     ]
