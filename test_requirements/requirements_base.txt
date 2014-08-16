@@ -13,15 +13,15 @@ dj-database-url
 selenium==2.42.1
 django-debug-toolbar
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
--e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
--e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
--e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
--e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
--e git+git://github.com/divio/djangocms-flash.git#egg=djangocms-flash
--e git+git://github.com/divio/djangocms-googlemap.git#egg=djangocms-googlemap
--e git+git://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
--e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
--e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
--e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
--e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
+-e git+git://github.com/yakky/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
+-e git+git://github.com/yakky/djangocms-column.git#egg=djangocms-column
+-e git+git://github.com/yakky/djangocms-style.git#egg=djangocms-style
+-e git+git://github.com/yakky/djangocms-file.git#egg=djangocms-file
+-e git+git://github.com/yakky/djangocms-flash.git#egg=djangocms-flash
+-e git+git://github.com/yakky/djangocms-googlemap.git#egg=djangocms-googlemap
+-e git+git://github.com/yakky/djangocms-inherit.git#egg=djangocms-inherit
+-e git+git://github.com/yakky/djangocms-picture.git#egg=djangocms-picture
+-e git+git://github.com/yakky/djangocms-teaser.git#egg=djangocms-teaser
+-e git+git://github.com/yakky/djangocms-video.git#egg=djangocms-video
+-e git+git://github.com/yakky/djangocms-link.git#egg=djangocms-link
 pyflakes
