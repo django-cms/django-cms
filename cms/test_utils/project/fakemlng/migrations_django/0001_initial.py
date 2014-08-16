@@ -8,14 +8,14 @@ import cms.models.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0001_initial'),
+        ('cms', '0002_auto_20140816_1918'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='MainModel',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
             ],
             options={
             },
@@ -24,10 +24,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Translations',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('language_code', models.CharField(db_index=True, max_length=15)),
                 ('master', models.ForeignKey(to='fakemlng.MainModel')),
-                ('placeholder', cms.models.fields.PlaceholderField(editable=False, to='cms.Placeholder', null=True, slotname='translated')),
+                ('placeholder', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', slotname='translated', editable=False)),
             ],
             options={
             },

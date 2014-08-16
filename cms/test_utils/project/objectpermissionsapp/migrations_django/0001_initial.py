@@ -9,16 +9,16 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0001_initial'),
-        ('contenttypes', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('contenttypes', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='UserObjectPermission',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
-                ('object_pk', models.CharField(verbose_name='object ID', max_length=255)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('object_pk', models.CharField(max_length=255, verbose_name='object ID')),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
                 ('permission', models.ForeignKey(to='auth.Permission')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),

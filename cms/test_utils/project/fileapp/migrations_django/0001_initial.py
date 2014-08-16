@@ -13,8 +13,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='FileModel',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
-                ('test_file', models.FileField(blank=True, null=True, upload_to='fileapp/')),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('test_file', models.FileField(null=True, blank=True, upload_to='fileapp/')),
             ],
             options={
             },

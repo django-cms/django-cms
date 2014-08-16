@@ -189,7 +189,7 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
         'cms', 'menus',
         # testing applications
         'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
-        'objectpermissionsapp', 'bunch_of_plugins',
+        'objectpermissionsapp', 'bunch_of_plugins', 'emailuserapp'
     ]
     if migrate_plugins:
         applications.extend([
