@@ -24,6 +24,9 @@ class MenuUtilsTests(CMSTestCase):
         response = self.client.get('/en/sample/login_other/')
         self.assertContains(response, '<h1>/fr/sample/login_other/</h1>')
 
+        response = self.client.get('/en/sample/login3/')
+        self.assertContains(response, '<h1>/fr/sample/login3/</h1>')
+
     def test_simple_language_changer(self):
         func = self.get_simple_view()
         decorated_view = simple_language_changer(func)

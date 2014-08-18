@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import inspect
+import warnings
+from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
+from cms.utils.compat import DJANGO_1_6
 from cms.utils.i18n import force_language, hide_untranslated
 from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch, reverse, resolve
-
-import warnings
-from cms.models.titlemodels import Title
-
+from django.utils import six
 
 
 def mark_descendants(nodes):
     for node in nodes:
         node.descendant = True
         mark_descendants(node.children)
+
 
 def cut_levels(nodes, level):
     """
@@ -26,6 +28,7 @@ def cut_levels(nodes, level):
     for node in nodes:
         result += cut_levels(node.children, level)
     return result
+
 
 def find_selected(nodes):
     """
@@ -54,6 +57,7 @@ def set_language_changer(request, func):
     Use this function in your nav extender views that have i18n slugs.
     """
     request._language_changer = func
+
 
 def language_changer_decorator(language_changer):
     """
@@ -128,20 +132,45 @@ class DefaultLanguageChanger(object):
             if view.namespace:
                 "%s:%s" % (view.namespace, view_name)
             url = None
-            # every class-level argument is instantiated
-            # before reversing as reverse does not support
-            # classes as arguments
-            for idx, arg in enumerate(view.args):
-                if isinstance(arg, type):
-                    view.args[idx] = arg()
-            for key, arg in view.kwargs.items():
-                if isinstance(arg, type):
-                    view.kwargs[key] = arg()
+            # In Django < 1.7 reverse tries to convert
+            # to string the arguments without checking
+            # if they are classes or instances.
+            # Here we monkeypatch the __unicode__ method
+            # to make it works as static.
+            # Before leaving we undo the monkeypatching
+            if DJANGO_1_6:
+                for idx, arg in enumerate(view.args):
+                    if inspect.isclass(arg):
+                        if hasattr(arg, '__unicode__'):
+                            @staticmethod
+                            def custom_str():
+                                return six.text_type(arg)
+                            arg._original = arg.__unicode__
+                            arg.__unicode__ = custom_str
+                        view.args[idx] = arg
+                for key, arg in view.kwargs.items():
+                    if inspect.isclass(arg):
+                        if hasattr(arg, '__unicode__'):
+                            @staticmethod
+                            def custom_str():
+                                return six.text_type(arg)
+                            arg._original = arg.__unicode__
+                            arg.__unicode__ = custom_str
+                        view.kwargs[key] = arg
             with force_language(lang):
                 try:
                     url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
                 except NoReverseMatch:
                     pass
+            if DJANGO_1_6:
+                for idx, arg in enumerate(view.args):
+                    if inspect.isclass(arg):
+                        if hasattr(arg, '__unicode__'):
+                            arg.__unicode__ = arg._original
+                for key, arg in view.kwargs.items():
+                    if inspect.isclass(arg):
+                        if hasattr(arg, '__unicode__'):
+                            arg.__unicode__ = arg._original
             if url:
                 return url
         return '%s%s' % (self.get_page_path(lang), self.app_path)
