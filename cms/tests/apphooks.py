@@ -6,6 +6,7 @@ from cms.utils.conf import get_cms_setting
 from django.core.urlresolvers import clear_url_caches, reverse
 
 from cms.api import create_page, create_title
+from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.models import Title
@@ -443,6 +444,20 @@ class ApphooksTestCase(CMSTestCase):
             reverse('sample2-root')
 
             apphook_pool.clear()
+
+    def test_apphook_pool_register_returns_apphook(self):
+        @apphook_pool.register
+        class TestApp(CMSApp):
+            name = "Test App"
+        self.assertIsNotNone(TestApp)
+
+        # Now test the quick return codepath, when apphooks is not empty
+        apphook_pool.apphooks.append("foo")
+
+        @apphook_pool.register
+        class TestApp2(CMSApp):
+            name = "Test App 2"
+        self.assertIsNotNone(TestApp2)
 
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
