@@ -1092,6 +1092,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         # double check through the getter
         self.assertEqual({'body': "It works!"}, plugin.get_translatable_content())
 
+    def test_plugin_pool_register_returns_plugin_class(self):
+        @plugin_pool.register_plugin
+        class DecoratorTestPlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Test Plugin"
+        self.assertIsNotNone(DecoratorTestPlugin)
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):

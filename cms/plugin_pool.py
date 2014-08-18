@@ -106,6 +106,8 @@ class PluginPool(object):
             except RegistrationError:
                 pass
 
+        return plugin
+
     def unregister_plugin(self, plugin):
         """
         Unregisters the given plugin(s).
