@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import warnings
 
 try:
     from django.contrib.admin.options import (RenameBaseModelAdminMethods as
@@ -148,6 +149,9 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     def _get_render_template(self, context, instance, placeholder):
         if getattr(instance, 'render_template', False):
+            warnings.warn('CMSPlugin.render_template attribute is deprecated '
+                          'and it will be removed in version 3.2; please move'
+                          'template in plugin classes', DeprecationWarning)
             return getattr(instance, 'render_template', False)
         elif getattr(self, 'render_template', False):
             return getattr(self, 'render_template', False)
