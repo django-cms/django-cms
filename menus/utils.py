@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from contextlib import contextmanager
 import inspect
 import warnings
 from cms.models.titlemodels import Title
@@ -132,45 +133,12 @@ class DefaultLanguageChanger(object):
             if view.namespace:
                 "%s:%s" % (view.namespace, view_name)
             url = None
-            # In Django < 1.7 reverse tries to convert
-            # to string the arguments without checking
-            # if they are classes or instances.
-            # Here we monkeypatch the __unicode__ method
-            # to make it works as static.
-            # Before leaving we undo the monkeypatching
-            if DJANGO_1_6:
-                for idx, arg in enumerate(view.args):
-                    if inspect.isclass(arg):
-                        if hasattr(arg, '__unicode__'):
-                            @staticmethod
-                            def custom_str():
-                                return six.text_type(arg)
-                            arg._original = arg.__unicode__
-                            arg.__unicode__ = custom_str
-                        view.args[idx] = arg
-                for key, arg in view.kwargs.items():
-                    if inspect.isclass(arg):
-                        if hasattr(arg, '__unicode__'):
-                            @staticmethod
-                            def custom_str():
-                                return six.text_type(arg)
-                            arg._original = arg.__unicode__
-                            arg.__unicode__ = custom_str
-                        view.kwargs[key] = arg
             with force_language(lang):
-                try:
-                    url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
-                except NoReverseMatch:
-                    pass
-            if DJANGO_1_6:
-                for idx, arg in enumerate(view.args):
-                    if inspect.isclass(arg):
-                        if hasattr(arg, '__unicode__'):
-                            arg.__unicode__ = arg._original
-                for key, arg in view.kwargs.items():
-                    if inspect.isclass(arg):
-                        if hasattr(arg, '__unicode__'):
-                            arg.__unicode__ = arg._original
+                with static_stringifier(view):  # This is a fix for Django < 1.7
+                    try:
+                        url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
+                    except NoReverseMatch:
+                        pass
             if url:
                 return url
         return '%s%s' % (self.get_page_path(lang), self.app_path)
@@ -187,3 +155,44 @@ def simple_language_changer(func):
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__
     return _wrapped
+
+
+@contextmanager
+def static_stringifier(view):
+    """
+    In Django < 1.7 reverse tries to convert to string the arguments without
+    checking whether they are classes or instances.
+
+    This context manager monkeypatches the __unicode__ method of each view
+    argument if it's a class definition to render it a static method.
+    Before leaving we undo the monkeypatching.
+    """
+    if DJANGO_1_6:
+        for idx, arg in enumerate(view.args):
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    @staticmethod
+                    def custom_str():
+                        return six.text_type(arg)
+                    arg._original = arg.__unicode__
+                    arg.__unicode__ = custom_str
+                view.args[idx] = arg
+        for key, arg in view.kwargs.items():
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    @staticmethod
+                    def custom_str():
+                        return six.text_type(arg)
+                    arg._original = arg.__unicode__
+                    arg.__unicode__ = custom_str
+                view.kwargs[key] = arg
+    yield
+    if DJANGO_1_6:
+        for idx, arg in enumerate(view.args):
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    arg.__unicode__ = arg._original
+        for key, arg in view.kwargs.items():
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    arg.__unicode__ = arg._original
