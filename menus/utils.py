@@ -131,7 +131,7 @@ class DefaultLanguageChanger(object):
         elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
-                "%s:%s" % (view.namespace, view_name)
+                view_name = "%s:%s" % (view.namespace, view_name)
             url = None
             with force_language(lang):
                 with static_stringifier(view):  # This is a fix for Django < 1.7
