@@ -1,6 +1,7 @@
 from __future__ import with_statement
 import copy
 import os
+from classytags.tests import DummyParser, DummyTokens
 
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
@@ -18,7 +19,7 @@ from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models.pagemodel import Page, Placeholder
 from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
                                        _show_placeholder_for_page,
-                                       _get_placeholder)
+                                       _get_placeholder, RenderPlugin)
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import SettingsOverrideTestCase, CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -26,6 +27,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting, get_site_id
 from cms.utils.plugins import get_placeholders
 from cms.utils.compat.dj import get_user_model
+from sekizai.context import SekizaiContext
 
 
 class TemplatetagTests(TestCase):
@@ -325,6 +327,30 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         with self.assertNumQueries(0):
             output = template.render(context)
         self.assertIn('<b>Test</b>', output)
+
+    def test_render_plugin_no_context(self):
+        placeholder = Placeholder.objects.create(slot='test')
+        plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')
+        parser = DummyParser()
+        tokens = DummyTokens(plugin)
+        tag = RenderPlugin(parser, tokens)
+        superuser = self.get_superuser()
+        request = RequestFactory().get('/')
+        request.current_page = None
+        request.user = superuser
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = True
+        context = SekizaiContext({
+            'request': request
+        })
+        output = tag.render(context)
+        self.assertEqual(
+            output,
+            '<div class="cms_plugin cms_plugin-{0}">Test</div>'.format(
+                plugin.pk
+            )
+        )
 
     def test_render_placeholder_with_no_page(self):
         page = create_page('Test', 'col_two.html', 'en', published=True)
