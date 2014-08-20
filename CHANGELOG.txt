@@ -246,7 +246,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Implemented transaction.atomic in django 1.4/1.5 way
 - Added a automatic dynamic template directory for page templates
 
-==== 3.0.4 (2014-08-XX) ===
+==== 3.0.4 (2014-08-16) ===
 - Removed file cms/utils/compat/type_checks.py, use django.utils.six module instead
 - Removed file cms/utils/compat/string_io.py, use django.utils.six module instead
 - Removed file cms/utils/compat/input.py, use django.utils.six module instead
@@ -261,3 +261,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - slots for placeholders can now be 255 characters long
 - Plugin pool initialises incorrectly if database is down during first request
 - some refactoring and simplifications
+
+==== 3.0.5 (2014-08-20) ===
+- Fixes 2 regressions introduced in 3.0.4
