@@ -15,6 +15,7 @@ from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
+from menus.utils import DefaultLanguageChanger
 
 
 APP_NAME = 'SampleApp'
@@ -319,6 +320,23 @@ class ApphooksTestCase(CMSTestCase):
 
             apphook_pool.clear()
 
+    def test_default_language_changer_with_implicit_current_app(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'namespaced_app_ns')  # nopyflakes
+            self.reload_urls()
+            with force_language("en"):
+                path = reverse('namespaced_app_ns:translated-url')
+            request = self.get_request(path)
+            request.LANGUAGE_CODE = 'en'
+
+            url = DefaultLanguageChanger(request)('en')
+            self.assertEqual(url, path)
+
+            url = DefaultLanguageChanger(request)('de')
+            self.assertEqual(url, '/de%s' % path[3:].replace('/page', '/Seite'))
+
+            apphook_pool.clear()
+
     def test_get_i18n_apphook_with_explicit_current_app(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
@@ -349,9 +367,6 @@ class ApphooksTestCase(CMSTestCase):
                 reverse('namespaced_app_ns:current-app', current_app="instance_1")
                 reverse('namespaced_app_ns:current-app', current_app="instance_2")
                 reverse('namespaced_app_ns:current-app')
-
-
-
 
     def test_apphook_include_extra_parameters(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
