@@ -4,7 +4,7 @@
 - Build newest english translation (django-admin.py makemessages -l en)
 - Build newest english JS translations (django-admin.py makemessages -l en -d djangojs)
 - Pull translations (tx pull -f -a)
-- Compile translations (django-manage.py compilemessages)
+- Compile translations (django-admin.py compilemessages)
 - Check CHANGELOG that all closed PRs are present.
 - Prepare blog post
 - update AUTHORS file (python develop.py authors)

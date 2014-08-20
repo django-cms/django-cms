@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-15 14:57+0200\n"
+"POT-Creation-Date: 2014-08-20 15:15+0200\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -209,15 +209,15 @@ msgstr ""
 msgid "View history"
 msgstr ""
 
-#: plugin_base.py:78
+#: plugin_base.py:80
 msgid "Advanced options"
 msgstr ""
 
-#: plugin_base.py:95
+#: plugin_base.py:97
 msgid "Generic"
 msgstr ""
 
-#: plugin_base.py:263
+#: plugin_base.py:265
 msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
@@ -352,7 +352,7 @@ msgstr ""
 
 #: admin/forms.py:461 admin/forms.py:468 admin/forms.py:472
 #: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:762
+#: templatetags/cms_tags.py:771
 msgid "Add"
 msgstr ""
 
@@ -794,7 +794,7 @@ msgid "Allow"
 msgstr ""
 
 #: models/pagemodel.py:124 models/permissionmodels.py:125
-#: models/titlemodels.py:27
+#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
 msgid "page"
 msgstr ""
 
@@ -1439,8 +1439,8 @@ msgstr ""
 msgid "Drop a plugin here"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:753
-#: templatetags/cms_tags.py:756
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:762
+#: templatetags/cms_tags.py:765
 msgid "Edit"
 msgstr ""
 
