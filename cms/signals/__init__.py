@@ -31,6 +31,9 @@ urls_need_reloading = Signal(providing_args=[])
 if settings.DEBUG:
     urls_need_reloading.connect(debug_server_restart)
 
+# fired if a mptt tree corruption is detected
+mptt_tree_corruption_detected = Signal(providing_args=['tree_id'])
+
 ######################### plugins #######################
 
 signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_delete_plugin')

@@ -302,14 +302,30 @@ def build_plugin_tree(plugin_list):
     root = []
     cache = {}
 
+    # init child plugin instances list separately so it is accessible in case of tree corruption
     for plugin in plugin_list:
         plugin.child_plugin_instances = []
-        cache[plugin.pk] = plugin
 
     for plugin in plugin_list:
-        if plugin.parent_id:
-            parent = cache[plugin.parent_id]
+        cache[plugin.pk] = plugin
+        parent_id = plugin.parent_id
+
+        if parent_id:
+            if parent_id in cache:
+                parent = cache[parent_id]
+
+            else:  # plugin tree is corrupted
+                from ..signals import mptt_tree_corruption_detected
+                from ..models import CMSPlugin
+
+                mptt_tree_corruption_detected.send(CMSPlugin, tree_id=plugin.tree_id)
+
+                # get parent from plugin_list not from db so we have the correct child plugin instance list
+                parent = [p for p in plugin_list if p.pk == parent_id].pop()
+                cache[parent.pk] = parent  # store parent in cache for siblings and descendants
+
             parent.child_plugin_instances.append(plugin)
+
         else:
             root.append(plugin)
 
