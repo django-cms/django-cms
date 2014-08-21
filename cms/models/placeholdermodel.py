@@ -23,7 +23,7 @@ class Placeholder(models.Model):
         is_static       Set to "True" for static placeholders by the template tag
         is_editable     If False the content of the placeholder is not editable in the frontend
     """
-    slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
     cache_placeholder = True
     is_static = False
