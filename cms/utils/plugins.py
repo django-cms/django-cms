@@ -301,18 +301,25 @@ def create_default_children_plugins(request, placeholder, lang, parent_plugin, c
 def build_plugin_tree(plugin_list):
     root = []
     cache = {}
+
     for plugin in plugin_list:
         plugin.child_plugin_instances = []
         cache[plugin.pk] = plugin
-        if not plugin.parent_id:
-            root.append(plugin)
-        else:
+
+    for plugin in plugin_list:
+        if plugin.parent_id:
             parent = cache[plugin.parent_id]
             parent.child_plugin_instances.append(plugin)
-    root.sort(key=lambda x: x.position)
+        else:
+            root.append(plugin)
+
+    position = lambda p: p.position
+
+    root.sort(key=position)
+
     for plugin in plugin_list:
-        if plugin.child_plugin_instances and len(plugin.child_plugin_instances) > 1:
-            plugin.child_plugin_instances.sort(key=lambda x: x.position)
+        plugin.child_plugin_instances.sort(key=position)
+
     return root
 
 
