@@ -320,9 +320,12 @@ def build_plugin_tree(plugin_list):
 
                 mptt_tree_corruption_detected.send(CMSPlugin, tree_id=plugin.tree_id)
 
-                # get parent from plugin_list not from db so we have the correct child plugin instance list
-                parent = [p for p in plugin_list if p.pk == parent_id].pop()
-                cache[parent.pk] = parent  # store parent in cache for siblings and descendants
+                try:  # get parent from plugin_list not from db so we have the correct child plugin instance list
+                    parent = [p for p in plugin_list if p.pk == parent_id].pop()
+                except IndexError:  # there is something really wrong!
+                    continue
+                else:
+                    cache[parent.pk] = parent  # store parent in cache for siblings and descendants
 
             parent.child_plugin_instances.append(plugin)
 
