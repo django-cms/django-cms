@@ -692,9 +692,6 @@ class AdminTests(AdminTestsBase):
         self.assertTrue(title.publisher_is_draft)
         self.assertTrue(new_title.publisher_is_draft)
 
-
-
-
     def test_revert_page_requires_perms(self):
         permless = self.get_permless()
         with self.login_user_context(permless):
