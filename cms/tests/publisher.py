@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin, create_title
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
+from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from cms.plugin_pool import plugin_pool
@@ -27,12 +28,9 @@ class PublisherCommandTests(TestCase):
     """
 
     def test_command_line_should_raise_without_superuser(self):
-        raised = False
-        try:
-            call_command('publisher_publish')
-        except CommandError:
-            raised = True
-        self.assertTrue(raised)
+        with self.assertRaises(CommandError):
+            com = publisher_publish.Command()
+            com.handle_noargs()
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)

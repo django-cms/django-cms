@@ -12,16 +12,16 @@ argparse
 dj-database-url
 selenium==2.42.1
 django-debug-toolbar
--e git+https://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
--e git+https://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
--e git+https://github.com/divio/djangocms-column.git#egg=djangocms-column
--e git+https://github.com/divio/djangocms-style.git#egg=djangocms-style
--e git+https://github.com/divio/djangocms-file.git#egg=djangocms-file
--e git+https://github.com/divio/djangocms-flash.git#egg=djangocms-flash
--e git+https://github.com/divio/djangocms-googlemap.git#egg=djangocms-googlemap
--e git+https://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
--e git+https://github.com/divio/djangocms-picture.git#egg=djangocms-picture
--e git+https://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
--e git+https://github.com/divio/djangocms-video.git#egg=djangocms-video
--e git+https://github.com/divio/djangocms-link.git#egg=djangocms-link
+-e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
+-e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
+-e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
+-e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
+-e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
+-e git+git://github.com/divio/djangocms-flash.git#egg=djangocms-flash
+-e git+git://github.com/divio/djangocms-googlemap.git#egg=djangocms-googlemap
+-e git+git://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
+-e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
+-e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
+-e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
+-e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
 pyflakes

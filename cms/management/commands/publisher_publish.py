@@ -43,10 +43,9 @@ class Command(NoArgsCommand):
             if add:
                 pages_published += 1
                 m = "*"
-            self.stdout.write(u"%d.\t%s  %s [%d]" % (i + 1, m, force_unicode(page), page.id))
+            self.stdout.write(u"%d.\t%s  %s [%d]\n" % (i + 1, m, force_unicode(page), page.id))
 
         self.stdout.write(u"\n")
         self.stdout.write(u"=" * 40)
-        self.stdout.write(u"Total:     %s" % pages_total)
-        self.stdout.write(u"Published: %s" % pages_published)
-
+        self.stdout.write(u"\nTotal:     %s\n" % pages_total)
+        self.stdout.write(u"Published: %s\n" % pages_published)
