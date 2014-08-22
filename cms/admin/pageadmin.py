@@ -269,6 +269,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         language = get_language_from_request(request, obj)
         form_cls = self.get_form_class(request, obj)
         form = super(PageAdmin, self).get_form(request, obj, form=form_cls, **kwargs)
+        # get_form method operates by overriding initial fields value which
+        # may persist across invocation. Code below deepcopies fields definition
+        # to avoid leaks
+        for field in form.base_fields.keys():
+            form.base_fields[field] = copy.deepcopy(form.base_fields[field])
 
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
