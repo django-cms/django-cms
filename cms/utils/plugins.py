@@ -76,7 +76,7 @@ def _extend_nodelist(extend_node):
     if is_variable_extend_node(extend_node):
         return []
         # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
-    blocks = extend_node.blocks
+    blocks = dict(extend_node.blocks)
     _extend_blocks(extend_node, blocks)
     placeholders = []
 
