@@ -1,4 +1,5 @@
 # Create your views here.
+from django.views.decorators.csrf import csrf_exempt
 from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import resolve
 from django.http import Http404
@@ -6,6 +7,14 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from cms.test_utils.project.sampleapp.models import Category
 from django.utils.translation import ugettext_lazy as _
+
+@csrf_exempt
+def exempt_view(request, **kw):
+    app = resolve(request.path).namespace
+    kw['app'] = app
+    response_kwargs = {'current_app': app, 'dict_': kw}
+    context = RequestContext(request, **response_kwargs)
+    return render_to_response("sampleapp/home.html", context_instance=context)
 
 
 def sample_view(request, **kw):
