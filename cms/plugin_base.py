@@ -148,6 +148,14 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         context['placeholder'] = placeholder
         return context
 
+    @classmethod
+    def get_require_parent(cls, slot, page):
+        template = page and page.get_template() or None
+
+        # config overrides..
+        require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
+        return require_parent
+
     @property
     def parent(self):
         return self.cms_plugin_instance.parent
