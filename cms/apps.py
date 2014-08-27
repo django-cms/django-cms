@@ -10,3 +10,5 @@ class CMSConfig(AppConfig):
 
     def ready(self):
         setup()
+        from cms.plugin_pool import plugin_pool
+        plugin_pool.set_plugin_meta()
