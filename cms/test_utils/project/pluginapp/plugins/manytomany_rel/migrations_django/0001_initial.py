@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '__first__'),
+        ('cms', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='Article',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('title', models.CharField(max_length=50)),
             ],
             options={
@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ArticlePluginModel',
             fields=[
+                ('cmsplugin_ptr', models.OneToOneField(primary_key=True, to='cms.CMSPlugin', auto_created=True, parent_link=True, serialize=False)),
                 ('title', models.CharField(max_length=50)),
-                ('cmsplugin_ptr', models.OneToOneField(auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
             ],
             options={
                 'abstract': False,
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Section',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('name', models.CharField(max_length=50)),
             ],
             options={

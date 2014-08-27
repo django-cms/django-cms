@@ -1,5 +1,5 @@
 -r requirements_base.txt
-https://github.com/django/django/archive/1.7c2.zip
+https://github.com/django/django/archive/stable/1.7.x.zip
 django-reversion>=1.8
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip
 

@@ -288,6 +288,7 @@ def configure(db_url, **extra):
             'fileapp': 'cms.test_utils.project.fileapp.migrations_django',
             'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations_django',
             'sampleapp': 'cms.test_utils.project.sampleapp.migrations_django',
+            'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations_django',
             'fakemlng': 'cms.test_utils.project.fakemlng.migrations_django',
             'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations_django',
             'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations_django',
