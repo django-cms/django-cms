@@ -29,5 +29,15 @@ def setup():
     """
     Gather all checks and validations
     """
+    from django.db.models import loading
+
+    def get_models_patched(app_mod=None, include_auto_created=False,
+                           include_deferred=False, only_installed=True):
+        loading.cache.get_models(app_mod, include_auto_created,
+                                 include_deferred, only_installed)
+        from cms.plugin_pool import plugin_pool
+        plugin_pool.set_plugin_meta()
+
+    loading.get_models = get_models_patched
     validate_dependencies()
     validate_settings()
