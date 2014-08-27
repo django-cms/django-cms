@@ -2,6 +2,7 @@
 from datetime import date
 import json
 import os
+from treebeard.mp_tree import MP_Node
 import warnings
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -58,7 +59,7 @@ class PluginModelBase(MPTTModelBase):
 
 
 @python_2_unicode_compatible
-class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
+class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):#, MP_Node)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.

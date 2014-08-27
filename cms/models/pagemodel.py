@@ -28,9 +28,11 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from menus.menu_pool import menu_pool
+from treebeard.mp_tree import MP_Node
+
 
 @python_2_unicode_compatible
-class Page(with_metaclass(PageMetaClass, MPTTModel)):
+class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
     """
     A simple hierarchical page model
     """
@@ -45,7 +47,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     X_FRAME_OPTIONS_SAMEORIGIN = 2
     X_FRAME_OPTIONS_ALLOW= 3
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]   
+    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
@@ -108,7 +110,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         ),
         default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
     )
- 
+
 
     # Managers
     objects = PageManager()
@@ -1225,16 +1227,16 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
         return found
- 
+
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = cache.get('cms:xframe_options:%s' % self.pk)
         if xframe_options is None:
             ancestors = self.get_ancestors(ascending=True, include_self=True)
-            
+
             # Ignore those pages which just inherit their value
             ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
-            
+
             # Now just give me the clickjacking setting (not anything else)
             xframe_options = ancestors.values_list('xframe_options', flat=True)
 
