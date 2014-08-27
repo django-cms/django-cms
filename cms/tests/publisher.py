@@ -5,6 +5,7 @@ from cms.utils.urlutils import admin_reverse
 from djangocms_text_ckeditor.models import Text
 from django.core.cache import cache
 from django.core.management.base import CommandError
+from django.core.management import call_command
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin, create_title
@@ -27,13 +28,9 @@ class PublisherCommandTests(TestCase):
     """
 
     def test_command_line_should_raise_without_superuser(self):
-        raised = False
-        try:
+        with self.assertRaises(CommandError):
             com = publisher_publish.Command()
             com.handle_noargs()
-        except CommandError:
-            raised = True
-        self.assertTrue(raised)
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
@@ -44,8 +41,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -68,8 +64,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -105,8 +100,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEqual(not_drafts, 1)
@@ -136,8 +130,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -157,6 +150,27 @@ class PublisherCommandTests(TestCase):
         # Now check that the non-draft has the attribute we set to the draft.
         non_draft = Page.objects.public()[0]
         self.assertEqual(non_draft.reverse_id, 'a_test')
+
+    def test_command_line_publish_multiple_languages(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        # Create a draft page with two published titles
+        page = create_page(u"The page!", "nav_playground.html", "en", published=False)
+        title = create_title('de', 'ja', page)
+        title.published = True
+        title.save()
+        title = create_title('fr', 'non', page)
+        title.published = True
+        title.save()
+
+        with StdoutOverride():
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish')
+
+        public = Page.objects.public()[0]
+        languages = sorted(public.title_set.values_list('language', flat=True))
+        self.assertEqual(languages, ['de', 'fr'])
 
     def tearDown(self):
         plugin_pool.patched = False
