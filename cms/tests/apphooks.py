@@ -13,6 +13,7 @@ from cms.models import Title
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
+from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
@@ -496,6 +497,45 @@ class ApphooksTestCase(CMSTestCase):
         class TestApp2(CMSApp):
             name = "Test App 2"
         self.assertIsNotNone(TestApp2)
+
+    def test_toolbar_current_app_namespace(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')  # nopyflakes
+            with force_language("en"):
+                path = reverse('namespaced_app_ns:sample-settings')
+            request = self.get_request(path)
+            toolbar = CMSToolbar(request)
+            self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
+
+            # Testing a decorated view
+            with force_language("en"):
+                path = reverse('namespaced_app_ns:sample-exempt')
+            request = self.get_request(path)
+            toolbar = CMSToolbar(request)
+            self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
+
+    def test_toolbar_current_app_apphook_with_implicit_current_app(self):
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
+            en_title = self.create_base_structure(NS_APP_NAME, 'en', 'namespaced_app_ns')  # nopyflakes
+            with force_language("en"):
+                path = reverse('namespaced_app_ns:current-app')
+            request = self.get_request(path)
+            toolbar = CMSToolbar(request)
+            self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
+
+    def test_toolbar_no_namespace(self):
+        # Test with a basic application with no defined app_name and no namespace
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
+            self.create_base_structure(APP_NAME, 'en')
+            path = reverse('detail', kwargs={'id': 20})
+            request = self.get_request(path)
+            toolbar = CMSToolbar(request)
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
+            self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbar.Example1Toolbar'].is_current_app)
 
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
