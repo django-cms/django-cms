@@ -42,7 +42,7 @@ setup(
     ],
     tests_require=[
         'django-reversion==1.8.2',
-        'Pillow==2.5.2',
+        'Pillow==2.5.3',
         'Sphinx==1.2.2',
         'Jinja2==2.7.3',
         'Pygments==1.6',
