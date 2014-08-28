@@ -62,6 +62,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self._login_context.__exit__(None, None, None)
 
     def test_placeholder_scanning_extend(self):
+        print("test_placeholder_scanning_extend")
         placeholders = get_placeholders('placeholder_tests/test_one.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
 
@@ -94,6 +95,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
+        print("test_placeholder_scanning_duplicate")
         placeholders = self.assertWarns(DuplicatePlaceholderWarning,
                                         'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
                                         get_placeholders, 'placeholder_tests/test_seven.html')
