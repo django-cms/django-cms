@@ -119,7 +119,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
         self.assertCheck(True, warnings=0, errors=0)
         copy_rel = ArticlePluginModel.copy_relations
         del ArticlePluginModel.copy_relations
-        self.assertCheck(True, warnings=1, errors=0)
+        self.assertCheck(True, warnings=2, errors=0)
         ArticlePluginModel.copy_relations = copy_rel
 
     def test_copy_relations_on_page_extension(self):

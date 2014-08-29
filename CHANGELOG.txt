@@ -268,3 +268,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 ==== 3.0.6 (unreleased) ===
 - Experimental full Django 1.7 migrations support
+- Add CMSPlugin.get_render_model to get the plugin model at render time
