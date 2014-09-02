@@ -16,14 +16,12 @@ from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import model_unpickle
+from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import signals, Model
-from mptt.models import MPTTModel, MPTTModelBase
-
 
 class BoundRenderMeta(object):
     def __init__(self, meta):
@@ -32,7 +30,7 @@ class BoundRenderMeta(object):
         self.text_enabled = getattr(meta, 'text_enabled', False)
 
 
-class PluginModelBase(MPTTModelBase):
+class PluginModelBase(ModelBase):
     """
     Metaclass for all CMSPlugin subclasses. This class should not be used for
     any other type of models.
@@ -59,7 +57,7 @@ class PluginModelBase(MPTTModelBase):
 
 
 @python_2_unicode_compatible
-class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):#, MP_Node)):
+class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -78,10 +76,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):#, MP_Node)):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
-    level = models.PositiveIntegerField(db_index=True, editable=False)
-    lft = models.PositiveIntegerField(db_index=True, editable=False)
-    rght = models.PositiveIntegerField(db_index=True, editable=False)
-    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     child_plugin_instances = None
     translatable_content_excluded_fields = []
 
@@ -253,11 +247,15 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):#, MP_Node)):
             else:
                 super(CMSPlugin, self).save_base()
         else:
+            if not self.depth:
+                if self.parent_id:
+                    self.parent.add_child(self)
+                else:
+                    self.add_root(instance=self)
             super(CMSPlugin, self).save()
 
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght',
-            'position', 'tree_id']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path', 'numchild', 'pk']:
             setattr(plugin, attr, getattr(self, attr))
 
     def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
@@ -272,17 +270,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):#, MP_Node)):
         # set up some basic attributes on the new_plugin
         new_plugin = CMSPlugin()
         new_plugin.placeholder = target_placeholder
-        new_plugin.tree_id = None
-        new_plugin.lft = None
-        new_plugin.rght = None
-        new_plugin.level = None
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
         if self.parent:
             parent = parent_cache[self.parent_id]
             parent = CMSPlugin.objects.get(pk=parent.pk)
             new_plugin.parent = parent
-        new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
         new_plugin.position = self.position
@@ -299,13 +292,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):#, MP_Node)):
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
             plugin_instance.placeholder = target_placeholder
-            plugin_instance.tree_id = new_plugin.tree_id
-            plugin_instance.lft = new_plugin.lft
-            plugin_instance.rght = new_plugin.rght
-            plugin_instance.level = new_plugin.level
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
             plugin_instance.parent = new_plugin.parent
+            plugin_instance.depth = new_plugin.depth
+            plugin_instance.path = new_plugin.path
+            plugin_instance.numchild = new_plugin.numchild
             # added to retain the position when creating a public copy of a plugin
             plugin_instance.position = new_plugin.position
             plugin_instance.save()

@@ -212,7 +212,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,    
     )
-    page.insert_at(parent, position)
+    if parent:
+        parent.add_child(instance=page)
+    else:
+        page.add_root(instance=page)
     page.save()
 
     create_title(
@@ -304,9 +307,13 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         plugin_type=plugin_type,
         placeholder=placeholder,
         position=new_pos,
-        language=language
+        language=language,
+        depth=0
     )
-    plugin_base.insert_at(target, position=position, save=False)
+    if target:
+        plugin_base.move(target, pos=position)
+    else:
+        plugin_base.add_root(instance=plugin_base)
 
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)

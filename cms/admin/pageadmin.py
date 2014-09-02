@@ -213,7 +213,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             except self.model.DoesNotExist:
                 pass
             else:
-                obj.move_to(target, position)
+                obj.move(target, pos=position)
         page_type_id = form.cleaned_data.get('page_type')
         copy_target_id = request.GET.get('copy_target')
         if copy_target_id or page_type_id:

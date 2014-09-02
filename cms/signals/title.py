@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cms.models import Title
+from cms.models import Title, Page
 from cms.signals.apphook import apphook_pre_title_checker, apphook_post_title_checker, apphook_post_delete_title_checker
 from menus.menu_pool import menu_pool
 
@@ -58,19 +58,18 @@ def post_save_title(instance, raw, created, **kwargs):
     # Update descendants only if path changed
     prevent_descendants = hasattr(instance, 'tmp_prevent_descendant_update')
     if instance.path != getattr(instance, 'tmp_path', None) and not prevent_descendants:
-        descendant_titles = Title.objects.filter(
-            page__lft__gt=instance.page.lft,
-            page__rght__lt=instance.page.rght,
-            page__tree_id__exact=instance.page.tree_id,
+        child_titles = Title.objects.filter(
+            page__depth=instance.page.depth + 1,
+            page__path__range=Page._get_children_path_interval(instance.page.path),
             language=instance.language,
             has_url_overwrite=False, # TODO: what if child has no url overwrite?
-        ).order_by('page__tree_id', 'page__parent', 'page__lft')
+        ).order_by('page__depth', 'page__path')
 
-        for descendant_title in descendant_titles:
-            descendant_title.path = ''  # just reset path
-            descendant_title.tmp_prevent_descendant_update = True
-            descendant_title._publisher_keep_state = True
-            descendant_title.save()
+        for child_title in child_titles:
+            child_title.path = ''  # just reset path
+            child_title.tmp_prevent_descendant_update = True
+            child_title._publisher_keep_state = True
+            child_title.save()
             # remove temporary attributes
     if hasattr(instance, 'tmp_path'):
         del instance.tmp_path

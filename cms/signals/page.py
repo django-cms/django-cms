@@ -24,7 +24,8 @@ def post_save_page(instance, **kwargs):
         instance.rescan_placeholders()
         update_home(instance)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
-        for page in instance.get_descendants(include_self=True):
+        pages = [instance] + list(instance.get_descendants())
+        for page in pages:
             for title in page.title_set.all().select_related('page'):
                 update_title(title)
                 title._publisher_keep_state = True

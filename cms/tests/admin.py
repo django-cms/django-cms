@@ -3,6 +3,7 @@ from __future__ import with_statement
 import json
 import datetime
 from cms.utils.urlutils import admin_reverse
+from django.db import transaction
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
@@ -1263,7 +1264,6 @@ class AdminFormsTests(AdminTestsBase):
 
             form = PageForm(data)
             self.assertTrue(form.is_valid(), form.errors.as_text())
-            # WTF? WHY DOES form.save() not handle this stuff???
             instance = form.save()
             instance.permission_user_cache = user
             instance.permission_advanced_settings_cache = True
@@ -1343,6 +1343,11 @@ class AdminFormsTests(AdminTestsBase):
         page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
         for placeholder in Placeholder.objects.all():
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+        print '--------------------'
+        for p in Page.objects.all():
+            print p.pk, p.path
+
+        transaction.commit()
         page.publish('en')
         self.assertEqual(Page.objects.count(), 2)
         self.assertEqual(CMSPlugin.objects.count(), 4)

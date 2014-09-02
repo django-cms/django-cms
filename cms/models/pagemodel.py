@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from logging import Logger
+from cms.publisher.errors import PublisherCantPublish
 from os.path import join
 
 from django.utils.timezone import now
@@ -10,8 +11,6 @@ from django.conf import settings
 from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils.translation import get_language, ugettext_lazy as _
-from mptt.models import MPTTModel
-
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
@@ -19,7 +18,6 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.publisher.errors import MpttPublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.compat import DJANGO_1_5
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
@@ -32,7 +30,7 @@ from treebeard.mp_tree import MP_Node
 
 
 @python_2_unicode_compatible
-class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
+class Page(with_metaclass(PageMetaClass, MP_Node)):
     """
     A simple hierarchical page model
     """
@@ -83,10 +81,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
-    level = models.PositiveIntegerField(db_index=True, editable=False)
-    lft = models.PositiveIntegerField(db_index=True, editable=False)
-    rght = models.PositiveIntegerField(db_index=True, editable=False)
-    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
 
     # Placeholders (plugins)
     placeholders = models.ManyToManyField(Placeholder, editable=False)
@@ -125,7 +119,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
         unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')
         verbose_name_plural = _('pages')
-        ordering = ('tree_id', 'lft')
+        ordering = ('path',)
         app_label = 'cms'
 
     class PublisherMeta:
@@ -189,7 +183,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
                     target = target.publisher_public
                 else:
                     Logger.warn('mptt tree may need rebuilding: run manage.py cms fix-mptt')
-        self.move_to(target, position)
+        self.move(target, pos=position)
 
         # fire signal
         import cms.signals as cms_signals
@@ -256,7 +250,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
         from cms.plugin_pool import plugin_pool
 
         plugin_pool.set_plugin_meta()
-        for plugin in CMSPlugin.objects.filter(placeholder__page=target, language=language).order_by('-level'):
+        for plugin in CMSPlugin.objects.filter(placeholder__page=target, language=language).order_by('-depth'):
             inst, cls = plugin.get_plugin_instance()
             if inst and getattr(inst, 'cmsplugin_ptr', False):
                 inst.cmsplugin_ptr._no_reorder = True
@@ -424,7 +418,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
         Args:
             commit: True if model should be really saved
         """
-
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
@@ -447,7 +440,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
             self.changed_by = "script"
         if created:
             self.created_by = self.changed_by
-
         if commit:
             if no_signals:  # ugly hack because of mptt
                 if DJANGO_1_5:
@@ -455,6 +447,12 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
                 else:
                     self.save_base(**kwargs)
             else:
+                if not self.depth:
+                    if self.parent_id:
+                        self.parent.add_child(self)
+                    else:
+                        self.add_root(instance=self)
+                print 'path: %s' % self.path, self.pk
                 super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
@@ -535,6 +533,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
         return title
 
     def publish(self, language):
+        print 'publish'
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible.
 
@@ -551,10 +550,9 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
             self.save()
             # be sure we have the newest data including mptt
         p = Page.objects.get(pk=self.pk)
-        self.lft = p.lft
-        self.rght = p.rght
-        self.level = p.level
-        self.tree_id = p.tree_id
+        self.path = p.path
+        self.depth = p.depth
+        self.numchild = p.numchild
         if self._publisher_can_publish():
             if self.publisher_public_id:
                 # Ensure we have up to date mptt properties
@@ -569,7 +567,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
             public_page.publisher_is_draft = False
 
             # Ensure that the page is in the right position and save it
-            public_page = self._publisher_save_public(public_page)
+            self._publisher_save_public(public_page)
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
@@ -577,6 +575,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
             # trigger home update
+            print public_page.pk, public_page.path, public_page.depth, Page.objects.all()
+
             public_page.save()
             # invalidate the menu for this site
             menu_pool.clear(site_id=self.site_id)
@@ -923,7 +923,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
                 template = self.template
             else:
                 try:
-                    template = self.get_ancestors(ascending=True).exclude(
+                    template = self.get_ancestors().exclude(
                         template=constants.TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
                 except IndexError:
                     pass
@@ -1092,76 +1092,32 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
             try:
                 return bool(self.parent.publisher_public_id)
             except AttributeError:
-                raise MpttPublisherCantPublish
+                raise PublisherCantPublish
         return True
 
-    def get_next_filtered_sibling(self, **filters):
-        """Very similar to original mptt method, but adds support for filters.
-        Returns this model instance's next sibling in the tree, or
-        ``None`` if it doesn't have a next sibling.
-        """
-        opts = self._mptt_meta
-        if self.is_root_node():
-            filters.update({
-                '%s__isnull' % opts.parent_attr: True,
-                '%s__gt' % opts.tree_id_attr: getattr(self, opts.tree_id_attr),
-            })
-        else:
-            filters.update({
-                opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
-                '%s__gt' % opts.left_attr: getattr(self, opts.right_attr),
-            })
-
-        # publisher stuff
-        filters.update({
-            'publisher_is_draft': self.publisher_is_draft
-        })
-        # multisite
-        filters.update({
-            'site__id': self.site_id
-        })
-
-        sibling = None
-        try:
-            sibling = self._tree_manager.filter(**filters)[0]
-        except IndexError:
-            pass
-        return sibling
-
     def get_previous_filtered_sibling(self, **filters):
-        """Very similar to original mptt method, but adds support for filters.
-        Returns this model instance's previous sibling in the tree, or
-        ``None`` if it doesn't have a previous sibling.
-        """
-        opts = self._mptt_meta
-        if self.is_root_node():
-            filters.update({
-                '%s__isnull' % opts.parent_attr: True,
-                '%s__lt' % opts.tree_id_attr: getattr(self, opts.tree_id_attr),
-            })
-            order_by = '-%s' % opts.tree_id_attr
-        else:
-            filters.update({
-                opts.parent_attr: getattr(self, '%s_id' % opts.parent_attr),
-                '%s__lt' % opts.right_attr: getattr(self, opts.left_attr),
-            })
-            order_by = '-%s' % opts.right_attr
-
-        # publisher stuff
         filters.update({
             'publisher_is_draft': self.publisher_is_draft
         })
-        # multisite
         filters.update({
             'site__id': self.site_id
         })
-
-        sibling = None
         try:
-            sibling = self._tree_manager.filter(**filters).order_by(order_by)[0]
+            return self.get_siblings().filter(path__lt=self.path, **filters).reverse()[0]
         except IndexError:
-            pass
-        return sibling
+            return None
+
+    def get_next_filtered_sibling(self, **filters):
+        filters.update({
+            'publisher_is_draft': self.publisher_is_draft
+        })
+        filters.update({
+            'site__id': self.site_id
+        })
+        try:
+            return self.get_siblings().filter(path__gt=self.path, **filters)[0]
+        except IndexError:
+            return None
 
     def _publisher_save_public(self, obj):
         """Mptt specific stuff before the object can be saved, overrides original
@@ -1177,35 +1133,43 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):#, MP_Node)):
             filters['publisher_public__parent__in'] = [public_parent]
         else:
             filters['publisher_public__parent__isnull'] = True
+        print filters
         prev_sibling = self.get_previous_filtered_sibling(**filters)
         public_prev_sib = prev_sibling.publisher_public if prev_sibling else None
-
+        print 'prev sibling', prev_sibling
+        print 'public prev siv', public_prev_sib
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if not self.parent_id:
-                obj.insert_at(self, position='right', save=False)
+                self.add_sibling(pos='right', instance=obj)
             else:
                 if public_prev_sib:
-                    obj.insert_at(public_prev_sib, position='right', save=False)
+                    public_prev_sib.add_sibling(pos='right', instance=obj)
                 else:
                     if public_parent:
-                        obj.insert_at(public_parent, position='first-child', save=False)
+                        public_parent.add_child(obj, pos='first-child')
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
-            if self.level != obj.level or \
+            print self.depth != obj.depth, public_parent != obj.parent, public_prev_sib != prev_public_sibling
+            print self.depth , obj.depth
+            print public_parent , obj.parent_id
+            print public_prev_sib, prev_public_sibling
+
+            if self.depth != obj.depth or \
                             public_parent != obj.parent or \
                             public_prev_sib != prev_public_sibling:
+                print 'has moved'
                 if public_prev_sib:
-                    obj.move_to(public_prev_sib, position="right")
+                    obj.move(public_prev_sib, position="right")
                 elif public_parent:
                     # move as a first child to parent
-                    obj.move_to(public_parent, position='first-child')
+                    obj.move(public_parent, position='first-child')
                 else:
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
-                        obj.move_to(next_sibling.publisher_public, position="left")
+                        obj.move(next_sibling.publisher_public, pos="left")
 
         return obj
 

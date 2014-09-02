@@ -359,7 +359,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         from cms.models import (ACCESS_DESCENDANTS, ACCESS_CHILDREN,
             ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE)
 
-        if page.level is None or page.lft is None or page.rght is None:
+        if page.depth is None or page.path is None or page.numchild is None:
             raise ValueError("Cannot use unsaved page for permission lookup, missing MPTT attributes.")
 
         parents = Q(page__tree_id=page.tree_id) & (
