@@ -232,7 +232,7 @@ class CMSMenu(Menu):
 
         if not use_draft(request):
             page_queryset = page_queryset.published(lang)
-        pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
+        pages = page_queryset.filter(**filters).order_by("path")
         ids = {}
         nodes = []
         first = True

@@ -225,10 +225,10 @@ class BaseCMSTestCase(object):
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in qs.order_by('tree_id', 'lft'):
+        for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-            page.pk, page.lft, page.rght, page.tree_id))
+            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -355,10 +355,10 @@ class BaseCMSTestCase(object):
         # TODO: add check for siblings
         draft_siblings = list(page.get_siblings(True).filter(
             publisher_is_draft=True
-        ).order_by('tree_id', 'parent', 'lft'))
+        ).order_by('path'))
         public_siblings = list(public_page.get_siblings(True).filter(
             publisher_is_draft=False
-        ).order_by('tree_id', 'parent', 'lft'))
+        ).order_by('path'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:

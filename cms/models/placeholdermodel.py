@@ -40,7 +40,7 @@ class Placeholder(models.Model):
             qs = self.cmsplugin_set.filter(language=language)
         else:
             qs = self.cmsplugin_set.all()
-        qs = qs.order_by('-level').select_related()
+        qs = qs.order_by('-depth').select_related()
         for plugin in qs:
             inst, cls = plugin.get_plugin_instance()
             if inst and getattr(inst, 'cmsplugin_ptr', False):

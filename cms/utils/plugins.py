@@ -212,7 +212,7 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     lang = lang or get_language_from_request(request)
     request_lang = lang
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
-        'placeholder', 'tree_id', 'level', 'position')
+        'placeholder', 'path')
     plugins = list(qs)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins

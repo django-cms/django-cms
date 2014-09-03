@@ -122,11 +122,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         ordering = ('path',)
         app_label = 'cms'
 
-    class PublisherMeta:
-        exclude_fields_append = ['id', 'publisher_is_draft', 'publisher_public',
-            'publisher_state', 'placeholders', 'lft', 'rght', 'tree_id',
-            'parent']
-
     def __str__(self):
         try:
             title = self.get_menu_title(fallback=True)
@@ -179,10 +174,10 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self.template = self.get_template()
             if target.publisher_public_id and position == 'right':
                 public = target.publisher_public
-                if target.tree_id + 1 == public.tree_id:
+                if target.get_root().get_next_sibling() == target.get_root():
                     target = target.publisher_public
                 else:
-                    Logger.warn('mptt tree may need rebuilding: run manage.py cms fix-mptt')
+                    Logger.warn('tree may need rebuilding: run manage.py cms fix-tree')
         self.move(target, pos=position)
 
         # fire signal
@@ -331,10 +326,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             # create a copy of this page by setting pk = None (=new instance)
             page.old_pk = page.pk
             page.pk = None
-            page.level = None
-            page.rght = None
-            page.lft = None
-            page.tree_id = None
+            page.path = None
+            page.depth = None
             page.publisher_public_id = None
             page.is_home = False
             # only set reverse_id on standard copy
@@ -452,7 +445,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                         self.parent.add_child(self)
                     else:
                         self.add_root(instance=self)
-                print 'path: %s' % self.path, self.pk
                 super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
@@ -533,7 +525,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         return title
 
     def publish(self, language):
-        print 'publish'
         """Overrides Publisher method, because there may be some descendants, which
         are waiting for parent to publish, so publish them if possible.
 
@@ -575,20 +566,9 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
             # trigger home update
-            print public_page.pk, public_page.path, public_page.depth, Page.objects.all()
-
             public_page.save()
             # invalidate the menu for this site
             menu_pool.clear(site_id=self.site_id)
-
-            # taken from Publisher - copy_page needs to call self._publisher_save_public(copy) for mptt insertion
-            # insert_at() was maybe calling _create_tree_space() method, in this
-            # case may tree_id change, so we must update tree_id from db first
-            # before save
-            if getattr(self, 'tree_id', None):
-                me = self._default_manager.get(pk=self.pk)
-                self.tree_id = me.tree_id
-
             self.publisher_public = public_page
             published = True
         else:
@@ -1133,11 +1113,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             filters['publisher_public__parent__in'] = [public_parent]
         else:
             filters['publisher_public__parent__isnull'] = True
-        print filters
         prev_sibling = self.get_previous_filtered_sibling(**filters)
         public_prev_sib = prev_sibling.publisher_public if prev_sibling else None
-        print 'prev sibling', prev_sibling
-        print 'public prev siv', public_prev_sib
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if not self.parent_id:
@@ -1147,24 +1124,18 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     public_prev_sib.add_sibling(pos='right', instance=obj)
                 else:
                     if public_parent:
-                        public_parent.add_child(obj, pos='first-child')
+                        public_parent.add_child(instance=obj)
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
-            print self.depth != obj.depth, public_parent != obj.parent, public_prev_sib != prev_public_sibling
-            print self.depth , obj.depth
-            print public_parent , obj.parent_id
-            print public_prev_sib, prev_public_sibling
-
             if self.depth != obj.depth or \
                             public_parent != obj.parent or \
                             public_prev_sib != prev_public_sibling:
-                print 'has moved'
                 if public_prev_sib:
-                    obj.move(public_prev_sib, position="right")
+                    obj.move(public_prev_sib, pos="right")
                 elif public_parent:
                     # move as a first child to parent
-                    obj.move(public_parent, position='first-child')
+                    obj.move(public_parent, pos='first-child')
                 else:
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
@@ -1196,14 +1167,15 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = cache.get('cms:xframe_options:%s' % self.pk)
         if xframe_options is None:
-            ancestors = self.get_ancestors(ascending=True, include_self=True)
+            ancestors = self.get_ancestors()
 
             # Ignore those pages which just inherit their value
             ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
 
             # Now just give me the clickjacking setting (not anything else)
             xframe_options = ancestors.values_list('xframe_options', flat=True)
-
+            if self.xframe_options != self.X_FRAME_OPTIONS_INHERIT:
+                xframe_options.append(self.xframe_options)
             if len(xframe_options) <= 0:
                 # No ancestors were found
                 return None

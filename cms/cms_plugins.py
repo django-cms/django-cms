@@ -37,8 +37,8 @@ class AliasPlugin(CMSPluginBase):
         context['instance'] = instance
         context['placeholder'] = placeholder
         if instance.plugin_id:
-            plugins = instance.plugin.get_descendants(include_self=True).order_by('placeholder', 'tree_id', 'level',
-                                                                                  'position')
+            plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
+            plugins = [instance.plugin] + list(plugins)
             plugins = downcast_plugins(plugins)
             plugins[0].parent_id = None
             plugins = build_plugin_tree(plugins)

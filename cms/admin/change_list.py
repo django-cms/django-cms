@@ -105,7 +105,7 @@ class CMSChangeList(ChangeList):
         site = self.current_site()
         # Get all the pages, ordered by tree ID (it's convenient to build the
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related('publisher_public')
+        pages = self.get_query_set(request).drafts().order_by('path').select_related('publisher_public')
 
         # Get lists of page IDs for which the current user has
         # "permission to..." on the current site.

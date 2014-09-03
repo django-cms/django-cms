@@ -288,7 +288,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
     if target:
         if position == 'last-child':
-            new_pos = CMSPlugin.objects.filter(language=language, parent=target, tree_id=target.tree_id).count()
+            new_pos = CMSPlugin.objects.filter(language=language, parent=target).count()
         elif position == 'first-child':
             new_pos = 0
         elif position == 'left':
@@ -297,7 +297,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
             new_pos = target.position + 1
         else:
             raise Exception('position not supported: %s' % position)
-        for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, tree_id=target.tree_id, position__gte=new_pos):
+        for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, position__gte=new_pos):
             pl.position += 1
             pl.save()
     else:
@@ -318,6 +318,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
+    plugin.move(target=target, pos=position)
     return plugin
 
 
@@ -467,7 +468,7 @@ def copy_plugins_to_language(page, source_language, target_language,
         # we skip it if has some
         if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
             plugins = list(
-                placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied

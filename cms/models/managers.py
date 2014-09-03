@@ -362,23 +362,16 @@ class PagePermissionManager(BasicPagePermissionManager):
         if page.depth is None or page.path is None or page.numchild is None:
             raise ValueError("Cannot use unsaved page for permission lookup, missing MPTT attributes.")
 
-        parents = Q(page__tree_id=page.tree_id) & (
-            Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
-        direct_parents = Q(
-            page__tree_id=page.tree_id,
-            page__level=page.level - 1) & (
-                             Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN)
-                         )
-        page_qs = Q(page=page) & (
-            Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) | Q(grant_on=ACCESS_PAGE))
-
-        parents = parents & Q(page__lft__lte=page.lft)
-        direct_parents = direct_parents & Q(page__lft__lte=page.lft)
-        parents = parents & Q(page__rght__gte=page.rght)
-        direct_parents = direct_parents & Q(page__rght__gte=page.rght)
-
+        paths = [
+            page.path[0:pos]
+            for pos in range(0, len(page.path), page.steplen)[1:]
+        ]
+        parents = Q(page__path__in=paths) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
+        direct_parents = Q(pk=page.parent_id) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
+        page_qs = Q(page=page) & (Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) |
+                                  Q(grant_on=ACCESS_PAGE))
         query = (parents | direct_parents | page_qs)
-        return self.filter(query).order_by('page__level')
+        return self.filter(query).order_by('page__depth')
 
 
 class PagePermissionsPermissionManager(models.Manager):
@@ -459,7 +452,7 @@ class PagePermissionsPermissionManager(models.Manager):
             # for standard users without global permissions, get all pages for him or
         # his group/s
         qs = PagePermission.objects.filter(page__site=site, can_view=True).select_related('page')
-        qs.order_by('page__tree_id', 'page__level', 'page__lft')
+        qs.order_by('page__path')
         # default is denny...
         page_id_allow_list = []
         for permission in qs:
@@ -496,8 +489,7 @@ class PagePermissionsPermissionManager(models.Manager):
             # for standard users without global permissions, get all pages for him or
         # his group/s
         qs = PagePermission.objects.with_user(user)
-        qs.filter(**{'page__site': site}).order_by('page__tree_id', 'page__level',
-                                                               'page__lft').select_related('page')
+        qs.filter(**{'page__site': site}).order_by('page__path').select_related('page')
         # default is denny...
         page_id_allow_list = []
         for permission in qs:

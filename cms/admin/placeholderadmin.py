@@ -306,13 +306,13 @@ class PlaceholderAdminMixin(object):
                 plugins = inst.placeholder_ref.get_plugins_list()
             else:
                 plugins = list(
-                    source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
-                                                            rght__lte=source_plugin.rght).order_by('tree_id', 'level',
-                                                                                                   'position'))
+                    source_placeholder.cmsplugin_set.filter(
+                        path__startswith=source_plugin.path,
+                        depth__gte=source_plugin.depth).order_by('path')
+                )
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level',
-                                                                                           'position'))
+                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
@@ -329,7 +329,7 @@ class PlaceholderAdminMixin(object):
         else:
             copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
-            'tree_id', 'level', 'position')
+            'path')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
