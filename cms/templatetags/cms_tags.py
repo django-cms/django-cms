@@ -1,38 +1,45 @@
 # -*- coding: utf-8 -*-
 from copy import copy
-from itertools import chain
 from datetime import datetime
+from itertools import chain
+import re
+from classytags.values import StringValue
+from cms.utils.urlutils import admin_reverse
+
+from django import template
+from django.conf import settings
+from django.contrib.sites.models import Site
+from django.core.mail import mail_managers
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import safe
-from classytags.arguments import Argument, MultiValueArgument
+from django.template.loader import render_to_string
+from django.utils import six
+from django.utils.encoding import smart_text
+from django.utils.html import escape
+from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _, get_language
+from classytags.arguments import Argument, MultiValueArgument, \
+    MultiKeywordArgument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from sekizai.helpers import Watcher
+from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
+
 from cms import __version__
 from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
-from cms.utils import get_language_from_request, get_cms_setting, get_site_id
-from cms.utils.compat.type_checks import string_types, int_types
+from cms.utils import get_language_from_request, get_site_id
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
-from django import template
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.mail import mail_managers
-from django.core.urlresolvers import reverse
-from django.template.loader import render_to_string
-from django.utils.encoding import smart_text
-from django.utils.html import escape
-from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _, get_language
-import re
-from sekizai.helpers import Watcher
-from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
+
 
 register = template.Library()
 
@@ -75,9 +82,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if request.current_page and request.current_page.pk == page_lookup.pk:
             return request.current_page
         return page_lookup
-    if isinstance(page_lookup, string_types):
+    if isinstance(page_lookup, six.string_types):
         page_lookup = {'reverse_id': page_lookup}
-    elif isinstance(page_lookup, int_types):
+    elif isinstance(page_lookup, six.integer_types):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
@@ -334,24 +341,40 @@ class RenderPlugin(InclusionTag):
         Argument('plugin')
     )
 
-    def get_context(self, context, plugin):
-        # Prepend frontedit toolbar output if applicable
-        edit = False
-        if not plugin:
-            return {'content': ''}
+    def get_processors(self, context, plugin, placeholder):
+        #
+        # Prepend frontedit toolbar output if applicable. Moved to its own
+        # method to aide subclassing the whole RenderPlugin if required.
+        #
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
-        page = request.current_page
-        if toolbar and toolbar.edit_mode and (not page or page.has_change_permission(request)):
-            edit = True
-        if edit:
+        if toolbar and toolbar.edit_mode and placeholder.has_change_permission(request) and getattr(placeholder, 'is_editable', True):
             from cms.middleware.toolbar import toolbar_plugin_processor
-
             processors = (toolbar_plugin_processor,)
         else:
             processors = None
+        return processors
 
-        return {'content': plugin.render_plugin(context, processors=processors)}
+    def get_context(self, context, plugin):
+
+        # Prepend frontedit toolbar output if applicable
+        if not plugin:
+            return {'content': ''}
+
+        try:
+            placeholder = context['cms_placeholder_instance']
+        except KeyError:
+            placeholder = plugin.placeholder
+
+        processors = self.get_processors(context, plugin, placeholder)
+
+        return {
+            'content': plugin.render_plugin(
+                context,
+                placeholder=placeholder,
+                processors=processors
+            )
+        }
 
 
 register.tag(RenderPlugin)
@@ -397,6 +420,45 @@ class PluginChildClasses(InclusionTag):
 
 
 register.tag(PluginChildClasses)
+
+
+class ExtraMenuItems(InclusionTag):
+    """
+    Accepts a placeholder or a plugin and renders the additional menu items.
+    """
+
+    template = "cms/toolbar/dragitem_extra_menu.html"
+    name = "extra_menu_items"
+    options = Options(
+        Argument('obj')
+    )
+
+    def get_context(self, context, obj):
+        # Prepend frontedit toolbar output if applicable
+        request = context['request']
+        items = []
+        if isinstance(obj, CMSPlugin):
+            plugin = obj
+            plugin_class_inst = plugin.get_plugin_class_instance()
+            item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
+            if item:
+                items.append(item)
+            plugin_classes = plugin_pool.get_all_plugins()
+            for plugin_class in plugin_classes:
+                plugin_class_inst = plugin_class()
+                item = plugin_class_inst.get_extra_global_plugin_menu_items(request, plugin)
+                if item:
+                    items += item
+
+        elif isinstance(obj, PlaceholderModel):
+            plugin_classes = plugin_pool.get_all_plugins()
+            for plugin_class in plugin_classes:
+                plugin_class_inst = plugin_class()
+                item = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
+                if item:
+                    items += item
+        return {'items': items}
+register.tag(ExtraMenuItems)
 
 
 class PageAttribute(AsTag):
@@ -604,7 +666,8 @@ class CMSToolbar(RenderBlock):
         toolbar = getattr(request, 'toolbar', None)
         if toolbar:
             toolbar.populate()
-        context['cms_toolbar_login_error'] = request.GET.get('cms-toolbar-login-error', False) == '1'
+        if request and 'cms-toolbar-login-error' in request.GET:
+            context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
         context['cms_version'] = __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
@@ -675,7 +738,7 @@ class CMSEditableObject(InclusionTag):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        output = render_to_string(template, data)
+        output = render_to_string(template, data).strip()
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output
@@ -700,6 +763,10 @@ class CMSEditableObject(InclusionTag):
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                if not context.get('attribute_name', None):
+                    # Make sure CMS.Plugin object will not clash in the frontend.
+                    extra_context['attribute_name'] = '-'.join(edit_fields) \
+                                                        if not isinstance('edit_fields', six.string_types) else edit_fields
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
                 extra_context['attribute_name'] = 'add'
@@ -723,9 +790,13 @@ class CMSEditableObject(InclusionTag):
                         instance._meta.app_label, instance._meta.module_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
-                    view_url = 'admin:%s_%s_change' % (
-                        instance._meta.app_label, instance._meta.module_name)
-                    url_base = reverse(view_url, args=(instance.pk,))
+                    if not view_url:
+                        view_url = 'admin:%s_%s_change' % (
+                            instance._meta.app_label, instance._meta.module_name)
+                    if isinstance(instance, Page):
+                        url_base = reverse(view_url, args=(instance.pk, language))
+                    else:
+                        url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
@@ -753,10 +824,12 @@ class CMSEditableObject(InclusionTag):
         Renders the requested attribute
         """
         extra_context = copy(context)
+        attr_value = None
         if hasattr(instance, 'lazy_translation_getter'):
-            extra_context['content'] = instance.lazy_translation_getter(attribute, '')
-        else:
-            extra_context['content'] = getattr(instance, attribute, '')
+            attr_value = instance.lazy_translation_getter(attribute, '')
+        if not attr_value:
+            attr_value = getattr(instance, attribute, '')
+        extra_context['content'] = attr_value
         # This allow the requested item to be a method, a property or an
         # attribute
         if callable(extra_context['content']):
@@ -1013,32 +1086,104 @@ class StaticPlaceholderNode(Tag):
             request.static_placeholders = []
         request.static_placeholders.append(static_placeholder)
         if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            placeholder = static_placeholder.draft
+            if not request.user.has_perm('cms.edit_static_placeholder'):
+                placeholder = static_placeholder.public
+                placeholder.is_editable = False
+            else:
+                placeholder = static_placeholder.draft
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
+        context.update({'cms_placeholder_instance': placeholder})
         content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
         return content
 register.tag(StaticPlaceholderNode)
 
 
-class RenderPlaceholder(Tag):
+class RenderPlaceholder(AsTag):
+    """
+    Render the content of the plugins contained in a placeholder.
+    The result can be assigned to a variable within the template's context by using the `as` keyword.
+    It behaves in the same way as the `PageAttribute` class, check its docstring for more details.
+    """
     name = 'render_placeholder'
     options = Options(
         Argument('placeholder'),
         Argument('width', default=None, required=False),
         'language',
         Argument('language', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False)
     )
 
-    def render_tag(self, context, placeholder, width, language=None):
+    def _get_value(self, context, editable=True, **kwargs):
         request = context.get('request', None)
+        placeholder = kwargs.get('placeholder')
+        width = kwargs.get('width')
+        language = kwargs.get('language')
+
         if not request:
             return ''
         if not placeholder:
             return ''
-        if not hasattr(request, 'placeholder'):
+        if not hasattr(request, 'placeholders'):
             request.placeholders = []
         request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language))
+        return safe(placeholder.render(context, width, lang=language, editable=editable))
+
+    def get_value_for_context(self, context, **kwargs):
+        return self._get_value(context, editable=False, **kwargs)
+
+    def get_value(self, context, **kwargs):
+        return self._get_value(context, **kwargs)
+
 register.tag(RenderPlaceholder)
+
+
+NULL = object()
+
+
+class EmptyListValue(list, StringValue):
+    """
+    A list of template variables for easy resolving
+    """
+    def __init__(self, value=NULL):
+        list.__init__(self)
+        if value is not NULL:
+            self.append(value)
+
+    def resolve(self, context):
+        resolved = [item.resolve(context) for item in self]
+        return self.clean(resolved)
+
+
+class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
+    sequence_class = EmptyListValue
+
+    def parse(self, parser, token, tagname, kwargs):
+        if '=' in token:
+            if self.name not in kwargs:
+                kwargs[self.name] = self.sequence_class()
+            return False
+        return super(MultiValueArgumentBeforeKeywordArgument, self).parse(
+            parser,
+            token,
+            tagname,
+            kwargs
+        )
+
+
+class CMSAdminURL(AsTag):
+    name = 'cms_admin_url'
+    options = Options(
+        Argument('viewname'),
+        MultiValueArgumentBeforeKeywordArgument('args', required=False),
+        MultiKeywordArgument('kwargs', required=False),
+        'as',
+        Argument('varname', resolve=False, required=False)
+    )
+
+    def get_value(self, context, viewname, args, kwargs):
+        return admin_reverse(viewname, args=args, kwargs=kwargs)
+
+register.tag(CMSAdminURL)

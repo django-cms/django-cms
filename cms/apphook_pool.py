@@ -1,74 +1,96 @@
 # -*- coding: utf-8 -*-
+import warnings
+
+from django.core.exceptions import ImproperlyConfigured
+
+from cms.app_base import CMSApp
 from cms.exceptions import AppAlreadyRegistered
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
-from django.core.exceptions import ImproperlyConfigured
-import warnings
 
 
 class ApphookPool(object):
+
     def __init__(self):
+        self.apphooks = []
         self.apps = {}
         self.discovered = False
-        self.block_register = False
-
-    def discover_apps(self):
-        if self.discovered:
-            return
-            #import all the modules
-        apphooks = get_cms_setting('APPHOOKS')
-        if apphooks:
-            self.block_register = True
-            for cls in iterload_objects(apphooks):
-                self.block_register = False
-                self.register(cls)
-                self.block_register = True
-            self.block_register = False
-        else:
-            load('cms_app')
-        self.discovered = True
 
     def clear(self):
+        # TODO: remove this method, it's Python, we don't need it.
+        self.apphooks = []
         self.apps = {}
         self.discovered = False
 
-    def register(self, app):
-        if self.block_register:
-            return
-        from cms.app_base import CMSApp
-        # validate the app
+    def register(self, app=None, discovering_apps=False):
+        # allow use as a decorator
+        if app is None:
+            return lambda app: self.register(app, discovering_apps)
+
+        if self.apphooks and not discovering_apps:
+            return app
+
+        if app.__name__ in self.apps:
+            raise AppAlreadyRegistered(
+                'A CMS application %r is already registered' % app.__name__)
+
         if not issubclass(app, CMSApp):
-            raise ImproperlyConfigured('CMS Apps must inherit '
-                                       'cms.app_base.CMSApp, %r does not' % app)
-        if hasattr(app, 'menu') and not app.menus:
-            warnings.warn("You define a 'menu' attribute on your CMS App %r, "
-                          "but the 'menus' attribute is empty, did you make a typo?")
-        name = app.__name__
-        if name in self.apps.keys():
-            raise AppAlreadyRegistered("[%s] a cms app with this name is already registered" % name)
-        self.apps[name] = app
+            raise ImproperlyConfigured(
+                'CMS application must inherit from cms.app_base.CMSApp, '
+                'but %r does not' % app.__name__)
+
+        if not hasattr(app, 'menus') and hasattr(app, 'menu'):
+            warnings.warn("You define a 'menu' attribute on CMS application %r, "
+                "but the 'menus' attribute is empty, did you make a typo?" % app.__name__)
+
+        self.apps[app.__name__] = app
+        return app
+
+    def discover_apps(self):
+        self.apphooks = get_cms_setting('APPHOOKS')
+
+        if self.apphooks:
+            for cls in iterload_objects(self.apphooks):
+                try:
+                    self.register(cls, discovering_apps=True)
+                except AppAlreadyRegistered:
+                    pass
+
+        else:
+            load('cms_app')
+
+        self.discovered = True
 
     def get_apphooks(self):
-        self.discover_apps()
         hooks = []
-        for app_name in self.apps.keys():
+
+        if not self.discovered:
+            self.discover_apps()
+
+        for app_name in self.apps:
             app = self.apps[app_name]
+
             if app.urls:
                 hooks.append((app_name, app.name))
-            # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
+
+        # Unfortunately, we loose the ordering since we now have a list of tuples. Let's reorder by app_name:
         hooks = sorted(hooks, key=lambda hook: hook[1])
+
         return hooks
 
     def get_apphook(self, app_name):
-        self.discover_apps()
+        if not self.discovered:
+            self.discover_apps()
+
         try:
             return self.apps[app_name]
         except KeyError:
-            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name 
+            # deprecated: return apphooks registered in db with urlconf name instead of apphook class name
             for app in self.apps.values():
                 if app_name in app.urls:
                     return app
-        raise ImproperlyConfigured('No registered apphook `%s` found.' % app_name)
+
+        raise ImproperlyConfigured('No registered apphook %r found' % app_name)
 
 
 apphook_pool = ApphookPool()

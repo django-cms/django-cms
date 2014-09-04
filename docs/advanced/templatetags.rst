@@ -135,6 +135,18 @@ only the english plugins:
 
     {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
+.. versionadded:: 3.0.2
+    This template tag supports the ``as`` argument. With this you can assign the result
+    of the template tag to a new variable that you can use elsewhere in the template.
+
+    Example::
+
+        {% render_placeholder mymodel_instance.my_placeholder as placeholder_content %}
+        <p>{{ placeholder_content }}</p>
+
+    When used in this manner, the placeholder will not be displayed for
+    editing when the CMS is in edit mode.
+
 
 
 show_placeholder
@@ -580,7 +592,7 @@ show_menu
 =========
 
 The ``show_menu`` tag renders the navigation of the current page. You can
-overwrite the appearance and the HTML if you add a ``cms/menu.html`` template
+overwrite the appearance and the HTML if you add a ``menu/menu.html`` template
 to your project or edit the one provided with django CMS. ``show_menu`` takes
 four optional parameters: ``start_level``, ``end_level``, ``extra_inactive``,
 and ``extra_active``.
@@ -687,7 +699,7 @@ show_breadcrumb
 ===============
 
 Renders the breadcrumb navigation of the current page.
-The template for the HTML can be found at ``cms/breadcrumb.html``::
+The template for the HTML can be found at ``menu/breadcrumb.html``::
 
     {% show_breadcrumb %}
 
@@ -698,7 +710,7 @@ Or with a custom template and only display level 2 or higher::
 Usually, only pages visible in the navigation are shown in the
 breadcrumb. To include *all* pages in the breadcrumb, write::
 
-    {% show_breadcrumb 0 "cms/breadcrumb.html" 0 %}
+    {% show_breadcrumb 0 "menu/breadcrumb.html" 0 %}
 
 If the current URL is not handled by the CMS or by a navigation extender,
 the current menu node can not be determined.

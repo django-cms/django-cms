@@ -6,6 +6,7 @@ from cms.signals.placeholder import pre_delete_placeholder_ref, post_delete_plac
 from cms.signals.plugins import post_delete_plugins, pre_save_plugins, pre_delete_plugins
 from cms.signals.reversion_signals import post_revision
 from cms.signals.title import pre_save_title, post_save_title, pre_delete_title, post_delete_title
+from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 from django.db.models import signals
 from django.dispatch import Signal
@@ -87,7 +88,7 @@ if get_cms_setting('PERMISSION'):
 
 ###################### reversion #########################
 
-if 'reversion' in settings.INSTALLED_APPS:
+if is_installed('reversion'):
     from reversion.models import post_revision_commit
 
     post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')

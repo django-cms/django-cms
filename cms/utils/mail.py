@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.core.mail import EmailMultiAlternatives
-from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.sites.models import Site
 
-from cms.utils.urlutils import urljoin
+from cms.utils.urlutils import urljoin, admin_reverse
+
 
 def send_mail(subject, txt_template, to, context=None, html_template=None, fail_silently=True):
     """
@@ -15,7 +15,7 @@ def send_mail(subject, txt_template, to, context=None, html_template=None, fail_
     
     context = context or {}
     context.update({
-        'login_url': "http://%s" % urljoin(site.domain, reverse('admin:index')),
+        'login_url': "http://%s" % urljoin(site.domain, admin_reverse('index')),
         'title': subject,
     })
     

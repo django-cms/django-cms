@@ -8,7 +8,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import NoReverseMatch
 from django.utils.translation import get_language
-from menus.exceptions import NamespaceAllreadyRegistered
+from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
@@ -100,7 +100,7 @@ class MenuPool(object):
         from menus.base import Menu
         assert issubclass(menu, Menu)
         if menu.__name__ in self.menus.keys():
-            raise NamespaceAllreadyRegistered(
+            raise NamespaceAlreadyRegistered(
                 "[%s] a menu with this name is already registered" % menu.__name__)
         self.menus[menu.__name__] = menu()
 

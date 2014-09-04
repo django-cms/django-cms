@@ -1,19 +1,17 @@
-coverage==3.7
-python-coveralls==2.4.0
-docopt==0.6.1
-unittest-xml-reporting==1.0.3
+coverage==3.7.1
+python-coveralls==2.4.2
+docopt==0.6.2
+unittest-xml-reporting==1.9.0
 sphinx
-Pillow==2.0
+Pillow==2.5.3
 django-classy-tags>=0.5
-South>=0.7.2
 html5lib>=0.90
 django-mptt>=0.6
 django-sekizai>=0.7
 argparse
 dj-database-url
-selenium
+selenium==2.42.1
 django-debug-toolbar
-https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column

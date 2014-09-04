@@ -7,10 +7,12 @@ from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.utils.translation import activate
+from menus.base import NavigationNode
+from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
+from menus.models import CacheKey
+from menus.utils import mark_descendants, find_selected, cut_levels
 
-from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.api import create_page
-from cms.compat import get_user_model, user_related_name
 from cms.menu import CMSMenu, get_visible_pages
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -19,13 +21,11 @@ from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride,
     LanguageOverride)
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
+from cms.utils.compat.dj import get_user_model, user_related_name
 from cms.utils.i18n import force_language
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.models import CacheKey
-from menus.utils import mark_descendants, find_selected, cut_levels
 
 
 class BaseMenuTest(SettingsOverrideTestCase):
@@ -387,7 +387,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
     def test_page_language_url(self):
         path = self.get_page(3).get_absolute_url()
         context = self.get_context(path=path)
-        tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % settings.LANGUAGES[0][0])
+        tpl = Template("{%% load menu_tags %%}{%% page_language_url '%s' %%}" % 'en')
         url = tpl.render(context)
         self.assertEqual(url, "%s" % path)
 

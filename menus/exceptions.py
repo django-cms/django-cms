@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-class NamespaceAllreadyRegistered(Exception):
+class NamespaceAlreadyRegistered(Exception):
     pass
+
 
 class NoParentFound(Exception):
     pass

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from cms.models.placeholderpluginmodel import PlaceholderReference
+from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
-from django.db import transaction
 import json
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -27,12 +27,12 @@ from django.template.response import TemplateResponse
 
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.db import router
 from django.http import HttpResponseRedirect
 
 from cms.utils import copy_plugins, permissions, get_language_from_request
 from cms.utils.i18n import get_language_list
+from cms.utils.transaction import wrap_transaction
 
 
 class FrontendEditableAdminMixin(object):
@@ -264,10 +264,10 @@ class PlaceholderAdminMixin(object):
         self.post_add_plugin(request, placeholder, plugin)
         response = {
             'url': force_unicode(
-                reverse("admin:%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                admin_reverse("%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
                         args=[plugin.pk])),
             'delete': force_unicode(
-                reverse("admin:%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                admin_reverse("%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
                         args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
@@ -275,7 +275,7 @@ class PlaceholderAdminMixin(object):
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
-    @transaction.commit_on_success
+    @wrap_transaction
     def copy_plugins(self, request):
         """
         POST request should have the following data:
@@ -423,12 +423,14 @@ class PlaceholderAdminMixin(object):
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
-        language = request.POST.get('plugin_language', plugin.language)
+        language = request.POST.get('plugin_language', None)
         source_placeholder = plugin.placeholder
         if not parent_id:
             parent_id = None
         else:
             parent_id = int(parent_id)
+        if not language and plugin.language:
+            language = plugin.language
         order = request.POST.getlist("plugin_order[]")
         if not self.has_move_plugin_permission(request, plugin, placeholder):
             return HttpResponseForbidden(force_unicode(_("You have no permission to move this plugin")))
@@ -442,11 +444,13 @@ class PlaceholderAdminMixin(object):
             else:
                 parent = None
             plugin.move_to(parent, position='last-child')
-        try:
-            template = self.get_placeholder_template(request, placeholder)
-            has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
-        except PluginLimitReached as er:
-            return HttpResponseBadRequest(er)
+        if not placeholder == source_placeholder:
+            try:
+                template = self.get_placeholder_template(request, placeholder)
+                has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
+            except PluginLimitReached as er:
+                return HttpResponseBadRequest(er)
+
         plugin.save()
         for child in plugin.get_descendants(include_self=True):
             child.placeholder = placeholder
@@ -497,7 +501,7 @@ class PlaceholderAdminMixin(object):
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
                 'name': force_unicode(opts.verbose_name), 'obj': force_unicode(obj_display)})
             self.post_delete_plugin(request, plugin)
-            return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
         plugin_name = force_unicode(plugin_pool.get_plugin(plugin.plugin_type).name)
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": plugin_name}
@@ -533,12 +537,11 @@ class PlaceholderAdminMixin(object):
             if perms_needed:
                 return HttpResponseForbidden(force_unicode(_("You do not have permission to clear this placeholder")))
             self.log_deletion(request, placeholder, obj_display)
-            for plugin in plugins:
-                plugin.delete()
+            placeholder.clear()
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {
                 'obj': force_unicode(obj_display)})
             self.post_clear_placeholder(request, placeholder)
-            return HttpResponseRedirect(reverse('admin:index', current_app=self.admin_site.name))
+            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": obj_display}
         else:

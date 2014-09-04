@@ -530,6 +530,45 @@ $(document).ready(function () {
 				form.submit();
 			});
 
+			//
+			// If an A element has a data-attribute 'alt-class'. At this time,
+			// this is only the edit button in the page-tree, but could be
+			// more in future. It is important that the CSS be written in such
+			// a manner that the alt-class is defined after the normal class,
+			// so that it can be overridden when the alt-key is depressed.
+			//
+			// NOTE: This 'preview' part of the 'alt-click to [alternative
+			// function]' feature may not work in some environments (Windows
+			// in a some virtual machine environments, notably), but is only a
+			// nice-'extra', not a requirement for the feature.
+			//
+			$(document).on('keydown keyup', function(evt){
+				if (evt.which === 18) {
+					$('a[data-alt-class]').each(function(){
+						var self = $(this);
+						self.toggleClass(self.data('alt-class'), evt.type === 'keydown');
+					})
+				}
+			});
+
+			//
+			// If the A-element has a data-attribute 'alt-href', then this
+			// click-handler uses that instead of the normal href attribute as
+			// the click-destination. Again, currently this is only on the
+			// edit button, but could be more in future.
+			//
+			$('a[data-alt-href]').on('click', function(evt){
+				var href;
+				evt.preventDefault();
+				if (evt.shiftKey) {
+					href = $(this).data('alt-href');
+				}
+				else {
+					href = $(this).attr('href');
+				}
+				window.location = href;					
+			});
+
 			var copy_splits = window.location.href.split("copy=");
 			if(copy_splits.length > 1){
 				var id = copy_splits[1].split("&")[0];

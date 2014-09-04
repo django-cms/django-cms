@@ -11,7 +11,8 @@ from cms.utils.compat import DJANGO_1_5
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.helpers import reversion_register
-from django.core.urlresolvers import reverse, NoReverseMatch
+from cms.utils.urlutils import admin_reverse
+from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
 from django.db.models.base import model_unpickle
@@ -19,7 +20,7 @@ from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import signals
+from django.db.models import signals, Model
 from mptt.models import MPTTModel, MPTTModelBase
 
 
@@ -124,7 +125,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return (model_unpickle, (model, defers, factory), data)
 
     def __str__(self):
-        return force_unicode(self.id)
+        return force_unicode(self.pk)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -148,6 +149,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return plugin_class(plugin_class.model, admin)
 
     def get_plugin_instance(self, admin=None):
+        '''
+        Given a plugin instance (usually as a CMSPluginBase), this method
+        returns a tuple containing:
+
+            instance - The instance AS THE APPROPRIATE SUBCLASS OF
+                       CMSPluginBase and not necessarily just 'self', which is
+                       often just a CMSPluginBase,
+
+            plugin   - the associated plugin class instance (subclass
+                       of CMSPlugin)
+        '''
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
@@ -178,7 +190,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
                 page = request.current_page
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
             if plugin.render_plugin:
-                template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
+                template = plugin._get_render_template(context, instance, placeholder)
                 if not template:
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
@@ -281,7 +293,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         new_plugin.save()
         if plugin_instance:
             if plugin_instance.__class__ == CMSPlugin:
-                #get a new instance so references do not get mixed up
+                # get a new instance so references do not get mixed up
                 plugin_instance = CMSPlugin.objects.get(pk=plugin_instance.pk)
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
@@ -353,22 +365,22 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         if not self.parent_id:
             try:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
                             args=[self.pk]))
             except NoReverseMatch:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
                             args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
             try:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
                             args=[parent.pk]))
             except NoReverseMatch:
                 url = force_unicode(
-                    reverse("admin:%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
                             args=[parent.pk]))
             breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb
@@ -405,7 +417,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         fields = []
         for field in self._meta.fields:
             if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices and
-                field.editable and field.name not in self.translatable_content_excluded_fields and field):
+                    field.editable and field.name not in self.translatable_content_excluded_fields and field):
                 fields.append(field)
 
         translatable_fields = {}
@@ -429,8 +441,27 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
 
         return True
 
+    def delete(self, no_mptt=False, *args,  **kwargs):
+        if no_mptt:
+            Model.delete(self, *args, **kwargs)
+        else:
+            super(CMSPlugin, self).delete(*args, **kwargs)
+
 
 reversion_register(CMSPlugin)
+
+
+def get_plugin_media_path(instance, filename):
+    """
+    Django 1.7 requires that unbound function used in fields' definitions are defined outside the parent class
+     (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
+    This function is used withing field definition:
+
+        file = models.FileField(_("file"), upload_to=get_plugin_media_path)
+
+    and it invokes the bounded method on the given instance at runtime
+    """
+    return instance.get_media_path(filename)
 
 
 def deferred_class_factory(model, attrs):

@@ -54,7 +54,7 @@ placeholder (configuration is the same as for placeholders in the CMS) or you ca
 .. warning::
 
     For security reasons the related_name for a
-    :class:`~cms.models.fields.PlaceholderField` may not be surpressed using
+    :class:`~cms.models.fields.PlaceholderField` may not be suppressed using
     ``'+'`` to allow the cms to check permissions properly. Attempting to do
     so will raise a :exc:`ValueError`.
 
@@ -70,8 +70,8 @@ Admin Integration
 .. versionchanged:: 3.0
 
 If you install this model in the admin application, you have to use the mixin
-:class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` together with
-:class:`~django.contrib.admin.ModelAdmin` so that the interface renders
+:class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` together with,
+and must precede, :class:`~django.contrib.admin.ModelAdmin` so that the interface renders
 correctly::
 
     from django.contrib import admin
@@ -180,6 +180,20 @@ page displaying your model (where you put the :ttag:`render_placeholder` tag),
 then append ``?edit`` to the page's URL.
 This will make the frontend editor top banner appear, and will eventually
 require you to login.
+
+If you need change ``?edit`` to custom string (eq: ``?admin_on``) you may
+set ``CMS_TOOLBAR_URL__EDIT_ON`` variable in yours ``settings.py`` to
+``"admin_on"``.
+
+Also you may change ``?edit_off`` or ``?build`` to custom string with
+set ``CMS_TOOLBAR_URL__EDIT_OFF`` or ``CMS_TOOLBAR_URL__BUILD`` variables
+in yours ``settings.py``.
+
+Notice: when you changing  ``CMS_TOOLBAR_URL__EDIT_ON`` or
+``CMS_TOOLBAR_URL__EDIT_OFF`` or ``CMS_TOOLBAR_URL__BUILD`` please be
+careful because you may replace reserved strings in system (eq:
+``?page``). We recommended you use unique strings for this option
+(eq: ``secret_admin`` or ``company_name``).
 
 You are now using the so-called *frontend edit mode*:
 

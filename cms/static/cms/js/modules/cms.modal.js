@@ -417,22 +417,27 @@ $(document).ready(function () {
 		},
 
 		_setButtons: function (iframe) {
+			var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
 			var that = this;
-			var row = iframe.contents().find('.submit-row:eq(0)');
-				row.hide(); // hide submit-row
-			var buttons = row.find('input, a');
+			var row;
+			if (!djangoSuit) {
+				row = iframe.contents().find('.submit-row:eq(0)');
+			} else {
+				row = iframe.contents().find('.save-box:eq(0)');
+			}
+			row.hide(); // hide submit-row
+			var buttons = row.find('input, a, button');
 			var render = $('<span />'); // seriously jquery...
 
 			// if there are no given buttons within the submit-row area
 			// scan deeper within the form itself
 			if(!buttons.length) {
-				row = iframe.contents().find('form:eq(0)');
-				buttons = row.find('input[type="submit"]');
+				row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
+				buttons = row.find('input[type="submit"], button[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
 					.hide();
 			}
-
 			// attach relation id
 			buttons.each(function (index, item) {
 				$(item).attr('data-rel', '_' + index);
@@ -456,7 +461,7 @@ $(document).ready(function () {
 				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
-						if(item.is('input')) item[0].click();
+						if(item.is('input') || item.is('button')) item[0].click();
 						if(item.is('a')) that._loadContent(item.prop('href'), title);
 
 						// trigger only when blue action buttons are triggered
@@ -528,8 +533,11 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_modal + '" />'));
 
+				// adding django hacks
+				contents.find('.viewsitelink').attr('target', '_top');
+
 				// set modal buttons
-  				that._setButtons($(this));
+				that._setButtons($(this));
 
 				// when an error occurs, reset the saved status so the form can be checked and validated again
 				if(iframe.contents().find('.errornote').length || iframe.contents().find('.errorlist').length) {
@@ -557,6 +565,7 @@ $(document).ready(function () {
 					contents.find('body').bind('keydown.cms', function (e) {
 						if(e.keyCode === 27) that.close();
 					});
+					contents.find('body').addClass('cms_modal-window');
 
 					// figure out if .object-tools is available
 					if(contents.find('.object-tools').length) {

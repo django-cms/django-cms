@@ -3,7 +3,7 @@
 from itertools import chain
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.forms.widgets import Select, MultiWidget, TextInput
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
@@ -128,6 +128,17 @@ class PageSelectWidget(MultiWidget):
 class PageSmartLinkWidget(TextInput):
 
 
+    def __init__(self, attrs=None, ajax_view=None):
+        super(PageSmartLinkWidget, self).__init__(attrs)
+        self.ajax_url = self.get_ajax_url(ajax_view=ajax_view)
+
+    def get_ajax_url(self, ajax_view):
+        try:
+            return reverse_lazy(ajax_view)
+        except NoReverseMatch:
+            raise Exception(
+                'You should provide an ajax_view argument that can be reversed to the PageSmartLinkWidget'
+            )
 
     def render(self, name=None, value=None, attrs=None):
         final_attrs = self.build_attrs(attrs)
@@ -175,7 +186,7 @@ class PageSmartLinkWidget(TextInput):
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': reverse("admin:cms_page_get_published_pagelist")
+            'ajax_url': force_unicode(self.ajax_url)
         }]
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))

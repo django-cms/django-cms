@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from logging import Logger
 from os.path import join
 
 from django.utils.timezone import now
@@ -117,6 +118,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         permissions = (
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
+            ('edit_static_placeholder', 'Can edit static placeholders'),
         )
         unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')
@@ -168,6 +170,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         check_title_slugs, overwrite_url on the moved page don't need any check
         as it remains the same regardless of the page position in the tree
         """
+        assert self.publisher_is_draft
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
@@ -176,8 +179,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
-        if (position in ('left', 'right') and not target.parent and is_inherited_template):
+        if position in ('left', 'right') and not target.parent and is_inherited_template:
             self.template = self.get_template()
+            if target.publisher_public_id and position == 'right':
+                public = target.publisher_public
+                if target.tree_id + 1 == public.tree_id:
+                    target = target.publisher_public
+                else:
+                    Logger.warn('mptt tree may need rebuilding: run manage.py cms fix-mptt')
         self.move_to(target, position)
 
         # fire signal
@@ -214,7 +223,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             # If an old title exists, overwrite. Otherwise create new
             title.pk = old_titles.pop(title.language, None)
             title.page = target
-            title.publisher_is_draft = False
+            title.publisher_is_draft = target.publisher_is_draft
             title.publisher_public_id = old_pk
             if published:
                 title.publisher_state = PUBLISHER_STATE_DEFAULT
@@ -461,7 +470,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             delattr(self, '_publisher_keep_state')
 
         if not DJANGO_1_5 and 'cls' in kwargs:
-            del (kwargs['cls'])
+            del kwargs['cls']
         ret = super(Page, self).save_base(*args, **kwargs)
         return ret
 
@@ -565,7 +574,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
-            #trigger home update
+            # trigger home update
             public_page.save()
             # invalidate the menu for this site
             menu_pool.clear(site_id=self.site_id)
@@ -964,7 +973,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
                 user_perm = user.has_perm(codename)
                 generic_perm = self.has_generic_permission(request, "view")
-                return (user_perm or generic_perm)
+                return user_perm or generic_perm
 
         else:
             if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
@@ -1044,7 +1053,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
             self.permission_user_cache = user
             setattr(self, att_name, has_generic_permission(
-                self.id, user, perm_type, self.site_id))
+                self.pk, user, perm_type, self.site_id))
             if getattr(self, att_name):
                 self.permission_edit_cache = True
         return getattr(self, att_name)
@@ -1060,7 +1069,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
         """
-        return join(get_cms_setting('PAGE_MEDIA_PATH'), "%d" % self.id, filename)
+        return join(get_cms_setting('PAGE_MEDIA_PATH'), "%d" % self.pk, filename)
 
     def reload(self):
         """

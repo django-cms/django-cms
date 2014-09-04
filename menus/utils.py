@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from cms.utils import get_language_from_request
-from cms.utils.i18n import force_language, hide_untranslated
-from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
+from contextlib import contextmanager
+import inspect
 import warnings
 from cms.models.titlemodels import Title
+from cms.utils import get_language_from_request
+from cms.utils.compat import DJANGO_1_6
+from cms.utils.i18n import force_language, hide_untranslated
+from django.conf import settings
+from django.core.urlresolvers import NoReverseMatch, reverse, resolve
+from django.utils import six
 
 
 def mark_descendants(nodes):
     for node in nodes:
         node.descendant = True
         mark_descendants(node.children)
+
 
 def cut_levels(nodes, level):
     """
@@ -24,6 +29,7 @@ def cut_levels(nodes, level):
     for node in nodes:
         result += cut_levels(node.children, level)
     return result
+
 
 def find_selected(nodes):
     """
@@ -53,6 +59,7 @@ def set_language_changer(request, func):
     """
     request._language_changer = func
 
+
 def language_changer_decorator(language_changer):
     """
     A decorator wrapper for set_language_changer.
@@ -72,6 +79,7 @@ def language_changer_decorator(language_changer):
         return _wrapped
     return _decorator
 
+
 class DefaultLanguageChanger(object):
     def __init__(self, request):
         self.request = request
@@ -90,15 +98,6 @@ class DefaultLanguageChanger(object):
                 self._app_path = self.request.path
         return self._app_path
 
-    def __call__(self, lang):
-        if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
-            with force_language(lang):
-                try:
-                    return self.request.toolbar.obj.get_absolute_url()
-                except:
-                    pass
-        return '%s%s' % (self.get_page_path(lang), self.app_path)
-
     def get_page_path(self, lang):
         page = getattr(self.request, 'current_page', None)
         if page:
@@ -116,6 +115,35 @@ class DefaultLanguageChanger(object):
             else:
                 return "/"
 
+    def __call__(self, lang):
+        page_language = get_language_from_request(self.request)
+        with force_language(page_language):
+            try:
+                view = resolve(self.request.path)
+            except:
+                view = None
+        if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
+            with force_language(lang):
+                try:
+                    return self.request.toolbar.obj.get_absolute_url()
+                except:
+                    pass
+        elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
+            view_name = view.url_name
+            if view.namespace:
+                view_name = "%s:%s" % (view.namespace, view_name)
+            url = None
+            with force_language(lang):
+                with static_stringifier(view):  # This is a fix for Django < 1.7
+                    try:
+                        url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
+                    except NoReverseMatch:
+                        pass
+            if url:
+                return url
+        return '%s%s' % (self.get_page_path(lang), self.app_path)
+
+
 def simple_language_changer(func):
     warnings.warn("simple_language_changer is deprecated and will be removed in "
         "2.5! This is the default behaviour now for non CMS managed views and is no longer needed.",
@@ -127,3 +155,44 @@ def simple_language_changer(func):
     _wrapped.__name__ = func.__name__
     _wrapped.__doc__ = func.__doc__
     return _wrapped
+
+
+@contextmanager
+def static_stringifier(view):
+    """
+    In Django < 1.7 reverse tries to convert to string the arguments without
+    checking whether they are classes or instances.
+
+    This context manager monkeypatches the __unicode__ method of each view
+    argument if it's a class definition to render it a static method.
+    Before leaving we undo the monkeypatching.
+    """
+    if DJANGO_1_6:
+        for idx, arg in enumerate(view.args):
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    @staticmethod
+                    def custom_str():
+                        return six.text_type(arg)
+                    arg._original = arg.__unicode__
+                    arg.__unicode__ = custom_str
+                view.args[idx] = arg
+        for key, arg in view.kwargs.items():
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    @staticmethod
+                    def custom_str():
+                        return six.text_type(arg)
+                    arg._original = arg.__unicode__
+                    arg.__unicode__ = custom_str
+                view.kwargs[key] = arg
+    yield
+    if DJANGO_1_6:
+        for idx, arg in enumerate(view.args):
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    arg.__unicode__ = arg._original
+        for key, arg in view.kwargs.items():
+            if inspect.isclass(arg):
+                if hasattr(arg, '__unicode__'):
+                    arg.__unicode__ = arg._original

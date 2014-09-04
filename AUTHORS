@@ -9,8 +9,8 @@ Current or previous core committers:
 * Jonas Obrist
 * Martin Koistinen
 * Patrick Lauber
-* Peter Ciciman
 * Paulo Alvarado
+* Peter Ciciman
 * Stefan Foulis
 * Øyvind Saltvik
 
@@ -19,12 +19,13 @@ Current and previous core designers:
 
 * Christian Bertschy
 
-Contributors (based on gitlog) (390):
+Contributors (based on gitlog) (421):
 
 * A. Bram Neijt
 * aaloy
 * Aaron Fay
 * Aaron Renner
+* Aaron Spike
 * aball
 * Adi Sieker
 * Admin Adminaras
@@ -51,6 +52,7 @@ Contributors (based on gitlog) (390):
 * Antoine Catton
 * Anton Parkhomenko
 * Antoni Aloy López
+* Arcady Usov
 * Arne Gellhaus
 * Arne Schauf
 * Artem Skoretskiy
@@ -62,21 +64,26 @@ Contributors (based on gitlog) (390):
 * behrooz
 * Behrooz Nobakht
 * Belegnar
+* Ben Stähli
 * Beni Wohlwend
 * Benjamin
 * Benjamin Liles
 * Benjamin Wohlwend
 * benjaoming
+* benzkji
 * Bernardo Cabezas Serra
 * Bernd Zeimetz
 * Bertrand Bordage
 * beshrkayali
+* Bitdeli Chef
 * Bjorn Sandberg
 * Bob Karreman
 * Bouke Haarsma
 * Braden MacDonald
+* Brian Schott
 * brightwhitefox
 * Calvin Cheng
+* Carlos de Paula
 * Catalin Dragomirescu
 * centralniak
 * Chanita Siridechkun
@@ -89,14 +96,18 @@ Contributors (based on gitlog) (390):
 * Chris Hughes
 * Chris Jones
 * Chris Wesseling
+* Chris Wilson
 * Christian Bertschy
 * Christof Hagedorn
+* Christopher Grebs
 * Christos Kopanos
 * cip
 * Colin Wirz
 * Conrado Buhrer
 * Conrado Bührer
+* Corey Farwell
 * Craig de Stigter
+* Damian Moore
 * Damir Arbula
 * DamirArbula
 * Daniel Barden
@@ -109,17 +120,20 @@ Contributors (based on gitlog) (390):
 * Darii Denis Home
 * Darren Pearce
 * Darryl Woods
+* Dave Bell
 * David Grant
 * David Jean Louis
 * David Lam
 * David Lee
 * David Thompson
+* derek73
 * deshack
 * digi604
 * divio
 * Diógenes Augusto Fernandes Hermínio
 * dlamotte
 * Dmitry Akinin
+* Donatas Kučinskas
 * dstufft
 * Dylann CORDEL
 * DylannCordel
@@ -197,6 +211,7 @@ Contributors (based on gitlog) (390):
 * Jason Zylks
 * Javi Nievas
 * Jessica Tallon
+* Jimmy Lam
 * Johannes Bornhold
 * John-Scott Atlakson
 * Jon Prindiville
@@ -207,7 +222,10 @@ Contributors (based on gitlog) (390):
 * Jorge Vargas
 * Jorge Vargas (elpargo)
 * Joseph Bergantine
+* Kalle Bronsen
 * kar1m
+* kater169
+* kblomqvis
 * kblomqvist
 * Kegan Holtzhausen
 * Keryn Knight
@@ -241,6 +259,7 @@ Contributors (based on gitlog) (390):
 * Markus Holtermann
 * Markus Zapke-Gründemann
 * Markus Zapke-Gründemann
+* Marti Raudsepp
 * Martin
 * Martin Bommeli
 * Martin Brochhaus
@@ -248,6 +267,7 @@ Contributors (based on gitlog) (390):
 * Martin Kosír
 * Martin Pajuste
 * martinkosir
+* Mateusz Dereniowski
 * Mateusz Marzantowicz
 * mathijs
 * Matt Chisholm
@@ -265,6 +285,7 @@ Contributors (based on gitlog) (390):
 * Milo Price
 * Mitar
 * Mokys
+* Morgan Wahl
 * Motiejus Jakštys
 * mrlundis
 * mvaerle
@@ -297,6 +318,7 @@ Contributors (based on gitlog) (390):
 * Pedro Gracia
 * Pete Loggie
 * Peter Ciciman
+* Peter Farrell
 * Peter Landry
 * Peter-Paul van Gemerden
 * Petteri
@@ -309,12 +331,15 @@ Contributors (based on gitlog) (390):
 * poweredbypenguins
 * Pratik Vyas
 * pumalo
+* Rafal Radulski
 * raidsan
 * Rainer Koirikivi
 * Rajesh
 * Rajesh K.
+* Rajesh P.
 * Rebecca Breu
 * Remco Wendt
+* requires.io
 * Restless Being
 * Richard Barran
 * rizumu
@@ -331,6 +356,8 @@ Contributors (based on gitlog) (390):
 * Roman Kozlovskiy
 * root
 * rtpm
+* Russ Ferriday
+* Samuel Lahti
 * Samuel Lüscher
 * sbussetti
 * Schoen
@@ -338,6 +365,7 @@ Contributors (based on gitlog) (390):
 * scottbarnham
 * sealibora
 * Sean Bleier
+* Sebastian Braun
 * Seth Buntin
 * Seyhun Akyurek
 * Shahar Or
@@ -360,6 +388,7 @@ Contributors (based on gitlog) (390):
 * Stefano Crosta
 * Stefano Morandi
 * Stephan
+* Stephan Herzog
 * Stephan Jaekel
 * Stephen Muss
 * Stephen Watkin
@@ -391,12 +420,14 @@ Contributors (based on gitlog) (390):
 * Vinit (Vermicelli on IRC)
 * vinit kumar
 * Vitor Figueiro
+* Vladimir Bolshakov
 * Vladyslav
 * vvangelovski
 * wangJunjie
 * Wayne Moore
 * wid
 * wildermesser
+* Xavier Fernandez
 * Xavier Ordoquy
 * xray7224
 * Yann Malet

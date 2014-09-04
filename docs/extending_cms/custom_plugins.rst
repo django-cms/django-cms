@@ -129,7 +129,7 @@ are where you should define your subclasses of
 :class:`cms.plugin_base.CMSPluginBase`, these classes define the different
 plugins.
 
-There are three required attributes on those classes:
+There are two required attributes on those classes:
 
 * ``model``: The model you wish to use for storing information about this plugin.
   If you do not require any special information, for example configuration, to
@@ -142,28 +142,20 @@ There are three required attributes on those classes:
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
+
+And one of thw following **must** be defined if ``render_plugin`` attribute
+is ``True`` (the default):
+
 * ``render_template``: The template to render this plugin with.
 
-In addition to those three attributes, you can also define a
-:meth:`render` method on your subclasses. It is specifically this `render`
+**or**
+
+* ``get_render_template``: A method that returns a template path to render the
+  plugin with.
+
+In addition to those attributes, you can also define a
+:meth:`render` method on your subclasses. It is specifically this `render`_
 method that is the **view** for your plugin.
-
-The :meth:`render` method takes three arguments:
-
-* ``context``: The context with which the page is rendered.
-* ``instance``: The instance of your plugin that is rendered.
-* ``placeholder``: The name of the placeholder that is rendered.
-
-This method must return a dictionary or an instance of
-:class:`django.template.Context`, which will be used as context to render the
-plugin template.
-
-.. versionadded:: 2.4
-
-By default this method will add ``instance`` and ``placeholder`` to the
-context, which means for simple plugins, there is no need to overwrite this
-method.
-
 
 
 ***************
@@ -268,13 +260,22 @@ clause.
     field, as it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`,
     and your plugin will not work as intended in the administration without
     further work.
+    
+.. warning::
+
+    If you are using Python 2.x and overriding the ``__unicode__`` method of the 
+    model file, make sure to return its results as UTF8-string. Otherwise 
+    saving an instance of your plugin might fail with the frontend editor showing 
+    an <Empty> plugin instance. To return in unicode use a return statement like
+    ``return u'{}'.format(self.guest_name)``.
 
 .. _handling-relations:
 
 Handling Relations
 ==================
 
-If your custom plugin has foreign key (to it, or from it) or many-to-many
+Everytime the page with your custom plugin is published the plugin is copied.
+So if your custom plugin has foreign key (to it, or from it) or many-to-many
 relations you are responsible for copying those related objects, if required,
 whenever the CMS copies the plugin - **it won't do it for you automatically**.
 
@@ -301,7 +302,7 @@ For foreign key relations *from* other objects
 
 Your plugin may have items with foreign keys to it, which will typically be
 the case if you set it up so that they are inlines in its admin. So you might
-have a two models, one for the plugin and one for those items::
+have two models, one for the plugin and one for those items::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
@@ -353,6 +354,30 @@ to use *both* the copying techniques described above.
 Advanced
 ********
 
+Inline Admin
+============
+
+If you want to have the foreign key relation as a inline admin, you can create a admin.StackedInline class 
+and put it in the Plugin to "inlines". Then you can use the inline Admin form for your foreign key references.
+inline admin::
+
+    class ItemInlineAdmin(admin.StackedInline):
+        model = AssociatedItem
+
+
+    class ArticlePlugin(CMSPluginBase):
+        model = ArticlePluginModel
+        name = _("Article Plugin")
+        render_template = "article/index.html"
+        inlines = (ItemInlineAdmin,)
+
+        def render(self, context, instance, placeholder):
+            items = instance.associated_item.all()
+            context.update({
+                'items': items,
+                'instance': instance,
+            })
+            return context
 
 Plugin form
 ===========
@@ -629,6 +654,108 @@ achieve this functionality:
     </div>
 
 
+.. _extending_context_menus:
+
+Extending context menus of placeholders or plugins
+==================================================
+
+There are three possibilities to extend the context menus
+of placeholders or plugins.
+
+* You can either extend a placeholder context menu.
+* You can extend all plugin context menus.
+* You can extend the current plugin context menu.
+
+For this purpose you can overwrite 3 methods on CMSPluginBase.
+
+* :ref:`get_extra_placeholder_menu_items`
+* :ref:`get_extra_global_plugin_menu_items`
+* :ref:`get_extra_local_plugin_menu_items`
+
+Example::
+
+    class AliasPlugin(CMSPluginBase):
+        name = _("Alias")
+        allow_children = False
+        model = AliasPluginModel
+        render_template = "cms/plugins/alias.html"
+
+        def render(self, context, instance, placeholder):
+            context['instance'] = instance
+            context['placeholder'] = placeholder
+            if instance.plugin_id:
+                plugins = instance.plugin.get_descendants(include_self=True).order_by('placeholder', 'tree_id', 'level',
+                                                                                      'position')
+                plugins = downcast_plugins(plugins)
+                plugins[0].parent_id = None
+                plugins = build_plugin_tree(plugins)
+                context['plugins'] = plugins
+            if instance.alias_placeholder_id:
+                content = render_placeholder(instance.alias_placeholder, context)
+                print content
+                context['content'] = mark_safe(content)
+            return context
+
+        def get_extra_global_plugin_menu_items(self, request, plugin):
+            return [
+                PluginMenuItem(
+                    _("Create Alias"),
+                    reverse("admin:cms_create_alias"),
+                    data={'plugin_id': plugin.pk, 'csrfmiddlewaretoken': get_token(request)},
+                )
+            ]
+
+        def get_extra_placeholder_menu_items(self, request, placeholder):
+            return [
+                PluginMenuItem(
+                    _("Create Alias"),
+                    reverse("admin:cms_create_alias"),
+                    data={'placeholder_id': placeholder.pk, 'csrfmiddlewaretoken': get_token(request)},
+                )
+            ]
+
+        def get_plugin_urls(self):
+            urlpatterns = [
+                url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+            ]
+            urlpatterns = patterns('', *urlpatterns)
+            return urlpatterns
+
+        def create_alias(self, request):
+            if not request.user.is_staff:
+                return HttpResponseForbidden("not enough privileges")
+            if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
+                return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
+            plugin = None
+            placeholder = None
+            if 'plugin_id' in request.POST:
+                pk = request.POST['plugin_id']
+                try:
+                    plugin = CMSPlugin.objects.get(pk=pk)
+                except CMSPlugin.DoesNotExist:
+                    return HttpResponseBadRequest("plugin with id %s not found." % pk)
+            if 'placeholder_id' in request.POST:
+                pk = request.POST['placeholder_id']
+                try:
+                    placeholder = Placeholder.objects.get(pk=pk)
+                except Placeholder.DoesNotExist:
+                    return HttpResponseBadRequest("placeholder with id %s not found." % pk)
+                if not placeholder.has_change_permission(request):
+                    return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
+            clipboard = request.toolbar.clipboard
+            clipboard.cmsplugin_set.all().delete()
+            language = request.LANGUAGE_CODE
+            if plugin:
+                language = plugin.language
+            alias = AliasPluginModel(language=language, placeholder=clipboard, plugin_type="AliasPlugin")
+            if plugin:
+                alias.plugin = plugin
+            if placeholder:
+                alias.alias_placeholder = placeholder
+            alias.save()
+            return HttpResponse("ok")
+
+
 **********************************************
 CMSPluginBase Attributes and Methods Reference
 **********************************************
@@ -774,18 +901,18 @@ Default: ``True``
 Should the plugin be rendered at all, or doesn't it have any output?  If
 `render_plugin` is ``True``, then you must also define :meth:`render_template`
 
-See also: `render_template`_
+See also: `render_template`_, `get_render_template`_
 
 
 render_template
-_______________
+---------------
 
 Default: ``None``
 
-The path to the template used to render the template. This is required if
-``render_plugin`` is ``True``.
+The path to the template used to render the template. If ``render_plugin``
+is ``True`` either this or ``get_render_template`` **must** be defined;
 
-See also: `render_plugin`_
+See also: `render_plugin`_ , `get_render_template`_
 
 
 require_parent
@@ -805,13 +932,52 @@ text_enabled
 Default: ``False``
 
 Can the plugin be inserted inside the text plugin?  If this is ``True`` then
-:meth:`icon_src` must be overriden.
+:meth:`icon_src` must be overridden.
 
 See also: `icon_src`_, `icon_alt`_
 
 
 Methods
 =======
+
+
+render
+------
+
+The :meth:`render` method takes three arguments:
+
+* ``context``: The context with which the page is rendered.
+* ``instance``: The instance of your plugin that is rendered.
+* ``placeholder``: The name of the placeholder that is rendered.
+
+This method must return a dictionary or an instance of
+:class:`django.template.Context`, which will be used as context to render the
+plugin template.
+
+.. versionadded:: 2.4
+
+By default this method will add ``instance`` and ``placeholder`` to the
+context, which means for simple plugins, there is no need to overwrite this
+method.
+
+
+get_render_template
+-------------------
+
+If you need to determine the plugin render model at render time
+you can implement :meth:`get_render_template` method on the plugin
+class; this method taks the same arguments as ``render``.
+The method **must** return a valid template file path.
+
+Example::
+
+    def get_render_template(self, context, instance, placeholder):
+        if instance.attr = 'one':
+            return 'template1.html'
+        else:
+            return 'template2.html'
+
+See also: `render_plugin`_ , `render_template`_
 
 icon_src
 --------
@@ -863,6 +1029,33 @@ The default implementation is as follows::
 
 See also: `text_enabled`_, `icon_src`_
 
+.. _get_extra_placeholder_menu_items:
+
+get_extra_placeholder_menu_items
+--------------------------------
+
+``get_extra_placeholder_menu_items(self, request, placeholder)``
+
+overwrite to extends a placeholders context menu
+return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+.. _get_extra_global_plugin_menu_items:
+
+get_extra_global_plugin_menu_items
+----------------------------------
+
+``get_extra_global_plugin_menu_items(self, request, plugin)``
+extends all plugins context menu
+return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+.. _get_extra_local_plugin_menu_items:
+
+get_extra_local_plugin_menu_items
+---------------------------------
+
+``get_extra_local_plugin_menu_items(self, request, plugin)``
+extends the current plugins context menu
+return a list of ``cms.plugin_base.PluginMenuItem`` instances
 
 ******************************************
 CMSPlugin Attributes and Methods Reference
@@ -926,7 +1119,7 @@ See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
 post_copy
 ---------
 
-Can (should) be overriden to handle the copying of plugins which contain
+Can (should) be overridden to handle the copying of plugins which contain
 children plugins after the original parent has been copied.
 
 ``post_copy`` takes 2 arguments:

@@ -2,7 +2,7 @@
 
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
-from cms.compat import user_related_name
+from cms.utils.compat.dj import user_related_name
 from menus.menu_pool import menu_pool
 
 
@@ -58,7 +58,8 @@ def pre_save_group(instance, raw, **kwargs):
 
 
 def pre_delete_group(instance, **kwargs):
-    for user in instance.user_set.all():
+    user_set = getattr(instance, user_related_name)
+    for user in user_set.all():
         clear_user_permission_cache(user)
 
 

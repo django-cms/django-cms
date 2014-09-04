@@ -2,9 +2,44 @@
 from __future__ import with_statement
 import datetime
 import json
-from cms.test_utils.util.fuzzy_int import FuzzyInt
-from django.core.cache import cache
 import os
+
+from django import http
+from django.conf import settings
+from django.contrib import admin
+from django.core import urlresolvers
+from django.core.cache import cache
+from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
+from django.forms.widgets import Media
+from django.test.testcases import TestCase
+from django.utils import timezone
+
+from cms import api
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
+from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.models import Page, Placeholder
+from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_base import CMSPluginBase
+from cms.plugin_pool import plugin_pool
+from cms.sitemaps.cms_sitemap import CMSSitemap
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
+    Article, Section, ArticlePluginModel)
+from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
+    TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5)
+from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
+    NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate)
+from cms.test_utils.testcases import (
+    CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD,
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
+    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH)
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.fuzzy_int import FuzzyInt
+from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.conf import get_cms_setting
+from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.plugins import get_plugins_for_page, get_plugins
 
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
@@ -15,34 +50,6 @@ from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
-from django import http
-from django.utils import timezone
-from django.conf import settings
-from django.contrib import admin
-from django.core import urlresolvers
-from django.core.exceptions import ValidationError, ImproperlyConfigured
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command
-from django.forms.widgets import Media
-from django.test.testcases import TestCase
-
-from cms import api
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
-from cms.models import Page, Placeholder
-from cms.models.pluginmodel import CMSPlugin, PluginModelBase
-from cms.plugin_base import CMSPluginBase
-from cms.plugin_pool import plugin_pool
-from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate
-from cms.utils.plugins import get_plugins_for_page
-from cms.toolbar.toolbar import CMSToolbar
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section, ArticlePluginModel
-from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE, URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH
-from cms.sitemaps.cms_sitemap import CMSSitemap
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.copy_plugins import copy_plugins_to
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -1084,6 +1091,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         # double check through the getter
         self.assertEqual({'body': "It works!"}, plugin.get_translatable_content())
 
+    def test_plugin_pool_register_returns_plugin_class(self):
+        @plugin_pool.register_plugin
+        class DecoratorTestPlugin(CMSPluginBase):
+            render_plugin = False
+            name = "Test Plugin"
+        self.assertIsNotNone(DecoratorTestPlugin)
+
 
 class FileSystemPluginTests(PluginsTestBaseCase):
     def setUp(self):
@@ -1143,6 +1157,21 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
 
+    def test_dynamic_plugin_template(self):
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        ph_en = page_en.placeholders.get(slot="body")
+        api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="a title")
+        api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="custom template")
+        request = self.get_request(path=page_en.get_absolute_url())
+        plugins = get_plugins(request, ph_en, page_en.template)
+        for plugin in plugins:
+            if plugin.title == 'custom template':
+                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html')
+                self.assertTrue('Articles Custom template' in plugin.render_plugin({}, ph_en))
+            else:
+                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html')
+                self.assertFalse('Articles Custom template' in plugin.render_plugin({}, ph_en))
+
     def test_add_plugin_with_m2m(self):
         # add a new text plugin
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
@@ -1184,7 +1213,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEqual(self.section_count, plugin.sections.count())
-        response = self.client.get('/en/?edit')
+        response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodel_sections')
 
@@ -1417,19 +1446,14 @@ class NoDatabasePluginTests(TestCase):
         self.assertTrue(link._render_meta.text_enabled)
 
     def test_db_table_hack(self):
-        # TODO: Django tests seem to leak models from test methods, somehow
-        # we should clear django.db.models.loading.app_cache in tearDown.
-        plugin_class = PluginModelBase('TestPlugin', (CMSPlugin,), {'__module__': 'cms.tests.plugins'})
-        self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin')
+        # Plugin models has been moved away due to the Django 1.7 AppConfig
+        from cms.test_utils.project.bunch_of_plugins.models import TestPlugin1
+        self.assertEqual(TestPlugin1._meta.db_table, 'bunch_of_plugins_testplugin1')
 
     def test_db_table_hack_with_mixin(self):
-        class LeftMixin: pass
-
-        class RightMixin: pass
-
-        plugin_class = PluginModelBase('TestPlugin2', (LeftMixin, CMSPlugin, RightMixin),
-                                       {'__module__': 'cms.tests.plugins'})
-        self.assertEqual(plugin_class._meta.db_table, 'tests_testplugin2')
+        # Plugin models has been moved away due to the Django 1.7 AppConfig
+        from cms.test_utils.project.bunch_of_plugins.models import TestPlugin2
+        self.assertEqual(TestPlugin2._meta.db_table, 'bunch_of_plugins_testplugin2')
 
     def test_pickle(self):
         text = Text()
@@ -1485,7 +1509,17 @@ class BrokenPluginTests(TestCase):
         in opposition to the ImportError if the file 'cms_plugins.py' doesn't
         exist.
         """
-        apps = ['cms.test_utils.project.brokenpluginapp']
-        with SettingsOverride(INSTALLED_APPS=apps):
+        new_apps = ['cms.test_utils.project.brokenpluginapp']
+        try:
+            from django.apps import apps
+            apps.set_installed_apps(new_apps)
+
             plugin_pool.discovered = False
             self.assertRaises(ImportError, plugin_pool.discover_plugins)
+
+            apps.unset_installed_apps()
+        except ImportError:
+            with SettingsOverride(INSTALLED_APPS=new_apps):
+                plugin_pool.discovered = False
+                self.assertRaises(ImportError, plugin_pool.discover_plugins)
+

@@ -80,7 +80,7 @@ The get_nodes function should return a list of
 
 - ``parent_id=None``
 
-  If this is a child of another node supply the the id of the parent here.
+  If this is a child of another node supply the id of the parent here.
 
 - ``parent_namespace=None``
 
@@ -409,6 +409,59 @@ Or, if you are rendering a plugin, of the context instance::
                     current_app=current_app)
             # ...
 
+.. _apphook_permissions:
+
+Apphook Permissions
+-------------------
+
+By default all apphooks have the same permissions set as the page they are assigned to.
+So if you set login required on page the attached apphook and all it's urls have the same
+requirements.
+
+To disable this behavior set ``permissions = False`` on your apphook::
+
+    class SampleApp(CMSApp):
+        name = _("Sample App")
+        urls = ["project.sampleapp.urls"]
+        permissions = False
+
+
+
+If you still want some of your views to have permission checks you can enable them via a decorator:
+
+``cms.utils.decorators.cms_perms``
+
+Here is a simple example::
+
+    from cms.utils.decorators import cms_perms
+
+    @cms_perms
+    def my_view(request, **kw):
+        ...
+
+
+If you have your own permission check in your app, or just don't want to wrap some nested apps
+with CMS permission decorator, then use ``exclude_permissions`` property of apphook::
+
+    class SampleApp(CMSApp):
+        name = _("Sample App")
+        urls = ["project.sampleapp.urls"]
+        permissions = True
+        exclude_permissions = ["some_nested_app"]
+
+
+For example, django-oscar_ apphook integration needs to be used with exclude permissions of dashboard app,
+because it use `customizable access function`__. So, your apphook in this case will looks like this::
+
+    class OscarApp(CMSApp):
+        name = _("Oscar")
+        urls = [
+            patterns('', *application.urls[0])
+        ]
+        exclude_permissions = ['dashboard']
+
+.. _django-oscar: https://github.com/tangentlabs/django-oscar
+.. __: https://github.com/tangentlabs/django-oscar/blob/0.7.2/oscar/apps/dashboard/nav.py#L57
 
 Automatically restart server on apphook changes
 -----------------------------------------------
@@ -433,6 +486,7 @@ should not be needed.
 
     The signal is fired **after** a request. If you change something via API
     you need a request for the signal to fire.
+
 
 .. _integration_modifiers:
 

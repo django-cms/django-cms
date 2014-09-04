@@ -2,17 +2,21 @@
 from __future__ import with_statement
 from contextlib import contextmanager
 import inspect
-import os
 from itertools import chain
+import os
+
 from django.conf import settings
 from django.template import Lexer, TOKEN_BLOCK
+from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
 
 from cms import constants
+from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths
+from cms.utils.compat.dj import get_app_paths, is_installed
+
 
 SUCCESS = 1
 WARNING = 2
@@ -161,7 +165,7 @@ def define_check(func):
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
-        if 'sekizai' in settings.INSTALLED_APPS:
+        if is_installed('sekizai'):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
@@ -194,7 +198,7 @@ def check_i18n(output):
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
                 section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        if isinstance(settings.SITE_ID, int):
+        if isinstance(settings.SITE_ID, six.integer_types):
             for site, items in get_cms_setting('LANGUAGES').items():
                 if type(site) == int:
                     for lang in items:
@@ -268,7 +272,7 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._meta.get_all_related_objects():
-                if rel.model != CMSPlugin:
+                if rel.model != CMSPlugin and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),

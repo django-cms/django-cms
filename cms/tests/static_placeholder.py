@@ -7,8 +7,8 @@ from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
+from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.sites import site
-from django.core.urlresolvers import reverse
 from django.template.base import Template
 
 
@@ -92,6 +92,22 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         request = self.get_request()
         static_placeholder.publish(request, 'en')
 
+    def test_permissions(self):
+        static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar', site_id=1)
+        request = self.get_request()
+
+        request.user = self._create_user('user_a', is_staff=True, is_superuser=False, permissions=['change_staticplaceholder'])
+        self.assertTrue( static_placeholder.has_change_permission(request) )
+        self.assertFalse( static_placeholder.has_publish_permission(request) )
+
+        request.user = self._create_user('user_b', is_staff=True, is_superuser=False, permissions=['change_staticplaceholder', 'publish_page'])
+        self.assertTrue( static_placeholder.has_change_permission(request) )
+        self.assertTrue( static_placeholder.has_publish_permission(request) )
+
+        request.user = self.get_superuser()
+        self.assertTrue( static_placeholder.has_change_permission(request) )
+        self.assertTrue( static_placeholder.has_publish_permission(request) )
+
     def test_move_plugin(self):
         static_placeholder_source = StaticPlaceholder.objects.create(name='foobar', code='foobar', site_id=1)
         static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
@@ -157,7 +173,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             self.assertTrue(target.dirty)
 
     def test_create_by_admin(self):
-        url = reverse("admin:cms_staticplaceholder_add")
+        url = admin_reverse("cms_staticplaceholder_add")
         with self.login_user_context(self.get_superuser()):
             response = self.client.post(url, data={'name': 'Name', 'code': 'content'})
             self.assertEqual(response.status_code, 302)

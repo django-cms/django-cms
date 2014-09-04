@@ -12,8 +12,10 @@ refer to http://django-load.readthedocs.org/en/latest/index.html.
 import imp
 import traceback # changed
 
-from django.conf import settings
 from django.utils.importlib import import_module
+
+from .compat.dj import installed_apps
+
 
 def get_module(app, modname, verbose, failfast):
     """
@@ -50,7 +52,7 @@ def load(modname, verbose=False, failfast=False):
 
     If failfast is True, import errors will not be surpressed.
     """
-    for app in settings.INSTALLED_APPS:
+    for app in installed_apps():
         get_module(app, modname, verbose, failfast)
 
 
@@ -63,7 +65,7 @@ def iterload(modname, verbose=False, failfast=False):
 
     If failfast is True, import errors will not be surpressed.
     """
-    for app in settings.INSTALLED_APPS:
+    for app in installed_apps():
         module = get_module(app, modname, verbose, failfast)
         if module:
             yield module
@@ -107,3 +109,15 @@ def get_subclasses(c):
     for d in list(subclasses):
         subclasses.extend(get_subclasses(d))
     return subclasses
+
+def load_from_file(module_path):
+    """
+    Load a python module from its absolute filesystem path
+    """
+    from imp import load_module, PY_SOURCE
+
+    imported = None
+    if module_path:
+        with open(module_path, 'r') as openfile:
+            imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
+    return imported

@@ -1,20 +1,32 @@
+from django.http import HttpResponse
+
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
-from django.http import HttpResponse
 from menus.templatetags.menu_tags import PageLanguageUrl
-from menus.utils import (simple_language_changer, find_selected, 
-    language_changer_decorator)
+from menus.utils import (simple_language_changer, find_selected,
+                         language_changer_decorator)
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
     def __init__(self): pass
+
 
 class MenuUtilsTests(CMSTestCase):
     def get_simple_view(self):
         def myview(request):
             return HttpResponse('')
         return myview
-    
+
+    def test_reverse_in_changer(self):
+        response = self.client.get('/en/sample/login/')
+        self.assertContains(response, '<h1>/fr/sample/login/</h1>')
+
+        response = self.client.get('/en/sample/login_other/')
+        self.assertContains(response, '<h1>/fr/sample/login_other/</h1>')
+
+        response = self.client.get('/en/sample/login3/')
+        self.assertContains(response, '<h1>/fr/sample/login3/</h1>')
+
     def test_simple_language_changer(self):
         func = self.get_simple_view()
         decorated_view = simple_language_changer(func)
@@ -63,8 +75,7 @@ class MenuUtilsTests(CMSTestCase):
         output = tag.get_context(fake_context, 'ja')
         url = output['content']
         self.assertEqual(url, '/ja/dummy/')
-        
-        
+
     def test_find_selected(self):
         subchild = AttributeObject()
         firstchild = AttributeObject(ancestor=True, children=[subchild])

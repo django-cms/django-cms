@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
+import os
 import pprint
-from cms.utils.compat.urls import urljoin
-from cms import constants
-from cms.exceptions import CMSDeprecationWarning
+import warnings
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
-import os
-import warnings
+
+from cms import constants
+from cms.exceptions import CMSDeprecationWarning
+from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
@@ -56,6 +59,10 @@ DEFAULTS = {
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'MAX_PAGE_PUBLISH_REVERSIONS': 10,
     'MAX_PAGE_HISTORY_REVERSIONS': 15,
+    'TOOLBAR_URL__EDIT_ON': 'edit',
+    'TOOLBAR_URL__EDIT_OFF': 'edit_off',
+    'TOOLBAR_URL__BUILD': 'build',
+    'ADMIN_NAMESPACE': 'admin',
 }
 
 
@@ -77,10 +84,59 @@ def get_media_url():
     return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
 
 
+@default('CMS_TOOLBAR_URL__EDIT_ON')
+def get_toolbar_url__edit_on():
+    return get_cms_setting('TOOLBAR_URL__EDIT_ON')
+
+
+@default('CMS_TOOLBAR_URL__EDIT_OFF')
+def get_toolbar_url__edit_off():
+    return get_cms_setting('TOOLBAR_URL__EDIT_OFF')
+
+
+@default('CMS_TOOLBAR_URL__BUILD')
+def get_toolbar_url__build():
+    return get_cms_setting('TOOLBAR_URL__BUILD')
+
+
 def get_templates():
-    templates = list(getattr(settings, 'CMS_TEMPLATES', []))
+    from cms.utils.django_load import load_from_file
+    if getattr(settings, 'CMS_TEMPLATES_DIR', False):
+        tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
+        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # or a dictionary holding 'site: template dir' entries
+        if isinstance(tpldir, dict):
+            tpldir = tpldir[settings.SITE_ID]
+        # We must extract the relative path of CMS_TEMPLATES_DIR to the neares
+        # valid templates directory. Here we mimick what the filesystem and
+        # app_directories template loaders do
+        prefix = ''
+        # Relative to TEMPLATE_DIRS for filesystem loader
+        for basedir in settings.TEMPLATE_DIRS:
+            if tpldir.find(basedir) == 0:
+                prefix = tpldir.replace(basedir + os.sep, '')
+                break
+        # Relative to 'templates' directory that app_directory scans
+        if not prefix:
+            components = tpldir.split(os.sep)
+            try:
+                prefix = os.path.join(*components[components.index('templates') + 1:])
+            except ValueError:
+                # If templates is not found we use the directory name as prefix
+                # and hope for the best
+                prefix = os.path.basename(tpldir)
+        config_path = os.path.join(tpldir, '__init__.py')
+        # Try to load templates list and names from the template module
+        # If module file is not present skip configuration and just dump the filenames as templates
+        if config_path:
+            template_module = load_from_file(config_path)
+            templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
+        else:
+            templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
+    else:
+        templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
+        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _(constants.TEMPLATE_INHERITANCE_LABEL)))
     return templates
 
 
@@ -102,7 +158,7 @@ def _ensure_languages_settings_new(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, int):
+        if not isinstance(site, six.integer_types):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -192,7 +248,7 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, int):
+    if not isinstance(settings.SITE_ID, six.integer_types):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
@@ -229,6 +285,9 @@ COMPLEX = {
     'TEMPLATES': get_templates,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
+    'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
+    'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
+    'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
 }
 
 

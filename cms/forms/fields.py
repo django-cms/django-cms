@@ -2,6 +2,7 @@
 import six
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms.fields import EMPTY_VALUES
 from cms.models.pagemodel import Page
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
@@ -56,12 +57,20 @@ class PageSelectFormField(forms.MultiValueField):
             return Page.objects.get(pk=page_id)
         return None
 
+    def _has_changed(self, initial, data):
+        if isinstance(self.widget, RelatedFieldWidgetWrapper):
+            self.widget.decompress = self.widget.widget.decompress
+        return super(PageSelectFormField, self)._has_changed(initial, data)
+
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget
 
-    def __init__(self, max_length=None, min_length=None, placeholder_text=None, *args, **kwargs):
+    def __init__(self, max_length=None, min_length=None, placeholder_text=None,
+                 ajax_view=None, *args, **kwargs):
         self.placeholder_text = placeholder_text
-        super(PageSmartLinkField, self).__init__(max_length, min_length, *args, **kwargs)
+        widget = self.widget(ajax_view=ajax_view)
+        super(PageSmartLinkField, self).__init__(max_length, min_length,
+                                                 widget=widget, *args, **kwargs)
 
     def widget_attrs(self, widget):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)

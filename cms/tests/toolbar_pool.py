@@ -1,3 +1,4 @@
+from cms.utils.conf import get_cms_setting
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -57,7 +58,7 @@ class ToolbarPoolTests(CMSTestCase):
             self.assertEqual(len(list(self.pool.get_toolbars().keys())), 2)
             api.create_page("home", "simple.html", "en", published=True)
             with self.login_user_context(self.get_superuser()):
-                response = self.client.get("/en/?edit")
+                response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 self.assertEqual(response.status_code, 200)
         toolbar_pool.toolbars = toolbars
 

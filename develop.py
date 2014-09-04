@@ -5,6 +5,7 @@ import multiprocessing
 import pkgutil
 import pyclbr
 import subprocess
+from django.core.exceptions import DjangoRuntimeWarning
 import os
 import sys
 import warnings
@@ -12,11 +13,14 @@ import warnings
 from docopt import docopt
 from django import VERSION
 from django.utils import autoreload
+from django.utils.encoding import force_text
+from django.core.management import call_command, CommandError
 
 import cms
 from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
+from cms.utils.compat import DJANGO_1_6
 
 __doc__ = '''django CMS development helper script. 
 
@@ -32,6 +36,8 @@ Usage:
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
+    develop.py makemigrations [--merge]
+    develop.py squashmigrations <applications-name> <migration-name>
     develop.py pyflakes
     develop.py authors
 
@@ -40,6 +46,7 @@ Options:
     --version                   Show version.
     --parallel                  Run tests in parallel.
     --migrate                   Use south migrations in test or server command.
+    --merge                     Merge migrations
     --failfast                  Stop tests on first failure (only if not --parallel).
     --port=<port>               Port to listen on [default: 8000].
     --bind=<bind>               Interface to bind to [default: 127.0.0.1].
@@ -48,18 +55,20 @@ Options:
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
     if os.environ.get("RUN_MAIN") != "true":
-        from south.management.commands import syncdb, migrate
-        if migrate:
-            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
-            migrate.Command().handle(interactive=False, verbosity=1)
+        from cms.utils.compat.dj import get_user_model
+        if DJANGO_1_6:
+            from south.management.commands import syncdb, migrate
+            if migrate_cmd:
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
+                migrate.Command().handle(interactive=False, verbosity=1)
+            else:
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
+                migrate.Command().handle(interactive=False, verbosity=1, fake=True)
         else:
-            syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
-            migrate.Command().handle(interactive=False, verbosity=1, fake=True)
-        
-        from cms.compat import get_user_model
-        User = get_user_model()        
+            call_command("migrate", database='default')
+        User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
 
@@ -106,6 +115,7 @@ def _get_test_labels():
             for method, _ in cls.methods.items():
                 if method.startswith('test_'):
                     test_labels.append('cms.%s.%s' % (clsname, method))
+    test_labels = sorted(test_labels)
     return test_labels
 
 
@@ -164,13 +174,45 @@ def compilemessages():
 def makemessages():
     from django.core.management import call_command
     os.chdir('cms')
-    call_command('makemessages', locale='en')
+    call_command('makemessages', locale=('en',))
 
 
 def shell():
     from django.core.management import call_command
     call_command('shell')
-    
+
+
+def makemigrations(migrate_plugins=True, merge=False, squash=False):
+    from django.core.management import call_command
+    applications = [
+        # core applications
+        'cms', 'menus',
+        # testing applications
+        'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
+        'objectpermissionsapp', 'bunch_of_plugins', 'emailuserapp'
+    ]
+    if migrate_plugins:
+        applications.extend([
+            # official plugins
+            'djangocms_inherit', 'djangocms_googlemap', 'djangocms_column', 'djangocms_style', 'djangocms_link',
+            'djangocms_file', 'djangocms_text_ckeditor', 'djangocms_picture', 'djangocms_teaser', 'djangocms_file',
+            'djangocms_flash', 'djangocms_video',
+        ])
+    if DJANGO_1_6:
+        if merge:
+            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
+        call_command('makemigrations', *applications)
+    else:
+        call_command('makemigrations', *applications, merge=merge)
+
+
+def squashmigrations(application, migration):
+    if DJANGO_1_6:
+        raise CommandError(u'Command not implemented for Django 1.6')
+    else:
+        call_command('squashmigrations', application, migration)
+
+
 def generate_authors():
     print("Generating AUTHORS")
 
@@ -182,12 +224,12 @@ def generate_authors():
     with open('AUTHORS', 'r') as f:
         for line in f.readlines():
             if line.startswith("*"):
-                author = line.decode('utf-8').strip("* \n")
+                author = force_text(line).strip("* \n")
                 if author.lower() not in seen_authors:
                     seen_authors.append(author.lower())
                     authors.append(author)
     for author in r.stdout.readlines():
-        author = author.decode('utf-8').strip()
+        author = force_text(author).strip()
         if author.lower() not in seen_authors:
             seen_authors.append(author.lower())
             authors.append(author)
@@ -285,13 +327,17 @@ def main():
                         num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
                     sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'], migrate)
+                server(args['--bind'], args['--port'], args.get('--migrate', True))
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
                 compilemessages()
             elif args['makemessages']:
-                compilemessages()
+                makemessages()
+            elif args['makemigrations']:
+                makemigrations(merge=args['--merge'])
+            elif args['squashmigrations']:
+                squashmigrations(args['<applications-name>'], args['<migration-name>'])
 
 
 if __name__ == '__main__':

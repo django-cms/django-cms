@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
-import operator
-
-try:
-    reduce
-except NameError:
-    from functools import reduce
-
-from django.core.urlresolvers import reverse
+from cms.utils.urlutils import admin_reverse
 from django.db import models
-from django.forms.widgets import Media
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
@@ -26,15 +18,38 @@ from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 
 @python_2_unicode_compatible
 class Placeholder(models.Model):
-    slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    """
+    Attributes:
+        is_static       Set to "True" for static placeholders by the template tag
+        is_editable     If False the content of the placeholder is not editable in the frontend
+    """
+    slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
     cache_placeholder = True
+    is_static = False
+    is_editable = True
 
     class Meta:
         app_label = 'cms'
 
     def __str__(self):
         return self.slot
+
+    def clear(self, language=None):
+        if language:
+            qs = self.cmsplugin_set.filter(language=language)
+        else:
+            qs = self.cmsplugin_set.all()
+        qs = qs.order_by('-level').select_related()
+        for plugin in qs:
+            inst, cls = plugin.get_plugin_instance()
+            if inst and getattr(inst, 'cmsplugin_ptr', False):
+                inst.cmsplugin_ptr._no_reorder = True
+                inst._no_reorder = True
+                inst.delete(no_mptt=True)
+            else:
+                plugin._no_reorder = True
+                plugin.delete(no_mptt=True)
 
     def get_label(self):
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
@@ -62,6 +77,10 @@ class Placeholder(models.Model):
     def get_copy_url(self):
         return self._get_url('copy_plugins')
 
+    def get_extra_menu_items(self):
+        from cms.plugin_pool import plugin_pool
+        return plugin_pool.get_extra_placeholder_menu_items(self)
+
     def get_cache_key(self, lang):
         cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
         if settings.USE_TZ:
@@ -75,11 +94,11 @@ class Placeholder(models.Model):
         if pk:
             args.append(pk)
         if not model:
-            return reverse('admin:cms_page_%s' % key, args=args)
+            return admin_reverse('cms_page_%s' % key, args=args)
         else:
             app_label = model._meta.app_label
             model_name = model.__name__.lower()
-            return reverse('admin:%s_%s_%s' % (app_label, model_name, key), args=args)
+            return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def _get_permission(self, request, key):
         """
@@ -95,21 +114,10 @@ class Placeholder(models.Model):
             return self._get_object_permission(obj, request, key)
 
     def _get_object_permission(self, obj, request, key):
-        found = False
-        model = obj.__class__
-        opts = model._meta
+        opts = obj._meta
         perm_accessor = getattr(opts, 'get_%s_permission' % key)
         perm_code = '%s.%s' % (opts.app_label, perm_accessor())
-        # if they don't have the permission for this attached model or object, bail out
-        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
-            return False
-        else:
-            found = True
-        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
-            return False
-        else:
-            found = True
-        return found
+        return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
 
     def has_change_permission(self, request):
         return self._get_permission(request, 'change')
@@ -120,21 +128,17 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def render(self, context, width, lang=None):
+    def render(self, context, width, lang=None, editable=True):
+        '''
+        Set editable = False to disable front-end rendering for this render.
+        '''
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
             context.update({'width': width})
-        return render_placeholder(self, context, lang=lang)
-
-    def get_media(self, request, context):
-        from cms.utils.plugins import get_plugin_media
-        media_classes = [get_plugin_media(request, context, plugin) for plugin in self.get_plugins()]
-        if media_classes:
-            return reduce(operator.add, media_classes)
-        return Media()
+        return render_placeholder(self, context, lang=lang, editable=editable)
 
     def _get_attached_fields(self):
         """

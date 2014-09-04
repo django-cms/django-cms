@@ -1,24 +1,25 @@
 from __future__ import with_statement
 import sys
 
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
+from django.template import TemplateDoesNotExist
+from django.test.testcases import TestCase
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
+from menus.menu_pool import menu_pool
+
 from cms.api import _generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page
 from cms.apphook_pool import apphook_pool
-from cms.compat import get_user_model
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
-from django.core.exceptions import FieldError
-from django.template import TemplateDoesNotExist
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.apphooks import APP_MODULE, APP_NAME
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from django.test.testcases import TestCase
-from menus.menu_pool import menu_pool
+from cms.utils.compat.dj import get_user_model
 
 
 def _grant_page_permission(user, codename):

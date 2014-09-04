@@ -17,7 +17,7 @@ from django.utils.timezone import get_current_timezone_name
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
 from cms.models import Page
-from cms.utils import get_template_from_request
+from cms.utils import get_template_from_request, get_language_code
 from cms.utils import get_language_from_request
 from cms.utils import get_cms_setting
 from cms.utils.i18n import get_fallback_languages
@@ -28,6 +28,7 @@ from cms.utils.i18n import get_language_list
 from cms.utils.i18n import is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
 from cms.test_utils.util.context_managers import SettingsOverride
+from django.utils.translation import get_language
 
 CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
 
@@ -69,14 +70,23 @@ def details(request, slug):
             response._headers = headers
             return response
 
-    # get the right model
-    context = RequestContext(request)
     # Get a Page model object from the request
     page = get_page_from_request(request, use_path=slug)
     if not page:
         return _handle_no_page(request, slug)
-
-    current_language = get_language_from_request(request)
+    current_language = request.REQUEST.get('language', None)
+    if current_language:
+        current_language = get_language_code(current_language)
+        if not current_language in get_language_list(page.site_id):
+            current_language = None
+    if current_language is None:
+        current_language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
+        if current_language:
+            current_language = get_language_code(current_language)
+            if not current_language in get_language_list(page.site_id):
+                current_language = None
+    if current_language is None:
+        current_language = get_language_code(get_language())
     # Check that the current page is available in the desired (current) language
     available_languages = []
     page_languages = list(page.get_languages())
@@ -180,7 +190,8 @@ def details(request, slug):
         request.toolbar.set_object(page)
 
     template_name = get_template_from_request(request, page, no_current_page=True)
-    # fill the context 
+    # fill the context
+    context = RequestContext(request)
     context['lang'] = current_language
     context['current_page'] = page
     context['has_change_permissions'] = page.has_change_permission(request)
@@ -245,12 +256,13 @@ def _cache_page(response):
         )
         # See note in invalidate_cms_page_cache()
         _set_cache_version(version)
-    
+
 
 def _get_cache_key(request):
     #md5 key of current path
-    cache_key = "%s:%s" % (
+    cache_key = "%s:%d:%s" % (
         get_cms_setting("CACHE_PREFIX"),
+        settings.SITE_ID,
         hashlib.md5(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
     )
     if settings.USE_TZ:

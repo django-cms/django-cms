@@ -122,7 +122,7 @@ available from https://github.com/divio/djangocms-text-ckeditor. You may of
 course use your preferred editor; others are available.
 
 Furthermore, we removed the following plugins from the core and moved them into
-seperate repositories.
+separate repositories.
 
 .. note::
     In order to update from the old ``cms.plugins.X`` to the new
@@ -243,8 +243,8 @@ Apphooks
 ========
 
 Apphooks have moved from the title to the page model. This means you can no
-longer have separate apphooks for each language. A new ``namespace`` field has
-been added.
+longer have separate apphooks for each language. A new ``application instance name``
+field has been added.
 
 .. note::
     The reverse id is not used for the namespace anymore. If you used
@@ -252,8 +252,11 @@ been added.
     namespace fields.
 
 If you use apphook apps with ``app_name`` for app namespaces, be sure to fill
-out the namespace field as it's now required to have a namespace defined if you
-use app namespaces.
+out the instance namespace field ``application instance name`` as it's now
+required to have a namespace defined if you use app namespaces.
+
+For further reading about application namespaces, please refer to the Django
+documentation on the subject at https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces
 
 ``request.current_app`` has been removed. If you relied on this, use the
 following code instead in your views::
@@ -268,17 +271,20 @@ Details can be found in :ref:`multi_apphook`.
 ``PlaceholderAdmin``
 ====================
 
-``PlaceholderAdmin`` now is deprecated. Instead of deriving from ``admin.ModelAdmin``, a new mixin
-class ``PlaceholderAdminMixin`` has been introduced which shall be used together with ``admin.ModelAdmin``.
-Therefore when defining a model admin class containing a placeholder, now add ``PlaceholderAdminMixin``
-to the list of parent classes, together with ``admin.ModelAdmin``.
+``PlaceholderAdmin`` now is deprecated. Instead of deriving from
+``admin.ModelAdmin``, a new mixin class ``PlaceholderAdminMixin`` has been
+introduced which shall be used together with ``admin.ModelAdmin``. Therefore
+when defining a model admin class containing a placeholder, now add
+``PlaceholderAdminMixin`` to the list of parent classes, together with
+``admin.ModelAdmin``.
 
-``PlaceholderAdmin`` doesn't have language tabs anymore and the plugin editor is gone.
-The plugin API has changed and is now more consistent. ``PageAdmin`` uses the
-same API as ``PlaceholderAdmin`` now. If your app talked with the Plugin API
-directly be sure to read the code and the changed parameters. If you use
-``PlaceholderFields`` you still need the ``PlaceholderAdmin`` as it delivers
-the API for editing the plugins and the placeholders.
+``PlaceholderAdmin`` doesn't have language tabs anymore and the plugin editor
+is gone. The plugin API has changed and is now more consistent. ``PageAdmin``
+uses the same API as ``PlaceholderAdminMixin`` now. If your app talked with
+the Plugin API directly be sure to read the code and the changed parameters.
+If you use ``PlaceholderFields`` you should add the mixin
+``PlaceholderAdminMixin`` as it delivers the API for editing the plugins and
+the placeholders.
 
 The workflow in the future should look like this:
 
@@ -294,13 +300,12 @@ In addition to model level permissions, ``Placeholder`` now checks if a user
 has permissions on a specific object of that model. Details can be found here
 in :ref:`placeholder_object_permissions`.
 
-Placeholder are prefillable with default plugins
-================================================
+Placeholders are prefillable with default plugins
+=================================================
 
 In CMS_PLACEHOLDER_CONF, for each placeholder configuration, you can specify
-via 'default_plugins' a list of plugins to automagically add to the 
-placeholder if empty. See 
-:ref:`default_plugins in CMS_PLACEHOLDER_CONF <placeholder_default_plugins>`.
+via 'default_plugins' a list of plugins to automaticaly add to the
+placeholder if empty. See :ref:`default_plugins in CMS_PLACEHOLDER_CONF <placeholder_default_plugins>`.
 
 Custom modules and plugin labels in the toolbar UI
 ==================================================
@@ -418,6 +423,12 @@ See :ref:`CMS_TEMPLATE reference <page_template>` for details.
 ******************
 Upgrading from 2.4
 ******************
+
+.. note::
+    There are reports that upgrading the CMS from 2.4 to 3.0 may fail if
+    Django Debug Toolbar is installed. Please remove/disable Django Debug
+    Toolbar and other non-essential apps before attempting to upgrade, then
+    once complete, re-enable them.
 
 If you want to upgrade from version 2.4 to 3.0, there's a few things you need to do.
 Start of by updating the cms' package::

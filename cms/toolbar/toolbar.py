@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.utils.conf import get_cms_setting
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.models import UserSettings, Placeholder
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
@@ -43,6 +44,8 @@ class CMSToolbar(ToolbarAPIMixin):
         self.login_form = CMSToolbarLoginForm(request=request)
         self.is_staff = self.request.user.is_staff
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
+        self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
@@ -74,16 +77,32 @@ class CMSToolbar(ToolbarAPIMixin):
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
-                self.view_name = resolve(self.request.path).func.__module__
+                decorator = resolve(self.request.path).func
+                try:
+                    # If the original view is decorated we try to extract the real function
+                    # module instead of the decorator's one
+                    if decorator and getattr(decorator, 'func_closure', False):
+                        # python 2
+                        self.app_name = decorator.func_closure[0].cell_contents.__module__
+                    elif decorator and getattr(decorator, '__closure__', False):
+                        # python 3
+                        self.app_name = decorator.__closure__[0].cell_contents.__module__
+                    else:
+                        raise AttributeError()
+                except (TypeError, AttributeError):
+                    # no decorator
+                    self.app_name = decorator.__module__
             except Resolver404:
-                self.view_name = ""
+                self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
 
         self.toolbars = SortedDict()
         app_key = ''
         for key in toolbars:
             app_name = ".".join(key.split(".")[:-2])
-            if app_name in self.view_name and len(key) > len(app_key):
+            if (self.app_name and app_name and
+                    self.app_name.startswith(app_name) and
+                    len(key) > len(app_key)):
                 app_key = key
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, key == app_key, app_key)

@@ -4,3 +4,5 @@ class CMSApp(object):
     urls = None
     menus = []
     app_name = None
+    permissions = True
+    exclude_permissions = []

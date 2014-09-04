@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
+from cms.utils.urlutils import admin_reverse
 
 from django.contrib.sites.models import Site
 
@@ -9,7 +10,6 @@ from cms.models import Page, Placeholder
 from cms.utils import get_cms_setting
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from django.core.urlresolvers import reverse
 
 
 class SiteTestCase(CMSTestCase):
@@ -58,9 +58,9 @@ class SiteTestCase(CMSTestCase):
     def test_site_preview(self):
         page = create_page("page", "nav_playground.html", "de", site=self.site2, published=True)
         with self.login_user_context(self.get_superuser()):
-            response = self.client.get(reverse('admin:cms_page_preview_page', args=[page.pk, 'de']))
+            response = self.client.get(admin_reverse('cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response._headers['location'][1], 'http://sample2.com/de/?edit&language=de')
+            self.assertEqual(response._headers['location'][1], 'http://sample2.com/de/?%s&language=de' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
 
     def test_site_publish(self):
         self._login_context.__exit__(None, None, None)

@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+
+import os
+import socket
+
+from django.utils.six.moves import StringIO
+
+import cms
 from cms.test_utils.compat import skipIf
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
 from sphinx.application import Sphinx
-import cms
-import os
-import socket
-from cms.utils.compat.string_io import StringIO
 
 
 ROOT_DIR = os.path.dirname(cms.__file__)

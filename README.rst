@@ -1,12 +1,17 @@
 ##########
 django CMS
 ##########
-.. image:: https://api.travis-ci.org/divio/django-cms.png?branch=develop
+.. image:: https://api.travis-ci.org/divio/django-cms.svg?branch=develop
     :target: http://travis-ci.org/divio/django-cms
-.. image:: https://pypip.in/v/django-cms/badge.png
-   :target: https://crate.io/packages/django-cms/
-.. image:: https://pypip.in/d/django-cms/badge.png
-   :target: https://crate.io/packages/django-cms/
+.. image:: https://pypip.in/v/django-cms/badge.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+.. image:: https://pypip.in/d/django-cms/badge.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+.. image:: https://pypip.in/wheel/django-cms/badge.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+.. image:: https://pypip.in/license/django-cms/badge.svg
+    :target: https://pypi.python.org/pypi/django-cms/
+
 
 Open source enterprise content management system based on the django framework.
 
@@ -20,7 +25,7 @@ Features
 * Draft/Published workflows
 * Undo/Redo
 * Use the content blocks (placeholders) in your own apps (models)
-* Use the content blocks (stacks) anywhere in your templates
+* Use the content blocks (static placeholders) anywhere in your templates
 * Edit content directly in the frontend on your pages
 * Hierarchical content plugins (columns, style changes etc)
 * Navigation rendering and extending from your apps

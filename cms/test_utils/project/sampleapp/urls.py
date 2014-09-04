@@ -7,6 +7,7 @@ Also used in cms.tests.ApphooksTestCase
 
 urlpatterns = patterns('cms.test_utils.project.sampleapp.views',
     url(r'^$', 'sample_view', {'message': 'sample root page',}, name='sample-root'),
+    url(r'^exempt/$', 'exempt_view', {'message': 'sample root page',}, name='sample-exempt'),
     url(r'^settings/$', 'sample_view', kwargs={'message': 'sample settings page'}, name='sample-settings'),
     url(r'^myparams/(?P<my_params>[\w_-]+)/$', 'sample_view', name='sample-params'),
     url(_(r'^account/$'), 'sample_view', {'message': 'sample account page'}, name='sample-account'),

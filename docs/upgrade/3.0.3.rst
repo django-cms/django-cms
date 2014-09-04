@@ -1,0 +1,37 @@
+.. _upgrade-to-3.0.3:
+
+###################
+3.0.3 release notes
+###################
+
+*******************
+What's new in 3.0.3
+*******************
+
+New Alias Plugin
+================
+
+A new Alias plugin has been added. You will find in your plugins and placeholders context menu in
+structure mode a new entry called "Create alias". This will create a new Alias plugin in the clipboard
+with a reference to the original. It will render this original plugin/placeholder instead. This
+is useful for content that is present in more then one place.
+
+New Context Menu API
+====================
+
+Plugins can now change the context menus of placeholders and plugins.
+For more details have a look at the docs:
+
+:ref:`extending_context_menus`
+
+
+Apphook Permissions
+===================
+
+Apphooks have now by default the same permissions as the page they are attached to.
+This means if a page has for example a login required enabled all views in the apphook
+will have the same behavior.
+
+Docs on how to disable or customize this behavior have a look here:
+
+:ref:`apphook_permissions`

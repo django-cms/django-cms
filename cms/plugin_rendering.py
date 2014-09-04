@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+from django.template import Template, Context
+from django.template.loader import render_to_string
+from django.utils import six
+from django.utils.safestring import mark_safe
+
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
-from cms.utils.compat.type_checks import string_types
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
-from django.template import Template, Context
-from django.template.loader import render_to_string
-from django.utils.safestring import mark_safe
 
 
 # these are always called before all other plugin context processors
@@ -51,7 +52,7 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     """
     if not processors:
         processors = []
-    if isinstance(template, string_types):
+    if isinstance(template, six.string_types):
         content = render_to_string(template, context_instance=context)
     elif isinstance(template, Template):
         content = template.render(context)
@@ -86,10 +87,15 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder", lang=None, default=None):
+def render_placeholder(placeholder, context_to_copy,
+        name_fallback="Placeholder", lang=None, default=None, editable=True):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
+
+    Set editable = False to disable front-end editing for this placeholder
+    during rendering. This is primarily used for the "as" variant of the
+    render_placeholder tag.
     """
     if not placeholder:
         return
@@ -97,7 +103,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     context = context_to_copy
     context.push()
     request = context['request']
-    if not hasattr(request, 'placeholder'):
+    if not hasattr(request, 'placeholders'):
         request.placeholders = []
     request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
@@ -112,17 +118,14 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
         save_language = lang
 
     # Prepend frontedit toolbar output if applicable
-    edit = False
     toolbar = getattr(request, 'toolbar', None)
-
-    if getattr(toolbar, 'edit_mode', False):
-        edit = True
-    if edit:
+    if getattr(toolbar, 'edit_mode', False) and getattr(placeholder, 'is_editable', True) and editable:
         from cms.middleware.toolbar import toolbar_plugin_processor
-
         processors = (toolbar_plugin_processor,)
+        edit = True
     else:
         processors = None
+        edit = False
     from django.core.cache import cache
     if get_cms_setting('PLACEHOLDER_CACHE'):
         cache_key = placeholder.get_cache_key(lang)
@@ -147,7 +150,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if slot:
         extra_context = get_placeholder_conf("extra_context", slot, template, {})
     for key, value in extra_context.items():
-        if not key in context:
+        if key not in context:
             context[key] = value
 
     content = []
@@ -155,12 +158,11 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     content.extend(render_plugins(plugins, context, placeholder, processors))
     toolbar_content = ''
 
-    if edit:
+    if edit and editable:
         if not hasattr(request.toolbar, 'placeholders'):
             request.toolbar.placeholders = {}
-        if not placeholder.pk in request.toolbar.placeholders:
+        if placeholder.pk not in request.toolbar.placeholders:
             request.toolbar.placeholders[placeholder.pk] = placeholder
-    if edit:
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
     if content:
         content = mark_safe("".join(content))
@@ -197,7 +199,7 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
         slot = None
     context.push()
 
-    ## to restrict child-only plugins from draggables..
+    # to restrict child-only plugins from draggables..
     context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
     context['placeholder'] = placeholder
     context['language'] = save_language

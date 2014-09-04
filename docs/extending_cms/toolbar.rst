@@ -142,7 +142,7 @@ return the menu if it is present, or, if not, will return `None`.
 Adding Items Alphabetically
 ===========================
 
-Sometimes it is desireable to add sub-menus from different applications
+Sometimes it is desirable to add sub-menus from different applications
 alphabetically. This can be challenging due to the non-obvious manner in which
 your apps will be loaded into Django and is further complicated when you add new
 applications over time.

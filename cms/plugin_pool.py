@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import warnings
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, patterns, include
 from django.contrib.formtools.wizard.views import normalize_name
@@ -10,17 +9,17 @@ from django.db.models import signals
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
+from django.utils import six
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
-from cms.utils.compat.type_checks import string_types
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
 from cms.utils.django_load import load, get_subclasses
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode
+from cms.utils.compat.dj import force_unicode, is_installed
 
 
 class PluginPool(object):
@@ -32,10 +31,10 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
-        self.discovered = True
         from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
+        self.discovered = True
 
     def clear(self):
         self.discovered = False
@@ -53,25 +52,42 @@ class PluginPool(object):
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
                 % plugin
             )
-        if plugin.render_plugin and not type(plugin.render_plugin) == property or hasattr(plugin.model, 'render_template'):
-            if plugin.render_template is None and not hasattr(plugin.model, 'render_template'):
+        if (plugin.render_plugin and not type(plugin.render_plugin) == property
+                or hasattr(plugin.model, 'render_template')
+                or hasattr(plugin, 'get_render_template')):
+            if (plugin.render_template is None and
+                    not hasattr(plugin.model, 'render_template') and
+                    not hasattr(plugin, 'get_render_template')):
                 raise ImproperlyConfigured(
-                    "CMS Plugins must define a render template or set render_plugin=False: %s"
-                    % plugin
+                    "CMS Plugins must define a render template, "
+                    "a get_render_template method or "
+                    "set render_plugin=False: %s" % plugin
                 )
-            else:
+            # If plugin class defines get_render_template we cannot
+            # statically check for valid template file as it depends
+            # on plugin configuration and context.
+            # We cannot prevent developer to shoot in the users' feet
+            elif not hasattr(plugin, 'get_render_template'):
                 from django.template import loader
 
-                template = hasattr(plugin.model,
-                                   'render_template') and plugin.model.render_template or plugin.render_template
-                if isinstance(template, string_types) and template:
+                template = ((hasattr(plugin.model, 'render_template') and
+                            plugin.model.render_template) or
+                            plugin.render_template)
+                if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
-                    except TemplateDoesNotExist:
-                        raise ImproperlyConfigured(
-                            "CMS Plugins must define a render template (%s) that exist: %s"
-                            % (plugin, template)
-                        )
+                    except TemplateDoesNotExist as e:
+                        # Note that the template loader will throw
+                        # TemplateDoesNotExist if the plugin's render_template
+                        # does in fact exist, but it includes a template that
+                        # doesn't.
+                        if six.text_type(e) == template:
+                            raise ImproperlyConfigured(
+                                "CMS Plugins must define a render template (%s) that exists: %s"
+                                % (plugin, template)
+                            )
+                        else:
+                            pass
                     except TemplateSyntaxError:
                         pass
         else:
@@ -97,7 +113,7 @@ class PluginPool(object):
                                     dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
-        if 'reversion' in settings.INSTALLED_APPS:
+        if is_installed('reversion'):
             try:
                 from reversion.registration import RegistrationError
             except ImportError:
@@ -106,6 +122,8 @@ class PluginPool(object):
                 reversion_register(plugin.model)
             except RegistrationError:
                 pass
+
+        return plugin
 
     def unregister_plugin(self, plugin):
         """
@@ -140,42 +158,58 @@ class PluginPool(object):
 
                 splitter = '%s_' % model._meta.app_label
                 table_name = model._meta.db_table
-                if (table_name not in table_names
-                and splitter in table_name):
-                    old_db_name = table_name
+
+                #
+                # Checks to see if this plugin's model's table's name is
+                # properly named with the app_label as the prefix (not
+                # 'cmsplugin')
+                #
+                if (table_name not in table_names and splitter in table_name):
+                    proper_table_name = table_name
                     splitted = table_name.split(splitter, 1)
-                    table_name = 'cmsplugin_%s' % splitted[1]
-                    if table_name in table_names:
-                        model._meta.db_table = table_name
+                    bad_table_name = 'cmsplugin_%s' % splitted[1]
+                    if bad_table_name in table_names:
+                        model._meta.db_table = bad_table_name
                         warnings.warn(
                             'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+                                bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
+
                 for att_name in model.__dict__.keys():
                     att = model.__dict__[att_name]
+
+                    #
+                    # Checks to see if this plugin's model contains an M2M
+                    # field, whose 'through' table is properly named with the
+                    # app_label as the prefix (and not 'cmsplugin')
+                    #
                     if isinstance(att, ManyToManyField):
                         table_name = att.rel.through._meta.db_table
-                        if (table_name not in table_names
-                        and splitter in table_name):
-                            old_db_name = table_name
-                            table_name.split(splitter, 1)
-                            table_name = 'cmsplugin_%s' % splitted[1]
-                            if table_name in table_names:
-                                att.rel.through._meta.db_table = table_name
+                        if (table_name not in table_names and splitter in table_name):
+                            proper_table_name = table_name
+                            splitted = proper_table_name.split(splitter, 1)
+                            bad_table_name = 'cmsplugin_%s' % splitted[1]
+                            if bad_table_name in table_names:
+                                att.rel.through._meta.db_table = bad_table_name
                                 warnings.warn(
                                     'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                        table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+                                        bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
+
+                    #
+                    # Checks to see if this plugin's model contains an M2M
+                    # field, whose 'through' table is properly named with the
+                    # app_label as the prefix (and not 'cmsplugin')
+                    #
                     elif isinstance(att, ReverseManyRelatedObjectsDescriptor):
                         table_name = att.through._meta.db_table
-                        if (table_name not in table_names
-                        and splitter in table_name):
-                            old_db_name = table_name
-                            table_name.split(splitter, 1)
-                            table_name = 'cmsplugin_%s_items' % splitted[1]
-                            if table_name in table_names:
-                                att.through._meta.db_table = table_name
+                        if (table_name not in table_names and splitter in table_name):
+                            proper_table_name = table_name
+                            splitted = proper_table_name.split(splitter, 1)
+                            bad_table_name = 'cmsplugin_%s' % splitted[1]
+                            if bad_table_name in table_names:
+                                att.through._meta.db_table = bad_table_name
                                 warnings.warn(
                                     'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                        table_name, old_db_name, model._meta.app_label), DeprecationWarning)
+                                        bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
 
         self.patched = True
 

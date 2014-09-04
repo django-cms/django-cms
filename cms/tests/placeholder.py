@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
-from cms.toolbar.toolbar import CMSToolbar
-from sekizai.context import SekizaiContext
 import warnings
+from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
 from django.contrib import admin
@@ -11,28 +10,30 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
+from django.template.loader import get_template
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
+from sekizai.context import SekizaiContext
 
 from cms import constants
+from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
 from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
-from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
+from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from cms.test_utils.project.placeholderapp.models import (
     Example1,
     TwoPlaceholderExample,
@@ -42,11 +43,12 @@ from cms.test_utils.project.placeholderapp.models import (
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
-from cms.utils.compat.dj import force_unicode
+from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat.dj import force_unicode, get_user_model
+from cms.utils.compat.tests import UnittestCompatMixin
+from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
-from cms.utils.plugins import get_placeholders
-from cms.compat import get_user_model
-from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
+from cms.utils.plugins import get_placeholders, assign_plugins
 
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
@@ -114,9 +116,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
     def test_fieldsets_requests(self):
-        response = self.client.get(reverse('admin:placeholderapp_example1_add'))
+        response = self.client.get(admin_reverse('placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('admin:placeholderapp_twoplaceholderexample_add'))
+        response = self.client.get(admin_reverse('placeholderapp_twoplaceholderexample_add'))
         self.assertEqual(response.status_code, 200)
 
     def test_page_only_plugins(self):
@@ -127,7 +129,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             char_4='four'
         )
         ex.save()
-        response = self.client.get(reverse('admin:placeholderapp_example1_change', args=(ex.pk,)))
+        response = self.client.get(admin_reverse('placeholderapp_example1_change', args=(ex.pk,)))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'InheritPagePlaceholderPlugin')
 
@@ -147,7 +149,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         ph2_pl1 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin1').cmsplugin_ptr
         ph2_pl2 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin2').cmsplugin_ptr
         ph2_pl3 = add_plugin(ph2, TextPlugin, 'en', body='ph2 plugin3').cmsplugin_ptr
-        response = self.client.post(reverse('admin:placeholderapp_twoplaceholderexample_move_plugin'), {
+        response = self.client.post(admin_reverse('placeholderapp_twoplaceholderexample_move_plugin'), {
             'placeholder_id': str(ph2.pk),
             'plugin_id': str(ph1_pl2.pk),
             'plugin_order[]': [str(p.pk) for p in [ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2]]
@@ -178,7 +180,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
-                reverse('admin:placeholderapp_example1_change', args=(ex.pk,)),
+                admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
             self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
@@ -197,7 +199,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
             test_plugin.save()
             pl_url = "%sedit-plugin/%s/" % (
-                reverse('admin:cms_page_change', args=(page.pk,)),
+                admin_reverse('cms_page_change', args=(page.pk,)),
                 test_plugin.pk)
             response = self.client.post(pl_url, {})
             self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
@@ -449,6 +451,44 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             content_en = render_placeholder(placeholder_en, context_en)
             self.assertRegexpMatches(content_en, "^en body$")
 
+    def test_plugins_discarded_with_language_fallback(self):
+        """
+        Tests side effect of language fallback: if fallback enabled placeholder
+        existed, it discards all other existing plugins
+        """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        create_title("de", "page_de", page_en)
+        placeholder_sidebar_en = page_en.placeholders.get(slot='col_sidebar')
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        add_plugin(placeholder_sidebar_en, TextPlugin, 'en', body='en body')
+
+        class NoPushPopContext(Context):
+            def push(self):
+                pass
+
+            pop = push
+
+        context_en = NoPushPopContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            # call assign plugins first, as this is what is done in real cms life
+            # for all placeholders in a page at once
+            assign_plugins(context_en['request'],
+                           [placeholder_sidebar_en, placeholder_en], 'col_two.html')
+            # if the normal, non fallback enabled placeholder still has content
+            content_en = render_placeholder(placeholder_sidebar_en, context_en)
+            self.assertRegexpMatches(content_en, "^en body$")
+
+            # remove the cached plugins instances
+            del(placeholder_sidebar_en._plugins_cache)
+            cache.clear()
+
     def test_plugins_prepopulate(self):
         """ Tests prepopulate placeholder configuration """
 
@@ -552,7 +592,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
                               password=getattr(user, get_user_model().USERNAME_FIELD))
-            response = self.client.get("/en/?edit")
+            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             for placeholder in page.placeholders.all():
                 self.assertContains(
                     response, "'placeholder_id': '%s'" % placeholder.pk)
@@ -625,6 +665,56 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertTrue("PlaceholderAdminMixin with admin.ModelAdmin" in str(w[-1].message))
             self.assertIsInstance(pa, admin.ModelAdmin, 'PlaceholderAdmin not admin.ModelAdmin')
             self.assertIsInstance(pa, PlaceholderAdminMixin, 'PlaceholderAdmin not PlaceholderAdminMixin')
+
+    @override_settings(TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),))
+    def test_cached_template_not_corrupted_by_placeholder_scan(self):
+        """
+        This is the test for the low-level code that caused the bug:
+        the placeholder scan corrupts the nodelist of the extends node,
+        which is retained by the cached template loader, and future
+        renders of that template will render the super block twice.
+        """
+    
+        self.assertNotIn('one',
+            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            "test_super_extends_1.html contains a block called 'one', "
+            "but _2.html does not.")
+
+        get_placeholders("placeholder_tests/test_super_extends_2.html")
+
+        self.assertNotIn('one',
+            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            "test_super_extends_1.html still should not contain a block "
+            "called 'one' after rescanning placeholders.")
+
+    @override_settings(TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),))
+    def test_super_extends_not_corrupted_by_placeholder_scan(self):
+        """
+        This is the test for the symptom of the bug: because the block
+        context now contains two copies of the inherited block, that block
+        will be executed twice, and if it adds content to {{block.super}},
+        that content will be added twice.
+        """
+
+        template = get_template("placeholder_tests/test_super_extends_2.html")
+        output = template.render(Context({}))
+        self.assertEqual(['Whee'], [o for o in output.split('\n')
+            if 'Whee' in o])
+          
+        get_placeholders("placeholder_tests/test_super_extends_2.html")
+
+        template = get_template("placeholder_tests/test_super_extends_2.html")
+        output = template.render(Context({}))
+        self.assertEqual(['Whee'], [o for o in output.split('\n')
+            if 'Whee' in o])
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
@@ -881,6 +971,24 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    def test_no_limit_check_same_placeholder_move(self):
+        admin_instance = self.get_admin()
+        superuser = self.get_superuser()
+        source_placeholder = self.get_placeholder()
+        data = {
+            'placeholder': source_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+        plugin_1 = add_plugin(**data)
+        add_plugin(**data)
+        with UserLoginContext(self, superuser):
+            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
+                                                 'plugin_order': 1, })
+                response = admin_instance.move_plugin(request) # first
+                self.assertEqual(response.status_code, 200)
 
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
