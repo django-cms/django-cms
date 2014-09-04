@@ -1,16 +1,34 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+from optparse import make_option
 from django.core.management.base import NoArgsCommand, CommandError
 from django.utils.translation import activate
 from cms.utils.compat.dj import force_unicode
 
 class Command(NoArgsCommand):
-    def handle_noargs(self, **options):
-        """Create published public version of all published drafts.
-        """
-        self.publish_pages()
+    option_list = NoArgsCommand.option_list + (
+        make_option(
+            '-l', '--language',
+            dest='language',
+            help='Languages to publish',
+        ),
+        make_option(
+            '--unpublished',
+            action='store_true',
+            dest='include_unpublished',
+            default=False,
+            help='Include unpublished drafts',
+        ),
+    )
 
-    def publish_pages(self):
+    def handle_noargs(self, **options):
+        """Create published public version of selected drafts.
+        """
+        include_unpublished = options.get('include_unpublished')
+        language = options.get('language')
+        self.publish_pages(language, include_unpublished)
+
+    def publish_pages(self, language, include_unpublished):
         from cms.models import Page
         from cms.utils.compat.dj import get_user_model
         from cms.utils.permissions import set_current_user
@@ -25,7 +43,9 @@ class Command(NoArgsCommand):
 
         set_current_user(user) # set him as current user
 
-        qs = Page.objects.drafts().filter(title_set__published=True).distinct()
+        qs = Page.objects.drafts()
+        if not include_unpublished:
+            qs = qs.filter(title_set__published=True).distinct()
         pages_total, pages_published = qs.count(), 0
 
         self.stdout.write(u"\nPublishing public drafts....\n")
@@ -33,11 +53,15 @@ class Command(NoArgsCommand):
         for i, page in enumerate(qs):
             m = " "
             add = True
-            for lang in page.title_set.filter(published=True).values_list("language", flat=True):
-                if not output_language:
-                    output_language = lang
-                if not page.publish(lang):
-                    add = False
+            titles = page.title_set
+            if not include_unpublished:
+                titles = titles.filter(published=True)
+            for lang in titles.values_list("language", flat=True):
+                if language is None or lang == language:
+                    if not output_language:
+                        output_language = lang
+                    if not page.publish(lang):
+                        add = False
             # we may need to activate the first (main) language for proper page title rendering
             activate(output_language)
             if add:

@@ -78,6 +78,99 @@ class PublisherCommandTests(TestCase):
 
         self.assertEqual(Page.objects.public().count(), 0)
 
+    def test_command_line_publishes_draft_page(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        create_page("The page!", "nav_playground.html", "en", published=False)
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', include_unpublished=True)
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
+        self.assertEqual(Page.objects.public().count(), 1)
+
+    def test_command_line_publishes_selected_language(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        page = create_page("en title", "nav_playground.html", "en")
+        title = create_title('de', 'de title', page)
+        title.published = True
+        title.save()
+        title = create_title('fr', 'fr title', page)
+        title.published = True
+        title.save()
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', language='de')
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
+        self.assertEqual(Page.objects.public().count(), 1)
+        public = Page.objects.public()[0]
+        languages = sorted(public.title_set.values_list('language', flat=True))
+        self.assertEqual(languages, ['de'])
+
+    def test_command_line_publishes_selected_language_drafts(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        page = create_page("en title", "nav_playground.html", "en")
+        title = create_title('de', 'de title', page)
+        title.published = False
+        title.save()
+        title = create_title('fr', 'fr title', page)
+        title.published = False
+        title.save()
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', language='de', include_unpublished=True)
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
+        self.assertEqual(Page.objects.public().count(), 1)
+        public = Page.objects.public()[0]
+        languages = sorted(public.title_set.values_list('language', flat=True))
+        self.assertEqual(languages, ['de'])
+
     def test_table_name_patching(self):
         """
         This tests the plugin models patching when publishing from the command line

@@ -157,3 +157,40 @@ system, but when you run into trouble it's useful to be able to rebuild the tree
 
     This command **alters data** in your database. You should make a backup of
     your database before using it!
+
+
+**************************************
+Additional commands
+**************************************
+
+``publisher_publish``
+======================
+
+If you want to publish many pages at once, this command can help you. By default,
+this command publishes drafts for all public pages.
+
+It accepts the following options
+
+* ``unpublished``: set to publish all drafts, including unpublished ones;
+  if not set, only already published pages will be republished.
+* ``language``: specify a language code to publish pages in only one language;
+  if not specified, this command publishes all page languages;
+
+Example::
+
+    #publish drafts for public pages in all languages
+    publisher_publish
+
+    #publish all drafts in all pages
+    publisher_publish --unpublished
+
+    #publish drafts for public pages in deutsch
+    publisher_publish --language=de
+
+    #publish all drafts in deutsch
+    publisher_publish --unpublished --language=de
+
+.. warning::
+
+    This command publishes drafts. You should review drafts before using this
+    command, because they will become public.
