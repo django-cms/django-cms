@@ -175,6 +175,9 @@ It accepts the following options
   if not set, only already published pages will be republished.
 * ``language``: specify a language code to publish pages in only one language;
   if not specified, this command publishes all page languages;
+* ``site``: specify a site id to publish pages for specified site only;
+  if not specified, this command publishes pages for all sites;
+
 
 Example::
 
@@ -189,6 +192,9 @@ Example::
 
     #publish all drafts in deutsch
     publisher_publish --unpublished --language=de
+
+    #publish all drafts in deutsch, but only for site with id=2
+    publisher_publish --unpublished --language=de --site=2
 
 .. warning::
 
