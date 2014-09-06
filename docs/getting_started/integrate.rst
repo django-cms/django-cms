@@ -237,7 +237,7 @@ generic package:
 
 .. code-block:: bash
 
-    $ sudo brew install python
+    $ brew install python
 
 Then create an environment and work on it instead of install the packages in the
 system path:
