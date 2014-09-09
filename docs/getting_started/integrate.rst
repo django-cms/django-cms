@@ -605,11 +605,11 @@ Fresh install
 
 Run::
 
-    python manage.py syncdb --all
-    python manage.py migrate --fake
+    python manage.py migrate
 
-The first command will prompt you to create a super user. Choose 'yes' and enter
-appropriate values.
+To create a super user run::
+
+    python manage.py createsuperuser
 
 Upgrade
 -------
