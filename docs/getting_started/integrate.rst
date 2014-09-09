@@ -246,7 +246,7 @@ system path:
 
     $ virtualenv djangocms-env
     $ ./djangocms-env/bin/activate
-    (djangocms-env)$ pip install Django==1.5 South Django-CMS
+    (djangocms-env)$ pip install Django-CMS
 
 .. note:: You can see the general instructions on how to pip install packages
           after creating the virtualenv here: :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
