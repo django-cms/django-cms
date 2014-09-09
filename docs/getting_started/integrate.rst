@@ -197,14 +197,18 @@ Installing globally on Ubuntu
     and django CMS globally, which is not recommended. We recommend you use
     `virtualenv`_ instead (see above).
 
-If you're using Ubuntu (tested with 10.10), the following should get you
+If you're using Ubuntu (tested with 14.04), the following should get you
 started:
 
 .. code-block:: bash
 
-    sudo aptitude install python2.6 python-setuptools
-    sudo easy_install pip
-    sudo pip install Django==1.5 django-cms south Pillow
+    sudo aptitude install python-pip
+    sudo pip install virtualenv
+    cd ~/workspace/myproject/
+    virtualenv env
+    source env/bin/activate
+    pip install django-cms
+
 
 Additionally, you need the Python driver for your selected database:
 
