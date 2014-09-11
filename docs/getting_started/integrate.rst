@@ -26,6 +26,14 @@ Requirements
 .. note:: When installing the django CMS using pip, all of the dependencies
           will be installed automatically.
 
+.. note:: There is currently a bug in South 1.0 that is incompatible with Python 3.x.
+          If you are running Python 3.x, you will need to install South from version
+          control: ``pip install https://bitbucket.org/andrewgodwin/south/get/e2c9102ee033.zip#egg=South``
+
+.. warning:: While django CMS is compatible with Django 1.5.x, this version of Django
+             is no longer supported by the Django team. Please upgrade to
+             Django 1.6.x or 1.7.x immediately.
+
 .. _Python: https://www.python.org
 .. _Django: https://www.djangoproject.com
 .. _South: http://south.aeracode.org/
@@ -101,20 +109,16 @@ Installing
 Installing in a virtualenv using pip
 ====================================
 
-.. code-block:: bash
-
-    pip install django-cms
-
 Installing inside a `virtualenv`_ is the preferred way to install any Django
 installation.
 
 .. code-block:: bash
 
-  pip install --upgrade virtualenv
+  sudo pip install --upgrade virtualenv
   virtualenv env
 
-If you are using a system-wide install of Python you may need to use ``sudo``
-when installing via ``pip``.
+.. note:: If you are *not* using a system-wide install of Python (such as with Homebrew),
+          omit the usage of ``sudo`` when installing via ``pip``.
 
 Switch to the virtualenv at the command line by typing:
 
@@ -122,7 +126,15 @@ Switch to the virtualenv at the command line by typing:
 
   source env/bin/activate
 
-Next, you can install packages one at a time using `pip`_, but we recommend
+Next, install the CMS:
+
+.. code-block:: bash
+
+  pip install django-cms
+
+This will automatically install all of the `requirements`_ listed above.
+
+While you could install packages one at a time using `pip`_, we recommend
 using a `requirements.txt`_ file. The following is an example
 requirements.txt file that can be used with pip to install django CMS and
 its dependencies:
@@ -134,14 +146,14 @@ its dependencies:
 
     # These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
-    Django>=1.6
+    Django>=1.7
 
-    South==0.8.4
+    South==1.0
     django-mptt==0.6
     django-sekizai==0.7
     django-classy-tags==0.5
     djangocms-admin-style==0.2.2
-    html5lib==1.0b1
+    html5lib==0.999
     six==1.3.0
 
     # Optional, recommended packages
@@ -501,14 +513,18 @@ You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following
 ``~/workspace/myproject/myproject/urls.py``::
 
+    from django.conf import settings
     from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
+    from django.conf.urls.static import static
     from django.contrib import admin
+
+    admin.autodiscover() # Not required for Django 1.7.x+
 
     urlpatterns = i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
-    )
+    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 Creating templates
