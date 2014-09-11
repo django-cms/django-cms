@@ -140,28 +140,28 @@ Example::
     CMS_PLACEHOLDER_CONF = {
         'content': {
             'plugins': ['TextPlugin', 'PicturePlugin'],
-            'text_only_plugins': ['LinkPlugin']
+            'text_only_plugins': ['LinkPlugin'],
             'extra_context': {"width":640},
             'name': gettext("Content"),
             'language_fallback': True,
-            'default_plugins':[
+            'default_plugins': [
                 {
                     'plugin_type': 'TextPlugin',
                     'values': {
                         'body':'<p>Lorem ipsum dolor sit amet...</p>',
                     },
                 },
-            ]
+            ],
             'child_classes': {
                 'TextPlugin': ['PicturePlugin', 'LinkPlugin'],
             },
             'parent_classes': {
-                'LinkPlugin': ['TextPlugin',],
-            }
+                'LinkPlugin': ['TextPlugin'],
+            },
         },
         'right-column': {
             "plugins": ['TeaserPlugin', 'LinkPlugin'],
-            "extra_context": {"width":280},
+            "extra_context": {"width": 280},
             'name': gettext("Right Column"),
             'limits': {
                 'global': 2,
@@ -170,10 +170,10 @@ Example::
             },
             'plugin_modules': {
                 'LinkPlugin': 'Extra',
-            }.
+            },
             'plugin_labels': {
                 'LinkPlugin': 'Add a link',
-            }.
+            },
         },
         'base.html content': {
             "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin'],
@@ -290,6 +290,10 @@ plugins, as shown above with ``base.html content``.
 ``parent_classes``
     A dictionary of plugin names with lists describing which plugins may contain
     each plugin. If not supplied, all plugins can be selected.
+
+``require_parent``
+    A boolean indication whether that plugin requires another plugin as parent or
+    not.
 
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the

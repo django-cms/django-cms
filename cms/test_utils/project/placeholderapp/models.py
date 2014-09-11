@@ -1,3 +1,4 @@
+from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import reverse
 from cms.utils import get_language_from_request
 from cms.utils.compat.dj import python_2_unicode_compatible
@@ -40,12 +41,12 @@ class Example1(models.Model):
     def set_static_url(self, request):
         language = get_language_from_request(request)
         if self.pk:
-            self.static_admin_url = reverse('admin:placeholderapp_example1_edit_field', args=(self.pk, language))
+            self.static_admin_url = admin_reverse('placeholderapp_example1_edit_field', args=(self.pk, language))
         return self.pk
 
     def dynamic_url(self, request):
         language = get_language_from_request(request)
-        return reverse('admin:placeholderapp_example1_edit_field', args=(self.pk, language))
+        return admin_reverse('placeholderapp_example1_edit_field', args=(self.pk, language))
 
 
 class TwoPlaceholderExample(models.Model):

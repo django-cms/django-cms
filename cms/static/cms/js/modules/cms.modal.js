@@ -432,13 +432,12 @@ $(document).ready(function () {
 			// if there are no given buttons within the submit-row area
 			// scan deeper within the form itself
 			if(!buttons.length) {
-				row = iframe.contents().find('#content form:eq(0)');
+				row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
 				buttons = row.find('input[type="submit"], button[type="submit"]');
 				buttons.attr('name', '_save')
 					.addClass('deletelink')
 					.hide();
 			}
-
 			// attach relation id
 			buttons.each(function (index, item) {
 				$(item).attr('data-rel', '_' + index);
@@ -566,6 +565,7 @@ $(document).ready(function () {
 					contents.find('body').bind('keydown.cms', function (e) {
 						if(e.keyCode === 27) that.close();
 					});
+					contents.find('body').addClass('cms_modal-window');
 
 					// figure out if .object-tools is available
 					if(contents.find('.object-tools').length) {

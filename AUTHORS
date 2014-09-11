@@ -19,7 +19,7 @@ Current and previous core designers:
 
 * Christian Bertschy
 
-Contributors (based on gitlog) (409):
+Contributors (based on gitlog) (421):
 
 * A. Bram Neijt
 * aaloy
@@ -83,6 +83,7 @@ Contributors (based on gitlog) (409):
 * Brian Schott
 * brightwhitefox
 * Calvin Cheng
+* Carlos de Paula
 * Catalin Dragomirescu
 * centralniak
 * Chanita Siridechkun
@@ -95,8 +96,10 @@ Contributors (based on gitlog) (409):
 * Chris Hughes
 * Chris Jones
 * Chris Wesseling
+* Chris Wilson
 * Christian Bertschy
 * Christof Hagedorn
+* Christopher Grebs
 * Christos Kopanos
 * cip
 * Colin Wirz
@@ -123,12 +126,14 @@ Contributors (based on gitlog) (409):
 * David Lam
 * David Lee
 * David Thompson
+* derek73
 * deshack
 * digi604
 * divio
 * Diógenes Augusto Fernandes Hermínio
 * dlamotte
 * Dmitry Akinin
+* Donatas Kučinskas
 * dstufft
 * Dylann CORDEL
 * DylannCordel
@@ -313,6 +318,7 @@ Contributors (based on gitlog) (409):
 * Pedro Gracia
 * Pete Loggie
 * Peter Ciciman
+* Peter Farrell
 * Peter Landry
 * Peter-Paul van Gemerden
 * Petteri
@@ -333,6 +339,7 @@ Contributors (based on gitlog) (409):
 * Rajesh P.
 * Rebecca Breu
 * Remco Wendt
+* requires.io
 * Restless Being
 * Richard Barran
 * rizumu
@@ -350,6 +357,7 @@ Contributors (based on gitlog) (409):
 * root
 * rtpm
 * Russ Ferriday
+* Samuel Lahti
 * Samuel Lüscher
 * sbussetti
 * Schoen
@@ -357,6 +365,7 @@ Contributors (based on gitlog) (409):
 * scottbarnham
 * sealibora
 * Sean Bleier
+* Sebastian Braun
 * Seth Buntin
 * Seyhun Akyurek
 * Shahar Or
@@ -379,6 +388,7 @@ Contributors (based on gitlog) (409):
 * Stefano Crosta
 * Stefano Morandi
 * Stephan
+* Stephan Herzog
 * Stephan Jaekel
 * Stephen Muss
 * Stephen Watkin
@@ -410,12 +420,14 @@ Contributors (based on gitlog) (409):
 * Vinit (Vermicelli on IRC)
 * vinit kumar
 * Vitor Figueiro
+* Vladimir Bolshakov
 * Vladyslav
 * vvangelovski
 * wangJunjie
 * Wayne Moore
 * wid
 * wildermesser
+* Xavier Fernandez
 * Xavier Ordoquy
 * xray7224
 * Yann Malet

@@ -9,7 +9,7 @@
 
 //##################################################
 // #MODAL#
-#content h2:first-child { display:none; }
+#content > h2:first-child { display:none; }
 #content { margin:10px 10px 0; }
 #content .module { padding:10px; }
 

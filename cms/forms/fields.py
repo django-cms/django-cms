@@ -2,6 +2,7 @@
 import six
 from django.utils.translation import ugettext_lazy as _
 from django import forms
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms.fields import EMPTY_VALUES
 from cms.models.pagemodel import Page
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
@@ -55,6 +56,11 @@ class PageSelectFormField(forms.MultiValueField):
                 raise forms.ValidationError(self.error_messages['invalid_page'])
             return Page.objects.get(pk=page_id)
         return None
+
+    def _has_changed(self, initial, data):
+        if isinstance(self.widget, RelatedFieldWidgetWrapper):
+            self.widget.decompress = self.widget.widget.decompress
+        return super(PageSelectFormField, self)._has_changed(initial, data)
 
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget

@@ -1,4 +1,4 @@
-{% load staticfiles cms_tags sekizai_tags %}{% load url from future %}
+{% load staticfiles cms_tags sekizai_tags %}
 <!doctype html><html lang="{{ LANGUAGE_CODE }}">
 <head>
 	<meta charset="utf-8" />
@@ -44,7 +44,7 @@
 <div class="wrapper">
 	<div class="inner">
 		<h1 class="logo">Installation successful!</h1>
-		<p>Switch to <a href="/?{{ request.toolbar.edit_mode_url_on }}">edit mode</a>,<br />log in and start <a href="{% url "admin:cms_page_add" %}?title=Home" id="add-page">adding pages</a>.</p>
+		<p>Switch to <a href="/?{{ request.toolbar.edit_mode_url_on }}">edit mode</a>,<br />log in and start <a href="{% cms_admin_url "cms_page_add" %}?title=Home" id="add-page">adding pages</a>.</p>
 		<p class="buttons">
 			<a href="//docs.django-cms.org/" class="btn" target="_blank">Documentation</a>
 			<a href="//www.django-cms.org/" class="btn" target="_blank">Support</a>
@@ -63,7 +63,7 @@ if(window.CMS !== undefined) {
 	CMS.$('#add-page').bind('click', function (e) {
 		e.preventDefault();
 		var sideframe = new CMS.Sideframe();
-			sideframe.open('{% url "admin:cms_page_add" %}?title=Home', true);
+			sideframe.open('{% cms_admin_url "cms_page_add" %}?title=Home', true);
 	});
 }
 </script>

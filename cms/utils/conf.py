@@ -6,11 +6,11 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
 from cms.exceptions import CMSDeprecationWarning
-from cms.utils.compat.type_checks import int_types
 from cms.utils.compat.urls import urljoin
 
 
@@ -62,6 +62,7 @@ DEFAULTS = {
     'TOOLBAR_URL__EDIT_ON': 'edit',
     'TOOLBAR_URL__EDIT_OFF': 'edit_off',
     'TOOLBAR_URL__BUILD': 'build',
+    'ADMIN_NAMESPACE': 'admin',
 }
 
 
@@ -157,7 +158,7 @@ def _ensure_languages_settings_new(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, int_types):
+        if not isinstance(site, six.integer_types):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -247,7 +248,7 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, int_types):
+    if not isinstance(settings.SITE_ID, six.integer_types):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )

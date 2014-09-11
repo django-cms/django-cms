@@ -1,9 +1,10 @@
-from cms.utils.compat import PY2
+from django.utils import six
 
-if PY2:
+
+if six.PY3:
+    class UnittestCompatMixin(object):
+        pass
+else:
     class UnittestCompatMixin(object):
         def assertNotRegex(self, text, regex, msg=None):
             return self.assertNotRegexpMatches(text, regex, msg)
-else:
-    class UnittestCompatMixin(object):
-        pass

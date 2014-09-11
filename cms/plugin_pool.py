@@ -9,10 +9,10 @@ from django.db.models import signals
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
+from django.utils import six
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
-from cms.utils.compat.type_checks import string_types
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
@@ -31,10 +31,10 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
-        self.discovered = True
         from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
+        self.discovered = True
 
     def clear(self):
         self.discovered = False
@@ -63,14 +63,21 @@ class PluginPool(object):
 
                 template = hasattr(plugin.model,
                                    'render_template') and plugin.model.render_template or plugin.render_template
-                if isinstance(template, string_types) and template:
+                if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
-                    except TemplateDoesNotExist:
-                        raise ImproperlyConfigured(
-                            "CMS Plugins must define a render template (%s) that exist: %s"
-                            % (plugin, template)
-                        )
+                    except TemplateDoesNotExist as e:
+                        # Note that the template loader will throw
+                        # TemplateDoesNotExist if the plugin's render_template
+                        # does in fact exist, but it includes a template that
+                        # doesn't.
+                        if six.text_type(e) == template:
+                            raise ImproperlyConfigured(
+                                "CMS Plugins must define a render template (%s) that exists: %s"
+                                % (plugin, template)
+                            )
+                        else:
+                            pass
                     except TemplateSyntaxError:
                         pass
         else:
@@ -105,6 +112,8 @@ class PluginPool(object):
                 reversion_register(plugin.model)
             except RegistrationError:
                 pass
+
+        return plugin
 
     def unregister_plugin(self, plugin):
         """
@@ -208,7 +217,7 @@ class PluginPool(object):
         ) or ()
         for plugin in plugins:
             include_plugin = False
-            if placeholder and not plugin.require_parent:
+            if placeholder and not plugin.get_require_parent(placeholder, page):
                 include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
             if plugin.page_only and not include_page_only:
                 include_plugin = False
