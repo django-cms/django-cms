@@ -216,7 +216,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         parent.add_child(instance=page)
     else:
         page.add_root(instance=page)
-    page.save()
+    #page.save()
 
     create_title(
         language=language,
@@ -310,15 +310,18 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         language=language,
         depth=0
     )
+    plugin_base.add_root(instance=plugin_base)
     if target:
+        if position == 'last-child' or position == 'first-child':
+            plugin_base.parent_id = target.pk
+        else:
+            plugin_base.parent_id = target.parent_id
         plugin_base.move(target, pos=position)
-    else:
-        plugin_base.add_root(instance=plugin_base)
-
+        plugin_base = CMSPlugin.objects.get(plugin_base.pk)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
-    plugin.move(target=target, pos=position)
+
     return plugin
 
 

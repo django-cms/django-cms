@@ -174,29 +174,35 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self.template = self.get_template()
             if target.publisher_public_id and position == 'right':
                 public = target.publisher_public
-                if target.get_root().get_next_sibling() == target.get_root():
+                if target.get_root().get_next_sibling().pk == public.get_root().pk:
                     target = target.publisher_public
                 else:
                     Logger.warn('tree may need rebuilding: run manage.py cms fix-tree')
+        if position == 'first-child' or position == 'last-child':
+            self.parent_id = target.pk
+        else:
+            self.parent_id = target.parent_id
+        self.save()
         self.move(target, pos=position)
 
         # fire signal
         import cms.signals as cms_signals
 
         cms_signals.page_moved.send(sender=Page, instance=self)
-        self.save()  # always save the page after move, because of publisher
+        moved_page = Page.objects.get(pk=self.pk)
+        #self.save()  # always save the page after move, because of publisher
         # check the slugs
-        page_utils.check_title_slugs(self)
-        # Make sure to update the slug and path of the target page.
+        page_utils.check_title_slugs(moved_page)
+        ## Make sure to update the slug and path of the target page.
         page_utils.check_title_slugs(target)
 
         if self.publisher_public_id:
             # Ensure we have up to date mptt properties
             public_page = Page.objects.get(pk=self.publisher_public_id)
             # Ensure that the page is in the right position and save it
-            public_page = self._publisher_save_public(public_page)
+            public_page = moved_page._publisher_save_public(public_page)
             cms_signals.page_moved.send(sender=Page, instance=public_page)
-            public_page.save()
+
             page_utils.check_title_slugs(public_page)
         from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
@@ -299,13 +305,15 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-        pages = [self] + list(self.get_descendants().order_by('-rght'))
+        print self, target, site, position,copy_permissions
+        print
+        pages = [self] + list(self.get_descendants().order_by('path'))
 
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
 
         if target:
             target.old_pk = -1
-            if position == "first-child":
+            if position == "first-child" or position == "last-child":
                 tree = [target]
             elif target.parent_id:
                 tree = [target.parent]
@@ -328,6 +336,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             page.pk = None
             page.path = None
             page.depth = None
+            page.numchild = 0
             page.publisher_public_id = None
             page.is_home = False
             # only set reverse_id on standard copy
@@ -339,7 +348,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     page.parent = tree[0]
                 else:
                     page.parent = None
-                page.insert_at(target, position)
+                page.save()
+                page.move(target, pos=position)
             else:
                 count = 1
                 found = False
@@ -442,9 +452,10 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             else:
                 if not self.depth:
                     if self.parent_id:
-                        self.parent.add_child(self)
+                        self.parent.add_child(instance=self)
                     else:
                         self.add_root(instance=self)
+                    return #add_root and add_child save as well
                 super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
@@ -559,6 +570,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
             # Ensure that the page is in the right position and save it
             self._publisher_save_public(public_page)
+            public_page = public_page.reload()
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
@@ -716,11 +728,11 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
     def get_cached_ancestors(self, ascending=True):
         if ascending:
             if not hasattr(self, "ancestors_ascending"):
-                self.ancestors_ascending = list(self.get_ancestors(ascending))
+                self.ancestors_ascending = list(self.get_ancestors())
             return self.ancestors_ascending
         else:
             if not hasattr(self, "ancestors_descending"):
-                self.ancestors_descending = list(self.get_ancestors(ascending))
+                self.ancestors_descending = list(self.get_ancestors().order_by('-deptjh'))
             return self.ancestors_descending
 
     # ## Title object access
@@ -1122,24 +1134,45 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             else:
                 if public_prev_sib:
                     public_prev_sib.add_sibling(pos='right', instance=obj)
+                    obj = obj.reload()
+                    obj.parent_id = public_prev_sib.parent_id
+                    obj.save()
                 else:
                     if public_parent:
                         public_parent.add_child(instance=obj)
+                        obj = obj.reload()
+                        obj.parent = public_parent
+                        obj.save()
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
             if self.depth != obj.depth or \
                             public_parent != obj.parent or \
                             public_prev_sib != prev_public_sibling:
+                print public_prev_sib
+
                 if public_prev_sib:
+                    print 'has preve pub sib'
+                    obj.parent_id = public_prev_sib.parent_id
+                    obj.save()
                     obj.move(public_prev_sib, pos="right")
                 elif public_parent:
                     # move as a first child to parent
+                    #obj.parent = public_parent
+                    obj.parent_id = public_parent.pk
+                    obj.save()
+                    print '-------------------'
+                    print obj.pk
+                    print public_parent.pk
                     obj.move(public_parent, pos='first-child')
+                    for p in Page.objects.all().order_by('path'):
+                        print p.pk, p.parent_id, p.path
                 else:
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
+                        obj.parent_id = next_sibling.parent_id
+                        obj.save()
                         obj.move(next_sibling.publisher_public, pos="left")
 
         return obj
@@ -1173,7 +1206,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
 
             # Now just give me the clickjacking setting (not anything else)
-            xframe_options = ancestors.values_list('xframe_options', flat=True)
+            xframe_options = list(ancestors.values_list('xframe_options', flat=True))
             if self.xframe_options != self.X_FRAME_OPTIONS_INHERIT:
                 xframe_options.append(self.xframe_options)
             if len(xframe_options) <= 0:

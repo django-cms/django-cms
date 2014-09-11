@@ -249,9 +249,10 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         else:
             if not self.depth:
                 if self.parent_id:
-                    self.parent.add_child(self)
+                    self.parent.add_child(instance=self)
                 else:
                     self.add_root(instance=self)
+                return
             super(CMSPlugin, self).save()
 
     def set_base_attr(self, plugin):

@@ -274,7 +274,12 @@ class BaseCMSTestCase(object):
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-
+        for p in Page.objects.all():
+            print '----'
+            print p.pk, p.parent_id, p.path, p, p.is_home
+            for t in p.title_set.all():
+                print t.slug, t.path
+        print copied_slug
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
         return copied_page
 
