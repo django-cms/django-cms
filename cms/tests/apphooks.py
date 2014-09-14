@@ -4,12 +4,17 @@ import sys
 
 from django.core.urlresolvers import clear_url_caches, reverse
 from django.utils import six
+from django.utils.timezone import now
 
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
+from cms.cms_toolbar import PlaceholderToolbar
+from cms.exceptions import AppAlreadyRegistered
 from cms.models import Title
+from cms.test_utils.project.placeholderapp.cms_app import Example1App
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.tests.menu_utils import DumbPageLanguageUrl
@@ -536,6 +541,38 @@ class ApphooksTestCase(CMSTestCase):
             self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
             self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
             self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbar.Example1Toolbar'].is_current_app)
+
+    def test_toolbar_staff(self):
+        # Test that the toolbar contains edito mode switcher if placeholders are available
+        apphooks = (
+            'cms.test_utils.project.placeholderapp.cms_app.Example1App',
+        )
+        with SettingsOverride(CMS_APPHOOKS=apphooks, ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
+            self.create_base_structure('Example1App', 'en')
+            ex1 = Example1.objects.create(char_1='1', char_2='2', char_3='3', char_4='4', date_field=now())
+            path = reverse('example_detail', kwargs={'pk': ex1.pk})
+
+            self.user = self._create_user('admin_staff', True, True)
+            response = self.client.get(path+"?edit")
+            toolbar = CMSToolbar(response.context['request'])
+            toolbar.populate()
+            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
+            placeholder_toolbar.populate()
+            placeholder_toolbar.init_placeholders_from_request()
+            placeholder_toolbar.add_structure_mode()
+            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 1)
+
+            self.user = self._create_user('staff', True, False)
+            response = self.client.get(path+"?edit")
+            toolbar = CMSToolbar(response.context['request'])
+            toolbar.populate()
+            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
+            placeholder_toolbar.populate()
+            placeholder_toolbar.init_placeholders_from_request()
+            placeholder_toolbar.add_structure_mode()
+            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 1)
+
+            self.user = None
 
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
