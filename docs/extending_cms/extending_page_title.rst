@@ -96,9 +96,75 @@ Adding a Toolbar Menu Item for your Page extension
 
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page. (Page isn't an
-editable attribute in the default admin interface.) The following example,
-which should live in a file named ``cms_toolbar.py`` in one of your apps, adds
-a menu entry for the extension on each page::
+editable attribute in the default admin interface.).
+To add toolbar items for your extension creare a file named ``cms_toolbar.py``
+in one of your apps, and add the relevant menu entries for the extension on each page.
+
+
+**********************
+Simplified toolbar API
+**********************
+
+.. versionadded:: 3.0.6
+
+Since 3.0.6 a simplified toolbar API is available to handle the more common cases::
+
+    from cms.extensions.toolbar import ExtensionToolbar
+    from django.utils.translation import ugettext_lazy as _
+    from .models import IconExtension
+
+
+    @toolbar_pool.register
+    class IconExtensionToolbar(ExtensionToolbar):
+        # defineds the model for the current toolbar
+        model = IconExtension
+
+        def populate(self):
+            # setup the extension toolbar with permissions and sanity checks
+            current_page_menu = self._setup_extension_toolbar()
+            # if it's all ok
+            if current_page_menu:
+                # retrieves the instance of the current extension (if any) and the toolbar item url
+                page_extension, url = self.get_page_extension_admin()
+                if url:
+                    # adds a toolbar item
+                    current_page_menu.add_modal_item(_('Page Icon'), url=url,
+                        disabled=not self.toolbar.edit_mode)
+
+Similarly for title extensions::
+
+    from cms.extensions.toolbar import ExtensionToolbar
+    from django.utils.translation import ugettext_lazy as _
+    from .models import TitleIconExtension
+
+    @toolbar_pool.register
+    class TitleIconExtensionToolbar(ExtensionToolbar):
+        # setup the extension toolbar with permissions and sanity checks
+        model = TitleIconExtension
+
+        def populate(self):
+            # setup the extension toolbar with permissions and sanity checks
+            current_page_menu = self._setup_extension_toolbar()
+            # if it's all ok
+            if current_page_menu and self.toolbar.edit_mode:
+                # create a sub menu
+                sub_menu = self._get_sub_menu(current_page_menu, 'submenu_label', 'Submenu', position)
+                # retrieves the instances of the current title extension (if any) and the toolbar item url
+                urls = self.get_title_extension_admin()
+                # cycle through the title list
+                for title_extension, url in urls:
+                    # adds toolbar items
+                    sub_menu.add_modal_item('icon for title %s' % title,
+                                            url=url, disabled=not self.toolbar.edit_mode)
+
+For details see the :ref:`reference <simplified_extension_toolbar>`
+
+********************
+Complete toolbar API
+********************
+
+If you need complete control over the layout of your extension toolbar items you can still use the
+low-level API to edit the toolbar according to your needs::
 
     from cms.api import get_page_draft
     from cms.toolbar_pool import toolbar_pool
@@ -227,3 +293,22 @@ Here's an example that uses a `ManyToMany`` field::
                 page_category.save()
 
     extension_pool.register(MyPageExtension)
+
+
+.. _simplified_extension_toolbar:
+
+Simplified Toolbar API
+======================
+
+The simplified Toolbar API works by deriving your toolbar class from ``ExtensionToolbar``
+which provides the following API:
+
+
+* :py:meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
+  the environment and do the permission checking;
+* :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin`: for page extensions, retrieves the
+  correct admin url for the related toolbar item; returns the extension instance (or `None` if not exists)
+  and the admin url for the toolbar item;
+* :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin`: for title extensions, retrieves the
+  correct admin url for the related toolbar item; returns a list of the extension instances
+  (or `None` if not exists) and the admin urls for each title of the current page;
