@@ -52,7 +52,7 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
         if not new_plugin.form:
             form_meta_attrs = {
                 'model': new_plugin.model,
-                'exclude': ('position', 'placeholder', 'language', 'plugin_type')
+                'exclude': ('position', 'placeholder', 'language', 'plugin_type', 'path', 'depth')
             }
             form_attrs = {
                 'Meta': type('Meta', (object,), form_meta_attrs)

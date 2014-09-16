@@ -290,7 +290,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             new_plugin.parent = parent
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
-        new_plugin.position = CMSPlugin.objects.filter(parent=parent).count()
+        new_plugin.position = CMSPlugin.objects.filter(parent=parent, language=target_language, placeholder=target_placeholder).count()
         if no_signals:
             from cms.signals import pre_save_plugins
 
@@ -300,7 +300,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         print '@@@@@@@@@@@@@'
         print self.pk
         for p in CMSPlugin.objects.all():
-            print p.pk, p.parent_id, p.path, p.position
+            print p.placeholder_id,p.path, p.pk, p.parent_id, p.position
         new_plugin.save()
         if plugin_instance:
             if plugin_instance.__class__ == CMSPlugin:
