@@ -129,7 +129,7 @@ are where you should define your subclasses of
 :class:`cms.plugin_base.CMSPluginBase`, these classes define the different
 plugins.
 
-There are three required attributes on those classes:
+There are two required attributes on those classes:
 
 * ``model``: The model you wish to use for storing information about this plugin.
   If you do not require any special information, for example configuration, to
@@ -142,28 +142,20 @@ There are three required attributes on those classes:
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
+
+And one of thw following **must** be defined if ``render_plugin`` attribute
+is ``True`` (the default):
+
 * ``render_template``: The template to render this plugin with.
 
-In addition to those three attributes, you can also define a
-:meth:`render` method on your subclasses. It is specifically this `render`
+**or**
+
+* ``get_render_template``: A method that returns a template path to render the
+  plugin with.
+
+In addition to those attributes, you can also define a
+:meth:`render` method on your subclasses. It is specifically this `render`_
 method that is the **view** for your plugin.
-
-The :meth:`render` method takes three arguments:
-
-* ``context``: The context with which the page is rendered.
-* ``instance``: The instance of your plugin that is rendered.
-* ``placeholder``: The name of the placeholder that is rendered.
-
-This method must return a dictionary or an instance of
-:class:`django.template.Context`, which will be used as context to render the
-plugin template.
-
-.. versionadded:: 2.4
-
-By default this method will add ``instance`` and ``placeholder`` to the
-context, which means for simple plugins, there is no need to overwrite this
-method.
-
 
 
 ***************
@@ -275,7 +267,7 @@ clause.
     model file, make sure to return its results as UTF8-string. Otherwise 
     saving an instance of your plugin might fail with the frontend editor showing 
     an <Empty> plugin instance. To return in unicode use a return statement like
-    ``return u'{}'.format(self.guest_name)``.
+    ``return u'{0}'.format(self.guest_name)``.
 
 .. _handling-relations:
 
@@ -909,18 +901,18 @@ Default: ``True``
 Should the plugin be rendered at all, or doesn't it have any output?  If
 `render_plugin` is ``True``, then you must also define :meth:`render_template`
 
-See also: `render_template`_
+See also: `render_template`_, `get_render_template`_
 
 
 render_template
-_______________
+---------------
 
 Default: ``None``
 
-The path to the template used to render the template. This is required if
-``render_plugin`` is ``True``.
+The path to the template used to render the template. If ``render_plugin``
+is ``True`` either this or ``get_render_template`` **must** be defined;
 
-See also: `render_plugin`_
+See also: `render_plugin`_ , `get_render_template`_
 
 
 require_parent
@@ -947,6 +939,45 @@ See also: `icon_src`_, `icon_alt`_
 
 Methods
 =======
+
+
+render
+------
+
+The :meth:`render` method takes three arguments:
+
+* ``context``: The context with which the page is rendered.
+* ``instance``: The instance of your plugin that is rendered.
+* ``placeholder``: The name of the placeholder that is rendered.
+
+This method must return a dictionary or an instance of
+:class:`django.template.Context`, which will be used as context to render the
+plugin template.
+
+.. versionadded:: 2.4
+
+By default this method will add ``instance`` and ``placeholder`` to the
+context, which means for simple plugins, there is no need to overwrite this
+method.
+
+
+get_render_template
+-------------------
+
+If you need to determine the plugin render model at render time
+you can implement :meth:`get_render_template` method on the plugin
+class; this method taks the same arguments as ``render``.
+The method **must** return a valid template file path.
+
+Example::
+
+    def get_render_template(self, context, instance, placeholder):
+        if instance.attr = 'one':
+            return 'template1.html'
+        else:
+            return 'template2.html'
+
+See also: `render_plugin`_ , `render_template`_
 
 icon_src
 --------

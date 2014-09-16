@@ -1,6 +1,9 @@
+from functools import partial
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
+from cms.utils.compat import DJANGO_1_6
 from cms.utils.compat.dj import is_installed as app_is_installed
 
 
@@ -29,5 +32,20 @@ def setup():
     """
     Gather all checks and validations
     """
+    if DJANGO_1_6:
+        # While setup is called both in all the Django versions only 1.6-
+        # requires paching the AppCache. 1.7 provides a cleaner way to handle
+        # this in AppConfig and thus the patching is left for older version only
+        from django.db.models import loading
+
+        def get_models_patched(self, app_mod=None, include_auto_created=False,
+                               include_deferred=False, only_installed=True):
+            loading.AppCache.get_models(self, app_mod, include_auto_created,
+                                        include_deferred, only_installed)
+            from cms.plugin_pool import plugin_pool
+            plugin_pool.set_plugin_meta()
+
+        loading.cache.get_models = get_models_patched
+        loading.get_models = partial(get_models_patched, loading.cache)
     validate_dependencies()
     validate_settings()

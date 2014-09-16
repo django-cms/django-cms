@@ -189,7 +189,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                 page = request.current_page
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
             if plugin.render_plugin:
-                template = hasattr(instance, 'render_template') and instance.render_template or plugin.render_template
+                template = plugin._get_render_template(context, instance, placeholder)
                 if not template:
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:

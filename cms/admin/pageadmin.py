@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.db.models import Q
+import copy
 from functools import wraps
 import json
 import sys
-from cms.toolbar_pool import toolbar_pool
-from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -17,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.db import router
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
@@ -25,28 +24,30 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
-from cms.admin.placeholderadmin import PlaceholderAdminMixin
-from cms.plugin_pool import plugin_pool
-from cms.utils.conf import get_cms_setting
-from cms.utils.compat.dj import force_unicode, is_installed
-from cms.utils.compat.urls import unquote
-from cms.utils.helpers import find_placeholder_relation
-from cms.utils.urlutils import add_url_parameters, admin_reverse
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
                              PublicationDatesForm)
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
+from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
+from cms.plugin_pool import plugin_pool
+from cms.toolbar_pool import toolbar_pool
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.admin import jsonify_request
+from cms.utils.compat.dj import force_unicode, is_installed
+from cms.utils.compat.urls import unquote
+from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import find_placeholder_relation
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
 from cms.utils.compat import DJANGO_1_4
 from cms.utils.transaction import wrap_transaction
+from cms.utils.urlutils import add_url_parameters, admin_reverse
 
 require_POST = method_decorator(require_POST)
 
@@ -274,6 +275,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         language = get_language_from_request(request, obj)
         form_cls = self.get_form_class(request, obj)
         form = super(PageAdmin, self).get_form(request, obj, form=form_cls, **kwargs)
+        # get_form method operates by overriding initial fields value which
+        # may persist across invocation. Code below deepcopies fields definition
+        # to avoid leaks
+        for field in form.base_fields.keys():
+            form.base_fields[field] = copy.deepcopy(form.base_fields[field])
 
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language

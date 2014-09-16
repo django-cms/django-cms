@@ -5,6 +5,7 @@ import multiprocessing
 import pkgutil
 import pyclbr
 import subprocess
+from django.core.exceptions import DjangoRuntimeWarning
 import os
 import sys
 import warnings
@@ -13,7 +14,7 @@ from docopt import docopt
 from django import VERSION
 from django.utils import autoreload
 from django.utils.encoding import force_text
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 
 import cms
 from cms.test_utils.cli import configure
@@ -35,7 +36,8 @@ Usage:
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
-    develop.py makemigrations
+    develop.py makemigrations [--merge]
+    develop.py squashmigrations <applications-name> <migration-name>
     develop.py pyflakes
     develop.py authors
 
@@ -44,6 +46,7 @@ Options:
     --version                   Show version.
     --parallel                  Run tests in parallel.
     --migrate                   Use south migrations in test or server command.
+    --merge                     Merge migrations
     --failfast                  Stop tests on first failure (only if not --parallel).
     --port=<port>               Port to listen on [default: 8000].
     --bind=<bind>               Interface to bind to [default: 127.0.0.1].
@@ -179,14 +182,14 @@ def shell():
     call_command('shell')
 
 
-def makemigrations(migrate_plugins=True):
+def makemigrations(migrate_plugins=True, merge=False, squash=False):
     from django.core.management import call_command
     applications = [
         # core applications
         'cms', 'menus',
         # testing applications
         'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
-        'objectpermissionsapp', 'bunch_of_plugins',
+        'objectpermissionsapp', 'bunch_of_plugins', 'emailuserapp'
     ]
     if migrate_plugins:
         applications.extend([
@@ -195,8 +198,20 @@ def makemigrations(migrate_plugins=True):
             'djangocms_file', 'djangocms_text_ckeditor', 'djangocms_picture', 'djangocms_teaser', 'djangocms_file',
             'djangocms_flash', 'djangocms_video',
         ])
-    call_command('makemigrations', *applications)
-    
+    if DJANGO_1_6:
+        if merge:
+            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
+        call_command('makemigrations', *applications)
+    else:
+        call_command('makemigrations', *applications, merge=merge)
+
+
+def squashmigrations(application, migration):
+    if DJANGO_1_6:
+        raise CommandError(u'Command not implemented for Django 1.6')
+    else:
+        call_command('squashmigrations', application, migration)
+
 
 def generate_authors():
     print("Generating AUTHORS")
@@ -320,7 +335,9 @@ def main():
             elif args['makemessages']:
                 makemessages()
             elif args['makemigrations']:
-                makemigrations()
+                makemigrations(merge=args['--merge'])
+            elif args['squashmigrations']:
+                squashmigrations(args['<applications-name>'], args['<migration-name>'])
 
 
 if __name__ == '__main__':

@@ -692,9 +692,6 @@ class AdminTests(AdminTestsBase):
         self.assertTrue(title.publisher_is_draft)
         self.assertTrue(new_title.publisher_is_draft)
 
-
-
-
     def test_revert_page_requires_perms(self):
         permless = self.get_permless()
         with self.login_user_context(permless):
@@ -898,6 +895,21 @@ class AdminTests(AdminTestsBase):
             self.client.post(admin_url, post_data)
             draft_page = Page.objects.get(pk=page.pk).get_draft_object()
             self.assertTrue(draft_page.is_dirty('en'))
+
+    def test_page_form_leak(self):
+        language = "en"
+        admin_user = self.get_admin()
+        request = self.get_request('/', 'en')
+        request.user = admin_user
+        page = create_page('A', 'nav_playground.html', language, menu_title='menu title')
+        page_admin = PageAdmin(Page, site)
+        page_admin._current_page = page
+
+        edit_form = page_admin.get_form(request, page)
+        add_form = page_admin.get_form(request, None)
+
+        self.assertEqual(edit_form.base_fields['menu_title'].initial, 'menu title')
+        self.assertEqual(add_form.base_fields['menu_title'].initial, None)
 
 
 class NoDBAdminTests(CMSTestCase):
