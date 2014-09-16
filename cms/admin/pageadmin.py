@@ -186,7 +186,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.path = None
             obj.numchild = 0
             obj.pk = None
-            obj.insert_at(parent, save=False)
+            if parent:
+                parent.add_child(instance=obj)
+            else:
+                obj.add_root(instance=obj)
             obj.pk = pk
             obj.save(no_signals=True)
 
@@ -805,7 +808,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
         for plugin in plugins:
             plugin._no_reorder = True
             plugin.delete()
@@ -872,7 +875,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
         for plugin in plugins:
             plugin._no_reorder = True
             plugin.delete()

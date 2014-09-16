@@ -135,7 +135,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         return Page.objects.public().get(title_set__title='P%s' % num)
     
     def get_level(self, num):
-        return Page.objects.public().filter(level=num)
+        return Page.objects.public().filter(depth=num)
     
     def get_all_pages(self):
         return Page.objects.public()
@@ -258,7 +258,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
-        self.assertEqual(len(nodes), len(self.get_level(1)))
+        self.assertEqual(len(nodes), len(self.get_level(2)))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
 

@@ -200,7 +200,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             # Ensure we have up to date mptt properties
             public_page = Page.objects.get(pk=self.publisher_public_id)
             # Ensure that the page is in the right position and save it
-            public_page = moved_page._publisher_save_public(public_page)
+            moved_page._publisher_save_public(public_page)
+            public_page = public_page.reload()
             cms_signals.page_moved.send(sender=Page, instance=public_page)
 
             page_utils.check_title_slugs(public_page)
@@ -604,13 +605,15 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         # Check if there are some children which are waiting for parents to
         # become published.
         publish_set = self.get_descendants().filter(title_set__published=True,
-                                                    title_set__language=language).select_related('publisher_public')
+                                                    title_set__language=language).select_related('publisher_public').order_by('depth', 'path')
         from cms.models import Title
         for page in publish_set:
             if page.publisher_public_id:
                 if not page.publisher_public.parent_id:
-                    page.publisher_public.parent = page.parent.publisher_public
-                    page.publisher_public.save()
+                    page._publisher_save_public(page.publisher_public)
+                    #page.publisher_public.parent = page.parent.publisher_public
+                    #page.publisher_public.save()
+                    #page.publisher_public.move(target=page.parent.publisher_public, pos='last-child')
                 if page.publisher_public.parent.is_published(language):
                     try:
                         public_title = Title.objects.get(page=page.publisher_public, language=language)
@@ -1119,7 +1122,13 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             obj - public variant of `self` to be saved.
 
         """
-        public_parent = self.parent.publisher_public if self.parent_id else None
+        print '!!!!!!', obj.pk, self.pk, self.parent_id
+        if self.parent_id and self.parent.publisher_public_id:
+            assert self.parent_id == self.parent.pk
+            public_parent = Page.objects.get(pk=self.parent.publisher_public_id)
+            print 'public parent', public_parent.pk
+        else:
+            public_parent = None
         filters = dict(publisher_public__isnull=False)
         if public_parent:
             filters['publisher_public__parent__in'] = [public_parent]
@@ -1130,20 +1139,30 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if not self.parent_id:
+                print 'first no parent_id'
+                obj.parent_id = None
                 self.add_sibling(pos='right', instance=obj)
             else:
                 if public_prev_sib:
-                    public_prev_sib.add_sibling(pos='right', instance=obj)
-                    obj = obj.reload()
+                    print 'first public prev sib'
+
+                    #
                     obj.parent_id = public_prev_sib.parent_id
-                    obj.save()
+                    public_prev_sib.add_sibling(pos='right', instance=obj)
                 else:
+                    print 'first public parent', public_parent.pk, obj.pk, self.pk
                     if public_parent:
-                        public_parent.add_child(instance=obj)
+
+                        obj.parent_id = public_parent.pk
+                        obj.add_root(instance=obj)
+                        public_parent = public_parent.reload()
                         obj = obj.reload()
-                        obj.parent = public_parent
-                        obj.save()
+                        print obj.pk, obj.path
+                        obj.move(public_parent, pos='first-child')
+                        obj = obj.reload()
+                        print obj.pk, obj.path
         else:
+
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
             if self.depth != obj.depth or \
@@ -1152,30 +1171,35 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 print public_prev_sib
 
                 if public_prev_sib:
-                    print 'has preve pub sib'
+                    print 'has prev pub sib'
                     obj.parent_id = public_prev_sib.parent_id
                     obj.save()
                     obj.move(public_prev_sib, pos="right")
                 elif public_parent:
+                    print 'public parent', public_parent.pk
                     # move as a first child to parent
                     #obj.parent = public_parent
                     obj.parent_id = public_parent.pk
                     obj.save()
+
                     print '-------------------'
                     print obj.pk
                     print public_parent.pk
-                    obj.move(public_parent, pos='first-child')
-                    for p in Page.objects.all().order_by('path'):
-                        print p.pk, p.parent_id, p.path
+                    #public_parent = public_parent.reload()
+                    obj.move(target=public_parent, pos='first-child')
                 else:
+                    print 'next sib', public_parent
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.parent_id = next_sibling.parent_id
                         obj.save()
                         obj.move(next_sibling.publisher_public, pos="left")
-
-        return obj
+            else:
+                obj.save()
+        print '%%%%%'
+        for p in Page.objects.all().order_by('path'):
+            print p.pk, p.parent_id, p.path, p.publisher_is_draft, p.publisher_public_id
 
     def rescan_placeholders(self):
         """

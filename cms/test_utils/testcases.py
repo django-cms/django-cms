@@ -355,16 +355,18 @@ class BaseCMSTestCase(object):
         if page.parent:
             self.assertEqual(page.parent_id, public_page.parent.publisher_draft.id)
 
-        self.assertEqual(page.level, public_page.level)
+        self.assertEqual(page.depth, public_page.depth)
 
-        # TODO: add check for siblings
-        draft_siblings = list(page.get_siblings(True).filter(
-            publisher_is_draft=True
-        ).order_by('path'))
-        public_siblings = list(public_page.get_siblings(True).filter(
-            publisher_is_draft=False
-        ).order_by('path'))
+        draft_siblings = list(Page.objects.filter(parent_id=page.parent_id, publisher_is_draft=True).order_by('path'))
+        public_siblings = list(Page.objects.filter(parent_id=public_page.parent_id, publisher_is_draft=False).order_by('path'))
         skip = 0
+        print 'draft'
+        for p in draft_siblings:
+            print p.pk, p.parent_id, p.path, p.publisher_public_id
+        print '-----'
+        print 'public'
+        for p in public_siblings:
+            print p.pk, p.parent_id, p.path
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1

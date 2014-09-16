@@ -25,7 +25,7 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
             if parent_plugin_id:
                 from cms.models import CMSPlugin
                 if parent_plugin_id:
-                    new_plugin.move_to(target=CMSPlugin.objects.get(pk=parent_plugin_id))
+                    new_plugin.move(CMSPlugin.objects.get(pk=parent_plugin_id), pos='last-child')
                     new_plugin = CMSPlugin.objects.get(pk=new_plugin.pk)
         plugins_ziplist.append((new_plugin, old_plugin))
         # this magic is needed for advanced plugins like Text Plugins that can have

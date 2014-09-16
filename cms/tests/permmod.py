@@ -336,21 +336,21 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.assertFalse(subpage.publisher_public)
 
         # tree id must be the same
-        self.assertEqual(page.tree_id, subpage.tree_id)
+        self.assertEqual(page.path[0:4], subpage.path[0:4])
 
         # publish both of them  
         page = self.reload(page)
         page = publish_page(page, self.user_super, 'en')
         # reload subpage, there were an tree_id change
         subpage = self.reload(subpage)
-        self.assertEqual(page.tree_id, subpage.tree_id)
+        self.assertEqual(page.path[0:4], subpage.path[0:4])
 
         subpage = publish_page(subpage, self.user_super, 'en')
         # tree id must stay the same
-        self.assertEqual(page.tree_id, subpage.tree_id)
+        self.assertEqual(page.path[0:4], subpage.path[0:4])
 
         # published pages must also have the same tree_id
-        self.assertEqual(page.publisher_public.tree_id, subpage.publisher_public.tree_id)
+        self.assertEqual(page.publisher_public.path[0:4], subpage.publisher_public.path[0:4])
 
         #check attributes
         self.check_published_page_attributes(page)

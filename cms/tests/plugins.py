@@ -118,20 +118,29 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        print response
+        self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(response.status_code, 200)
         created_plugin_id = self.get_response_pk(response)
+        print created_plugin_id
+        print CMSPlugin.objects.all()
+        print CMSPlugin.objects.all()[0]
         self.assertEqual(created_plugin_id, CMSPlugin.objects.all()[0].pk)
         return created_plugin_id
 
     def _edit_text_plugin(self, plugin_id, text):
         edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT, plugin_id)
+        print edit_url
         response = self.client.get(edit_url)
         self.assertEqual(response.status_code, 200)
         data = {
             "body": text
         }
         response = self.client.post(edit_url, data)
+        print response
         self.assertEqual(response.status_code, 200)
+        print Text.objects.all()
+        print CMSPlugin.objects.all()
         txt = Text.objects.get(pk=plugin_id)
         return txt
 
@@ -593,7 +602,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             zipcode="8006",
             city="Zurich",
         )
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
         inheritfrompage.publish('en')
 
         page = api.create_page('inherit from page',
@@ -610,7 +619,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE,
             from_page=inheritfrompage,
             from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.insert_at(None, position='last-child', save=True)
+        inherit_plugin.add_root(instance=inherit_plugin)
         page.publish('en')
 
         self.client.logout()
@@ -631,7 +640,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             position=1,
             language='en',
         )
-        empty_plugin.insert_at(None, position='last-child', save=True)
+        empty_plugin.add_root(instance=empty_plugin)
         other_page = api.create_page('other page', 'nav_playground.html', 'en', published=True)
         inherited_body = other_page.placeholders.get(slot="body")
 
@@ -650,6 +659,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         text_plugin = api.add_plugin(ph, "TextPlugin", "en", body="Hello World")
         link_plugins = []
         for i in range(0, 10):
+            text_plugin = Text.objects.get(pk=text_plugin.pk)
             link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
                                            target=text_plugin,
                                            name="A Link %d" % i,
@@ -684,8 +694,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
-        plugin_base.insert_at(None, position='last-child', save=False)
-
+        plugin_base.add_root(instance=plugin_base)
+        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
         plugin.save()
@@ -695,16 +705,15 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
-        plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
-        plugin_ref_1_base.save()
-
+        plugin_base.add_child(instance=plugin_ref_1_base)
+        plugin_ref_1_base = CMSPlugin.objects.get(pk=plugin_ref_1_base.pk)
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin_ref_2_base.insert_at(plugin_base, position='last-child', save=False)
-
+        plugin_base.add_child(instance=plugin_ref_2_base)
+        plugin_ref_2_base = CMSPlugin.objects.get(pk=plugin_ref_2_base.pk)
         plugin_ref_2 = Text(body='')
         plugin_ref_2_base.set_base_attr(plugin_ref_2)
 
@@ -772,7 +781,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
 
         # this should not raise any errors, but just ignore the empty plugin
         out = placeholder.render(self.get_context(), width=300)
@@ -844,8 +853,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         ph_en = page_en.placeholders.get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
-        inner_text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
-        text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
+        inner_text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1", target=text_plugin_1)
+        for p in CMSPlugin.objects.all():
+            print p.pk, p.parent_id, p.path, p.position
+        #text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
         self.assertEqual(text_plugin_2.is_last_in_placeholder(), True)
 
     def test_plugin_move_with_reload(self):
@@ -1128,7 +1139,7 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE,
         )
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
 
@@ -1276,7 +1287,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
 
         edit_url = URL_CMS_PLUGIN_EDIT + str(plugin.pk) + "/"
 

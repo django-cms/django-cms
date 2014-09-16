@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 import json
+
 import os
 from treebeard.mp_tree import MP_Node
 import warnings
@@ -22,6 +23,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import signals, Model
+
 
 class BoundRenderMeta(object):
     def __init__(self, meta):
@@ -49,10 +51,11 @@ class PluginModelBase(ModelBase):
         else:
             # else try to use the one from the superclass (if present)
             meta = getattr(new_class, '_render_meta', None)
-
+        for field in new_class._meta.fields:
+            if field.name in ['path', 'numchild', 'depth']:
+                field.editable = False
         # set a new BoundRenderMeta to prevent leaking of state
         new_class._render_meta = BoundRenderMeta(meta)
-
         return new_class
 
 
@@ -78,6 +81,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     changed_date = models.DateTimeField(auto_now=True)
     child_plugin_instances = None
     translatable_content_excluded_fields = []
+
 
     class Meta:
         app_label = 'cms'
@@ -158,7 +162,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
-        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
+        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 instance = plugin.model.objects.get(cmsplugin_ptr=self)
@@ -251,12 +255,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                 if self.parent_id:
                     self.parent.add_child(instance=self)
                 else:
+                    if not self.position and not self.position == 0:
+                        self.position == CMSPlugin.objects.filter(parent__isnull=True,
+                                                                  placeholder_id=self.placeholder_id).count()
+                    print 'add root pos', self.position
                     self.add_root(instance=self)
                 return
             super(CMSPlugin, self).save()
 
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path', 'numchild', 'pk']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path',
+                     'numchild', 'pk', 'position']:
             setattr(plugin, attr, getattr(self, attr))
 
     def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
@@ -273,18 +282,25 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         new_plugin.placeholder = target_placeholder
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
+        parent = None
         if self.parent:
             parent = parent_cache[self.parent_id]
             parent = CMSPlugin.objects.get(pk=parent.pk)
+            new_plugin.parent_id = parent.pk
             new_plugin.parent = parent
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
-        new_plugin.position = self.position
+        new_plugin.position = CMSPlugin.objects.filter(parent=parent).count()
         if no_signals:
             from cms.signals import pre_save_plugins
+
             signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
             signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
             new_plugin._no_reorder = True
+        print '@@@@@@@@@@@@@'
+        print self.pk
+        for p in CMSPlugin.objects.all():
+            print p.pk, p.parent_id, p.path, p.position
         new_plugin.save()
         if plugin_instance:
             if plugin_instance.__class__ == CMSPlugin:
@@ -360,22 +376,22 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             try:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[self.pk]))
+                                  args=[self.pk]))
             except NoReverseMatch:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
-                            args=[self.pk]))
+                                  args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors(False, True):
             try:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[parent.pk]))
+                                  args=[parent.pk]))
             except NoReverseMatch:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
-                            args=[parent.pk]))
+                                  args=[parent.pk]))
             breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb
 
@@ -435,7 +451,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
 
         return True
 
-    def delete(self, no_mptt=False, *args,  **kwargs):
+    def delete(self, no_mptt=False, *args, **kwargs):
         if no_mptt:
             Model.delete(self, *args, **kwargs)
         else:
@@ -485,7 +501,7 @@ def deferred_class_factory(model, attrs):
     name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
 
     overrides = dict([(attr, DeferredAttribute(attr, model))
-        for attr in attrs])
+                      for attr in attrs])
     overrides["Meta"] = RenderMeta
     overrides["RenderMeta"] = RenderMeta
     overrides["__module__"] = model.__module__

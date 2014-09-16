@@ -259,8 +259,9 @@ class PlaceholderAdminMixin(object):
 
         if parent:
             plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-            plugin.insert_at(parent, position='last-child', save=False)
-        plugin.save()
+            parent.add_child(instance=plugin)
+        else:
+            plugin.save()
         self.post_add_plugin(request, placeholder, plugin)
         response = {
             'url': force_unicode(

@@ -454,13 +454,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
             # mptt related insertion correct?
             msg = u"parent plugin right is not updated, child not inserted correctly"
-            self.assertTrue(text_plugin.rght > link_plugin.rght, msg=msg)
+            self.assertTrue(text_plugin.position > link_plugin.position, msg=msg)
             msg = u"link has no parent"
             self.assertFalse(link_plugin.parent == None, msg=msg)
             msg = u"parent plugin left is not updated, child not inserted correctly"
-            self.assertTrue(text_plugin.lft < link_plugin.lft, msg=msg)
+            self.assertTrue(text_plugin.position < link_plugin.position, msg=msg)
             msg = u"child level is not bigger than parent level"
-            self.assertTrue(text_plugin.level < link_plugin.level, msg=msg)
+            self.assertTrue(text_plugin.depth < link_plugin.depth, msg=msg)
 
             # add the link plugin to the body
             # emulate the editor in admin that adds some txt for the nested plugin

@@ -1115,6 +1115,7 @@ class PageTreeTests(CMSTestCase):
         child.publish('en')
 
         child.move_page(parent)
+        child = child.reload()
         child.publish('en')
         child.reload()
 

@@ -50,7 +50,7 @@ def update_site_and_page_choices(lang=None):
             if not title:
                 continue
 
-            indent = u"&nbsp;&nbsp;" * title.page.level
+            indent = u"&nbsp;&nbsp;" * (title.page.depth - 1)
             page_title = mark_safe(u"%s%s" % (indent, title.title))
             site_page_choices.append((title.page.pk, page_title))
 
