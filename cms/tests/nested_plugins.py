@@ -114,6 +114,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     original_text_plugin.position,
                     copied_text_plugin.position
                 )
+                self.assertEqual(
+                    original_text_plugin.numchild,
+                    copied_text_plugin.numchild
+                )
 
                 self.assertEqual(
                     original_text_plugin.get_descendant_count(),

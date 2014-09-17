@@ -932,6 +932,7 @@ class PublishingTests(TestCase):
             public = not_drafts[idx]
             # Check that a node doesn't become a root node magically
             self.assertEqual(bool(public.parent_id), bool(draft.parent_id))
+            self.assertEqual(public.numchild, draft.numchild)
             if public.parent:
                 self.assertEqual(public.path[0:4], public.parent.path[0:4])
                 self.assertTrue(public.parent in public.get_ancestors())

@@ -46,10 +46,10 @@ class Placeholder(models.Model):
             if inst and getattr(inst, 'cmsplugin_ptr', False):
                 inst.cmsplugin_ptr._no_reorder = True
                 inst._no_reorder = True
-                inst.delete(no_mptt=True)
+                inst.delete(no_mp=True)
             else:
                 plugin._no_reorder = True
-                plugin.delete(no_mptt=True)
+                plugin.delete(no_mp=True)
 
     def get_label(self):
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))

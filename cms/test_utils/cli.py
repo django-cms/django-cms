@@ -73,7 +73,7 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
-            #'debug_toolbar.middleware.DebugToolbarMiddleware',
+            'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',

@@ -120,17 +120,18 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
-
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
         cache_tree_children(pages)
         ids = dict((page.id, page) for page in pages)
-
+        parent_ids = {}
         for page in pages:
-
-            children = list(page.get_children())
-
+            if not page.parent_id in parent_ids:
+                parent_ids[page.parent_id] = []
+            parent_ids[page.parent_id].append(page)
+        for page in pages:
+            children = parent_ids.get(page.pk, [])
             # If the parent page is not among the nodes shown, this node should
             # be a "root node". The filtering for this has already been made, so
             # using the ids dictionary means this check is constant time

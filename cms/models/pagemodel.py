@@ -609,9 +609,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             if page.publisher_public_id:
                 if not page.publisher_public.parent_id:
                     page._publisher_save_public(page.publisher_public)
-                    #page.publisher_public.parent = page.parent.publisher_public
-                    #page.publisher_public.save()
-                    #page.publisher_public.move(target=page.parent.publisher_public, pos='last-child')
+
                 if page.publisher_public.parent.is_published(language):
                     try:
                         public_title = Title.objects.get(page=page.publisher_public, language=language)
@@ -1145,9 +1143,9 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     if public_parent:
                         obj.parent_id = public_parent.pk
                         obj.add_root(instance=obj)
-                        public_parent = public_parent.reload()
+                        #public_parent = public_parent.reload()
                         obj = obj.reload()
-                        obj.move(public_parent, pos='first-child')
+                        obj.move(target=public_parent, pos='first-child')
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()

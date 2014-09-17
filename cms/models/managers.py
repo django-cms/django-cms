@@ -466,6 +466,8 @@ class PagePermissionsPermissionManager(models.Manager):
         return page_id_allow_list
 
     def __get_id_list(self, user, site, attr):
+        if site and not isinstance(site, int):
+            site = site.pk
         from cms.models import (GlobalPagePermission, PagePermission,
             MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
 
@@ -489,7 +491,7 @@ class PagePermissionsPermissionManager(models.Manager):
             # for standard users without global permissions, get all pages for him or
         # his group/s
         qs = PagePermission.objects.with_user(user)
-        qs.filter(**{'page__site': site}).order_by('page__path').select_related('page')
+        qs.filter(**{'page__site_id': site}).order_by('page__path').select_related('page')
         # default is denny...
         page_id_allow_list = []
         for permission in qs:

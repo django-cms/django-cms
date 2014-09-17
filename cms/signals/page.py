@@ -49,9 +49,9 @@ def post_save_page(instance, **kwargs):
 def pre_delete_page(instance, **kwargs):
     menu_pool.clear(instance.site_id)
     for placeholder in instance.placeholders.all():
-        for plugin in placeholder.cmsplugin_set.all():
+        for plugin in placeholder.cmsplugin_set.all().order_by('-depth'):
             plugin._no_reorder = True
-            plugin.delete()
+            plugin.delete(no_mp=True)
         placeholder.delete()
     clear_permission_cache()
 

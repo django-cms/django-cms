@@ -446,8 +446,8 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
 
         return True
 
-    def delete(self, no_mptt=False, *args, **kwargs):
-        if no_mptt:
+    def delete(self, no_mp=False, *args, **kwargs):
+        if no_mp:
             Model.delete(self, *args, **kwargs)
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
