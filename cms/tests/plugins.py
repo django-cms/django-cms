@@ -117,29 +117,21 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        print response
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(response.status_code, 200)
         created_plugin_id = self.get_response_pk(response)
-        print created_plugin_id
-        print CMSPlugin.objects.all()
-        print CMSPlugin.objects.all()[0]
         self.assertEqual(created_plugin_id, CMSPlugin.objects.all()[0].pk)
         return created_plugin_id
 
     def _edit_text_plugin(self, plugin_id, text):
         edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT, plugin_id)
-        print edit_url
         response = self.client.get(edit_url)
         self.assertEqual(response.status_code, 200)
         data = {
             "body": text
         }
         response = self.client.post(edit_url, data)
-        print response
         self.assertEqual(response.status_code, 200)
-        print Text.objects.all()
-        print CMSPlugin.objects.all()
         txt = Text.objects.get(pk=plugin_id)
         return txt
 
@@ -852,10 +844,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         ph_en = page_en.placeholders.get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
-        inner_text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1", target=text_plugin_1)
-        for p in CMSPlugin.objects.all():
-            print p.pk, p.parent_id, p.path, p.position
-        #text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
+        api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1", target=text_plugin_1)
         self.assertEqual(text_plugin_2.is_last_in_placeholder(), True)
 
     def test_plugin_move_with_reload(self):

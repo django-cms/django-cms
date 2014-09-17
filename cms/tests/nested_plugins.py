@@ -94,16 +94,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertEqual(len(copied_plugins_list), copied_plugins.count())
             # Check that each pair of items in the two lists match, in lots of 
             # different ways
-            for p in original_plugins_list:
-                p = p.get_plugin_instance()[0]
-                print p.pk, p.position, p.path
-
-
-            print
-            for p in copied_plugins_list:
-                p = p.get_plugin_instance()[0]
-                print p.pk, p.position, p.path
-
             for original, copy in zip(original_plugins_list, copied_plugins_list):
                 original_text_plugin = Text.objects.get(id=original.id)
                 copied_text_plugin = Text.objects.get(id=copy.id)
@@ -383,10 +373,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_2 = self.reload(plugin_2)
         plugin_1 = self.reload(plugin_1)
         old_parent = plugin_2.parent
-        print "@!@!!@!!@!@!@!@@!!@!@!@!@!@!@!@!@"
-        for p in CMSPlugin.objects.all():
-            print p.placeholder_id, p.path, p.pk, p.position
-
         plugin_2.parent_id = plugin_1.parent_id
         plugin_2.save()
         plugin_2.move(target=plugin_1, pos="left")

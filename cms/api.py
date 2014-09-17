@@ -294,7 +294,6 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 
     # validate and normalize plugin type
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
-    print 'add_plugin', plugin_type, language, position, target
     if target:
         if position == 'last-child':
             if CMSPlugin.node_order_by:
@@ -329,17 +328,14 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
             pl.save()
     else:
         if position == 'last-child':
-            print 'insert last root'
             new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
         else:
-            print 'insert root a 0'
             new_pos = 0
             for pl in CMSPlugin.objects.filter(language=language, parent__isnull=True, position__gte=new_pos,
                                                placeholder=placeholder):
                 pl.position += 1
                 pl.save()
         parent_id = None
-    print 'api new pos', new_pos
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
         placeholder=placeholder,
@@ -350,23 +346,12 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 
     plugin_base.add_root(instance=plugin_base)
 
-    #plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
-    print plugin_base.parent_id
-    print plugin_base.position
     if target:
-        #if position == 'last-child' or position == 'first-child':
-        #    plugin_base.parent_id = target.pk
-        #else:
-        #    plugin_base.parent_id = target.parent_id
-        #plugin_base.save()
         plugin_base.move(target, pos=position)
         plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
-    print '============='
-    for p in CMSPlugin.objects.all():
-        print p.pk, p.parent_id, p.path, p.position
     return plugin
 
 

@@ -258,7 +258,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                     if not self.position and not self.position == 0:
                         self.position == CMSPlugin.objects.filter(parent__isnull=True,
                                                                   placeholder_id=self.placeholder_id).count()
-                    print 'add root pos', self.position
                     self.add_root(instance=self)
                 return
             super(CMSPlugin, self).save()
@@ -297,10 +296,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
             signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
             new_plugin._no_reorder = True
-        print '@@@@@@@@@@@@@'
-        print self.pk
-        for p in CMSPlugin.objects.all():
-            print p.placeholder_id,p.path, p.pk, p.parent_id, p.position
         new_plugin.save()
         if plugin_instance:
             if plugin_instance.__class__ == CMSPlugin:

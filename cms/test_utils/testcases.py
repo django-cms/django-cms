@@ -274,12 +274,6 @@ class BaseCMSTestCase(object):
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-        for p in Page.objects.all():
-            print '----'
-            print p.pk, p.parent_id, p.path, p, p.is_home
-            for t in p.title_set.all():
-                print t.slug, t.path
-        print copied_slug
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
         return copied_page
 
@@ -360,13 +354,6 @@ class BaseCMSTestCase(object):
         draft_siblings = list(Page.objects.filter(parent_id=page.parent_id, publisher_is_draft=True).order_by('path'))
         public_siblings = list(Page.objects.filter(parent_id=public_page.parent_id, publisher_is_draft=False).order_by('path'))
         skip = 0
-        print 'draft'
-        for p in draft_siblings:
-            print p.pk, p.parent_id, p.path, p.publisher_public_id
-        print '-----'
-        print 'public'
-        for p in public_siblings:
-            print p.pk, p.parent_id, p.path
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
                 skip += 1

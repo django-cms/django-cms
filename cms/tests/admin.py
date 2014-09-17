@@ -1389,7 +1389,6 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(Page.objects.count(), 4)
             self.assertEqual(CMSPlugin.objects.count(), 6)
             response = self.client.get(admin_reverse('cms_page_add'))
-            print response
             self.assertContains(response, "page_type")
             # no page types available if you use the copy_target
             response = self.client.get("%s?copy_target=%s&language=en" % (admin_reverse('cms_page_add'), page.pk))

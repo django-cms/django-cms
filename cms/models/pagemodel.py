@@ -306,8 +306,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-        print self, target, site, position,copy_permissions
-        print
         pages = [self] + list(self.get_descendants().order_by('path'))
 
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
@@ -1122,11 +1120,9 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             obj - public variant of `self` to be saved.
 
         """
-        print '!!!!!!', obj.pk, self.pk, self.parent_id
         if self.parent_id and self.parent.publisher_public_id:
             assert self.parent_id == self.parent.pk
             public_parent = Page.objects.get(pk=self.parent.publisher_public_id)
-            print 'public parent', public_parent.pk
         else:
             public_parent = None
         filters = dict(publisher_public__isnull=False)
@@ -1139,56 +1135,35 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if not self.parent_id:
-                print 'first no parent_id'
                 obj.parent_id = None
                 self.add_sibling(pos='right', instance=obj)
             else:
                 if public_prev_sib:
-                    print 'first public prev sib'
-
-                    #
                     obj.parent_id = public_prev_sib.parent_id
                     public_prev_sib.add_sibling(pos='right', instance=obj)
                 else:
-                    print 'first public parent', public_parent.pk, obj.pk, self.pk
                     if public_parent:
-
                         obj.parent_id = public_parent.pk
                         obj.add_root(instance=obj)
                         public_parent = public_parent.reload()
                         obj = obj.reload()
-                        print obj.pk, obj.path
                         obj.move(public_parent, pos='first-child')
-                        obj = obj.reload()
-                        print obj.pk, obj.path
         else:
-
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
             if self.depth != obj.depth or \
                             public_parent != obj.parent or \
                             public_prev_sib != prev_public_sibling:
-                print public_prev_sib
-
                 if public_prev_sib:
-                    print 'has prev pub sib'
                     obj.parent_id = public_prev_sib.parent_id
                     obj.save()
                     obj.move(public_prev_sib, pos="right")
                 elif public_parent:
-                    print 'public parent', public_parent.pk
                     # move as a first child to parent
-                    #obj.parent = public_parent
                     obj.parent_id = public_parent.pk
                     obj.save()
-
-                    print '-------------------'
-                    print obj.pk
-                    print public_parent.pk
-                    #public_parent = public_parent.reload()
                     obj.move(target=public_parent, pos='first-child')
                 else:
-                    print 'next sib', public_parent
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
@@ -1197,9 +1172,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                         obj.move(next_sibling.publisher_public, pos="left")
             else:
                 obj.save()
-        print '%%%%%'
-        for p in Page.objects.all().order_by('path'):
-            print p.pk, p.parent_id, p.path, p.publisher_is_draft, p.publisher_public_id
 
     def rescan_placeholders(self):
         """
