@@ -1002,7 +1002,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             source_language = request.POST.get('source_language')
             target_language = request.POST.get('target_language')
             page = Page.objects.get(pk=page_id)
-            placeholders = page.placeholders.all()
+            placeholders = page.get_placeholders()
 
             if not target_language or not target_language in get_language_list():
                 return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))

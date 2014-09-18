@@ -43,21 +43,21 @@ def get_visible_pages(request, pages, site=None):
         # collect the pages that are affected by permissions
         if site and perm.page.site_id != site.pk:
             continue
-        if perm is not None and perm not in restricted_pages[perm.page.pk]:
+        if perm is not None and perm not in restricted_pages[perm.page_id]:
             # affective restricted pages gathering
-            # using mptt functions 
             # add the page with the perm itself
+
             if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]:
-                restricted_pages[perm.page.pk].append(perm)
+                restricted_pages[perm.page_id].append(perm)
                 restricted_pages[perm.page.publisher_public_id].append(perm)
                 # add children
-            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]:
+            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN] and perm.page.numchild:
                 child_ids = perm.page.get_children().values_list('id', 'publisher_public_id')
                 for id, public_id in child_ids:
                     restricted_pages[id].append(perm)
                     restricted_pages[public_id].append(perm)
             # add descendants
-            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]:
+            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS] and perm.page.numchild:
                 child_ids = perm.page.get_descendants().values_list('id', 'publisher_public_id')
                 for id, public_id in child_ids:
                     restricted_pages[id].append(perm)

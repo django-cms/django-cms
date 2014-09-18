@@ -312,7 +312,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.numchild = new_plugin.numchild
             # added to retain the position when creating a public copy of a plugin
             plugin_instance.position = new_plugin.position
+            plugin_instance._no_reorder = True
             plugin_instance.save()
+            #new_plugin._inst = plugin_instance
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
         if no_signals:

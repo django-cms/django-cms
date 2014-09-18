@@ -35,6 +35,7 @@ def copy_plugins_to(plugin_list, to_placeholder, to_language=None, parent_plugin
     for new_plugin, old_plugin in plugins_ziplist:
         new_instance = new_plugin.get_plugin_instance()[0]
         if new_instance:
+            new_instance._no_reorder = True
             new_instance.post_copy(old_plugin, plugins_ziplist)
         # returns information about originals and copies
     return plugins_ziplist

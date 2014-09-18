@@ -254,23 +254,31 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         plugin_pool.set_plugin_meta()
         for plugin in CMSPlugin.objects.filter(placeholder__page=target, language=language).order_by('-depth'):
             inst, cls = plugin.get_plugin_instance()
-            if inst and getattr(inst, 'cmsplugin_ptr', False):
+            if inst and getattr(inst, 'cmsplugin_ptr_id', False):
+                inst.cmsplugin_ptr = plugin
                 inst.cmsplugin_ptr._no_reorder = True
-                inst.delete()
+                inst.delete(no_mp=True)
             else:
                 plugin._no_reorder = True
-                plugin.delete()
-        for ph in self.placeholders.all():
+                plugin.delete(no_mp=True)
+        new_phs = []
+        target_phs = target.placeholders.all()
+        for ph in self.get_placeholders():
             plugins = ph.get_plugins_list(language)
-            try:
-                ph = target.placeholders.get(slot=ph.slot)
-            except Placeholder.DoesNotExist:
+            found = False
+            for target_ph in target_phs:
+                if target_ph.slot == ph.slot:
+                    ph = target_ph
+                    found = True
+                    break
+            if not found:
                 ph.pk = None  # make a new instance
                 ph.save()
-                target.placeholders.add(ph)
+                new_phs.append(ph)
                 # update the page copy
             if plugins:
                 copy_plugins_to(plugins, ph, no_signals=True)
+        target.placeholders.add(*new_phs)
 
     def _copy_attributes(self, target, clean=False):
         """
@@ -328,7 +336,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         for page in pages:
             titles = list(page.title_set.all())
             # get all current placeholders (->plugins)
-            placeholders = list(page.placeholders.all())
+            placeholders = list(page.get_placeholders())
             origin_id = page.id
             # create a copy of this page by setting pk = None (=new instance)
             page.old_pk = page.pk
@@ -602,20 +610,38 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
         # Check if there are some children which are waiting for parents to
         # become published.
-        publish_set = self.get_descendants().filter(title_set__published=True,
-                                                    title_set__language=language).select_related('publisher_public').order_by('depth', 'path')
         from cms.models import Title
+        publish_set = list(self.get_descendants().filter(title_set__published=True,
+                                                    title_set__language=language).select_related('publisher_public', 'publisher_public__parent').order_by('depth', 'path'))
+        #prefetch the titles
+        publish_ids = {}
         for page in publish_set:
+            publish_ids[page.pk] = None
+            if page.publisher_public_id:
+                publish_ids[page.publisher_public.pk] = None
+        titles = Title.objects.filter(page__pk__in=publish_ids.keys(), language=language)
+        for title in titles:
+            publish_ids[title.page_id] = title
+
+        for page in publish_set:
+            if page.pk in publish_ids and publish_ids[page.pk]:
+                page.title_cache = {}
+                page.title_cache[language] = publish_ids[page.pk]
             if page.publisher_public_id:
                 if not page.publisher_public.parent_id:
                     page._publisher_save_public(page.publisher_public)
-
+                #query and caching optimization
+                if page.publisher_public.parent_id and not page.publisher_public.parent:
+                    page.publisher_public.parent = Page.objects.get(pk=page.publisher_public.parent_id)
+                if page.publisher_public.parent_id in publish_ids:
+                    page.publisher_public.parent.title_cache = {}
+                    page.publisher_public.parent.title_cache[language] = publish_ids[page.publisher_public.parent_id]
                 if page.publisher_public.parent.is_published(language):
-                    try:
-                        public_title = Title.objects.get(page=page.publisher_public, language=language)
-                    except Title.DoesNotExist:
+                    if page.publisher_public_id in publish_ids:
+                        public_title = publish_ids[page.publisher_public_id]
+                    else:
                         public_title = None
-                    draft_title = Title.objects.get(page=page, language=language)
+                    draft_title = publish_ids[page.pk]
                     if public_title and not public_title.published:
                         public_title._publisher_keep_state = True
                         public_title.published = True
@@ -658,7 +684,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
         public_title.save()
         public_page = self.publisher_public
-        public_placeholders = public_page.placeholders.all()
+        public_placeholders = public_page.get_placeholders()
         for pl in public_placeholders:
             pl.cmsplugin_set.filter(language=language).delete()
         public_page.save()
@@ -783,6 +809,11 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         if not menu_title:
             return self.get_title(language, True, version_id, force_reload)
         return menu_title
+
+    def get_placeholders(self):
+        if not hasattr(self, '_placeholder_cache'):
+            self._placeholder_cache = self.placeholders.all()
+        return self._placeholder_cache
 
     def get_admin_tree_title(self):
         language = get_language()
@@ -1142,6 +1173,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 else:
                     if public_parent:
                         obj.parent_id = public_parent.pk
+                        obj.parent = public_parent
                         obj.add_root(instance=obj)
                         #public_parent = public_parent.reload()
                         obj = obj.reload()

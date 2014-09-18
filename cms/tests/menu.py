@@ -1099,6 +1099,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 """
                 get_visible_pages(request, pages)
 
+
     def test_page_permissions_view_groups(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
             user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
