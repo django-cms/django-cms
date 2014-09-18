@@ -267,7 +267,7 @@ clause.
     model file, make sure to return its results as UTF8-string. Otherwise 
     saving an instance of your plugin might fail with the frontend editor showing 
     an <Empty> plugin instance. To return in unicode use a return statement like
-    ``return u'{}'.format(self.guest_name)``.
+    ``return u'{0}'.format(self.guest_name)``.
 
 .. _handling-relations:
 
