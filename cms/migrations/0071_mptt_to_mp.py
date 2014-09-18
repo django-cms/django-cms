@@ -58,10 +58,9 @@ class Migration(DataMigration):
             else:
                 parent = orm['cms.Page'].objects.get(pk=page.parent_id)
                 parent.__class__.__bases__ = (MP_Node, )
-                print parent
+
                 page.path = "0000"
                 handler = MP_MoveHandler(page, target=parent, pos='last-child')
-                print handler.target
                 handler.target = parent
                 handler.process()
             cache[page.pk] = [page]
