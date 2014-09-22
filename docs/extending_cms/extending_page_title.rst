@@ -105,9 +105,9 @@ in one of your apps, and add the relevant menu entries for the extension on each
 Simplified toolbar API
 **********************
 
-.. versionadded:: 3.0.6
+.. versionadded:: 3.1
 
-Since 3.0.6 a simplified toolbar API is available to handle the more common cases::
+Since 3.1 a simplified toolbar API is available to handle the more common cases::
 
     from cms.extensions.toolbar import ExtensionToolbar
     from django.utils.translation import ugettext_lazy as _
