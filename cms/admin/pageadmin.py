@@ -14,7 +14,7 @@ from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
-from django.db import router
+from django.db import router, IntegrityError
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
@@ -180,20 +180,28 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'recover' in request.path:
             pk = obj.pk
             if obj.parent_id:
-                parent = Page.objects.get(pk=obj.parent_id)
+                try:
+                    parent = Page.objects.get(pk=obj.parent_id)
+                except Page.DoesNotExist:
+                    parent = None
             else:
                 parent = None
-            obj.depth = None
+            obj.pk = None
             obj.path = None
             obj.numchild = 0
-            obj.pk = None
+            obj.depth = 0
             if parent:
                 parent.add_child(instance=obj)
             else:
                 obj.add_root(instance=obj)
+            new_pk = obj.pk
+            saved_obj = Page.objects.get(pk=new_pk)
             obj.pk = pk
+            obj.path = saved_obj.path
+            obj.numchild = saved_obj.numchild
+            obj.depth = saved_obj.depth
+            saved_obj.delete()
             obj.save(no_signals=True)
-
         else:
             if 'history' in request.path:
                 old_obj = Page.objects.get(pk=obj.pk)

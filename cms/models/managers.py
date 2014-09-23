@@ -2,6 +2,7 @@
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
+from django.utils import six
 
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.exceptions import NoPermissionsException
@@ -10,6 +11,7 @@ from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import user_related_query_name
 from cms.utils.i18n import get_fallback_languages
+
 
 
 class PageManager(PublisherManager):
@@ -466,7 +468,7 @@ class PagePermissionsPermissionManager(models.Manager):
         return page_id_allow_list
 
     def __get_id_list(self, user, site, attr):
-        if site and not isinstance(site, int):
+        if site and not isinstance(site, six.integer_types):
             site = site.pk
         from cms.models import (GlobalPagePermission, PagePermission,
             MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
