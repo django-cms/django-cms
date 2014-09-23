@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import shutil
-from cms.api import create_page
 from os.path import join
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -242,7 +241,6 @@ class ReversionTestCase(TransactionCMSTestCase):
     def test_recover_path_collision(self):
         with self.login_user_context(self.user):
             self.assertEqual(Page.objects.count(), 2)
-            page1 = Page.objects.all()[0]
             page_data2 = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data2)
             self.assertRedirects(response, URL_CMS_PAGE)
