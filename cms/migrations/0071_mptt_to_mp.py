@@ -156,7 +156,21 @@ class Migration(DataMigration):
             cache[plugin.pk] = plugin
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        print("***********************************")
+        print("***********************************")
+        print("***********************************")
+        print("           ATTENTION")
+        print("           =========")
+        print("")
+        print("Your tree is now in an nonfunctional")
+        print("state. Please install an old version")
+        print("of django CMS (3.0.5) and run:")
+        print("    python manage.py cms fix-mptt")
+        print()
+        print()
+        print("************************************")
+        print("************************************")
+        print("************************************")
 
     models = {
         u'auth.group': {
