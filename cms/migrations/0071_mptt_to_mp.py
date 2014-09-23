@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.db.models import F
 from django.middleware import transaction
 from south.utils import datetime_utils as datetime
 from south.db import db
@@ -23,6 +24,28 @@ def _int2str(num):
 def _str2int(num):
     return NUM.str2int(num)
 
+def _get_basepath(path, depth):
+    """:returns: The base path of another path up to a given depth"""
+    if path:
+        return path[0:depth * STEPLEN]
+    return ''
+
+def _get_path(path, depth, newstep):
+    """
+    Builds a path given some values
+
+    :param path: the base path
+    :param depth: the depth of the  node
+    :param newstep: the value (integer) of the new step
+    """
+    parentpath = _get_basepath(path, depth - 1)
+    key = _int2str(newstep)
+    return '{0}{1}{2}'.format(
+        parentpath,
+        ALPHABET[0] * (STEPLEN - len(key)),
+        key
+    )
+
 def _inc_path(obj):
     """:returns: The path of the next sibling of a given node path."""
     newpos = _str2int(obj.path[-STEPLEN:]) + 1
@@ -31,39 +54,28 @@ def _inc_path(obj):
         raise Exception(_("Path Overflow from: '%s'" % (obj.path, )))
     return '{0}{1}{2}'.format(
         obj.path[:-STEPLEN],
-        obj.alphabet[0] * (STEPLEN - len(key)),
+        ALPHABET[0] * (STEPLEN - len(key)),
         key
     )
 
 class MP_AddRootHandler(MP_AddHandler):
-    def __init__(self, cls, **kwargs):
+    def __init__(self, **kwargs):
         super(MP_AddRootHandler, self).__init__()
-        self.cls = cls
         self.kwargs = kwargs
 
     def process(self):
 
         # do we have a root node already?
-        last_root = self.cls.get_last_root_node()
-
-        if last_root and last_root.node_order_by:
-            # there are root nodes and node_order_by has been set
-            # delegate sorted insertion to add_sibling
-            return last_root.add_sibling('sorted-sibling', **self.kwargs)
+        last_root = self.kwargs['last_root']
 
         if last_root:
             # adding the new root node as the last one
             newpath = _inc_path(last_root)
         else:
             # adding the first root node
-            newpath = self.cls._get_path(None, 1, 1)
+            newpath = _get_path(None, 1, 1)
 
-        if len(self.kwargs) == 1 and 'instance' in self.kwargs:
-            # adding the passed (unsaved) instance to the tree
-            newobj = self.kwargs['instance']
-        else:
-            # creating the new object
-            newobj = self.cls(**self.kwargs)
+        newobj = self.kwargs['instance']
 
         newobj.depth = 1
         newobj.path = newpath
@@ -72,56 +84,38 @@ class MP_AddRootHandler(MP_AddHandler):
         return newobj
 
 class MP_AddChildHandler(MP_AddHandler):
-    def __init__(self, node, **kwargs):
+    def __init__(self, node, orm, **kwargs):
         super(MP_AddChildHandler, self).__init__()
         self.node = node
         self.node_cls = node.__class__
         self.kwargs = kwargs
+        self.orm = orm
 
     def process(self):
-        if self.node_cls.node_order_by and not self.node.is_leaf():
-            # there are child nodes and node_order_by has been set
-            # delegate sorted insertion to add_sibling
-            self.node.numchild += 1
-            return self.node.get_last_child().add_sibling(
-                'sorted-sibling', **self.kwargs)
-
-        if len(self.kwargs) == 1 and 'instance' in self.kwargs:
-            # adding the passed (unsaved) instance to the tree
-            newobj = self.kwargs['instance']
-            if newobj.pk:
-                raise NodeAlreadySaved("Attempted to add a tree node that is "\
-                    "already in the database")
-        else:
-            # creating a new object
-            newobj = self.node_cls(**self.kwargs)
-
+        newobj = self.kwargs['instance']
         newobj.depth = self.node.depth + 1
-        if self.node.is_leaf():
+        if self.node.numchild == 0:
             # the node had no children, adding the first child
-            newobj.path = self.node_cls._get_path(
+            newobj.path = _get_path(
                 self.node.path, newobj.depth, 1)
             max_length = self.node_cls._meta.get_field('path').max_length
             if len(newobj.path) > max_length:
-                raise PathOverflow(
+                raise Exception(
                     _('The new node is too deep in the tree, try'
                       ' increasing the path.max_length property'
                       ' and UPDATE your database'))
         else:
             # adding the new child as the last one
-            newobj.path = self.node.get_last_child()._inc_path()
+            newobj.path = _inc_path(self.node.last_child)
         # saving the instance before returning it
         newobj.save()
         newobj._cached_parent_obj = self.node
-
-        get_result_class(self.node_cls).objects.filter(
+        self.orm['cms.Page'].objects.filter(
             path=self.node.path).update(numchild=F('numchild')+1)
 
         # we increase the numchild value of the object in memory
         self.node.numchild += 1
-        transaction.commit_unless_managed()
         return newobj
-
 
 class Migration(DataMigration):
 
@@ -129,25 +123,37 @@ class Migration(DataMigration):
         pages = orm['cms.Page'].objects.all().order_by('tree_id', 'level', 'lft')
 
         cache = {}
+        last_root = None
         for page in pages:
-            page.__class__.__bases__ = (MP_Node, )
             if not page.parent_id:
-                handler = MP_AddRootHandler(page.__class__, instance=page)
+                handler = MP_AddRootHandler(instance=page, last_root=last_root)
                 handler.process()
+                last_root = page
+                page.last_child = None
             else:
-                parent = orm['cms.Page'].objects.get(pk=page.parent_id)
-                parent.__class__.__bases__ = (MP_Node, )
-
-                page.path = "0000"
-                handler = MP_MoveHandler(page, target=parent, pos='last-child')
-                handler.target = parent
+                parent = cache[page.parent_id]
+                handler = MP_AddChildHandler(parent, orm, instance=page)
                 handler.process()
-            cache[page.pk] = [page]
+                parent.last_child = page
+            cache[page.pk] = page
 
-        "Write your forwards methods here."
-        # Note: Don't use "from appname.models import ModelName". 
-        # Use orm.ModelName to refer to models in this application,
-        # and orm['appname.ModelName'] for models in other applications.
+
+        plugins = orm['cms.CMSPlugin'].objects.all().order_by('tree_id', 'level', 'lft')
+
+        cache = {}
+        last_root = None
+        for plugin in plugins:
+            if not plugin.parent_id:
+                handler = MP_AddRootHandler(instance=plugin, last_root=last_root)
+                handler.process()
+                last_root = plugin
+                plugin.last_child = None
+            else:
+                parent = cache[plugin.parent_id]
+                handler = MP_AddChildHandler(parent, orm, instance=plugin)
+                handler.process()
+                parent.last_child = plugin
+            cache[plugin.pk] = plugin
 
     def backwards(self, orm):
         "Write your backwards methods here."
