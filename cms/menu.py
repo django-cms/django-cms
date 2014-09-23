@@ -157,7 +157,7 @@ def page_to_node(page, home, cut):
     Transform a CMS page into a navigation node.
 
     :param page: the page you wish to transform
-    :param home: a reference to the "home" page (the page with tree_id=1)
+    :param home: a reference to the "home" page (the page with path="0001)
     :param cut: Should we cut page from its parent pages? This means the node will not
          have a parent anymore.
     """
