@@ -48,7 +48,7 @@ class CMSSitemap(Sitemap):
         all_titles = Title.objects.public().filter(
             Q(redirect='') | Q(redirect__isnull=True),
             page__login_required=False
-        ).order_by('page__tree_id', 'page__lft')
+        ).order_by('page__path')
         return all_titles
 
     def lastmod(self, title):
