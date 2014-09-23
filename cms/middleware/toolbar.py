@@ -60,20 +60,24 @@ class ToolbarMiddleware(object):
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         build = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
 
-        if edit_on in request.GET and not request.session.get('cms_edit', False):
-            if not request.session.get('cms_edit', False):
-                menu_pool.clear()
-            request.session['cms_edit'] = True
-            if request.session.get('cms_build', False):
-                request.session['cms_build'] = False
-        if edit_off in request.GET and request.session.get('cms_edit', True):
-            if request.session.get('cms_edit', True):
-                menu_pool.clear()
+        if request.user.is_staff or request.user.is_anonymous():
+            if edit_on in request.GET and not request.session.get('cms_edit', False):
+                if not request.session.get('cms_edit', False):
+                    menu_pool.clear()
+                request.session['cms_edit'] = True
+                if request.session.get('cms_build', False):
+                    request.session['cms_build'] = False
+            if edit_off in request.GET and request.session.get('cms_edit', True):
+                if request.session.get('cms_edit', True):
+                    menu_pool.clear()
+                request.session['cms_edit'] = False
+                if request.session.get('cms_build', False):
+                    request.session['cms_build'] = False
+            if build in request.GET and not request.session.get('cms_build', False):
+                request.session['cms_build'] = True
+        else:
+            request.session['cms_build'] = False
             request.session['cms_edit'] = False
-            if request.session.get('cms_build', False):
-                request.session['cms_build'] = False
-        if build in request.GET and not request.session.get('cms_build', False):
-            request.session['cms_build'] = True
         if request.user.is_staff:
             try:
                 request.cms_latest_entry = LogEntry.objects.filter(

@@ -71,7 +71,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.add_structure_mode()
 
     def add_structure_mode(self):
-        if self.page:
+        if self.page and not self.page.application_urls:
             if self.page.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
