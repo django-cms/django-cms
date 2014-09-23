@@ -4,8 +4,36 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
-from treebeard.mp_tree import MP_Node, MP_MoveHandler, MP_AddRootHandler, MP_AddHandler
+from treebeard.numconv import NumConv
 
+
+STEPLEN = 4
+ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+class MP_AddHandler(object):
+    def __init__(self):
+        self.stmts = []
+
+NUM = NumConv(len(ALPHABET), ALPHABET)
+
+def _int2str(num):
+    return NUM.int2str(num)
+
+
+def _str2int(num):
+    return NUM.str2int(num)
+
+def _inc_path(obj):
+    """:returns: The path of the next sibling of a given node path."""
+    newpos = _str2int(obj.path[-STEPLEN:]) + 1
+    key = _int2str(newpos)
+    if len(key) > STEPLEN:
+        raise Exception(_("Path Overflow from: '%s'" % (obj.path, )))
+    return '{0}{1}{2}'.format(
+        obj.path[:-STEPLEN],
+        obj.alphabet[0] * (STEPLEN - len(key)),
+        key
+    )
 
 class MP_AddRootHandler(MP_AddHandler):
     def __init__(self, cls, **kwargs):
@@ -25,7 +53,7 @@ class MP_AddRootHandler(MP_AddHandler):
 
         if last_root:
             # adding the new root node as the last one
-            newpath = last_root._inc_path()
+            newpath = _inc_path(last_root)
         else:
             # adding the first root node
             newpath = self.cls._get_path(None, 1, 1)
@@ -41,6 +69,57 @@ class MP_AddRootHandler(MP_AddHandler):
         newobj.path = newpath
         # saving the instance before returning it
         newobj.save()
+        return newobj
+
+class MP_AddChildHandler(MP_AddHandler):
+    def __init__(self, node, **kwargs):
+        super(MP_AddChildHandler, self).__init__()
+        self.node = node
+        self.node_cls = node.__class__
+        self.kwargs = kwargs
+
+    def process(self):
+        if self.node_cls.node_order_by and not self.node.is_leaf():
+            # there are child nodes and node_order_by has been set
+            # delegate sorted insertion to add_sibling
+            self.node.numchild += 1
+            return self.node.get_last_child().add_sibling(
+                'sorted-sibling', **self.kwargs)
+
+        if len(self.kwargs) == 1 and 'instance' in self.kwargs:
+            # adding the passed (unsaved) instance to the tree
+            newobj = self.kwargs['instance']
+            if newobj.pk:
+                raise NodeAlreadySaved("Attempted to add a tree node that is "\
+                    "already in the database")
+        else:
+            # creating a new object
+            newobj = self.node_cls(**self.kwargs)
+
+        newobj.depth = self.node.depth + 1
+        if self.node.is_leaf():
+            # the node had no children, adding the first child
+            newobj.path = self.node_cls._get_path(
+                self.node.path, newobj.depth, 1)
+            max_length = self.node_cls._meta.get_field('path').max_length
+            if len(newobj.path) > max_length:
+                raise PathOverflow(
+                    _('The new node is too deep in the tree, try'
+                      ' increasing the path.max_length property'
+                      ' and UPDATE your database'))
+        else:
+            # adding the new child as the last one
+            newobj.path = self.node.get_last_child()._inc_path()
+        # saving the instance before returning it
+        newobj.save()
+        newobj._cached_parent_obj = self.node
+
+        get_result_class(self.node_cls).objects.filter(
+            path=self.node.path).update(numchild=F('numchild')+1)
+
+        # we increase the numchild value of the object in memory
+        self.node.numchild += 1
+        transaction.commit_unless_managed()
         return newobj
 
 
