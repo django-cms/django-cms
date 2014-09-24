@@ -13,7 +13,6 @@ from cms.utils.compat.dj import user_related_query_name
 from cms.utils.i18n import get_fallback_languages
 
 
-
 class PageManager(PublisherManager):
     """Use draft() and public() methods for accessing the corresponding
     instances.
