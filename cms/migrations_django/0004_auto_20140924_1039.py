@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
+from django.db.models import F
 
 from treebeard.numconv import NumConv
 
@@ -55,7 +56,7 @@ def _inc_path(obj):
     newpos = _str2int(obj.path[-STEPLEN:]) + 1
     key = _int2str(newpos)
     if len(key) > STEPLEN:
-        raise Exception(_("Path Overflow from: '%s'" % (obj.path, )))
+        raise Exception("Path Overflow from: '%s'" % (obj.path, ))
     return '{0}{1}{2}'.format(
         obj.path[:-STEPLEN],
         ALPHABET[0] * (STEPLEN - len(key)),
@@ -107,9 +108,9 @@ class MP_AddChildHandler(MP_AddHandler):
             max_length = self.node_cls._meta.get_field('path').max_length
             if len(newobj.path) > max_length:
                 raise Exception(
-                    _('The new node is too deep in the tree, try'
+                      'The new node is too deep in the tree, try'
                       ' increasing the path.max_length property'
-                      ' and UPDATE your database'))
+                      ' and UPDATE your database')
         else:
             # adding the new child as the last one
             newobj.path = _inc_path(self.node.last_child)
