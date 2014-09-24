@@ -84,12 +84,12 @@ class MP_AddRootHandler(MP_AddHandler):
         return newobj
 
 class MP_AddChildHandler(MP_AddHandler):
-    def __init__(self, node, orm, **kwargs):
+    def __init__(self, node, model, **kwargs):
         super(MP_AddChildHandler, self).__init__()
         self.node = node
         self.node_cls = node.__class__
         self.kwargs = kwargs
-        self.orm = orm
+        self.model = model
 
     def process(self):
         newobj = self.kwargs['instance']
@@ -110,7 +110,7 @@ class MP_AddChildHandler(MP_AddHandler):
         # saving the instance before returning it
         newobj.save()
         newobj._cached_parent_obj = self.node
-        self.orm['cms.Page'].objects.filter(
+        self.model.objects.filter(
             path=self.node.path).update(numchild=F('numchild')+1)
 
         # we increase the numchild value of the object in memory
@@ -132,7 +132,7 @@ class Migration(DataMigration):
                 page.last_child = None
             else:
                 parent = cache[page.parent_id]
-                handler = MP_AddChildHandler(parent, orm, instance=page)
+                handler = MP_AddChildHandler(parent, orm['cms.Page'], instance=page)
                 handler.process()
                 parent.last_child = page
             cache[page.pk] = page
@@ -150,7 +150,7 @@ class Migration(DataMigration):
                 plugin.last_child = None
             else:
                 parent = cache[plugin.parent_id]
-                handler = MP_AddChildHandler(parent, orm, instance=plugin)
+                handler = MP_AddChildHandler(parent, orm['cms.CMSPlugin'], instance=plugin)
                 handler.process()
                 parent.last_child = plugin
             cache[plugin.pk] = plugin
