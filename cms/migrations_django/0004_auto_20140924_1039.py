@@ -125,12 +125,6 @@ class MP_AddChildHandler(MP_AddHandler):
 
 
 def move_to_mp(apps, schema_editor):
-    # We can't import the Person model directly as it may be a newer
-    # version than this migration expects. We use the historical version.
-    Person = apps.get_model("yourappname", "Person")
-    for person in Person.objects.all():
-        person.name = "%s %s" % (person.first_name, person.last_name)
-        person.save()
     Page = apps.get_model("cms", "Page")
     CMSPlugin = apps.get_model("cms", "CMSPlugin")
     pages = Page.objects.all().order_by('tree_id', 'level', 'lft')
