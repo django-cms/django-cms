@@ -15,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
-
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -101,7 +100,7 @@ def _verify_plugin_type(plugin_type):
     (plugin_model, plugin_type)
     """
     if (hasattr(plugin_type, '__module__') and
-        issubclass(plugin_type, CMSPluginBase)):
+            issubclass(plugin_type, CMSPluginBase)):
         plugin_pool.set_plugin_meta()
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
@@ -116,6 +115,7 @@ def _verify_plugin_type(plugin_type):
     else:
         raise TypeError('plugin_type must be CMSPluginBase subclass or string')
     return plugin_model, plugin_type
+
 
 #===============================================================================
 # Public API 
@@ -184,6 +184,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
+    if parent:
+        if position in ('last-child', 'first-child'):
+            parent_id = parent.pk
+        else:
+            parent_id = parent.parent_id
+    else:
+        parent_id = None
     # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook, apphook_namespace)
@@ -197,7 +204,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     page = Page(
         created_by=created_by,
         changed_by=created_by,
-        parent=parent,
+        parent_id=parent_id,
         publication_date=publication_date,
         publication_end_date=publication_end_date,
         in_navigation=in_navigation,
@@ -210,10 +217,14 @@ def create_page(title, template, language, menu_title=None, slug=None,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,    
+        xframe_options=xframe_options,
     )
-    page.insert_at(parent, position)
-    page.save()
+    page.add_root(instance=page)
+    page = page.reload()
+
+    if parent:
+        page.move(target=parent, pos=position)
+        page = page.reload()
 
     create_title(
         language=language,
@@ -285,29 +296,59 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
     if target:
         if position == 'last-child':
-            new_pos = CMSPlugin.objects.filter(language=language, parent=target, tree_id=target.tree_id).count()
+            if CMSPlugin.node_order_by:
+                position = 'sorted-child'
+            new_pos = CMSPlugin.objects.filter(parent=target).count()
+            parent_id = target.pk
         elif position == 'first-child':
             new_pos = 0
+            if CMSPlugin.node_order_by:
+                position = 'sorted-child'
+            parent_id = target.pk
         elif position == 'left':
             new_pos = target.position
+            if CMSPlugin.node_order_by:
+                position = 'sorted-sibling'
+            parent_id = target.parent_id
         elif position == 'right':
             new_pos = target.position + 1
+            if CMSPlugin.node_order_by:
+                position = 'sorted-sibling'
+            parent_id = target.parent_id
         else:
             raise Exception('position not supported: %s' % position)
-        for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, tree_id=target.tree_id, position__gte=new_pos):
+        if position == 'last-child' or position == 'first-child':
+            qs = CMSPlugin.objects.filter(language=language, parent=target, position__gte=new_pos,
+                                          placeholder=placeholder)
+        else:
+            qs = CMSPlugin.objects.filter(language=language, parent=target.parent_id, position__gte=new_pos,
+                                          placeholder=placeholder)
+        for pl in qs:
             pl.position += 1
             pl.save()
     else:
-        new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
-
+        if position == 'last-child':
+            new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
+        else:
+            new_pos = 0
+            for pl in CMSPlugin.objects.filter(language=language, parent__isnull=True, position__gte=new_pos,
+                                               placeholder=placeholder):
+                pl.position += 1
+                pl.save()
+        parent_id = None
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
         placeholder=placeholder,
         position=new_pos,
-        language=language
+        language=language,
+        parent_id=parent_id,
     )
-    plugin_base.insert_at(target, position=position, save=False)
 
+    plugin_base.add_root(instance=plugin_base)
+
+    if target:
+        plugin_base.move(target, pos=position)
+        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
@@ -454,13 +495,13 @@ def copy_plugins_to_language(page, source_language, target_language,
     :return int: number of copied plugins
     """
     copied = 0
-    placeholders = page.placeholders.all()
+    placeholders = page.get_placeholders()
     for placeholder in placeholders:
         # only_empty is True we check if the placeholder already has plugins and
         # we skip it if has some
         if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
             plugins = list(
-                placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied

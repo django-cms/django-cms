@@ -36,7 +36,7 @@ setup(
         'django-classy-tags>=0.5',
         'south>=0.7.2',
         'html5lib',
-        'django-mptt==0.5.2,==0.6,==0.6.1',
+        'django-treebeard==2.0',
         'django-sekizai>=0.7',
         'djangocms-admin-style'
     ],

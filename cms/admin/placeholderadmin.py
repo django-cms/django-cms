@@ -259,8 +259,9 @@ class PlaceholderAdminMixin(object):
 
         if parent:
             plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-            plugin.insert_at(parent, position='last-child', save=False)
-        plugin.save()
+            parent.add_child(instance=plugin)
+        else:
+            plugin.save()
         self.post_add_plugin(request, placeholder, plugin)
         response = {
             'url': force_unicode(
@@ -306,13 +307,13 @@ class PlaceholderAdminMixin(object):
                 plugins = inst.placeholder_ref.get_plugins_list()
             else:
                 plugins = list(
-                    source_placeholder.cmsplugin_set.filter(tree_id=source_plugin.tree_id, lft__gte=source_plugin.lft,
-                                                            rght__lte=source_plugin.rght).order_by('tree_id', 'level',
-                                                                                                   'position'))
+                    source_placeholder.cmsplugin_set.filter(
+                        path__startswith=source_plugin.path,
+                        depth__gte=source_plugin.depth).order_by('path')
+                )
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level',
-                                                                                           'position'))
+                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
@@ -329,7 +330,7 @@ class PlaceholderAdminMixin(object):
         else:
             copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
-            'tree_id', 'level', 'position')
+            'path')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
@@ -443,7 +444,9 @@ class PlaceholderAdminMixin(object):
                     return HttpResponseBadRequest(force_unicode('parent must be in the same language as plugin_language'))
             else:
                 parent = None
-            plugin.move_to(parent, position='last-child')
+            plugin.move(parent, pos='last-child')
+            plugin = CMSPlugin.objects.get(pk=plugin.pk)
+            plugin.parent_id = parent.pk
         if not placeholder == source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
@@ -452,7 +455,7 @@ class PlaceholderAdminMixin(object):
                 return HttpResponseBadRequest(er)
 
         plugin.save()
-        for child in plugin.get_descendants(include_self=True):
+        for child in [plugin] + list(plugin.get_descendants()):
             child.placeholder = placeholder
             child.language = language
             child.save()

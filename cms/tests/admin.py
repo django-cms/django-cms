@@ -1275,7 +1275,6 @@ class AdminFormsTests(AdminTestsBase):
 
             form = PageForm(data)
             self.assertTrue(form.is_valid(), form.errors.as_text())
-            # WTF? WHY DOES form.save() not handle this stuff???
             instance = form.save()
             instance.permission_user_cache = user
             instance.permission_advanced_settings_cache = True
@@ -1418,7 +1417,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(18, 34)):
             force_unicode(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
-        with self.assertNumQueries(FuzzyInt(12, 14)):
+        with self.assertNumQueries(FuzzyInt(11, 13)):
             force_unicode(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):

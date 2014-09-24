@@ -151,7 +151,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
             # generate the expected response
             plugin_list = CMSPlugin.objects.filter(
                 language='en', placeholder_id=static_placeholder_target.draft.pk).order_by(
-                'tree_id', 'level', 'position')
+                'depth', 'position')
             reduced_list = []
             for plugin in plugin_list:
                 reduced_list.append(

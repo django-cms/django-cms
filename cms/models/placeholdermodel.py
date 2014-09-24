@@ -40,16 +40,16 @@ class Placeholder(models.Model):
             qs = self.cmsplugin_set.filter(language=language)
         else:
             qs = self.cmsplugin_set.all()
-        qs = qs.order_by('-level').select_related()
+        qs = qs.order_by('-depth').select_related()
         for plugin in qs:
             inst, cls = plugin.get_plugin_instance()
             if inst and getattr(inst, 'cmsplugin_ptr', False):
                 inst.cmsplugin_ptr._no_reorder = True
                 inst._no_reorder = True
-                inst.delete(no_mptt=True)
+                inst.delete(no_mp=True)
             else:
                 plugin._no_reorder = True
-                plugin.delete(no_mptt=True)
+                plugin.delete(no_mp=True)
 
     def get_label(self):
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
@@ -232,9 +232,9 @@ class Placeholder(models.Model):
 
     def get_plugins(self, language=None):
         if language:
-            return self.cmsplugin_set.filter(language=language).order_by('tree_id', 'lft')
+            return self.cmsplugin_set.filter(language=language).order_by('path')
         else:
-            return self.cmsplugin_set.all().order_by('tree_id', 'lft')
+            return self.cmsplugin_set.all().order_by('path')
 
     def get_filled_languages(self):
         """
