@@ -350,8 +350,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             return page.has_change_permission(request)
         elif self.placeholder:
             return self.placeholder.has_change_permission(request)
-        elif self.parent:
-            return self.parent.has_change_permission(request)
         return False
 
     def is_first_in_placeholder(self):
@@ -387,7 +385,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                                   args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
-        for parent in self.get_ancestors(False, True):
+        for parent in self.get_ancestors().reverse():
             try:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
@@ -405,8 +403,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         return result
 
     def num_children(self):
-        if self.child_plugin_instances:
-            return len(self.child_plugin_instances)
+        return self.numchild
 
     def notify_on_autoadd(self, request, conf):
         """

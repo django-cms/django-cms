@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import datetime
 import json
+import warnings
 import os
 
 from django import http
@@ -18,7 +19,7 @@ from django.utils import timezone
 
 from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -785,10 +786,43 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         placeholder = page.placeholders.get(slot='body')
         text = api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
-        plugins = Text.objects.all().defer('lft')
+        plugins = Text.objects.all().defer('path')
         import pickle
         a = StringIO()
         pickle.dump(plugins[0], a)
+
+    def test_empty_plugin_description(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        a = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG
+        )
+
+        self.assertEqual(a.get_short_description(), "<Empty>")
+
+    def test_page_attribute_warns(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        a = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG
+        )
+        a.save()
+        def get_page(plugin):
+            return plugin.page
+        self.assertWarns(
+            DontUsePageAttributeWarning,
+            "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
+            get_page, a
+        )
+
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
