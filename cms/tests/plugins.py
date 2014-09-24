@@ -815,13 +815,19 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=self.FIRST_LANG
         )
         a.save()
+
         def get_page(plugin):
             return plugin.page
+
         self.assertWarns(
             DontUsePageAttributeWarning,
             "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
             get_page, a
         )
+
+    def test_set_translatable_content(self):
+        a = Text(body="hello")
+        self.assertTrue(a.set_translatable_content({'body':'world'}))
 
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
