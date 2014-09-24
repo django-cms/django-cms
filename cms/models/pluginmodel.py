@@ -108,6 +108,11 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         # See #10547 and #12121.
         defers = []
         pk_val = None
+        for field in self._meta.fields:
+            if isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute):
+                defers.append(field.attname)
+        model = self._meta.proxy_for_model
+        return (model_unpickle, (model, defers), data)
         if self._deferred:
             factory = deferred_class_factory
             for field in self._meta.fields:
@@ -118,8 +123,10 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
                         # The pk_val and model values are the same for all
                         # DeferredAttribute classes, so we only need to do this
                         # once.
+                        print field.attname
                         obj = self.__class__.__dict__[field.attname]
-                        model = obj.model_ref()
+                        print dir(obj)
+                        #model = obj.model_ref()
         else:
             factory = lambda x, y: x
         return (model_unpickle, (model, defers, factory), data)

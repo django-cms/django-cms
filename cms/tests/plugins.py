@@ -50,6 +50,7 @@ from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
+from six import StringIO
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -777,6 +778,16 @@ class PluginsTestCase(PluginsTestBaseCase):
         out = placeholder.render(self.get_context(), width=300)
         self.assertFalse(len(out))
         self.assertTrue(len(placeholder._plugins_cache))
+
+    def test_defer_pickel(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        text = api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
+        plugins = Text.objects.all().defer('lft')
+        import pickle
+        a = StringIO()
+        pickle.dump(plugins[0], a)
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
