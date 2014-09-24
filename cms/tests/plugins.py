@@ -2,7 +2,6 @@
 from __future__ import with_statement
 import datetime
 import json
-import warnings
 import os
 
 from django import http
@@ -785,7 +784,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
 
         placeholder = page.placeholders.get(slot='body')
-        text = api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
+        api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
         plugins = Text.objects.all().defer('path')
         import pickle
         a = StringIO()
