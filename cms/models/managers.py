@@ -42,38 +42,8 @@ class PageManager(PublisherManager):
     def on_site(self, site=None):
         return self.get_query_set().on_site(site)
 
-    def root(self):
-        """
-        Return a queryset with pages that don't have parents, a.k.a. root. For
-        current site - used in frontend
-        """
-        return self.get_query_set().root()
-
-    def all_root(self):
-        """
-        Return a queryset with pages that don't have parents, a.k.a. root. For
-        all sites - used in frontend
-        """
-        return self.get_query_set().all_root()
-
-    def valid_targets(self, page_id, request, perms, page=None):
-        """
-        Give valid targets to move a page into the tree
-        """
-        return self.get_query_set().valid_targets(page_id, request, perms, page)
-
     def published(self, site=None):
         return self.get_query_set().published(site=site)
-
-    def expired(self):
-        return self.drafts().expired()
-
-    def get_all_pages_with_application(self):
-        """Returns all pages containing applications for all sites.
-
-        Doesn't cares about the application language.
-        """
-        return self.get_query_set().filter(title_set__application_urls__gt='').distinct()
 
     def get_home(self, site=None):
         return self.get_query_set().get_home(site)
@@ -136,23 +106,6 @@ class TitleManager(PublisherManager):
             else:
                 raise
         return None
-
-    def get_page_slug(self, slug, site=None):
-        """
-        Returns the latest slug for the given slug and checks if it's available
-        on the current site.
-        """
-        if not site:
-            site = Site.objects.get_current()
-        try:
-            titles = self.filter(
-                slug=slug,
-                page__site=site,
-            ).select_related()  # 'page')
-        except self.model.DoesNotExist:
-            return None
-        else:
-            return titles
 
     # created new public method to meet test case requirement and to get a list of titles for published pages
     def public(self):
