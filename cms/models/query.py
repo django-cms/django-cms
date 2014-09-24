@@ -15,6 +15,13 @@ class PageQuerySet(PublisherQuerySet):
                 site = None
         return self.filter(site=site)
 
+    def all_root(self):
+        """
+        Return a queryset with pages that don't have parents, a.k.a. root. For
+        all sites - used in frontend
+        """
+        return self.filter(parent__isnull=True)
+
     def published(self, language=None, site=None):
 
         if language:
