@@ -50,7 +50,6 @@ from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
 from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
-from six import StringIO
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -787,8 +786,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
         plugins = Text.objects.all().defer('path')
         import pickle
-        a = StringIO()
+        import io
+        a = io.BytesIO()
         pickle.dump(plugins[0], a)
+
 
     def test_empty_plugin_description(self):
         page = api.create_page("page", "nav_playground.html", "en")
