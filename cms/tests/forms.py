@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from cms.models import ACCESS_PAGE
+from cms.test_utils.util.context_managers import SettingsOverride
 
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 
 from cms.admin import forms
-from cms.admin.forms import PageUserForm
-from cms.api import create_page, create_page_user
+from cms.admin.forms import PageUserForm, PagePermissionInlineAdminForm
+from cms.api import create_page, create_page_user, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
@@ -149,3 +151,32 @@ class FormsTestCase(CMSTestCase):
             self.assertTrue(puf.initial.get(name, False))
 
 
+class PermissionFormTestCase(CMSTestCase):
+
+    def test_permission_forms(self):
+        page = create_page("page_b", "nav_playground.html", "en",
+                             created_by=self.get_superuser())
+        normal_user =  self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(page, normal_user, can_view=True,
+                            can_change=True)
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get("/en/admin/cms/page/%s/permission-settings/" % page.pk)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get("/en/admin/cms/page/%s/permissions/" % page.pk)
+            self.assertEqual(response.status_code, 200)
+
+        with SettingsOverride(CMS_RAW_ID_USERS=True):
+            data = {
+                'page': page.pk,
+                'grant_on': "hello",
+            }
+            form = PagePermissionInlineAdminForm(data=data, files=None)
+            self.assertFalse(form.is_valid())
+            data = {
+                'page': page.pk,
+                'grant_on': ACCESS_PAGE,
+            }
+            form = PagePermissionInlineAdminForm(data=data, files=None)
+            self.assertTrue(form.is_valid())
+            form.save(commit=False)

@@ -17,7 +17,7 @@ from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGrou
 from cms.utils.compat.dj import get_user_model, force_unicode
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, get_language_list
+from cms.utils.i18n import get_language_tuple
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import is_valid_url
@@ -118,16 +118,8 @@ class PageForm(forms.ModelForm):
         # No language, can not go further, but validation failed already
         if not lang:
             return cleaned_data
-
-        if 'parent' not in cleaned_data:
-            cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
-
-        try:
-            site = self.cleaned_data.get('site', Site.objects.get_current())
-        except Site.DoesNotExist:
-            raise ValidationError("No site found for current settings.")
-
+        site = self.cleaned_data.get('site', Site.objects.get_current())
         if parent and parent.site != site:
             raise ValidationError("Site doesn't match the parent's page site")
 
@@ -162,12 +154,6 @@ class PageForm(forms.ModelForm):
         if not slug:
             raise ValidationError(_("Slug must not be empty."))
         return slug
-
-    def clean_language(self):
-        language = self.cleaned_data['language']
-        if not language in get_language_list():
-            raise ValidationError("Given language does not match language settings.")
-        return language
 
 
 class PublicationDatesForm(forms.ModelForm):
@@ -344,7 +330,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     level or under him in choosen page tree, and users which were created by him, 
     but aren't assigned to higher page level than current user.
     """
-    page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
+    page = forms.ModelChoiceField(Page.objects.all(), label=_('user'), widget=HiddenInput(), required=True)
 
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdminForm, self).__init__(*args, **kwargs)
