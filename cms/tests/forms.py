@@ -255,7 +255,7 @@ class PermissionFormTestCase(CMSTestCase):
         }
 
         form = PageUserForm(data=data, files=None)
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), form.errors)
         form.save()
         data = {'username': "test2",
                 'password': 'hello',
@@ -269,17 +269,17 @@ class PermissionFormTestCase(CMSTestCase):
         }
         form = PageUserForm(data=data, files=None, instance=user2)
         form.save()
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), form.errors)
 
         data = {
             'name':'test_group'
         }
         form = PageUserGroupForm(data=data, files=None)
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), form.errors)
         instance = form.save()
 
         form = PageUserGroupForm(data=data, files=None, instance=instance)
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
 
