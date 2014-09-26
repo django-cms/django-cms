@@ -164,7 +164,7 @@ def get_user_permission_level(user):
         # those
         return 0
     try:
-        permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__level')[0]
+        permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__path')[0]
     except IndexError:
         # user isn't assigned to any node
         raise NoPermissionsException
