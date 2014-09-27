@@ -262,7 +262,7 @@ documentation on the subject at https://docs.djangoproject.com/en/dev/topics/htt
 following code instead in your views::
 
     def my_view(request):
-      current_app = resolve(request.path).namespace
+      current_app = resolve(request.path_info).namespace
       context = RequestContext(request, current_app=current_app)
       return render_to_response("my_templace.html", context_instance=context)
 
