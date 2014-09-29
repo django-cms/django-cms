@@ -47,9 +47,4 @@ class Migration(migrations.Migration):
             field=models.CharField(default='', unique=True, max_length=255),
             preserve_default=False,
         ),
-        migrations.AlterField(
-            model_name='placeholder',
-            name='slot',
-            field=models.CharField(verbose_name='slot', max_length=255, editable=False, db_index=True),
-        ),
     ]
