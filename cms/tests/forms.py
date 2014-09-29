@@ -252,6 +252,7 @@ class PermissionFormTestCase(CMSTestCase):
                 'created_by': user.pk,
                 'last_login': datetime.now(),
                 'date_joined': datetime.now(),
+                'email': 'test@example.com',
         }
 
         form = PageUserForm(data=data, files=None)
@@ -272,7 +273,7 @@ class PermissionFormTestCase(CMSTestCase):
         self.assertTrue(form.is_valid(), form.errors)
 
         data = {
-            'name':'test_group'
+            'name': 'test_group'
         }
         form = PageUserGroupForm(data=data, files=None)
         self.assertTrue(form.is_valid(), form.errors)
