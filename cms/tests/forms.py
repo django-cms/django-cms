@@ -269,9 +269,8 @@ class PermissionFormTestCase(CMSTestCase):
                 'notify_user': 'on',
         }
         form = PageUserForm(data=data, files=None, instance=user2)
-        form.save()
         self.assertTrue(form.is_valid(), form.errors)
-
+        form.save()
         data = {
             'name': 'test_group'
         }
