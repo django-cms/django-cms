@@ -495,6 +495,9 @@ $(document).ready(function () {
 		_loadContent: function (url, name) {
 			var that = this;
 
+			// FIXME: A better fix is needed for '&' being interpreted as the
+			// start of en entity by jQuery. See #3404
+			url = url.replace('&', '&amp;');
 			// now refresh the content
 			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
 				iframe.css('visibility', 'hidden');
