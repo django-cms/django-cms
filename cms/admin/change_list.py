@@ -155,7 +155,7 @@ class CMSChangeList(ChangeList):
                 page.menu_level = 0
                 root_pages.append(page)
                 if page.parent_id:
-                    page.get_cached_ancestors(ascending=True)
+                    page.get_cached_ancestors()
                 else:
                     page.ancestors_ascending = []
 

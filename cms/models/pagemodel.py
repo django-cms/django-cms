@@ -307,17 +307,13 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         Copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
 
-        Note: public_copy was added in order to enable the creation of a copy
-        for creating the public page during the publish operation as it sets the
-        publisher_is_draft=False.
-
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-        pages = [self] + list(self.get_descendants().order_by('path'))
-
+        if not self.publisher_is_draft:
+            raise PublicIsUnmodifiable("copy page is not allowed for public pages")
+        pages = list(self.get_descendants(True).order_by('path'))
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
-
         if target:
             target.old_pk = -1
             if position == "first-child" or position == "last-child":
@@ -371,9 +367,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     page.parent = None
             tree.append(page)
             page.site = site
-
             page.save()
-
             # copy permissions if necessary
             if get_cms_setting('PERMISSION') and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
@@ -385,30 +379,17 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
             # copy titles of this page
             draft_titles = {}
-            public_titles = []
             for title in titles:
-                if title.publisher_is_draft:
-                    title.pk = None  # setting pk = None creates a new instance
-                    title.page = page
-                    if title.publisher_public_id:
-                        draft_titles[title.publisher_public_id] = title
-                        title.publisher_public = None
-                        # create slug-copy for standard copy
-                    title.published = False
-                    title.slug = page_utils.get_available_slug(title)
-                    title.save()
-                else:
-                    public_titles.append(title)
-            for title in public_titles:
-                draft_title = draft_titles[title.pk]
+
                 title.pk = None  # setting pk = None creates a new instance
                 title.page = page
+                if title.publisher_public_id:
+                    draft_titles[title.publisher_public_id] = title
+                    title.publisher_public = None
+                    # create slug-copy for standard copy
+                title.published = False
                 title.slug = page_utils.get_available_slug(title)
-                title.publisher_public_id = draft_title.pk
                 title.save()
-                draft_title.publisher_public = title
-                draft_title.save()
-
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
                 plugins = ph.get_plugins_list()
@@ -750,15 +731,21 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         else:
             return []
 
-    def get_cached_ancestors(self, ascending=True):
-        if ascending:
-            if not hasattr(self, "ancestors_ascending"):
-                self.ancestors_ascending = list(self.get_ancestors())
-            return self.ancestors_ascending
+    def get_descendants(self, include_self=False):
+        """
+        :returns: A queryset of all the node's descendants as DFS, doesn't
+            include the node itself
+        """
+        if include_self:
+            return self.__class__.get_tree(self)
         else:
-            if not hasattr(self, "ancestors_descending"):
-                self.ancestors_descending = list(self.get_ancestors().order_by('-deptjh'))
-            return self.ancestors_descending
+            return self.__class__.get_tree(self).exclude(pk=self.pk)
+
+    def get_cached_ancestors(self):
+        if not hasattr(self, "ancestors_ascending"):
+            self.ancestors_ascending = list(self.get_ancestors())
+        return self.ancestors_ascending
+
 
     # ## Title object access
 
@@ -1100,12 +1087,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         Reload a page from the database
         """
         return Page.objects.get(pk=self.pk)
-
-    def get_object_queryset(self):
-        """Returns smart queryset depending on object type - draft / public
-        """
-        qs = self.__class__.objects
-        return self.publisher_is_draft and qs.drafts() or qs.public().published()
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?
