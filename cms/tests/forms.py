@@ -262,7 +262,7 @@ class PermissionFormTestCase(CMSTestCase):
                 'password': 'hello',
                 'password1': 'hello',
                 'password2': 'hello',
-                'email': 'test@example.com',
+                'email': 'test2@example.com',
                 'created_by': user.pk,
                 'last_login': datetime.now(),
                 'date_joined': datetime.now(),
