@@ -219,7 +219,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
     # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
     # there for possible enhancements
     if inherit and not edit_mode:
-        pages = chain([current_page], current_page.get_cached_ancestors(ascending=True))
+        pages = chain([current_page], current_page.get_cached_ancestors())
     for page in pages:
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
