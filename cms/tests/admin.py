@@ -77,6 +77,7 @@ class AdminTestsBase(CMSTestCase):
 
 
 class AdminTestCase(AdminTestsBase):
+
     def test_permissioned_page_list(self):
         """
         Makes sure that a user with restricted page permissions can view

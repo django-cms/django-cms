@@ -333,15 +333,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             return self.placeholder.has_change_permission(request)
         return False
 
-    def is_first_in_placeholder(self):
-        return self.position == 0
-
-    def is_last_in_placeholder(self):
-        """
-        WARNING: this is a rather expensive call compared to is_first_in_placeholder!
-        """
-        return self.placeholder.cmsplugin_set.filter(parent__isnull=True).order_by('-position')[0].pk == self.pk
-
     def get_position_in_placeholder(self):
         """
         1 based position!
@@ -423,14 +414,11 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     def set_translatable_content(self, fields):
         for field, value in fields.items():
             setattr(self, field, value)
-
         self.save()
-
         # verify that all fields have been set
         for field, value in fields.items():
             if getattr(self, field) != value:
                 return False
-
         return True
 
     def delete(self, no_mp=False, *args, **kwargs):
@@ -454,42 +442,3 @@ def get_plugin_media_path(instance, filename):
     and it invokes the bounded method on the given instance at runtime
     """
     return instance.get_media_path(filename)
-
-
-def deferred_class_factory(model, attrs):
-    """
-    Returns a class object that is a copy of "model" with the specified "attrs"
-    being replaced with DeferredAttribute objects. The "pk_value" ties the
-    deferred attributes to a particular instance of the model.
-    """
-
-    class Meta:
-        pass
-
-    setattr(Meta, "proxy", True)
-    setattr(Meta, "app_label", model._meta.app_label)
-
-    class RenderMeta:
-        pass
-
-    setattr(RenderMeta, "index", model._render_meta.index)
-    setattr(RenderMeta, "total", model._render_meta.total)
-    setattr(RenderMeta, "text_enabled", model._render_meta.text_enabled)
-
-    # The app_cache wants a unique name for each model, otherwise the new class
-    # won't be created (we get an old one back). Therefore, we generate the
-    # name using the passed in attrs. It's OK to reuse an old case if the attrs
-    # are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
-
-    overrides = dict([(attr, DeferredAttribute(attr, model))
-                      for attr in attrs])
-    overrides["Meta"] = RenderMeta
-    overrides["RenderMeta"] = RenderMeta
-    overrides["__module__"] = model.__module__
-    overrides["_deferred"] = True
-    return type(name, (model,), overrides)
-
-# The above function is also used to unpickle model instances with deferred
-# fields.
-deferred_class_factory.__safe_for_unpickling__ = True

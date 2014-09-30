@@ -827,7 +827,9 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_set_translatable_content(self):
         a = Text(body="hello")
-        self.assertTrue(a.set_translatable_content({'body':'world'}))
+        self.assertTrue(a.set_translatable_content({'body': 'world'}))
+        b = Link(name="hello")
+        self.assertTrue(b.set_translatable_content({'name': 'world'}))
 
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
@@ -885,18 +887,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
         self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
         self.assertEqual(db_text_plugin_1.pk, text_plugin_1.pk)
-
-    def test_is_last_in_placeholder(self):
-        """
-        Tests that children plugins don't affect the is_last_in_placeholder plugin method.
-        """
-        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                              slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-        text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
-        api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1", target=text_plugin_1)
-        self.assertEqual(text_plugin_2.is_last_in_placeholder(), True)
 
     def test_plugin_move_with_reload(self):
         action_options = {
