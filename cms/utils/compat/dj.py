@@ -8,7 +8,7 @@ __all__ = ['User', 'get_user_model', 'user_model_label', 'user_related_name',
            ]
 
 
-try:
+try:  # pragma: no cover
     from django.utils.encoding import force_unicode
     def python_2_unicode_compatible(klass):
         """
@@ -25,7 +25,7 @@ except ImportError:
     force_unicode = lambda s: str(s)
     from django.utils.encoding import python_2_unicode_compatible  # nopyflakes
 
-try:
+try:  # pragma: no cover
     from django.db.models.loading import get_app_paths
 except ImportError:
     from django.db.models.loading import get_apps
@@ -49,7 +49,7 @@ except ImportError:
                 app_paths.append(upath(app.__file__))
         return app_paths
 
-try:
+try:  # pragma: no cover
     from django.apps import apps
 
     def is_installed(app_name):
@@ -72,7 +72,7 @@ if django.VERSION >= (1, 5):
     from django.contrib.auth import get_user_model
     from django.contrib.auth.models import User as OriginalUser
     is_user_swapped = bool(OriginalUser._meta.swapped)
-else:
+else:  # pragma: no cover
     from django.contrib.auth.models import User
     User.USERNAME_FIELD = 'username'
     get_user_model = lambda: User
@@ -83,9 +83,9 @@ user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 # With a custom user model named "EmailUser", Django 1.5 creates
 # Group.emailuser_set but Django 1.6 creates Group.user_set.
 # See https://code.djangoproject.com/ticket/20244
-if (1, 5) <= django.VERSION < (1, 6):
+if (1, 5) <= django.VERSION < (1, 6):  # pragma: no cover
     user_related_query_name = user_model_label.split('.')[1].lower()
     user_related_name = user_related_query_name + '_set'
-else:
+else:  # pragma: no cover
     user_related_query_name = "user"
     user_related_name = "user_set"
