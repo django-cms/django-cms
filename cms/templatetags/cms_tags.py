@@ -537,27 +537,6 @@ class PageAttribute(AsTag):
 
 register.tag(PageAttribute)
 
-
-class CleanAdminListFilter(InclusionTag):
-    template = 'admin/filter.html'
-    name = 'clean_admin_list_filter'
-
-    options = Options(
-        Argument('cl'),
-        Argument('spec'),
-    )
-
-    def get_context(self, context, cl, spec):
-        choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
-        query_string = None
-        unique_choices = []
-        for choice in choices:
-            if choice['query_string'] != query_string:
-                unique_choices.append(choice)
-                query_string = choice['query_string']
-        return {'title': spec.title(), 'choices': unique_choices}
-
-
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
                                site=None, cache_result=True):
     """
