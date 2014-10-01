@@ -15,8 +15,7 @@ from cms.test_utils.project.extensionapp.models import (MyPageExtension,
                                                         MyTitleExtension)
 from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
 from cms.tests import AdminTestsBase
-from cms.utils.compat.dj import get_user_model, force_unicode
-from django.template.response import TemplateResponse
+from cms.utils.compat.dj import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
