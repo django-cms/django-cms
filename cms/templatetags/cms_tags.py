@@ -291,25 +291,13 @@ class Placeholder(Tag):
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
         validate_placeholder_name(name)
-        width = None
         inherit = False
         for bit in extra_bits:
             if bit == 'inherit':
                 inherit = True
-            elif bit.isdigit():
-                width = int(bit)
-                import warnings
-
-                warnings.warn(
-                    "The width parameter for the placeholder tag is deprecated.",
-                    DeprecationWarning
-                )
         if not 'request' in context:
             return ''
         request = context['request']
-        if width:
-            context.update({'width': width})
-
         page = request.current_page
         if not page or page == 'dummy':
             if nodelist:
@@ -320,7 +308,6 @@ class Placeholder(Tag):
         except PlaceholderNotFound:
             if nodelist:
                 return nodelist.render(context)
-            raise
         if not content:
             if nodelist:
                 return nodelist.render(context)

@@ -10,6 +10,7 @@ from cms.utils.compat.dj import force_unicode
 from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.sites import site
 from django.core.urlresolvers import reverse
+from django.template import Context
 from django.template.base import Template
 
 
@@ -65,8 +66,18 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         t = Template('{% load cms_tags %}{% static_placeholder "foobar" or %}No Content{% endstatic_placeholder %}')
         rendered = t.render(self.get_context('/'))
         self.assertIn("No Content", rendered)
+
+        t = Template('{% load cms_tags %}{% static_placeholder "" %}')
+        rendered = t.render(self.get_context('/'))
+        self.assertEqual("", rendered)
+
+        t = Template('{% load cms_tags %}{% static_placeholder code or %}No Content{% endstatic_placeholder %}')
+        rendered = t.render(Context({'code': StaticPlaceholder.objects.all()[0]}))
+        self.assertIn("No Content", rendered)
+
         for p in Placeholder.objects.all():
             add_plugin(p, 'TextPlugin', 'en', body='test')
+        t = Template('{% load cms_tags %}{% static_placeholder "foobar" or %}No Content{% endstatic_placeholder %}')
         rendered = t.render(self.get_context('/'))
         self.assertNotIn("No Content", rendered)
         self.assertEqual(StaticPlaceholder.objects.filter(site_id__isnull=True, code='foobar').count(), 1)
