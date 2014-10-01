@@ -380,15 +380,33 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page.get_admin_tree_title(), 'page_a')
         page.title_cache = {}
         self.assertEqual("Empty", force_unicode(page.get_admin_tree_title()))
-        with force_language('fr'):
-            page.title_cache = {'en': Title(slug='test', page_title="test2")}
-            self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
-            page.title_cache = {'en': Title(slug='test', menu_title="test2")}
-            self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
-            page.title_cache = {'en': Title(slug='test2')}
-            self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
-            page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-            self.assertEqual('', force_unicode(page.get_admin_tree_title()))
+        languages = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': 'English',
+                    'fallbacks': ['fr', 'de'],
+                    'public': True,
+                    'fallbacks':['fr']
+                },
+
+                {
+                    'code': 'fr',
+                    'name': 'French',
+                    'public': True,
+                    'fallbacks':['en']
+                },
+        ]}
+        with SettingsOverride(CMS_LANGUAGES=languages):
+            with force_language('fr'):
+                page.title_cache = {'en': Title(slug='test', page_title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test', menu_title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test2')}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
+                self.assertEqual('', force_unicode(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
