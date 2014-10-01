@@ -9,6 +9,7 @@ from cms.tests.plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
 from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.sites import site
+from django.core.urlresolvers import reverse
 from django.template.base import Template
 
 
@@ -90,6 +91,8 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertEqual(static_placeholder.draft.cmsplugin_set.all().count(), 2)
         self.assertEqual(static_placeholder.public.cmsplugin_set.all().count(), 0)
         request = self.get_request()
+        with self.login_user_context(self.get_superuser()):
+            self.client.post(reverse("admin:cms_page_publish", args=[1]))
         static_placeholder.publish(request, 'en')
 
     def test_permissions(self):

@@ -28,7 +28,7 @@ from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import installed_apps
+from cms.utils.compat.dj import installed_apps, force_unicode
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
 
@@ -379,16 +379,16 @@ class PagesTestCase(CMSTestCase):
         page = create_page("page_a", "nav_playground.html", "en", published=True)
         self.assertEqual(page.get_admin_tree_title(), 'page_a')
         page.title_cache = {}
-        self.assertEqual("Empty", unicode(page.get_admin_tree_title()))
+        self.assertEqual("Empty", force_unicode(page.get_admin_tree_title()))
         with force_language('fr'):
             page.title_cache = {'en': Title(slug='test', page_title="test2")}
-            self.assertEqual('test2', unicode(page.get_admin_tree_title()))
+            self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
             page.title_cache = {'en': Title(slug='test', menu_title="test2")}
-            self.assertEqual('test2', unicode(page.get_admin_tree_title()))
+            self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
             page.title_cache = {'en': Title(slug='test2')}
-            self.assertEqual('test2', unicode(page.get_admin_tree_title()))
+            self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
             page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-            self.assertEqual('', unicode(page.get_admin_tree_title()))
+            self.assertEqual('', force_unicode(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()

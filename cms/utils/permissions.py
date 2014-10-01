@@ -9,9 +9,9 @@ from cms.plugin_pool import plugin_pool
 from cms.utils.compat.dj import get_user_model, user_related_query_name
 
 
-try:
+try: # pragma: no cover
     from threading import local
-except ImportError:
+except ImportError: # pragma: no cover
     from django.utils._threading_local import local
 
 # thread local support
