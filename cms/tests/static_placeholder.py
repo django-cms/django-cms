@@ -92,7 +92,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertEqual(static_placeholder.public.cmsplugin_set.all().count(), 0)
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(reverse("admin:cms_page_publish_page", args=[1, 'en']), {'statics':[static_placeholder.pk]})
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
 
     def test_permissions(self):
         static_placeholder = StaticPlaceholder.objects.create(name='foo', code='bar', site_id=1)
