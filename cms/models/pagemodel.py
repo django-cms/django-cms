@@ -802,33 +802,33 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
 
-    def get_admin_tree_title(self):
-        language = get_language()
+    def _validate_title(self, title):
         from cms.models.titlemodels import EmptyTitle
+        if isinstance(title, EmptyTitle):
+            return False
+        if not title.title or not title.slug:
+            return False
+        return True
 
-        def validate_title(title):
-            if isinstance(title, EmptyTitle):
-                return False
-            if not title.title or not title.slug:
-                return False
-            return True
-
+    def get_admin_tree_title(self):
+        from cms.models.titlemodels import EmptyTitle
+        language = get_language()
         if not hasattr(self, 'title_cache'):
             self.title_cache = {}
             for title in self.title_set.all():
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
+        if not language in self.title_cache or not self._validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
-                if lang in self.title_cache and validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
+                if lang in self.title_cache and self._validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
                     found = True
                     language = lang
             if not found:
-                if self.title_cache.keys():
-                    language = list(self.title_cache.keys())[0]
-                else:
-                    language = None
+                language = None
+                for lang, item in self.title_cache.items():
+                    if not isinstance(item, EmptyTitle):
+                        language = lang
         if not language:
             return _("Empty")
         title = self.title_cache[language]

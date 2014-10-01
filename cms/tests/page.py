@@ -399,6 +399,8 @@ class PagesTestCase(CMSTestCase):
         ]}
         with SettingsOverride(CMS_LANGUAGES=languages):
             with force_language('fr'):
+                page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', page_title="test2")}
                 self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', menu_title="test2")}
@@ -406,7 +408,7 @@ class PagesTestCase(CMSTestCase):
                 page.title_cache = {'en': Title(slug='test2')}
                 self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-                self.assertEqual('', force_unicode(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
