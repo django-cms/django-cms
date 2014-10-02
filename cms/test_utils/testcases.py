@@ -255,11 +255,11 @@ class BaseCMSTestCase(object):
             return
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
-    def copy_page(self, page, target_page):
+    def copy_page(self, page, target_page, position='last-child'):
         from cms.utils.page import get_available_slug
 
         data = {
-            'position': 'last-child',
+            'position': position,
             'target': target_page.pk,
             'site': 1,
             'copy_permissions': 'on',
@@ -274,7 +274,11 @@ class BaseCMSTestCase(object):
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
+        if position in ('first-child', 'last-child'):
+            parent = target_page
+        else:
+            parent = target_page.parent
+        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=parent)
         return copied_page
 
     def move_page(self, page, target_page, position="first-child"):
