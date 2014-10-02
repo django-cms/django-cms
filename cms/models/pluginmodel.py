@@ -380,7 +380,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                                   args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
-        for parent in self.get_ancestors(False, True):
+        for parent in self.get_ancestors().reverse():
             try:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
