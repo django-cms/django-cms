@@ -427,26 +427,28 @@ class PlaceholderAdminMixin(object):
         order = request.POST.getlist("plugin_order[]")
         if not self.has_move_plugin_permission(request, plugin, placeholder):
             return HttpResponseForbidden(force_unicode(_("You have no permission to move this plugin")))
-        if plugin.parent_id != parent_id:
-            if parent_id:
-                parent = CMSPlugin.objects.get(pk=parent_id)
-                if parent.placeholder_id != placeholder.pk:
-                    return HttpResponseBadRequest(force_unicode('parent must be in the same placeholder'))
-                if parent.language != language:
-                    return HttpResponseBadRequest(force_unicode('parent must be in the same language as plugin_language'))
-            else:
-                parent = None
-            plugin.move(parent, pos='last-child')
-            plugin = CMSPlugin.objects.get(pk=plugin.pk)
-            plugin.parent_id = parent.pk
         if not placeholder == source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
-
-        plugin.save()
+        if parent_id:
+            if plugin.parent_id != parent_id:
+                parent = CMSPlugin.objects.get(pk=parent_id)
+                if parent.placeholder_id != placeholder.pk:
+                    return HttpResponseBadRequest(force_unicode('parent must be in the same placeholder'))
+                if parent.language != language:
+                    return HttpResponseBadRequest(force_unicode('parent must be in the same language as plugin_language'))
+                plugin.parent_id = parent.pk
+                plugin.save()
+                plugin.move(parent, pos='last-child')
+        else:
+            sibling = CMSPlugin.get_last_root_node()
+            plugin.parent_id = None
+            plugin.save()
+            plugin.move(sibling, pos='right')
+        plugin = CMSPlugin.objects.get(pk=plugin.pk)
         for child in [plugin] + list(plugin.get_descendants()):
             child.placeholder = placeholder
             child.language = language
