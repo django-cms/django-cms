@@ -16,6 +16,7 @@ from cms.utils.compat.tests import UnittestCompatMixin
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
+URL_CMS_ADD_PLUGIN = u'/en/admin/cms/page/%d/add-plugin/'
 
 
 class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
@@ -916,3 +917,26 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             copied_placeholder = copied_link_child_plugin.placeholder
             msg = u"placeholder of the orginal plugin and copied plugin are the same"
             self.assertNotEqual(org_placeholder.id, copied_placeholder.id, msg)
+
+    def test_add_child_plugin(self):
+        page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
+                                   position=u"last-child", published=True, in_navigation=True)
+        page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
+        # add the text plugin to placeholder one
+        text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            # now move the parent text plugin to another placeholder
+            post_data = {
+                'placeholder_id': page_one_ph_one.id,
+                'plugin_type': 'LinkPlugin',
+                'plugin_language': 'en',
+                'plugin_parent': text_plugin_en.pk,
+
+            }
+            add_url = URL_CMS_ADD_PLUGIN % page_one.pk
+            response = self.client.post(add_url, post_data)
+            self.assertEqual(response.status_code, 200)
+        link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)
+        self.assertEqual(link_plugin.parent_id, text_plugin_en.pk)
+        self.assertEqual(link_plugin.path, '00010001')

@@ -215,20 +215,14 @@ class PlaceholderAdminMixin(object):
         - plugin_language
         - plugin_parent (optional)
         """
+        parent = None
         plugin_type = request.POST['plugin_type']
-
         placeholder_id = request.POST.get('placeholder_id', None)
-        parent_id = request.POST.get('parent_id', None)
-        if parent_id:
-            warnings.warn("parent_id is deprecated and will be removed in 3.1, use plugin_parent instead",
-                          DeprecationWarning)
-        if not parent_id:
-            parent_id = request.POST.get('plugin_parent', None)
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
+        parent_id = request.POST.get('plugin_parent', None)
+        language = request.POST.get('plugin_language') or get_language_from_request(request)
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
             return HttpResponseForbidden(force_unicode(_('You do not have permission to add a plugin')))
-        parent = None
-        language = request.POST.get('plugin_language') or get_language_from_request(request)
         try:
             has_reached_plugin_limit(placeholder, plugin_type, language,
                                      template=self.get_placeholder_template(request, placeholder))
@@ -236,7 +230,6 @@ class PlaceholderAdminMixin(object):
             return HttpResponseBadRequest(er)
             # page add-plugin
         if not parent_id:
-
             position = request.POST.get('plugin_order',
                                         CMSPlugin.objects.filter(language=language, placeholder=placeholder).count())
         # in-plugin add-plugin
@@ -259,9 +252,8 @@ class PlaceholderAdminMixin(object):
 
         if parent:
             plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-            parent.add_child(instance=plugin)
-        else:
-            plugin.save()
+            plugin.parent_id = parent.pk
+        plugin.save()
         self.post_add_plugin(request, placeholder, plugin)
         response = {
             'url': force_unicode(
