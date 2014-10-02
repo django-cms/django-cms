@@ -244,7 +244,7 @@ class CMSMenu(Menu):
         # cache view perms
         visible_pages = get_visible_pages(request, pages, site)
         for page in pages:
-            # Pages are ordered by tree_id, therefore the first page is the root
+            # Pages are ordered by path, therefore the first page is the root
             # of the page tree (a.k.a "home")
             if page.pk not in visible_pages:
                 # Don't include pages the user doesn't have access to

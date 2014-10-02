@@ -221,7 +221,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_descendants(),
             [
-                # note tree_id ordering of MPTT reflected here:
+                # note path ordering of MP reflected here:
                 CMSPlugin.objects.get(id=plugin_2.pk),
                 CMSPlugin.objects.get(id=plugin_4.pk),
                 CMSPlugin.objects.get(id=plugin_3.pk),

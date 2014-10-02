@@ -20,7 +20,7 @@ def cache_tree_children(queryset):
     item, which would otherwise (if '_cached_children' is not set) cause a
     database query.
 
-    The queryset must be ordered by 'lft', or the function will put the children
+    The queryset must be ordered by 'path', or the function will put the children
     in the wrong order.
     """
     parents_dict = {}
