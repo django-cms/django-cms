@@ -326,7 +326,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             tree = []
         if tree:
             tree[0].old_pk = tree[0].pk
-
         first = True
         # loop over all affected pages (self is included in descendants)
         for page in pages:
@@ -342,6 +341,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             page.numchild = 0
             page.publisher_public_id = None
             page.is_home = False
+            page.site = site
             # only set reverse_id on standard copy
             if page.reverse_id in site_reverse_ids:
                 page.reverse_id = None
@@ -357,17 +357,24 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 count = 1
                 found = False
                 for prnt in tree:
-                    if prnt.old_pk == page.parent_id:
-                        page.parent = prnt
+                    if tree[0].pk == self.pk and page.parent_id == self.pk and count==1:
+                        count += 1
+                        continue
+                    elif prnt.old_pk == page.parent_id:
+                        page.parent_id = prnt.pk
                         tree = tree[0:count]
                         found = True
                         break
                     count += 1
                 if not found:
                     page.parent = None
+                    page.parent_id = None
+                page.save()
             tree.append(page)
-            page.site = site
-            page.save()
+
+
+
+
             # copy permissions if necessary
             if get_cms_setting('PERMISSION') and copy_permissions:
                 from cms.models.permissionmodels import PagePermission
@@ -745,7 +752,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         if not hasattr(self, "ancestors_ascending"):
             self.ancestors_ascending = list(self.get_ancestors())
         return self.ancestors_ascending
-
 
     # ## Title object access
 

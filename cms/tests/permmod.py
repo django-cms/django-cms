@@ -341,7 +341,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # publish both of them  
         page = self.reload(page)
         page = publish_page(page, self.user_super, 'en')
-        # reload subpage, there were an tree_id change
+        # reload subpage, there were an path change
         subpage = self.reload(subpage)
         self.assertEqual(page.path[0:4], subpage.path[0:4])
 
@@ -349,7 +349,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # tree id must stay the same
         self.assertEqual(page.path[0:4], subpage.path[0:4])
 
-        # published pages must also have the same tree_id
+        # published pages must also have the same root-path
         self.assertEqual(page.publisher_public.path[0:4], subpage.publisher_public.path[0:4])
 
         #check attributes
@@ -861,8 +861,6 @@ class ViewPermissionTests(PermissionTestsBase):
         request = self.get_request(user)
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         fake_tree_attrs(page)
         self.assertTrue(page.has_view_permission(request))
 
@@ -874,8 +872,6 @@ class ViewPermissionTests(PermissionTestsBase):
         current_site.save()
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         fake_tree_attrs(page)
         with self.assertNumQueries(3):
             """
@@ -890,8 +886,6 @@ class ViewPermissionTests(PermissionTestsBase):
         request = self.get_request()
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         fake_tree_attrs(page)
         self.assertTrue(page.has_view_permission(request))
 
@@ -901,8 +895,6 @@ class ViewPermissionTests(PermissionTestsBase):
         current_site.pk = 1
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         fake_tree_attrs(page)
         with self.assertNumQueries(1):
             """
@@ -918,8 +910,6 @@ class ViewPermissionTests(PermissionTestsBase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             fake_tree_attrs(page)
             self.assertTrue(page.has_view_permission(request))
 
@@ -933,8 +923,6 @@ class ViewPermissionTests(PermissionTestsBase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             fake_tree_attrs(page)
             with self.assertNumQueries(5):
                 """
@@ -953,8 +941,6 @@ class ViewPermissionTests(PermissionTestsBase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             fake_tree_attrs(page)
             self.assertFalse(page.has_view_permission(request))
 
@@ -963,8 +949,6 @@ class ViewPermissionTests(PermissionTestsBase):
             request = self.get_request()
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             fake_tree_attrs(page)
             self.assertFalse(page.has_view_permission(request))
 
@@ -974,8 +958,6 @@ class ViewPermissionTests(PermissionTestsBase):
         request = self.get_request()
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         fake_tree_attrs(page)
         with self.assertNumQueries(1):
             page.has_view_permission(request)
@@ -1006,8 +988,6 @@ class ViewPermissionTests(PermissionTestsBase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             fake_tree_attrs(page)
             self.assertTrue(page.has_view_permission(request))
 

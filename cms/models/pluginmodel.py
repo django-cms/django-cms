@@ -240,7 +240,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                 super(CMSPlugin, self).save_base()
         else:
             if not self.depth:
-                if self.parent_id:
+                if self.parent_id or self.parent:
                     self.parent.add_child(instance=self)
                 else:
                     if not self.position and not self.position == 0:

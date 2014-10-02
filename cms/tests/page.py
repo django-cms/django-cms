@@ -363,7 +363,36 @@ class PagesTestCase(CMSTestCase):
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
 
-    def test_public_exceptions(self):
+    def test_copy_self_page(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        page_a = create_page("page_a", "nav_playground.html", "en")
+        page_b = create_page("page_b", "nav_playground.html", "en", parent=page_a)
+        page_c = create_page("page_c", "nav_playground.html", "en", parent=page_b)
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(page_b, page_b)
+        self.assertEqual(Page.objects.drafts().count(), 5)
+        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+        page_d = Page.objects.filter(parent=page_b)[1]
+        page_e = Page.objects.get(parent=page_d)
+        self.assertEqual(page_d.path, '000100010002')
+        self.assertEqual(page_e.path, '0001000100020001')
+        page_e.delete()
+        page_d.delete()
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(page_b, page_c)
+        self.assertEqual(Page.objects.filter(parent=page_c).count(), 1)
+        self.assertEqual(Page.objects.filter(parent=page_b).count(), 1)
+        Page.objects.filter(parent=page_c).delete()
+        self.assertEqual(Page.objects.all().count(), 3)
+        page_b = page_b.reload()
+        page_c = page_c.reload()
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(page_b, page_c, position="left")
+        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+    
+def test_public_exceptions(self):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_b = create_page("page_b", "nav_playground.html", "en")
         page = page_a.publisher_public
@@ -389,7 +418,6 @@ class PagesTestCase(CMSTestCase):
                     'public': True,
                     'fallbacks':['fr']
                 },
-
                 {
                     'code': 'fr',
                     'name': 'French',
