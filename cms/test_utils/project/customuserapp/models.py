@@ -1,14 +1,33 @@
 # -*- coding: utf-8 -*-
 from django.core.mail import send_mail
 from django.db import models
+from django.utils import timezone
 from django.utils.http import urlquote
 
 try:
     import re
-    from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin,
-        UserManager)
+    from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
     from django.core import validators
     from django.utils.translation import ugettext_lazy as _
+
+    class CustomUserManager(UserManager):
+
+        def _create_user(self, username, email, password,
+                         is_staff, is_superuser, **extra_fields):
+            """
+            Creates and saves a User with the given username, email and password.
+            """
+            now = timezone.now()
+            if not username:
+                raise ValueError('The given username must be set')
+            email = self.normalize_email(email)
+            user = self.model(username=username, email=email,
+                              is_staff=is_staff, is_active=True,
+                              is_superuser=is_superuser, last_login=now,
+                              **extra_fields)
+            user.set_password(password)
+            user.save(using=self._db)
+            return user
 
     class User(AbstractBaseUser, PermissionsMixin):
         """
@@ -32,7 +51,7 @@ try:
                         'active. Unselect this instead of deleting accounts.'))
         my_new_field = models.IntegerField(null=True, blank=True, default=42)
 
-        objects = UserManager()
+        objects = CustomUserManager()
 
         USERNAME_FIELD = 'username'
         REQUIRED_FIELDS = ['email']
