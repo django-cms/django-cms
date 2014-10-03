@@ -60,4 +60,5 @@ try:
             """
             send_mail(subject, message, from_email, [self.email])
 except ImportError:
+    raise
     from django.contrib.auth.models import User  # nopyflakes

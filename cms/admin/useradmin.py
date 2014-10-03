@@ -11,15 +11,16 @@ from cms.utils.compat.forms import UserAdmin
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_subordinate_users
 
+
 class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     form = PageUserForm
     add_form = PageUserForm
     model = PageUser
     
-    list_display = ('username', 'email', 'get_full_name', 'created_by')
+    list_display = ('email', 'get_full_name', 'created_by')
 
     if get_user_model().USERNAME_FIELD != 'email':
-        list_display += (get_user_model().USERNAME_FIELD,)
+        list_display = (get_user_model().USERNAME_FIELD,) + list_display
     
     # get_fieldsets method may add fieldsets depending on user
     fieldsets = [
@@ -35,11 +36,10 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     
     add_fieldsets = fieldsets
 
-    ordering = ('username', 'email')
-
+    ordering = ('email',)
     if get_user_model().USERNAME_FIELD != 'email':
         ordering = (get_user_model().USERNAME_FIELD,) + ordering
-    
+
     def get_fieldsets(self, request, obj=None):
         fieldsets = self.update_permission_fieldsets(request, obj)
         
