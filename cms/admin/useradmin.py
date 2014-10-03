@@ -43,7 +43,7 @@ class PageUserAdmin(UserAdmin, GenericCmsPermissionAdmin):
     def get_fieldsets(self, request, obj=None):
         fieldsets = self.update_permission_fieldsets(request, obj)
         
-        if not '/add' in request.path:
+        if not '/add' in request.path_info:
             fieldsets[0] = (None, {'fields': (get_user_model().USERNAME_FIELD, 'notify_user')})
             fieldsets.append((_('Password'), {'fields': ('password1', 'password2'), 'classes': ('collapse',)}))
         return fieldsets

@@ -100,7 +100,7 @@ def get_page_from_request(request, use_path=None):
     if use_path is not None:
         path = use_path
     else:
-        path = request.path
+        path = request.path_info
         pages_root = unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
         if is_installed('django.contrib.admin'):
