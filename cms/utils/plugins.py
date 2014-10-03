@@ -109,7 +109,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                 # Check if it quacks like a template object, if not
                 # presume is a template path and get the object out of it
                 if not callable(getattr(node.template, 'render', None)):
-                    template = get_template(force_unicode(node.template).strip('"'))
+                    template = get_template(node.template.var)
                 else:
                     template = node.template
                 placeholders += _scan_placeholders(template.nodelist, current_block)

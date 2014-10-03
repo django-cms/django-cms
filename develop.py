@@ -21,6 +21,7 @@ from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
 from cms.utils.compat import DJANGO_1_6
+import menus
 
 __doc__ = '''django CMS development helper script. 
 
@@ -245,7 +246,7 @@ def main():
     args = docopt(__doc__, version=cms.__version__)
 
     if args['pyflakes']:
-        return static_analysis.pyflakes()
+        return static_analysis.pyflakes((cms, menus))
     
     if args['authors']:
         return generate_authors()

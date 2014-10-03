@@ -77,7 +77,7 @@ class CMSToolbar(ToolbarAPIMixin):
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
-                decorator = resolve(self.request.path).func
+                decorator = resolve(self.request.path_info).func
                 try:
                     # If the original view is decorated we try to extract the real function
                     # module instead of the decorator's one
@@ -258,7 +258,7 @@ class CMSToolbar(ToolbarAPIMixin):
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:
             logout(self.request)
-            return HttpResponseRedirect(self.request.path)
+            return HttpResponseRedirect(self.request.path_info)
 
     def _request_hook_post(self):
         # login hook
@@ -269,7 +269,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 if REDIRECT_FIELD_NAME in self.request.GET:
                     return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME])
                 else:
-                    return HttpResponseRedirect(self.request.path)
+                    return HttpResponseRedirect(self.request.path_info)
             else:
                 if REDIRECT_FIELD_NAME in self.request.GET:
                     return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME]+"?cms-toolbar-login-error=1")
