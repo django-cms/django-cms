@@ -168,6 +168,20 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
+    def test_show_toolbar_staff(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), edit=True)
+        self.assertTrue(request.session.get('cms_build', True))
+        self.assertTrue(request.session.get('cms_edit', False))
+
+    def test_hide_toolbar_non_staff(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_nonstaff(), edit=True)
+        self.assertFalse(request.session.get('cms_build', True))
+        self.assertFalse(request.session.get('cms_edit', True))
+
     def test_show_toolbar_without_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)

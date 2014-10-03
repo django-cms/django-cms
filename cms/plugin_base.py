@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import warnings
 
 try:
     from django.contrib.admin.options import (RenameBaseModelAdminMethods as
@@ -44,9 +45,11 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
                 % (new_plugin.model, new_plugin)
             )
         # validate the template:
-        if not hasattr(new_plugin, 'render_template'):
+        if (not hasattr(new_plugin, 'render_template') and
+                not hasattr(new_plugin, 'get_render_template')):
             raise ImproperlyConfigured(
                 "CMSPluginBase subclasses must have a render_template attribute"
+                " or get_render_template method"
             )
         # Set the default form
         if not new_plugin.form:
@@ -132,6 +135,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         },
     }
 
+
     def __init__(self, model=None, admin_site=None):
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
@@ -142,6 +146,17 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         self.cms_plugin_instance = None
         self.placeholder = None
         self.page = None
+
+    def _get_render_template(self, context, instance, placeholder):
+        if getattr(instance, 'render_template', False):
+            warnings.warn('CMSPlugin.render_template attribute is deprecated '
+                          'and it will be removed in version 3.2; please move'
+                          'template in plugin classes', DeprecationWarning)
+            return getattr(instance, 'render_template', False)
+        elif getattr(self, 'render_template', False):
+            return getattr(self, 'render_template', False)
+        elif hasattr(self, 'get_render_template'):
+            return self.get_render_template(context, instance, placeholder)
 
     def render(self, context, instance, placeholder):
         context['instance'] = instance

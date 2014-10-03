@@ -39,8 +39,7 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.plugins import get_plugins_for_page
-
+from cms.utils.plugins import get_plugins_for_page, get_plugins
 
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
@@ -1157,6 +1156,21 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
                 )
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
+
+    def test_dynamic_plugin_template(self):
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        ph_en = page_en.placeholders.get(slot="body")
+        api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="a title")
+        api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="custom template")
+        request = self.get_request(path=page_en.get_absolute_url())
+        plugins = get_plugins(request, ph_en, page_en.template)
+        for plugin in plugins:
+            if plugin.title == 'custom template':
+                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html')
+                self.assertTrue('Articles Custom template' in plugin.render_plugin({}, ph_en))
+            else:
+                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html')
+                self.assertFalse('Articles Custom template' in plugin.render_plugin({}, ph_en))
 
     def test_add_plugin_with_m2m(self):
         # add a new text plugin

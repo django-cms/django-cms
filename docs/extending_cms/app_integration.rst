@@ -357,7 +357,7 @@ hook like this::
 If you use app namespace you will need to give all your view ``context`` a ``current_app``::
 
   def my_view(request):
-      current_app = resolve(request.path).namespace
+      current_app = resolve(request.path_info).namespace
       context = RequestContext(request, current_app=current_app)
       return render_to_response("my_templace.html", context_instance=context)
 
@@ -393,7 +393,7 @@ as an argument. You can do so by looking up the `current_app` attribute of
 the request instance::
 
     def myviews(request):
-        current_app = resolve(request.path).namespace
+        current_app = resolve(request.path_info).namespace
 
         reversed_url = reverse('myapp_namespace:app_main',
                 current_app=current_app)
@@ -404,7 +404,7 @@ Or, if you are rendering a plugin, of the context instance::
     class MyPlugin(CMSPluginBase):
         def render(self, context, instance, placeholder):
             # ...
-            current_app = resolve(request.path).namespace
+            current_app = resolve(request.path_info).namespace
             reversed_url = reverse('myapp_namespace:app_main',
                     current_app=current_app)
             # ...
