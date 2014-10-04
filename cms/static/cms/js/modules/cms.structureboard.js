@@ -247,7 +247,12 @@ $(document).ready(function () {
 						if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
 						// we need to redirect to the default behaviours
 						// all events will be lost in edit mode, use '#' if href should not be triggered
-						window.location.href = $(e.currentTarget).attr('href');
+						if($(e.currentTarget).attr('target')) {
+							window.open($(e.currentTarget).attr('href'), $(e.currentTarget).attr('target'));
+						}
+						else {
+							window.location.href = $(e.currentTarget).attr('href');
+						}
 					}, delay);
 				}
 
