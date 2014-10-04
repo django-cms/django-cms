@@ -313,8 +313,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
