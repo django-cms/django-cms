@@ -231,7 +231,7 @@ class CMSMenu(Menu):
             filters['title_set__language'] = lang
 
         if not use_draft(request):
-            page_queryset = page_queryset.published(lang)
+            page_queryset = page_queryset.published()
         pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
