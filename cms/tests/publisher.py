@@ -294,6 +294,37 @@ class PublisherCommandTests(TestCase):
         self.assertEqual(pages_from_output, 2)
         self.assertEqual(published_from_output, 2)
 
+    def test_command_line_publish_multiple_languages_check_count(self):
+        """
+        Publishing one page with multiple languages still counts
+        as one page. This test case checks whether it works
+        as expected.
+        """
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        # Now, let's create a page with 2 languages.
+        page = create_page("en title", "nav_playground.html", "en", published=True)
+        create_title("de", "de title", page)
+        page.publish("de")
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish')
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
     def tearDown(self):
         plugin_pool.patched = False
         plugin_pool.set_plugin_meta()

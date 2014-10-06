@@ -4,6 +4,11 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 from django.conf import settings
 import django.utils.timezone
+from cms.models import ACCESS_CHOICES, Page
+from cms.utils.conf import get_cms_setting
+from django.utils.translation import ugettext_lazy as _
+
+template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
 
 class Migration(migrations.Migration):
@@ -86,9 +91,9 @@ class Migration(migrations.Migration):
                 ('soft_root', models.BooleanField(db_index=True, default=False, help_text='All ancestors will not be displayed in the navigation', verbose_name='soft root')),
                 ('reverse_id', models.CharField(db_index=True, max_length=40, verbose_name='id', null=True, help_text='A unique identifier that is used with the page_url templatetag for linking to this page', blank=True)),
                 ('navigation_extenders', models.CharField(db_index=True, max_length=80, blank=True, verbose_name='attached menu', null=True)),
-                ('template', models.CharField(max_length=100, default='INHERIT', help_text='The template used to render the content.', verbose_name='template', choices=[('col_two.html', 'two columns'), ('col_three.html', 'three columns'), ('nav_playground.html', 'navigation examples'), ('simple.html', 'simple'), ('static.html', 'static placeholders'), ('INHERIT', 'Inherit the template of the nearest ancestor')])),
+                ('template', models.CharField(max_length=100, default='INHERIT', help_text='The template used to render the content.', verbose_name='template', choices=template_choices)),
                 ('login_required', models.BooleanField(default=False, verbose_name='login required')),
-                ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name='menu visibility', null=True, choices=[(1, 'for logged in users only'), (2, 'for anonymous users only')], help_text='limit when this page is visible in the menu', blank=True)),
+                ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name='menu visibility', null=True, choices=Page.LIMIT_VISIBILITY_IN_MENU_CHOICES, help_text='limit when this page is visible in the menu', blank=True)),
                 ('is_home', models.BooleanField(db_index=True, default=False, editable=False)),
                 ('application_urls', models.CharField(db_index=True, max_length=200, blank=True, verbose_name='application', null=True)),
                 ('application_namespace', models.CharField(max_length=200, null=True, blank=True, verbose_name='application instance name')),
@@ -99,7 +104,7 @@ class Migration(migrations.Migration):
                 ('publisher_is_draft', models.BooleanField(db_index=True, default=True, editable=False)),
                 ('languages', models.CharField(max_length=255, null=True, blank=True, editable=False)),
                 ('revision_id', models.PositiveIntegerField(default=0, editable=False)),
-                ('xframe_options', models.IntegerField(default=0, choices=[(0, 'Inherit from parent page'), (1, 'Deny'), (2, 'Only this website'), (3, 'Allow')])),
+                ('xframe_options', models.IntegerField(default=0, choices=Page.X_FRAME_OPTIONS_CHOICES)),
                 ('parent', models.ForeignKey(null=True, to='cms.Page', related_name='children', blank=True)),
                 ('publisher_public', models.OneToOneField(null=True, to='cms.Page', related_name='publisher_draft', editable=False)),
                 ('site', models.ForeignKey(to='sites.Site', verbose_name='site', related_name='djangocms_pages', help_text='The site the page is accessible at.')),
@@ -124,7 +129,7 @@ class Migration(migrations.Migration):
                 ('can_change_permissions', models.BooleanField(default=False, help_text='on page level', verbose_name='can change permissions')),
                 ('can_move_page', models.BooleanField(default=True, verbose_name='can move')),
                 ('can_view', models.BooleanField(default=False, help_text='frontend view restriction', verbose_name='view restricted')),
-                ('grant_on', models.IntegerField(default=5, verbose_name='Grant on', choices=[(1, 'Current page'), (2, 'Page children (immediate)'), (3, 'Page and children (immediate)'), (4, 'Page descendants'), (5, 'Page and descendants')])),
+                ('grant_on', models.IntegerField(default=5, verbose_name='Grant on', choices=ACCESS_CHOICES)),
                 ('group', models.ForeignKey(null=True, to='auth.Group', verbose_name='group', blank=True)),
                 ('page', models.ForeignKey(null=True, to='cms.Page', verbose_name='page', blank=True)),
                 ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, verbose_name='user', blank=True)),

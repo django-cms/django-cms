@@ -173,7 +173,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
 
-        if 'recover' in request.path:
+        if 'recover' in request.path_info:
             pk = obj.pk
             if obj.parent_id:
                 try:
@@ -199,7 +199,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             saved_obj.delete()
             obj.save(no_signals=True)
         else:
-            if 'history' in request.path:
+            if 'history' in request.path_info:
                 old_obj = Page.objects.get(pk=obj.pk)
                 obj.depth = old_obj.depth
                 obj.parent_id = old_obj.parent_id
@@ -210,7 +210,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             new = True
         obj.save()
 
-        if 'recover' in request.path or 'history' in request.path:
+        if 'recover' in request.path_info or 'history' in request.path_info:
             revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
@@ -238,7 +238,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.save()
             for lang in copy_target.languages.split(','):
                 copy_target._copy_contents(obj, lang)
-        if not 'permission' in request.path:
+        if not 'permission' in request.path_info:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
@@ -259,16 +259,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return form.fieldsets
 
     def get_inline_classes(self, request, obj=None, **kwargs):
-        if obj and 'permission' in request.path:
+        if obj and 'permission' in request.path_info:
             return PERMISSION_ADMIN_INLINES
         return []
 
     def get_form_class(self, request, obj=None, **kwargs):
-        if 'advanced' in request.path:
+        if 'advanced' in request.path_info:
             return AdvancedSettingsForm
-        elif 'permission' in request.path:
+        elif 'permission' in request.path_info:
             return PagePermissionForm
-        elif 'dates' in request.path:
+        elif 'dates' in request.path_info:
             return PublicationDatesForm
         return self.form
 
@@ -303,8 +303,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         self.inlines = self.get_inline_classes(request, obj, **kwargs)
 
         if obj:
-            if 'history' in request.path or 'recover' in request.path:
-                version_id = request.path.split('/')[-2]
+            if 'history' in request.path_info or 'recover' in request.path_info:
+                version_id = request.path_info.split('/')[-2]
             else:
                 version_id = None
 
@@ -453,7 +453,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self._current_page = obj
         response = super(PageAdmin, self).change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
+        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
@@ -697,7 +697,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # is screwed up with the database, so display an error page.
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
-            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+            return HttpResponseRedirect(request.path_info + '?' + ERROR_FLAG + '=1')
         cl.set_items(request)
 
         site_id = request.GET.get('site__exact', None)

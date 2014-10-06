@@ -33,7 +33,7 @@ def applications_page_check(request, current_page=None, path=None):
     if path is None:
         # We should get in this branch only if an apphook is active on /
         # This removes the non-CMS part of the URL.
-        path = request.path.replace(reverse('pages-root'), '', 1)
+        path = request.path_info.replace(reverse('pages-root'), '', 1)
         # check if application resolver can resolve this
     for lang in get_language_list():
         if path.startswith(lang + "/"):

@@ -248,7 +248,7 @@ class PageToolbar(CMSToolbar):
     def in_apphook(self):
         with force_language(self.toolbar.language):
             try:
-                resolver = resolve(self.request.path)
+                resolver = resolve(self.request.path_info)
             except Resolver404:
                 return False
             else:
@@ -310,7 +310,7 @@ class PageToolbar(CMSToolbar):
                 params['statics'] = ','.join(str(sp.pk) for sp in self.dirty_statics)
 
             if self.in_apphook():
-                params['redirect'] = self.request.path
+                params['redirect'] = self.request.path_info
 
             with force_language(self.current_lang):
                 url = admin_reverse('cms_page_publish_page', args=(pk, self.current_lang))

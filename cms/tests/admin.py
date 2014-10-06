@@ -138,7 +138,6 @@ class AdminTestCase(AdminTestsBase):
             'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
-
         with self.login_user_context(normal_guy):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
                                     follow=True)
@@ -151,22 +150,21 @@ class AdminTestCase(AdminTestsBase):
             title = page.get_title_obj()
             self.assertEqual(title.overwrite_url, OVERRIDE_URL)
 
-            # The admin edits the page (change the page name for ex.)
-            page_data = {
-                'title': OLD_PAGE_NAME,
-                'slug': page.get_slug(),
-                'language': title.language,
-                'site': page.site.pk,
-                'template': page.template,
-                'reverse_id': page.reverse_id,
-                'pagepermission_set-TOTAL_FORMS': 0,  # required only if user haves can_change_permission
-                'pagepermission_set-INITIAL_FORMS': 0,
-                'pagepermission_set-MAX_NUM_FORMS': 0,
-                'pagepermission_set-2-TOTAL_FORMS': 0,
-                'pagepermission_set-2-INITIAL_FORMS': 0,
-                'pagepermission_set-2-MAX_NUM_FORMS': 0
-            }
-
+        # The admin edits the page (change the page name for ex.)
+        page_data = {
+            'title': OLD_PAGE_NAME,
+            'slug': page.get_slug(),
+            'language': title.language,
+            'site': page.site.pk,
+            'template': page.template,
+            'reverse_id': page.reverse_id,
+            'pagepermission_set-TOTAL_FORMS': 0,  # required only if user haves can_change_permission
+            'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0,
+            'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0,
+            'pagepermission_set-2-MAX_NUM_FORMS': 0
+        }
         with self.login_user_context(admin_user):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
                                     follow=True)
@@ -177,7 +175,7 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(page.get_title(), OLD_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
             title = page.get_title_obj()
-            self.assertEqual(title.overwrite_url, None)
+            self.assertEqual(title.overwrite_url, OVERRIDE_URL)
 
     def test_edit_does_not_reset_apphook(self):
         """

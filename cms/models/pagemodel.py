@@ -43,7 +43,13 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
     X_FRAME_OPTIONS_INHERIT = 0
     X_FRAME_OPTIONS_DENY = 1
     X_FRAME_OPTIONS_SAMEORIGIN = 2
-    X_FRAME_OPTIONS_ALLOW= 3
+    X_FRAME_OPTIONS_ALLOW = 3
+    X_FRAME_OPTIONS_CHOICES = (
+        (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+        (X_FRAME_OPTIONS_DENY, _('Deny')),
+        (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+        (X_FRAME_OPTIONS_ALLOW, _('Allow'))
+    )
 
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
@@ -96,12 +102,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
-        choices=(
-            (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-            (X_FRAME_OPTIONS_DENY, _('Deny')),
-            (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-            (X_FRAME_OPTIONS_ALLOW, _('Allow'))
-        ),
+        choices=X_FRAME_OPTIONS_CHOICES,
         default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
     )
 
