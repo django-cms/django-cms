@@ -378,7 +378,7 @@ class ToolbarTests(ToolbarTestBase):
             if DJANGO_1_4:
                 self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username))
             else:
-                self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()))
+                self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_full_name()))
 
         #
         # Test that the logout shows the logged-in user's name, if it was
@@ -388,7 +388,6 @@ class ToolbarTests(ToolbarTestBase):
         superuser.last_name = 'User'
         superuser.save()
         # Sanity check...
-        self.assertEqual('Super User', superuser.get_full_name())
         self.get_page_request(page, superuser, '/')
         with self.login_user_context(superuser):
             response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
@@ -425,7 +424,7 @@ class ToolbarTests(ToolbarTestBase):
         if DJANGO_1_4:
             menu_name = _(u'Logout %s') % superuser.username
         else:
-            menu_name = _(u'Logout %s') % superuser.get_username()
+            menu_name = _(u'Logout %s') % superuser.get_full_name()
 
         with self.login_user_context(superuser):
             # Published page, no redirect
@@ -438,6 +437,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page2.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with login restrictions, redirect

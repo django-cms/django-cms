@@ -138,15 +138,7 @@ class UserLoginContext(object):
         self.testcase.user = self.old_user
         if not self.testcase.user:
             delattr(self.testcase, 'user')
-
-        try:
-            from django.db.transaction import TransactionManagementError
-            try:
-                self.testcase.client.logout()
-            except TransactionManagementError:
-                pass # ignore this error if a previous DB command failed
-        except ImportError:
-            self.testcase.client.logout()
+        self.testcase.client.logout()
 
 
 class ChangeModel(object):

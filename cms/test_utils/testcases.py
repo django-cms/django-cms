@@ -94,16 +94,7 @@ class BaseCMSTestCase(object):
         pass
 
     def _post_teardown(self):
-        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
-        try:
-            from django.db.transaction import TransactionManagementError
-            try:
-                menu_pool.clear()
-            except TransactionManagementError:
-                pass # ignore this error if a previous DB command failed
-        except ImportError:
-            menu_pool.clear()
-
+        menu_pool.clear()
         cache.clear()
         super(BaseCMSTestCase, self)._post_teardown()
         set_current_user(None)
