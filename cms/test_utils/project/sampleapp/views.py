@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 @csrf_exempt
 def exempt_view(request, **kw):
-    app = resolve(request.path).namespace
+    app = resolve(request.path_info).namespace
     kw['app'] = app
     response_kwargs = {'current_app': app, 'dict_': kw}
     context = RequestContext(request, **response_kwargs)
@@ -18,7 +18,7 @@ def exempt_view(request, **kw):
 
 
 def sample_view(request, **kw):
-    app = resolve(request.path).namespace
+    app = resolve(request.path_info).namespace
     kw['app'] = app
     response_kwargs = {'current_app': app, 'dict_': kw}
     context = RequestContext(request, **response_kwargs)
@@ -36,7 +36,7 @@ def category_view(request, id):
 
 
 def extra_view(request, **kw):
-    app = resolve(request.path).namespace
+    app = resolve(request.path_info).namespace
     kw['app'] = app
     response_kwargs = {'current_app': app, 'dict_': kw}
     context = RequestContext(request, **response_kwargs)
@@ -44,7 +44,7 @@ def extra_view(request, **kw):
 
 
 def current_app(request):
-    app = resolve(request.path).namespace
+    app = resolve(request.path_info).namespace
     context = RequestContext(request, {'app': app}, current_app=app)
     return render_to_response("sampleapp/app.html", context)
 
