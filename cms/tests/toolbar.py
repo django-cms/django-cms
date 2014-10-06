@@ -349,6 +349,19 @@ class ToolbarTests(ToolbarTestBase):
         response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
         self.assertEqual(response.content.decode('utf-8'), '')
 
+    def get_username(self, user=None, default=''):
+        user = user or self.request.user
+        try:
+            name = user.get_full_name()
+            if name:
+                return name
+            elif DJANGO_1_4:
+                return user.username
+            else:
+                return user.get_username()
+        except (AttributeError, NotImplementedError):
+            return default
+
     def test_toolbar_logout(self):
         '''
         Tests that the Logout menu item includes the user's full name, if the
@@ -375,10 +388,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            if DJANGO_1_4:
-                self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username))
-            else:
-                self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_full_name()))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
 
         #
         # Test that the logout shows the logged-in user's name, if it was
@@ -393,7 +403,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_full_name()))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
 
     def test_toolbar_logout_redirect(self):
         """
@@ -421,15 +431,11 @@ class ToolbarTests(ToolbarTestBase):
         page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
 
-        if DJANGO_1_4:
-            menu_name = _(u'Logout %s') % superuser.username
-        else:
-            menu_name = _(u'Logout %s') % superuser.get_full_name()
-
         with self.login_user_context(superuser):
             # Published page, no redirect
             response = self.client.get(page1.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
+            menu_name = _(u'Logout %s') % self.get_username(superuser)
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
