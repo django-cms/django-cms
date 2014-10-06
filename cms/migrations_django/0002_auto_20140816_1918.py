@@ -15,6 +15,7 @@ else:
 user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
 user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
 user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
+languages = settings.LANGUAGES
 
 
 class Migration(migrations.Migration):
@@ -102,7 +103,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, default='', help_text='Descriptive name to identify this static placeholder. Not displayed to users.', blank=True, verbose_name='static placeholder name')),
                 ('code', models.CharField(max_length=255, verbose_name='placeholder code', help_text='To render the static placeholder in templates.', blank=True)),
                 ('dirty', models.BooleanField(default=False, editable=False)),
-                ('creation_method', models.CharField(max_length=20, default='code', blank=True, verbose_name='creation_method', choices=[('template', 'by template'), ('code', 'by code')])),
+                ('creation_method', models.CharField(max_length=20, default='code', blank=True, verbose_name='creation_method', choices=cms.models.static_placeholder.StaticPlaceholder.CREATION_METHODS)),
                 ('draft', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', verbose_name='placeholder content', related_name='static_draft', slotname=cms.models.static_placeholder.static_slotname, editable=False)),
                 ('public', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', slotname=cms.models.static_placeholder.static_slotname, related_name='static_public', editable=False)),
                 ('site', models.ForeignKey(null=True, to='sites.Site', blank=True)),
@@ -149,7 +150,7 @@ class Migration(migrations.Migration):
             name='UserSettings',
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('language', models.CharField(max_length=10, choices=[('en', 'English'), ('fr', 'French'), ('de', 'German'), ('pt-br', 'Brazilian Portuguese'), ('nl', 'Dutch'), ('es-mx', 'Español')], help_text='The language for the admin interface and toolbar', verbose_name='Language')),
+                ('language', models.CharField(max_length=10, choices=languages, help_text='The language for the admin interface and toolbar', verbose_name='Language')),
                 ('clipboard', models.ForeignKey(null=True, to='cms.Placeholder', blank=True, editable=False)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, unique=True, related_name='djangocms_usersettings', editable=False)),
             ],
