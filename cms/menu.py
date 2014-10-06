@@ -231,7 +231,7 @@ class CMSMenu(Menu):
             filters['title_set__language'] = lang
 
         if not use_draft(request):
-            page_queryset = page_queryset.published(lang)
+            page_queryset = page_queryset.published()
         pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
@@ -316,7 +316,7 @@ class NavExtender(Modifier):
         # if breadcrumb and home not in navigation add node
             if breadcrumb and home and not home.visible:
                 home.visible = True
-                if request.path == home.get_absolute_url():
+                if request.path_info == home.get_absolute_url():
                     home.selected = True
                 else:
                     home.selected = False

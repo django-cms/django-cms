@@ -1,0 +1,11 @@
+{% extends "placeholder_tests/nested_super_level4.html" %}
+{% load cms_tags %}
+
+{% comment %}
+This template adds a line to "block one".
+{% endcomment %}
+
+{% block one %}
+Whee
+{{ block.super }}
+{% endblock %}

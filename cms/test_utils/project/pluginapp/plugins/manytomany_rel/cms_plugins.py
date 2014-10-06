@@ -14,9 +14,30 @@ class ArticlePlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         article_qs = Article.objects.filter(section__in=instance.sections.all())
-        context.update({'instance':instance,
-                        'article_qs':article_qs,
-                        'placeholder':placeholder})
+        context.update({'instance': instance,
+                        'article_qs': article_qs,
+                        'placeholder': placeholder})
         return context
     
 plugin_pool.register_plugin(ArticlePlugin)
+
+
+class ArticleDynamicTemplatePlugin(CMSPluginBase):
+    model = ArticlePluginModel
+    name = _("Articles")
+    admin_preview = False
+
+    def get_render_template(self, context, instance, placeholder):
+        if instance.title == 'custom template':
+            return "articles_custom.html"
+        else:
+            return "articles.html"
+
+    def render(self, context, instance, placeholder):
+        article_qs = Article.objects.filter(section__in=instance.sections.all())
+        context.update({'instance': instance,
+                        'article_qs': article_qs,
+                        'placeholder': placeholder})
+        return context
+
+plugin_pool.register_plugin(ArticleDynamicTemplatePlugin)

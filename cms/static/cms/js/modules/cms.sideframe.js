@@ -246,7 +246,7 @@ $(document).ready(function () {
 			}, 100);
 		},
 
-		_minimize: function () {
+		_minimize: function (noPositionReset) {
 			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
 			this.sideframe.find('.cms_sideframe-hide').show();
 
@@ -254,7 +254,9 @@ $(document).ready(function () {
 			this.preventScroll(false);
 
 			// reset to first state
-			this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
+			if(!noPositionReset) {
+				this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
+			}
 
 			// remove event
 			$(window).unbind('resize.cms.sideframe');
@@ -287,6 +289,7 @@ $(document).ready(function () {
 			var timer = function () {};
 			// this prevents the iframe from being focusable
 			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
+			this._minimize(true);
 
 			$(document).bind('mousemove.cms', function (e) {
 				if(e.clientX <= 320) e.clientX = 320;

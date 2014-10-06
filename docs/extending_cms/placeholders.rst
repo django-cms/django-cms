@@ -95,7 +95,7 @@ I18N Placeholders
 =================
 
 Out of the box :class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` supports multiple
-languages and will display language tabs. If you extend yout model admin class derived from
+languages and will display language tabs. If you extend your model admin class derived from
 `PlaceholderAdminMixin` and overwrite `change_form_template` be sure to have a look at
 'admin/placeholders/placeholder/change_form.html' on how to display the language tabs.
 

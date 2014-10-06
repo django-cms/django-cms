@@ -265,3 +265,9 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 ==== 3.0.5 (2014-08-20) ===
 - Fixes 2 regressions introduced in 3.0.4
 - apphook and plugins can now be registered via decorator
+
+==== 3.0.6 (unreleased) ===
+- Experimental full Django 1.7 migrations support
+- Add CMSPlugin.get_render_model to get the plugin model at render time
+- Add simplified API to handle toolbar for page extensions
+

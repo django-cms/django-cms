@@ -69,7 +69,6 @@ class ExtensionsTestCase(TestCase):
         except ImportError:
             pass
 
-
     def get_page_extension_class(self):
         from django.db import models
 

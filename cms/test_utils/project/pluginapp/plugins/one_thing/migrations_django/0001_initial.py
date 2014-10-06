@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '__first__'),
+        ('cms', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='TestPluginModel3',
             fields=[
-                ('cmsplugin_ptr', models.OneToOneField(auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
+                ('cmsplugin_ptr', models.OneToOneField(primary_key=True, to='cms.CMSPlugin', auto_created=True, parent_link=True, serialize=False)),
             ],
             options={
             },
@@ -23,10 +23,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='TestPluginModel5',
             fields=[
-                ('cmsplugin_ptr', models.OneToOneField(auto_created=True, primary_key=True, serialize=False, to='cms.CMSPlugin')),
+                ('cmsplugin_ptr', models.OneToOneField(primary_key=True, to='cms.CMSPlugin', auto_created=True, parent_link=True, serialize=False)),
             ],
             options={
-                'db_table': b'or_another_5',
+                'db_table': 'or_another_5',
             },
             bases=('cms.cmsplugin',),
         ),
