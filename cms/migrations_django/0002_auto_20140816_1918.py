@@ -6,16 +6,12 @@ import cms.models.static_placeholder
 import cms.models.fields
 from django.conf import settings
 import django.utils.timezone
-try:
-    from django.contrib.auth import get_user_model
-except ImportError: # django < 1.5
-    from django.contrib.auth.models import User
-else:
-    User = get_user_model()
-user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
-user_model_label = '%s.%s' % (User._meta.app_label, User._meta.module_name)
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
 user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
-languages = settings.LANGUAGES
 
 
 class Migration(migrations.Migration):
@@ -129,7 +125,7 @@ class Migration(migrations.Migration):
                 ('meta_description', models.TextField(max_length=155, null=True, help_text='The text displayed in search engines.', blank=True, verbose_name='description')),
                 ('slug', models.SlugField(max_length=255, verbose_name='slug')),
                 ('path', models.CharField(db_index=True, max_length=255, verbose_name='Path')),
-                ('has_url_overwrite', models.BooleanField(db_index=True, default=False, editable=False, verbose_name='has URL overwrite')),
+                ('has_url_overwrite', models.BooleanField(db_index=True, default=False, editable=False, verbose_name='has url overwrite')),
                 ('redirect', models.CharField(max_length=255, null=True, blank=True, verbose_name='redirect')),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now, verbose_name='creation date', editable=False)),
                 ('published', models.BooleanField(default=False, verbose_name='is published')),
@@ -150,7 +146,7 @@ class Migration(migrations.Migration):
             name='UserSettings',
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('language', models.CharField(max_length=10, choices=languages, help_text='The language for the admin interface and toolbar', verbose_name='Language')),
+                ('language', models.CharField(max_length=10, choices=settings.LANGUAGES, help_text='The language for the admin interface and toolbar', verbose_name='Language')),
                 ('clipboard', models.ForeignKey(null=True, to='cms.Placeholder', blank=True, editable=False)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, unique=True, related_name='djangocms_usersettings', editable=False)),
             ],
