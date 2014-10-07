@@ -40,3 +40,13 @@ At this stage you are required to add::
     By Django 1.7 migrations design **every** application that defines
     a django CMS plugin or a model that uses a PlaceholderField or depends
     in any way on django CMS models **must** define Django 1.7 migrations.
+
+Extended Custom User Support
+============================
+
+If you are using custom user models and use ``CMS_PERMISSIONS = True`` then be sure
+to check that PageUserAdmin and PageUserGroup is still in working order.
+
+The PageUserAdmin class now extends dynamically from the admin class that handles the user
+model. This allows that we use the same search_fields and filters in PageUserAdmin as in
+the custom user model admin.
