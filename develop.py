@@ -176,6 +176,7 @@ def makemessages():
     from django.core.management import call_command
     os.chdir('cms')
     call_command('makemessages', locale=('en',))
+    call_command('makemessages', locale=('en',), domain='djangojs')
 
 
 def shell():
