@@ -226,12 +226,10 @@ class CMSMenu(Menu):
         filters = {
             'site': site,
         }
-
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
-
         if not use_draft(request):
-            page_queryset = page_queryset.published(lang)
+            page_queryset = page_queryset.published()
         pages = page_queryset.filter(**filters).order_by("path")
         ids = {}
         nodes = []
