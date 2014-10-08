@@ -4,7 +4,6 @@ import cms.admin.useradmin
 import cms.admin.permissionadmin
 import cms.admin.settingsadmin
 import cms.admin.static_placeholder  # nopyflakes
-import cms.admin.pluginadmin
 # Piggyback off admin.autodiscover() to discover cms plugins
 from cms import plugin_pool
 
