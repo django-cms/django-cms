@@ -10,9 +10,10 @@ from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches, reverse
 from django.test import LiveServerTestCase
 from django.utils import unittest
-from djangocms_link.models import Link
+from djangocms_style.models import Style
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -451,31 +452,64 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
 
 class AddPluginTest(CMSLiveTests):
+    def _login(self):
+        get_user_model().objects.create_superuser(
+            'admin', 'admin@example.org', 'admin'
+        )
+        url = '{0}/?{1}'.format(
+            self.live_server_url,
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        )
+        self.driver.get(url)
+
+        self.assertRaises(
+            NoSuchElementException,
+            self.driver.find_element_by_class_name,
+            'cms_toolbar-item_logout'
+        )
+        username_input = self.driver.find_element_by_id("id_cms-username")
+        username_input.send_keys('admin')
+        password_input = self.driver.find_element_by_id("id_cms-password")
+        password_input.send_keys('admin')
+        password_input.submit()
+        self.wait_page_loaded()
+
+        self.assertTrue(
+            self.driver.find_element_by_class_name(
+                'cms_toolbar-item-navigation'
+            )
+        )
+
     def test_add_text_plugin(self):
         page = create_page('Home', 'simple.html', 'en', published=True)
+
         placeholder_id = page.placeholders.all()[0].pk
-        plugin_type = 'LinkPlugin'
+        plugin_type = 'StylePlugin'
         language = 'en'
-        url = '{host}{path}/?{querystring}'.format(
+
+        self._login()
+
+        url = '{host}{path}?{querystring}'.format(
             host=self.live_server_url,
-            path=reverse('admin:cms_cmsplugin_add'),
+            path=reverse('admin:cms_page_add_plugin'),
             querystring=urlencode({
-                'placeholder': placeholder_id,
-                'language': language,
+                'placeholder_id': placeholder_id,
+                'plugin_language': language,
                 'plugin_type': plugin_type,
             })
         )
+
         self.assertEqual(CMSPlugin.objects.count(), 0)
-        self.assertEqual(Link.objects.count(), 0)
+        self.assertEqual(Style.objects.count(), 0)
+
         self.driver.get(url)
-        name_input = self.driver.find_element_by_id("id_name")
-        name_input.send_keys("Test")
-        url_input = self.driver.find_element_by_id("id_url")
-        url_input.send_keys("http://www.example.org/")
-        url_input.submit()
+
+        class_input = self.driver.find_element_by_id("id_class_name")
+        Select(class_input).select_by_value("new")
+        class_input.submit()
+
         self.wait_page_loaded()
         self.assertEqual(CMSPlugin.objects.count(), 1)
-        self.assertEqual(Link.objects.count(), 1)
-        link = Link.objects.get()
-        self.assertEqual(link.url, "http://www.example.org/")
-        self.assertEqual(link.name, "Test")
+        self.assertEqual(Style.objects.count(), 1)
+        link = Style.objects.get()
+        self.assertEqual(link.class_name, "new")
