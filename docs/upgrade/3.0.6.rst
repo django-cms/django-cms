@@ -1,22 +1,17 @@
 .. _upgrade-to-3.0.6:
 
-####################################
-3.0.6 release notes (in development)
-####################################
+###################
+3.0.6 release notes
+###################
 
 *******************
 What's new in 3.0.6
 *******************
 
-Experimental Django 1.7 support
-===============================
+Django 1.7 support
+==================
 
-Since 3.0.6 django CMS has experimental Django 1.7 support.
-
-.. warning:: **Migration changes**
-
-    As support is marked as experimental, Django migrations **may** change
-    at least until Django 1.7.1 release.
+Since 3.0.6 django CMS has Django 1.7 support.
 
 Currently Django 1.7 migrations are shipped in non-default ``migrations_django``
 package to allow better backward compatibility; in future releases the Django
