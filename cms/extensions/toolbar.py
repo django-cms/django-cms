@@ -65,7 +65,7 @@ class ExtensionToolbar(CMSToolbar):
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
         else:
-            has_global_current_page_change_permission = False
+            has_global_current_page_change_permission = True
             # check if user has page edit permission
         can_change = (self.request.current_page and
                       self.request.current_page.has_change_permission(self.request))
@@ -147,7 +147,7 @@ class ExtensionToolbar(CMSToolbar):
                 urls.append((title_extension, admin_url))
         return urls
 
-    def _get_sub_menu(self, current_menu, key, label, position):
+    def _get_sub_menu(self, current_menu, key, label, position=None):
         """
         Utility function to get a submenu of the current menu
         """
