@@ -148,13 +148,14 @@ Similarly for title extensions::
             # if it's all ok
             if current_page_menu and self.toolbar.edit_mode:
                 # create a sub menu
+                position = 0
                 sub_menu = self._get_sub_menu(current_page_menu, 'submenu_label', 'Submenu', position)
                 # retrieves the instances of the current title extension (if any) and the toolbar item url
                 urls = self.get_title_extension_admin()
                 # cycle through the title list
                 for title_extension, url in urls:
                     # adds toolbar items
-                    sub_menu.add_modal_item('icon for title %s' % title,
+                    sub_menu.add_modal_item('icon for title %s' % self._page().get_title(),
                                             url=url, disabled=not self.toolbar.edit_mode)
 
 For details see the :ref:`reference <simplified_extension_toolbar>`
