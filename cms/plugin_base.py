@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import warnings
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.shortcuts import get_object_or_404
 
 try:
     from django.contrib.admin.options import (RenameBaseModelAdminMethods as
@@ -10,12 +12,12 @@ except ImportError:
 import re
 
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.utils import get_cms_setting
+from cms.utils import get_cms_setting, get_language_list
 from cms.utils.compat import DJANGO_1_4
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.exceptions import SubClassNeededError, Deprecated
+from cms.exceptions import SubClassNeededError, Deprecated, PluginLimitReached
 from cms.models import CMSPlugin, Placeholder
 from django.core.urlresolvers import reverse
 from django.contrib import admin
@@ -202,6 +204,68 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             return self.has_add_permission(request)
     has_delete_permission = has_change_permission
 
+    def get_form(self, request, obj=None, **kwargs):
+        form_class = super(CMSPluginBase, self).get_form(request, obj, **kwargs)
+
+        if obj:
+            return form_class
+
+        plugin_type = self.__class__.__name__
+
+        class Form(form_class):
+            def __init__(self, *args, **kwargs):
+                super(Form, self).__init__(*args, **kwargs)
+                self.instance.language = request.GET['plugin_language']
+                self.instance.placeholder_id = request.GET['placeholder_id']
+                self.instance.parent_id = request.GET.get(
+                    'plugin_parent', None
+                )
+                self.instance.plugin_type = plugin_type
+
+        return Form
+
+    def add_view(self, request, form_url='', extra_context=None):
+        from cms.utils.plugins import has_reached_plugin_limit
+        plugin_type = self.__class__.__name__
+
+        placeholder = get_object_or_404(
+            Placeholder, pk=request.GET['placeholder_id']
+        )
+
+        language = request.GET['plugin_language']
+        if language not in get_language_list():
+            return HttpResponseBadRequest(force_unicode(
+                _("Language must be set to a supported language!")
+            ))
+
+        if request.GET.get('plugin_parent', None):
+            get_object_or_404(
+                CMSPlugin, pk=request.GET['plugin_parent']
+            )
+
+        if not self.has_add_permission(request):
+            return HttpResponseForbidden(force_unicode(
+                _('You do not have permission to add a plugin')
+            ))
+
+        if placeholder.page:
+            template = placeholder.page.get_template()
+        else:
+            template = None
+        try:
+            has_reached_plugin_limit(
+                placeholder,
+                plugin_type,
+                language,
+                template=template
+            )
+        except PluginLimitReached as er:
+            return HttpResponseBadRequest(er)
+
+        return super(CMSPluginBase, self).add_view(
+            request, form_url, extra_context
+        )
+
     def save_model(self, request, obj, form, change):
         """
         Override original method, and add some attributes to obj
@@ -222,15 +286,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         # remember the saved object
         self.saved_object = obj
-
-        if not obj.pk:
-            obj.plugin_type = request.GET['plugin_type']
-            obj.placeholder = Placeholder.objects.get(
-                pk=request.GET['placeholder_id']
-            )
-            obj.language = request.GET['plugin_language']
-            if request.GET.get('plugin_parent', None):
-                obj.parent_id = request.GET['plugin_parent']
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 

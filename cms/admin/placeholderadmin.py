@@ -20,7 +20,6 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
-from django.conf import settings
 from django.views.decorators.http import require_POST
 import warnings
 from django.template.response import TemplateResponse
@@ -30,7 +29,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.http import HttpResponseRedirect
 
-from cms.utils import copy_plugins, permissions, get_language_from_request
+from cms.utils import copy_plugins, permissions
 from cms.utils.i18n import get_language_list
 from cms.utils.transaction import wrap_transaction
 
@@ -222,46 +221,17 @@ class PlaceholderAdminMixin(object):
                 return HttpResponseBadRequest(force_unicode(
                     _("Invalid request, missing '%s' parameter") % required
                 ))
-        placeholder = get_object_or_404(
-            Placeholder, pk=request.GET['placeholder_id']
-        )
         plugin_type = request.GET['plugin_type']
         try:
-            plugin_class = plugin_pool.get_plugin(plugin_type)(
-                admin_site=self.admin_site
-            )
+            plugin_class = plugin_pool.get_plugin(plugin_type)
         except KeyError:
             return HttpResponseBadRequest(force_unicode(
                 _("Invalid plugin type '%s'") % plugin_type
             ))
-        language = request.GET['plugin_language']
-        if language not in get_language_list():
-            return HttpResponseBadRequest(force_unicode(
-                _("Language must be set to a supported language!")
-            ))
 
-        if request.GET.get('plugin_parent', None):
-            get_object_or_404(
-                CMSPlugin, pk=request.GET['plugin_parent']
-            )
+        plugin_admin = plugin_class(admin_site=self.admin_site)
 
-        if not self.has_add_plugin_permission(request, placeholder,
-                                              plugin_type):
-            return HttpResponseForbidden(force_unicode(
-                _('You do not have permission to add a plugin')
-            ))
-
-        try:
-            has_reached_plugin_limit(
-                placeholder,
-                plugin_type,
-                language,
-                template=self.get_placeholder_template(request, placeholder)
-            )
-        except PluginLimitReached as er:
-            return HttpResponseBadRequest(er)
-
-        return plugin_class.add_view(request)
+        return plugin_admin.add_view(request)
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
