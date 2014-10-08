@@ -7,9 +7,10 @@ import time
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
+from django.core.urlresolvers import clear_url_caches, reverse
 from django.test import LiveServerTestCase
 from django.utils import unittest
+from djangocms_link.models import Link
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -28,6 +29,7 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model
+from cms.utils.compat.urls import urlencode
 from cms.utils.conf import get_cms_setting
 
 
@@ -446,3 +448,34 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
         # test static placeholder permission (content of static placeholders is editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
         self.assertTrue(self.driver.find_element_by_class_name(self.placeholder_name))
+
+
+class AddPluginTest(CMSLiveTests):
+    def test_add_text_plugin(self):
+        page = create_page('Home', 'simple.html', 'en', published=True)
+        placeholder_id = page.placeholders.all()[0].pk
+        plugin_type = 'LinkPlugin'
+        language = 'en'
+        url = '{host}{path}/?{querystring}'.format(
+            host=self.live_server_url,
+            path=reverse('admin:cms_cmsplugin_add'),
+            querystring=urlencode({
+                'placeholder': placeholder_id,
+                'language': language,
+                'plugin_type': plugin_type,
+            })
+        )
+        self.assertEqual(CMSPlugin.objects.count(), 0)
+        self.assertEqual(Link.objects.count(), 0)
+        self.driver.get(url)
+        name_input = self.driver.find_element_by_id("id_name")
+        name_input.send_keys("Test")
+        url_input = self.driver.find_element_by_id("id_url")
+        url_input.send_keys("http://www.example.org/")
+        url_input.submit()
+        self.wait_page_loaded()
+        self.assertEqual(CMSPlugin.objects.count(), 1)
+        self.assertEqual(Link.objects.count(), 1)
+        link = Link.objects.get()
+        self.assertEqual(link.url, "http://www.example.org/")
+        self.assertEqual(link.name, "Test")

@@ -204,74 +204,64 @@ class PlaceholderAdminMixin(object):
     def get_placeholder_template(self, request, placeholder):
         pass
 
-    @method_decorator(require_POST)
     @xframe_options_sameorigin
     def add_plugin(self, request):
         """
-        POST request should have the following data:
+        Shows the add plugin form and saves it on POST.
 
-        - placeholder_id
-        - plugin_type
-        - plugin_language
-        - plugin_parent (optional)
+        Requires the following GET parameters:
+
+            - placeholder_id
+            - plugin_type
+            - plugin_language
+            - plugin_parent (optional)
+            - plugin_position (optional)
         """
-        plugin_type = request.POST['plugin_type']
-
-        placeholder_id = request.POST.get('placeholder_id', None)
-        parent_id = request.POST.get('parent_id', None)
-        if parent_id:
-            warnings.warn("parent_id is deprecated and will be removed in 3.1, use plugin_parent instead",
-                          DeprecationWarning)
-        if not parent_id:
-            parent_id = request.POST.get('plugin_parent', None)
-        placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        if not self.has_add_plugin_permission(request, placeholder, plugin_type):
-            return HttpResponseForbidden(force_unicode(_('You do not have permission to add a plugin')))
-        parent = None
-        language = request.POST.get('plugin_language') or get_language_from_request(request)
+        for required in ['placeholder_id', 'plugin_type', 'plugin_language']:
+            if required not in request.GET:
+                return HttpResponseBadRequest(force_unicode(
+                    _("Invalid request, missing '%s' parameter") % required
+                ))
+        placeholder = get_object_or_404(
+            Placeholder, pk=request.GET['placeholder_id']
+        )
+        plugin_type = request.GET['plugin_type']
         try:
-            has_reached_plugin_limit(placeholder, plugin_type, language,
-                                     template=self.get_placeholder_template(request, placeholder))
+            plugin_class = plugin_pool.get_plugin(plugin_type)(
+                admin_site=self.admin_site
+            )
+        except KeyError:
+            return HttpResponseBadRequest(force_unicode(
+                _("Invalid plugin type '%s'") % plugin_type
+            ))
+        language = request.GET['plugin_language']
+        if language not in get_language_list():
+            return HttpResponseBadRequest(force_unicode(
+                _("Language must be set to a supported language!")
+            ))
+
+        if request.GET.get('plugin_parent', None):
+            get_object_or_404(
+                CMSPlugin, pk=request.GET['plugin_parent']
+            )
+
+        if not self.has_add_plugin_permission(request, placeholder,
+                                              plugin_type):
+            return HttpResponseForbidden(force_unicode(
+                _('You do not have permission to add a plugin')
+            ))
+
+        try:
+            has_reached_plugin_limit(
+                placeholder,
+                plugin_type,
+                language,
+                template=self.get_placeholder_template(request, placeholder)
+            )
         except PluginLimitReached as er:
             return HttpResponseBadRequest(er)
-            # page add-plugin
-        if not parent_id:
 
-            position = request.POST.get('plugin_order',
-                                        CMSPlugin.objects.filter(language=language, placeholder=placeholder).count())
-        # in-plugin add-plugin
-        else:
-            parent = get_object_or_404(CMSPlugin, pk=parent_id)
-            placeholder = parent.placeholder
-            position = request.POST.get('plugin_order',
-                                        CMSPlugin.objects.filter(language=language, parent=parent).count())
-            # placeholder (non-page) add-plugin
-
-        # Sanity check to make sure we're not getting bogus values from JavaScript:
-        if settings.USE_I18N:
-            if not language or not language in [lang[0] for lang in settings.LANGUAGES]:
-                return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))
-            if parent and parent.language != language:
-                return HttpResponseBadRequest(force_unicode(_("Parent plugin language must be same as language!")))
-        else:
-            language = settings.LANGUAGE_CODE
-        plugin = CMSPlugin(language=language, plugin_type=plugin_type, position=position, placeholder=placeholder)
-
-        if parent:
-            plugin.position = CMSPlugin.objects.filter(parent=parent).count()
-            plugin.insert_at(parent, position='last-child', save=False)
-        plugin.save()
-        self.post_add_plugin(request, placeholder, plugin)
-        response = {
-            'url': force_unicode(
-                admin_reverse("%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
-                        args=[plugin.pk])),
-            'delete': force_unicode(
-                admin_reverse("%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
-                        args=[plugin.pk])),
-            'breadcrumb': plugin.get_breadcrumb(),
-        }
-        return HttpResponse(json.dumps(response), content_type='application/json')
+        return plugin_class.add_view(request)
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin

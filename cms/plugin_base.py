@@ -16,7 +16,7 @@ from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.exceptions import SubClassNeededError, Deprecated
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, Placeholder
 from django.core.urlresolvers import reverse
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
@@ -180,15 +180,27 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def has_add_permission(self, request, *args, **kwargs):
+    def has_add_permission(self, request):
+        if 'placeholder_id' not in request.GET:
+            return False
+        placeholder = Placeholder.objects.get(pk=request.GET['placeholder_id'])
+        if placeholder.page:
+            return placeholder.page.has_change_permission(request)
+        else:
+            return placeholder.has_change_permission(request)
+
+    def has_change_permission(self, request, obj=None):
         """Permission handling change - if user is allowed to change the page
         he must be also allowed to add/change/delete plugins..
 
         Not sure if there will be plugin permission requirement in future, but
         if, then this must be changed.
         """
-        return self.cms_plugin_instance.has_change_permission(request)
-    has_delete_permission = has_change_permission = has_add_permission
+        if obj:
+            return obj.has_change_permission(request)
+        else:
+            return self.has_add_permission(request)
+    has_delete_permission = has_change_permission
 
     def save_model(self, request, obj, form, change):
         """
@@ -210,6 +222,15 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         # remember the saved object
         self.saved_object = obj
+
+        if not obj.pk:
+            obj.plugin_type = request.GET['plugin_type']
+            obj.placeholder = Placeholder.objects.get(
+                pk=request.GET['placeholder_id']
+            )
+            obj.language = request.GET['plugin_language']
+            if request.GET.get('plugin_parent', None):
+                obj.parent_id = request.GET['plugin_parent']
 
         return super(CMSPluginBase, self).save_model(request, obj, form, change)
 
