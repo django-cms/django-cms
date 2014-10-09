@@ -1060,6 +1060,36 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
                 tpl.render(context)
 
+    def test_menu_in_soft_root(self):
+        """
+        Test for issue 3504
+        
+        Build the following tree:
+        
+            A
+            |-B
+            C (soft_root)
+        """
+        a = create_page('A', 'nav_playground.html', 'en', published=True,
+                        in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a,
+                       published=True, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', published=True, 
+                        in_navigation=True, soft_root=True)
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        node = nodes[0]
+        self.assertEqual(node.id, b.publisher_public.id)
+        context = self.get_context(c.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        node = nodes[0]
+        self.assertEqual(node.id, b.publisher_public.id)
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
     settings_overrides = {
