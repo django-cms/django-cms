@@ -428,7 +428,7 @@ class SoftRootCutter(Modifier):
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
-        if post_cut:
+        if post_cut or root_id:
             return nodes
         selected = None
         root_nodes = []
