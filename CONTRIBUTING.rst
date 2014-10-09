@@ -109,9 +109,9 @@ And at any point in that process, you can add: *discuss discuss discuss*,
 because it's always useful for everyone to pass ideas around and look at thngs
 together.
 
-:ref:`testing` is really important; starting from 3.1 to be merged a pull
-request **must** improve test coverage and bug-fixing patches **must**
-demonstrate the bug with a test.
+:ref:`testing` is really important: to get pull request merged, it **must** keep
+the coverage the same or improve it; bug-fixing patches **must** demonstrate
+the bug with a test to avoid regressions and check that the fix works.
 
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
