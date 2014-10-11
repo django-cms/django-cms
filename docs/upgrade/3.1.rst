@@ -22,3 +22,8 @@ Bofore upgrading
 ----------------
 
 Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
+
+
+********************
+Incompatible changes
+********************

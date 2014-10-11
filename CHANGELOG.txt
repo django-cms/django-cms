@@ -276,3 +276,5 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixed menu when hide untranslated is set to False
 - Fix sitemap ordering
 - Fix plugin table name generation fixes
+
+=== 3.1 (unreleased) ===
