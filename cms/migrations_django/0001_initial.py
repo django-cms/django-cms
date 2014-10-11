@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
-from django.conf import settings
-import django.utils.timezone
 from cms.models import ACCESS_CHOICES, Page
 from cms.utils.conf import get_cms_setting
+from django.conf import settings
+from django.db import models, migrations
+import django.utils.timezone
 from django.utils.translation import ugettext_lazy as _
 
 template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
@@ -23,11 +23,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='CMSPlugin',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('position', models.PositiveSmallIntegerField(null=True, editable=False, blank=True, verbose_name='position')),
-                ('language', models.CharField(db_index=True, max_length=15, verbose_name='language', editable=False)),
-                ('plugin_type', models.CharField(db_index=True, max_length=50, verbose_name='plugin_name', editable=False)),
-                ('creation_date', models.DateTimeField(default=django.utils.timezone.now, verbose_name='creation date', editable=False)),
+                ('id', models.AutoField(primary_key=True, verbose_name=_('ID'), auto_created=True, serialize=False)),
+                ('position', models.PositiveSmallIntegerField(null=True, editable=False, blank=True, verbose_name=_('position'))),
+                ('language', models.CharField(db_index=True, max_length=15, verbose_name=_("language"), editable=False)),
+                ('plugin_type', models.CharField(db_index=True, max_length=50, verbose_name=_('plugin_name'), editable=False)),
+                ('creation_date', models.DateTimeField(default=django.utils.timezone.now, verbose_name=_('creation date'), editable=False)),
                 ('changed_date', models.DateTimeField(auto_now=True)),
                 ('level', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('lft', models.PositiveIntegerField(db_index=True, editable=False)),
@@ -57,19 +57,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='GlobalPagePermission',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('can_change', models.BooleanField(default=True, verbose_name='can edit')),
-                ('can_add', models.BooleanField(default=True, verbose_name='can add')),
-                ('can_delete', models.BooleanField(default=True, verbose_name='can delete')),
-                ('can_change_advanced_settings', models.BooleanField(default=False, verbose_name='can change advanced settings')),
-                ('can_publish', models.BooleanField(default=True, verbose_name='can publish')),
-                ('can_change_permissions', models.BooleanField(default=False, help_text='on page level', verbose_name='can change permissions')),
-                ('can_move_page', models.BooleanField(default=True, verbose_name='can move')),
-                ('can_view', models.BooleanField(default=False, help_text='frontend view restriction', verbose_name='view restricted')),
-                ('can_recover_page', models.BooleanField(default=True, help_text='can recover any deleted page', verbose_name='can recover pages')),
-                ('group', models.ForeignKey(null=True, to='auth.Group', verbose_name='group', blank=True)),
-                ('sites', models.ManyToManyField(null=True, help_text='If none selected, user haves granted permissions to all sites.', blank=True, to='sites.Site', verbose_name='sites')),
-                ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, verbose_name='user', blank=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name=_('ID'), auto_created=True, serialize=False)),
+                ('can_change', models.BooleanField(default=True, verbose_name=_('can edit'))),
+                ('can_add', models.BooleanField(default=True, verbose_name=_('can add'))),
+                ('can_delete', models.BooleanField(default=True, verbose_name=_('can delete'))),
+                ('can_change_advanced_settings', models.BooleanField(default=False, verbose_name=_('can change advanced settings'))),
+                ('can_publish', models.BooleanField(default=True, verbose_name=_('can publish'))),
+                ('can_change_permissions', models.BooleanField(default=False, help_text='on page level', verbose_name=_('can change permissions'))),
+                ('can_move_page', models.BooleanField(default=True, verbose_name=_('can move'))),
+                ('can_view', models.BooleanField(default=False, help_text='frontend view restriction', verbose_name=_('view restricted'))),
+                ('can_recover_page', models.BooleanField(default=True, help_text='can recover any deleted page', verbose_name=_('can recover pages'))),
+                ('group', models.ForeignKey(null=True, to='auth.Group', verbose_name=_('group'), blank=True)),
+                ('sites', models.ManyToManyField(null=True, help_text='If none selected, user haves granted permissions to all sites.', blank=True, to='sites.Site', verbose_name=_('sites'))),
+                ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, verbose_name=_('user'), blank=True)),
             ],
             options={
                 'verbose_name': 'Page global permission',
@@ -80,23 +80,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Page',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('created_by', models.CharField(max_length=70, verbose_name='created by', editable=False)),
-                ('changed_by', models.CharField(max_length=70, verbose_name='changed by', editable=False)),
+                ('id', models.AutoField(primary_key=True, verbose_name=_('ID'), auto_created=True, serialize=False)),
+                ('created_by', models.CharField(max_length=70, verbose_name=_('created by'), editable=False)),
+                ('changed_by', models.CharField(max_length=70, verbose_name=_('changed by'), editable=False)),
                 ('creation_date', models.DateTimeField(auto_now_add=True)),
                 ('changed_date', models.DateTimeField(auto_now=True)),
-                ('publication_date', models.DateTimeField(db_index=True, null=True, help_text='When the page should go live. Status must be "Published" for page to go live.', blank=True, verbose_name='publication date')),
-                ('publication_end_date', models.DateTimeField(db_index=True, null=True, help_text='When to expire the page. Leave empty to never expire.', blank=True, verbose_name='publication end date')),
-                ('in_navigation', models.BooleanField(db_index=True, default=True, verbose_name='in navigation')),
-                ('soft_root', models.BooleanField(db_index=True, default=False, help_text='All ancestors will not be displayed in the navigation', verbose_name='soft root')),
-                ('reverse_id', models.CharField(db_index=True, max_length=40, verbose_name='id', null=True, help_text='A unique identifier that is used with the page_url templatetag for linking to this page', blank=True)),
-                ('navigation_extenders', models.CharField(db_index=True, max_length=80, blank=True, verbose_name='attached menu', null=True)),
-                ('template', models.CharField(max_length=100, default='INHERIT', help_text='The template used to render the content.', verbose_name='template', choices=template_choices)),
-                ('login_required', models.BooleanField(default=False, verbose_name='login required')),
-                ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name='menu visibility', null=True, choices=Page.LIMIT_VISIBILITY_IN_MENU_CHOICES, help_text='limit when this page is visible in the menu', blank=True)),
+                ('publication_date', models.DateTimeField(db_index=True, null=True, help_text='When the page should go live. Status must be "Published" for page to go live.', blank=True, verbose_name=_('publication date'))),
+                ('publication_end_date', models.DateTimeField(db_index=True, null=True, help_text='When to expire the page. Leave empty to never expire.', blank=True, verbose_name=_('publication end date'))),
+                ('in_navigation', models.BooleanField(db_index=True, default=True, verbose_name=_('in navigation'))),
+                ('soft_root', models.BooleanField(db_index=True, default=False, help_text='All ancestors will not be displayed in the navigation', verbose_name=_('soft root'))),
+                ('reverse_id', models.CharField(db_index=True, max_length=40, verbose_name=_('id'), null=True, help_text='A unique identifier that is used with the page_url templatetag for linking to this page', blank=True)),
+                ('navigation_extenders', models.CharField(db_index=True, max_length=80, blank=True, verbose_name=_('attached menu'), null=True)),
+                ('template', models.CharField(max_length=100, default='INHERIT', help_text='The template used to render the content.', verbose_name=_('template'), choices=template_choices)),
+                ('login_required', models.BooleanField(default=False, verbose_name=_('login required'))),
+                ('limit_visibility_in_menu', models.SmallIntegerField(db_index=True, default=None, verbose_name=_('menu visibility'), null=True, choices=Page.LIMIT_VISIBILITY_IN_MENU_CHOICES, help_text='limit when this page is visible in the menu', blank=True)),
                 ('is_home', models.BooleanField(db_index=True, default=False, editable=False)),
-                ('application_urls', models.CharField(db_index=True, max_length=200, blank=True, verbose_name='application', null=True)),
-                ('application_namespace', models.CharField(max_length=200, null=True, blank=True, verbose_name='application instance name')),
+                ('application_urls', models.CharField(db_index=True, max_length=200, blank=True, verbose_name=_('application'), null=True)),
+                ('application_namespace', models.CharField(max_length=200, null=True, blank=True, verbose_name=_('application instance name'))),
                 ('level', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('lft', models.PositiveIntegerField(db_index=True, editable=False)),
                 ('rght', models.PositiveIntegerField(db_index=True, editable=False)),
@@ -107,7 +107,7 @@ class Migration(migrations.Migration):
                 ('xframe_options', models.IntegerField(default=0, choices=Page.X_FRAME_OPTIONS_CHOICES)),
                 ('parent', models.ForeignKey(null=True, to='cms.Page', related_name='children', blank=True)),
                 ('publisher_public', models.OneToOneField(null=True, to='cms.Page', related_name='publisher_draft', editable=False)),
-                ('site', models.ForeignKey(to='sites.Site', verbose_name='site', related_name='djangocms_pages', help_text='The site the page is accessible at.')),
+                ('site', models.ForeignKey(to='sites.Site', verbose_name=_('site'), related_name='djangocms_pages', help_text='The site the page is accessible at.')),
             ],
             options={
                 'ordering': ('tree_id', 'lft'),
@@ -120,19 +120,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PagePermission',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
-                ('can_change', models.BooleanField(default=True, verbose_name='can edit')),
-                ('can_add', models.BooleanField(default=True, verbose_name='can add')),
-                ('can_delete', models.BooleanField(default=True, verbose_name='can delete')),
-                ('can_change_advanced_settings', models.BooleanField(default=False, verbose_name='can change advanced settings')),
-                ('can_publish', models.BooleanField(default=True, verbose_name='can publish')),
-                ('can_change_permissions', models.BooleanField(default=False, help_text='on page level', verbose_name='can change permissions')),
-                ('can_move_page', models.BooleanField(default=True, verbose_name='can move')),
-                ('can_view', models.BooleanField(default=False, help_text='frontend view restriction', verbose_name='view restricted')),
-                ('grant_on', models.IntegerField(default=5, verbose_name='Grant on', choices=ACCESS_CHOICES)),
-                ('group', models.ForeignKey(null=True, to='auth.Group', verbose_name='group', blank=True)),
-                ('page', models.ForeignKey(null=True, to='cms.Page', verbose_name='page', blank=True)),
-                ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, verbose_name='user', blank=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name=_('ID'), auto_created=True, serialize=False)),
+                ('can_change', models.BooleanField(default=True, verbose_name=_('can edit'))),
+                ('can_add', models.BooleanField(default=True, verbose_name=_('can add'))),
+                ('can_delete', models.BooleanField(default=True, verbose_name=_('can delete'))),
+                ('can_change_advanced_settings', models.BooleanField(default=False, verbose_name=_('can change advanced settings'))),
+                ('can_publish', models.BooleanField(default=True, verbose_name=_('can publish'))),
+                ('can_change_permissions', models.BooleanField(default=False, help_text='on page level', verbose_name=_('can change permissions'))),
+                ('can_move_page', models.BooleanField(default=True, verbose_name=_('can move'))),
+                ('can_view', models.BooleanField(default=False, help_text='frontend view restriction', verbose_name=_('view restricted'))),
+                ('grant_on', models.IntegerField(default=5, verbose_name=_('Grant on'), choices=ACCESS_CHOICES)),
+                ('group', models.ForeignKey(null=True, to='auth.Group', verbose_name=_('group'), blank=True)),
+                ('page', models.ForeignKey(null=True, to='cms.Page', verbose_name=_('page'), blank=True)),
+                ('user', models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, verbose_name=_('user'), blank=True)),
             ],
             options={
                 'verbose_name': 'Page permission',
