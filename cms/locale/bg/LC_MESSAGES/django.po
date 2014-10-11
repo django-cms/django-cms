@@ -1035,7 +1035,7 @@ msgstr "Път"
 
 #: models/titlemodels.py:25
 msgid "has url overwrite"
-msgstr "has URL overwrite"
+msgstr "has url overwrite"
 
 #: models/titlemodels.py:26
 msgid "redirect"
