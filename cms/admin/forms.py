@@ -453,9 +453,6 @@ class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
 
 
 class GlobalPagePermissionAdminForm(forms.ModelForm):
-    class Meta:
-        exclude = []
-
     def clean(self):
         super(GlobalPagePermissionAdminForm, self).clean()
         if not self.cleaned_data['user'] and not self.cleaned_data['group']:
@@ -466,9 +463,6 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
 class GenericCmsPermissionForm(forms.ModelForm):
     """Generic form for User & Grup permissions in cms
     """
-    class Meta:
-        exclude = []
-
     can_add_page = forms.BooleanField(label=_('Add'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Change'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Delete'), required=False)
@@ -503,7 +497,6 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
     notify_user = forms.BooleanField(label=_('Notify user'), required=False,
                                      help_text=_(
                                          'Send email notification to user about username or password change. Requires user email.'))
-
     class Meta:
         model = PageUser
         exclude = []
