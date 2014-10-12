@@ -174,6 +174,10 @@ class PublicationDatesForm(forms.ModelForm):
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
+    class Meta:
+        model = Page
+        fields = ['site', 'publication_date', 'publication_end_date']
+
     def __init__(self, *args, **kwargs):
         # Dates are not language dependent, so let's just fake the language to
         # make the ModelAdmin happy
@@ -187,12 +191,16 @@ class PublicationDatesForm(forms.ModelForm):
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
 
-    class Meta:
-        model = Page
-        fields = ['site', 'publication_date', 'publication_end_date']
-
 
 class AdvancedSettingsForm(forms.ModelForm):
+
+    class Meta:
+        model = Page
+        fields = [
+            'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
+            'application_urls', 'application_namespace', "xframe_options",
+        ]
+
     from cms.forms.fields import PageSmartLinkField
     application_urls = forms.ChoiceField(label=_('Application'),
                                          choices=(), required=False,
@@ -323,13 +331,6 @@ class AdvancedSettingsForm(forms.ModelForm):
             is_valid_url(url, self.instance)
             return url
 
-    class Meta:
-        model = Page
-        fields = [
-            'site', 'template', 'reverse_id', 'overwrite_url', 'redirect', 'soft_root', 'navigation_extenders',
-            'application_urls', 'application_namespace', "xframe_options",
-        ]
-
 
 class PagePermissionForm(forms.ModelForm):
     class Meta:
@@ -344,6 +345,10 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     level or under him in choosen page tree, and users which were created by him, 
     but aren't assigned to higher page level than current user.
     """
+    class Meta:
+        model = PagePermission
+        exclude = []
+
     page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
 
     def __init__(self, *args, **kwargs):
@@ -435,12 +440,12 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
             instance.save()
         return instance
 
-    class Meta:
-        model = PagePermission
-
 
 class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
     can_view = forms.BooleanField(label=_('can_view'), widget=HiddenInput(), initial=True)
+
+    class Meta:
+        exclude = []
 
     def clean_can_view(self):
         self.cleaned_data["can_view"] = True
@@ -448,6 +453,9 @@ class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
 
 
 class GlobalPagePermissionAdminForm(forms.ModelForm):
+    class Meta:
+        exclude = []
+
     def clean(self):
         super(GlobalPagePermissionAdminForm, self).clean()
         if not self.cleaned_data['user'] and not self.cleaned_data['group']:
@@ -458,6 +466,9 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
 class GenericCmsPermissionForm(forms.ModelForm):
     """Generic form for User & Grup permissions in cms
     """
+    class Meta:
+        exclude = []
+
     can_add_page = forms.BooleanField(label=_('Add'), required=False, initial=True)
     can_change_page = forms.BooleanField(label=_('Change'), required=False, initial=True)
     can_delete_page = forms.BooleanField(label=_('Delete'), required=False)
@@ -495,6 +506,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
 
     class Meta:
         model = PageUser
+        exclude = []
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=':',
