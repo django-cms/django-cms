@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import json
 import warnings
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, \
+    HttpResponse
 from django.shortcuts import get_object_or_404
 
 try:
@@ -224,7 +225,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         return Form
 
-    def add_view(self, request, form_url='', extra_context=None):
+    def add_view_check_request(self, request):
         from cms.utils.plugins import has_reached_plugin_limit
         plugin_type = self.__class__.__name__
 
@@ -261,6 +262,14 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             )
         except PluginLimitReached as er:
             return HttpResponseBadRequest(er)
+
+        return True
+
+    def add_view(self, request, form_url='', extra_context=None):
+        result = self.add_view_check_request(request)
+
+        if isinstance(result, HttpResponse):
+            return result
 
         return super(CMSPluginBase, self).add_view(
             request, form_url, extra_context
