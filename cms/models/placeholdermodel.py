@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.utils.urlutils import admin_reverse
-from django.db import models
+from django.db import models, OperationalError
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
@@ -153,8 +153,11 @@ class Placeholder(models.Model):
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
                 if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
-                    if field.count():
-                        self._attached_fields_cache.append(rel.field)
+                    try:
+                        if field.count():
+                            self._attached_fields_cache.append(rel.field)
+                    except OperationalError:
+                        pass
         return self._attached_fields_cache
 
     def _get_attached_field(self):
@@ -172,9 +175,12 @@ class Placeholder(models.Model):
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
                 if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
-                    if field.count():
-                        self._attached_field_cache = rel.field
-                        break
+                    try:
+                        if field.count():
+                            self._attached_field_cache = rel.field
+                            break
+                    except OperationalError:
+                        pass
         return self._attached_field_cache
 
     def _get_attached_field_name(self):

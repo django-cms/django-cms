@@ -99,7 +99,7 @@ def configure(db_url, **extra):
             'django.contrib.sites',
             'django.contrib.staticfiles',
             'django.contrib.messages',
-            'mptt',
+            'treebeard',
             'cms',
             'menus',
             'djangocms_text_ckeditor',
