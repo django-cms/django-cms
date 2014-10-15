@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.utils.urlutils import admin_reverse
-from django.db import models, OperationalError
+from django.db import models
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
@@ -156,7 +156,7 @@ class Placeholder(models.Model):
                     try:
                         if field.count():
                             self._attached_fields_cache.append(rel.field)
-                    except OperationalError:
+                    except:
                         pass
         return self._attached_fields_cache
 
@@ -179,7 +179,7 @@ class Placeholder(models.Model):
                         if field.count():
                             self._attached_field_cache = rel.field
                             break
-                    except OperationalError:
+                    except:
                         pass
         return self._attached_field_cache
 
