@@ -13,6 +13,15 @@ django CMS
     :target: https://pypi.python.org/pypi/django-cms/
 
 
+NOTE::
+
+	You are currently on the 'develop' branch, normally, this is a great place
+	to get the latest and greatest. However, at this time, this branch is
+	being prepared for 3.1 and is currently pre-alpha quality. if you want the
+	latest stable release, please switch to the `Support 3.0.x` branch.
+
+
+
 Open source enterprise content management system based on the django framework.
 
 ********
