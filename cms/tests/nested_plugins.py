@@ -16,9 +16,24 @@ from cms.utils.compat.tests import UnittestCompatMixin
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
+URL_CMS_ADD_PLUGIN = u'/en/admin/cms/page/%d/add-plugin/'
 
 
 class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
+
+    def reorder_positions(self, plugin=None, parent=None):
+
+        if parent:
+            parent_id = parent.pk
+            plugin = parent
+        else:
+            parent_id = plugin.parent_id
+        x = 0
+        for p in CMSPlugin.objects.filter(parent_id=parent_id, language=plugin.language, placeholder_id=plugin.placeholder_id):
+            p.position = x
+            p.save()
+            x += 1
+
     def copy_placeholders_and_check_results(self, placeholders):
         """
         This function is not itself a test; rather, it can be used by any test
@@ -73,8 +88,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     plugin_list_from_tree(plugin.get_children(), plugin_list)
 
             # build the tree for each set of plugins
-            plugin_list_from_tree(original_plugins.filter(level=0), original_plugins_list)
-            plugin_list_from_tree(copied_plugins.filter(level=0), copied_plugins_list)
+            plugin_list_from_tree(original_plugins.filter(depth=1), original_plugins_list)
+            plugin_list_from_tree(copied_plugins.filter(depth=1), copied_plugins_list)
 
             self.assertEqual(len(original_plugins_list), original_plugins.count())
             self.assertEqual(len(copied_plugins_list), copied_plugins.count())
@@ -93,21 +108,18 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     copied_text_plugin.body
                 )
                 self.assertEqual(
-                    original_text_plugin.level,
-                    copied_text_plugin.level
+                    original_text_plugin.depth,
+                    copied_text_plugin.depth
                 )
                 self.assertEqual(
                     original_text_plugin.position,
                     copied_text_plugin.position
                 )
                 self.assertEqual(
-                    original_text_plugin.rght,
-                    copied_text_plugin.rght
+                    original_text_plugin.numchild,
+                    copied_text_plugin.numchild
                 )
-                self.assertEqual(
-                    original_text_plugin.lft,
-                    copied_text_plugin.lft
-                )
+
                 self.assertEqual(
                     original_text_plugin.get_descendant_count(),
                     copied_text_plugin.get_descendant_count()
@@ -163,20 +175,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         # plugin in placeholder
         plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
                               body=u"01")
-        plugin_1.save()
 
         # IMPORTANT: plugins must be reloaded, before they can be assigned 
         # as a parent. Otherwise, the MPTT structure doesn't seem to rebuild 
         # properly.
 
         # child of plugin_1
-        plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"02",
-        )
         plugin_1 = self.reload(plugin_1)
-        plugin_2.parent = plugin_1
-        plugin_2.save()
-
+        plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"02", target=plugin_1,
+        )
         # plugin_2 should be plugin_1's only child 
         # for a single item we use assertSequenceEqual
         self.assertSequenceEqual(
@@ -184,13 +192,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             [CMSPlugin.objects.get(id=plugin_2.pk)])
 
         # create a second child of plugin_1
-        plugin_3 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"03",
-        )
         plugin_1 = self.reload(plugin_1)
-        plugin_3.parent = plugin_1
-        plugin_3.save()
-
+        plugin_3 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"03", target=plugin_1
+        )
         # plugin_2 & plugin_3 should be plugin_1's children
         # for multiple items we use assertSequenceEqual, because
         # assertSequenceEqual may re-order the list without warning
@@ -202,12 +207,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             ])
 
         # child of plugin_2
-        plugin_4 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"04",
-        )
         plugin_2 = self.reload(plugin_2)
-        plugin_4.parent = plugin_2
-        plugin_4.save()
+        plugin_4 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"04", target=plugin_2
+        )
 
         # plugin_4 should be plugin_2's child
         self.assertSequenceEqual(
@@ -218,28 +221,27 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_descendants(),
             [
-                # note tree_id ordering of MPTT reflected here:
+                # note path ordering of MP reflected here:
                 CMSPlugin.objects.get(id=plugin_2.pk),
                 CMSPlugin.objects.get(id=plugin_4.pk),
                 CMSPlugin.objects.get(id=plugin_3.pk),
             ],
         )
-
+        plugin_1 = self.reload(plugin_1)
         # create a second root plugin
-        plugin_5 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              # force this to first-child, to make the tree more challenging
-                              position='first-child',
-                              body=u"05",
-        )
-        plugin_5.save()
+        plugin_5 = add_plugin(placeholder, u"TextPlugin", u"en", body=u"05")
+        left = CMSPlugin.objects.filter(parent__isnull=True).order_by('path')[0]
+        plugin_5 = self.reload(plugin_5)
+        plugin_5.move(left, pos='right')
+        self.reorder_positions(plugin_5)
+        self.reorder_positions(plugin_2)
 
         # child of plugin_5
-        plugin_6 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"06",
-        )
         plugin_5 = self.reload(plugin_5)
-        plugin_6.parent = plugin_5
-        plugin_6.save()
+        plugin_6 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"06", target=plugin_5
+        )
+
 
         # plugin_6 should be plugin_5's child
         self.assertSequenceEqual(
@@ -247,12 +249,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             [CMSPlugin.objects.get(id=plugin_6.pk)])
 
         # child of plugin_6
-        plugin_7 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"07",
-        )
         plugin_5 = self.reload(plugin_5)
-        plugin_7.parent = plugin_5
-        plugin_7.save()
+        plugin_7 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"07", target=plugin_5
+        )
 
         # plugin_7 should be plugin_5's child
         self.assertSequenceEqual(
@@ -271,12 +271,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             ])
 
         # another child of plugin_2
-        plugin_8 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"08",
-        )
         plugin_2 = self.reload(plugin_2)
-        plugin_8.parent = plugin_2
-        plugin_8.save()
+        plugin_8 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"08", target=plugin_2
+        )
 
         # plugin_4 should be plugin_2's child
         self.assertSequenceEqual(
@@ -287,12 +285,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             ])
 
         # child of plugin_3
-        plugin_9 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"09",
-        )
         plugin_3 = self.reload(plugin_3)
-        plugin_9.parent = plugin_3
-        plugin_9.save()
+        plugin_9 = add_plugin(placeholder, u"TextPlugin", u"en",
+                              body=u"09", target=plugin_3
+        )
 
         # plugin_9 should be plugin_3's child
         self.assertSequenceEqual(
@@ -300,12 +296,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             [CMSPlugin.objects.get(id=plugin_9.pk)])
 
         # child of plugin_4
-        plugin_10 = add_plugin(placeholder, u"TextPlugin", u"en",
-                               body=u"10",
-        )
         plugin_4 = self.reload(plugin_4)
-        plugin_10.parent = plugin_4
-        plugin_10.save()
+        plugin_10 = add_plugin(placeholder, u"TextPlugin", u"en",
+                               body=u"10", target=plugin_4
+        )
 
         # plugin_10 should be plugin_4's child
         self.assertSequenceEqual(
@@ -322,7 +316,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                target=plugin_1,
                                position="left"
         )
-        plugin_11.save()
 
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_1.pk).get_children(),
@@ -338,8 +331,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                target=plugin_4,
                                position="left"
         )
-        plugin_12.save()
-
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_2.pk).get_children(),
             [
@@ -355,7 +346,6 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                                target=plugin_7,
                                position="right"
         )
-        plugin_13.save()
 
         self.assertSequenceEqual(
             CMSPlugin.objects.get(id=plugin_5.pk).get_children(),
@@ -370,54 +360,73 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_14 = add_plugin(placeholder, u"TextPlugin", u"en",
                                body=u"14"
         )
-        plugin_14.save()
 
         self.assertSequenceEqual(
-            CMSPlugin.objects.filter(level=0),
+            CMSPlugin.objects.filter(depth=1).order_by('path'),
             [
                 CMSPlugin.objects.get(id=plugin_11.pk),
                 CMSPlugin.objects.get(id=plugin_1.pk),
                 CMSPlugin.objects.get(id=plugin_5.pk),
                 CMSPlugin.objects.get(id=plugin_14.pk)
             ])
-        self.assertEqual(CMSPlugin.objects.get(id=plugin_11.pk).tree_id, 1)
+
         self.copy_placeholders_and_check_results([placeholder])
 
         # now let's move plugins around in the tree
 
         # move plugin_2 before plugin_11
         plugin_2 = self.reload(plugin_2)
-        plugin_2.move_to(target=plugin_1, position="left")
+        plugin_1 = self.reload(plugin_1)
+        old_parent = plugin_2.parent
+        plugin_2.parent_id = plugin_1.parent_id
         plugin_2.save()
-        self.assertEqual(CMSPlugin.objects.get(id=plugin_2.pk).tree_id, 1)
+        plugin_2.move(target=plugin_1, pos="left")
+        self.reorder_positions(parent=old_parent)
+        self.reorder_positions(plugin_2)
         self.copy_placeholders_and_check_results([placeholder])
 
         # move plugin_6 after plugin_7
         plugin_6 = self.reload(plugin_6)
         plugin_7 = self.reload(plugin_7)
-        plugin_6.move_to(target=plugin_7, position="right")
+        old_parent = plugin_6.parent
+        plugin_6.parent_id = plugin_7.parent_id
         plugin_6.save()
+        plugin_6.move(target=plugin_7, pos="right")
+        self.reorder_positions(parent=old_parent)
+        self.reorder_positions(plugin_6)
         self.copy_placeholders_and_check_results([placeholder])
 
         # move plugin_3 before plugin_2
         plugin_2 = self.reload(plugin_2)
         plugin_3 = self.reload(plugin_3)
-        plugin_3.move_to(target=plugin_2, position="left")
+        old_parent = plugin_3.parent
+        plugin_3.parent_id = plugin_2.parent_id
         plugin_3.save()
+        plugin_3.move(target=plugin_2, pos="left")
+        self.reorder_positions(parent=old_parent)
+        self.reorder_positions(plugin_3)
         self.copy_placeholders_and_check_results([placeholder])
 
         # make plugin_3 plugin_2's first-child
         plugin_2 = self.reload(plugin_2)
         plugin_3 = self.reload(plugin_3)
-        plugin_3.move_to(target=plugin_2, position="first-child")
+        old_parent = plugin_3.parent
+        plugin_3.parent_id = plugin_2.pk
         plugin_3.save()
+        plugin_3.move(target=plugin_2, pos="first-child")
+        self.reorder_positions(CMSPlugin.objects.filter(placeholder_id=plugin_3.placeholder_id, language=plugin_3.language, depth=1)[0])
+        self.reorder_positions(plugin_3)
         self.copy_placeholders_and_check_results([placeholder])
 
         # make plugin_7 plugin_2's first-child
-        self.reload(plugin_2)
+        plugin_3 = self.reload(plugin_3)
         plugin_7 = self.reload(plugin_7)
-        plugin_7.move_to(target=plugin_3, position="right")
+        old_parent = plugin_7.parent
+        plugin_7.parent_id = plugin_3.parent_id
         plugin_7.save()
+        plugin_7.move(target=plugin_3, pos="right")
+        self.reorder_positions(parent=old_parent)
+        self.reorder_positions(plugin_7)
         self.copy_placeholders_and_check_results([placeholder, ])
 
     def test_nested_plugin_on_page(self):
@@ -454,13 +463,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
             # mptt related insertion correct?
             msg = u"parent plugin right is not updated, child not inserted correctly"
-            self.assertTrue(text_plugin.rght > link_plugin.rght, msg=msg)
+            self.assertTrue(text_plugin.position == link_plugin.position, msg=msg)
             msg = u"link has no parent"
             self.assertFalse(link_plugin.parent == None, msg=msg)
-            msg = u"parent plugin left is not updated, child not inserted correctly"
-            self.assertTrue(text_plugin.lft < link_plugin.lft, msg=msg)
+            msg = u"parent plugin path is not updated, child not inserted correctly"
+            self.assertTrue(text_plugin.path == link_plugin.path[:4], msg=msg)
             msg = u"child level is not bigger than parent level"
-            self.assertTrue(text_plugin.level < link_plugin.level, msg=msg)
+            self.assertTrue(text_plugin.depth < link_plugin.depth, msg=msg)
 
             # add the link plugin to the body
             # emulate the editor in admin that adds some txt for the nested plugin
@@ -908,3 +917,26 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             copied_placeholder = copied_link_child_plugin.placeholder
             msg = u"placeholder of the orginal plugin and copied plugin are the same"
             self.assertNotEqual(org_placeholder.id, copied_placeholder.id, msg)
+
+    def test_add_child_plugin(self):
+        page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
+                                   position=u"last-child", published=True, in_navigation=True)
+        page_one_ph_one = page_one.placeholders.get(slot=u"col_sidebar")
+        # add the text plugin to placeholder one
+        text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            # now move the parent text plugin to another placeholder
+            post_data = {
+                'placeholder_id': page_one_ph_one.id,
+                'plugin_type': 'LinkPlugin',
+                'plugin_language': 'en',
+                'plugin_parent': text_plugin_en.pk,
+
+            }
+            add_url = URL_CMS_ADD_PLUGIN % page_one.pk
+            response = self.client.post(add_url, post_data)
+            self.assertEqual(response.status_code, 200)
+        link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)
+        self.assertEqual(link_plugin.parent_id, text_plugin_en.pk)
+        self.assertEqual(link_plugin.path, '00010001')

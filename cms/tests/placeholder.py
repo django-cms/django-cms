@@ -585,8 +585,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             page.placeholders.add(placeholder)
         page.reload()
         for placeholder in page.placeholders.all():
-            add_plugin(placeholder, "TextPlugin", "en", body="body",
-                       id=placeholder.pk)
+            add_plugin(placeholder, "TextPlugin", "en", body="body")
         with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()

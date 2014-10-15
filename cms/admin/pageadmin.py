@@ -180,26 +180,35 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if 'recover' in request.path_info:
             pk = obj.pk
             if obj.parent_id:
-                parent = Page.objects.get(pk=obj.parent_id)
+                try:
+                    parent = Page.objects.get(pk=obj.parent_id)
+                except Page.DoesNotExist:
+                    parent = None
             else:
                 parent = None
-            obj.lft = 0
-            obj.rght = 0
-            obj.tree_id = 0
-            obj.level = 0
             obj.pk = None
-            obj.insert_at(parent, save=False)
+            obj.path = None
+            obj.numchild = 0
+            obj.depth = 0
+            if parent:
+                parent.add_child(instance=obj)
+            else:
+                obj.add_root(instance=obj)
+            new_pk = obj.pk
+            saved_obj = Page.objects.get(pk=new_pk)
             obj.pk = pk
+            obj.path = saved_obj.path
+            obj.numchild = saved_obj.numchild
+            obj.depth = saved_obj.depth
+            saved_obj.delete()
             obj.save(no_signals=True)
-
         else:
             if 'history' in request.path_info:
                 old_obj = Page.objects.get(pk=obj.pk)
-                obj.level = old_obj.level
+                obj.depth = old_obj.depth
                 obj.parent_id = old_obj.parent_id
-                obj.rght = old_obj.rght
-                obj.lft = old_obj.lft
-                obj.tree_id = old_obj.tree_id
+                obj.path = old_obj.path
+                obj.numchild = old_obj.numchild
         new = False
         if not obj.pk:
             new = True
@@ -214,7 +223,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             except self.model.DoesNotExist:
                 pass
             else:
-                obj.move_to(target, position)
+                if position == 'last-child' or position == 'first-child':
+                    obj.parent_id = target.pk
+                else:
+                    obj.parent_id = target.parent_id
+                obj.save()
+                obj.move(target, pos=position)
         page_type_id = form.cleaned_data.get('page_type')
         copy_target_id = request.GET.get('copy_target')
         if copy_target_id or page_type_id:
@@ -809,7 +823,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
         for plugin in plugins:
             plugin._no_reorder = True
             plugin.delete()
@@ -876,7 +890,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
         for plugin in plugins:
             plugin._no_reorder = True
             plugin.delete()
@@ -996,13 +1010,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             source_language = request.POST.get('source_language')
             target_language = request.POST.get('target_language')
             page = Page.objects.get(pk=page_id)
-            placeholders = page.placeholders.all()
+            placeholders = page.get_placeholders()
 
             if not target_language or not target_language in get_language_list():
                 return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))
             for placeholder in placeholders:
                 plugins = list(
-                    placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                    placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
                 if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
                     return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
                 copy_plugins.copy_plugins_to(plugins, placeholder, target_language)

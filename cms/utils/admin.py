@@ -64,14 +64,18 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
     has_add_on_same_level_permission = False
     opts = Page._meta
     if get_cms_setting('PERMISSION'):
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            request.user, page.site_id).exists()
+        if hasattr(request.user, '_global_add_perm_cache'):
+            global_add_perm = request.user._global_add_perm_cache
+        else:
+            global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
+                request.user, page.site_id).exists()
+            request.user._global_add_perm_cache = global_add_perm
         if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
             has_add_on_same_level_permission = True
     from cms.utils import permissions
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
-                                                                              page.site)
+                                                                              page.site_id)
         #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
     context = {
         'page': page,

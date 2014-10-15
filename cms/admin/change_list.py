@@ -20,7 +20,7 @@ def cache_tree_children(queryset):
     item, which would otherwise (if '_cached_children' is not set) cause a
     database query.
 
-    The queryset must be ordered by 'lft', or the function will put the children
+    The queryset must be ordered by 'path', or the function will put the children
     in the wrong order.
     """
     parents_dict = {}
@@ -105,7 +105,7 @@ class CMSChangeList(ChangeList):
         site = self.current_site()
         # Get all the pages, ordered by tree ID (it's convenient to build the
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related('publisher_public')
+        pages = self.get_query_set(request).drafts().order_by('path').select_related('publisher_public')
 
         # Get lists of page IDs for which the current user has
         # "permission to..." on the current site.
@@ -120,17 +120,18 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
-
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
         cache_tree_children(pages)
         ids = dict((page.id, page) for page in pages)
-
+        parent_ids = {}
         for page in pages:
-
-            children = list(page.get_children())
-
+            if not page.parent_id in parent_ids:
+                parent_ids[page.parent_id] = []
+            parent_ids[page.parent_id].append(page)
+        for page in pages:
+            children = parent_ids.get(page.pk, [])
             # If the parent page is not among the nodes shown, this node should
             # be a "root node". The filtering for this has already been made, so
             # using the ids dictionary means this check is constant time
