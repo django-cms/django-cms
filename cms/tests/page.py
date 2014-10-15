@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
+from cms.utils.i18n import force_language
 import os.path
 from cms.utils.urlutils import admin_reverse
 
@@ -18,7 +20,7 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
 from cms.middleware.user import CurrentUserMiddleware
-from cms.models import Page, Title
+from cms.models import Page, Title, EmptyTitle
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
@@ -26,7 +28,7 @@ from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import installed_apps
+from cms.utils.compat.dj import installed_apps, force_unicode
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
 
@@ -344,14 +346,14 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = create_page("page_a", "nav_playground.html", "en")
+        page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_a_a = create_page("page_a_a", "nav_playground.html", "en",
-                               parent=page_a)
-        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a)
+                               parent=page_a, published=True, reverse_id="hello")
+        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a, published=True)
 
-        page_b = create_page("page_b", "nav_playground.html", "en")
+        page_b = create_page("page_b", "nav_playground.html", "en", published=True)
         page_b_a = create_page("page_b_b", "nav_playground.html", "en",
-                               parent=page_b)
+                               parent=page_b, published=True)
 
         count = Page.objects.drafts().count()
 
@@ -389,7 +391,52 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c, position="left")
         self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+    
+    def test_public_exceptions(self):
+        page_a = create_page("page_a", "nav_playground.html", "en", published=True)
+        page_b = create_page("page_b", "nav_playground.html", "en")
+        page = page_a.publisher_public
+        self.assertRaises(PublicIsUnmodifiable, page.copy_page, 3, 1)
+        self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
+        self.assertRaises(PublicIsUnmodifiable, page.revert, 'en')
+        self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
 
+        self.assertTrue(page.get_draft_object().publisher_is_draft)
+        self.assertRaises(PublicVersionNeeded, page_b.revert, 'en')
+
+    def test_get_admin_tree_title(self):
+        page = create_page("page_a", "nav_playground.html", "en", published=True)
+        self.assertEqual(page.get_admin_tree_title(), 'page_a')
+        page.title_cache = {}
+        self.assertEqual("Empty", force_unicode(page.get_admin_tree_title()))
+        languages = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': 'English',
+                    'fallbacks': ['fr', 'de'],
+                    'public': True,
+                    'fallbacks':['fr']
+                },
+                {
+                    'code': 'fr',
+                    'name': 'French',
+                    'public': True,
+                    'fallbacks':['en']
+                },
+        ]}
+        with SettingsOverride(CMS_LANGUAGES=languages):
+            with force_language('fr'):
+                page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test', page_title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test', menu_title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test2')}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()

@@ -18,7 +18,7 @@ from django.utils import timezone
 
 from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -779,6 +779,59 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertFalse(len(out))
         self.assertTrue(len(placeholder._plugins_cache))
 
+    def test_defer_pickel(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
+        plugins = Text.objects.all().defer('path')
+        import pickle
+        import io
+        a = io.BytesIO()
+        pickle.dump(plugins[0], a)
+
+
+    def test_empty_plugin_description(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        a = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG
+        )
+
+        self.assertEqual(a.get_short_description(), "<Empty>")
+
+    def test_page_attribute_warns(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        a = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG
+        )
+        a.save()
+
+        def get_page(plugin):
+            return plugin.page
+
+        self.assertWarns(
+            DontUsePageAttributeWarning,
+            "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
+            get_page, a
+        )
+
+    def test_set_translatable_content(self):
+        a = Text(body="hello")
+        self.assertTrue(a.set_translatable_content({'body': 'world'}))
+        b = Link(name="hello")
+        self.assertTrue(b.set_translatable_content({'name': 'world'}))
+
+
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
@@ -833,18 +886,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
         self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
         self.assertEqual(db_text_plugin_1.pk, text_plugin_1.pk)
-
-    def test_is_last_in_placeholder(self):
-        """
-        Tests that children plugins don't affect the is_last_in_placeholder plugin method.
-        """
-        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                              slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-        text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
-        api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1", target=text_plugin_1)
-        self.assertEqual(text_plugin_2.is_last_in_placeholder(), True)
 
     def test_plugin_move_with_reload(self):
         action_options = {

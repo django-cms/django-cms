@@ -123,7 +123,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/copy-language/$', self.copy_language),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
-            pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
@@ -144,9 +143,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         url_patterns += super(PageAdmin, self).get_urls()
         return url_patterns
-
-    def redirect_jsi18n(self, request):
-        return HttpResponseRedirect(admin_reverse('jsi18n'))
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""

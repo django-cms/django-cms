@@ -308,17 +308,13 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         Copy a page [ and all its descendants to a new location ]
         Doesn't checks for add page permissions anymore, this is done in PageAdmin.
 
-        Note: public_copy was added in order to enable the creation of a copy
-        for creating the public page during the publish operation as it sets the
-        publisher_is_draft=False.
-
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
-        pages = [self.reload()] + list(self.get_descendants().order_by('path'))
-
+        if not self.publisher_is_draft:
+            raise PublicIsUnmodifiable("copy page is not allowed for public pages")
+        pages = list(self.get_descendants(True).order_by('path'))
         site_reverse_ids = Page.objects.filter(site=site, reverse_id__isnull=False).values_list('reverse_id', flat=True)
-
         if target:
             target.old_pk = -1
             if position == "first-child" or position == "last-child":
@@ -391,30 +387,17 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
             # copy titles of this page
             draft_titles = {}
-            public_titles = []
             for title in titles:
-                if title.publisher_is_draft:
-                    title.pk = None  # setting pk = None creates a new instance
-                    title.page = page
-                    if title.publisher_public_id:
-                        draft_titles[title.publisher_public_id] = title
-                        title.publisher_public = None
-                        # create slug-copy for standard copy
-                    title.published = False
-                    title.slug = page_utils.get_available_slug(title)
-                    title.save()
-                else:
-                    public_titles.append(title)
-            for title in public_titles:
-                draft_title = draft_titles[title.pk]
+
                 title.pk = None  # setting pk = None creates a new instance
                 title.page = page
+                if title.publisher_public_id:
+                    draft_titles[title.publisher_public_id] = title
+                    title.publisher_public = None
+                    # create slug-copy for standard copy
+                title.published = False
                 title.slug = page_utils.get_available_slug(title)
-                title.publisher_public_id = draft_title.pk
                 title.save()
-                draft_title.publisher_public = title
-                draft_title.save()
-
             # copy the placeholders (and plugins on those placeholders!)
             for ph in placeholders:
                 plugins = ph.get_plugins_list()
@@ -756,15 +739,20 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         else:
             return []
 
-    def get_cached_ancestors(self, ascending=True):
-        if ascending:
-            if not hasattr(self, "ancestors_ascending"):
-                self.ancestors_ascending = list(self.get_ancestors())
-            return self.ancestors_ascending
+    def get_descendants(self, include_self=False):
+        """
+        :returns: A queryset of all the node's descendants as DFS, doesn't
+            include the node itself
+        """
+        if include_self:
+            return self.__class__.get_tree(self)
         else:
-            if not hasattr(self, "ancestors_descending"):
-                self.ancestors_descending = list(self.get_ancestors().order_by('-deptjh'))
-            return self.ancestors_descending
+            return self.__class__.get_tree(self).exclude(pk=self.pk)
+
+    def get_cached_ancestors(self):
+        if not hasattr(self, "ancestors_ascending"):
+            self.ancestors_ascending = list(self.get_ancestors())
+        return self.ancestors_ascending
 
     # ## Title object access
 
@@ -821,33 +809,33 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self._placeholder_cache = self.placeholders.all()
         return self._placeholder_cache
 
-    def get_admin_tree_title(self):
-        language = get_language()
+    def _validate_title(self, title):
         from cms.models.titlemodels import EmptyTitle
+        if isinstance(title, EmptyTitle):
+            return False
+        if not title.title or not title.slug:
+            return False
+        return True
 
-        def validate_title(title):
-            if isinstance(title, EmptyTitle):
-                return False
-            if not title.title or not title.slug:
-                return False
-            return True
-
+    def get_admin_tree_title(self):
+        from cms.models.titlemodels import EmptyTitle
+        language = get_language()
         if not hasattr(self, 'title_cache'):
             self.title_cache = {}
             for title in self.title_set.all():
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
+        if not language in self.title_cache or not self._validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
-                if lang in self.title_cache and validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
+                if lang in self.title_cache and self._validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
                     found = True
                     language = lang
             if not found:
-                if self.title_cache.keys():
-                    language = self.title_cache.keys()[0]
-                else:
-                    language = None
+                language = None
+                for lang, item in self.title_cache.items():
+                    if not isinstance(item, EmptyTitle):
+                        language = lang
         if not language:
             return _("Empty")
         title = self.title_cache[language]
@@ -1106,12 +1094,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         Reload a page from the database
         """
         return Page.objects.get(pk=self.pk)
-
-    def get_object_queryset(self):
-        """Returns smart queryset depending on object type - draft / public
-        """
-        qs = self.__class__.objects
-        return self.publisher_is_draft and qs.drafts() or qs.public().published()
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?

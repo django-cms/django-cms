@@ -5,6 +5,7 @@ source =
 branch = False
 omit =
     cms/migrations/*
+    cms/migrations_django/*
     cms/plugins/*/migrations/*
     cms/stacks/migrations/*
     cms/tests/*
