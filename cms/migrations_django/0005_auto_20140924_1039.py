@@ -166,7 +166,7 @@ def move_to_mp(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('cms', '0004_auto_20140926_2347'),
+        ('cms', '0004_auto_20140924_1038'),
     ]
 
     operations = [
