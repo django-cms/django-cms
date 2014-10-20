@@ -2,9 +2,9 @@
 Development of django CMS
 #########################
 
-django CMS is developed by a community of developers form across the world,
-with a wide range and levels of skills and expertise. Everyone's contribution,
-however small, is welcomed.
+django CMS is developed by a community of developers from across the world,
+with a wide range and levels of skills and expertise. Every contribution,
+however small, is valued.
 
 As an open source project, anyone is welcome to contribute in whatever form
 they are able, which can include taking part in dicussions, filing bug reports,
