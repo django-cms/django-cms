@@ -16,7 +16,7 @@ Requirements
 * `Django`_ 1.6.x or 1.7.x
 * `South`_ 1.0
 * `django-classy-tags`_ 0.5 or higher
-* `django-treebeard`_ 2.0 (strict due to API compatibility issues)
+* `django-mptt`_ 0.6 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.99 or higher
 * `djangocms-admin-style`_
@@ -38,7 +38,7 @@ Requirements
 .. _Django: https://www.djangoproject.com
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
-.. _django-treebeard: http://code.tabo.pe/django-treebeard/src
+.. _django-mptt: https://github.com/django-mptt/django-mptt
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: https://github.com/html5lib/html5lib-python
 .. _django-i18nurls: https://github.com/brocaar/django-i18nurls
