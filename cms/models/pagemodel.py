@@ -178,7 +178,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 if target.get_root().get_next_sibling().pk == public.get_root().pk:
                     target = target.publisher_public
                 else:
-                    Logger.warn('tree may need rebuilding: run manage.py cms fix-tree')
+                    Logger.warning('tree may need rebuilding: run manage.py cms fix-tree')
         if position == 'first-child' or position == 'last-child':
             self.parent_id = target.pk
         else:
