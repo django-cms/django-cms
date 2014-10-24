@@ -16,7 +16,7 @@ Requirements
 * `Django`_ 1.4.x, 1.5.x, 1.6.x or 1.7.x
 * `South`_ 1.0
 * `django-classy-tags`_ 0.5 or higher
-* `django-mptt`_ 0.6 (strict due to API compatibility issues)
+* `django-treebeard`_ 2.0
 * `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.99 or higher
 * `djangocms-admin-style`_
@@ -38,7 +38,7 @@ Requirements
 .. _Django: https://www.djangoproject.com
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
-.. _django-mptt: https://github.com/django-mptt/django-mptt
+.. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: https://github.com/html5lib/html5lib-python
 .. _django-i18nurls: https://github.com/brocaar/django-i18nurls
@@ -149,7 +149,7 @@ its dependencies:
     Django>=1.7
 
     South==1.0
-    django-mptt==0.6
+    django-treebeard==2.0
     django-sekizai==0.7
     django-classy-tags==0.5
     djangocms-admin-style==0.2.2
@@ -319,7 +319,7 @@ This includes django CMS itself as well as its dependenices and
 other highly recommended applications/libraries::
 
     'cms',  # django CMS itself
-    'mptt',  # utilities for implementing a modified pre-order traversal tree
+    'treebeard',  # utilities for implementing a tree using materialised paths
     'menus',  # helper for model independent hierarchical website navigation
     'south',  # intelligent schema and data migrations
     'sekizai',  # for javascript and css management
