@@ -73,12 +73,11 @@ Similarly, substantial patches with significant implications for the codebase
 from other members of the community should be reviewed and discussed by more
 than one core developer before being accepted.
 
-List of current core developers
+Current core developers
 ===============================
 
 * Angelo Dini http://github.com/finalangel
 * Benjamin Wohlwend http://github.com/piquadrat
-* Chris Glass http://github.com/chrisglass
 * Daniele Procida http://github.com/evildmp
 * Iacopo Spalletti http://github.com/yakky
 * Jonas Obrist http://github.com/ojii
@@ -87,6 +86,12 @@ List of current core developers
 * Paulo Alvarado http://github.com/czpython
 * Patrick Lauber http://github.com/digi604
 * Stefan Foulis http://github.com/stefanfoulis
+
+Retired core developers
+=======================
+
+* Chris Glass http://github.com/chrisglass
+
 
 Election of new core developers
 ===============================
