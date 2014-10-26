@@ -91,7 +91,7 @@ Credits
 
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
-  `django-mptt <https://github.com/django-mptt/django-mptt>`_.
+  `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
 * Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
   `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
