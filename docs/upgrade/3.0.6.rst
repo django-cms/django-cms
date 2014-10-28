@@ -29,7 +29,7 @@ To support the current arrangement you need to add the following to your
 .. warning:: **Applications migrations**
 
     **Any** application that defines a django CMS plugin or a model that uses a
-    PlaceholderField or depends in any way on django CMS models **must** alos
+    PlaceholderField or depends in any way on django CMS models **must** also
     provide Django 1.7 migrations.
 
 Extended Custom User Support
