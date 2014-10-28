@@ -220,7 +220,6 @@ $(document).ready(function () {
 
 		// public methods
 		addPlugin: function (type, name, parent) {
-			//placeholder_id=3&plugin_type=PicturePlugin&plugin_language=en
 			// cancel request if already in progress
 			var params = {
 				'placeholder_id': this.options.placeholder_id,
