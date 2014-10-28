@@ -5,7 +5,7 @@
 
 	<p class="deletelink-box">
 	{% if show_delete_link %}<a href="delete/" class="deletelink">{% trans "Delete" %}</a>{% endif %}
-	{% if basic_info %}<a href="{% cms_admin_url 'cms_page_change' object_id %}?language={{ language }}" class="cms_btn-active basic_info">{% trans "Basic Infos" %}</a>{% endif %}
+	{% if basic_info %}<a href="{% cms_admin_url 'cms_page_change' object_id %}?language={{ language }}" class="cms_btn-active basic_info">{% trans "Basic Settings" %}</a>{% endif %}
 	{% if advanced_settings %}<a href="{% cms_admin_url 'cms_page_advanced' object_id %}?language={{ language }}" class="cms_btn-active advanced_settings">{% trans "Advanced Settings" %}</a>{% endif %}
 	</p>
 
