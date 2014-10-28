@@ -220,17 +220,17 @@ $(document).ready(function () {
 
 		// public methods
 		addPlugin: function (type, name, parent) {
-      //placeholder_id=3&plugin_type=PicturePlugin&plugin_language=en
+			//placeholder_id=3&plugin_type=PicturePlugin&plugin_language=en
 			// cancel request if already in progress
-      var params = {
-        'placeholder_id': this.options.placeholder_id,
-        'plugin_type': type,
-        'plugin_language': this.options.plugin_language
-      };
-      if (parent){
-        params['plugin_parent'] = parent;
-      }
-      var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
+			var params = {
+				'placeholder_id': this.options.placeholder_id,
+				'plugin_type': type,
+				'plugin_language': this.options.plugin_language
+			};
+			if (parent){
+				params['plugin_parent'] = parent;
+			}
+			var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
 			var modal = new CMS.Modal({
 				'newPlugin': this.newPlugin || false,
 				'onClose': this.options.onClose || false,
