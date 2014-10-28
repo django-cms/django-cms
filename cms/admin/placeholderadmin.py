@@ -559,16 +559,3 @@ class PlaceholderAdminMixin(object):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
 
-
-class PlaceholderAdmin(PlaceholderAdminMixin, ModelAdmin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class PlaceholderAdmin is deprecated and will be removed in 3.1. "
-            "Instead, combine PlaceholderAdminMixin with admin.ModelAdmin.", DeprecationWarning)
-        super(PlaceholderAdmin, self).__init__(*args, **kwargs)
-
-
-class FrontendEditableAdmin(FrontendEditableAdminMixin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class FrontendEditableAdmin is deprecated and will be removed in 3.1. "
-            "Instead, use FrontendEditableAdminMixin.", DeprecationWarning)
-        super(FrontendEditableAdmin, self).__init__(*args, **kwargs)

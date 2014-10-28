@@ -144,19 +144,6 @@ class DefaultLanguageChanger(object):
         return '%s%s' % (self.get_page_path(lang), self.app_path)
 
 
-def simple_language_changer(func):
-    warnings.warn("simple_language_changer is deprecated and will be removed in "
-        "2.5! This is the default behaviour now for non CMS managed views and is no longer needed.",
-        DeprecationWarning)
-
-    def _wrapped(request, *args, **kwargs):
-        set_language_changer(request, DefaultLanguageChanger(request))
-        return func(request, *args, **kwargs)
-    _wrapped.__name__ = func.__name__
-    _wrapped.__doc__ = func.__doc__
-    return _wrapped
-
-
 @contextmanager
 def static_stringifier(view):
     """

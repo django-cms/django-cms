@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
 import os
-import pprint
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -10,7 +8,6 @@ from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
-from cms.exceptions import CMSDeprecationWarning
 from cms.utils.compat.urls import urljoin
 
 
@@ -219,30 +216,8 @@ def _get_old_language_conf(code, name, template): # pragma: no cover
     return language
 
 
-def _translate_legacy_languages_settings(languages):
-    new_languages = {}
-    lang_template = {'fallbacks': [], 'public': True, 'redirect_on_fallback': True,
-        'hide_untranslated': getattr(settings, 'CMS_HIDE_UNTRANSLATED', False)}
-    codes = dict(languages)
-    for site, site_languages in getattr(settings, 'CMS_SITE_LANGUAGES', {1: languages}).items():
-        new_languages[site] = []
-        for site_language in site_languages:
-            if site_language in codes:
-                new_languages[site].append(_get_old_language_conf(site_language, codes[site_language], lang_template))
-
-    pp = pprint.PrettyPrinter(indent=4)
-    warnings.warn("CMS_LANGUAGES has changed in django-cms 2.4\n"
-                  "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(new_languages),
-                  CMSDeprecationWarning)
-    new_languages['default'] = lang_template.copy()
-    return new_languages
-
-
 def _ensure_languages_settings(languages):
-    if isinstance(languages, dict):
-        verified_languages = _ensure_languages_settings_new(languages)
-    else:
-        verified_languages = _translate_legacy_languages_settings(languages)
+    verified_languages = _ensure_languages_settings_new(languages)
     verified_languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
     return verified_languages
 

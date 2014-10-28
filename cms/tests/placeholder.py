@@ -654,17 +654,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         langs = [lang['code'] for lang in placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
 
-    def test_deprecated_PlaceholderAdmin(self):
-        admin_site = admin.sites.AdminSite()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            pa = PlaceholderAdmin(Placeholder, admin_site)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
-            self.assertTrue("PlaceholderAdminMixin with admin.ModelAdmin" in str(w[-1].message))
-            self.assertIsInstance(pa, admin.ModelAdmin, 'PlaceholderAdmin not admin.ModelAdmin')
-            self.assertIsInstance(pa, PlaceholderAdminMixin, 'PlaceholderAdmin not PlaceholderAdminMixin')
-
     @override_settings(TEMPLATE_LOADERS=(
         ('django.template.loaders.cached.Loader', (
             'django.template.loaders.filesystem.Loader',

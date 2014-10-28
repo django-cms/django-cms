@@ -81,16 +81,6 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     return default
 
 
-def get_page_from_placeholder_if_exists(placeholder):
-    import warnings
-
-    warnings.warn(
-        "The get_page_from_placeholder_if_exists function is deprecated. Use placeholder.page instead",
-        DeprecationWarning
-    )
-    return placeholder.page if placeholder else None
-
-
 def validate_placeholder_name(name):
     if not isinstance(name, six.string_types):
         raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
