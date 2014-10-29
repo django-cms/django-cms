@@ -83,9 +83,10 @@ class PageField(models.ForeignKey):
     default_model_class = Page
 
     def __init__(self, **kwargs):
-        # we call ForeignKey.__init__ with the Page model as parameter...
-        # a PageField can only be a ForeignKey to a Page
-        super(PageField, self).__init__(self.default_model_class, **kwargs)
+        # We hard-code the `to` argument for ForeignKey.__init__
+        # since a PageField can only be a ForeignKey to a Page
+        kwargs['to'] = self.default_model_class
+        super(PageField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
         defaults = {

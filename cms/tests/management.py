@@ -42,6 +42,24 @@ class ManagementTestCase(CMSTestCase):
         command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
         self.assertEqual(out.getvalue(), "no 'SampleApp' apphooks found\n")
 
+    def test_fix_tree(self):
+        create_page("home", "nav_playground.html", "en")
+        page1 = create_page("page", "nav_playground.html", "en")
+        page1.depth = 3
+        page1.numchild = 4
+        page1.path = "00100010"
+        page1.save()
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("fix-tree", interactive=False)
+        self.assertEqual(out.getvalue(), 'fixing page treefixing plugin treeall done')
+        page1 = page1.reload()
+        self.assertEqual(page1.path, "0002")
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 0)
+
+
     def test_uninstall_apphooks_with_apphook(self):
         out = StringIO()
         apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]

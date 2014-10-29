@@ -203,7 +203,8 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
     if DJANGO_1_6:
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
-        call_command('makemigrations', *applications)
+        for application in applications:
+            call_command('schemamigration', application, auto=True)
     else:
         call_command('makemigrations', *applications, merge=merge)
 

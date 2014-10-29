@@ -33,12 +33,14 @@ class PageSelectFormField(forms.MultiValueField):
     }
 
     def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
-                 required=True, widget=None, to_field_name=None, *args, **kwargs):
+                 required=True, widget=None, to_field_name=None, limit_choices_to=None,
+                  *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
         site_choices = SuperLazyIterator(get_site_choices)
         page_choices = SuperLazyIterator(get_page_choices)
+        self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
         fields = (
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),

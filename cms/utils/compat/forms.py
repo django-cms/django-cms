@@ -6,7 +6,7 @@ from .dj import is_user_swapped, user_model_label
 
 
 # overide with custom classes if they exist
-if is_user_swapped:
+if is_user_swapped:  # pragma: no cover
     # UserAdmin class
     user_app_name = user_model_label.split('.')[0]
     app = models.get_app(user_app_name)

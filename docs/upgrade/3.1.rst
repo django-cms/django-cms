@@ -1,0 +1,29 @@
+.. _upgrade-to-3.1:
+
+#################
+3.1 release notes
+#################
+
+*****************
+What's new in 3.1
+*****************
+
+Switch from MPTT to MP
+======================
+
+Since django CMS 2.0 we relied on MPTT (Modified Preorder Tree Traversal) for efficiently handling tree structures in the DB.
+Over the years it proved that MPTT was not fast enough for big tree operations (>1000 pages) and regularly
+the tree got corrupted because of transactional errors.
+
+In 3.1 we replaced MPTT for MP (Materialized Path). MP is more efficient and has more error resistance then MPTT.
+It should make the whole django CMS experience way better, faster and reliable.
+
+Bofore upgrading
+----------------
+
+Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
+
+
+********************
+Incompatible changes
+********************

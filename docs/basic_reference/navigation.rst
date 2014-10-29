@@ -96,6 +96,9 @@ You can give it the same optional parameters as :ttag:`show_menu`::
         {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
     </ul>
 
+Unlike :ttag:`show_menu`, however, soft roots will not affect the menu when 
+using :ttag:`show_menu_below_id`.
+
 *************
 show_sub_menu
 *************
@@ -164,7 +167,7 @@ Properties of Navigation Nodes in templates
     {{ node.is_leaf_node }}
 
 Is it the last in the tree? If true it doesn't have any children.
-(This normally comes from mptt.)
+
 ::
 
     {{ node.level }}

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 import json
+
 import os
+from treebeard.mp_tree import MP_Node
 import warnings
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -15,13 +17,12 @@ from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models.base import model_unpickle
+from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import signals, Model
-from mptt.models import MPTTModel, MPTTModelBase
 
 
 class BoundRenderMeta(object):
@@ -31,7 +32,7 @@ class BoundRenderMeta(object):
         self.text_enabled = getattr(meta, 'text_enabled', False)
 
 
-class PluginModelBase(MPTTModelBase):
+class PluginModelBase(ModelBase):
     """
     Metaclass for all CMSPlugin subclasses. This class should not be used for
     any other type of models.
@@ -50,15 +51,16 @@ class PluginModelBase(MPTTModelBase):
         else:
             # else try to use the one from the superclass (if present)
             meta = getattr(new_class, '_render_meta', None)
-
+        for field in new_class._meta.fields:
+            if field.name in ['path', 'numchild', 'depth']:
+                field.editable = False
         # set a new BoundRenderMeta to prevent leaking of state
         new_class._render_meta = BoundRenderMeta(meta)
-
         return new_class
 
 
 @python_2_unicode_compatible
-class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
+class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -77,12 +79,9 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
-    level = models.PositiveIntegerField(db_index=True, editable=False)
-    lft = models.PositiveIntegerField(db_index=True, editable=False)
-    rght = models.PositiveIntegerField(db_index=True, editable=False)
-    tree_id = models.PositiveIntegerField(db_index=True, editable=False)
     child_plugin_instances = None
     translatable_content_excluded_fields = []
+
 
     class Meta:
         app_label = 'cms'
@@ -100,29 +99,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         only module-level classes can be pickled by the default path.
         """
         data = self.__dict__
-        model = self.__class__
         # The obvious thing to do here is to invoke super().__reduce__()
         # for the non-deferred case. Don't do that.
         # On Python 2.4, there is something wierd with __reduce__,
         # and as a result, the super call will cause an infinite recursion.
         # See #10547 and #12121.
         defers = []
-        pk_val = None
-        if self._deferred:
-            factory = deferred_class_factory
-            for field in self._meta.fields:
-                if isinstance(self.__class__.__dict__.get(field.attname),
-                              DeferredAttribute):
-                    defers.append(field.attname)
-                    if pk_val is None:
-                        # The pk_val and model values are the same for all
-                        # DeferredAttribute classes, so we only need to do this
-                        # once.
-                        obj = self.__class__.__dict__[field.attname]
-                        model = obj.model_ref()
-        else:
-            factory = lambda x, y: x
-        return (model_unpickle, (model, defers, factory), data)
+        for field in self._meta.fields:
+            if isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute):
+                defers.append(field.attname)
+        model = self._meta.proxy_for_model
+        return (model_unpickle, (model, defers), data)
 
     def __str__(self):
         return force_unicode(self.pk)
@@ -163,7 +150,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin
-        if plugin.model != self.__class__: # and self.__class__ == CMSPlugin:
+        if plugin.model != self.__class__:  # and self.__class__ == CMSPlugin:
             # (if self is actually a subclass, getattr below would break)
             try:
                 instance = plugin.model.objects.get(cmsplugin_ptr=self)
@@ -252,11 +239,20 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             else:
                 super(CMSPlugin, self).save_base()
         else:
+            if not self.depth:
+                if self.parent_id or self.parent:
+                    self.parent.add_child(instance=self)
+                else:
+                    if not self.position and not self.position == 0:
+                        self.position == CMSPlugin.objects.filter(parent__isnull=True,
+                                                                  placeholder_id=self.placeholder_id).count()
+                    self.add_root(instance=self)
+                return
             super(CMSPlugin, self).save()
 
     def set_base_attr(self, plugin):
-        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'level', 'lft', 'rght',
-            'position', 'tree_id']:
+        for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path',
+                     'numchild', 'pk', 'position']:
             setattr(plugin, attr, getattr(self, attr))
 
     def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
@@ -271,22 +267,20 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         # set up some basic attributes on the new_plugin
         new_plugin = CMSPlugin()
         new_plugin.placeholder = target_placeholder
-        new_plugin.tree_id = None
-        new_plugin.lft = None
-        new_plugin.rght = None
-        new_plugin.level = None
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
+        parent = None
         if self.parent:
             parent = parent_cache[self.parent_id]
             parent = CMSPlugin.objects.get(pk=parent.pk)
+            new_plugin.parent_id = parent.pk
             new_plugin.parent = parent
-        new_plugin.level = None
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
-        new_plugin.position = self.position
+        new_plugin.position = CMSPlugin.objects.filter(parent=parent, language=target_language, placeholder=target_placeholder).count()
         if no_signals:
             from cms.signals import pre_save_plugins
+
             signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
             signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
             new_plugin._no_reorder = True
@@ -298,16 +292,17 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
             plugin_instance.placeholder = target_placeholder
-            plugin_instance.tree_id = new_plugin.tree_id
-            plugin_instance.lft = new_plugin.lft
-            plugin_instance.rght = new_plugin.rght
-            plugin_instance.level = new_plugin.level
             plugin_instance.cmsplugin_ptr = new_plugin
             plugin_instance.language = target_language
             plugin_instance.parent = new_plugin.parent
+            plugin_instance.depth = new_plugin.depth
+            plugin_instance.path = new_plugin.path
+            plugin_instance.numchild = new_plugin.numchild
             # added to retain the position when creating a public copy of a plugin
             plugin_instance.position = new_plugin.position
+            plugin_instance._no_reorder = True
             plugin_instance.save()
+            #new_plugin._inst = plugin_instance
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
         if no_signals:
@@ -336,18 +331,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             return page.has_change_permission(request)
         elif self.placeholder:
             return self.placeholder.has_change_permission(request)
-        elif self.parent:
-            return self.parent.has_change_permission(request)
         return False
-
-    def is_first_in_placeholder(self):
-        return self.position == 0
-
-    def is_last_in_placeholder(self):
-        """
-        WARNING: this is a rather expensive call compared to is_first_in_placeholder!
-        """
-        return self.placeholder.cmsplugin_set.filter(parent__isnull=True).order_by('-position')[0].pk == self.pk
 
     def get_position_in_placeholder(self):
         """
@@ -366,22 +350,22 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             try:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[self.pk]))
+                                  args=[self.pk]))
             except NoReverseMatch:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
-                            args=[self.pk]))
+                                  args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
-        for parent in self.get_ancestors(False, True):
+        for parent in self.get_ancestors().reverse():
             try:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
-                            args=[parent.pk]))
+                                  args=[parent.pk]))
             except NoReverseMatch:
                 url = force_unicode(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
-                            args=[parent.pk]))
+                                  args=[parent.pk]))
             breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb
 
@@ -391,8 +375,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
         return result
 
     def num_children(self):
-        if self.child_plugin_instances:
-            return len(self.child_plugin_instances)
+        return self.numchild
 
     def notify_on_autoadd(self, request, conf):
         """
@@ -431,18 +414,15 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     def set_translatable_content(self, fields):
         for field, value in fields.items():
             setattr(self, field, value)
-
         self.save()
-
         # verify that all fields have been set
         for field, value in fields.items():
             if getattr(self, field) != value:
                 return False
-
         return True
 
-    def delete(self, no_mptt=False, *args,  **kwargs):
-        if no_mptt:
+    def delete(self, no_mp=False, *args, **kwargs):
+        if no_mp:
             Model.delete(self, *args, **kwargs)
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
@@ -462,42 +442,3 @@ def get_plugin_media_path(instance, filename):
     and it invokes the bounded method on the given instance at runtime
     """
     return instance.get_media_path(filename)
-
-
-def deferred_class_factory(model, attrs):
-    """
-    Returns a class object that is a copy of "model" with the specified "attrs"
-    being replaced with DeferredAttribute objects. The "pk_value" ties the
-    deferred attributes to a particular instance of the model.
-    """
-
-    class Meta:
-        pass
-
-    setattr(Meta, "proxy", True)
-    setattr(Meta, "app_label", model._meta.app_label)
-
-    class RenderMeta:
-        pass
-
-    setattr(RenderMeta, "index", model._render_meta.index)
-    setattr(RenderMeta, "total", model._render_meta.total)
-    setattr(RenderMeta, "text_enabled", model._render_meta.text_enabled)
-
-    # The app_cache wants a unique name for each model, otherwise the new class
-    # won't be created (we get an old one back). Therefore, we generate the
-    # name using the passed in attrs. It's OK to reuse an old case if the attrs
-    # are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
-
-    overrides = dict([(attr, DeferredAttribute(attr, model))
-        for attr in attrs])
-    overrides["Meta"] = RenderMeta
-    overrides["RenderMeta"] = RenderMeta
-    overrides["__module__"] = model.__module__
-    overrides["_deferred"] = True
-    return type(name, (model,), overrides)
-
-# The above function is also used to unpickle model instances with deferred
-# fields.
-deferred_class_factory.__safe_for_unpickling__ = True
