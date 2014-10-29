@@ -8,6 +8,7 @@ depth, and customise its behaviour to meet your needs.
 .. toctree::
     :maxdepth: 2
 
+    editing_basics
     configuration
     navigation
     plugin_reference
