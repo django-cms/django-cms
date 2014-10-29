@@ -133,7 +133,7 @@ Documentation should be:
 
 - Written using valid `Sphinx`_/`restructuredText`_ syntax (see below for specifics)
   and the file extension should be ``.rst``.
-- Written in English. We could discuss how it would bring more people to the
+- Written in British English. We could discuss how it would bring more people to the
   project by having a Klingon or some other translation, but that's a problem we
   will confront once we already have good documentation in English.
 - Accessible. You should assume the reader to be moderately familiar with
