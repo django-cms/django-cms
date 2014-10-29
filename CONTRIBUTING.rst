@@ -131,8 +131,8 @@ correctness.
 
 Documentation should be:
 
-- We use `Sphinx`_/`restructuredText`_. So obviously this is the format you should
-  use :) File extensions should be .rst.
+- Written using valid `Sphinx`_/`restructuredText`_ syntax (see below for specifics)
+  and the file extension should be ``.rst``.
 - Written in English. We could discuss how it would bring more people to the
   project by having a Klingon or some other translation, but that's a problem we
   will confront once we already have good documentation in English.
@@ -150,6 +150,26 @@ files automagically it's really convenient to work with.
 Also, contributing to the documentation will earn you great respect from the
 core developers. You get good karma just like a test contributor, but you get
 double cookie points. Seriously. You rock.
+
+Simple changes, such as fixing typographical errors, can be made directly via Github.
+If you are making significant changes such as adding new files, we recommend
+that you make these changes on your local machine and test them before submitting.
+Follow the same steps above to fork and clone the project locally.
+Next, create a virtualenv so you can install the documentation tools::
+
+    virtualenv djcms-docs-env
+    source djcms-docs-env/bin/activate
+    pip install sphinx sphinx_rtd_theme
+
+Now you can ``cd`` into the ``django-cms/docs`` directory and build the documentation::
+
+    make html
+    open build/html/index.html
+
+This allows you to review your changes in your local browser.
+After each change, be sure to rebuild the docs using ``make html``.
+If everything looks good, then it's time to push your changes to Github and open a
+pull request.
 
 Documentation markup
 ====================

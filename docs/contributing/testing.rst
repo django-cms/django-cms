@@ -14,7 +14,7 @@ behave as it expected, and help identify what's going wrong if something breaks
 it.
 
 Not insisting on good tests when code is committed is like letting a gang of
-teenagers without a driving licence borrow your car on a Friday night, even if
+teenagers without a driving license borrow your car on a Friday night, even if
 you think they are very nice teenagers and they really promise to be careful.
 
 We certainly do want your contributions and fixes, but we need your tests with
