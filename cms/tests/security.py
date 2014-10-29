@@ -10,6 +10,7 @@ from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD,
                                       URL_CMS_PLUGIN_REMOVE)
 from cms.utils.compat import DJANGO_1_6
 from cms.utils.compat.dj import get_user_model
+from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 
@@ -31,15 +32,17 @@ class SecurityTests(CMSTestCase):
         Test adding a plugin to a *PAGE*.
         """
         page, placeholder, superuser, staff = self.get_data()
-        plugin_data = {
+        get_data = {
             'plugin_type': "TextPlugin",
             'plugin_language': settings.LANGUAGES[0][0],
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
+        post_data = {}
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # log the user out and post the plugin data to the cms add-plugin URL.
         self.client.logout()
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        add_url = URL_CMS_PLUGIN_ADD + '?' + urlencode(get_data)
+        response = self.client.post(add_url, post_data)
         # since the user is not logged in, they should be prompted to log in.
         if DJANGO_1_6:
             self.assertEqual(response.status_code, 200)
@@ -51,7 +54,7 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username=getattr(staff, get_user_model().USERNAME_FIELD),
                           password=getattr(staff, get_user_model().USERNAME_FIELD))
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        response = self.client.post(add_url, post_data)
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
@@ -129,16 +132,20 @@ class SecurityTests(CMSTestCase):
         Test adding a *NON PAGE* plugin
         """
         page, placeholder, superuser, staff = self.get_data()
-        plugin_data = {
+        post_data = {}
+        get_data = {
             'plugin_type': "TextPlugin",
             'plugin_language': settings.LANGUAGES[0][0],
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
-        url = admin_reverse('placeholderapp_example1_add_plugin')
+        url = (
+            admin_reverse('placeholderapp_example1_add_plugin') + '?' +
+            urlencode(get_data)
+        )
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # log the user out and try to add a plugin using PlaceholderAdmin
         self.client.logout()
-        response = self.client.post(url, plugin_data)
+        response = self.client.post(url, post_data)
         # since the user is not logged in, they should be prompted to log in.
         if DJANGO_1_6:
             self.assertEqual(response.status_code, 200)
@@ -150,7 +157,7 @@ class SecurityTests(CMSTestCase):
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username=getattr(staff, get_user_model().USERNAME_FIELD),
                           password=getattr(staff, get_user_model().USERNAME_FIELD))
-        response = self.client.post(url, plugin_data)
+        response = self.client.post(url, post_data)
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)

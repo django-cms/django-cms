@@ -11,7 +11,9 @@ from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponse
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from django.template.loader import get_template
@@ -890,15 +892,17 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
             'plugin_type': 'LinkPlugin',
             'placeholder_id': placeholder.pk,
             'plugin_language': 'en',
+            'name': 'test'
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
+                request.GET = request.POST
                 response = admin_instance.add_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 302)
                 response = admin_instance.add_plugin(request) # second
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 302)
                 response = admin_instance.add_plugin(request) # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
@@ -915,8 +919,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
+                request.GET = request.POST
                 response = admin_instance.add_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.status_code, 302)
                 response = admin_instance.add_plugin(request) # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
@@ -992,25 +997,22 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
-        data = {
-            'plugin_type': 'TextPlugin',
-            'placeholder_id': placeholder.pk,
-            'plugin_language': 'en',
-        }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request)
-                self.assertEqual(response.status_code, 200)
-                plugin_id = int(str(response.content).split('edit-plugin/')[1].split("/")[0])
+                plugin = add_plugin(
+                    placeholder=placeholder,
+                    plugin_type='TextPlugin',
+                    language='en',
+                    body='Test'
+                )
                 data = {
                     'body': 'Hello World',
                 }
                 request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin_id)
+                response = admin_instance.edit_plugin(request, plugin.pk)
                 self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin_id)
+                text_plugin = Text.objects.get(pk=plugin.pk)
                 self.assertEqual('Hello World', text_plugin.body)
 
                 # edit again, but this time press cancel
@@ -1019,9 +1021,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                     '_cancel': True,
                 }
                 request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin_id)
+                response = admin_instance.edit_plugin(request, plugin.pk)
                 self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin_id)
+                text_plugin = Text.objects.get(pk=plugin.pk)
                 self.assertEqual('Hello World', text_plugin.body)
 
 
@@ -1044,6 +1046,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         ex.save()
         self._placeholder = ex.placeholder
         self.example_object = ex
+        return ex
 
     def _create_plugin(self):
         self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
@@ -1084,7 +1087,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         self._test_plugin_action_requires_permissions('change')
 
     def _test_plugin_action_requires_permissions(self, key):
-        self._create_example()
+        example = self._create_example()
         if key == 'change':
             self._create_plugin()
         normal_guy = self._testuser()
@@ -1094,11 +1097,22 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
             self._set_perms(normal_guy, [Text, Example1, self.example_object], perms, key)
             request = self._post_request(normal_guy)
             if key == 'add':
+                request.GET = {
+                    'placeholder_id': example.placeholder_id,
+                    'plugin_type': 'TextPlugin',
+                    'plugin_language': 'en'
+                }
                 response = admin_instance.add_plugin(request)
             elif key == 'change':
                 response = admin_instance.edit_plugin(request, self._plugin.id)
             should_pass = perms[0] and (perms[1] or perms[2])
-            expected_status_code = HttpResponse.status_code if should_pass else HttpResponseForbidden.status_code
+            if should_pass:
+                if key == 'add':
+                    expected_status_code = HttpResponseRedirect.status_code
+                else:
+                    expected_status_code = HttpResponse.status_code
+            else:
+                expected_status_code = HttpResponseForbidden.status_code
             self.assertEqual(response.status_code, expected_status_code)
         # cleanup
         self._set_perms(normal_guy, [Text, Example1, self.example_object], (False,)*3, key)

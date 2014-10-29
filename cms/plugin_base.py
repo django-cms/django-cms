@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
 import json
-import warnings
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, \
-    HttpResponse
-from django.shortcuts import get_object_or_404
-
-try:
-    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
-                                              ModelAdminMetaClass)
-except ImportError:
-    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
 import re
+import warnings
 
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.utils import get_cms_setting, get_language_list
-from cms.utils.compat import DJANGO_1_4
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.exceptions import SubClassNeededError, Deprecated, PluginLimitReached
-from cms.models import CMSPlugin, Placeholder
+from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
+                                              ModelAdminMetaClass)
+except ImportError:
+    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
+
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
+from cms.utils import get_cms_setting, get_language_list
+from cms.utils.compat import DJANGO_1_4
+from cms.utils.compat.metaclasses import with_metaclass
+from cms.utils.placeholder import get_placeholder_conf
+from cms.utils.urlutils import admin_reverse
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.exceptions import SubClassNeededError, Deprecated, PluginLimitReached
+from cms.models import CMSPlugin, Placeholder
 
 
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
@@ -186,11 +190,10 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     def has_add_permission(self, request):
         if 'placeholder_id' not in request.GET:
             return False
+        if not super(CMSPluginBase, self).has_add_permission(request):
+            return False
         placeholder = Placeholder.objects.get(pk=request.GET['placeholder_id'])
-        if placeholder.page:
-            return placeholder.page.has_change_permission(request)
-        else:
-            return placeholder.has_change_permission(request)
+        return placeholder.has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
         """Permission handling change - if user is allowed to change the page
@@ -274,6 +277,14 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return super(CMSPluginBase, self).add_view(
             request, form_url, extra_context
         )
+
+    def response_post_save_add(self, request, obj):
+        """
+        Always redirect to index. Usually CMS Plugins aren't registred with
+        an admin site directly and the add_view is accessed via frontend
+        editing.
+        """
+        return HttpResponseRedirect(admin_reverse('index'))
 
     def save_model(self, request, obj, form, change):
         """
