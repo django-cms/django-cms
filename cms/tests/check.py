@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.core.exceptions import ImproperlyConfigured
 import os
 import unittest
 
@@ -90,7 +91,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
 
     def test_old_style_i18n_settings(self):
         with SettingsOverride(CMS_LANGUAGES=[('en', 'English')]):
-            self.assertCheck(True, warnings=1, errors=0)
+            self.assertRaises(ImproperlyConfigured, self.assertCheck, True, warnings=1, errors=0)
 
     def test_cms_hide_untranslated_deprecated(self):
         with SettingsOverride(CMS_HIDE_UNTRANSLATED=True):

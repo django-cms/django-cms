@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from cms.utils.conf import get_cms_setting
 from cms.utils import get_template_from_request
-import warnings
 
 
 def cms_settings(request):

@@ -2,7 +2,6 @@
 from __future__ import with_statement
 from contextlib import contextmanager
 import inspect
-import warnings
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_1_6

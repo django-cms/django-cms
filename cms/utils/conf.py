@@ -137,10 +137,15 @@ def get_templates():
     return templates
 
 
-def _ensure_languages_settings_new(languages):
+def _ensure_languages_settings(languages):
     valid_language_keys = ['code', 'name', 'fallbacks', 'hide_untranslated', 'redirect_on_fallback', 'public']
     required_language_keys = ['code', 'name']
     simple_defaults = ['public', 'redirect_on_fallback', 'hide_untranslated']
+
+    if not isinstance(languages, dict):
+        raise ImproperlyConfigured(
+            "CMS_LANGUAGES must be a dictionary with site IDs and 'default'"
+            " as keys. Please check the format")
 
     defaults = languages.pop('default', {})
     default_fallbacks = defaults.get('fallbacks')
@@ -189,37 +194,9 @@ def _ensure_languages_settings_new(languages):
             lang_code != language_object['code']]
 
     languages['default'] = defaults
+    languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
 
     return languages
-
-
-def _get_old_language_conf(code, name, template): # pragma: no cover
-    language = template.copy()
-    language['code'] = code
-    language['name'] = name
-    default_fallbacks = dict(settings.CMS_LANGUAGES).keys()
-    if hasattr(settings, 'CMS_LANGUAGE_FALLBACK'):
-        if settings.CMS_LANGUAGE_FALLBACK:
-            if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-                language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-            else:
-                language['fallbacks'] = default_fallbacks
-        else:
-            language['fallbacks'] = []
-    else:
-        if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-            language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-        else:
-            language['fallbacks'] = default_fallbacks
-    if hasattr(settings, 'CMS_FRONTEND_LANGUAGES'):
-        language['public'] = code in settings.CMS_FRONTEND_LANGUAGES
-    return language
-
-
-def _ensure_languages_settings(languages):
-    verified_languages = _ensure_languages_settings_new(languages)
-    verified_languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
-    return verified_languages
 
 
 def get_languages():
