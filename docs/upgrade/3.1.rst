@@ -33,3 +33,14 @@ Starting from version 3.1 the supported Django versions are 1.6 and 1.7
 ********************
 Incompatible changes
 ********************
+
+Migrations moved
+================
+
+Migrations packages as been renamed to a more standard layout:
+
+ * Django 1.7 migrations has been moved to standard ``cms.migrations`` and ``menus.migrations`` packages
+ * South migrations are now in ``cms.south_migrations`` and ``menus.south_migrations`` packages
+
+South 1.0.1 is now required to correctly handle the above layout; if you are upgrading from Django 1.7 / django CMS 3.0,
+please remove the old migration path from ``MIGRATION_MODULES`` settings.

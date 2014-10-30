@@ -1,5 +1,5 @@
 -r requirements_base.txt
 django>=1.6,<1.7
-South==0.8.4
+South==1.0.1
 django-reversion<1.8.3
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
