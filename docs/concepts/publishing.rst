@@ -30,7 +30,8 @@ Draft pages are the ones you interact with in the admin, and in draft mode in
 the CMS frontend. When a draft page is published, a public version is created
 and all titles, placeholders and plugins are copied to the public version.
 
-The ``cms.Page`` model has a ``publisher_is_draft`` field, that's ``True`` for draft versions. Use a filter::
+The ``cms.Page`` model has a ``publisher_is_draft`` field, that's ``True`` for
+draft versions. Use a filter::
 
     ``publisher_is_draft=True``
 
