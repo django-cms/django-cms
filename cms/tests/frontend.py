@@ -7,7 +7,7 @@ import time
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches, reverse
+from django.core.urlresolvers import clear_url_caches
 from django.test import LiveServerTestCase
 from django.utils import unittest
 from djangocms_style.models import Style
@@ -30,7 +30,6 @@ from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model
-from cms.utils.compat.urls import urlencode
 from cms.utils.conf import get_cms_setting
 
 
@@ -69,6 +68,9 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         super(CMSLiveTests, self).tearDown()
         Page.objects.all().delete() # somehow the sqlite transaction got lost.
         cache.clear()
+
+    def get_live_sever_url(self, path):
+        return '{0}{1}'.format(self.live_server_url, path)
 
     def wait_until(self, callback, timeout=10):
         """
@@ -484,31 +486,40 @@ class AddPluginTest(CMSLiveTests):
         page = create_page('Home', 'simple.html', 'en', published=True)
 
         placeholder_id = page.placeholders.all()[0].pk
-        plugin_type = 'StylePlugin'
-        language = 'en'
 
         self._login()
 
-        url = '{host}{path}?{querystring}'.format(
-            host=self.live_server_url,
-            path=reverse('admin:cms_page_add_plugin'),
-            querystring=urlencode({
-                'placeholder_id': placeholder_id,
-                'plugin_language': language,
-                'plugin_type': plugin_type,
-            })
+        # click structure mode
+        self.driver.find_element_by_css_selector('a[href="?build"]').click()
+        self.wait_page_loaded()
+
+        # open the "add plugin menu"
+        placeholder_bar = self.driver.find_element_by_css_selector(
+            'div.cms_dragbar-{0} div'.format(placeholder_id)
         )
+        placeholder_bar.click()
+        # click the Style Plugin
+        placeholder_bar.find_element_by_css_selector(
+            'a[href="StylePlugin"]'
+        ).click()
+        self.wait_page_loaded()
 
-        self.assertEqual(CMSPlugin.objects.count(), 0)
-        self.assertEqual(Style.objects.count(), 0)
+        # switch to the edit window iframe
+        iframe = self.driver.find_element_by_css_selector(
+            'div.cms_modal-frame iframe'
+        )
+        self.driver.switch_to.frame(iframe)
 
-        self.driver.get(url)
-
+        # change the class name to "new"
         class_input = self.driver.find_element_by_id("id_class_name")
         Select(class_input).select_by_value("new")
+
+        # submit the form
         class_input.submit()
 
+        # wait for everything to be done
         self.wait_page_loaded()
+
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(Style.objects.count(), 1)
         link = Style.objects.get()
