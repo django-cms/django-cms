@@ -32,22 +32,27 @@ Changes to PlaceholderAdmin.add_plugin
 ======================================
 
 Historically, when a plugin was added to django CMS, a POST request was made to
-the ``PlaceholderAdmin.add_plugin`` (before ``PlaceholderAdmin`` existed,
-``PageAdmin.add_plugin``) endpoint, which would create an instance of CMSPlugin
-but no the actual plugin model itself and then let the user agent edit the
-created plugin, which when saved would put the database in a consistent state.
-In some cases, such as the user agent stopping at that point due to for example
-the browser window being closed, this lead to the creation of "Ghost Plugins".
-That is plugins in the database that lack data to actually work. In some cases
-this has resulted in pages not working at all, due to the resulting database
+the ``PlaceholderAdmin.add_plugin`` endpoint (and going back into very ancient
+history before ``PlaceholderAdmin`` existed, it was ``PageAdmin.add_plugin``).
+This would create an instance of ``CMSPlugin``, but not an instance of the
+actual plugin model itself. It would then let the user agent edit the created
+plugin, which when saved would put the database back in to a consistent state,
+with a plugin instance connected to the otherwise empty and meaningless
+``CMSPlugin``.
+
+In some cases, "ghost plugins" would be created, if the process of creating the plugin instance failed or were interrupted, for example by the broswer window's being closed.
+
+This would leave orphaned ``CMSPlugin`` instances in the database without any
+data. This could result pages not working at all, due to the resulting database
 inconsistencies.
 
-This issue has been solved now, and calling ``CMSPluginBase.add_plugin`` with a
-GET request will serve the form to create a new instance of a plugin. Then on
-submitting that form via POST, the plugin is created in it's entirety, ensuring
-a consistent database. However, to solve it some backwards incompatible changes
-to non-documented APIs that developers might have used had to be made.
+This issue has now been solved. Calling ``CMSPluginBase.add_plugin`` with a
+GET request now serves the form for creating a new instance of a plugin. Then on
+submitting that form via POST, the plugin is created in its entirety, ensuring
+a consistent database and an end to ghost plugins.
 
+However, to solve it some backwards incompatible changes to non-documented APIs
+that developers might have used have had to be made.
 
 CMSPluginBase permission hooks
 ------------------------------
@@ -56,36 +61,39 @@ Until now, ``CMSPluginBase.has_delete_permission``,
 ``CMSPluginBase.has_change_permission`` and
 ``CMSPluginBase.has_add_permission`` were handled by a single method, which
 used an undocumented and unreliable property on ``CMSPluginBase`` instances
-(or subclasses thereof) to handle permission management. In 3.1,
-``CMSPluginBase.has_add_permission`` is it's own method that implements proper
-permission checking for adding plugins.
+(or subclasses thereof) to handle permission management.
 
-If you hook into those APIs, the `documentation of Django`_ for the permission
-methods applies.
+In 3.1, ``CMSPluginBase.has_add_permission`` is its own method that implements
+proper permission checking for adding plugins.
+
+If you want to work with those APIs, see the `Django documentation`_ for more
+on the permission methods.
 
 
 CMSPluginBase.get_form
 ----------------------
 
 Prior to 3.1, this method would only ever be called with an actual instance
-available. As of 3.1, this method will be called without an instance (the
-``obj`` argument to the method will be ``None``) if the form is used to add a
-plugin, rather than editing it. Again, this is in line with how Django's
-``ModelAdmin`` works. If you need access to the ``Placeholder`` object to which
-the plugin will be added, the ``request`` object is guaranteed to have a
-``placeholder_id`` key in ``request.GET`` which is the primary key of the
-``Placeholder`` object to which the plugin will be added. Similarly,
-``plugin_language`` in ``request.GET`` holds the language code of the plugin to
-be added.
+available.
+
+As of 3.1, this method will be called without an instance (the ``obj`` argument
+to the method will be ``None``) if the form is used to add a plugin, rather
+than editing it. Again, this is in line with how Django's ``ModelAdmin`` works.
+
+If you need access to the ``Placeholder`` object to which the plugin will be
+added, the ``request`` object is *guaranteed* to have a ``placeholder_id`` key
+in ``request.GET``, which is the primary key of the ``Placeholder`` object to
+which the plugin will be added. Similarly, ``plugin_language`` in
+``request.GET`` holds the language code of the plugin to be added.
 
 CMSPlugin.add_view
 ------------------
 
-This method used to never be called, but as of 3.1 it will. Should you have a
-need to hook into this method, you may want to use the
-``CMSPluginBase.add_view_check_request`` method to verify a request made to
-this view is valid. That method will perform integrity and permission checks
+This method used to never be called, but as of 3.1 it will be. Should you need
+to hook into this method, you may want to use the
+``CMSPluginBase.add_view_check_request`` method to verify that a request made to
+this view is valid. This method will perform integrity and permission checks
 for the GET parameters of the request.
 
 
-.. _documentation of Django: https://docs.djangoproject.com/en/1.6/ref/contrib/admin/#django.contrib.admin.ModelAdmin.has_add_permission
+.. _Django documentation: https://docs.djangoproject.com/en/1.6/ref/contrib/admin/#django.contrib.admin.ModelAdmin.has_add_permission
