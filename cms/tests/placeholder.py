@@ -888,17 +888,20 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
     def test_global_limit(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
-        data = {
+        get_data = {
             'plugin_type': 'LinkPlugin',
             'placeholder_id': placeholder.pk,
             'plugin_language': 'en',
-            'name': 'test'
+        }
+        post_data = {
+            'name': 'test',
+            'url': 'http://www.example.org/'
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
             with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                request.GET = request.POST
+                request = self.get_post_request(post_data)
+                request.GET = get_data
                 response = admin_instance.add_plugin(request) # first
                 self.assertEqual(response.status_code, 302)
                 response = admin_instance.add_plugin(request) # second

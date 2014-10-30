@@ -928,7 +928,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             post_data = {
-                'name': 'test'
+                'name': 'test',
+                'url': 'http://www.example.org/'
             }
             get_data = {
                 'placeholder_id': page_one_ph_one.id,
@@ -941,7 +942,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 get_data
             )
             response = self.client.post(add_url, post_data)
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 302, response.content)
         link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)
         self.assertEqual(link_plugin.parent_id, text_plugin_en.pk)
         self.assertEqual(link_plugin.path, '00010001')
