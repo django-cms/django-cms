@@ -69,9 +69,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         Page.objects.all().delete() # somehow the sqlite transaction got lost.
         cache.clear()
 
-    def get_live_sever_url(self, path):
-        return '{0}{1}'.format(self.live_server_url, path)
-
     def wait_until(self, callback, timeout=10):
         """
         Helper function that blocks the execution of the tests until the
