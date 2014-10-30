@@ -40,7 +40,9 @@ plugin, which when saved would put the database back in to a consistent state,
 with a plugin instance connected to the otherwise empty and meaningless
 ``CMSPlugin``.
 
-In some cases, "ghost plugins" would be created, if the process of creating the plugin instance failed or were interrupted, for example by the broswer window's being closed.
+In some cases, "ghost plugins" would be created, if the process of creating the
+plugin instance failed or were interrupted, for example by the broswer window's
+being closed.
 
 This would leave orphaned ``CMSPlugin`` instances in the database without any
 data. This could result pages not working at all, due to the resulting database
@@ -51,8 +53,8 @@ GET request now serves the form for creating a new instance of a plugin. Then on
 submitting that form via POST, the plugin is created in its entirety, ensuring
 a consistent database and an end to ghost plugins.
 
-However, to solve it some backwards incompatible changes to non-documented APIs
-that developers might have used have had to be made.
+However, to solve it some backwards incompatible changes to **non-documented
+APIs** that developers might have used have had to be made.
 
 CMSPluginBase permission hooks
 ------------------------------
