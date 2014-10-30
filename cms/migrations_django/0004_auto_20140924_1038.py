@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cmsplugin',
             name='path',
-            field=models.CharField(default='', unique=True, max_length=255),
+            field=models.CharField(default='', max_length=255),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='page',
             name='path',
-            field=models.CharField(default='', unique=True, max_length=255),
+            field=models.CharField(default='', max_length=255),
             preserve_default=False,
         ),
     ]
