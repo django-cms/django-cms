@@ -1,18 +1,17 @@
 from __future__ import with_statement
-from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
+from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page, add_plugin
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PLUGIN_ADD,
                                       URL_CMS_PLUGIN_EDIT,
                                       URL_CMS_PLUGIN_REMOVE)
+from cms.utils.urlutils import admin_reverse
 from cms.utils.compat import DJANGO_1_6
 from cms.utils.compat.dj import get_user_model
-from django.utils.http import urlencode
-
-from djangocms_text_ckeditor.models import Text
+from cms.utils.compat.urls import urlencode
 
 
 class SecurityTests(CMSTestCase):
@@ -49,7 +48,10 @@ class SecurityTests(CMSTestCase):
             self.assertTemplateUsed(response, 'admin/login.html')
         else:
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, '/en/admin/login/?next=%s' % URL_CMS_PLUGIN_ADD)
+            self.assertRedirects(
+                response,
+                '/en/admin/login/?%s' % urlencode({'next': add_url}, safe='/')
+            )
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username=getattr(staff, get_user_model().USERNAME_FIELD),
@@ -152,7 +154,10 @@ class SecurityTests(CMSTestCase):
             self.assertTemplateUsed(response, 'admin/login.html')
         else:
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, '/en/admin/login/?next=%s' % url)
+            self.assertRedirects(
+                response,
+                '/en/admin/login/?%s' % urlencode({'next': url}, safe='/')
+            )
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username=getattr(staff, get_user_model().USERNAME_FIELD),
