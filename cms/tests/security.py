@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 from django.conf import settings
+from django.http import QueryDict
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page, add_plugin
@@ -48,10 +49,13 @@ class SecurityTests(CMSTestCase):
             self.assertTemplateUsed(response, 'admin/login.html')
         else:
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(
-                response,
-                '/en/admin/login/?%s' % urlencode({'next': add_url}, safe='/')
+            querystring = QueryDict('', mutable=True)
+            querystring['next'] = add_url
+            expected_url = '/{lang}/admin/login/?{next}'.format(
+                lang=settings.LANGUAGES[0][0],
+                next=querystring.urlencode(safe='/')
             )
+            self.assertRedirects(response, expected_url)
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username=getattr(staff, get_user_model().USERNAME_FIELD),
@@ -140,29 +144,32 @@ class SecurityTests(CMSTestCase):
             'plugin_language': settings.LANGUAGES[0][0],
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
-        url = (
+        add_url = (
             admin_reverse('placeholderapp_example1_add_plugin') + '?' +
             urlencode(get_data)
         )
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # log the user out and try to add a plugin using PlaceholderAdmin
         self.client.logout()
-        response = self.client.post(url, post_data)
+        response = self.client.post(add_url, post_data)
         # since the user is not logged in, they should be prompted to log in.
         if DJANGO_1_6:
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(response, 'admin/login.html')
         else:
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(
-                response,
-                '/en/admin/login/?%s' % urlencode({'next': url}, safe='/')
+            querystring = QueryDict('', mutable=True)
+            querystring['next'] = add_url
+            expected_url = '/{lang}/admin/login/?{next}'.format(
+                lang=settings.LANGUAGES[0][0],
+                next=querystring.urlencode(safe='/')
             )
+            self.assertRedirects(response, expected_url)
         self.assertEqual(CMSPlugin.objects.count(), 0)
         # now log a staff user without permissions in and do the same as above.
         self.client.login(username=getattr(staff, get_user_model().USERNAME_FIELD),
                           password=getattr(staff, get_user_model().USERNAME_FIELD))
-        response = self.client.post(url, post_data)
+        response = self.client.post(add_url, post_data)
         # the user is logged in and the security check fails, so it should 403.
         self.assertEqual(response.status_code, 403)
         self.assertEqual(CMSPlugin.objects.count(), 0)
