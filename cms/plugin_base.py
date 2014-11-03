@@ -185,9 +185,9 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     def save_model(self, request, obj, form, change):
         """
-        Override original method, and add some attributes to obj
-        This have to be made, because if object is newly created, he must know
-        where he lives.
+        Override original method, and add some attributes to obj.
+        This has to be made, because if object is newly created, it must know
+        where it lives.
         Attributes from cms_plugin_instance have to be assigned to object, if
         is cms_plugin_instance attribute available.
         """
