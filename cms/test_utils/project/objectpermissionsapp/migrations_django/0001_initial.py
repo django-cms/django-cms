@@ -8,16 +8,16 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '__first__'),
+        ('auth', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('auth', '__first__'),
+        ('contenttypes', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='UserObjectPermission',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('object_pk', models.CharField(max_length=255, verbose_name='object ID')),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
                 ('permission', models.ForeignKey(to='auth.Permission')),
@@ -29,6 +29,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='userobjectpermission',
-            unique_together=set([(b'user', b'permission', b'object_pk')]),
+            unique_together=set([('user', 'permission', 'object_pk')]),
         ),
     ]

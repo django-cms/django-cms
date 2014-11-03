@@ -8,19 +8,19 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('cms', '0002_auto_20140816_1918'),
     ]
 
     operations = [
         migrations.CreateModel(
             name='MyPageExtension',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('extra', models.CharField(default=b'', max_length=255, blank=True)),
-                ('extended_object', models.OneToOneField(editable=False, to='cms.Page')),
-                ('favorite_users', models.ManyToManyField(to=settings.AUTH_USER_MODEL, null=True, blank=True)),
-                ('public_extension', models.OneToOneField(null=True, editable=False, to='extensionapp.MyPageExtension')),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('extra', models.CharField(max_length=255, default='', blank=True)),
+                ('extended_object', models.OneToOneField(to='cms.Page', editable=False)),
+                ('favorite_users', models.ManyToManyField(null=True, to=settings.AUTH_USER_MODEL, blank=True)),
+                ('public_extension', models.OneToOneField(null=True, to='extensionapp.MyPageExtension', related_name='draft_extension', editable=False)),
             ],
             options={
                 'abstract': False,
@@ -30,10 +30,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MyTitleExtension',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('extra_title', models.CharField(default=b'', max_length=255, blank=True)),
-                ('extended_object', models.OneToOneField(editable=False, to='cms.Title')),
-                ('public_extension', models.OneToOneField(null=True, editable=False, to='extensionapp.MyTitleExtension')),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
+                ('extra_title', models.CharField(max_length=255, default='', blank=True)),
+                ('extended_object', models.OneToOneField(to='cms.Title', editable=False)),
+                ('public_extension', models.OneToOneField(null=True, to='extensionapp.MyTitleExtension', related_name='draft_extension', editable=False)),
             ],
             options={
                 'abstract': False,

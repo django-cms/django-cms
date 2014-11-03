@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
+from cms.utils.i18n import force_language
 import os.path
 from cms.utils.urlutils import admin_reverse
 
@@ -18,7 +20,7 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
 from cms.middleware.user import CurrentUserMiddleware
-from cms.models import Page, Title
+from cms.models import Page, Title, EmptyTitle
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
@@ -26,7 +28,7 @@ from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import installed_apps
+from cms.utils.compat.dj import installed_apps, force_unicode
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
 
@@ -344,14 +346,14 @@ class PagesTestCase(CMSTestCase):
         """
         Test that a page can be copied via the admin
         """
-        page_a = create_page("page_a", "nav_playground.html", "en")
+        page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_a_a = create_page("page_a_a", "nav_playground.html", "en",
-                               parent=page_a)
-        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a)
+                               parent=page_a, published=True, reverse_id="hello")
+        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a, published=True)
 
-        page_b = create_page("page_b", "nav_playground.html", "en")
-        page_b_a = create_page("page_b", "nav_playground.html", "en",
-                               parent=page_b)
+        page_b = create_page("page_b", "nav_playground.html", "en", published=True)
+        page_b_a = create_page("page_b_b", "nav_playground.html", "en",
+                               parent=page_b, published=True)
 
         count = Page.objects.drafts().count()
 
@@ -360,6 +362,81 @@ class PagesTestCase(CMSTestCase):
             self.copy_page(page_a, page_b_a)
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
+
+    def test_copy_self_page(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        page_a = create_page("page_a", "nav_playground.html", "en")
+        page_b = create_page("page_b", "nav_playground.html", "en", parent=page_a)
+        page_c = create_page("page_c", "nav_playground.html", "en", parent=page_b)
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(page_b, page_b)
+        self.assertEqual(Page.objects.drafts().count(), 5)
+        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+        page_d = Page.objects.filter(parent=page_b)[1]
+        page_e = Page.objects.get(parent=page_d)
+        self.assertEqual(page_d.path, '000100010002')
+        self.assertEqual(page_e.path, '0001000100020001')
+        page_e.delete()
+        page_d.delete()
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(page_b, page_c)
+        self.assertEqual(Page.objects.filter(parent=page_c).count(), 1)
+        self.assertEqual(Page.objects.filter(parent=page_b).count(), 1)
+        Page.objects.filter(parent=page_c).delete()
+        self.assertEqual(Page.objects.all().count(), 3)
+        page_b = page_b.reload()
+        page_c = page_c.reload()
+        with self.login_user_context(self.get_superuser()):
+            self.copy_page(page_b, page_c, position="left")
+        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+    
+    def test_public_exceptions(self):
+        page_a = create_page("page_a", "nav_playground.html", "en", published=True)
+        page_b = create_page("page_b", "nav_playground.html", "en")
+        page = page_a.publisher_public
+        self.assertRaises(PublicIsUnmodifiable, page.copy_page, 3, 1)
+        self.assertRaises(PublicIsUnmodifiable, page.unpublish, 'en')
+        self.assertRaises(PublicIsUnmodifiable, page.revert, 'en')
+        self.assertRaises(PublicIsUnmodifiable, page.publish, 'en')
+
+        self.assertTrue(page.get_draft_object().publisher_is_draft)
+        self.assertRaises(PublicVersionNeeded, page_b.revert, 'en')
+
+    def test_get_admin_tree_title(self):
+        page = create_page("page_a", "nav_playground.html", "en", published=True)
+        self.assertEqual(page.get_admin_tree_title(), 'page_a')
+        page.title_cache = {}
+        self.assertEqual("Empty", force_unicode(page.get_admin_tree_title()))
+        languages = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': 'English',
+                    'fallbacks': ['fr', 'de'],
+                    'public': True,
+                    'fallbacks':['fr']
+                },
+                {
+                    'code': 'fr',
+                    'name': 'French',
+                    'public': True,
+                    'fallbacks':['en']
+                },
+        ]}
+        with SettingsOverride(CMS_LANGUAGES=languages):
+            with force_language('fr'):
+                page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test', page_title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test', menu_title="test2")}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test2')}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
+                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
@@ -392,6 +469,8 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post("/en/admin/cms/page/%s/move-page/" % page3.pk,
                                         {"target": page2.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
+
+            page3 = Page.objects.get(pk=page3.pk)
             response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk,
                                         {"target": page1.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
@@ -568,7 +647,7 @@ class PagesTestCase(CMSTestCase):
             position=1,
             language=settings.LANGUAGES[0][0]
         )
-        plugin_base.insert_at(None, position='last-child', save=False)
+        plugin_base.add_root(instance=plugin_base)
 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
@@ -699,6 +778,15 @@ class PagesTestCase(CMSTestCase):
 
         page5 = create_page('test page 5', 'nav_playground.html', 'en',
                             published=True, parent=page4)
+        page1 = page1.reload()
+        page2 = page2.reload()
+        page3 = page3.reload()
+        page4 = page4.reload()
+        page5 = page5.reload()
+        self.assertEqual(page3.parent_id, page2.pk)
+        self.assertEqual(page2.parent_id, page1.pk)
+        self.assertEqual(page5.parent_id, page4.pk)
+
 
         self.assertEqual(page1.get_absolute_url(),
                          self.get_pages_root() + '')
@@ -710,15 +798,18 @@ class PagesTestCase(CMSTestCase):
                          self.get_pages_root() + 'test-page-4/')
         self.assertEqual(page5.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-5/')
-
         page3 = self.move_page(page3, page1)
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-3/')
-
+        page3 = page3.reload()
+        self.assertEqual(len(page3.path), len(page3.publisher_public.path))
+        page2 = page2.reload()
+        page5 = page5.reload()
         page5 = self.move_page(page5, page2)
         self.assertEqual(page5.get_absolute_url(),
                          self.get_pages_root() + 'test-page-2/test-page-5/')
-
+        page3 = page3.reload()
+        page4 = page4.reload()
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
@@ -1101,6 +1192,7 @@ class PageTreeTests(CMSTestCase):
         child.publish('en')
 
         child.move_page(parent)
+        child = child.reload()
         child.publish('en')
         child.reload()
 

@@ -19,7 +19,7 @@ def update_site_and_page_choices(lang=None):
     PAGE_CHOICES_KEY = get_page_cache_key(lang)
     title_queryset = (Title.objects.drafts()
     .select_related('page', 'page__site')
-    .order_by('page__tree_id', 'page__lft', 'page__rght'))
+    .order_by('page__path'))
     pages = defaultdict(SortedDict)
     sites = {}
     for title in title_queryset:
@@ -50,7 +50,7 @@ def update_site_and_page_choices(lang=None):
             if not title:
                 continue
 
-            indent = u"&nbsp;&nbsp;" * title.page.level
+            indent = u"&nbsp;&nbsp;" * (title.page.depth - 1)
             page_title = mark_safe(u"%s%s" % (indent, title.title))
             site_page_choices.append((title.page.pk, page_title))
 

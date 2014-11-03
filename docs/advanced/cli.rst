@@ -137,23 +137,44 @@ used moderation in the past.
     orphaned plugins will fail and leave bad data in your database.
 
 
-*******************
-MPTT repair command
-*******************
+**************************************
+Additional commands
+**************************************
 
-``cms fix-mptt``
-===================
+``publisher_publish``
+======================
 
-Occasionally, the MPTT structure in which pages and plugins are held can
-accumulate small errors. These are typically the result of failed operations or
-large and complex restructurings of the tree (perhaps even cosmic rays,
-planetary alignment or other mysterious conditions).
+If you want to publish many pages at once, this command can help you. By default,
+this command publishes drafts for all public pages.
 
-Usually you won't even notice them, and they won't affect the operation of the
-system, but when you run into trouble it's useful to be able to rebuild the tree
-- it's also useful to rebuild it as part of preventative maintenance.
+It accepts the following options
+
+* ``unpublished``: set to publish all drafts, including unpublished ones;
+  if not set, only already published pages will be republished.
+* ``language``: specify a language code to publish pages in only one language;
+  if not specified, this command publishes all page languages;
+* ``site``: specify a site id to publish pages for specified site only;
+  if not specified, this command publishes pages for all sites;
+
+
+Example::
+
+    #publish drafts for public pages in all languages
+    publisher_publish
+
+    #publish all drafts in all pages
+    publisher_publish --unpublished
+
+    #publish drafts for public pages in deutsch
+    publisher_publish --language=de
+
+    #publish all drafts in deutsch
+    publisher_publish --unpublished --language=de
+
+    #publish all drafts in deutsch, but only for site with id=2
+    publisher_publish --unpublished --language=de --site=2
 
 .. warning::
 
-    This command **alters data** in your database. You should make a backup of
-    your database before using it!
+    This command publishes drafts. You should review drafts before using this
+    command, because they will become public.

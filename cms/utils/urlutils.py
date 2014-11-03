@@ -59,7 +59,7 @@ def is_media_request(request):
     Check if a request is a media request.
     """
     parsed_media_url = urlparse(settings.MEDIA_URL)
-    if request.path.startswith(parsed_media_url.path):
+    if request.path_info.startswith(parsed_media_url.path):
         if parsed_media_url.netloc:
             if request.get_host() == parsed_media_url.netloc:
                 return True

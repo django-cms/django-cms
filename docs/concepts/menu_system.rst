@@ -100,7 +100,7 @@ Don't forget that show_menu recurses - so it will do *all* of the below for *eac
 				    * adds all nodes into a big list
             * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()` 
                 * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
-                * loops over each node, comparing its URL with the request.path, and marks the best match as ``selected``
+                * loops over each node, comparing its URL with the request.path_info, and marks the best match as ``selected``
                 * loops over the Modifiers in self.modifiers calling each one's :py:meth:`modify(post_cut=False)`. The default Modifiers are:
                     * :py:class:`cms.menu.NavExtender`
                     * :py:class:`cms.menu.SoftRootCutter` removes all nodes below the appropriate soft root 

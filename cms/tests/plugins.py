@@ -18,7 +18,7 @@ from django.utils import timezone
 
 from cms import api
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -39,8 +39,7 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.plugins import get_plugins_for_page
-
+from cms.utils.plugins import get_plugins_for_page, get_plugins
 
 from djangocms_googlemap.models import GoogleMap
 from djangocms_inherit.cms_plugins import InheritPagePlaceholderPlugin
@@ -118,6 +117,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             'plugin_parent': '',
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEqual(CMSPlugin.objects.count(), 1)
         self.assertEqual(response.status_code, 200)
         created_plugin_id = self.get_response_pk(response)
         self.assertEqual(created_plugin_id, CMSPlugin.objects.all()[0].pk)
@@ -593,7 +593,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             zipcode="8006",
             city="Zurich",
         )
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
         inheritfrompage.publish('en')
 
         page = api.create_page('inherit from page',
@@ -610,7 +610,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE,
             from_page=inheritfrompage,
             from_language=settings.LANGUAGE_CODE)
-        inherit_plugin.insert_at(None, position='last-child', save=True)
+        inherit_plugin.add_root(instance=inherit_plugin)
         page.publish('en')
 
         self.client.logout()
@@ -631,7 +631,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             position=1,
             language='en',
         )
-        empty_plugin.insert_at(None, position='last-child', save=True)
+        empty_plugin.add_root(instance=empty_plugin)
         other_page = api.create_page('other page', 'nav_playground.html', 'en', published=True)
         inherited_body = other_page.placeholders.get(slot="body")
 
@@ -650,6 +650,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         text_plugin = api.add_plugin(ph, "TextPlugin", "en", body="Hello World")
         link_plugins = []
         for i in range(0, 10):
+            text_plugin = Text.objects.get(pk=text_plugin.pk)
             link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
                                            target=text_plugin,
                                            name="A Link %d" % i,
@@ -684,8 +685,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
-        plugin_base.insert_at(None, position='last-child', save=False)
-
+        plugin_base.add_root(instance=plugin_base)
+        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
         plugin.save()
@@ -695,16 +696,15 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
-        plugin_ref_1_base.insert_at(plugin_base, position='last-child', save=False)
-        plugin_ref_1_base.save()
-
+        plugin_base.add_child(instance=plugin_ref_1_base)
+        plugin_ref_1_base = CMSPlugin.objects.get(pk=plugin_ref_1_base.pk)
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin_ref_2_base.insert_at(plugin_base, position='last-child', save=False)
-
+        plugin_base.add_child(instance=plugin_ref_2_base)
+        plugin_ref_2_base = CMSPlugin.objects.get(pk=plugin_ref_2_base.pk)
         plugin_ref_2 = Text(body='')
         plugin_ref_2_base.set_base_attr(plugin_ref_2)
 
@@ -772,12 +772,65 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
 
         # this should not raise any errors, but just ignore the empty plugin
         out = placeholder.render(self.get_context(), width=300)
         self.assertFalse(len(out))
         self.assertTrue(len(placeholder._plugins_cache))
+
+    def test_defer_pickel(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        api.add_plugin(placeholder, "TextPlugin", 'en', body="Hello World")
+        plugins = Text.objects.all().defer('path')
+        import pickle
+        import io
+        a = io.BytesIO()
+        pickle.dump(plugins[0], a)
+
+
+    def test_empty_plugin_description(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        a = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG
+        )
+
+        self.assertEqual(a.get_short_description(), "<Empty>")
+
+    def test_page_attribute_warns(self):
+        page = api.create_page("page", "nav_playground.html", "en")
+
+        placeholder = page.placeholders.get(slot='body')
+        a = CMSPlugin(
+            plugin_type='TextPlugin',
+            placeholder=placeholder,
+            position=1,
+            language=self.FIRST_LANG
+        )
+        a.save()
+
+        def get_page(plugin):
+            return plugin.page
+
+        self.assertWarns(
+            DontUsePageAttributeWarning,
+            "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
+            get_page, a
+        )
+
+    def test_set_translatable_content(self):
+        a = Text(body="hello")
+        self.assertTrue(a.set_translatable_content({'body': 'world'}))
+        b = Link(name="hello")
+        self.assertTrue(b.set_translatable_content({'name': 'world'}))
+
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
@@ -818,7 +871,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
 
         from cms.utils.plugins import build_plugin_tree
-
         build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
         plugin_pool.unregister_plugin(DumbFixturePlugin)
 
@@ -834,19 +886,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_text_plugin_1 = page_plugins.get(pk=text_plugin_1.pk)
         self.assertRaises(CMSPlugin.DoesNotExist, page_plugins.get, pk=text_plugin_2.pk)
         self.assertEqual(db_text_plugin_1.pk, text_plugin_1.pk)
-
-    def test_is_last_in_placeholder(self):
-        """
-        Tests that children plugins don't affect the is_last_in_placeholder plugin method.
-        """
-        page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                              slug="page1", published=True, in_navigation=True)
-        ph_en = page_en.placeholders.get(slot="col_left")
-        text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-        text_plugin_2 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the second")
-        inner_text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first child of text_plugin_1")
-        text_plugin_1.cmsplugin_set.add(inner_text_plugin_1)
-        self.assertEqual(text_plugin_2.is_last_in_placeholder(), True)
 
     def test_plugin_move_with_reload(self):
         action_options = {
@@ -1128,7 +1167,7 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             language=settings.LANGUAGE_CODE,
         )
         plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
 
@@ -1157,6 +1196,21 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
                 )
         self.FIRST_LANG = settings.LANGUAGES[0][0]
         self.SECOND_LANG = settings.LANGUAGES[1][0]
+
+    def test_dynamic_plugin_template(self):
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        ph_en = page_en.placeholders.get(slot="body")
+        api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="a title")
+        api.add_plugin(ph_en, "ArticleDynamicTemplatePlugin", "en", title="custom template")
+        request = self.get_request(path=page_en.get_absolute_url())
+        plugins = get_plugins(request, ph_en, page_en.template)
+        for plugin in plugins:
+            if plugin.title == 'custom template':
+                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html')
+                self.assertTrue('Articles Custom template' in plugin.render_plugin({}, ph_en))
+            else:
+                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html')
+                self.assertFalse('Articles Custom template' in plugin.render_plugin({}, ph_en))
 
     def test_add_plugin_with_m2m(self):
         # add a new text plugin
@@ -1276,7 +1330,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin.insert_at(None, position='last-child', save=True)
+        plugin.add_root(instance=plugin)
 
         edit_url = URL_CMS_PLUGIN_EDIT + str(plugin.pk) + "/"
 

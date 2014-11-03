@@ -36,13 +36,13 @@ setup(
         'django-classy-tags>=0.5',
         'south>=0.7.2',
         'html5lib',
-        'django-mptt==0.5.2,==0.6,==0.6.1',
+        'django-treebeard==2.0',
         'django-sekizai>=0.7',
         'djangocms-admin-style'
     ],
     tests_require=[
-        'django-reversion==1.8.1',
-        'Pillow==2.5.0',
+        'django-reversion==1.8.2',
+        'Pillow==2.5.3',
         'Sphinx==1.2.2',
         'Jinja2==2.7.3',
         'Pygments==1.6',

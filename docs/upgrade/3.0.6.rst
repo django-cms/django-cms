@@ -1,0 +1,47 @@
+.. _upgrade-to-3.0.6:
+
+###################
+3.0.6 release notes
+###################
+
+*******************
+What's new in 3.0.6
+*******************
+
+Django 1.7 support
+==================
+
+Since 3.0.6 django CMS has Django 1.7 support.
+
+Currently Django 1.7 migrations are shipped in non-default ``migrations_django``
+package to allow better backward compatibility; in future releases the Django
+migrations will be moved to standard ``migrations`` package with the South
+ones in ``south_migrations``.
+At this stage you are required to add::
+
+    MIGRATION_MODULES = {
+        'cms': 'cms.migrations_django',
+        'menus': 'menus.migrations_django',
+    }
+
+.. warning:: **MySQL support**
+
+    As of now MySQL is not *officially* supported on Django 1.7: it's known
+    to work, but still some corner cases in tests have to be addressed.
+
+
+.. warning:: **Applications migrations**
+
+    By Django 1.7 migrations design **every** application that defines
+    a django CMS plugin or a model that uses a PlaceholderField or depends
+    in any way on django CMS models **must** define Django 1.7 migrations.
+
+Extended Custom User Support
+============================
+
+If you are using custom user models and use ``CMS_PERMISSIONS = True`` then be sure
+to check that PageUserAdmin and PageUserGroup is still in working order.
+
+The PageUserAdmin class now extends dynamically from the admin class that handles the user
+model. This allows that we use the same search_fields and filters in PageUserAdmin as in
+the custom user model admin.

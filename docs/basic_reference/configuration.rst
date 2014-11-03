@@ -15,7 +15,11 @@ Custom User Requirements
 
 When using a custom user model (i.e. the AUTH_USER_MODEL Django setting), there are a few requirements that must be met.
 
-DjangoCMS expects a user model with at minimum the following fields: email, password, first_name, last_name, is_active, is_staff, and is_superuser.  Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as the USERNAME_FIELD (see Django documentation for more details).
+DjangoCMS expects a user model with at minimum the following fields: email, password, is_active, is_staff, and is_superuser.
+Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as
+the USERNAME_FIELD (see Django documentation for more details) and define a get_fullname() method.
+
+The models must also be editable via django admin and have an admin class registered.
 
 Additionally, the application in which the model is defined **must** be loaded before `cms` in `INSTALLED_APPS`.
 

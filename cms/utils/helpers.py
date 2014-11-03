@@ -66,7 +66,7 @@ def make_revision_with_plugins(obj, user=None, message=None):
             else:
                 revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj))
             # add placeholders to the revision
-            for ph in obj.placeholders.all():
+            for ph in obj.get_placeholders():
                 phadapter = revision_manager.get_adapter(ph.__class__)
                 if hasattr(reversion.models, 'VERSION_CHANGE'):
                     revision_context.add_to_context(revision_manager, ph, phadapter.get_version_data(ph, VERSION_CHANGE))

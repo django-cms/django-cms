@@ -14,7 +14,9 @@ from django.db import models
 from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
+from django.template.loader import get_template
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -583,8 +585,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             page.placeholders.add(placeholder)
         page.reload()
         for placeholder in page.placeholders.all():
-            add_plugin(placeholder, "TextPlugin", "en", body="body",
-                       id=placeholder.pk)
+            add_plugin(placeholder, "TextPlugin", "en", body="body")
         with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()
@@ -663,6 +664,56 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertTrue("PlaceholderAdminMixin with admin.ModelAdmin" in str(w[-1].message))
             self.assertIsInstance(pa, admin.ModelAdmin, 'PlaceholderAdmin not admin.ModelAdmin')
             self.assertIsInstance(pa, PlaceholderAdminMixin, 'PlaceholderAdmin not PlaceholderAdminMixin')
+
+    @override_settings(TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),))
+    def test_cached_template_not_corrupted_by_placeholder_scan(self):
+        """
+        This is the test for the low-level code that caused the bug:
+        the placeholder scan corrupts the nodelist of the extends node,
+        which is retained by the cached template loader, and future
+        renders of that template will render the super block twice.
+        """
+    
+        self.assertNotIn('one',
+            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            "test_super_extends_1.html contains a block called 'one', "
+            "but _2.html does not.")
+
+        get_placeholders("placeholder_tests/test_super_extends_2.html")
+
+        self.assertNotIn('one',
+            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            "test_super_extends_1.html still should not contain a block "
+            "called 'one' after rescanning placeholders.")
+
+    @override_settings(TEMPLATE_LOADERS=(
+        ('django.template.loaders.cached.Loader', (
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        )),))
+    def test_super_extends_not_corrupted_by_placeholder_scan(self):
+        """
+        This is the test for the symptom of the bug: because the block
+        context now contains two copies of the inherited block, that block
+        will be executed twice, and if it adds content to {{block.super}},
+        that content will be added twice.
+        """
+
+        template = get_template("placeholder_tests/test_super_extends_2.html")
+        output = template.render(Context({}))
+        self.assertEqual(['Whee'], [o for o in output.split('\n')
+            if 'Whee' in o])
+          
+        get_placeholders("placeholder_tests/test_super_extends_2.html")
+
+        template = get_template("placeholder_tests/test_super_extends_2.html")
+        output = template.render(Context({}))
+        self.assertEqual(['Whee'], [o for o in output.split('\n')
+            if 'Whee' in o])
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):

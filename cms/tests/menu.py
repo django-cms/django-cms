@@ -135,7 +135,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         return Page.objects.public().get(title_set__title='P%s' % num)
     
     def get_level(self, num):
-        return Page.objects.public().filter(level=num)
+        return Page.objects.public().filter(depth=num)
     
     def get_all_pages(self):
         return Page.objects.public()
@@ -258,7 +258,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
-        self.assertEqual(len(nodes), len(self.get_level(1)))
+        self.assertEqual(len(nodes), len(self.get_level(2)))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
 
@@ -881,6 +881,36 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
                 tpl.render(context)
 
+    def test_menu_in_soft_root(self):
+        """
+        Test for issue 3504
+        
+        Build the following tree:
+        
+            A
+            |-B
+            C (soft_root)
+        """
+        a = create_page('A', 'nav_playground.html', 'en', published=True,
+                        in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a,
+                       published=True, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', published=True, 
+                        in_navigation=True, soft_root=True)
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        node = nodes[0]
+        self.assertEqual(node.id, b.publisher_public.id)
+        context = self.get_context(c.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
+        tpl.render(context)
+        nodes = context['children']
+        self.assertEqual(len(nodes), 1)
+        node = nodes[0]
+        self.assertEqual(node.id, b.publisher_public.id)
 
 class ViewPermissionMenuTests(SettingsOverrideTestCase):
     settings_overrides = {
@@ -901,8 +931,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
@@ -912,8 +940,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request.user.is_staff = True
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         with self.assertNumQueries(1):
             """
@@ -927,8 +953,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request = self.get_request(user)
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
@@ -940,8 +964,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site.pk = 1
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         with self.assertNumQueries(2):
             """
@@ -955,8 +977,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request = self.get_request()
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         result = get_visible_pages(request, pages)
         self.assertEqual(result, [1])
@@ -967,8 +987,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site.pk = 1
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         with self.assertNumQueries(1):
             """
@@ -990,8 +1008,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [1])
@@ -1009,8 +1025,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             pages = [page]
             with self.assertNumQueries(2):
                 """
@@ -1026,8 +1040,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [])
@@ -1040,8 +1052,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             pages = [page]
             with self.assertNumQueries(2):
                 """
@@ -1056,8 +1066,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             request = self.get_request()
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [])
@@ -1068,8 +1076,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         request = self.get_request()
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         with self.assertNumQueries(1):
             get_visible_pages(request, pages, site)
@@ -1098,6 +1104,7 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
                 GlobalpagePermission query for user
                 """
                 get_visible_pages(request, pages)
+
 
     def test_page_permissions_view_groups(self):
         with SettingsOverride(CMS_PUBLIC_FOR='staff'):
@@ -1142,8 +1149,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
             request = self.get_request(user)
             page = Page()
             page.pk = 1
-            page.level = 0
-            page.tree_id = 1
             pages = [page]
             result = get_visible_pages(request, pages)
             self.assertEqual(result, [1])
@@ -1158,8 +1163,6 @@ class ViewPermissionMenuTests(SettingsOverrideTestCase):
         site.pk = 1
         page = Page()
         page.pk = 1
-        page.level = 0
-        page.tree_id = 1
         pages = [page]
         with self.assertNumQueries(2):
             """

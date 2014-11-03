@@ -196,7 +196,7 @@ def _ensure_languages_settings_new(languages):
     return languages
 
 
-def _get_old_language_conf(code, name, template):
+def _get_old_language_conf(code, name, template): # pragma: no cover
     language = template.copy()
     language['code'] = code
     language['name'] = name

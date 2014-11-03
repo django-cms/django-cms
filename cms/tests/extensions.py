@@ -1,3 +1,6 @@
+from copy import deepcopy
+from cms.extensions.toolbar import ExtensionToolbar
+from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -68,7 +71,6 @@ class ExtensionsTestCase(TestCase):
             del apps.all_models['cms']['testtitleextension']
         except ImportError:
             pass
-
 
     def get_page_extension_class(self):
         from django.db import models
@@ -240,6 +242,48 @@ class ExtensionAdminTestCase(AdminTestsBase):
             )
             self.assertEqual(response.status_code, 403)
             self.assertTrue(MyPageExtension.objects.filter(extended_object=self.page).exists())
+
+    def test_toolbar_page_extension(self):
+        old_toolbars = deepcopy(toolbar_pool.toolbars)
+        class SampleExtension(ExtensionToolbar):
+            model = MyPageExtension  # The PageExtension / TitleExtension you are working with
+
+            def populate(self):
+                current_page_menu = self._setup_extension_toolbar()
+                if current_page_menu:
+                    position = 0
+                    page_extension, url = self.get_page_extension_admin()
+                    if url:
+                        current_page_menu.add_modal_item('TestItem', url=url,
+                                                         disabled=not self.toolbar.edit_mode,
+                                                         position=position)
+        toolbar_pool.register(SampleExtension)
+        with self.login_user_context(self.admin):
+            response = self.client.get('/en/?edit')
+            self.assertIn("TestItem", response.rendered_content)
+        toolbar_pool.toolbars = old_toolbars
+
+    def test_toolbar_title_extension(self):
+        old_toolbars = deepcopy(toolbar_pool.toolbars)
+
+        class SampleExtension(ExtensionToolbar):
+            model = MyTitleExtension
+
+            def populate(self):
+                current_page_menu = self._setup_extension_toolbar()
+                if current_page_menu:
+                    position = 0
+                    urls = self.get_title_extension_admin()
+                    for title_extension, url in urls:
+                        current_page_menu.add_modal_item('TestItem', url=url,
+                                                         disabled=not self.toolbar.edit_mode,
+                                                         position=position)
+        toolbar_pool.register(SampleExtension)
+        with self.login_user_context(self.admin):
+            response = self.client.get('/en/?edit')
+            self.assertIn("TestItem", response.rendered_content)
+        toolbar_pool.toolbars = old_toolbars
+
 
     def test_admin_title_extension(self):
         with self.login_user_context(self.admin):
