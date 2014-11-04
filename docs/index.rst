@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-#####################################
-Welcome to django CMS' documentation!
-#####################################
+########################
+django CMS documentation
+########################
 
 ********
 Overview
@@ -18,7 +18,7 @@ from a CMS but can also be easily customized by developers to create a site
 that is tailored to your unique needs.
 
 If you are a content editor looking for documentation on how to use the editing
-interface, see our :doc:`/basic_reference/editing_basics` guide.
+interface, see our :doc:`/user/editing_basics` guide.
 
 If you are a developer looking to learn more about django CMS as well as how to
 install, configure and customize it for your project, this guide is for you.
@@ -69,12 +69,12 @@ Table of contents
 .. toctree::
     :maxdepth: 2
 
-    getting_started/index
-    basic_reference/index
-    extending_cms/index
-    advanced/index
-    concepts/index
+    introduction/index
+    how_to/index
+    topics/index
+    reference/index
     contributing/index
+    user/index
     upgrade/index
 
 
