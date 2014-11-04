@@ -434,8 +434,7 @@ $(document).ready(function () {
 			if(!buttons.length) {
 				row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
 				buttons = row.find('input[type="submit"], button[type="submit"]');
-				buttons.attr('name', '_save')
-					.addClass('deletelink')
+				buttons.addClass('deletelink')
 					.hide();
 			}
 			// attach relation id
