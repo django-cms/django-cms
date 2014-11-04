@@ -11,6 +11,8 @@ CMS all the way up to adding your own plugins and apps and extending the CMS' mo
 
     tutorial
     integrate
+    custom_plugins
+    extending_examples
 
 
 

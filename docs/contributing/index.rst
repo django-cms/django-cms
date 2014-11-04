@@ -1,6 +1,6 @@
-#########################
-Development of django CMS
-#########################
+#######################
+Development & community
+#######################
 
 django CMS is an open-source project, and relies on its community of users to
 keep getting better.

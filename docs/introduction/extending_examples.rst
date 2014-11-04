@@ -46,10 +46,10 @@ In your poll application's ``models.py`` add the following::
 
     # existing Poll and Choice models...
     ....
-    
+
     class PollPluginModel(CMSPlugin):
         poll = models.ForeignKey('polls.Poll', related_name='plugins')
-        
+
         def __unicode__(self):
           return self.poll.question
 
@@ -61,7 +61,7 @@ In your poll application's ``models.py`` add the following::
     :class:`models.Model <django.db.models.Model>`.
 
 Run ``manage.py syncdb`` to create the database tables for this model or see
-:doc:`../../basic_reference/using_south` to see how to do it using `South`_.
+:doc:`/how_to/using_south` to see how to do it using `South`_.
 
 
 The Plugin Class
@@ -99,21 +99,21 @@ For our poll plugin, write the following plugin class::
     from cms.plugin_pool import plugin_pool
 
     from .models import PollPluginModel
-    
+
     class PollPlugin(CMSPluginBase):
         model = PollPluginModel                 # Model where data about this plugin is saved
         name = _("Poll Plugin")                 # Name of the plugin
         render_template = "polls/plugin.html"   # template to render the plugin with
-    
+
         def render(self, context, instance, placeholder):
             context.update({'instance':instance})
             return context
-    
+
     plugin_pool.register_plugin(PollPlugin) # register the plugin
 
 .. note::
 
-    All plugin classes must inherit from 
+    All plugin classes must inherit from
     :class:`cms.plugin_base.CMSPluginBase` and must register themselves
     with the :data:`cms.plugin_pool.plugin_pool`.
 
@@ -134,7 +134,7 @@ The template should look something like this:
 .. code-block:: html+django
 
     <h1>{{ instance.poll.question }}</h1>
-    
+
     <form action="{% url 'polls:vote' instance.poll.id %}" method="post">
     {% csrf_token %}
     {% for choice in instance.poll.choice_set.all %}
@@ -184,20 +184,20 @@ make your polls app look like this::
 
 In this file, write::
 
-    # -*- coding: utf-8 -*- 
+    # -*- coding: utf-8 -*-
 
     from django.utils.translation import ugettext_lazy as _
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
-    
+
     class PollsApp(CMSApp):
         name = _("Poll App")        # give your app a name, this is required
         urls = ["polls.urls"]       # link your app to url configuration(s)
         app_name = "polls"          # this is the application namespace
-        
+
     apphook_pool.register(PollsApp) # register your app
-    
+
 
 NOTE: If your polls module is not in the root of your project folder, then you
 may need to adjust the line above ``urls = ["polls.urls"]`` accordingly.
@@ -205,7 +205,7 @@ may need to adjust the line above ``urls = ["polls.urls"]`` accordingly.
 Now remove the inclusion of the polls urls in your main ``urls.py`` so it looks
 like this::
 
-    # -*- coding: utf-8 -*- 
+    # -*- coding: utf-8 -*-
 
     from django.conf.urls import *
     from django.contrib import admin
@@ -279,10 +279,10 @@ In your ``menu.py`` write::
     from menus.menu_pool import menu_pool
 
     from .models import Poll
-    
+
     class PollsMenu(CMSAttachMenu):
         name = _("Polls Menu") # give the menu a name, this is required.
-        
+
         def get_nodes(self, request):
             """
             This method is used to build the menu tree.
@@ -309,7 +309,7 @@ Apphook first.
 
 So open your ``cms_app.py`` and write::
 
-    # -*- coding: utf-8 -*- 
+    # -*- coding: utf-8 -*-
 
     from django.utils.translation import ugettext_lazy as _
 
@@ -323,7 +323,7 @@ So open your ``cms_app.py`` and write::
         urls = ["polls.urls"]       # link your app to url configuration(s)
         app_name = "polls"          # this is the application namespace
         menus = [PollsMenu]         # attach a CMSAttachMenu to this apphook.
-        
+
     apphook_pool.register(PollsApp) # register your app
 
 

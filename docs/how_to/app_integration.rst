@@ -196,7 +196,7 @@ under "Application". Save the page.
     Whenever you add or remove an apphook, change the slug of a page containing
     an apphook or the slug if a page which has a descendant with an apphook,
     you have to restart your server to re-load the URL caches.
-    
+
 .. note::
 
     If at some point you want to remove this apphook after deleting the cms_app.py
@@ -505,7 +505,7 @@ An example use-case
 
 A simple example: you have a news application that publishes pages
 independently of django CMS. However, you would like to integrate the
-application into the menu structure of your site, so that at appropriate 
+application into the menu structure of your site, so that at appropriate
 places a *News* node appears in the navigation menu.
 
 In such a case, a Navigation Modifier is the solution.
@@ -514,10 +514,10 @@ In such a case, a Navigation Modifier is the solution.
 How it works
 ------------
 
-Normally, you'd want to place modifiers in your application's 
+Normally, you'd want to place modifiers in your application's
 ``menu.py``.
 
-To make your modifier available, it then needs to be registered with 
+To make your modifier available, it then needs to be registered with
 ``menus.menu_pool.menu_pool``.
 
 Now, when a page is loaded and the menu generated, your modifier will
@@ -540,7 +540,7 @@ A simple modifier looks something like this::
                 node.counter = count
                 count += 1
             return nodes
-    
+
     menu_pool.register_modifier(MyMode)
 
 It has a method :meth:`~menus.base.Modifier.modify` that should return a list
@@ -605,7 +605,7 @@ Here is an example of a built-in modifier that marks all node levels::
                 else:
                     child.level = node.level + 1
                 self.mark_levels(child, post_cut)
-    
+
     menu_pool.register_modifier(Level)
 
 
@@ -621,7 +621,7 @@ want to display the top 10 news entries on your homepage, a custom plugin is
 the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to
-the :doc:`custom_plugins` section.
+the :doc:`/introduction/custom_plugins` section.
 
 
 .. _integration_toolbar:

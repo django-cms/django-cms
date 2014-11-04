@@ -38,7 +38,7 @@ New Toolbar
 
 The toolbar's code has been simplified and its appearance refreshed. The
 toolbar is now a more consistent management tool for adding and changing
-objects. See :doc:`../extending_cms/toolbar`.
+objects. See :doc:`/how_to/toolbar`.
 
 .. warning:: Upgrading from previous versions
 
@@ -129,7 +129,7 @@ separate repositories.
     ``djangocms_X`` plugins, simply install the new plugin, remove the old
     ``cms.plugins.X`` from ``settings.INSTALLED_APPS`` and add the new one
     to it. Then run the migrations (``python manage.py migrate djangocms_X``).
-    
+
 
 File Plugin
 -----------
@@ -138,7 +138,7 @@ We removed the file plugin (``cms.plugins.file``). Its new location is at:
 
 * https://github.com/divio/djangocms-file
 
-As an alternative, you could also use the following (yet you will not be able 
+As an alternative, you could also use the following (yet you will not be able
 to keep your existing files from the old ``cms.plugins.file``!)
 
 * https://github.com/stefanfoulis/django-filer

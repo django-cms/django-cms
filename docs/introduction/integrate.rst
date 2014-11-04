@@ -353,7 +353,7 @@ Also add any (or all) of the following plugins, depending on your needs::
     For more information, refer to `snippet_plugin`_.
 
 The plugins are described in more detail in chapter :doc:`Plugins reference
-<../basic_reference/plugin_reference>`. There are even more plugins available on the django CMS
+</reference/plugin_reference>`. There are even more plugins available on the django CMS
 `extensions page`_.
 
 .. _snippet_plugin: https://github.com/divio/djangocms-snippet
