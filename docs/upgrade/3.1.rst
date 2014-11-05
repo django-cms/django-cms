@@ -24,6 +24,12 @@ Bofore upgrading
 Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
 
 
+Dropped support for Django 1.4 and 1.5
+======================================
+
+Starting from version 3.1 the supported Django versions are 1.6 and 1.7
+
+
 ********************
 Incompatible changes
 ********************
