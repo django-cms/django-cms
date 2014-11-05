@@ -228,7 +228,7 @@ or has to have edit permission on that specific object of that model.
 Model permissions are usually added through default django auth application
 and its admin interface. On the other hand, object permission can be handled by
 writing custom Auth Backend as described in 
-`django docs <https://docs.djangoproject.com/en/1.5/topics/auth/customizing/#handling-object-permissions>`_
+`django docs <https://docs.djangoproject.com/en/1.7/topics/auth/customizing/#handling-object-permissions>`_
 For example, if there is a ``UserProfile`` model that contains placeholder field
 then custom backend can have following ``has_perm`` method that grants all rights
 to current user only on his ``UserProfile`` object::

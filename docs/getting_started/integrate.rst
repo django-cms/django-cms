@@ -13,7 +13,7 @@ Requirements
 ************
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
-* `Django`_ 1.4.x, 1.5.x, 1.6.x or 1.7.x
+* `Django`_ 1.6.x or 1.7.x
 * `South`_ 1.0
 * `django-classy-tags`_ 0.5 or higher
 * `django-treebeard`_ 2.0
@@ -83,11 +83,10 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ 1.6.6 (with Django 1.4.X), 1.7.X and 1.8 (exact) (with Django 1.5.X)
-  or 1.8.X (with Django 1.6.X and Django 1.7.X) to support versions of your content (If using
-  a different Django version it is a good idea to check the page
-  `Compatible-Django-Versions`_ in the django-reversion wiki in order
-  to make sure that the package versions are compatible.)
+* `django-reversion`_ 1.8.X (with Django 1.6.X and Django 1.7.X) to support
+  versions of your content (If using a different Django version it is a good
+  idea to check the page `Compatible-Django-Versions`_ in the django-reversion
+  wiki in order to make sure that the package versions are compatible.)
 
   .. note::
 
@@ -826,5 +825,5 @@ with the different plugins provided out of the box and to build great websites!
 Furthermore you can continue your introduction into django CMS on https://github.com/divio/django-cms-tutorial.
 
 .. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.5/topics/templates/
+.. _official documentation: http://docs.djangoproject.com/en/1.7/topics/templates/
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
