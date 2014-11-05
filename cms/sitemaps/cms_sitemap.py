@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.sitemaps import Sitemap
+from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils import translation
 
@@ -47,7 +48,8 @@ class CMSSitemap(Sitemap):
         #
         all_titles = Title.objects.public().filter(
             Q(redirect='') | Q(redirect__isnull=True),
-            page__login_required=False
+            page__login_required=False,
+            page__site=Site.objects.get_current(),
         ).order_by('page__path')
         return all_titles
 
