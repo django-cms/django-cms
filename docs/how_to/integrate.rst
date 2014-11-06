@@ -1,10 +1,10 @@
-##############################################
-Installing django CMS into an existing project
-##############################################
+#############################################
+Integrate django CMS into an existing project
+#############################################
 
-
-This document assumes you are familiar with Python and Django. It should
-outline the steps necessary for you to follow the :doc:`tutorial`.
+This document assumes you are familiar with Python and Django. After you've
+integrated django CMS into your project, you should be able to follow the
+:doc:`/introduction/index`.
 
 .. _requirements:
 

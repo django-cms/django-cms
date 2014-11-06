@@ -621,7 +621,7 @@ want to display the top 10 news entries on your homepage, a custom plugin is
 the way to go.
 
 For a detailed explanation on how to write custom plugins please head over to
-the :doc:`/introduction/custom_plugins` section.
+the :doc:`/how_to/custom_plugins` section.
 
 
 .. _integration_toolbar:
