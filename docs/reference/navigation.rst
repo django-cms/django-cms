@@ -293,4 +293,4 @@ Mark a page as *soft root* in the 'Advanced Settings' window of a page.
 Modifying & Extending the menu
 ******************************
 
-Please refer to the :doc:`/how_to/app_integration` documentation
+Please refer to the :doc:`/how_to/menus` documentation

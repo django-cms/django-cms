@@ -16,7 +16,5 @@ This section doesn't explain how to do anything, but explains and analyses some 
     templatetags
     cli
     permissions_reference
-    testing
-    placeholders
     frontend_models
     searchdocs

@@ -89,7 +89,7 @@ When adding items, all arguments other than the name or identifier should be
 given as **keyword arguments**. This will help ensure that your custom toolbar
 items survive upgrades.
 
-Following our :doc:`/introduction/extending_examples`, let's add the poll app
+Following our :doc:`/introduction/toolbar`, let's add the poll app
 to the toolbar::
 
     from django.core.urlresolvers import reverse
