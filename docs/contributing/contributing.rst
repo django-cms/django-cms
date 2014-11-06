@@ -167,8 +167,8 @@ Documentation structure
 
 Our documentation is divided into the following main sections:
 
-* **Getting started** (``introduction``): step-by-step tutorials and guides to
-  get you up and running
+* **Tutorials** (``introduction``): step-by-step tutorials to get you up and
+  running
 * **How-to guides** (``how_to``): guides covering more advanced development
 * **Key topics** (``topics``): explanations of key parts of the system
 * **Reference** (``reference``): technical reference for APIs, key models and
@@ -178,12 +178,6 @@ Our documentation is divided into the following main sections:
   developing for the CMS
 * **Release notes & upgrade information** (``upgrade``)
 
-* introduction: step-by-step tutorials and guides to get you up and running
-* how-to: guides covering more advanced development
-* topics: explanations of key parts of the system
-* reference: technical reference for APIs, key models and so on
-* contributing: information on the development process and how to take part
-* user: guides for *using* rather than setting up or developing for the CMS
 
 Documentation markup
 ====================

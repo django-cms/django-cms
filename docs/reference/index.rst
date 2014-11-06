@@ -2,8 +2,7 @@
 Reference
 #########
 
-Once you have django CMS working, you'll want to explore its features and capabilities in more
-depth, and customise its behaviour to meet your needs.
+Technical reference material.
 
 .. toctree::
     :maxdepth: 2
