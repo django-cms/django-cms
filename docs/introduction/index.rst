@@ -20,7 +20,6 @@ recommended to work through them in the order presented here.
 
 .. toctree::
     :maxdepth: 1
-    :titlesonly:
 
     install_from_scratch
     templates_placeholders
