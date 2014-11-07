@@ -9,6 +9,8 @@ Technical reference material.
 
     configuration
     navigation
-    plugin_reference
+    plugins
     api_references
     fields
+    templatetags
+    cli

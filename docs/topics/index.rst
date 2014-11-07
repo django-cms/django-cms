@@ -13,10 +13,6 @@ how it works.
     publishing
     multiple_languages
     i18n
-    caching
-    sitemap
-    templatetags
-    cli
-    permissions_reference
-    frontend_models
+    permissions
+    commonly_used_plugins
     searchdocs

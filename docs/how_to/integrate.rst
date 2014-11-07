@@ -353,9 +353,9 @@ Also add any (or all) of the following plugins, depending on your needs::
     Adding the ``'djangocms_snippet'`` plugin is a potential security hazard.
     For more information, refer to `snippet_plugin`_.
 
-The plugins are described in more detail in chapter :doc:`Plugins reference
-</reference/plugin_reference>`. There are even more plugins available on the django CMS
-`extensions page`_.
+Some commonly-used plugins are described in more detail in
+:doc:`/topics/commonly_used_plugins`. There are even more plugins available on
+the django CMS `extensions page`_.
 
 .. _snippet_plugin: https://github.com/divio/djangocms-snippet
 .. _extensions page: http://www.django-cms.org/en/extensions/

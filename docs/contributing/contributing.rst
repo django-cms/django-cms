@@ -167,16 +167,17 @@ Documentation structure
 
 Our documentation is divided into the following main sections:
 
-* **Tutorials** (``introduction``): step-by-step tutorials to get you up and
-  running
-* **How-to guides** (``how_to``): guides covering more advanced development
-* **Key topics** (``topics``): explanations of key parts of the system
-* **Reference** (``reference``): technical reference for APIs, key models and
-  so on
-* **Development & community** (``contributing``)
-* **Using django CMS** (``user``): guides for *using* rather than setting up or
-  developing for the CMS
-* **Release notes & upgrade information** (``upgrade``)
+* :doc:`/introduction/index` (``introduction``): step-by-step tutorials to get
+  you up and running
+* :doc:`/how_to/index` (``how_to``): guides covering more advanced development
+* :doc:`/topics/index` (``topics``): explanations of key parts of the system
+* :doc:`/reference/index` (``reference``): technical reference for APIs, key
+  models
+  and so on
+* :doc:`/contributing/index` (``contributing``)
+* :doc:`/upgrade/index` (``upgrade``)
+* (in progress Using django CMS (``user``): guides for *using* rather than
+  setting up or developing for the CMS
 
 
 Documentation markup

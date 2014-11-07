@@ -1,6 +1,6 @@
-#################
-Plugins reference
-#################
+##########################
+Some commonly-used plugins
+##########################
 
 .. warning::
     In version 3 of the CMS we removed all the plugins from the
