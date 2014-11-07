@@ -44,35 +44,28 @@ The get_nodes function should return a list of
 :class:`NavigationNode <menus.base.NavigationNode>` instances. A
 :class:`NavigationNode` takes the following arguments:
 
-- ``title``
-
+``title``
   What the menu entry should read as
 
-- ``url``,
-
+``url``
   Link if menu entry is clicked.
 
-- ``id``
-
+``id``
   A unique id for this menu.
 
-- ``parent_id=None``
-
+``parent_id=None``
   If this is a child of another node supply the id of the parent here.
 
-- ``parent_namespace=None``
-
+``parent_namespace=None``
   If the parent node is not from this menu you can give it the parent
   namespace. The namespace is the name of the class. In the above example that
   would be: "TestMenu"
 
-- ``attr=None``
-
+``attr=None``
   A dictionary of additional attributes you may want to use in a modifier or
   in the template.
 
-- ``visible=True``
-
+``visible=True``
   Whether or not this menu item should be visible.
 
 Additionally, each :class:`NavigationNode` provides a number of methods which are
@@ -203,33 +196,27 @@ It has a method :meth:`~menus.base.Modifier.modify` that should return a list
 of :class:`~menus.base.NavigationNode` instances.
 :meth:`~menus.base.Modifier.modify` should take the following arguments:
 
-- request
-
+`request`
   A Django request instance. You want to modify based on sessions, or
   user or permissions?
 
-- nodes
-
+`nodes`
   All the nodes. Normally you want to return them again.
 
-- namespace
-
+`namespace`
   A Menu Namespace. Only given if somebody requested a menu with only nodes
   from this namespace.
 
-- root_id
-
+`root_id`
   Was a menu request based on an ID?
 
-- post_cut
-
+`post_cut`
   Every modifier is called two times. First on the whole tree. After that the
   tree gets cut to only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
   the case ``post_cut`` is ``True``.
 
-- breadcrumb
-
+`breadcrumb`
   Is this not a menu call but a breadcrumb call?
 
 

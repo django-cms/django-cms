@@ -342,7 +342,7 @@ Example::
         </div>
     {% endfor %}
     </div>
-	
+
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
@@ -574,163 +574,6 @@ It will render to something like:
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
-
-*****************
-Menu Templatetags
-*****************
-
-.. highlightlang:: html+django
-
-To use any of the following templatetags you first need to load them at the
-top of your template::
-
-    {% load menu_tags %}
-	
-.. templatetag:: show_menu
-
-show_menu
-=========
-
-The ``show_menu`` tag renders the navigation of the current page. You can
-overwrite the appearance and the HTML if you add a ``menu/menu.html`` template
-to your project or edit the one provided with django CMS. ``show_menu`` takes
-four optional parameters: ``start_level``, ``end_level``, ``extra_inactive``,
-and ``extra_active``.
-
-The first two parameters, ``start_level`` (default=0) and ``end_level``
-(default=100) specify from which level the navigation shoud be rendered
-and at which level it should stop. If you have home as a root node and don't
-want to display home you can render the navigation only after level 1.
-
-The third parameter, ``extra_inactive`` (default=0), specifies how many levels
-of navigation should be displayed if a node is not a direct ancestor or
-descendant of the current active node.
-
-Finally, the fourth parameter, ``extra_active`` (default=100), specifies how
-many levels of descendants of the currently active node should be displayed.
-
-show_menu Examples
-------------------
-
-Complete navigation (as a nested list)::
-
-    <ul>
-        {% show_menu 0 100 100 100 %}
-    </ul>
-
-Navigation with active tree (as a nested list)::
-
-    <ul>
-        {% show_menu 0 100 0 100 %}
-    </ul>
-
-Navigation with only one active extra level::
-
-    <ul>
-        {% show_menu 0 100 0 1 %}
-    </ul>
-
-Level 1 navigation (as a nested list)::
-
-    <ul>
-        {% show_menu 1 %}
-    </ul>
-
-Navigation with a custom template::
-
-    {% show_menu 0 100 100 100 "myapp/menu.html" %}
-
-
-.. templatetag:: show_menu_below_id
-
-show_menu_below_id
-==================
-
-If you have set an id in the advanced settings of a page, you can display the
-submenu of this page with a template tag. For example, we have a page called
-meta that is not displayed in the navigation and that has the id "meta"::
-
-    <ul>
-        {% show_menu_below_id "meta" %}
-    </ul>
-
-You can give it the same optional parameters as ``show_menu``::
-
-    <ul>
-        {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
-    </ul>
-
-.. templatetag:: show_sub_menu
-
-show_sub_menu
-=============
-
-Displays the sub menu of the current page (as a nested list).
-
-The first argument, ``levels`` (default=100), specifies how many levels deep the submenu should be
-displayed
-
-The second argument, ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
-For example, if root_level is 0 the menu will start at that level regardless of what level the current page is on.
-
-The third argument, ``nephews`` (default=100), specifies how many levels of nephews (children of siblings) are show.
-
-The template can be found at ``cms/sub_menu.html``::
-
-    <ul>
-        {% show_sub_menu 1 %}
-    </ul>
-
-Rooted at level 0::
-
-    <ul>
-        {% show_sub_menu 1 0 %}
-    </ul>
-
-Or with a custom template::
-
-    <ul>
-        {% show_sub_menu 1 "myapp/submenu.html" %}
-    </ul>
-
-.. templatetag:: show_breadcrumb
-
-show_breadcrumb
-===============
-
-Renders the breadcrumb navigation of the current page.
-The template for the HTML can be found at ``menu/breadcrumb.html``::
-
-    {% show_breadcrumb %}
-
-Or with a custom template and only display level 2 or higher::
-
-    {% show_breadcrumb 2 "myapp/breadcrumb.html" %}
-    
-Usually, only pages visible in the navigation are shown in the
-breadcrumb. To include *all* pages in the breadcrumb, write::
-
-    {% show_breadcrumb 0 "menu/breadcrumb.html" 0 %}
-
-If the current URL is not handled by the CMS or by a navigation extender,
-the current menu node can not be determined.
-In this case you may need to provide your own breadcrumb via the template.
-This is mostly needed for pages like login, logout and third-party apps.
-This can easily be accomplished by a block you overwrite in your templates.
-
-For example in your base.html::
-
-    <ul>
-        {% block breadcrumb %}
-        {% show_breadcrumb %}
-        {% endblock %}
-    <ul>
-
-And then in your app template::
-
-    {% block breadcrumb %}
-    <li><a href="/">home</a></li>
-    <li>My current page</li>
     {% endblock %}
 
 .. templatetag:: page_language_url
@@ -749,7 +592,7 @@ If the current url has no cms-page and is handled by a navigation extender and
 the url changes based on the language, you will need to set a language_changer
 function with the set_language_changer function in cms.utils.
 
-For more information, see :doc:`i18n`.
+For more information, see :doc:`/topics/i18n`.
 
 .. templatetag:: language_chooser
 
@@ -768,7 +611,7 @@ Example::
 or with custom template::
 
     {% language_chooser "myapp/language_chooser.html" %}
-    
+
 The language_chooser has three different modes in which it will display the
 languages you can choose from: "raw" (default), "native", "current" and "short".
 It can be passed as the last argument to the ``language_chooser tag`` as a string.
@@ -783,7 +626,7 @@ If the current url has no cms-page and is handled by a navigation extender and
 the url changes based on the language, you will need to set a language_changer
 function with the set_language_changer function in menus.utils.
 
-For more information, see :doc:`i18n`.
+For more information, see :doc:`/topics/i18n`.
 
 ********************
 Toolbar Templatetags
@@ -791,9 +634,9 @@ Toolbar Templatetags
 
 .. highlightlang:: html+django
 
-The ``cms_toolbar`` templatetag is included in the ``cms_tags`` library and will add the 
-required css and javascript to the sekizai blocks in the base template. The templatetag 
-has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences 
+The ``cms_toolbar`` templatetag is included in the ``cms_tags`` library and will add the
+required css and javascript to the sekizai blocks in the base template. The templatetag
+has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences
 within your HTML.
 
 Example::

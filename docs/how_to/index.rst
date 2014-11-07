@@ -18,3 +18,6 @@ the same territory as the :doc:`/introduction/index`, but in more detail.
     using_south
     testing
     placeholders
+    caching
+    frontend_models
+    sitemap

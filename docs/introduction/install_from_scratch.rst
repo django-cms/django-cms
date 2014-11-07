@@ -58,7 +58,7 @@ default, they're highlighted below:
 
 * Database configuration (in URL format) [default sqlite://localhost/project.db]:
 * django CMS version: stable
-* Django version: stable
+* Django version: **1.6**
 * Activate Django I18N / L10N setting: yes
 * Install and configure reversion support: yes
 * Languages to enable. Option can be provided multiple times, or as a comma separated list: **en, de**

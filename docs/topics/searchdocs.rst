@@ -1,6 +1,6 @@
-#########################
-Search and the django CMS
-#########################
+#####################
+Search and django CMS
+#####################
 
 For powerful full-text search within the django CMS, we suggest using
 `Haystack`_ together with `django-cms-search`_.
