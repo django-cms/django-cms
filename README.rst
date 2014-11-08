@@ -13,16 +13,10 @@ django CMS
     :target: https://pypi.python.org/pypi/django-cms/
 
 
-NOTE::
-
-	You are currently on the 'develop' branch, normally, this is a great place
-	to get the latest and greatest. However, at this time, this branch is
-	being prepared for 3.1 and is currently pre-alpha quality. if you want the
-	latest stable release, please switch to the `Support 3.0.x` branch.
-
-
-
 Open source enterprise content management system based on the django framework.
+
+.. ATTENTION:: This is the **develop** branch. For the latest stable release,
+   please see use the **master** branch.
 
 ********
 Features
@@ -46,11 +40,11 @@ You can define editable areas, called placeholders, in your templates which you 
 with many different so called CMS content plugins.
 A list of all the plugins can be found here:
 
-`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_ 
+`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_
 
 Should you be unable to find a suitable plugin for you needs, writing your own is very simple.
 
-More information on `our website <http://www.django-cms.org>`_. 
+More information on `our website <http://www.django-cms.org>`_.
 
 *************
 Documentation
