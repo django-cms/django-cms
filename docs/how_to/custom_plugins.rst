@@ -143,7 +143,7 @@ There are two required attributes on those classes:
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
 
-And one of thw following **must** be defined if ``render_plugin`` attribute
+And one of the following **must** be defined if ``render_plugin`` attribute
 is ``True`` (the default):
 
 * ``render_template``: The template to render this plugin with.
