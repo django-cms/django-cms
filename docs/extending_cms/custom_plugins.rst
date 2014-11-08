@@ -143,7 +143,7 @@ There are two required attributes on those classes:
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
 
-And one of thw following **must** be defined if ``render_plugin`` attribute
+And one of the following **must** be defined if ``render_plugin`` attribute
 is ``True`` (the default):
 
 * ``render_template``: The template to render this plugin with.
@@ -260,12 +260,12 @@ clause.
     field, as it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`,
     and your plugin will not work as intended in the administration without
     further work.
-    
+
 .. warning::
 
-    If you are using Python 2.x and overriding the ``__unicode__`` method of the 
-    model file, make sure to return its results as UTF8-string. Otherwise 
-    saving an instance of your plugin might fail with the frontend editor showing 
+    If you are using Python 2.x and overriding the ``__unicode__`` method of the
+    model file, make sure to return its results as UTF8-string. Otherwise
+    saving an instance of your plugin might fail with the frontend editor showing
     an <Empty> plugin instance. To return in unicode use a return statement like
     ``return u'{0}'.format(self.guest_name)``.
 
@@ -357,7 +357,7 @@ Advanced
 Inline Admin
 ============
 
-If you want to have the foreign key relation as a inline admin, you can create a admin.StackedInline class 
+If you want to have the foreign key relation as a inline admin, you can create a admin.StackedInline class
 and put it in the Plugin to "inlines". Then you can use the inline Admin form for your foreign key references.
 inline admin::
 
