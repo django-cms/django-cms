@@ -295,6 +295,10 @@ plugins, as shown above with ``base.html content``.
     A dictionary of plugin names with lists describing which plugins may contain
     each plugin. If not supplied, all plugins can be selected.
 
+``require_parent``
+    A boolean indication whether that plugin requires another plugin as parent or
+    not.
+
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the
     example, the configuration for "base.html content" inherits from "content"
