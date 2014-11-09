@@ -1,10 +1,10 @@
-##############################################
-Installing django CMS into an existing project
-##############################################
+#############################################
+Integrate django CMS into an existing project
+#############################################
 
-
-This document assumes you are familiar with Python and Django. It should
-outline the steps necessary for you to follow the :doc:`tutorial`.
+This document assumes you are familiar with Python and Django. After you've
+integrated django CMS into your project, you should be able to follow the
+:doc:`/introduction/index`.
 
 .. _requirements:
 
@@ -352,9 +352,9 @@ Also add any (or all) of the following plugins, depending on your needs::
     Adding the ``'djangocms_snippet'`` plugin is a potential security hazard.
     For more information, refer to `snippet_plugin`_.
 
-The plugins are described in more detail in chapter :doc:`Plugins reference
-<../basic_reference/plugin_reference>`. There are even more plugins available on the django CMS
-`extensions page`_.
+Some commonly-used plugins are described in more detail in
+:doc:`/topics/commonly_used_plugins`. There are even more plugins available on
+the django CMS `extensions page`_.
 
 .. _snippet_plugin: https://github.com/divio/djangocms-snippet
 .. _extensions page: http://www.django-cms.org/en/extensions/
