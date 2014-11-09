@@ -15,7 +15,7 @@ For the toolbar API reference, please refer to :ref:`toolbar-api-reference`.
 Registering
 ***********
 
-There are two ways to control what gets shown in the toolbar. 
+There are two ways to control what gets shown in the toolbar.
 
 One is the :setting:`CMS_TOOLBARS`. This gives you full control over which
 classes are loaded, but requires that you specify them all manually.
@@ -75,7 +75,7 @@ Adding items
 ************
 
 Items can be added through the various :ref:`APIs <toolbar-api-reference>`
-exposed by the toolbar and its items. 
+exposed by the toolbar and its items.
 
 To add a :class:`cms.toolbar.items.Menu` to the toolbar, use
 :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu` which will either add a menu if
@@ -89,7 +89,7 @@ When adding items, all arguments other than the name or identifier should be
 given as **keyword arguments**. This will help ensure that your custom toolbar
 items survive upgrades.
 
-Following our :doc:`extending_examples`, let's add the poll app
+Following our :doc:`/introduction/toolbar`, let's add the poll app
 to the toolbar::
 
     from django.core.urlresolvers import reverse

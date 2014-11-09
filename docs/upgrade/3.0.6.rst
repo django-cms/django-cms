@@ -48,7 +48,7 @@ filters in ``PageUserAdmin`` as in the custom user model admin.
 
 A new method on plugins, that returns the template during the render phase,
 allowing you to change the template based on any plugin attribute or context
-status. See :doc:`../../extending_cms/custom_plugins` for more.
+status. See :doc:`/how_to/custom_plugins` for more.
 
 Simplified toolbar API for page extensions
 ==========================================

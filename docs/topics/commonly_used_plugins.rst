@@ -1,6 +1,6 @@
-#################
-Plugins reference
-#################
+##########################
+Some commonly-used plugins
+##########################
 
 .. warning::
     In version 3 of the CMS we removed all the plugins from the
@@ -280,6 +280,8 @@ We recommend one of the following plugins:
 
 * https://github.com/nephila/djangocms_twitter
 * https://github.com/changer/cmsplugin-twitter
+
+.. warning:: These plugins are not currently compatible with Django 1.7.
 
 .. :module:: djangocms_inherit
 

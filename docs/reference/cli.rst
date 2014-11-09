@@ -137,28 +137,6 @@ used moderation in the past.
     orphaned plugins will fail and leave bad data in your database.
 
 
-*******************
-MPTT repair command
-*******************
-
-``cms fix-mptt``
-===================
-
-Occasionally, the MPTT structure in which pages and plugins are held can
-accumulate small errors. These are typically the result of failed operations or
-large and complex restructurings of the tree (perhaps even cosmic rays,
-planetary alignment or other mysterious conditions).
-
-Usually you won't even notice them, and they won't affect the operation of the
-system, but when you run into trouble it's useful to be able to rebuild the tree
-- it's also useful to rebuild it as part of preventative maintenance.
-
-.. warning::
-
-    This command **alters data** in your database. You should make a backup of
-    your database before using it!
-
-
 **************************************
 Additional commands
 **************************************

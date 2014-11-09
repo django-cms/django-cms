@@ -21,11 +21,13 @@ your template before the line on which you call the templatetag.
     tightly coupled to the :mod:`cms` application exists independently of it.
     Menus are usable by any application, not just by django CMS.
 
+.. templatetag:: show_menu
+
 *********
 show_menu
 *********
 
-:ttag:`{% show_menu %} <show_menu>` renders the navigation of the current page.
+The ``show_menu`` tag renders the navigation of the current page.
 You can overwrite the appearance and the HTML if you add a ``menu/menu.html``
 template to your project or edit the one provided with django CMS.
 ``show_menu`` takes four optional parameters: ``start_level``, ``end_level``,
@@ -90,11 +92,16 @@ meta that is not displayed in the navigation and that has the id "meta"::
         {% show_menu_below_id "meta" %}
     </ul>
 
-You can give it the same optional parameters as :ttag:`show_menu`::
+You can give it the same optional parameters as ``show_menu``::
 
     <ul>
         {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
     </ul>
+
+Note that soft roots will not affect the menu when
+using ``show_menu_below_id``.
+
+.. templatetag:: show_sub_menu
 
 *************
 show_sub_menu
@@ -148,9 +155,32 @@ Or with a custom template and only display level 2 or higher::
 
     {% show_breadcrumb 2 "myapp/breadcrumb.html" %}
 
-If the current URL is not handled by the CMS or you are working in a navigation
-extender, you may need to provide your own breadcrumb via the template.
+Usually, only pages visible in the navigation are shown in the
+breadcrumb. To include *all* pages in the breadcrumb, write::
+
+    {% show_breadcrumb 0 "menu/breadcrumb.html" 0 %}
+
+If the current URL is not handled by the CMS or by a navigation extender,
+the current menu node can not be determined.
+In this case you may need to provide your own breadcrumb via the template.
 This is mostly needed for pages like login, logout and third-party apps.
+This can easily be accomplished by a block you overwrite in your templates.
+
+For example in your base.html::
+
+    <ul>
+        {% block breadcrumb %}
+        {% show_breadcrumb %}
+        {% endblock %}
+    <ul>
+
+And then in your app template::
+
+    {% block breadcrumb %}
+    <li><a href="/">home</a></li>
+    <li>My current page</li>
+    {% endblock %}
+
 
 
 .. _extending_the_menu:
@@ -164,7 +194,7 @@ Properties of Navigation Nodes in templates
     {{ node.is_leaf_node }}
 
 Is it the last in the tree? If true it doesn't have any children.
-(This normally comes from mptt.)
+
 ::
 
     {{ node.level }}
@@ -211,83 +241,13 @@ If true this node is a descendant of the current selected node.
 
     {{ node.soft_root }}
 
-If true this node is a "soft root".
+If true this node is a :ref:`soft root <soft-root>`. A page can be marked as a *soft root*
+in its 'Advanced Settings'.
 
-**********
-Soft Roots
-**********
 
-What Soft Roots do
-==================
-
-A *soft root* is a page that acts as the root for a menu
-navigation tree.
-
-Typically, this will be a page that is the root of a significant
-new section on your site.
-
-When the *soft root* feature is enabled, the navigation menu
-for any page will start at the nearest *soft root*, rather than
-at the real root of the site's page hierarchy.
-
-This feature is useful when your site has deep page hierarchies
-(and therefore multiple levels in its navigation trees). In such
-a case, you usually don't want to present site visitors with deep
-menus of nested items.
-
-For example, you're on the page "Introduction to Bleeding", so the menu might look like this:
-
-* School of Medicine
-    * Medical Education
-    * Departments
-        * Department of Lorem Ipsum
-        * Department of Donec Imperdiet
-        * Department of Cras Eros
-        * Department of Mediaeval Surgery
-            * Theory
-            * Cures
-                * Bleeding
-                    * Introduction to Bleeding <this is the current page>
-                    * Bleeding - the scientific evidence
-                    * Cleaning up the mess
-                * Cupping
-                * Leaches
-                * Maggots
-            * Techniques
-            * Instruments
-        * Department of Curabitur a Purus
-        * Department of Sed Accumsan
-        * Department of Etiam
-    * Research
-    * Administration
-    * Contact us
-    * Impressum
-
-which is frankly overwhelming.
-
-By making "Department of Mediaeval Surgery" a *soft root*, the
-menu becomes much more manageable:
-
-* Department of Mediaeval Surgery
-    * Theory
-    * Cures
-        * Bleeding
-            * Introduction to Bleeding <current page>
-            * Bleeding - the scientific evidence
-            * Cleaning up the mess
-        * Cupping
-        * Leaches
-        * Maggots
-    * Techniques
-    * Instruments
-
-Using Soft Roots
-================
-
-Mark a page as *soft root* in the 'Advanced Settings' window of a page.
 
 ******************************
 Modifying & Extending the menu
 ******************************
 
-Please refer to the :doc:`../../extending_cms/app_integration` documentation
+Please refer to the :doc:`/how_to/menus` documentation
