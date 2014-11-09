@@ -239,6 +239,8 @@ Displays the URL of a page in the current language.
 Arguments:
 
 - ``page_lookup`` (see `page_lookup`_ for more information)
+- ``language`` (optional)
+- ``site`` (optional)
 - ``as var_name`` (version 3.0 or later, optional; page_url can now be used to assign the resulting
   URL to a context variable ``var_name``)
 
