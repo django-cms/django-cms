@@ -77,6 +77,7 @@ Table of contents
     reference/index
     contributing/index
     upgrade/index
+    user/index
 
 
 Indices and tables
