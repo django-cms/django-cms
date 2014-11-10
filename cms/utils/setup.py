@@ -1,5 +1,3 @@
-from functools import partial
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -46,6 +44,5 @@ def setup():
             return ret_value
 
         loading.AppCache.get_models = get_models_patched
-        # loading.get_models = partial(get_models_patched, loading.cache)
     validate_dependencies()
     validate_settings()
