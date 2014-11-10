@@ -1,5 +1,5 @@
 ##########################################
-Release notes and information on upgrading
+Release notes & upgrade information
 ##########################################
 
 Some versions of django CMS present more complex upgrade paths than others, and some **require** you

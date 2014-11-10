@@ -104,4 +104,15 @@ this view is valid. This method will perform integrity and permission checks
 for the GET parameters of the request.
 
 
+Migrations moved
+================
+
+Migrations packages has been renamed to the standard layout:
+
+ * Django 1.7 migrations are now into standard ``cms.migrations`` and ``menus.migrations`` packages
+ * South migrations are now in ``cms.south_migrations`` and ``menus.south_migrations`` packages
+
+South 1.0.1 is now required to correctly handle the above layout; if you are upgrading from Django 1.7 / django CMS 3.0.6,
+please remove the old migration path from ``MIGRATION_MODULES`` settings.
+
 .. _Django documentation: https://docs.djangoproject.com/en/1.6/ref/contrib/admin/#django.contrib.admin.ModelAdmin.has_add_permission
