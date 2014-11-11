@@ -679,8 +679,8 @@ as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
 
 Log in with the user you created during the database setup.
 
-If this is your first django CMS project, read through the `tutorial`_ for a
-walkthrough of the main features of django CMS.
+If this is your first django CMS project, read through the :doc:`/introduction/index`
+for a walkthrough of the main features of django CMS.
 
 For more information on adding and creating pages, see :doc:`/user/editing_basics`.
 
@@ -688,4 +688,3 @@ To deploy your django CMS project on a production webserver, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
 
 .. _official documentation: http://docs.djangoproject.com/en/dev/topics/templates/
-.. _tutorial: https://github.com/divio/django-cms-tutorial

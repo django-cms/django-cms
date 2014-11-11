@@ -271,7 +271,5 @@ Where to go from here
 Feel free to play around with the different plugins provided out of the box and
 to build great websites!
 
-Developers may wish to read the technical `tutorial`_ for a walkthrough of the
+Developers may wish to read the technical :doc:`/introduction/index` for a walkthrough of the
 main features of django CMS.
-
-.. _tutorial: https://github.com/divio/django-cms-tutorial
