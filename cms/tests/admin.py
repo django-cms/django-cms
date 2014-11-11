@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import json
 import datetime
+from cms import api
 from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -76,6 +77,7 @@ class AdminTestsBase(CMSTestCase):
 
 
 class AdminTestCase(AdminTestsBase):
+
     def test_permissioned_page_list(self):
         """
         Makes sure that a user with restricted page permissions can view
@@ -136,7 +138,6 @@ class AdminTestCase(AdminTestsBase):
             'pagepermission_set-2-MAX_NUM_FORMS': 0
         }
         # required only if user haves can_change_permission
-
         with self.login_user_context(normal_guy):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
                                     follow=True)
@@ -149,22 +150,21 @@ class AdminTestCase(AdminTestsBase):
             title = page.get_title_obj()
             self.assertEqual(title.overwrite_url, OVERRIDE_URL)
 
-            # The admin edits the page (change the page name for ex.)
-            page_data = {
-                'title': OLD_PAGE_NAME,
-                'slug': page.get_slug(),
-                'language': title.language,
-                'site': page.site.pk,
-                'template': page.template,
-                'reverse_id': page.reverse_id,
-                'pagepermission_set-TOTAL_FORMS': 0,  # required only if user haves can_change_permission
-                'pagepermission_set-INITIAL_FORMS': 0,
-                'pagepermission_set-MAX_NUM_FORMS': 0,
-                'pagepermission_set-2-TOTAL_FORMS': 0,
-                'pagepermission_set-2-INITIAL_FORMS': 0,
-                'pagepermission_set-2-MAX_NUM_FORMS': 0
-            }
-
+        # The admin edits the page (change the page name for ex.)
+        page_data = {
+            'title': OLD_PAGE_NAME,
+            'slug': page.get_slug(),
+            'language': title.language,
+            'site': page.site.pk,
+            'template': page.template,
+            'reverse_id': page.reverse_id,
+            'pagepermission_set-TOTAL_FORMS': 0,  # required only if user haves can_change_permission
+            'pagepermission_set-INITIAL_FORMS': 0,
+            'pagepermission_set-MAX_NUM_FORMS': 0,
+            'pagepermission_set-2-TOTAL_FORMS': 0,
+            'pagepermission_set-2-INITIAL_FORMS': 0,
+            'pagepermission_set-2-MAX_NUM_FORMS': 0
+        }
         with self.login_user_context(admin_user):
             resp = self.client.post(base.URL_CMS_PAGE_CHANGE % page.pk, page_data,
                                     follow=True)
@@ -175,7 +175,7 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(page.get_title(), OLD_PAGE_NAME)
             self.assertEqual(page.reverse_id, REVERSE_ID)
             title = page.get_title_obj()
-            self.assertEqual(title.overwrite_url, None)
+            self.assertEqual(title.overwrite_url, OVERRIDE_URL)
 
     def test_edit_does_not_reset_apphook(self):
         """
@@ -1275,7 +1275,6 @@ class AdminFormsTests(AdminTestsBase):
 
             form = PageForm(data)
             self.assertTrue(form.is_valid(), form.errors.as_text())
-            # WTF? WHY DOES form.save() not handle this stuff???
             instance = form.save()
             instance.permission_user_cache = user
             instance.permission_advanced_settings_cache = True
@@ -1302,6 +1301,87 @@ class AdminFormsTests(AdminTestsBase):
         self.assertFalse(form.is_valid())
         self.assertIn(u"Site doesn't match the parent's page site",
                       form.errors['__all__'])
+
+    def test_form_errors(self):
+
+        new_page_data = {
+            'title': 'Title',
+            'slug': 'home',
+            'language': 'en',
+            'site': 10,
+            'template': get_cms_setting('TEMPLATES')[0][0],
+            'reverse_id': '',
+        }
+        form = PageForm(data=new_page_data, files=None)
+        self.assertFalse(form.is_valid())
+        site0 = Site.objects.create(domain='foo.com', name='foo.com')
+        page1 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "fr", site=site0)
+
+        new_page_data = {
+            'title': 'Title',
+            'slug': 'home',
+            'language': 'en',
+            'site': 1,
+            'template': get_cms_setting('TEMPLATES')[0][0],
+            'reverse_id': '',
+            'parent': page1.pk,
+        }
+        form = PageForm(data=new_page_data, files=None)
+        self.assertFalse(form.is_valid())
+
+        new_page_data = {
+            'title': 'Title',
+            'slug': '#',
+            'language': 'en',
+            'site': 1,
+            'template': get_cms_setting('TEMPLATES')[0][0],
+            'reverse_id': '',
+        }
+        form = PageForm(data=new_page_data, files=None)
+        self.assertFalse(form.is_valid())
+
+        new_page_data = {
+            'title': 'Title',
+            'slug': 'home',
+            'language': 'pp',
+            'site': 1,
+            'template': get_cms_setting('TEMPLATES')[0][0],
+            'reverse_id': '',
+            'parent':'',
+        }
+        form = PageForm(data=new_page_data, files=None)
+        self.assertFalse(form.is_valid())
+
+
+        page2 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "en")
+        new_page_data = {
+            'title': 'Title',
+            'slug': 'test',
+            'language': 'en',
+            'site': 1,
+            'template': get_cms_setting('TEMPLATES')[0][0],
+            'reverse_id': '',
+            'parent':'',
+        }
+        form = PageForm(data=new_page_data, files=None)
+        self.assertFalse(form.is_valid())
+
+        page3 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "en", parent=page2)
+        page3.title_set.update(path="hello/")
+        page3 = page3.reload()
+        new_page_data = {
+            'title': 'Title',
+            'slug': 'test',
+            'language': 'en',
+            'site': 1,
+            'template': get_cms_setting('TEMPLATES')[0][0],
+            'reverse_id': '',
+            'parent':'',
+        }
+        form = PageForm(data=new_page_data, files=None, instance=page3)
+        self.assertFalse(form.is_valid())
+
+
 
     def test_reverse_id_error_location(self):
         ''' Test moving the reverse_id validation error to a field specific one '''
@@ -1418,7 +1498,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(18, 34)):
             force_unicode(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
-        with self.assertNumQueries(FuzzyInt(12, 14)):
+        with self.assertNumQueries(FuzzyInt(11, 13)):
             force_unicode(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):

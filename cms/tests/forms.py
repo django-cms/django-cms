@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from datetime import datetime
 
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils.permissions import set_current_user
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-
 from cms.admin import forms
-from cms.admin.forms import PageUserForm
-from cms.api import create_page, create_page_user
+from cms.admin.forms import PageUserForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm, \
+    GlobalPagePermissionAdminForm, PageUserGroupForm
+from cms.api import create_page, create_page_user, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
@@ -61,7 +65,7 @@ class FormsTestCase(CMSTestCase):
         raised = False
         try:
             fake_field = Mock_PageSelectFormField(required=True)
-            data_list = (0, None) #(site_id, page_id) dsite-id is not used
+            data_list = (0, None)  #(site_id, page_id) dsite-id is not used
             fake_field.compress(data_list)
             self.fail('compress function didn\'t raise!')
         except forms.ValidationError:
@@ -70,7 +74,7 @@ class FormsTestCase(CMSTestCase):
 
     def test_compress_function_returns_none_when_not_required(self):
         fake_field = Mock_PageSelectFormField(required=False)
-        data_list = (0, None) #(site_id, page_id) dsite-id is not used
+        data_list = (0, None)  #(site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEqual(result, None)
 
@@ -83,7 +87,7 @@ class FormsTestCase(CMSTestCase):
     def test_compress_function_gets_a_page_when_one_exists(self):
         # boilerplate (creating a page)
         User = get_user_model()
-        
+
         fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
 
         if User.USERNAME_FIELD != 'email':
@@ -97,7 +101,7 @@ class FormsTestCase(CMSTestCase):
             home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The actual test
             fake_field = Mock_PageSelectFormField()
-            data_list = (0, home_page.pk) #(site_id, page_id) dsite-id is not used
+            data_list = (0, home_page.pk)  #(site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
             self.assertEqual(home_page, result)
 
@@ -135,17 +139,147 @@ class FormsTestCase(CMSTestCase):
 
     def test_page_user_form_initial(self):
         if get_user_model().USERNAME_FIELD == 'email':
-            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser@django-cms.org")
+            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org",
+                                                               "myuser@django-cms.org")
         else:
             myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
-        
+
         user = create_page_user(myuser, myuser, grant_all=True)
         puf = PageUserForm(instance=user)
         names = ['can_add_page', 'can_change_page', 'can_delete_page',
-            'can_add_pageuser', 'can_change_pageuser',
-            'can_delete_pageuser', 'can_add_pagepermission',
-            'can_change_pagepermission', 'can_delete_pagepermission']
+                 'can_add_pageuser', 'can_change_pageuser',
+                 'can_delete_pageuser', 'can_add_pagepermission',
+                 'can_change_pagepermission', 'can_delete_pagepermission']
         for name in names:
             self.assertTrue(puf.initial.get(name, False))
+
+
+class PermissionFormTestCase(CMSTestCase):
+    def test_permission_forms(self):
+        page = create_page("page_b", "nav_playground.html", "en",
+                           created_by=self.get_superuser())
+        normal_user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        assign_user_to_page(page, normal_user, can_view=True,
+                            can_change=True)
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get("/en/admin/cms/page/%s/permission-settings/" % page.pk)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.get("/en/admin/cms/page/%s/permissions/" % page.pk)
+            self.assertEqual(response.status_code, 200)
+
+        with SettingsOverride(CMS_RAW_ID_USERS=True):
+            data = {
+                'page': page.pk,
+                'grant_on': "hello",
+            }
+            form = PagePermissionInlineAdminForm(data=data, files=None)
+            self.assertFalse(form.is_valid())
+            data = {
+                'page': page.pk,
+                'grant_on': ACCESS_PAGE,
+            }
+            form = PagePermissionInlineAdminForm(data=data, files=None)
+            self.assertTrue(form.is_valid())
+            form.save()
+
+            data = {
+                'page': page.pk,
+                'grant_on': ACCESS_PAGE_AND_CHILDREN,
+                'can_add': '1',
+                'can_change': ''
+            }
+            form = PagePermissionInlineAdminForm(data=data, files=None)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(str(form.errors),
+                             '<ul class="errorlist"><li>__all__<ul class="errorlist"><li>Add page permission also '
+                             'requires edit page permission.</li></ul></li></ul>')
+            data = {
+                'page': page.pk,
+                'grant_on': ACCESS_PAGE,
+                'can_add': '1',
+
+            }
+            form = PagePermissionInlineAdminForm(data=data, files=None)
+            self.assertFalse(form.is_valid())
+            self.assertEqual(str(form.errors),
+                             '<ul class="errorlist"><li>__all__<ul class="errorlist"><li>Add page permission requires '
+                             'also access to children, or descendants, otherwise added page can&#39;t be changed by '
+                             'its creator.</li></ul></li></ul>')
+
+    def test_inlines(self):
+        user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        page = create_page("page_b", "nav_playground.html", "en",
+                           created_by=self.get_superuser())
+        data = {
+            'page': page.pk,
+            'grant_on': ACCESS_PAGE_AND_CHILDREN,
+            'can_view': 'True',
+            'user': '',
+            'group': '',
+        }
+        set_current_user(self.get_superuser())
+        form = ViewRestrictionInlineAdminForm(data=data, files=None)
+        self.assertTrue(form.is_valid())
+        data = {
+            'page': page.pk,
+            'grant_on': ACCESS_PAGE_AND_CHILDREN,
+            'can_view': 'True',
+            'user': '',
+            'group': ''
+        }
+        form = GlobalPagePermissionAdminForm(data=data, files=None)
+        self.assertFalse(form.is_valid())
+
+        data = {
+            'page': page.pk,
+            'grant_on': ACCESS_PAGE_AND_CHILDREN,
+            'can_view': 'True',
+            'user': user.pk,
+
+        }
+        form = GlobalPagePermissionAdminForm(data=data, files=None)
+        self.assertTrue(form.is_valid())
+
+    def test_user_forms(self):
+        user = self.get_superuser()
+        user2 = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        set_current_user(user)
+        data = {'username': "test",
+                'password': 'hello',
+                'password1': 'hello',
+                'password2': 'hello',
+                'created_by': user.pk,
+                'last_login': datetime.now(),
+                'date_joined': datetime.now(),
+                'email': 'test@example.com',
+        }
+
+        form = PageUserForm(data=data, files=None)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        data = {'username': "test2",
+                'password': 'hello',
+                'password1': 'hello',
+                'password2': 'hello',
+                'email': 'test2@example.com',
+                'created_by': user.pk,
+                'last_login': datetime.now(),
+                'date_joined': datetime.now(),
+                'notify_user': 'on',
+        }
+        form = PageUserForm(data=data, files=None, instance=user2)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        data = {
+            'name': 'test_group'
+        }
+        form = PageUserGroupForm(data=data, files=None)
+        self.assertTrue(form.is_valid(), form.errors)
+        instance = form.save()
+
+        form = PageUserGroupForm(data=data, files=None, instance=instance)
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
 
 

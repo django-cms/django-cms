@@ -99,7 +99,7 @@ def configure(db_url, **extra):
             'django.contrib.sites',
             'django.contrib.staticfiles',
             'django.contrib.messages',
-            'mptt',
+            'treebeard',
             'cms',
             'menus',
             'djangocms_text_ckeditor',
@@ -270,8 +270,8 @@ def configure(db_url, **extra):
         defaults['INSTALLED_APPS'].append('south')
     else:
         defaults['MIGRATION_MODULES'] = {
-            'cms': 'cms.migrations_django',
-            'menus': 'menus.migrations_django',
+            'cms': 'cms.migrations',
+            'menus': 'menus.migrations',
             'djangocms_column': 'djangocms_column.migrations_django',
             'djangocms_file': 'djangocms_file.migrations_django',
             'djangocms_flash': 'djangocms_flash.migrations_django',

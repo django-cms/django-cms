@@ -9,9 +9,9 @@ from cms.plugin_pool import plugin_pool
 from cms.utils.compat.dj import get_user_model, user_related_query_name
 
 
-try:
+try: # pragma: no cover
     from threading import local
-except ImportError:
+except ImportError: # pragma: no cover
     from django.utils._threading_local import local
 
 # thread local support
@@ -164,7 +164,7 @@ def get_user_permission_level(user):
         # those
         return 0
     try:
-        permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__level')[0]
+        permission = PagePermission.objects.with_can_change_permissions(user).order_by('page__path')[0]
     except IndexError:
         # user isn't assigned to any node
         raise NoPermissionsException

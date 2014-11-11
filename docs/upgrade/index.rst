@@ -1,5 +1,5 @@
 ##########################################
-Release notes and information on upgrading
+Release notes & upgrade information
 ##########################################
 
 Some versions of django CMS present more complex upgrade paths than others, and some **require** you
@@ -11,6 +11,8 @@ makes changes to your database.
 .. toctree::
     :maxdepth: 1
 
+
+    3.1
     3.0.6
     3.0.3
     3.0

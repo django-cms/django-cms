@@ -109,7 +109,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
                  "The URL of the request was: http://%(host)s%(path)s") \
-               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path}
+               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path_info}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
@@ -219,7 +219,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
     # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
     # there for possible enhancements
     if inherit and not edit_mode:
-        pages = chain([current_page], current_page.get_cached_ancestors(ascending=True))
+        pages = chain([current_page], current_page.get_cached_ancestors())
     for page in pages:
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
@@ -291,25 +291,13 @@ class Placeholder(Tag):
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
         validate_placeholder_name(name)
-        width = None
         inherit = False
         for bit in extra_bits:
             if bit == 'inherit':
                 inherit = True
-            elif bit.isdigit():
-                width = int(bit)
-                import warnings
-
-                warnings.warn(
-                    "The width parameter for the placeholder tag is deprecated.",
-                    DeprecationWarning
-                )
         if not 'request' in context:
             return ''
         request = context['request']
-        if width:
-            context.update({'width': width})
-
         page = request.current_page
         if not page or page == 'dummy':
             if nodelist:
@@ -320,7 +308,6 @@ class Placeholder(Tag):
         except PlaceholderNotFound:
             if nodelist:
                 return nodelist.render(context)
-            raise
         if not content:
             if nodelist:
                 return nodelist.render(context)
@@ -536,27 +523,6 @@ class PageAttribute(AsTag):
 
 
 register.tag(PageAttribute)
-
-
-class CleanAdminListFilter(InclusionTag):
-    template = 'admin/filter.html'
-    name = 'clean_admin_list_filter'
-
-    options = Options(
-        Argument('cl'),
-        Argument('spec'),
-    )
-
-    def get_context(self, context, cl, spec):
-        choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
-        query_string = None
-        unique_choices = []
-        for choice in choices:
-            if choice['query_string'] != query_string:
-                unique_choices.append(choice)
-                query_string = choice['query_string']
-        return {'title': spec.title(), 'choices': unique_choices}
-
 
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
                                site=None, cache_result=True):

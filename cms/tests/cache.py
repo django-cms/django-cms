@@ -59,12 +59,12 @@ class CacheTestCase(CMSTestCase):
         ]
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
         with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
-            with self.assertNumQueries(FuzzyInt(14, 18)):
+            with self.assertNumQueries(FuzzyInt(13, 17)):
                 self.client.get('/en/')
-            with self.assertNumQueries(FuzzyInt(6, 10)):
+            with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
         with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
-            with self.assertNumQueries(FuzzyInt(8, 12)):
+            with self.assertNumQueries(FuzzyInt(7, 11)):
                 self.client.get('/en/')
 
     def test_no_cache_plugin(self):
@@ -112,7 +112,7 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
             render2 = template.render(rctx)
-        with self.assertNumQueries(FuzzyInt(9, 13)):
+        with self.assertNumQueries(FuzzyInt(8, 12)):
             response = self.client.get('/en/')
             resp2 = response.content.decode('utf8').split("$$$")[1]
         self.assertNotEqual(render, render2)

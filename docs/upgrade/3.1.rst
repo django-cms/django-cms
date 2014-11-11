@@ -1,0 +1,46 @@
+.. _upgrade-to-3.1:
+
+#################
+3.1 release notes
+#################
+
+*****************
+What's new in 3.1
+*****************
+
+Switch from MPTT to MP
+======================
+
+Since django CMS 2.0 we relied on MPTT (Modified Preorder Tree Traversal) for efficiently handling tree structures in the DB.
+Over the years it proved that MPTT was not fast enough for big tree operations (>1000 pages) and regularly
+the tree got corrupted because of transactional errors.
+
+In 3.1 we replaced MPTT for MP (Materialized Path). MP is more efficient and has more error resistance then MPTT.
+It should make the whole django CMS experience way better, faster and reliable.
+
+Bofore upgrading
+----------------
+
+Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
+
+
+Dropped support for Django 1.4 and 1.5
+======================================
+
+Starting from version 3.1 the supported Django versions are 1.6 and 1.7
+
+
+********************
+Incompatible changes
+********************
+
+Migrations moved
+================
+
+Migrations packages has been renamed to the standard layout:
+
+ * Django 1.7 migrations are now into standard ``cms.migrations`` and ``menus.migrations`` packages
+ * South migrations are now in ``cms.south_migrations`` and ``menus.south_migrations`` packages
+
+South 1.0.1 is now required to correctly handle the above layout; if you are upgrading from Django 1.7 / django CMS 3.0.6,
+please remove the old migration path from ``MIGRATION_MODULES`` settings.

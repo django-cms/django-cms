@@ -21,6 +21,7 @@ from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
 from cms.test_utils.tmpdir import temp_dir
 from cms.utils.compat import DJANGO_1_6
+import menus
 
 __doc__ = '''django CMS development helper script. 
 
@@ -175,6 +176,7 @@ def makemessages():
     from django.core.management import call_command
     os.chdir('cms')
     call_command('makemessages', locale=('en',))
+    call_command('makemessages', locale=('en',), domain='djangojs')
 
 
 def shell():
@@ -201,7 +203,8 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
     if DJANGO_1_6:
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
-        call_command('makemigrations', *applications)
+        for application in applications:
+            call_command('schemamigration', application, auto=True)
     else:
         call_command('makemigrations', *applications, merge=merge)
 
@@ -245,7 +248,7 @@ def main():
     args = docopt(__doc__, version=cms.__version__)
 
     if args['pyflakes']:
-        return static_analysis.pyflakes()
+        return static_analysis.pyflakes((cms, menus))
     
     if args['authors']:
         return generate_authors()

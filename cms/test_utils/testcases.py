@@ -94,7 +94,6 @@ class BaseCMSTestCase(object):
         pass
 
     def _post_teardown(self):
-        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
         cache.clear()
         super(BaseCMSTestCase, self)._post_teardown()
@@ -225,10 +224,10 @@ class BaseCMSTestCase(object):
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in qs.order_by('tree_id', 'lft'):
+        for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-            page.pk, page.lft, page.rght, page.tree_id))
+            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -255,11 +254,11 @@ class BaseCMSTestCase(object):
             return
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
-    def copy_page(self, page, target_page):
+    def copy_page(self, page, target_page, position='last-child'):
         from cms.utils.page import get_available_slug
 
         data = {
-            'position': 'last-child',
+            'position': position,
             'target': target_page.pk,
             'site': 1,
             'copy_permissions': 'on',
@@ -274,8 +273,11 @@ class BaseCMSTestCase(object):
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-
-        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
+        if position in ('first-child', 'last-child'):
+            parent = target_page
+        else:
+            parent = target_page.parent
+        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=parent)
         return copied_page
 
     def move_page(self, page, target_page, position="first-child"):
@@ -350,15 +352,10 @@ class BaseCMSTestCase(object):
         if page.parent:
             self.assertEqual(page.parent_id, public_page.parent.publisher_draft.id)
 
-        self.assertEqual(page.level, public_page.level)
+        self.assertEqual(page.depth, public_page.depth)
 
-        # TODO: add check for siblings
-        draft_siblings = list(page.get_siblings(True).filter(
-            publisher_is_draft=True
-        ).order_by('tree_id', 'parent', 'lft'))
-        public_siblings = list(public_page.get_siblings(True).filter(
-            publisher_is_draft=False
-        ).order_by('tree_id', 'parent', 'lft'))
+        draft_siblings = list(Page.objects.filter(parent_id=page.parent_id, publisher_is_draft=True).order_by('path'))
+        public_siblings = list(Page.objects.filter(parent_id=public_page.parent_id, publisher_is_draft=False).order_by('path'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:

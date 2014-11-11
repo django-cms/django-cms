@@ -266,6 +266,15 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixes 2 regressions introduced in 3.0.4
 - apphook and plugins can now be registered via decorator
 
-==== 3.0.6 (unreleased) ===
+==== 3.0.6 (2014-10-07) ===
 - Experimental full Django 1.7 migrations support
 - Add CMSPlugin.get_render_model to get the plugin model at render time
+- Add simplified API to handle toolbar for page extensions
+- Extended custom user model support
+- Added option to publish all the pages in a language / site in publisher_publish command
+- Fixed a few frontend glitches
+- Fixed menu when hide untranslated is set to False
+- Fix sitemap ordering
+- Fix plugin table name generation fixes
+
+=== 3.1 (unreleased) ===

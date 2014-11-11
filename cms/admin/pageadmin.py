@@ -123,7 +123,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/copy-language/$', self.copy_language),
             pat(r'^([0-9]+)/dialog/copy/$', get_copy_dialog),  # copy dialog
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
-            pat(r'^([0-9]+)/jsi18n/$', self.redirect_jsi18n),
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
@@ -144,9 +143,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         url_patterns += super(PageAdmin, self).get_urls()
         return url_patterns
-
-    def redirect_jsi18n(self, request):
-        return HttpResponseRedirect(admin_reverse('jsi18n'))
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""
@@ -177,35 +173,44 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
 
-        if 'recover' in request.path:
+        if 'recover' in request.path_info:
             pk = obj.pk
             if obj.parent_id:
-                parent = Page.objects.get(pk=obj.parent_id)
+                try:
+                    parent = Page.objects.get(pk=obj.parent_id)
+                except Page.DoesNotExist:
+                    parent = None
             else:
                 parent = None
-            obj.lft = 0
-            obj.rght = 0
-            obj.tree_id = 0
-            obj.level = 0
             obj.pk = None
-            obj.insert_at(parent, save=False)
+            obj.path = None
+            obj.numchild = 0
+            obj.depth = 0
+            if parent:
+                parent.add_child(instance=obj)
+            else:
+                obj.add_root(instance=obj)
+            new_pk = obj.pk
+            saved_obj = Page.objects.get(pk=new_pk)
             obj.pk = pk
+            obj.path = saved_obj.path
+            obj.numchild = saved_obj.numchild
+            obj.depth = saved_obj.depth
+            saved_obj.delete()
             obj.save(no_signals=True)
-
         else:
-            if 'history' in request.path:
+            if 'history' in request.path_info:
                 old_obj = Page.objects.get(pk=obj.pk)
-                obj.level = old_obj.level
+                obj.depth = old_obj.depth
                 obj.parent_id = old_obj.parent_id
-                obj.rght = old_obj.rght
-                obj.lft = old_obj.lft
-                obj.tree_id = old_obj.tree_id
+                obj.path = old_obj.path
+                obj.numchild = old_obj.numchild
         new = False
         if not obj.pk:
             new = True
         obj.save()
 
-        if 'recover' in request.path or 'history' in request.path:
+        if 'recover' in request.path_info or 'history' in request.path_info:
             revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
@@ -214,7 +219,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             except self.model.DoesNotExist:
                 pass
             else:
-                obj.move_to(target, position)
+                if position == 'last-child' or position == 'first-child':
+                    obj.parent_id = target.pk
+                else:
+                    obj.parent_id = target.parent_id
+                obj.save()
+                obj.move(target, pos=position)
         page_type_id = form.cleaned_data.get('page_type')
         copy_target_id = request.GET.get('copy_target')
         if copy_target_id or page_type_id:
@@ -228,7 +238,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.save()
             for lang in copy_target.languages.split(','):
                 copy_target._copy_contents(obj, lang)
-        if not 'permission' in request.path:
+        if not 'permission' in request.path_info:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
@@ -249,16 +259,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return form.fieldsets
 
     def get_inline_classes(self, request, obj=None, **kwargs):
-        if obj and 'permission' in request.path:
+        if obj and 'permission' in request.path_info:
             return PERMISSION_ADMIN_INLINES
         return []
 
     def get_form_class(self, request, obj=None, **kwargs):
-        if 'advanced' in request.path:
+        if 'advanced' in request.path_info:
             return AdvancedSettingsForm
-        elif 'permission' in request.path:
+        elif 'permission' in request.path_info:
             return PagePermissionForm
-        elif 'dates' in request.path:
+        elif 'dates' in request.path_info:
             return PublicationDatesForm
         return self.form
 
@@ -293,8 +303,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         self.inlines = self.get_inline_classes(request, obj, **kwargs)
 
         if obj:
-            if 'history' in request.path or 'recover' in request.path:
-                version_id = request.path.split('/')[-2]
+            if 'history' in request.path_info or 'recover' in request.path_info:
+                version_id = request.path_info.split('/')[-2]
             else:
                 version_id = None
 
@@ -443,7 +453,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self._current_page = obj
         response = super(PageAdmin, self).change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
+        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
@@ -687,7 +697,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # is screwed up with the database, so display an error page.
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
-            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+            return HttpResponseRedirect(request.path_info + '?' + ERROR_FLAG + '=1')
         cl.set_items(request)
 
         site_id = request.GET.get('site__exact', None)
@@ -809,7 +819,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
         for plugin in plugins:
             plugin._no_reorder = True
             plugin.delete()
@@ -876,7 +886,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         placeholder_ids = []
         for placeholder in placeholders:
             placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-level')
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
         for plugin in plugins:
             plugin._no_reorder = True
             plugin.delete()
@@ -996,13 +1006,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             source_language = request.POST.get('source_language')
             target_language = request.POST.get('target_language')
             page = Page.objects.get(pk=page_id)
-            placeholders = page.placeholders.all()
+            placeholders = page.get_placeholders()
 
             if not target_language or not target_language in get_language_list():
                 return HttpResponseBadRequest(force_unicode(_("Language must be set to a supported language!")))
             for placeholder in placeholders:
                 plugins = list(
-                    placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                    placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
                 if not self.has_copy_plugin_permission(request, placeholder, placeholder, plugins):
                     return HttpResponseForbidden(force_unicode(_('You do not have permission to copy these plugins.')))
                 copy_plugins.copy_plugins_to(plugins, placeholder, target_language)

@@ -15,6 +15,9 @@ django CMS
 
 Open source enterprise content management system based on the django framework.
 
+.. ATTENTION:: This is the **develop** branch. For the latest stable release,
+   please see use the **master** branch.
+
 ********
 Features
 ********
@@ -37,11 +40,11 @@ You can define editable areas, called placeholders, in your templates which you 
 with many different so called CMS content plugins.
 A list of all the plugins can be found here:
 
-`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_ 
+`3rd party plugins <http://www.djangopackages.com/grids/g/django-cms/>`_
 
 Should you be unable to find a suitable plugin for you needs, writing your own is very simple.
 
-More information on `our website <http://www.django-cms.org>`_. 
+More information on `our website <http://www.django-cms.org>`_.
 
 *************
 Documentation
@@ -82,7 +85,7 @@ Credits
 
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
-  `django-mptt <https://github.com/django-mptt/django-mptt>`_.
+  `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
 * Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
   `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_

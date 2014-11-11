@@ -434,8 +434,7 @@ $(document).ready(function () {
 			if(!buttons.length) {
 				row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
 				buttons = row.find('input[type="submit"], button[type="submit"]');
-				buttons.attr('name', '_save')
-					.addClass('deletelink')
+				buttons.addClass('deletelink')
 					.hide();
 			}
 			// attach relation id
@@ -495,6 +494,9 @@ $(document).ready(function () {
 		_loadContent: function (url, name) {
 			var that = this;
 
+			// FIXME: A better fix is needed for '&' being interpreted as the
+			// start of en entity by jQuery. See #3404
+			url = url.replace('&', '&amp;');
 			// now refresh the content
 			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
 				iframe.css('visibility', 'hidden');

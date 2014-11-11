@@ -8,16 +8,21 @@ from cms.utils.compat.dj import force_unicode
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option(
-            '-l', '--language',
-            dest='language',
-            help='Languages to publish',
-        ),
-        make_option(
             '--unpublished',
             action='store_true',
             dest='include_unpublished',
             default=False,
             help='Include unpublished drafts',
+        ),
+        make_option(
+            '-l', '--language',
+            dest='language',
+            help='Language code to publish',
+        ),
+        make_option(
+            '-s', '--site',
+            dest='site',
+            help='Site id to publish',
         ),
     )
 
@@ -26,9 +31,18 @@ class Command(NoArgsCommand):
         """
         include_unpublished = options.get('include_unpublished')
         language = options.get('language')
-        self.publish_pages(language, include_unpublished)
+        site = options.get('site')
+        if site:
+            try:
+                site = int(site)
+            except ValueError:
+                site = None
+        else:
+            site = None
 
-    def publish_pages(self, language, include_unpublished):
+        self.publish_pages(include_unpublished, language, site)
+
+    def publish_pages(self, include_unpublished, language, site):
         from cms.models import Page
         from cms.utils.compat.dj import get_user_model
         from cms.utils.permissions import set_current_user
@@ -46,6 +60,9 @@ class Command(NoArgsCommand):
         qs = Page.objects.drafts()
         if not include_unpublished:
             qs = qs.filter(title_set__published=True).distinct()
+        if site:
+            qs = qs.filter(site_id=site)
+
         pages_total, pages_published = qs.count(), 0
 
         self.stdout.write(u"\nPublishing public drafts....\n")

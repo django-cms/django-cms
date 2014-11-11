@@ -93,9 +93,9 @@ class DefaultLanguageChanger(object):
             else:
                 page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
-                self._app_path = self.request.path[len(page_path):]
+                self._app_path = self.request.path_info[len(page_path):]
             else:
-                self._app_path = self.request.path
+                self._app_path = self.request.path_info
         return self._app_path
 
     def get_page_path(self, lang):
@@ -119,7 +119,7 @@ class DefaultLanguageChanger(object):
         page_language = get_language_from_request(self.request)
         with force_language(page_language):
             try:
-                view = resolve(self.request.path)
+                view = resolve(self.request.path_info)
             except:
                 view = None
         if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:

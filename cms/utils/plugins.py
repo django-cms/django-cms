@@ -109,7 +109,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                 # Check if it quacks like a template object, if not
                 # presume is a template path and get the object out of it
                 if not callable(getattr(node.template, 'render', None)):
-                    template = get_template(force_unicode(node.template).strip('"'))
+                    template = get_template(node.template.var)
                 else:
                     template = node.template
                 placeholders += _scan_placeholders(template.nodelist, current_block)
@@ -212,7 +212,7 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     lang = lang or get_language_from_request(request)
     request_lang = lang
     qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
-        'placeholder', 'tree_id', 'level', 'position')
+        'placeholder', 'path')
     plugins = list(qs)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins

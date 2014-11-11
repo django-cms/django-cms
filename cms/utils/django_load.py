@@ -25,7 +25,7 @@ def get_module(app, modname, verbose, failfast):
     # the module *should* exist - raise an error if it doesn't
     app_mod = import_module(app)
     try:
-        imp.find_module(modname, app_mod.__path__)
+        imp.find_module(modname, app_mod.__path__ if hasattr(app_mod, '__path__') else None)
     except ImportError:
         # this ImportError will be due to the module not existing
         # so here we can silently ignore it.  But an ImportError
