@@ -7,13 +7,12 @@ CMS's powerful front-end editing mode.
 This guide is suitable for non-technical and technical audiences alike.
 
 This guide can only cover the basics that are common to most sites built
-using django CMS.
-Your own site will likely have many customizations and special purpose plugins
-which we cannot cover here.
+using django CMS. Your own site will likely have many customisations and special
+purpose plugins which we cannot cover here.
+
 Nevertheless, by the end of this guide you should be comfortable with the content
-editing process using django CMS.
-Many of the skills you'll learn will be transferable to any custom plugins your
-site may have.
+editing process using django CMS. Many of the skills you'll learn will be
+transferable to any custom plugins your site may have.
 
 ***************
 Getting Started
