@@ -268,4 +268,5 @@ Create and Edit Content
 
 :TODO: Should cover the common flows of creating/editing content through the front-end
 
-
+Developers may wish to read the technical :doc:`/introduction/index` for a walkthrough of the
+main features of django CMS.
