@@ -14,7 +14,7 @@ Requirements
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
 * `Django`_ 1.6.x or 1.7.x
-* `South`_ 1.0
+* `South`_ 1.0.1 (Only required for Django 1.6.x)
 * `django-classy-tags`_ 0.5 or higher
 * `django-treebeard`_ 2.0
 * `django-sekizai`_ 0.7 or higher
@@ -25,14 +25,6 @@ Requirements
 
 .. note:: When installing the django CMS using pip, all of the dependencies
           will be installed automatically.
-
-.. note:: There is currently a bug in South 1.0 that is incompatible with Python 3.x.
-          If you are running Python 3.x, you will need to install South from version
-          control: ``pip install https://bitbucket.org/andrewgodwin/south/get/e2c9102ee033.zip#egg=South``
-
-.. warning:: While django CMS is compatible with Django 1.5.x, this version of Django
-             is no longer supported by the Django team. Please upgrade to
-             Django 1.6.x or 1.7.x immediately.
 
 .. _Python: https://www.python.org
 .. _Django: https://www.djangoproject.com
@@ -84,9 +76,7 @@ Revision management
 -------------------
 
 * `django-reversion`_ 1.8.X (with Django 1.6.X and Django 1.7.X) to support
-  versions of your content (If using a different Django version it is a good
-  idea to check the page `Compatible-Django-Versions`_ in the django-reversion
-  wiki in order to make sure that the package versions are compatible.)
+  versioning of your content.
 
   .. note::
 
@@ -147,7 +137,7 @@ its dependencies:
     # lock-in their version, specify them
     Django>=1.7
 
-    South==1.0
+    South==1.0.1 # Only needed for Django < 1.7
     django-treebeard==2.0
     django-sekizai==0.7
     django-classy-tags==0.5
@@ -156,10 +146,10 @@ its dependencies:
     six==1.3.0
 
     # Optional, recommended packages
-    Pillow==2.0.0
-    django-filer==0.9.5
-    cmsplugin-filer==0.9.5
-    django-reversion==1.7
+    Pillow>=2
+    django-filer==0.9.8
+    cmsplugin-filer==0.10.1
+    django-reversion==1.8
 
 .. note::
 
@@ -320,7 +310,7 @@ other highly recommended applications/libraries::
     'cms',  # django CMS itself
     'treebeard',  # utilities for implementing a tree using materialised paths
     'menus',  # helper for model independent hierarchical website navigation
-    'south',  # intelligent schema and data migrations
+    'south',  # Only needed for Django < 1.7
     'sekizai',  # for javascript and css management
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
@@ -613,10 +603,9 @@ HTML tag.
 Initial database setup
 ======================
 
-This command depends on whether you **upgrade** your installation or do a
-**fresh install**. We recommend that you get familiar with the way `South`_ works,
-as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
-
+django CMS uses Django 1.7's built-in support for database migrations to manage
+creating and altering database tables. django CMS still offers South-style migrations
+for users of Django 1.6.x but as noted above, strictly requires South==1.0.1.
 
 Fresh install
 -------------
@@ -626,28 +615,20 @@ If you are using Django 1.7 or later run::
     python manage.py migrate
     python manage.py createsuperuser
 
-.. note:: You will need to add the following setting in order for Django to pick up the new style migrations for django CMS:
-
-::
-
-    MIGRATION_MODULES = {
-        'cms': 'cms.migrations_django',
-        'menus': 'menus.migrations_django',
-    }
-
-If you are using Django 1.6 or earlier supported versions run::
+If you are using Django 1.6.x run::
 
     python manage.py syncdb --all
     python manage.py migrate --fake
 
-The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and enter appropriate values.
+The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and
+enter appropriate values.
 
 Upgrade
 -------
 
-Run::
+If you are upgrading your installation of django CMS from a previous version run::
 
-    python manage.py syncdb
+    python manage.py syncdb # Django 1.6.x only
     python manage.py migrate
 
 
