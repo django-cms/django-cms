@@ -53,10 +53,10 @@ menu:
 
 This menu contains jump links which open up administration controls in a side-frame.
 
-* "Pages ..." takes you directly to the pages editing interface
-* "Users ..." takes you directly to the users management panel
-* "Administration ..." takes you to the site-wide administration panel
-* "User settings ..." allows you to switch the language of the admin interface and toolbar
+* *Pages ...* takes you directly to the pages editing interface
+* *Users ...* takes you directly to the users management panel
+* *Administration ...* takes you to the site-wide administration panel
+* *User settings ...* allows you to switch the language of the admin interface and toolbar
 
 You can also logout from this menu.
 
