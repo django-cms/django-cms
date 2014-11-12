@@ -35,10 +35,11 @@ from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from cms.test_utils.project.placeholderapp.models import (
-    Example1,
-    TwoPlaceholderExample,
+    CharPksExample,
     DynamicPlaceholderSlotExample,
-    MultilingualExample1
+    Example1,
+    MultilingualExample1,
+    TwoPlaceholderExample,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
@@ -861,6 +862,41 @@ class PlaceholderModelTests(CMSTestCase):
         add_plugin(ph, TextPlugin, 'en', body='en body')
         result = [f.name for f in list(ph._get_attached_fields())]
         self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
+
+
+class FrontendEditableAdminMixinTest(CMSTestCase):
+
+    def get_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[CharPksExample]
+
+    def test_url_char_pk(self):
+        ex = CharPksExample(
+            char_1='one',
+            slug='some-Special_slug_123',
+        )
+        ex.save()
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            response = self.client.get(admin_reverse('placeholderapp_charpksexample_edit_field', args=(ex.pk, 'en')),
+                                       data={'edit_fields': 'char_1'})
+            # if we get a respose pattern matches
+            self.assertEqual(response.status_code, 200)
+
+    def test_url_numeric_pk(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            response = self.client.get(admin_reverse('placeholderapp_example1_edit_field', args=(ex.pk, 'en')),
+                                       data={'edit_fields': 'char_1'})
+            # if we get a respose pattern matches
+            self.assertEqual(response.status_code, 200)
 
 
 class PlaceholderAdminTestBase(CMSTestCase):
