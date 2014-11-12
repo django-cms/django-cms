@@ -76,7 +76,7 @@ $color-background-blue-hover: #e6f6fd;
 	li.open ul.last { border-bottom:none !important; }
 §
 	li .col1 > div { text-align:center; }
-	li .col1 .title { background:none; }
+	li .col1 .title { background:none; white-space: nowrap; }
 	li .col1 .success { color:$color-font; padding-left:10px; }
 	li .col1 a.changelink { display:none; line-height:27px; margin:6px 0 0 10px !important; }
 	li .col1 .title, li .col1 .success { float:left; line-height:29px; height:28px; padding-left:20px; }
