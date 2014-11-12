@@ -90,7 +90,7 @@ Now, click the "add page" button at the top right-hand corner of the side-frame.
 
 This is a basic form where you complete the title of the new page. The slug
 field is also required but a sensible value will be completed as you type the
-page’s title.
+page's title.
 
 The remaining fields are optional but are worth a quick review. "Menu title" is
 used to override what is displayed in the navigation. For example, you may want
@@ -125,7 +125,7 @@ Click "Advanced Settings" to reveal the additional settings for the page.
   url for the page is the slug of the current page prefixed with slugs from parent
   pages. For example, the default url for a page might be "/about/acme-incorporated/our-vision/".
   The "Overwrite URL" field allows you to shorten this to "/our-vision/" while
-  still keeping the page organized under the "About" page in the navigation.
+  still keeping the page and its children organized under the "About" page in the navigation.
 * "Redirect" allows you to redirect users to a different page. This is useful if
   you have moved content to another page but don't want to break urls your users
   may have bookmarked or affect the rank of the page in search engine results.
@@ -137,7 +137,7 @@ Click "Advanced Settings" to reveal the additional settings for the page.
   without consulting developers may result in a broken site.
 * "Soft root" allows you to shorten the navigation hierarchy to something manageable
   on sites that have deeply nested pages. When selected, this page will act as the
-  top-level page in the navigation
+  top-level page in the navigation.
 * "Attached menu" allows you to add a custom menu to the page. This is typically
   used by developers to add custom menu logic to the current page. Changing this
   requires a server restart so should only be changed in consultation with developers.
@@ -147,7 +147,7 @@ Click "Advanced Settings" to reveal the additional settings for the page.
 * "X Frame Options" allows you to control whether the current page can be embedded
   in an iframe on another web page.
 
-For now, let's leave these fields blank and simply click 'Save'. The side-frame
+For now, let's leave these fields blank and simply select 'Save'. The side-frame
 will redirect you back to the main list of pages.
 
 |my-first-page|
@@ -155,10 +155,10 @@ will redirect you back to the main list of pages.
 .. |my-first-page| image:: ../images/my-first-page.png
 
 The side-frame itself has a few controls. The "x" closes the side-frame. To reopen
-the side-frame, click one of the jump links from site administration menu (e.g.
-under "example.com"). The other two side-frame controls minimze and maximize the side-frame.
+the side-frame, choose one of the links from site administration menu (e.g.
+under "example.com"). The other two side-frame controls minimise and maximise the side-frame.
 
-In the Pages admin itself, there are a couple indicators and controls for pages.
+In the Pages admin itself, there are a couple of indicators and controls for pages.
 In the above image, the column "EN-US" has a circle indicating whether the "EN-US"
 version of a page is published. A green circle indicates that it is published and
 a grey circle indicates it is only a "Draft". The "Menu" column indicates whether
@@ -196,11 +196,11 @@ Publishing a page
 There are multiple ways to publish a page including a blue "Publishe page now"
 button on the right side of the toolbar if the page is not currently
 published. Other ways include a "Publish page" menu item in the "Page" menu in
-the toolbar and a publish link inside the "tool-tip" over the colored, round
+the toolbar and a publish link inside the "tool-tip" over the coloured, round
 icon in the language column of the page tree. The latter is useful for
 publishing pages without first navigating to them.
 
-Please review this image of the page-tree in the side-frame maximized with the
+Please review this image of the page-tree in the side-frame maximised with the
 page menu invoked.
 
 |page-options|
@@ -212,7 +212,7 @@ Menus
 ~~~~~
 
 If you would like your page to appear in your menu (or not), you should
-familiarize yourself with the option to include or exclude the page from
+familiarise yourself with the option to include or exclude the page from
 menus.
 
 Reviewing the image in `publishing a page`_ above, you should also see the
@@ -231,7 +231,7 @@ Template
 Choosing a template for your page is as simple as selecting the desired
 template from the "Templates" sub-menu (see image in `publishing a page`_
 above). The list of available templates is determined by the CMS_TEMPLATES
-list as defined in your project’s settings.
+list as defined in your project's settings.
 
 
 Adding content to a page
@@ -241,14 +241,14 @@ So far, our page doesn't do much. Make sure it's marked as "published" (see
 above), then click on the page's "edit" button.
 
 To add content to your page, click the "structure" mode-button in the toolbar.
-This will reveal all of the page’s available placeholders and allow you to add
+This will reveal all of the page's available placeholders and allow you to add
 CMS plugin instances to them.
 
 On any placeholder, click the menu icon on the right side to reveal the list
 of available plugins. In this case, we'll choose the Text plugin. Invoking the
 Text plugin will display your installed WYSIWYG Text editor plugin. Type in
 some text and press "Save". When you save the plugin, your plugin will now be
-displayed "inside" the placeholder as shown in this progession of images.
+displayed "inside" the placeholder as shown in this progression of images.
 
 |add-text-plugin|
 
