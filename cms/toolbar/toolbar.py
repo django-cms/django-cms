@@ -77,7 +77,21 @@ class CMSToolbar(ToolbarAPIMixin):
             self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
-                self.app_name = resolve(self.request.path).app_name
+                decorator = resolve(self.request.path_info).func
+                try:
+                    # If the original view is decorated we try to extract the real function
+                    # module instead of the decorator's one
+                    if decorator and getattr(decorator, 'func_closure', False):
+                        # python 2
+                        self.app_name = decorator.func_closure[0].cell_contents.__module__
+                    elif decorator and getattr(decorator, '__closure__', False):
+                        # python 3
+                        self.app_name = decorator.__closure__[0].cell_contents.__module__
+                    else:
+                        raise AttributeError()
+                except (TypeError, AttributeError):
+                    # no decorator
+                    self.app_name = decorator.__module__
             except Resolver404:
                 self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
@@ -86,7 +100,9 @@ class CMSToolbar(ToolbarAPIMixin):
         app_key = ''
         for key in toolbars:
             app_name = ".".join(key.split(".")[:-2])
-            if app_name == self.app_name and len(key) > len(app_key):
+            if (self.app_name and app_name and
+                    self.app_name.startswith(app_name) and
+                    len(key) > len(app_key)):
                 app_key = key
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, key == app_key, app_key)
@@ -242,7 +258,7 @@ class CMSToolbar(ToolbarAPIMixin):
     def _request_hook_get(self):
         if 'cms-toolbar-logout' in self.request.GET:
             logout(self.request)
-            return HttpResponseRedirect(self.request.path)
+            return HttpResponseRedirect(self.request.path_info)
 
     def _request_hook_post(self):
         # login hook
@@ -253,7 +269,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 if REDIRECT_FIELD_NAME in self.request.GET:
                     return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME])
                 else:
-                    return HttpResponseRedirect(self.request.path)
+                    return HttpResponseRedirect(self.request.path_info)
             else:
                 if REDIRECT_FIELD_NAME in self.request.GET:
                     return HttpResponseRedirect(self.request.GET[REDIRECT_FIELD_NAME]+"?cms-toolbar-login-error=1")

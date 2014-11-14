@@ -94,7 +94,6 @@ class BaseCMSTestCase(object):
         pass
 
     def _post_teardown(self):
-        # Needed to clean the menu keys cache, see menu.menu_pool.clear()
         menu_pool.clear()
         cache.clear()
         super(BaseCMSTestCase, self)._post_teardown()

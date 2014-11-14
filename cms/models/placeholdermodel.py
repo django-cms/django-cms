@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
+from cms.utils.urlutils import admin_reverse
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
@@ -18,9 +18,16 @@ from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 
 @python_2_unicode_compatible
 class Placeholder(models.Model):
-    slot = models.CharField(_("slot"), max_length=50, db_index=True, editable=False)
+    """
+    Attributes:
+        is_static       Set to "True" for static placeholders by the template tag
+        is_editable     If False the content of the placeholder is not editable in the frontend
+    """
+    slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
     cache_placeholder = True
+    is_static = False
+    is_editable = True
 
     class Meta:
         app_label = 'cms'
@@ -87,11 +94,11 @@ class Placeholder(models.Model):
         if pk:
             args.append(pk)
         if not model:
-            return reverse('admin:cms_page_%s' % key, args=args)
+            return admin_reverse('cms_page_%s' % key, args=args)
         else:
             app_label = model._meta.app_label
             model_name = model.__name__.lower()
-            return reverse('admin:%s_%s_%s' % (app_label, model_name, key), args=args)
+            return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
     def _get_permission(self, request, key):
         """
@@ -107,21 +114,10 @@ class Placeholder(models.Model):
             return self._get_object_permission(obj, request, key)
 
     def _get_object_permission(self, obj, request, key):
-        found = False
-        model = obj.__class__
-        opts = model._meta
+        opts = obj._meta
         perm_accessor = getattr(opts, 'get_%s_permission' % key)
         perm_code = '%s.%s' % (opts.app_label, perm_accessor())
-        # if they don't have the permission for this attached model or object, bail out
-        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
-            return False
-        else:
-            found = True
-        if not (request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)):
-            return False
-        else:
-            found = True
-        return found
+        return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
 
     def has_change_permission(self, request):
         return self._get_permission(request, 'change')
@@ -132,14 +128,17 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def render(self, context, width, lang=None):
+    def render(self, context, width, lang=None, editable=True):
+        '''
+        Set editable = False to disable front-end rendering for this render.
+        '''
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
             context.update({'width': width})
-        return render_placeholder(self, context, lang=lang)
+        return render_placeholder(self, context, lang=lang, editable=editable)
 
     def _get_attached_fields(self):
         """

@@ -1,9 +1,9 @@
-{% extends "admin/change_form.html" %}{% load i18n %}{% load url from future %}
+{% extends "admin/change_form.html" %}{% load i18n cms_tags %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-	<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-	&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
+	<a href="{% cms_admin_url 'index' %}">{% trans 'Home' %}</a>
+	&rsaquo; <a href="{% cms_admin_url 'app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
 	&rsaquo; {{ opts.verbose_name_plural|capfirst }}
 	&rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>

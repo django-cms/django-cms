@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.db.models import Q
+import copy
 from functools import wraps
 import json
 import sys
-from cms.toolbar_pool import toolbar_pool
-from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -16,8 +14,8 @@ from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
-from django.core.urlresolvers import reverse
 from django.db import router
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
@@ -26,28 +24,30 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
-from cms.admin.placeholderadmin import PlaceholderAdminMixin
-from cms.plugin_pool import plugin_pool
-from cms.utils.conf import get_cms_setting
-from cms.utils.compat.dj import force_unicode, is_installed
-from cms.utils.compat.urls import unquote
-from cms.utils.helpers import find_placeholder_relation
-from cms.utils.urlutils import add_url_parameters
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
 from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
                              PublicationDatesForm)
 from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
+from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
+from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
+from cms.plugin_pool import plugin_pool
+from cms.toolbar_pool import toolbar_pool
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.admin import jsonify_request
+from cms.utils.compat.dj import force_unicode, is_installed
+from cms.utils.compat.urls import unquote
+from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import find_placeholder_relation
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
 from cms.utils.compat import DJANGO_1_4
 from cms.utils.transaction import wrap_transaction
+from cms.utils.urlutils import add_url_parameters, admin_reverse
 
 require_POST = method_decorator(require_POST)
 
@@ -146,7 +146,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return url_patterns
 
     def redirect_jsi18n(self, request):
-        return HttpResponseRedirect(reverse('admin:jsi18n'))
+        return HttpResponseRedirect(admin_reverse('jsi18n'))
 
     def get_revision_instances(self, request, object):
         """Returns all the instances to be used in the object's revision."""
@@ -177,7 +177,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
 
-        if 'recover' in request.path:
+        if 'recover' in request.path_info:
             pk = obj.pk
             if obj.parent_id:
                 parent = Page.objects.get(pk=obj.parent_id)
@@ -193,7 +193,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.save(no_signals=True)
 
         else:
-            if 'history' in request.path:
+            if 'history' in request.path_info:
                 old_obj = Page.objects.get(pk=obj.pk)
                 obj.level = old_obj.level
                 obj.parent_id = old_obj.parent_id
@@ -205,7 +205,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             new = True
         obj.save()
 
-        if 'recover' in request.path or 'history' in request.path:
+        if 'recover' in request.path_info or 'history' in request.path_info:
             revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
@@ -228,7 +228,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.save()
             for lang in copy_target.languages.split(','):
                 copy_target._copy_contents(obj, lang)
-        if not 'permission' in request.path:
+        if not 'permission' in request.path_info:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
@@ -249,16 +249,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return form.fieldsets
 
     def get_inline_classes(self, request, obj=None, **kwargs):
-        if obj and 'permission' in request.path:
+        if obj and 'permission' in request.path_info:
             return PERMISSION_ADMIN_INLINES
         return []
 
     def get_form_class(self, request, obj=None, **kwargs):
-        if 'advanced' in request.path:
+        if 'advanced' in request.path_info:
             return AdvancedSettingsForm
-        elif 'permission' in request.path:
+        elif 'permission' in request.path_info:
             return PagePermissionForm
-        elif 'dates' in request.path:
+        elif 'dates' in request.path_info:
             return PublicationDatesForm
         return self.form
 
@@ -270,6 +270,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         language = get_language_from_request(request, obj)
         form_cls = self.get_form_class(request, obj)
         form = super(PageAdmin, self).get_form(request, obj, form=form_cls, **kwargs)
+        # get_form method operates by overriding initial fields value which
+        # may persist across invocation. Code below deepcopies fields definition
+        # to avoid leaks
+        for field in form.base_fields.keys():
+            form.base_fields[field] = copy.deepcopy(form.base_fields[field])
 
         if 'language' in form.base_fields:
             form.base_fields['language'].initial = language
@@ -288,8 +293,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         self.inlines = self.get_inline_classes(request, obj, **kwargs)
 
         if obj:
-            if 'history' in request.path or 'recover' in request.path:
-                version_id = request.path.split('/')[-2]
+            if 'history' in request.path_info or 'recover' in request.path_info:
+                version_id = request.path_info.split('/')[-2]
             else:
                 version_id = None
 
@@ -438,7 +443,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self._current_page = obj
         response = super(PageAdmin, self).change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path:
+        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         return response
@@ -682,7 +687,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # is screwed up with the database, so display an error page.
             if ERROR_FLAG in request.GET.keys():
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
-            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+            return HttpResponseRedirect(request.path_info + '?' + ERROR_FLAG + '=1')
         cl.set_items(request)
 
         site_id = request.GET.get('site__exact', None)
@@ -711,7 +716,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             'cl': cl,
             'opts': opts,
             'has_add_permission': self.has_add_permission(request),
-            'root_path': reverse('admin:index'),
+            'root_path': admin_reverse('index'),
             'app_label': app_label,
             'preview_language': language,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
@@ -1096,10 +1101,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseRedirect(request.GET['redirect'])
         referrer = request.META.get('HTTP_REFERER', '')
 
-        path = reverse("admin:cms_page_changelist")
+        path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
-        if reverse('admin:index') not in referrer:
+        if admin_reverse('index') not in referrer:
             if all_published:
                 if page:
                     if page.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
@@ -1171,7 +1176,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         except ValidationError:
             exc = sys.exc_info()[1]
             messages.error(request, exc.message)
-        path = reverse("admin:cms_page_changelist")
+        path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         return HttpResponseRedirect(path)
@@ -1193,7 +1198,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         referer = request.META.get('HTTP_REFERER', '')
         path = '../../'
-        if reverse('admin:index') not in referer:
+        if admin_reverse('index') not in referer:
             path = '%s?%s' % (referer.split('?')[0], get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         return HttpResponseRedirect(path)
 
@@ -1286,7 +1291,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
             "opts": opts,
-            "root_path": reverse('admin:index'),
+            "root_path": admin_reverse('index'),
             "app_label": app_label,
         }
         context.update(extra_context or {})
@@ -1343,7 +1348,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         type_title, created = Title.objects.get_or_create(page=type_root, language=language, slug=PAGE_TYPES_ID,
                                                           defaults={'title': _('Page Types')})
 
-        url = add_url_parameters(reverse('admin:cms_page_add'), target=type_root.pk, position='first-child',
+        url = add_url_parameters(admin_reverse('cms_page_add'), target=type_root.pk, position='first-child',
                                  add_page_type=1, copy_target=target, language=language)
 
         return HttpResponseRedirect(url)

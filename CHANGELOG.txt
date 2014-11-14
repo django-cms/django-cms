@@ -232,7 +232,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added changeable strings for "?edit", "?edit_off" and "?build" urls
 - utils.page_resolver was optimized. get_page_from_path() api changed
 
-==== 3.0.3 (2014-06-XX) ===
+==== 3.0.3 (2014-07-07) ===
 - Added an alias plugin for referencing plugins and placeholders
 - Added an api to change the context menus of plugins and placeholders from plugins
 - Apphooks respect the page permissions
@@ -245,3 +245,34 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - fallback language fixes for pages
 - Implemented transaction.atomic in django 1.4/1.5 way
 - Added a automatic dynamic template directory for page templates
+
+==== 3.0.4 (2014-08-16) ===
+- Removed file cms/utils/compat/type_checks.py, use django.utils.six module instead
+- Removed file cms/utils/compat/string_io.py, use django.utils.six module instead
+- Removed file cms/utils/compat/input.py, use django.utils.six module instead
+- Use PY3 from django.utils.six instead of PY2 from cms.utils.compat to check Python version
+- Staticplaceholders have not their own permissions
+- Apphooks support now nested namespaces
+- Apphooks can now exclude module for page permission checking
+- fixed the permissions for plugins on apphook pages
+- Allow the use of custom admin sites that do not reside under the 'admin' namespace
+- Added django 1.7 migrations
+- updated docs
+- slots for placeholders can now be 255 characters long
+- Plugin pool initialises incorrectly if database is down during first request
+- some refactoring and simplifications
+
+==== 3.0.5 (2014-08-20) ===
+- Fixes 2 regressions introduced in 3.0.4
+- apphook and plugins can now be registered via decorator
+
+==== 3.0.6 (2014-10-07) ===
+- Experimental full Django 1.7 migrations support
+- Add CMSPlugin.get_render_model to get the plugin model at render time
+- Add simplified API to handle toolbar for page extensions
+- Extended custom user model support
+- Added option to publish all the pages in a language / site in publisher_publish command
+- Fixed a few frontend glitches
+- Fixed menu when hide untranslated is set to False
+- Fix sitemap ordering
+- Fix plugin table name generation fixes

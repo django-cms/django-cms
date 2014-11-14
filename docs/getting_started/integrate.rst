@@ -12,9 +12,9 @@ outline the steps necessary for you to follow the :doc:`tutorial`.
 Requirements
 ************
 
-* `Python`_ 2.6, 2.7 or 3.3.
-* `Django`_ 1.4.5, 1.5.x or 1.6.x
-* `South`_ 0.8.4 or higher
+* `Python`_ 2.6, 2.7, 3.3 or 3.4.
+* `Django`_ 1.4.x, 1.5.x, 1.6.x or 1.7.x
+* `South`_ 1.0
 * `django-classy-tags`_ 0.5 or higher
 * `django-mptt`_ 0.6 (strict due to API compatibility issues)
 * `django-sekizai`_ 0.7 or higher
@@ -23,17 +23,24 @@ Requirements
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
 
-.. note:: When installing the django CMS using pip, Django, django-mptt
-          django-classy-tags, django-sekizai, south and html5lib will be
-          installed automatically.
+.. note:: When installing the django CMS using pip, all of the dependencies
+          will be installed automatically.
 
-.. _Python: http://www.python.org
-.. _Django: http://www.djangoproject.com
+.. note:: There is currently a bug in South 1.0 that is incompatible with Python 3.x.
+          If you are running Python 3.x, you will need to install South from version
+          control: ``pip install https://bitbucket.org/andrewgodwin/south/get/e2c9102ee033.zip#egg=South``
+
+.. warning:: While django CMS is compatible with Django 1.5.x, this version of Django
+             is no longer supported by the Django team. Please upgrade to
+             Django 1.6.x or 1.7.x immediately.
+
+.. _Python: https://www.python.org
+.. _Django: https://www.djangoproject.com
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-mptt: https://github.com/django-mptt/django-mptt
 .. _django-sekizai: https://github.com/ojii/django-sekizai
-.. _html5lib: http://code.google.com/p/html5lib/
+.. _html5lib: https://github.com/html5lib/html5lib-python
 .. _django-i18nurls: https://github.com/brocaar/django-i18nurls
 .. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
@@ -76,15 +83,15 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ 1.6.6 (with Django 1.4.X), 1.7 (with Django 1.5.X)
-  or 1.8 (with Django 1.6.X)  to support versions of your content (If using
+* `django-reversion`_ 1.6.6 (with Django 1.4.X), 1.7.X and 1.8 (exact) (with Django 1.5.X)
+  or 1.8.X (with Django 1.6.X and Django 1.7.X) to support versions of your content (If using
   a different Django version it is a good idea to check the page
   `Compatible-Django-Versions`_ in the django-reversion wiki in order
   to make sure that the package versions are compatible.)
 
   .. note::
 
-    As of django CMS 2.4, only the most recent 25 published revisions are
+    As of django CMS 3.0.x, only the most recent 10 published revisions are
     saved. You can change this behaviour if required with
     :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS`. Be aware that saved revisions
     will cause your database size to increase.
@@ -102,31 +109,32 @@ Installing
 Installing in a virtualenv using pip
 ====================================
 
-``pip install django-cms``
-
 Installing inside a `virtualenv`_ is the preferred way to install any Django
-installation. This should work on any platform where python in installed.
-The first step is to create the virtualenv:
+installation.
 
 .. code-block:: bash
 
-  #!/bin/sh
   sudo pip install --upgrade virtualenv
-  virtualenv --distribute --no-site-packages env
+  virtualenv env
 
-.. note:: Since virtualenv v1.10 (2013-07-23) --distribute or --setuptools are
-          the same because the new setuptools has been merged with Distribute.
-          Since virtualenv v1.7 (2011-11-30) --no-site-packages was made the
-          default behavior. By the way, we can create a virtualenv typing in our
-          console only `virtualenv env`.
+.. note:: If you are *not* using a system-wide install of Python (such as with Homebrew),
+          omit the usage of ``sudo`` when installing via ``pip``.
 
-You can switch to your virtualenv at the command line by typing:
+Switch to the virtualenv at the command line by typing:
 
 .. code-block:: bash
 
   source env/bin/activate
 
-Next, you can install packages one at a time using `pip`_, but we recommend
+Next, install the CMS:
+
+.. code-block:: bash
+
+  pip install django-cms
+
+This will automatically install all of the `requirements`_ listed above.
+
+While you could install packages one at a time using `pip`_, we recommend
 using a `requirements.txt`_ file. The following is an example
 requirements.txt file that can be used with pip to install django CMS and
 its dependencies:
@@ -138,14 +146,14 @@ its dependencies:
 
     # These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
-    Django>=1.6
+    Django>=1.7
 
-    South==0.8.4
+    South==1.0
     django-mptt==0.6
     django-sekizai==0.7
     django-classy-tags==0.5
     djangocms-admin-style==0.2.2
-    html5lib==1.0b1
+    html5lib==0.999
     six==1.3.0
 
     # Optional, recommended packages
@@ -158,100 +166,100 @@ its dependencies:
 
     In the above list, packages are pinned to specific version as an example;
     those are not mandatory versions; refer to `requirements`_
-    for any version-specific restriction
+    for any version-specific restrictions.
 
-for Postgresql you would also add:
-
-::
-
-    psycopg2==2.5
-
-and install libpq-dev (on Debian-based distro)
-
-for MySQL you would also add:
+If you are using PostgreSQL as your database, add the Python adapter to your
+requirements file:
 
 ::
 
-    mysql-python==1.2.4
+    psycopg2
 
-and install libmysqlclient-dev (on Debian-based distro)
+For MySQL you would instead add:
 
-One example of a script to create a virtualenv Python environment is as follows:
+::
 
-.. code-block:: bash
+    mysql-python
 
-  #!/bin/sh
-  env/bin/pip install --download-cache=~/.pip-cache -r requirements.txt
+.. note::
+
+    While the django CMS is compatible with Python 3.3+, the ``mysql-python`` package is not.
+
+Before you install the Python adapters for your chosen database, you will need to first
+install the appropriate headers and development libraries. See the platform specific notes below.
 
 .. _virtualenv: http://www.virtualenv.org
 .. _pip: http://www.pip-installer.org
 .. _requirements.txt: http://www.pip-installer.org/en/latest/cookbook.html#requirements-files
 
 
-Installing globally on Ubuntu
-=============================
+Installing on Ubuntu
+====================
 
-.. warning::
-
-    The instructions here install certain packages, such as Django, South, Pillow
-    and django CMS globally, which is not recommended. We recommend you use
-    `virtualenv`_ instead (see above).
-
-If you're using Ubuntu (tested with 10.10), the following should get you
+If you're using Ubuntu (tested with 14.04), the following should get you
 started:
 
 .. code-block:: bash
 
-    sudo aptitude install python2.6 python-setuptools
+    sudo aptitude install python-pip
+    sudo pip install virtualenv
+
+Next, install the appropriate libraries to build the Python adapters
+for your selected database. For PostgreSQL:
+
+.. code-block:: bash
+
+    sudo aptitude install libpq-dev postgresql-client-9.3 python-dev
+
+For MySQL:
+
+.. code-block:: bash
+
+    sudo aptitude install libmysqlclient-dev python-dev
+
+Installing and configuring database servers are beyond the scope of this document.
+See `Databases`_ below for more information and related links.
+
+Installing on Mac OSX
+=====================
+
+If you are using the system provided Python (2.6 or later), ensure you have
+``pip`` installed.
+
+.. code-block:: bash
+
     sudo easy_install pip
-    sudo pip install Django==1.5 django-cms south Pillow
-
-Additionally, you need the Python driver for your selected database:
-
-.. code-block:: bash
-
-    sudo aptitude python-psycopg2
-
-or
-
-.. code-block:: bash
-
-    sudo aptitude install python-mysql
-
-This will install Django, django CMS, South, Pillow, and your database's driver globally.
-
-You have now everything that is needed for you to follow the :doc:`tutorial`.
-
-
-On Mac OSX
-==========
-
-All you need to do is
-
-.. code-block:: bash
-
-    $ sudo easy_install pip
+    sudo pip install virtualenv
 
 If you're using `Homebrew`_ you can install pip and virtualenv with the python
 generic package:
 
 .. code-block:: bash
 
-    $ sudo brew install python
+    brew install python
+    pip install virtualenv
 
-Then create an environment and work on it instead of install the packages in the
-system path:
+Next, install the appropriate libraries to build the Python adapters
+for your selected database. For PostgreSQL:
 
 .. code-block:: bash
 
-    $ virtualenv djangocms-env
-    $ ./djangocms-env/bin/activate
-    (djangocms-env)$ pip install Django==1.5 South Django-CMS
+    brew install postgres
 
-.. note:: You can see the general instructions on how to pip install packages
-          after creating the virtualenv here: :ref:`Installing in a virtualenv using pip <installing-in-a-virtualenv-using-pip>`
+For MySQL:
+
+.. code-block:: bash
+
+    brew install mysql
+
+.. note:: Homebrew does not set the databases to run automatically. The software
+          necessary for the Python adapters will be installed but if you wish to
+          run the database server locally, follow the Homebrew instructions shown
+          in the terminal output after installing.
 
 .. _Homebrew: http://brew.sh/
+
+.. Databases:
 
 *********
 Databases
@@ -277,12 +285,23 @@ Configuration and setup
 Preparing the environment
 =========================
 
-The following assumes your django project is in ``~/workspace/myproject/myproject``.
+The following assumes your Django project is in ``~/workspace/myproject``.
+
+After completing the OS-specific installation instructions above as well as a pip
+requirements.txt file, you should now be able to create a virtual environment for
+your project and install the requirements:
+
+.. code-block:: bash
+
+    cd ~/workspace/myproject/
+    virtualenv env
+    source env/bin/activate
+    pip install -r requirements.txt
 
 
 .. _configure-django-cms:
 
-Installing and configuring django CMS in your django project
+Installing and configuring django CMS in your Django project
 ============================================================
 
 Open the file ``~/workspace/myproject/myproject/settings.py``.
@@ -292,7 +311,7 @@ To make your life easier, add the following at the top of the file::
     # -*- coding: utf-8 -*-
     import os
     gettext = lambda s: s
-    PROJECT_PATH = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 Add the following apps to your :setting:`django:INSTALLED_APPS`.
@@ -428,13 +447,13 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 Point your :setting:`django:STATIC_ROOT` to where the static files should live
 (that is, your images, CSS files, Javascript files, etc.)::
 
-    STATIC_ROOT = os.path.join(PROJECT_PATH, "static")
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
     STATIC_URL = "/static/"
 
 For uploaded files, you will need to set up the :setting:`django:MEDIA_ROOT`
 setting::
 
-    MEDIA_ROOT = os.path.join(PROJECT_PATH, "media")
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
     MEDIA_URL = "/media/"
 
 .. note::
@@ -445,9 +464,9 @@ setting::
 Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
 
     TEMPLATE_DIRS = (
-        # The docs say it should be absolute path: PROJECT_PATH is precisely one.
+        # The docs say it should be absolute path: BASE_DIR is precisely one.
         # Life is wonderful!
-        os.path.join(PROJECT_PATH, "templates"),
+        os.path.join(BASE_DIR, "templates"),
     )
 
 Add at least one template to :setting:`CMS_TEMPLATES`; for example::
@@ -482,7 +501,7 @@ setting should look like::
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(PROJECT_PATH, 'database.sqlite'),
+            'NAME': os.path.join(BASE_DIR, 'database.sqlite'),
         }
     }
 
@@ -494,24 +513,18 @@ You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
 urlpatterns. We suggest starting with the following
 ``~/workspace/myproject/myproject/urls.py``::
 
-    from django.conf.urls import include, patterns, url
-    from django.conf.urls.i18n import i18n_patterns
-    from django.contrib import admin
     from django.conf import settings
+    from django.conf.urls import include, url
+    from django.conf.urls.i18n import i18n_patterns
+    from django.conf.urls.static import static
+    from django.contrib import admin
 
-    admin.autodiscover()
+    admin.autodiscover() # Not required for Django 1.7.x+
 
     urlpatterns = i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
-    )
-
-    if settings.DEBUG:
-        urlpatterns = patterns('',
-        url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-        url(r'', include('django.contrib.staticfiles.urls')),
-    ) + urlpatterns
+    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 Creating templates
@@ -609,13 +622,26 @@ as it is a very powerful, easy and convenient tool. django CMS uses it extensive
 Fresh install
 -------------
 
-Run::
+If you are using Django 1.7 or later run::
+
+    python manage.py migrate
+    python manage.py createsuperuser
+
+.. note:: You will need to add the following setting in order for Django to pick up the new style migrations for django CMS:
+
+::
+
+    MIGRATION_MODULES = {
+        'cms': 'cms.migrations_django',
+        'menus': 'menus.migrations_django',
+    }
+
+If you are using Django 1.6 or earlier supported versions run::
 
     python manage.py syncdb --all
     python manage.py migrate --fake
 
-The first command will prompt you to create a super user. Choose 'yes' and enter
-appropriate values.
+The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and enter appropriate values.
 
 Upgrade
 -------

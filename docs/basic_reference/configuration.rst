@@ -15,7 +15,11 @@ Custom User Requirements
 
 When using a custom user model (i.e. the AUTH_USER_MODEL Django setting), there are a few requirements that must be met.
 
-DjangoCMS expects a user model with at minimum the following fields: email, password, first_name, last_name, is_active, is_staff, and is_superuser.  Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as the USERNAME_FIELD (see Django documentation for more details).
+DjangoCMS expects a user model with at minimum the following fields: email, password, is_active, is_staff, and is_superuser.
+Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as
+the USERNAME_FIELD (see Django documentation for more details) and define a get_fullname() method.
+
+The models must also be editable via django admin and have an admin class registered.
 
 Additionally, the application in which the model is defined **must** be loaded before `cms` in `INSTALLED_APPS`.
 
@@ -140,28 +144,28 @@ Example::
     CMS_PLACEHOLDER_CONF = {
         'content': {
             'plugins': ['TextPlugin', 'PicturePlugin'],
-            'text_only_plugins': ['LinkPlugin']
+            'text_only_plugins': ['LinkPlugin'],
             'extra_context': {"width":640},
             'name': gettext("Content"),
             'language_fallback': True,
-            'default_plugins':[
+            'default_plugins': [
                 {
                     'plugin_type': 'TextPlugin',
                     'values': {
                         'body':'<p>Lorem ipsum dolor sit amet...</p>',
                     },
                 },
-            ]
+            ],
             'child_classes': {
                 'TextPlugin': ['PicturePlugin', 'LinkPlugin'],
             },
             'parent_classes': {
-                'LinkPlugin': ['TextPlugin',],
-            }
+                'LinkPlugin': ['TextPlugin'],
+            },
         },
         'right-column': {
             "plugins": ['TeaserPlugin', 'LinkPlugin'],
-            "extra_context": {"width":280},
+            "extra_context": {"width": 280},
             'name': gettext("Right Column"),
             'limits': {
                 'global': 2,
@@ -170,10 +174,10 @@ Example::
             },
             'plugin_modules': {
                 'LinkPlugin': 'Extra',
-            }.
+            },
             'plugin_labels': {
                 'LinkPlugin': 'Add a link',
-            }.
+            },
         },
         'base.html content': {
             "plugins": ['TextPlugin', 'PicturePlugin', 'TeaserPlugin'],

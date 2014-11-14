@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import datetime
 import re
+from cms.utils.urlutils import admin_reverse
 
 from django.template.defaultfilters import truncatewords
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -27,7 +28,6 @@ from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.compat import DJANGO_1_4
-from cms.utils.compat.dj import is_user_swapped
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 
@@ -89,7 +89,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + admin-menu + logout
         self.assertEqual(len(items), 2, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 6, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
@@ -100,11 +100,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-
-        if is_user_swapped:
-            self.assertEqual(len(admin_items), 6, admin_items)
-        else:
-            self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 8, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -172,6 +168,20 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
+    def test_show_toolbar_staff(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), edit=True)
+        self.assertTrue(request.session.get('cms_build', True))
+        self.assertTrue(request.session.get('cms_edit', False))
+
+    def test_hide_toolbar_non_staff(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_nonstaff(), edit=True)
+        self.assertFalse(request.session.get('cms_build', True))
+        self.assertFalse(request.session.get('cms_edit', True))
+
     def test_show_toolbar_without_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)
@@ -217,7 +227,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 6, admin_items)
+        self.assertEqual(len(admin_items), 7, admin_items)
 
     def test_button_consistency_staff(self):
         """
@@ -312,7 +322,7 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
                            published=True)
-        resolve_url = reverse('admin:cms_page_resolve')
+        resolve_url = admin_reverse('cms_page_resolve')
         with self.login_user_context(superuser):
             response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
@@ -331,13 +341,26 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
-            url = reverse('admin:cms_page_resolve')
+            url = admin_reverse('cms_page_resolve')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/')
         response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
         self.assertEqual(response.content.decode('utf-8'), '')
+
+    def get_username(self, user=None, default=''):
+        user = user or self.request.user
+        try:
+            name = user.get_full_name()
+            if name:
+                return name
+            elif DJANGO_1_4:
+                return user.username
+            else:
+                return user.get_username()
+        except (AttributeError, NotImplementedError):
+            return default
 
     def test_toolbar_logout(self):
         '''
@@ -365,10 +388,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            if DJANGO_1_4:
-                self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.username))
-            else:
-                self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_username()))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
 
         #
         # Test that the logout shows the logged-in user's name, if it was
@@ -378,13 +398,12 @@ class ToolbarTests(ToolbarTestBase):
         superuser.last_name = 'User'
         superuser.save()
         # Sanity check...
-        self.assertEqual('Super User', superuser.get_full_name())
         self.get_page_request(page, superuser, '/')
         with self.login_user_context(superuser):
             response = self.client.get(page.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % superuser.get_full_name()))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
 
     def test_toolbar_logout_redirect(self):
         """
@@ -412,15 +431,11 @@ class ToolbarTests(ToolbarTestBase):
         page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
 
-        if DJANGO_1_4:
-            menu_name = _(u'Logout %s') % superuser.username
-        else:
-            menu_name = _(u'Logout %s') % superuser.get_username()
-
         with self.login_user_context(superuser):
             # Published page, no redirect
             response = self.client.get(page1.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
+            menu_name = _(u'Logout %s') % self.get_username(superuser)
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
@@ -428,6 +443,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page2.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with login restrictions, redirect
@@ -562,11 +578,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<h2></h2>',
         )
 
+        #
+        # NOTE: Using the render_placeholder "as" form should /not/ render
+        # frontend placeholder editing support.
+        #
         self.assertContains(
             response,
-            '<h3><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
-            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h3>'.format(ex1.placeholder.pk,
-                                                                           plugin.pk, render_placeholder_body)
+            '<h3>{0}</h3>'.format(render_placeholder_body)
             )
 
         self.assertContains(

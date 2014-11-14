@@ -6,7 +6,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
-from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2
+from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2, LoginForm3
 
 
 admin.autodiscover()
@@ -27,6 +27,8 @@ urlpatterns += i18n_patterns('',
                                  kwargs={'authentication_form': LoginForm2}),
                              url(r'^sample/login/$', 'django.contrib.auth.views.login',
                                  kwargs={'authentication_form': LoginForm}),
+                             url(r'^sample/login3/$', 'django.contrib.auth.views.login',
+                                 kwargs={'authentication_form': LoginForm3}),
                              url(r'^admin/', include(admin.site.urls)),
                              url(r'^example/$', 'cms.test_utils.project.placeholderapp.views.example_view'),
                              url(r'^plain_view/$', 'cms.test_utils.project.sampleapp.views.plain_view'),

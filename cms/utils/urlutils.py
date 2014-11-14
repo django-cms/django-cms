@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from cms.utils.conf import get_cms_setting
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.utils.http import urlencode
 from cms.utils.compat.urls import urlparse
 from cms.utils.compat.dj import force_unicode
@@ -57,7 +59,7 @@ def is_media_request(request):
     Check if a request is a media request.
     """
     parsed_media_url = urlparse(settings.MEDIA_URL)
-    if request.path.startswith(parsed_media_url.path):
+    if request.path_info.startswith(parsed_media_url.path):
         if parsed_media_url.netloc:
             if request.get_host() == parsed_media_url.netloc:
                 return True
@@ -79,3 +81,22 @@ def add_url_parameters(url, *args, **params):
     if params:
         return '%s?%s' % (url, urlencode(params))
     return url
+
+
+def admin_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None,
+                  current_app=None):
+    admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
+    if ':' in viewname:
+        raise ValueError(
+            "viewname in admin_reverse may not already have a namespace "
+            "defined: {0!r}".format(viewname)
+        )
+    viewname = "{0}:{1}".format(admin_namespace, viewname)
+    return reverse(
+        viewname,
+        urlconf=urlconf,
+        args=args,
+        kwargs=kwargs,
+        prefix=prefix,
+        current_app=current_app
+    )

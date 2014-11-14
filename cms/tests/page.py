@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import datetime
 import os.path
+from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
 from django.core.cache import cache
@@ -584,7 +585,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_on_non_cms_admin(self):
         request = self.get_request(
-            reverse('admin:sampleapp_category_change', args=(1,))
+            admin_reverse('sampleapp_category_change', args=(1,))
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
@@ -592,7 +593,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_on_cms_admin(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(page.pk,))
+            admin_reverse('cms_page_change', args=(page.pk,))
         )
         found_page = get_page_from_request(request)
         self.assertTrue(found_page)
@@ -600,7 +601,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_on_cms_admin_nopage(self):
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(1,))
+            admin_reverse('cms_page_change', args=(1,))
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
@@ -608,7 +609,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_cached(self):
         mock_page = 'hello world'
         request = self.get_request(
-            reverse('admin:sampleapp_category_change', args=(1,))
+            admin_reverse('sampleapp_category_change', args=(1,))
         )
         request._current_page_cache = mock_page
         page = get_page_from_request(request)
@@ -642,7 +643,7 @@ class PagesTestCase(CMSTestCase):
     def test_get_page_from_request_on_cms_admin_with_editplugin(self):
         page = create_page("page", "nav_playground.html", "en")
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(page.pk,)) + 'edit-plugin/42/'
+            admin_reverse('cms_page_change', args=(page.pk,)) + 'edit-plugin/42/'
         )
         found_page = get_page_from_request(request)
         self.assertTrue(found_page)
@@ -650,7 +651,7 @@ class PagesTestCase(CMSTestCase):
 
     def test_get_page_from_request_on_cms_admin_with_editplugin_nopage(self):
         request = self.get_request(
-            reverse('admin:cms_page_change', args=(1,)) + 'edit-plugin/42/'
+            admin_reverse('cms_page_change', args=(1,)) + 'edit-plugin/42/'
         )
         page = get_page_from_request(request)
         self.assertEqual(page, None)
@@ -952,7 +953,7 @@ class PageAdminTest(PageAdminTestBase):
         with self.login_user_context(superuser):
             pageadmin = self.get_admin()
             page = self.get_page()
-            form_url = reverse("admin:cms_page_change", args=(page.pk,))
+            form_url = admin_reverse("cms_page_change", args=(page.pk,))
             # Middleware is needed to correctly setup the environment for the admin
             middleware = CurrentUserMiddleware()
             request = self.get_request()

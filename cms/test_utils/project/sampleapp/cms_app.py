@@ -3,6 +3,7 @@ from cms.test_utils.project.sampleapp.menu import SampleAppMenu
 from cms.apphook_pool import apphook_pool
 from django.utils.translation import ugettext_lazy as _
 
+
 class SampleApp(CMSApp):
     name = _("Sample App")
     urls = ["cms.test_utils.project.sampleapp.urls"]
@@ -10,6 +11,17 @@ class SampleApp(CMSApp):
     permissions = True
 
 apphook_pool.register(SampleApp)
+
+
+class SampleAppWithExcludedPermissions(CMSApp):
+    name = _("Sample App with excluded permissions")
+    urls = [
+        "cms.test_utils.project.sampleapp.urls_excluded"
+    ]
+    permissions = True
+    exclude_permissions = ['excluded']
+
+apphook_pool.register(SampleAppWithExcludedPermissions)
 
 
 class SampleApp2(CMSApp):

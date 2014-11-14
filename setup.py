@@ -41,12 +41,12 @@ setup(
         'djangocms-admin-style'
     ],
     tests_require=[
-        'django-reversion==1.6.6',
-        'Pillow==1.7.7',
-        'Sphinx==1.1.3',
-        'Jinja2==2.6',
-        'Pygments==1.5',
-        'dj-database-url==0.2.1',
+        'django-reversion==1.8.2',
+        'Pillow==2.5.3',
+        'Sphinx==1.2.2',
+        'Jinja2==2.7.3',
+        'Pygments==1.6',
+        'dj-database-url==0.3.0',
         'django-hvad',
         'djangocms-text-ckeditor>=2.1.1',
         'djangocms-column',

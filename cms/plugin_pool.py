@@ -9,10 +9,10 @@ from django.db.models import signals
 from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
+from django.utils import six
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
-from cms.utils.compat.type_checks import string_types
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
@@ -31,10 +31,10 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
-        self.discovered = True
         from cms.views import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
+        self.discovered = True
 
     def clear(self):
         self.discovered = False
@@ -52,25 +52,42 @@ class PluginPool(object):
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
                 % plugin
             )
-        if plugin.render_plugin and not type(plugin.render_plugin) == property or hasattr(plugin.model, 'render_template'):
-            if plugin.render_template is None and not hasattr(plugin.model, 'render_template'):
+        if (plugin.render_plugin and not type(plugin.render_plugin) == property
+                or hasattr(plugin.model, 'render_template')
+                or hasattr(plugin, 'get_render_template')):
+            if (plugin.render_template is None and
+                    not hasattr(plugin.model, 'render_template') and
+                    not hasattr(plugin, 'get_render_template')):
                 raise ImproperlyConfigured(
-                    "CMS Plugins must define a render template or set render_plugin=False: %s"
-                    % plugin
+                    "CMS Plugins must define a render template, "
+                    "a get_render_template method or "
+                    "set render_plugin=False: %s" % plugin
                 )
-            else:
+            # If plugin class defines get_render_template we cannot
+            # statically check for valid template file as it depends
+            # on plugin configuration and context.
+            # We cannot prevent developer to shoot in the users' feet
+            elif not hasattr(plugin, 'get_render_template'):
                 from django.template import loader
 
-                template = hasattr(plugin.model,
-                                   'render_template') and plugin.model.render_template or plugin.render_template
-                if isinstance(template, string_types) and template:
+                template = ((hasattr(plugin.model, 'render_template') and
+                            plugin.model.render_template) or
+                            plugin.render_template)
+                if isinstance(template, six.string_types) and template:
                     try:
                         loader.get_template(template)
-                    except TemplateDoesNotExist:
-                        raise ImproperlyConfigured(
-                            "CMS Plugins must define a render template (%s) that exist: %s"
-                            % (plugin, template)
-                        )
+                    except TemplateDoesNotExist as e:
+                        # Note that the template loader will throw
+                        # TemplateDoesNotExist if the plugin's render_template
+                        # does in fact exist, but it includes a template that
+                        # doesn't.
+                        if six.text_type(e) == template:
+                            raise ImproperlyConfigured(
+                                "CMS Plugins must define a render template (%s) that exists: %s"
+                                % (plugin, template)
+                            )
+                        else:
+                            pass
                     except TemplateSyntaxError:
                         pass
         else:
@@ -105,6 +122,8 @@ class PluginPool(object):
                 reversion_register(plugin.model)
             except RegistrationError:
                 pass
+
+        return plugin
 
     def unregister_plugin(self, plugin):
         """

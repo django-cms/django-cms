@@ -15,7 +15,7 @@ they are attached to a CMS page.  So if you want to be able to use
 use the :ttag:`url` template tag, you need to hook up your app to a special
 test version of ``urls.py`` and tell your tests to use that.
 
-So you could create ``myapp/tests/test_urls.py`` with the following code::
+So you could create ``myapp/tests/urls.py`` with the following code::
 
     from django.contrib import admin
     from django.conf.urls import url, patterns, include
@@ -34,7 +34,7 @@ And then in your tests you can plug this in with the
 
     class MyappTests(CMSTestCase):
 
-        @override_settings(ROOT_URLCONF='myapp.tests.test_urls')
+        @override_settings(ROOT_URLCONF='myapp.tests.urls')
         def test_myapp_page(self):
             test_url = reverse('myapp_view_name')
             # rest of test as normal
@@ -45,7 +45,7 @@ apply the decorator to the whole class::
     from django.test.utils import override_settings
     from cms.test_utils.testcases import CMSTestCase
 
-    @override_settings(ROOT_URLCONF='myapp.tests.test_urls')
+    @override_settings(ROOT_URLCONF='myapp.tests.urls')
     class MyappTests(CMSTestCase):
 
         def test_myapp_page(self):

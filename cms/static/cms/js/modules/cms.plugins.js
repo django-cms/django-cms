@@ -459,6 +459,8 @@ $(document).ready(function () {
 		_setSubnav: function (nav) {
 			var that = this;
 
+			nav.bind('mousedown', function (e) { e.stopPropagation(); });  // avoid starting the longclick event when using the drag bar
+
 			nav.bind('mouseenter mouseleave tap.cms', function (e) {
 				e.preventDefault();
 				e.stopPropagation();

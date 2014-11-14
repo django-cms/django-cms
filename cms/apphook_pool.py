@@ -22,9 +22,13 @@ class ApphookPool(object):
         self.apps = {}
         self.discovered = False
 
-    def register(self, app, discovering_apps=False):
+    def register(self, app=None, discovering_apps=False):
+        # allow use as a decorator
+        if app is None:
+            return lambda app: self.register(app, discovering_apps)
+
         if self.apphooks and not discovering_apps:
-            return
+            return app
 
         if app.__name__ in self.apps:
             raise AppAlreadyRegistered(
@@ -40,6 +44,7 @@ class ApphookPool(object):
                 "but the 'menus' attribute is empty, did you make a typo?" % app.__name__)
 
         self.apps[app.__name__] = app
+        return app
 
     def discover_apps(self):
         self.apphooks = get_cms_setting('APPHOOKS')

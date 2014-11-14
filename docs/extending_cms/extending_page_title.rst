@@ -9,6 +9,20 @@ an icon for every page) by using the extension models:
 ``cms.extensions.PageExtension`` and ``cms.extensions.TitleExtension``,
 respectively.
 
+
+What's the difference?
+======================
+
+The difference between a page extension and a title extension is related to
+the difference between the Page and Title models. Titles support pages by
+providing a storage mechanism, among other things, for language-specific
+properties of Pages. So, if you find that you need to extend the page model in
+a language-specific manner, for example, if you need to create language-
+specific keywords for each language of your pages, then you may need to use a
+TitleExtension. If the extension you'd like to create is the same for all of
+the different languages of the page, then you may be fine using a
+PageExtension.
+
 ******
 How To
 ******
@@ -73,7 +87,8 @@ Note that the field that holds the relationship between the extension and a
 CMS Page is non-editable, so it will not appear in the admin views. This,
 unfortunately, leaves the operator without a means of "attaching" the page
 extension to the correct pages. The way to address this is to use a
-CMSToolbar.
+CMSToolbar. Note that creating the admin hook is still required, because it
+creates the add and change admin forms that are required for the next step.
 
 
 Adding a Toolbar Menu Item for your Page extension
@@ -81,9 +96,75 @@ Adding a Toolbar Menu Item for your Page extension
 
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page. (Page isn't an
-editable attribute in the default admin interface.) The following example,
-which should live in a file named ``cms_toolbar.py`` in one of your apps, adds
-a menu entry for the extension on each page::
+editable attribute in the default admin interface.).
+To add toolbar items for your extension creare a file named ``cms_toolbar.py``
+in one of your apps, and add the relevant menu entries for the extension on each page.
+
+
+**********************
+Simplified toolbar API
+**********************
+
+.. versionadded:: 3.0.6
+
+Since 3.0.6 a simplified toolbar API is available to handle the more common cases::
+
+    from cms.extensions.toolbar import ExtensionToolbar
+    from django.utils.translation import ugettext_lazy as _
+    from .models import IconExtension
+
+
+    @toolbar_pool.register
+    class IconExtensionToolbar(ExtensionToolbar):
+        # defineds the model for the current toolbar
+        model = IconExtension
+
+        def populate(self):
+            # setup the extension toolbar with permissions and sanity checks
+            current_page_menu = self._setup_extension_toolbar()
+            # if it's all ok
+            if current_page_menu:
+                # retrieves the instance of the current extension (if any) and the toolbar item url
+                page_extension, url = self.get_page_extension_admin()
+                if url:
+                    # adds a toolbar item
+                    current_page_menu.add_modal_item(_('Page Icon'), url=url,
+                        disabled=not self.toolbar.edit_mode)
+
+Similarly for title extensions::
+
+    from cms.extensions.toolbar import ExtensionToolbar
+    from django.utils.translation import ugettext_lazy as _
+    from .models import TitleIconExtension
+
+    @toolbar_pool.register
+    class TitleIconExtensionToolbar(ExtensionToolbar):
+        # setup the extension toolbar with permissions and sanity checks
+        model = TitleIconExtension
+
+        def populate(self):
+            # setup the extension toolbar with permissions and sanity checks
+            current_page_menu = self._setup_extension_toolbar()
+            # if it's all ok
+            if current_page_menu and self.toolbar.edit_mode:
+                # create a sub menu
+                sub_menu = self._get_sub_menu(current_page_menu, 'submenu_label', 'Submenu', position)
+                # retrieves the instances of the current title extension (if any) and the toolbar item url
+                urls = self.get_title_extension_admin()
+                # cycle through the title list
+                for title_extension, url in urls:
+                    # adds toolbar items
+                    sub_menu.add_modal_item('icon for title %s' % title,
+                                            url=url, disabled=not self.toolbar.edit_mode)
+
+For details see the :ref:`reference <simplified_extension_toolbar>`
+
+********************
+Complete toolbar API
+********************
+
+If you need complete control over the layout of your extension toolbar items you can still use the
+low-level API to edit the toolbar according to your needs::
 
     from cms.api import get_page_draft
     from cms.toolbar_pool import toolbar_pool
@@ -160,22 +241,23 @@ Using extensions in templates
 To access a page extension in page templates you can simply access the
 approriate related_name field that is now available on the Page object.
 
-As per normal Django defaul related_name naming mechanism, the appropriate
-field to access is the same as your PageExtension model name, but lowercased.
-Assuming your Page Extension model class is ``IconExtension``, the
-relationship to the page extension will be available on
-``page.iconextension``, so you can use something like::
+As per the normal related_name naming mechanism, the appropriate field to
+access is the same as your PageExtension model name, but lowercased. Assuming
+your Page Extension model class is ``IconExtension``, the relationship to the
+page extension model will be available on ``page.iconextension``. From there
+you can access the extra fields you defined in your extension, so you can use
+something like::
 
     {% load staticfiles %}
 
     {# rest of template omitted ... #}
 
     {% if request.current_page.iconextension %}
-        <img src="{% static request.current_page.iconextension.url %}">
+        <img src="{% static request.current_page.iconextension.image.url %}">
     {% endif %}
 
-Where ``request.current_page`` is the way to access the current page that is
-rendering the template.
+Where ``request.current_page`` is the normal way to access the current page
+that is rendering the template.
 
 It is important to remember that unless the operator has already assigned a
 page extension to every page, a page may not have the iconextension
@@ -211,3 +293,22 @@ Here's an example that uses a `ManyToMany`` field::
                 page_category.save()
 
     extension_pool.register(MyPageExtension)
+
+
+.. _simplified_extension_toolbar:
+
+Simplified Toolbar API
+======================
+
+The simplified Toolbar API works by deriving your toolbar class from ``ExtensionToolbar``
+which provides the following API:
+
+
+* :py:meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
+  the environment and do the permission checking;
+* :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin`: for page extensions, retrieves the
+  correct admin url for the related toolbar item; returns the extension instance (or `None` if not exists)
+  and the admin url for the toolbar item;
+* :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin`: for title extensions, retrieves the
+  correct admin url for the related toolbar item; returns a list of the extension instances
+  (or `None` if not exists) and the admin urls for each title of the current page;

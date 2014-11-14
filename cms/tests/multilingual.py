@@ -9,6 +9,7 @@ from django.http import Http404, HttpResponseRedirect
 from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
+from cms.menu import CMSMenu
 from cms.models import Title, EmptyTitle
 from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
@@ -141,6 +142,37 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         placeholder = public.placeholders.all()[0]
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG2).count(), 1)
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
+
+    def test_hide_untranslated(self):
+        TESTLANG = get_primary_lanaguage()
+        TESTLANG2 = get_secondary_lanaguage()
+        page = create_page("mlpage-%s" % TESTLANG, "nav_playground.html", TESTLANG)
+        create_title(TESTLANG2, "mlpage-%s" % TESTLANG2, page, slug=page.get_slug())
+        page2 = create_page("mlpage-2-%s" % TESTLANG, "nav_playground.html", TESTLANG, parent=page)
+        page.publish(TESTLANG)
+        page.publish(TESTLANG2)
+        page2.publish(TESTLANG)
+
+        menu = CMSMenu()
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+
+        request_1 = self.get_request('/%s/' % TESTLANG, TESTLANG)
+        request_2 = self.get_request('/%s/' % TESTLANG2, TESTLANG2)
+
+        lang_settings[1][1]['hide_untranslated'] = False
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            list_1 = [node.id for node in menu.get_nodes(request_1)]
+            list_2 = [node.id for node in menu.get_nodes(request_2)]
+            self.assertEqual(list_1, list_2)
+            self.assertEqual(len(list_1), 2)
+
+        lang_settings[1][1]['hide_untranslated'] = True
+        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+            list_1 = [node.id for node in menu.get_nodes(request_1)]
+            list_2 = [node.id for node in menu.get_nodes(request_2)]
+            self.assertNotEqual(list_1, list_2)
+            self.assertEqual(len(list_2), 1)
+            self.assertEqual(len(list_1), 2)
 
     def test_frontend_lang(self):
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))

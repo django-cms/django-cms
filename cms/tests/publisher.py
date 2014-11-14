@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.contrib.sites.models import Site
+from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
 from django.core.cache import cache
 from django.core.management.base import CommandError
+from django.core.management import call_command
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin, create_title
@@ -26,13 +29,9 @@ class PublisherCommandTests(TestCase):
     """
 
     def test_command_line_should_raise_without_superuser(self):
-        raised = False
-        try:
+        with self.assertRaises(CommandError):
             com = publisher_publish.Command()
             com.handle_noargs()
-        except CommandError:
-            raised = True
-        self.assertTrue(raised)
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
@@ -43,8 +42,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -67,8 +65,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -81,6 +78,99 @@ class PublisherCommandTests(TestCase):
         self.assertEqual(published_from_output, 0)
 
         self.assertEqual(Page.objects.public().count(), 0)
+
+    def test_command_line_publishes_draft_page(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        create_page("The page!", "nav_playground.html", "en", published=False)
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', include_unpublished=True)
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
+        self.assertEqual(Page.objects.public().count(), 1)
+
+    def test_command_line_publishes_selected_language(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        page = create_page("en title", "nav_playground.html", "en")
+        title = create_title('de', 'de title', page)
+        title.published = True
+        title.save()
+        title = create_title('fr', 'fr title', page)
+        title.published = True
+        title.save()
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', language='de')
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
+        self.assertEqual(Page.objects.public().count(), 1)
+        public = Page.objects.public()[0]
+        languages = sorted(public.title_set.values_list('language', flat=True))
+        self.assertEqual(languages, ['de'])
+
+    def test_command_line_publishes_selected_language_drafts(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        page = create_page("en title", "nav_playground.html", "en")
+        title = create_title('de', 'de title', page)
+        title.published = False
+        title.save()
+        title = create_title('fr', 'fr title', page)
+        title.published = False
+        title.save()
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', language='de', include_unpublished=True)
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
+        self.assertEqual(Page.objects.public().count(), 1)
+        public = Page.objects.public()[0]
+        languages = sorted(public.title_set.values_list('language', flat=True))
+        self.assertEqual(languages, ['de'])
 
     def test_table_name_patching(self):
         """
@@ -104,8 +194,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEqual(not_drafts, 1)
@@ -135,8 +224,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            com = publisher_publish.Command()
-            com.handle_noargs()
+            call_command('publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -157,6 +245,86 @@ class PublisherCommandTests(TestCase):
         non_draft = Page.objects.public()[0]
         self.assertEqual(non_draft.reverse_id, 'a_test')
 
+    def test_command_line_publish_multiple_languages(self):
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        # Create a draft page with two published titles
+        page = create_page(u"The page!", "nav_playground.html", "en", published=False)
+        title = create_title('de', 'ja', page)
+        title.published = True
+        title.save()
+        title = create_title('fr', 'non', page)
+        title.published = True
+        title.save()
+
+        with StdoutOverride():
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish')
+
+        public = Page.objects.public()[0]
+        languages = sorted(public.title_set.values_list('language', flat=True))
+        self.assertEqual(languages, ['de', 'fr'])
+
+    def test_command_line_publish_one_site(self):
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        siteA = Site.objects.create(domain='a.example.com', name='a.example.com')
+        siteB = Site.objects.create(domain='b.example.com', name='b.example.com')
+
+        #example.com
+        create_page(u"example.com homepage", "nav_playground.html", "en", published=True)
+        #a.example.com
+        create_page(u"a.example.com homepage", "nav_playground.html", "de", site=siteA, published=True)
+        #b.example.com
+        create_page(u"b.example.com homepage", "nav_playground.html", "de", site=siteB, published=True)
+        create_page(u"b.example.com about", "nav_playground.html", "nl", site=siteB, published=True)
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish', site=siteB.id)
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 2)
+        self.assertEqual(published_from_output, 2)
+
+    def test_command_line_publish_multiple_languages_check_count(self):
+        """
+        Publishing one page with multiple languages still counts
+        as one page. This test case checks whether it works
+        as expected.
+        """
+        # we need to create a superuser (the db is empty)
+        get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
+
+        # Now, let's create a page with 2 languages.
+        page = create_page("en title", "nav_playground.html", "en", published=True)
+        create_title("de", "de title", page)
+        page.publish("de")
+
+        pages_from_output = 0
+        published_from_output = 0
+
+        with StdoutOverride() as buffer:
+            # Now we don't expect it to raise, but we need to redirect IO
+            call_command('publisher_publish')
+            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+
+        for line in lines:
+            if 'Total' in line:
+                pages_from_output = int(line.split(':')[1])
+            elif 'Published' in line:
+                published_from_output = int(line.split(':')[1])
+
+        self.assertEqual(pages_from_output, 1)
+        self.assertEqual(published_from_output, 1)
+
     def tearDown(self):
         plugin_pool.patched = False
         plugin_pool.set_plugin_meta()
@@ -174,7 +342,7 @@ class PublishingTests(TestCase):
         self.assertEqual(Page.objects.all().count(), 1)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+            response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'], "http://testserver/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
 
@@ -213,7 +381,7 @@ class PublishingTests(TestCase):
         page = self.create_page("test_admin", published=False)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+            response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 
@@ -228,7 +396,7 @@ class PublishingTests(TestCase):
             ):
             with self.login_user_context(superuser):
                 with force_language('de'):
-                    response = self.client.get(reverse("admin:cms_page_publish_page", args=[page.pk, 'en']))
+                    response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 

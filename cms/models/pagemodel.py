@@ -43,7 +43,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     X_FRAME_OPTIONS_INHERIT = 0
     X_FRAME_OPTIONS_DENY = 1
     X_FRAME_OPTIONS_SAMEORIGIN = 2
-    X_FRAME_OPTIONS_ALLOW= 3
+    X_FRAME_OPTIONS_ALLOW = 3
+    X_FRAME_OPTIONS_CHOICES = (
+        (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
+        (X_FRAME_OPTIONS_DENY, _('Deny')),
+        (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
+        (X_FRAME_OPTIONS_ALLOW, _('Allow'))
+    )
 
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]   
 
@@ -100,12 +106,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
-        choices=(
-            (X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
-            (X_FRAME_OPTIONS_DENY, _('Deny')),
-            (X_FRAME_OPTIONS_SAMEORIGIN, _('Only this website')),
-            (X_FRAME_OPTIONS_ALLOW, _('Allow'))
-        ),
+        choices=X_FRAME_OPTIONS_CHOICES,
         default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
     )
  
@@ -118,6 +119,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         permissions = (
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
+            ('edit_static_placeholder', 'Can edit static placeholders'),
         )
         unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')

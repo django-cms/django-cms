@@ -4,6 +4,7 @@ import datetime
 import os
 import time
 
+from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
@@ -394,3 +395,54 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         plugins = self.page.placeholders.all()[0].get_plugins_list('en')
 
         self.assertEqual(len(plugins), 2)
+
+
+class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
+    settings_overrides = {
+        'SITE_ID': 1,
+        'CMS_PERMISSION': False,
+    }
+
+    def setUp(self):
+        Site.objects.create(domain='example.org', name='example.org')
+
+        self.page = create_page('Home', 'static.html', 'en', published=True)
+
+        self.base_url = self.live_server_url
+
+        self.placeholder_name = 'cms_placeholder-5'
+
+        self.user = self._create_user("testuser", is_staff=True)
+        self.user.user_permissions = Permission.objects.exclude(codename="edit_static_placeholder")
+
+        self.driver.implicitly_wait(2)
+
+        super(StaticPlaceholderPermissionTests, self).setUp()
+
+    def test_static_placeholders_permissions(self):
+
+        # login
+        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.driver.get(url)
+
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        username_input = self.driver.find_element_by_id("id_cms-username")
+        username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
+        password_input = self.driver.find_element_by_id("id_cms-password")
+        password_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
+        password_input.submit()
+        self.wait_page_loaded()
+
+        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+
+        # test static placeholder permission (content of static placeholders is NOT editable)
+        self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, self.placeholder_name)
+
+        # update userpermission
+        edit_permission = Permission.objects.get(codename="edit_static_placeholder")
+        self.user.user_permissions.add( edit_permission )
+
+        # test static placeholder permission (content of static placeholders is editable)
+        self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.assertTrue(self.driver.find_element_by_class_name(self.placeholder_name))

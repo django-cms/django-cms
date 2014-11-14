@@ -5,3 +5,4 @@ class CMSApp(object):
     menus = []
     app_name = None
     permissions = True
+    exclude_permissions = []

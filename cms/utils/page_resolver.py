@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from cms.models.pagemodel import Page
 from cms.utils.compat.dj import force_unicode, is_installed
 from cms.utils.compat.urls import unquote
-from cms.utils.urlutils import any_path_re
+from cms.utils.urlutils import any_path_re, admin_reverse
 
 ADMIN_PAGE_RE_PATTERN = r'cms/page/(\d+)'
 ADMIN_PAGE_RE = re.compile(ADMIN_PAGE_RE_PATTERN)
@@ -29,7 +29,7 @@ def get_page_queryset_from_path(path, preview=False, draft=False, site=None):
     """ Returns a queryset of pages corresponding to the path given
     """
     if is_installed('django.contrib.admin'):
-        admin_base = reverse('admin:index')
+        admin_base = admin_reverse('index')
 
         # Check if this is called from an admin request
         if path.startswith(admin_base):
@@ -100,11 +100,11 @@ def get_page_from_request(request, use_path=None):
     if use_path is not None:
         path = use_path
     else:
-        path = request.path
+        path = request.path_info
         pages_root = unquote(reverse("pages-root"))
         # otherwise strip off the non-cms part of the URL
         if is_installed('django.contrib.admin'):
-            admin_base = reverse('admin:index')
+            admin_base = admin_reverse('index')
         else:
             admin_base = None
         if path.startswith(pages_root) and (not admin_base or not path.startswith(admin_base)):
@@ -147,7 +147,7 @@ def is_valid_url(url, instance, create_links=True, site=None):
                 if create_links:
                     # Format return message with page url
                     url_clashes.append('<a href="%(page_url)s%(pk)s" target="_blank">%(page_title)s</a>' % {
-                        'page_url': reverse('admin:cms_page_changelist'), 'pk': page.pk,
+                        'page_url': admin_reverse('cms_page_changelist'), 'pk': page.pk,
                         'page_title': force_unicode(page),
                     })
                 else:

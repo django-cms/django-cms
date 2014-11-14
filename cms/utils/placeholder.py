@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import operator
-from cms.utils import get_cms_setting
-from cms.utils.compat.type_checks import string_types
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from cms.utils.compat.dj import force_unicode
 from django.db.models.query_utils import Q
+from django.utils import six
 from sekizai.helpers import get_varname
+
+from cms.utils import get_cms_setting
+from cms.utils.compat.dj import force_unicode
 
 
 def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
@@ -90,7 +92,7 @@ def get_page_from_placeholder_if_exists(placeholder):
 
 
 def validate_placeholder_name(name):
-    if not isinstance(name, string_types):
+    if not isinstance(name, six.string_types):
         raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
 
     if not all(ord(char) < 128 for char in name):
