@@ -1,5 +1,3 @@
-from functools import partial
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -37,15 +35,14 @@ def setup():
         # requires paching the AppCache. 1.7 provides a cleaner way to handle
         # this in AppConfig and thus the patching is left for older version only
         from django.db.models import loading
-
-        def get_models_patched(self, app_mod=None, include_auto_created=False,
-                               include_deferred=False, only_installed=True):
-            loading.AppCache.get_models(self, app_mod, include_auto_created,
-                                        include_deferred, only_installed)
+        old_get_models = loading.AppCache.get_models
+        
+        def get_models_patched(self, **kwargs):
+            ret_value = old_get_models(self, **kwargs)
             from cms.plugin_pool import plugin_pool
             plugin_pool.set_plugin_meta()
+            return ret_value
 
-        loading.cache.get_models = get_models_patched
-        loading.get_models = partial(get_models_patched, loading.cache)
+        loading.AppCache.get_models = get_models_patched
     validate_dependencies()
     validate_settings()
