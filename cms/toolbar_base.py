@@ -6,6 +6,7 @@ from django.contrib.sites.models import Site
 
 
 class CMSToolbar(object):
+    supported_apps = None
 
     def __init__(self, request, toolbar, is_current_app, app_path):
         self.request = request
@@ -26,3 +27,14 @@ class CMSToolbar(object):
 
     def request_hook(self):
         pass
+
+    @classmethod
+    def check_current_app(cls, key, app_name):
+        if cls.supported_apps is None:
+            local_apps = ".".join(key.split(".")[:-2]),
+        else:
+            local_apps = cls.supported_apps
+        for local_app in local_apps:
+            if app_name and local_app and app_name.startswith(local_app):
+                return True
+        return False
