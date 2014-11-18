@@ -9,7 +9,7 @@ class ExampleAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.Mode
     frontend_editable_fields = ("char_1", "char_2")
 
 
-class CharPksAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
+class CharPksAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1",)
 
 
