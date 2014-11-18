@@ -1251,7 +1251,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<div class="cms_plugin cms_plugin-cms-page-changelist-%s cms_render_model cms_render_model_block"><h3>Menu</h3></div>' % page.pk)
 
 
-class FrontendEditableAdminMixinTest(ToolbarTestBase):
+class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
 
     def get_admin(self):
         admin.autodiscover()
