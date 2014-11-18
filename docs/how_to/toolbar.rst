@@ -43,6 +43,10 @@ is available for overwrite as well.
 * The ``request_hook`` function is called before the view and may return a response. This way you would be able to issue
   redirects from a toolbar if needed
 
+This classes can define an optional ``supported_apps`` attribute to define the toolbar is local to (i.e.: for which the
+``is_current_app`` attribute is set to ``True``); this is useful to define the toolbar in a different application than
+the views it's related to.
+
 A simple example, registering a class that does nothing::
 
     from cms.toolbar_pool import toolbar_pool
