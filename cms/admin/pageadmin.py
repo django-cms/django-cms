@@ -1333,7 +1333,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.toggle_in_navigation()
-            return admin_utils.render_admin_menu_item(request, page)
+            language = request.GET.get('language') or get_language_from_request(request)
+            return admin_utils.render_admin_menu_item(request, page, language=language)
         return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page's in_navigation status")))
 
     def descendants(self, request, page_id, language):
