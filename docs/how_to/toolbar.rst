@@ -46,6 +46,7 @@ is available for overwrite as well.
 This classes can define an optional ``supported_apps`` attribute to define the toolbar is local to (i.e.: for which the
 ``is_current_app`` attribute is set to ``True``); this is useful to define the toolbar in a different application than
 the views it's related to.
+``supported_apps`` is a tuple of application dotted paths (e.g: ``supported_apps = ('whatever.path.app', 'another.path.app')``.
 
 A simple example, registering a class that does nothing::
 
@@ -141,6 +142,26 @@ If you wish to simply detect the presence of a menu without actually creating
 it, you can use :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`, which will
 return the menu if it is present, or, if not, will return `None`.
 
+
+**************************
+Modifying existing toolbar
+**************************
+
+If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) you can define your own
+toolbar by extending the original one and override the do the needed override.
+
+If :setting:`CMS_TOOLBARS` is used to register the toolbars, add your own toolbar instead of the original one, otherwise
+unregister the original and register your own::
+
+
+    from cms.toolbar_pool import toolbar_pool
+    from third.party.app.cms.toolbar_base import FooToolbar
+
+    @toolbar_pool.register
+    class BarToolbar(FooToolbar):
+        supported_apps = ('third.party.app', 'your.app')
+
+    toolbar_pool.unregister(FooToolbar)
 
 ===========================
 Adding Items Alphabetically
