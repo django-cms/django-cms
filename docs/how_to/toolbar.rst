@@ -53,7 +53,7 @@ A simple example, registering a class that does nothing::
     from cms.toolbar_base import CMSToolbar
 
     @toolbar_pool.register
-    class MoopModifier(CMSToolbar):
+    class NoopModifier(CMSToolbar):
 
         def populate(self):
             pass
@@ -67,7 +67,7 @@ A simple example, registering a class that does nothing::
 
 .. warning::
 
-    ``post_template_populate`` maybe finds different nodes in the toolbar than propagate.
+    ``post_template_populate`` maybe finds different nodes in the toolbar than populate.
 
 .. tip::
 
