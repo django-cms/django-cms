@@ -349,6 +349,53 @@ Plugins need the ``allow_children`` attribute to set to `True` for this to be en
 .. templatetag:: render_model
 .. versionadded:: 3.0
 
+
+render_plugin_block
+===================
+
+This templatetag acts like the CMS's templatetag 'render_model_block' but with
+a plugin instead of a model. This is used to link from a block of markup to a
+plugin's changeform.
+
+This is useful for UIs that have some plugins hidden from display in preview
+mode, but the CMS author needs to expose a way to edit them anyway. It is also
+useful for just making duplicate or alternate means of triggering the change
+form for a plugin.
+
+This would typically be used inside a parent-plugins render template. In this
+example code below, there is a parent container plugin which renders a list of
+child plugins inside a NAV block, then the actual plugin contents in side a
+DIV .contentgroup-items block. In this example, the nav block is always shown,
+but the items are only shown once the corresponding navigation element is
+clicked. Adding this render_plugin_block makes it significantly more intuitive
+to edit a child plugins content, by double-clicking its nav item in edit mode.
+
+Example::
+
+    {% load cms_tags l10n %}
+
+    {% block section_content %}
+    <div class="contentgroup-container">
+      <nav class="contentgroup">
+        <div class="inner">
+          <ul class="contentgroup-items">{% for child in children %}{% if child.enabled %}
+            <li class="item{{ forloop.counter0|unlocalize }}{% if not forloop.counter0 %} active{% endif %}">{% render_plugin_block child %}
+              <a href="#item{{ child.id|unlocalize }}">{{ child.title|safe }}</a>{% endrender_plugin_block %}
+            </li>{% endif %}{% endfor %}
+          </ul>
+        </div>
+      </nav>
+
+      <div class="contentgroup-items">{% for child in children %}
+        <div class="contentgroup-item item{{ child.id|unlocalize }}{% if not forloop.counter0 %} active{% endif %}">
+          {% render_plugin child  %}
+        </div>{% endfor %}
+      </div>
+    </div>
+    {% endblock %}
+
+
+
 render_model
 ============
 
