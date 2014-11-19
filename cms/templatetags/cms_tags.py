@@ -394,8 +394,7 @@ class RenderPluginBlock(Tag):
                 '{{ inner }}'
                 '</div>'
             )
-            output = t.render(context)
-        return output
+            return t.render(context)
 
 register.tag(RenderPluginBlock)
 
