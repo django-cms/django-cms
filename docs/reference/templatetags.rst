@@ -370,6 +370,10 @@ but the items are only shown once the corresponding navigation element is
 clicked. Adding this render_plugin_block makes it significantly more intuitive
 to edit a child plugins content, by double-clicking its nav item in edit mode.
 
+Arguments:
+
+- ``plugin``
+
 Example::
 
     {% load cms_tags l10n %}
@@ -378,10 +382,14 @@ Example::
     <div class="contentgroup-container">
       <nav class="contentgroup">
         <div class="inner">
-          <ul class="contentgroup-items">{% for child in children %}{% if child.enabled %}
-            <li class="item{{ forloop.counter0|unlocalize }}{% if not forloop.counter0 %} active{% endif %}">{% render_plugin_block child %}
-              <a href="#item{{ child.id|unlocalize }}">{{ child.title|safe }}</a>{% endrender_plugin_block %}
-            </li>{% endif %}{% endfor %}
+          <ul class="contentgroup-items">{% for child in children %}
+          {% if child.enabled %}
+            <li class="item{{ forloop.counter0|unlocalize }}">
+              {% render_plugin_block child %}
+              <a href="#item{{ child.id|unlocalize }}">{{ child.title|safe }}</a>
+              {% endrender_plugin_block %}
+            </li>{% endif %}
+          {% endfor %}
           </ul>
         </div>
       </nav>
