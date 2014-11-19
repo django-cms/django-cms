@@ -385,12 +385,16 @@ class RenderPluginBlock(Tag):
     )
 
     def render_tag(self, context, plugin, nodelist):
-        context.push()
-        context['inner'] = nodelist.render(context)
-        context['plugin'] = plugin
-        t = template.Template('{% load l10n %}<div class="cms_plugin cms_plugin-{{ plugin.id|unlocalize }}">{{ inner }}</div>')
-        output = t.render(context)
-        context.pop()
+        with context.push():
+            context['inner'] = nodelist.render(context)
+            context['plugin'] = plugin
+            t = template.Template(
+                '{% load l10n %}'
+                '<div class="cms_plugin cms_plugin-{{ plugin.id|unlocalize }}">'
+                '{{ inner }}'
+                '</div>'
+            )
+            output = t.render(context)
         return output
 
 register.tag(RenderPluginBlock)
