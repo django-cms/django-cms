@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.core.exceptions import ImproperlyConfigured
 import os
 import unittest
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, base
 from django.test import TestCase
 
@@ -16,6 +15,7 @@ from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
 from cms.utils.compat import DJANGO_1_6
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
 class TestOutput(FileOutputWrapper):

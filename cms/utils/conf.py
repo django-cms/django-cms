@@ -14,7 +14,7 @@ from cms.utils.compat.urls import urljoin
 __all__ = ['get_cms_setting']
 
 
-class VERIFIED: pass # need a unique identifier for CMS_LANGUAGES
+class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def default(name):
@@ -145,7 +145,7 @@ def _ensure_languages_settings(languages):
     if not isinstance(languages, dict):
         raise ImproperlyConfigured(
             "CMS_LANGUAGES must be a dictionary with site IDs and 'default'"
-            " as keys. Please check the format")
+            " as keys. Please check the format.")
 
     defaults = languages.pop('default', {})
     default_fallbacks = defaults.get('fallbacks')
@@ -194,7 +194,7 @@ def _ensure_languages_settings(languages):
             lang_code != language_object['code']]
 
     languages['default'] = defaults
-    languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
+    languages[VERIFIED] = True  # this will be busted by SettingsOverride and cause a re-check
 
     return languages
 
@@ -207,10 +207,10 @@ def get_languages():
     if not settings.USE_I18N:
         return _ensure_languages_settings(
             {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
-    if not settings.LANGUAGE_CODE in dict(settings.LANGUAGES):
+    if settings.LANGUAGE_CODE not in dict(settings.LANGUAGES):
         raise ImproperlyConfigured(
-                        'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
-                    )
+            'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
+        )
     languages = getattr(settings, 'CMS_LANGUAGES', {
         settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
     })
