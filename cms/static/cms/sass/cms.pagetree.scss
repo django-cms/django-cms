@@ -64,7 +64,7 @@ $color-background-blue-hover: #e6f6fd;
 	ul.header li .col2 > div { font-size:10px; line-height:14px; border:none; background:none; }
 
 	// row
-	li .cont { display:block; border-top:1px solid $color-border !important; }
+	li .cont { display:block; border-top:1px solid $color-border !important; overflow: hidden; }
 	li.open > .cont { border-bottom:1px solid $color-border !important; }
 	li.open ul .cont { border-top:none !important; border-bottom:1px solid $color-border !important; }
 	li.moveable > div { border-bottom:none !important; }
@@ -74,7 +74,7 @@ $color-background-blue-hover: #e6f6fd;
 	li.open ul { margin-left:0; border-bottom:1px solid $color-border !important; }
 	li.open.last ul { border-bottom:none !important; }
 	li.open ul.last { border-bottom:none !important; }
-§
+
 	li .col1 > div { text-align:center; }
 	li .col1 .title { background:none; white-space: nowrap; }
 	li .col1 .success { color:$color-font; padding-left:10px; }
@@ -179,7 +179,6 @@ $color-background-blue-hover: #e6f6fd;
 		&.unpublishedparent { background-color:#b3b3b3; }
 		&.published { background-color:#65b417; }
 	 }
-	 li .cont { overflow:visible !important; }
 }
 
 // dropdown for language change
