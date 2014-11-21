@@ -65,6 +65,12 @@ class DynamicPlaceholderSlotExample(models.Model):
     placeholder_2 = PlaceholderField(dynamic_placeholder_2, related_name='dynamic_pl_2')
 
 
+class CharPksExample(models.Model):
+    char_1 = models.CharField(u'char_1', max_length=255)
+    slug = models.SlugField(u'char_1', max_length=255, primary_key=True)
+    placeholder_1 = PlaceholderField('placeholder_1', related_name='charpk_p1')
+
+
 @python_2_unicode_compatible
 class MultilingualExample1(TranslatableModel):
     translations = TranslatedFields(

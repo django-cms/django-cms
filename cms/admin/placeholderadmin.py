@@ -43,13 +43,14 @@ class FrontendEditableAdminMixin(object):
         Register the url for the single field edit view
         """
         from django.conf.urls import patterns, url
+        from cms.urls import SLUG_REGEXP
 
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(
             '',
-            pat(r'edit-field/([0-9]+)/([a-z\-]+)/$', self.edit_field),
+            pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         )
         return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
 
@@ -125,6 +126,7 @@ class PlaceholderAdminMixin(object):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         from django.conf.urls import patterns, url
+        from cms.urls import SLUG_REGEXP
 
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
@@ -133,9 +135,9 @@ class PlaceholderAdminMixin(object):
             '',
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
-            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
+            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
+            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         )
         return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
