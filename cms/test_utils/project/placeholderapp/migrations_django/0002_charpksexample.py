@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('char_1', models.CharField(max_length=255, verbose_name='char_1')),
                 ('slug', models.SlugField(max_length=255, serialize=False, verbose_name='char_1', primary_key=True)),
-                ('placeholder_1', cms.models.fields.PlaceholderField(related_name='charpk_p1', slotname=b'placeholder_1', editable=False, to='cms.Placeholder', null=True)),
+                ('placeholder_1', cms.models.fields.PlaceholderField(related_name='charpk_p1', slotname='placeholder_1', editable=False, to='cms.Placeholder', null=True)),
             ],
             options={
             },
