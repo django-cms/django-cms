@@ -69,7 +69,7 @@ A simple example, registering a class that does nothing::
 
 .. warning::
 
-    As the toolbar passed to ``post_template_populate`` has been already populated with items from other application,
+    As the toolbar passed to ``post_template_populate`` has been already populated with items from other applications,
     it might contains different items that when processed by ``populate``.
 
 .. tip::
