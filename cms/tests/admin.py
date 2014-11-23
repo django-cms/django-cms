@@ -659,6 +659,9 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'no': 'data'})
             old = page.in_navigation
             response = self.admin_class.change_innavigation(request, page.pk)
+            # These asserts are for #3589
+            self.assertContains(response, 'lang="en"')
+            self.assertContains(response, './%s/en/preview/' % page.pk)
             self.assertEqual(response.status_code, 200)
             page = self.reload(page)
             self.assertEqual(old, not page.in_navigation)
