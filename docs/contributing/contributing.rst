@@ -205,6 +205,8 @@ Inline markup
 * use emphasis - ``*Home*`` around:
     * the names of available options in the Admin
     * values in or of fields
+* use strong emphasis - ``**Add page**`` around:
+    * buttons that perform an action
 
 References
 ----------

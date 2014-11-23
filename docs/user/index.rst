@@ -12,6 +12,7 @@ Using django CMS
     :maxdepth: 2
 
     editing_basics
+    page_admin
 
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/
