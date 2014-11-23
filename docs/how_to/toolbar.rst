@@ -34,7 +34,7 @@ These have four attributes:
 * is_current_app (a flag indicating whether the current request is handled by the same app as the function is in)
 * app_path (the name of the app used for the current request)
 
-This classes must implement a ``populate`` or ``post_template_populate`` function. An optional ``request_hook`` function
+These classes must implement a ``populate`` or ``post_template_populate`` function. An optional ``request_hook`` function
 is available for overwrite as well.
 
 * The populate functions will only be called if the current user is a staff user.
@@ -43,9 +43,10 @@ is available for overwrite as well.
 * The ``request_hook`` function is called before the view and may return a response. This way you would be able to issue
   redirects from a toolbar if needed
 
-This classes can define an optional ``supported_apps`` attribute to define the toolbar is local to (i.e.: for which the
-``is_current_app`` attribute is set to ``True``); this is useful to define the toolbar in a different application than
-the views it's related to.
+These classes can define an optional ``supported_apps`` attribute, specifying which applications the toolbar will work
+with.
+This is useful when the toolbar is defined in a different application from the views it's related to.
+to define the toolbar is local to (i.e.: for which the
 ``supported_apps`` is a tuple of application dotted paths (e.g: ``supported_apps = ('whatever.path.app', 'another.path.app')``.
 
 A simple example, registering a class that does nothing::
@@ -68,7 +69,8 @@ A simple example, registering a class that does nothing::
 
 .. warning::
 
-    ``post_template_populate`` maybe finds different nodes in the toolbar than populate.
+    As the toolbar passed to ``post_template_populate`` has been already populated with items from other application,
+    it might contains different items that when processed by ``populate``.
 
 .. tip::
 
@@ -143,12 +145,12 @@ it, you can use :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`, which will
 return the menu if it is present, or, if not, will return `None`.
 
 
-**************************
-Modifying existing toolbar
-**************************
+*****************************
+Modifying an existing toolbar
+******************* **********
 
-If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) you can define your own
-toolbar by extending the original one and override the do the needed override.
+If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) yyou can do this by
+extending the original one, and modifying the appropriate attribute.
 
 If :setting:`CMS_TOOLBARS` is used to register the toolbars, add your own toolbar instead of the original one, otherwise
 unregister the original and register your own::
