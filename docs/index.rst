@@ -20,7 +20,7 @@ from a CMS, but can also be easily customised and extended by developers to
 create a site that is tailored to their precise needs.
 
 **Web content editors** looking for documentation on how to use the editing
-interface should refer to our :doc:`/user/editing_basics` section.
+interface should refer to our :doc:`/user/index` section.
 
 **Web content developers** who want to learn more about django CMS, as well as
 how to install, configure and customize it for their own projects will can

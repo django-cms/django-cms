@@ -6,13 +6,21 @@ Page admin
 The interface
 *************
 
-===========
-The toolbar
-===========
+.. _toolbar:
+
+======================
+The django CMS toolbar
+======================
+
+The toolbar is central to your content editing and management work in django
+CMS.
 
 .. figure:: /images/toolbar-site-menu.png
 
-*django CMS* takes you back to home page of your site.
+*django CMS*
+============
+
+Takes you back to home page of your site.
 
 *Site menu*
 ===========
@@ -52,22 +60,47 @@ Here you can:
 * *Copy* all plugins and their contents from an existing translation to the
   current one.
 
-The *disclosure triangle* on the far right is a toggle to hide and reveal the
-toolbar.
+The *Structure/Content* button
+==============================
+
+Allows you to switch between different editing modes (when you're looking at a
+draft only).
+
+*Publishing controller*
+=======================
+
+The *Publishing controller* manages the publishing state of your page - options
+are *Publish page now*, for hitherto unpublished pages, and a *Draft/Live*
+switch.
+
+The *disclosure triangle*
+=========================
+
+A toggle to hide and reveal the toolbar.
+
+.. _side-frame:
 
 ==============
 The side-frame
 ==============
 
+.. figure:: /images/side-frame-controls.png
+   :figwidth: 28
+   :align: right
+
 The *x* closes the side-frame. To reopen the side-frame, choose one of the
-links from the *Site menu* (named *example.com* by default). The other two
-side-frame controls minimise and maximise the side-frame.
+links from the *Site menu* (named *example.com* by default).
+
+The triangle icon expands and collapses the side-frame, and the next expands
+and collapses the main frame.
 
 You can also adjust the side-frame's width by dragging it.
 
-***********
-Admin views
-***********
+*******************
+Admin views & forms
+*******************
+
+.. _page-list:
 
 =========
 Page list
@@ -116,6 +149,8 @@ If you expand the width of the side-frame, you'll see more:
   * *delete* page
 
 * *info* displays additional information about the page
+
+.. _basic-page-settings:
 
 ===================
 Basic page settings

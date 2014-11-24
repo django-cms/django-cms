@@ -663,7 +663,8 @@ Log in with the user you created during the database setup.
 If this is your first django CMS project, read through the `tutorial`_ for a
 walkthrough of the main features of django CMS.
 
-For more information on adding and creating pages, see :doc:`/user/editing_basics`.
+For more information on using django CMS for managing web content, see
+:doc:`/user/index`.
 
 To deploy your django CMS project on a production webserver, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
