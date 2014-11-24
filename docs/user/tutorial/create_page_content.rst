@@ -12,21 +12,24 @@ Adding content to a page
 
 Your page is empty of course. We need to add some content to it, by adding a
 *plugin*. In the toolbar, you'll notice that we're in *Content* mode. Change
-that to *Structure* mode.
+that to *Structure* mode, using the :ref:`Structure/Content button
+<structure-content-button>`.
 
 This reveals the *placeholders* available on the page
 
 On any placeholder, click the menu icon on the right side to reveal the list of
 available plugins. In this case, we'll choose the *Text* plugin. Invoking the
 *Text* plugin will open your installed text editor plugin. Enter some text and
-press "Save". When you save the plugin, your plugin will now be displayed
-"inside" the placeholder as shown in this progression of images:
+press **Save**.
+
+When you save the plugin, your plugin will now be displayed
+"inside" the placeholder, as shown.
 
 Previewing a page
 =================
 
-To preview the page, switch back to *Content* mode using the button in the
-toolbar.
+To preview the page, switch back to *Content* mode using the *Structure/Content
+button* in the toolbar.
 
 You can continue editing existing plugins in *Content* mode simply by
 double-clicking the content they present. Try it: double-click on the text you
