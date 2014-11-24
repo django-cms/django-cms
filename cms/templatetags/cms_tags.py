@@ -379,7 +379,7 @@ class RenderPluginBlock(InclusionTag):
     """
 
     name = 'render_plugin_block'
-    template = "contentgroup/render_plugin_block.html"
+    template = "cms/toolbar/render_plugin_block.html"
     options = Options(
         Argument('plugin'),
         blocks=[('endrender_plugin_block', 'nodelist')],
