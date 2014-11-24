@@ -149,7 +149,7 @@ return the menu if it is present, or, if not, will return `None`.
 Modifying an existing toolbar
 ******************* **********
 
-If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) yyou can do this by
+If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) you can do this by
 extending the original one, and modifying the appropriate attribute.
 
 If :setting:`CMS_TOOLBARS` is used to register the toolbars, add your own toolbar instead of the original one, otherwise
