@@ -366,7 +366,7 @@ class RenderPlugin(InclusionTag):
 register.tag(RenderPlugin)
 
 
-class RenderPluginBlock(Tag):
+class RenderPluginBlock(InclusionTag):
     """
     Acts like the CMS's templatetag 'render_model_block' but with a plugin
     instead of a model. This is used to link from a block of markup to a
@@ -379,22 +379,16 @@ class RenderPluginBlock(Tag):
     """
 
     name = 'render_plugin_block'
+    template = "contentgroup/render_plugin_block.html"
     options = Options(
         Argument('plugin'),
         blocks=[('endrender_plugin_block', 'nodelist')],
     )
 
-    def render_tag(self, context, plugin, nodelist):
-        with context.push():
-            context['inner'] = nodelist.render(context)
-            context['plugin'] = plugin
-            t = template.Template(
-                '{% load l10n %}'
-                '<div class="cms_plugin cms_plugin-{{ plugin.id|unlocalize }}">'
-                '{{ inner }}'
-                '</div>'
-            )
-            return t.render(context)
+    def get_context(self, context, plugin, nodelist):
+        context['inner'] = nodelist.render(context)
+        context['plugin'] = plugin
+        return context
 
 register.tag(RenderPluginBlock)
 
