@@ -272,7 +272,7 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._meta.get_all_related_objects():
-                if rel.model != CMSPlugin and rel.model != AliasPluginModel:
+                if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),
