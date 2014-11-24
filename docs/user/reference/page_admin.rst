@@ -60,18 +60,35 @@ Here you can:
 * *Copy* all plugins and their contents from an existing translation to the
   current one.
 
+.. _structure-content-button:
+
 The *Structure/Content* button
 ==============================
 
+.. figure:: /images/structure-content.png
+   :figwidth: 143
+   :align: right
+
 Allows you to switch between different editing modes (when you're looking at a
 draft only).
+
+.. _publishing-controller:
 
 *Publishing controller*
 =======================
 
 The *Publishing controller* manages the publishing state of your page - options
-are *Publish page now*, for hitherto unpublished pages, and a *Draft/Live*
-switch.
+are *Publish page now* |publish-page-now|, for hitherto unpublished pages, and
+a control to switch to *Draft* |draft| and *Live* |live| views.
+
+.. |publish-page-now| image:: /images/publish-page-now.png
+   :width: 119
+
+.. |draft| image:: /images/draft.png
+   :width: 91
+
+.. |live| image:: /images/live.png
+   :width: 79
 
 The *disclosure triangle*
 =========================
@@ -125,7 +142,7 @@ From left to right, items in the list have:
 * the page's *Title*
 * a *soft-root* indicator (*Cheese* has *soft-root* applied; *Home* is the menu
   root anyway)
-* *language version status* indicators and controls:
+* *language version* indicators and controls:
 
   * *blank*: the translation does not exist; pressing the indicator will open
     its *Basic settings* (in all other cases, hovering will reveal
