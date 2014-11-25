@@ -49,6 +49,8 @@ class MyTitleExtensionToolbar(CMSToolbar):
 
 @toolbar_pool.register
 class MyPageExtensionToolbar(CMSToolbar):
+    supported_apps = ('cms.test_utils.project.extensionapp.cms_toolbar', 'cms.test_utils.project.placeholderapp')
+
     def populate(self):
         # always use draft if we have a page
         self.page = get_page_draft(self.request.current_page)
