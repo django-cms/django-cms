@@ -50,7 +50,7 @@ class CMSChangeList(ChangeList):
         self._current_site = current_site(request)
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
-            self.queryset = self.get_query_set(request)
+            self.queryset = self.get_queryset(request)
         except:
             raise
         self.get_results(request)
@@ -59,7 +59,7 @@ class CMSChangeList(ChangeList):
             request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
 
-    def get_query_set(self, request=None):
+    def get_queryset(self, request=None):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
         if 'language' in self.params:
@@ -67,9 +67,9 @@ class CMSChangeList(ChangeList):
         if 'page_id' in self.params:
             del self.params['page_id']
         if django.VERSION[1] > 3:
-            qs = super(CMSChangeList, self).get_query_set(request).drafts()
+            qs = super(CMSChangeList, self).get_queryset(request).drafts()
         else:
-            qs = super(CMSChangeList, self).get_query_set().drafts()
+            qs = super(CMSChangeList, self).get_queryset().drafts()
         if request:
             site = self.current_site()
             permissions = Page.permissions.get_change_id_list(request.user, site)
@@ -105,7 +105,7 @@ class CMSChangeList(ChangeList):
         site = self.current_site()
         # Get all the pages, ordered by tree ID (it's convenient to build the
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('path').select_related('publisher_public')
+        pages = self.get_queryset(request).drafts().order_by('path').select_related('publisher_public')
 
         # Get lists of page IDs for which the current user has
         # "permission to..." on the current site.
