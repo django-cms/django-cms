@@ -39,6 +39,16 @@
 
 		.cms_sideframe-hide { border:5px solid $color-grey-70; border-left:none; border-right:none; }
 	}
+
+  .cms_sideframe-navigation {
+    position: relative;
+    z-index: 9999;
+    background:$color-grey-10; @include background-image($gradient-light); height: 51px; border-bottom: 1px solid #333333;
+    .cms_sideframe-back { background: url('../img/toolbar/back.png') no-repeat; width: 6px; height: 12px;
+        position: relative; z-index: 9999; top: 35px; float: left; left: 10px; cursor: pointer;}
+    .cms_sideframe-forward { background: url('../img/toolbar/forward.png') no-repeat; width: 6px; height: 12px;
+        position: relative; z-index: 9999; top: 35px; float: right; right: 10px; cursor: pointer;}
+  }
 }
 
 // end of toolbar
