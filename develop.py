@@ -10,7 +10,7 @@ import os
 import sys
 import warnings
 
-from StringIO import StringIO
+from django.utils.six.moves import StringIO
 
 from django import VERSION
 from django.core.exceptions import DjangoRuntimeWarning
