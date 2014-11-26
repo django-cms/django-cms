@@ -189,7 +189,7 @@ def shell():
     call_command('shell')
 
 
-class capture_all_output(object):
+class swallow_all_output(object):
     def __init__(self):
         self.output = StringIO()
         self.original_stdout = sys.stdout
@@ -198,7 +198,7 @@ class capture_all_output(object):
         sys.stderr = self.output
 
     def __enter__(self):
-        return self.output.getvalue()
+        pass
 
     def __exit__(self, *_):
         sys.stdout = self.original_stdout
@@ -239,9 +239,8 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
                 print('WARNING: The app: {0} could not be found.'.format(application))
             else:
                 try:
-                    with capture_all_output() as content:
+                    with swallow_all_output():
                         call_command('schemamigration', application, auto=True)
-                    print(content)
                 except SystemExit:
                     pass
     else:
