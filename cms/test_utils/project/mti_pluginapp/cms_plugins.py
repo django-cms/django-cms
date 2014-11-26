@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cms.models import CMSPluginBase
+from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 
 from .models import TestPluginAlphaModel, TestPluginBetaModel
