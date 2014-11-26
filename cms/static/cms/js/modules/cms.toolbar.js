@@ -219,7 +219,7 @@ $(document).ready(function () {
 		},
 
 		// public methods
-		toogleToolbar: function (show) {
+		toogleToolbar: function (show) {
 			// overwrite state when provided
 			if(show) this.settings.toolbar = 'collapsed';
 			// toggle bar
