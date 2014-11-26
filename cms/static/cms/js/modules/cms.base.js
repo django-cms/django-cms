@@ -72,7 +72,9 @@ $(document).ready(function () {
 
 			// add timeout if provided
 			parent.setTimeout(function () {
-				(url) ? parent.location.href = url : parent.location.reload();
+				if (url) { parent.location.href = url; }
+				// ensure page is always reloaded #3413
+				parent.location.reload()
 			}, timeout || 0);
 		},
 
