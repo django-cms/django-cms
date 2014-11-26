@@ -1,20 +1,28 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
+
 import contextlib
 import multiprocessing
 import pkgutil
 import pyclbr
 import subprocess
-from django.core.exceptions import DjangoRuntimeWarning
 import os
 import sys
 import warnings
 
-from docopt import docopt
+from StringIO import StringIO
+
 from django import VERSION
+from django.core.exceptions import DjangoRuntimeWarning
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command, CommandError
 from django.utils import autoreload
 from django.utils.encoding import force_text
-from django.core.management import call_command, CommandError
+
+from docopt import docopt
+
+from south.exceptions import NoMigrations
+from south.migration import Migrations
 
 import cms
 from cms.test_utils.cli import configure
@@ -184,8 +192,23 @@ def shell():
     call_command('shell')
 
 
+class capture_all_output(object):
+    def __init__(self):
+        self.output = StringIO()
+        self.original_stdout = sys.stdout
+        self.original_stderr = sys.stderr
+        sys.stdout = self.output
+        sys.stderr = self.output
+
+    def __enter__(self):
+        return self.output.getvalue()
+
+    def __exit__(self, *_):
+        sys.stdout = self.original_stdout
+        sys.stderr = self.original_stderr
+
+
 def makemigrations(migrate_plugins=True, merge=False, squash=False):
-    from django.core.management import call_command
     applications = [
         # core applications
         'cms', 'menus',
@@ -204,7 +227,23 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
         for application in applications:
-            call_command('schemamigration', application, auto=True)
+            try:
+                Migrations(application)
+            except NoMigrations:
+                print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(application))
+                try:
+                    call_command('schemamigration', application, initial=True)
+                except SystemExit:
+                    pass
+            except ImproperlyConfigured:
+                print('WARNING: The app: {0} could not be found.'.format(application))
+            else:
+                try:
+                    with capture_all_output() as content:
+                        call_command('schemamigration', application, auto=True)
+                    print(content)
+                except SystemExit:
+                    pass
     else:
         call_command('makemigrations', *applications, merge=merge)
 
