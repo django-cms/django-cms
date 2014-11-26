@@ -21,9 +21,6 @@ from django.utils.encoding import force_text
 
 from docopt import docopt
 
-from south.exceptions import NoMigrations
-from south.migration import Migrations
-
 import cms
 from cms.test_utils.cli import configure
 from cms.test_utils.util import static_analysis
@@ -224,6 +221,9 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
             'djangocms_flash', 'djangocms_video',
         ])
     if DJANGO_1_6:
+        from south.exceptions import NoMigrations
+        from south.migration import Migrations
+
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
         for application in applications:
