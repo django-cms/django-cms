@@ -34,7 +34,7 @@ $(document).ready(function () {
 			this.screenBlock = this.container.find('.cms_screenblock');
 
 			// states
-			this.click = 'click.cms touchend.cms';
+			this.click = 'click.cms';
 			this.timer = function () {};
 			this.lockToolbar = false;
 
