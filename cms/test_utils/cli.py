@@ -124,6 +124,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.bunch_of_plugins',
             'cms.test_utils.project.extensionapp',
+            'cms.test_utils.project.mti_pluginapp',
             'reversion',
             'sekizai',
             'hvad',
@@ -295,6 +296,7 @@ def configure(db_url, **extra):
             'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations_django',
             'extensionapp': 'cms.test_utils.project.extensionapp.migrations_django',
             'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations_django',
+            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations_django',
         }
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')

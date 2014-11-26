@@ -20,7 +20,6 @@ from cms.tests.permissions import *  # nopyflakes
 from cms.tests.permmod import *  # nopyflakes
 from cms.tests.placeholder import *  # nopyflakes
 from cms.tests.plugins import *  # nopyflakes
-# from cms.tests.plugins_mti import *  # nopyflakes
 from cms.tests.po import *  # nopyflakes
 from cms.tests.publisher import *  # nopyflakes
 from cms.tests.rendering import *  # nopyflakes
