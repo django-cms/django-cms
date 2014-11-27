@@ -97,7 +97,7 @@ $(document).ready(function () {
 			}
 
 			// because a new instance is called, we have to ensure minimized state is removed #3620
-			if(this.modal.is(':visible'), this.modal.find('.cms_modal-collapsed').length) {
+			if(this.modal.is(':visible') && this.modal.find('.cms_modal-collapsed').length) {
 				this.minimized = true;
 				this._minimize();
 			}
