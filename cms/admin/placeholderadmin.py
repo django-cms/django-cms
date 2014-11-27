@@ -75,7 +75,8 @@ class FrontendEditableAdminMixin(object):
                 'message': force_unicode(_("Field %s not found")) % raw_fields
             }
             return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
-        if not request.user.has_perm("%s_change" % self.model._meta.module_name):
+        if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
+                                                             self.model._meta.module_name)):
             context = {
                 'opts': opts,
                 'message': force_unicode(_("You do not have permission to edit this item"))
