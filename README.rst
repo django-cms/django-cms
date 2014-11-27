@@ -61,7 +61,7 @@ the details on how to install, extend and use the django CMS.
 Tutorial
 ********
 
-https://github.com/divio/django-cms-tutorial
+http://docs.django-cms.org/en/latest/introduction/index.html
 
 ***********
 Quick Start

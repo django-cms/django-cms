@@ -8,34 +8,34 @@
 <div class="breadcrumbs">
 	<a href="../../">{% trans "Home" %}</a> &rsaquo;
 	<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
-    {% if request.REQUEST.q %}
-    &rsaquo; {% trans "Search" %}
-    {% endif %}
+	{% if request.REQUEST.q %}
+	&rsaquo; {% trans "Search" %}
+	{% endif %}
 </div>
 {% endblock %}{% endif %}
 
 {% block coltype %}flex{% endblock %}
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />
-<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" />
-<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" />
+<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" type="text/css" />
 {% if cl.is_filtered %}
-<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" />
+<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" type="text/css" />
 {% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
 {{ block.super }}
-{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}"></script>{% endblock jquery %}
-<script src="{% static "cms/js/libs/class.min.js" %}"></script>
+{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}" type="text/javascript"></script>{% endblock jquery %}
+<script src="{% static "cms/js/libs/class.min.js" %}" type="text/javascript"></script>
 <!-- load jstree -->
-<script src="{% static "cms/js/jstree/_lib/_all.js" %}"></script>
-<script src="{% static "cms/js/jstree/tree_component.js" %}"></script>
+<script src="{% static "cms/js/jstree/_lib/_all.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/jstree/tree_component.js" %}" type="text/javascript"></script>
 <!-- load changelist -->
-<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}"></script>
-<script src="{% static "cms/js/modules/cms.base.js" %}"></script>
-<script src="{% static "cms/js/modules/cms.changelist.js" %}"></script>
+<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.base.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.changelist.js" %}" type="text/javascript"></script>
 <script>
 (function($) {
 // CMS.$ will be passed for $

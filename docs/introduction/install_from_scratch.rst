@@ -92,6 +92,6 @@ Try to switch between ``Live`` and ``Draft`` view, between ``Structure`` and
 
 To add a *Text* or or other plugin elements to a placeholder:
 
-1. switch to ``Structure`` mode
-1. select the menu icon on the placeholder's title bar
-1. select a plugin type to add
+#.  switch to ``Structure`` mode
+#.  select the menu icon on the placeholder's title bar
+#.  select a plugin type to add

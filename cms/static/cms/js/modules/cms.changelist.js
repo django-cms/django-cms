@@ -458,9 +458,10 @@ $(document).ready(function () {
 					e.stopPropagation();
 
 					var pageId = jtarget.attr('name').split('navigation-')[1];
+					var language = jtarget.closest('.cont').find('a[lang]').attr('lang') || '';
 
 					// if I don't put data in the post, django doesn't get it
-					reloadItem(jtarget, admin_base_url + 'cms/page/' + pageId + '/change-navigation/', { 1:1 });
+					reloadItem(jtarget, admin_base_url + 'cms/page/' + pageId + '/change-navigation/?language=' + language, { 1:1 });
 				}
 
 				 // lazy load descendants on tree open
