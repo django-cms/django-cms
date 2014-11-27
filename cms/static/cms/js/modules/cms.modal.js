@@ -168,7 +168,7 @@ $(document).ready(function () {
 			// handle refresh option
 			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
 
-			// reset parameters
+			// reset maximize or minimize states for #3111
 			setTimeout(function () {
 				if(that.minimized) { that._minimize(); }
 				if(that.maximized) { that._maximize(); }
