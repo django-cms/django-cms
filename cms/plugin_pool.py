@@ -208,5 +208,9 @@ class PluginPool(object):
 
         return url_patterns
 
+    def get_system_plugins(self):
+        self.discover_plugins()
+        self.set_plugin_meta()
+        return [plugin.name for plugin in self.plugins if plugin.system]
 
 plugin_pool = PluginPool()
