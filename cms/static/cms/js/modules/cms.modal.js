@@ -167,6 +167,13 @@ $(document).ready(function () {
 
 			// handle refresh option
 			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
+
+			// reset parameters
+			setTimeout(function () {
+				// reset states #3111
+				that.minimized = true;
+				that._minimize();
+			}, 300);
 		},
 
 		// private methods
