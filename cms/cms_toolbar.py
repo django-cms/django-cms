@@ -3,6 +3,8 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
@@ -96,6 +98,11 @@ class BasicToolbar(CMSToolbar):
     """
     Basic Toolbar for site and languages menu
     """
+
+    def __init__(self, request, toolbar, is_current_app, app_path):
+        super(BasicToolbar, self).__init__(request, toolbar, is_current_app, app_path)
+        user_settings = self.request.toolbar.get_user_settings()
+        self.clipboard = user_settings.clipboard
 
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
@@ -194,6 +201,18 @@ class BasicToolbar(CMSToolbar):
         except (AttributeError, NotImplementedError):
             return default
 
+    def get_clipboard_plugins(self):
+        self.populate()
+        if not hasattr(self, "clipboard"):
+            return []
+        return self.clipboard.get_plugins()
+
+    def render_addons(self, context):
+        context.push()
+        context['local_toolbar'] = self
+        clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
+        context.pop()
+        return [clipboard]
 
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):

@@ -17,6 +17,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
+from cms.utils.plugins import downcast_plugins
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -61,22 +62,14 @@ class CMSToolbar(ToolbarAPIMixin):
         # We need to store the current language in case the user's preferred language is different.
         self.toolbar_language = self.language
 
-        if self.is_staff:
-            try:
-                user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
-            except UserSettings.DoesNotExist:
-                user_settings = UserSettings(language=self.language, user=self.request.user)
-                placeholder = Placeholder(slot="clipboard")
-                placeholder.save()
-                user_settings.clipboard = placeholder
-                user_settings.save()
-            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
-                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
-                self.toolbar_language = user_settings.language
-            else:
-                user_settings.language = self.language
-                user_settings.save()
-            self.clipboard = user_settings.clipboard
+        user_settings = self.get_user_settings()
+        if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
+                not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
+            self.toolbar_language = user_settings.language
+        else:
+            user_settings.language = self.language
+            user_settings.save()
+
         with force_language(self.language):
             try:
                 decorator = resolve(self.request.path_info).func
@@ -109,6 +102,25 @@ class CMSToolbar(ToolbarAPIMixin):
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, toolbars[key].check_current_app(key, self.app_name), self.app_name)
             self.toolbars[key] = toolbar
+
+    def get_user_settings(self):
+        user_settings = None
+        if self.is_staff:
+            try:
+                user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
+            except UserSettings.DoesNotExist:
+                user_settings = UserSettings(language=self.language, user=self.request.user)
+                placeholder = Placeholder(slot="clipboard")
+                placeholder.save()
+                user_settings.clipboard = placeholder
+                user_settings.save()
+        return user_settings
+
+    def render_addons(self, context):
+        addons = []
+        for toolbar in self.toolbars.values():
+            addons.extend(toolbar.render_addons(context))
+        return ''.join(addons)
 
     @property
     def csrf_token(self):
@@ -209,12 +221,6 @@ class CMSToolbar(ToolbarAPIMixin):
             return self.right_items.index(item)
         else:
             return self.left_items.index(item)
-
-    def get_clipboard_plugins(self):
-        self.populate()
-        if not hasattr(self, "clipboard"):
-            return []
-        return self.clipboard.get_plugins()
 
     def get_left_items(self):
         self.populate()
