@@ -167,6 +167,12 @@ $(document).ready(function () {
 
 			// handle refresh option
 			if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
+
+			// reset maximize or minimize states for #3111
+			setTimeout(function () {
+				if(that.minimized) { that._minimize(); }
+				if(that.maximized) { that._maximize(); }
+			}, 300);
 		},
 
 		// private methods
@@ -230,12 +236,17 @@ $(document).ready(function () {
 
 		_minimize: function () {
 			var trigger = this.modal.find('.cms_modal-collapse');
+			var maximize = this.modal.find('.cms_modal-maximize');
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
+			var title = this.modal.find('.cms_modal-title');
 
 			// cancel action if maximized
 			if(this.maximized) return false;
 
 			if(this.minimized === false) {
+				// ensure toolbar is shown
+				CMS.API.Toolbar.toggleToolbar(true);
+
 				// minimize
 				trigger.addClass('cms_modal-collapsed');
 				contents.hide();
@@ -256,6 +267,11 @@ $(document).ready(function () {
 				// enable scrolling
 				this.body.css('overflow', '');
 
+				// ensure maximize element is hidden #3111
+				maximize.hide();
+				// set correct cursor when maximized #3111
+				title.css('cursor', 'default');
+
 				this.minimized = true;
 			} else {
 				// minimize
@@ -268,6 +284,11 @@ $(document).ready(function () {
 				// disable scrolling
 				this.body.css('overflow', 'hidden');
 
+				// ensure maximize element is shown #3111
+				maximize.show();
+				// set correct cursor when maximized #3111
+				title.css('cursor', 'move');
+
 				this.minimized = false;
 			}
 		},
@@ -275,7 +296,9 @@ $(document).ready(function () {
 		_maximize: function () {
 			var debug = (this.config.debug) ? 5 : 0;
 			var container = this.modal.find('.cms_modal-body');
+			var minimize = this.modal.find('.cms_modal-collapse');
 			var trigger = this.modal.find('.cms_modal-maximize');
+			var title = this.modal.find('.cms_modal-title');
 
 			// cancel action when minimized
 			if(this.minimized) return false;
@@ -310,6 +333,11 @@ $(document).ready(function () {
 					});
 				});
 				$(window).trigger('resize.cms.modal');
+
+				// ensure maximize element is hidden #3111
+				minimize.hide();
+				// set correct cursor when maximized #3111
+				title.css('cursor', 'default');
 			} else {
 				// minimize
 				this.maximized = false;
@@ -320,6 +348,11 @@ $(document).ready(function () {
 				// reattach css
 				this.modal.css(this.modal.data('css'));
 				container.css(container.data('css'));
+
+				// ensure maximize element is shown #3111
+				minimize.show();
+				// set correct cursor when maximized #3111
+				title.css('cursor', 'move');
 			}
 		},
 
@@ -513,10 +546,10 @@ $(document).ready(function () {
 			iframe.bind('load', function () {
 				// check if iframe can be accessed
 				try {
-				    iframe.contents();
+					iframe.contents();
 				} catch (error) {
-				    CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
-				    that.close();
+					CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
+					that.close();
 				}
 
 				// show messages in toolbar if provided
