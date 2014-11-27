@@ -12,8 +12,8 @@ window.Class = window.Class || undefined;
 
 // ensuring CMS namespace is set correctly
 var CMS = {
-	'$': (jQuery) ? jQuery : undefined,
-	'Class': (Class) ? Class : undefined,
+	'$': (typeof jQuery === 'function') ? jQuery : undefined,
+	'Class': (typeof Class === 'function') ? Class : undefined,
 	'API': {}
 };
 
