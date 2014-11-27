@@ -1620,4 +1620,5 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
 
         # Test that the change was properly stored in the DB
         plugin_model = TestPluginBetaModel.objects.all()[0]
+        self.assertEqual("ALPHA", plugin_model.alpha)
         self.assertEqual("BETA", plugin_model.beta)
