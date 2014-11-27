@@ -170,9 +170,8 @@ $(document).ready(function () {
 
 			// reset parameters
 			setTimeout(function () {
-				// reset states #3111
-				that.minimized = true;
-				that._minimize();
+				if(that.minimized) { that._minimize(); }
+				if(that.maximized) { that._maximize(); }
 			}, 300);
 		},
 
