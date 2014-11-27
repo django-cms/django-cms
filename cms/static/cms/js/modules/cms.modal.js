@@ -287,6 +287,7 @@ $(document).ready(function () {
 			var container = this.modal.find('.cms_modal-body');
 			var minimize = this.modal.find('.cms_modal-collapse');
 			var trigger = this.modal.find('.cms_modal-maximize');
+			var title = this.modal.find('.cms_modal-title');
 
 			// cancel action when minimized
 			if(this.minimized) return false;
@@ -324,6 +325,8 @@ $(document).ready(function () {
 
 				// ensure maximize element is hidden #3111
 				minimize.hide();
+				// set correct cursor when maximized #3111
+				title.css('cursor', 'default');
 			} else {
 				// minimize
 				this.maximized = false;
@@ -337,6 +340,8 @@ $(document).ready(function () {
 
 				// ensure maximize element is shown #3111
 				minimize.show();
+				// set correct cursor when maximized #3111
+				title.css('cursor', 'move');
 			}
 		},
 
