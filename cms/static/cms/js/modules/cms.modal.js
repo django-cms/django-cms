@@ -547,10 +547,10 @@ $(document).ready(function () {
 			iframe.bind('load', function () {
 				// check if iframe can be accessed
 				try {
-				    iframe.contents();
+					iframe.contents();
 				} catch (error) {
-				    CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
-				    that.close();
+					CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
+					that.close();
 				}
 
 				// show messages in toolbar if provided
