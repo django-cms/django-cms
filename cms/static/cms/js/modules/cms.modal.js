@@ -96,10 +96,10 @@ $(document).ready(function () {
 				CMS.API.locked = true;
 			}
 
-            // because a new instance is called, we have to ensure minimized state is removed #3620
+			// because a new instance is called, we have to ensure minimized state is removed #3620
 			if(this.modal.is(':visible'), this.modal.find('.cms_modal-collapsed').length) {
-			    this.minimized = true;
-			    this._minimize();
+				this.minimized = true;
+				this._minimize();
 			}
 
 			// show loader
