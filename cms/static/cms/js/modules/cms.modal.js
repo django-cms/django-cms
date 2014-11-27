@@ -285,6 +285,7 @@ $(document).ready(function () {
 		_maximize: function () {
 			var debug = (this.config.debug) ? 5 : 0;
 			var container = this.modal.find('.cms_modal-body');
+			var minimize = this.modal.find('.cms_modal-collapse');
 			var trigger = this.modal.find('.cms_modal-maximize');
 
 			// cancel action when minimized
@@ -320,6 +321,9 @@ $(document).ready(function () {
 					});
 				});
 				$(window).trigger('resize.cms.modal');
+
+				// ensure maximize element is hidden #3111
+				minimize.hide();
 			} else {
 				// minimize
 				this.maximized = false;
@@ -330,6 +334,9 @@ $(document).ready(function () {
 				// reattach css
 				this.modal.css(this.modal.data('css'));
 				container.css(container.data('css'));
+
+				// ensure maximize element is shown #3111
+				minimize.show();
 			}
 		},
 
