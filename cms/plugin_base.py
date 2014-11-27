@@ -361,8 +361,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
 
 class PluginMenuItem(object):
-    def __init__(self, name, url, data, question=None):
+    def __init__(self, name, url, data, question=None, action='ajax'):
         self.name = name
         self.url = url
         self.data = json.dumps(data)
         self.question = question
+        self.action = action

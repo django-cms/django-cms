@@ -456,6 +456,16 @@ $(document).ready(function () {
 			}
 		},
 
+		editPluginPostAjax: function(caller, toolbar, response){
+			if (typeof toolbar == 'undefined' || typeof response == 'undefined') {
+				return function(toolbar, response) {
+					var that = caller;
+					that.editPlugin(response['url'], that.options.plugin_name, response['breadcrumb']);
+				}
+			}
+			that.editPlugin(response['url'], that.options.plugin_name, response['breadcrumb']);
+		},
+
 		_setSubnav: function (nav) {
 			var that = this;
 
@@ -481,6 +491,9 @@ $(document).ready(function () {
 				switch(el.attr('data-rel')) {
 					case 'add':
 						that.addPlugin(el.attr('href').replace('#', ''), el.text(), that._getId(el.closest('.cms_draggable')));
+						break;
+					case 'ajax_add':
+						CMS.API.Toolbar.openAjax(el.attr('href'), JSON.stringify(el.data('post')), el.data('text'), that.editPluginPostAjax(that), el.data('on-success'));
 						break;
 					case 'edit':
 						that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
