@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import json
+from django.contrib.auth.models import AnonymousUser
 
 from djangocms_text_ckeditor.models import Text
 
@@ -10,8 +11,11 @@ from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
-from cms.utils.copy_plugins import copy_plugins_to
+from cms.test_utils.util.context_managers import SettingsOverride
+from cms.utils import get_cms_setting
 from cms.utils.compat.tests import UnittestCompatMixin
+from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.plugins import downcast_plugins
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
