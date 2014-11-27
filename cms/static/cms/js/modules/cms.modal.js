@@ -230,12 +230,16 @@ $(document).ready(function () {
 
 		_minimize: function () {
 			var trigger = this.modal.find('.cms_modal-collapse');
+			var maximize = this.modal.find('.cms_modal-maximize');
 			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
 
 			// cancel action if maximized
 			if(this.maximized) return false;
 
 			if(this.minimized === false) {
+				// ensure toolbar is shown
+				CMS.API.Toolbar.toggleToolbar(true);
+
 				// minimize
 				trigger.addClass('cms_modal-collapsed');
 				contents.hide();
@@ -256,6 +260,9 @@ $(document).ready(function () {
 				// enable scrolling
 				this.body.css('overflow', '');
 
+				// ensure maximize element is hidden #3111
+				maximize.hide();
+
 				this.minimized = true;
 			} else {
 				// minimize
@@ -267,6 +274,9 @@ $(document).ready(function () {
 
 				// disable scrolling
 				this.body.css('overflow', 'hidden');
+
+				// ensure maximize element is shown #3111
+				maximize.show();
 
 				this.minimized = false;
 			}
