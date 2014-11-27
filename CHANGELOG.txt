@@ -276,3 +276,18 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixed menu when hide untranslated is set to False
 - Fix sitemap ordering
 - Fix plugin table name generation fixes
+
+==== 3.0.7 (2014-11-27) ===
+- Complete Django 1.7 support
+- Numerous updates to the documentation
+- Numerous updates to the tutorial
+- Updates to better support South 1.0
+- Adds some new, user-facing documentation
+- Fixes an issue with placeholderadmin permissions
+- Numerous fixes for minor issues with the frontend UI
+- Fixes issue where the CMS would not reload pages properly if the URL contained a # symbol
+- Fixes an issue relating to 'limit_choices_to' in forms.MultiValueFields
+- Fixes PageField to work in Django 1.7 environments
+- Updates to community and project governance documentation
+- Added list of retired core developers
+- Added branch policy documentaion
