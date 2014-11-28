@@ -69,7 +69,7 @@ Example::
     ``cms`` as a directory name for your own project templates.
 
 *******************
-Basic Customization
+Basic Customisation
 *******************
 
 .. setting:: CMS_TEMPLATE_INHERITANCE
