@@ -671,6 +671,5 @@ For more information on using django CMS for managing web content, see
 To deploy your django CMS project on a production webserver, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
 
-.. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.7/topics/templates/
-.. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
+.. _official documentation: http://docs.djangoproject.com/en/stable/topics/templates/
+.. _tutorial: https://github.com/divio/django-cms-tutorial
