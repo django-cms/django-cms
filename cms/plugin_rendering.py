@@ -88,7 +88,8 @@ def render_plugins(plugins, context, placeholder, processors=None):
 
 
 def render_placeholder(placeholder, context_to_copy,
-        name_fallback="Placeholder", lang=None, default=None, editable=True):
+        name_fallback="Placeholder", lang=None, default=None, editable=True,
+        use_cache=True):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
@@ -127,7 +128,7 @@ def render_placeholder(placeholder, context_to_copy,
         processors = None
         edit = False
     from django.core.cache import cache
-    if get_cms_setting('PLACEHOLDER_CACHE'):
+    if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         cache_key = placeholder.get_cache_key(lang)
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
             cached_value = cache.get(cache_key)
@@ -176,7 +177,7 @@ def render_placeholder(placeholder, context_to_copy,
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
     changes = watcher.get_changes()
-    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
+    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         cache.set(cache_key, {'content': result, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
     context.pop()
     return result
