@@ -5,12 +5,13 @@ source =
 branch = False
 omit =
     cms/migrations/*
-    cms/migrations_django/*
+    cms/south_migrations/*
     cms/plugins/*/migrations/*
     cms/stacks/migrations/*
     cms/tests/*
     cms/test_utils/*
     menus/migrations/*
+    menus/south_migrations/*
     docs/*
     env/*
     env*
