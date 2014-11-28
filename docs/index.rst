@@ -31,10 +31,10 @@ and :doc:`/reference/index` sections.
 Why django CMS?
 ***************
 
-django CMS is a battle-tested CMS platform that powers sites both large and
+django CMS is a well-tested CMS platform that powers sites both large and
 small. Here are a few of the key features:
 
-* robust internationalization (i18n) support for creating multilingual sites
+* robust internationalisation (i18n) support for creating multilingual sites
 * virtually unlimited undo history, allowing editors to revert to a previous
   version
 * front-end editing, providing rapid access to the content management interface

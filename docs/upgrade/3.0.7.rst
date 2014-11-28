@@ -18,9 +18,9 @@ Bug Fixes
 
 * Fixes an issue with placeholderadmin permissions
 * Numerous fixes for minor issues with the frontend UI
-* Fixes issue where the CMS would not reload pages properly if the URL contained a # symbol
-* Fixes an issue relating to 'limit_choices_to' in forms.MultiValueFields
-* Fixes PageField to work in Django 1.7 environments
+* Fixes issue where the CMS would not reload pages properly if the URL contained a `#` symbol
+* Fixes an issue relating to `limit_choices_to` in `forms.MultiValueFields`
+* Fixes `PageField` to work in Django 1.7 environments
 
 Project & Community Governance
 ==============================
