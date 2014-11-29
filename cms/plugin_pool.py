@@ -227,7 +227,7 @@ class PluginPool(object):
         ) or ()
         for plugin in plugins:
             include_plugin = False
-            if placeholder and not plugin.require_parent:
+            if placeholder and not plugin.get_require_parent(placeholder, page):
                 include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
             if plugin.page_only and not include_page_only:
                 include_plugin = False
