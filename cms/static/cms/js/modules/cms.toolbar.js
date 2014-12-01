@@ -34,7 +34,7 @@ $(document).ready(function () {
 			this.screenBlock = this.container.find('.cms_screenblock');
 
 			// states
-			this.click = 'click.cms touchend.cms';
+			this.click = 'click.cms';
 			this.timer = function () {};
 			this.lockToolbar = false;
 
@@ -219,7 +219,7 @@ $(document).ready(function () {
 		},
 
 		// public methods
-		toggleToolbar: function (show) {
+		toggleToolbar: function (show) {
 			// overwrite state when provided
 			if(show) this.settings.toolbar = 'collapsed';
 			// toggle bar

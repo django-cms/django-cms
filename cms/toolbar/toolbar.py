@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-from cms.utils.conf import get_cms_setting
 from cms.constants import LEFT, REFRESH_PAGE
 from cms.models import UserSettings, Placeholder
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request
+from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 
 from django import forms
@@ -95,17 +96,17 @@ class CMSToolbar(ToolbarAPIMixin):
             except Resolver404:
                 self.app_name = ""
         toolbars = toolbar_pool.get_toolbars()
+        parts = self.app_name.split('.')
+        while parts:
+            path = '.'.join(parts)
+            if path in installed_apps():
+                self.app_name = path
+                break
+            parts.pop()
 
         self.toolbars = SortedDict()
-        app_key = ''
         for key in toolbars:
-            app_name = ".".join(key.split(".")[:-2])
-            if (self.app_name and app_name and
-                    self.app_name.startswith(app_name) and
-                    len(key) > len(app_key)):
-                app_key = key
-        for key in toolbars:
-            toolbar = toolbars[key](self.request, self, key == app_key, app_key)
+            toolbar = toolbars[key](self.request, self, toolbars[key].check_current_app(key, self.app_name), self.app_name)
             self.toolbars[key] = toolbar
 
     @property

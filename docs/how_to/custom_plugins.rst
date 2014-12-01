@@ -583,7 +583,7 @@ In your ``yourapp.cms_plugin_processors.py``::
             return t.render(c)
 
 
-.. _Django admin documentation: http://docs.djangoproject.com/en/1.2/ref/contrib/admin/
+.. _Django admin documentation: http://docs.djangoproject.com/en/dev/ref/contrib/admin/
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _django-sekizai documentation: http://django-sekizai.readthedocs.org
 

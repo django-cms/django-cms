@@ -516,7 +516,11 @@ class ApphooksTestCase(CMSTestCase):
                 path = reverse('namespaced_app_ns:sample-exempt')
             request = self.get_request(path)
             toolbar = CMSToolbar(request)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].app_path,
+                             'cms.test_utils.project.sampleapp')
             self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].app_path,
+                             'cms.test_utils.project.sampleapp')
             self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
 
     def test_toolbar_current_app_apphook_with_implicit_current_app(self):
@@ -526,7 +530,11 @@ class ApphooksTestCase(CMSTestCase):
                 path = reverse('namespaced_app_ns:current-app')
             request = self.get_request(path)
             toolbar = CMSToolbar(request)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].app_path,
+                             'cms.test_utils.project.sampleapp')
             self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].app_path,
+                             'cms.test_utils.project.sampleapp')
             self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
 
     def test_toolbar_no_namespace(self):
@@ -538,6 +546,26 @@ class ApphooksTestCase(CMSTestCase):
             toolbar = CMSToolbar(request)
             self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
             self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
+            self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbar.Example1Toolbar'].is_current_app)
+
+    def test_toolbar_multiple_supported_apps(self):
+        # Test with a basic application with no defined app_name and no namespace
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
+            self.create_base_structure(APP_NAME, 'en')
+            path = reverse('detail', kwargs={'id': 20})
+            request = self.get_request(path)
+            toolbar = CMSToolbar(request)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].app_path,
+                             'cms.test_utils.project.placeholderapp')
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbar.CategoryToolbar'].is_current_app)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].app_path,
+                             'cms.test_utils.project.placeholderapp')
+            self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyTitleExtensionToolbar'].is_current_app)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyPageExtensionToolbar'].app_path,
+                             'cms.test_utils.project.placeholderapp')
+            self.assertTrue(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbar.MyPageExtensionToolbar'].is_current_app)
+            self.assertEqual(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbar.Example1Toolbar'].app_path,
+                             'cms.test_utils.project.placeholderapp')
             self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbar.Example1Toolbar'].is_current_app)
 
     def test_toolbar_staff(self):

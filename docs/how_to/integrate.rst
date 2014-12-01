@@ -14,7 +14,7 @@ Requirements
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
 * `Django`_ 1.6.x or 1.7.x
-* `South`_ 1.0
+* `South`_ 1.0.1 (Only required for Django 1.6.x)
 * `django-classy-tags`_ 0.5 or higher
 * `django-treebeard`_ 2.0
 * `django-sekizai`_ 0.7 or higher
@@ -25,14 +25,6 @@ Requirements
 
 .. note:: When installing the django CMS using pip, all of the dependencies
           will be installed automatically.
-
-.. note:: There is currently a bug in South 1.0 that is incompatible with Python 3.x.
-          If you are running Python 3.x, you will need to install South from version
-          control: ``pip install https://bitbucket.org/andrewgodwin/south/get/e2c9102ee033.zip#egg=South``
-
-.. warning:: While django CMS is compatible with Django 1.5.x, this version of Django
-             is no longer supported by the Django team. Please upgrade to
-             Django 1.6.x or 1.7.x immediately.
 
 .. _Python: https://www.python.org
 .. _Django: https://www.djangoproject.com
@@ -147,7 +139,7 @@ its dependencies:
     # lock-in their version, specify them
     Django>=1.7
 
-    South==1.0
+    South==1.0.1 # Only needed for Django < 1.7
     django-treebeard==2.0
     django-sekizai==0.7
     django-classy-tags==0.5
@@ -156,10 +148,10 @@ its dependencies:
     six==1.3.0
 
     # Optional, recommended packages
-    Pillow==2.0.0
-    django-filer==0.9.5
-    cmsplugin-filer==0.9.5
-    django-reversion==1.7
+    Pillow>=2
+    django-filer==0.9.8
+    cmsplugin-filer==0.10.1
+    django-reversion==1.8
 
 .. note::
 
@@ -320,7 +312,7 @@ other highly recommended applications/libraries::
     'cms',  # django CMS itself
     'treebeard',  # utilities for implementing a tree using materialised paths
     'menus',  # helper for model independent hierarchical website navigation
-    'south',  # intelligent schema and data migrations
+    'south',  # Only needed for Django < 1.7
     'sekizai',  # for javascript and css management
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
@@ -613,10 +605,9 @@ HTML tag.
 Initial database setup
 ======================
 
-This command depends on whether you **upgrade** your installation or do a
-**fresh install**. We recommend that you get familiar with the way `South`_ works,
-as it is a very powerful, easy and convenient tool. django CMS uses it extensively.
-
+django CMS uses Django 1.7's built-in support for database migrations to manage
+creating and altering database tables. django CMS still offers South-style migrations
+for users of Django 1.6.x but as noted above, strictly requires South==1.0.1.
 
 Fresh install
 -------------
@@ -626,28 +617,20 @@ If you are using Django 1.7 or later run::
     python manage.py migrate
     python manage.py createsuperuser
 
-.. note:: You will need to add the following setting in order for Django to pick up the new style migrations for django CMS:
-
-::
-
-    MIGRATION_MODULES = {
-        'cms': 'cms.migrations_django',
-        'menus': 'menus.migrations_django',
-    }
-
-If you are using Django 1.6 or earlier supported versions run::
+If you are using Django 1.6.x run::
 
     python manage.py syncdb --all
     python manage.py migrate --fake
 
-The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and enter appropriate values.
+The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and
+enter appropriate values.
 
 Upgrade
 -------
 
-Run::
+If you are upgrading your installation of django CMS from a previous version run::
 
-    python manage.py syncdb
+    python manage.py syncdb # Django 1.6.x only
     python manage.py migrate
 
 
@@ -679,151 +662,14 @@ as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
 
 Log in with the user you created during the database setup.
 
+If this is your first django CMS project, read through the `tutorial`_ for a
+walkthrough of the main features of django CMS.
+
+For more information on using django CMS for managing web content, see
+:doc:`/user/index`.
+
 To deploy your django CMS project on a production webserver, please refer to the
-`Django documentation <http://docs.djangoproject.com/en/1.2/howto/deployment/>`_.
+`Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
 
-
-Creating your first CMS Page!
------------------------------
-
-That's it. Now the best part: you can start using the CMS! If you haven't
-already, run your server with ``python manage.py runserver``, then point a web
-browser to `127.0.0.1:8000/?edit <http://127.0.0.1:8000/?edit>`_ , and log
-in using the super user credentials you defined when you ran ``syncdb``
-earlier.
-
-Once in the admin part of your site, you should see something like the following:
-
-|logged-in|
-
-.. |logged-in| image:: ../images/logged-in.png
-
-
-Adding a page
--------------
-
-Adding a page is as simple as clicking the "Pages..." menu-item in the
-"example.com" (or similar) menu in the toolbar.
-
-|pages-menu-item|
-
-.. |pages-menu-item| image:: ../images/pages-menu-item.png
-
-This will reveal the new side-frame for administration.
-
-|no-pages|
-
-.. |no-pages| image:: ../images/no-pages.png
-
-Now, click the "add page" button at the top right-hand corner of the side-frame.
-
-|basic-page-form|
-
-.. |basic-page-form| image:: ../images/basic-page-form.png
-
-This is a basic form where you complete the title of the new page. The slug
-field is also required but a sensible value will be completed as you type the
-page’s title.
-
-Hitting the "Save" button, unsurprisingly, saves the page. It will now display in the list of
-pages.
-
-|my-first-page|
-
-.. |my-first-page| image:: ../images/my-first-page.png
-
-
-You can click the page title in the "page tree" to navigate to the page in the main window.
-
-|empty-page|
-
-.. |empty-page| image:: ../images/empty-page.png
-
-
-Congratulations! You now have a fully functional django CMS installation!
-
-
-Publishing a page
------------------
-
-There are multiple ways to publish a page including a blue "Publishe page now"
-button on the right side of the toolbar if the page is not currently
-published. Other ways include a "Publish page" menu item in the "Page" menu in
-the toolbar and a publish link inside the "tool-tip" over the colored, round
-icon in the language column of the page tree. The latter is useful for
-publishing pages without first navigating to them.
-
-Please review this image of the page-tree in the side-frame maximized with the
-page menu invoked.
-
-|page-options|
-
-.. |page-options| image:: ../images/page-options.png
-
-
-Menus
-~~~~~
-
-If you would like your page to appear in your menu (or note), you should
-familiarize yourself with the option to include or exclude the page from
-menus.
-
-Reviewing the image in `publishing a page`_ above, you should also see the
-"Hide in navigation" menu option. You can select this, or merely click on the
-green checkbox icon beneath "Menu" in the page tree to exclude this page from
-any menus.
-
-Similarly, when the page is currently not shown in menus, you can use the
-corresponding menu item "Show in navigation" or toggle the now red icon in the
-page tree to again show the page in your menus.
-
-
-Template
-~~~~~~~~
-
-Choosing a template for your page is as simple as selecting the desired
-template from the "Templates" sub-menu (see image in `publishing a page`_
-above). The list of available templates is determined by the CMS_TEMPLATES
-list as defined in your project’s settings.
-
-
-Adding content to a page
-------------------------
-
-So far, our page doesn't do much. Make sure it's marked as "published" (see
-above), then click on the page's "edit" button.
-
-To add content to your page, click the "structure" mode-button in the toolbar.
-This will reveal all of the page’s available placeholders and allow you to add
-CMS plugin instances to them.
-
-On any placeholder, click the menu icon on the right side to reveal the list
-of available plugins. In this case, we'll choose the Text plugin. Invoking the
-Text plugin will display your installed WYSIWYG Text editor plugin. Type in
-some text and press "Save". When you save the plugin, your plugin will now be
-displayed "inside" the placeholder as shown in this progession of images.
-
-|add-text-plugin|
-
-.. |add-text-plugin| image:: ../images/add-text-plugin.png
-
-To preview the page, click the "Content" mode button in the toolbar. You can
-continue editing existing plugins in Content mode simply by double-clicking
-the content they present. To add new plugins, or to re-arrange existing ones,
-click back into Structure more. When you're ready to share your content with
-the world, press the "Publish page now" button.
-
-That's it!
-
-
-Where to go from here
----------------------
-
-Congratulations, you now have a fully functional CMS! Feel free to play around
-with the different plugins provided out of the box and to build great websites!
-
-Furthermore you can continue your introduction into django CMS on https://github.com/divio/django-cms-tutorial.
-
-.. _TinyMCE: http://tinymce.moxiecode.com/
-.. _official documentation: http://docs.djangoproject.com/en/1.7/topics/templates/
-.. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
+.. _official documentation: http://docs.djangoproject.com/en/stable/topics/templates/
+.. _tutorial: https://github.com/divio/django-cms-tutorial
