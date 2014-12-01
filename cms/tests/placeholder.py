@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
-import warnings
 
 from django.conf import settings
 from django.contrib import admin
