@@ -3,7 +3,7 @@ from __future__ import with_statement
 import os
 import unittest
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, base
 from django.test import TestCase
 
@@ -15,6 +15,7 @@ from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
 from cms.utils.compat import DJANGO_1_6
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
 class TestOutput(FileOutputWrapper):
@@ -90,7 +91,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
 
     def test_old_style_i18n_settings(self):
         with SettingsOverride(CMS_LANGUAGES=[('en', 'English')]):
-            self.assertCheck(True, warnings=1, errors=0)
+            self.assertRaises(ImproperlyConfigured, self.assertCheck, True, warnings=1, errors=0)
 
     def test_cms_hide_untranslated_deprecated(self):
         with SettingsOverride(CMS_HIDE_UNTRANSLATED=True):

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import json
+
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
-import json
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
@@ -14,7 +15,6 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.utils.plugins import requires_reload, has_reached_plugin_limit
-from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -22,7 +22,6 @@ from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.decorators.http import require_POST
-import warnings
 from django.template.response import TemplateResponse
 
 from django.contrib.admin.util import get_deleted_objects
@@ -559,16 +558,3 @@ class PlaceholderAdminMixin(object):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
 
-
-class PlaceholderAdmin(PlaceholderAdminMixin, ModelAdmin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class PlaceholderAdmin is deprecated and will be removed in 3.1. "
-            "Instead, combine PlaceholderAdminMixin with admin.ModelAdmin.", DeprecationWarning)
-        super(PlaceholderAdmin, self).__init__(*args, **kwargs)
-
-
-class FrontendEditableAdmin(FrontendEditableAdminMixin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class FrontendEditableAdmin is deprecated and will be removed in 3.1. "
-            "Instead, use FrontendEditableAdminMixin.", DeprecationWarning)
-        super(FrontendEditableAdmin, self).__init__(*args, **kwargs)
