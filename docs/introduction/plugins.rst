@@ -2,7 +2,7 @@
 Plugins
 #######
 
-In this tutorial we're going to take a Django poll app and integrate it intoœ the CMS.
+In this tutorial we're going to take a Django poll app and integrate it into the CMS.
 
 Install the polls app
 #####################
