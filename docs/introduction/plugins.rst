@@ -133,7 +133,7 @@ For our poll plugin, we're going to write the following plugin class:
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from djangocms_polls.models import PollPlugin
+    from poll_plugin.models import PollPlugin
     from django.utils.translation import ugettext as _
 
 
