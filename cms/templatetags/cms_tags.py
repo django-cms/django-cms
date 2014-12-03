@@ -664,6 +664,7 @@ class CMSToolbar(RenderBlock):
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
+                context['addons'] = mark_safe(toolbar.render_addons(context))
         else:
             language = None
         # render everything below the tag
@@ -678,7 +679,6 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
         request.toolbar.post_template_populate()
         with force_language(language):
-            context['addons'] = toolbar.render_addons(context)
             content = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
         return '%s\n%s' % (content, rendered_contents)
