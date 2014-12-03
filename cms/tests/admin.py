@@ -1176,13 +1176,13 @@ class PluginPermissionTests(AdminTestsBase):
         plugins = self._placeholder.get_plugins()
         self.assertEqual(plugins.count(), 4)
         self.assertEqual(CMSPlugin.objects.count(), 7)
-        self.assertEqual(Placeholder.objects.count(), 5)
+        self.assertEqual(Placeholder.objects.count(), 4)
         url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
         with self.assertNumQueries(FuzzyInt(70, 80)):
             response = self.client.post(url, {'test': 0})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CMSPlugin.objects.count(), 4)
-        self.assertEqual(Placeholder.objects.count(), 4)
+        self.assertEqual(Placeholder.objects.count(), 3)
 
     def test_plugins_copy_language(self):
         """User tries to copy plugin but has no permissions. He can copy plugins after he got the permissions"""
@@ -1529,7 +1529,7 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(40, 66)):
                 output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
             self.assertIn('<b>Test</b>', output)
-            self.assertEqual(Placeholder.objects.all().count(), 10)
+            self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')

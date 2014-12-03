@@ -123,7 +123,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Title.objects.all().count(), 2)
             self.assertEqual(CMSPlugin.objects.all().count(), 2)
             self.assertEqual(Revision.objects.all().count(), 5)
-            self.assertEqual(Placeholder.objects.count(), 6)
+            self.assertEqual(Placeholder.objects.count(), 5)
 
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
@@ -168,7 +168,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.client.post(undo_url)
             self.client.post(undo_url)
             self.assertEqual(2, CMSPlugin.objects.all().count())
-            self.assertEqual(Placeholder.objects.count(), 6)
+            self.assertEqual(Placeholder.objects.count(), 5)
 
     def test_undo_slug_collision(self):
         data1 = self.get_new_page_data()
