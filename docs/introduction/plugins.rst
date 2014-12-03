@@ -133,7 +133,7 @@ For our poll plugin, we're going to write the following plugin class:
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from djangocms_polls.models import PollPlugin
+    from polls_plugin.models import PollPlugin
     from django.utils.translation import ugettext as _
 
 
@@ -183,7 +183,7 @@ something like this::
         <input type="submit" value="Vote" />
     </form>
 
-Now add ``djangocms_polls`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
+Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
 
     python manage.py schemamigration polls_plugin --init
     python manage.py migrate polls_plugin
