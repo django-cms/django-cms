@@ -101,8 +101,6 @@ class BasicToolbar(CMSToolbar):
 
     def __init__(self, request, toolbar, is_current_app, app_path):
         super(BasicToolbar, self).__init__(request, toolbar, is_current_app, app_path)
-        user_settings = self.request.toolbar.get_user_settings()
-        self.clipboard = user_settings.clipboard
 
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
