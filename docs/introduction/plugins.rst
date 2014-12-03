@@ -104,7 +104,7 @@ So our workspace looks like this::
 The Plugin Model
 ================
 
-In your poll application’s ``models.py`` add the following:
+In your poll application’s ``models.py`` add the following::
 
     from django.db import models
     from cms.models import CMSPlugin
@@ -129,7 +129,7 @@ Now create a file ``cms_plugins.py`` in the same folder your models.py is in.
 The plugin class is responsible for providing django CMS with the necessary
 information to render your plugin.
 
-For our poll plugin, we're going to write the following plugin class:
+For our poll plugin, we're going to write the following plugin class::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
