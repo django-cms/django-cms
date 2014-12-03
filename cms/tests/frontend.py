@@ -4,12 +4,16 @@ import datetime
 import os
 import time
 
+from django.conf import settings
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test import LiveServerTestCase
 from django.utils import unittest
+from django.utils.importlib import import_module
+from djangocms_link.models import Link
 from djangocms_style.models import Style
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -17,7 +21,9 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException, NoAlertPresentException
+from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 
 from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
@@ -28,8 +34,10 @@ from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.mock import AttributeObject
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model
+from cms.utils.compat.urls import urlparse
 from cms.utils.conf import get_cms_setting
 
 
@@ -69,6 +77,35 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         Page.objects.all().delete() # somehow the sqlite transaction got lost.
         cache.clear()
 
+    def _login(self):
+        session = import_module(settings.SESSION_ENGINE).SessionStore()
+        session.save()
+        request = AttributeObject(session=session, META={})
+        get_user_model().objects.create_superuser(
+            'admin', 'admin@example.org', 'admin'
+        )
+        user = authenticate(username='admin', password='admin')
+        login(request, user)
+        session.save()
+
+        # We need to "warm up" the webdriver as we can only set cookies on the
+        # current domain
+        self.driver.get(self.live_server_url)
+        # While we don't care about the page fully loading, Django will freak
+        # out if we 'abort' this request, so we wait patiently for it to finish
+        self.wait_page_loaded()
+        self.driver.add_cookie({
+            'name': settings.SESSION_COOKIE_NAME,
+            'value': session.session_key,
+            'path': '/',
+            'domain': urlparse(self.live_server_url).hostname
+        })
+        self.driver.get('{0}/?{1}'.format(
+            self.live_server_url,
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.wait_page_loaded()
+
     def wait_until(self, callback, timeout=10):
         """
         Helper function that blocks the execution of the tests until the
@@ -92,8 +129,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         """
         Block until page has started to load.
         """
-        from selenium.common.exceptions import TimeoutException
-
         try:
             # Wait for the next page to be loaded
             self.wait_loaded_tag('body')
@@ -102,6 +137,16 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             # display the webpage" and doesn't load the next page. We just
             # ignore it.
             pass
+
+    def fast_check_element_exists(self, css_selector, timeout=5):
+        try:
+            self.wait_until(
+                lambda driver: driver.find_element_by_css_selector(css_selector),
+                timeout=timeout
+            )
+            return True
+        except TimeoutException:
+            return False
 
     def is_element_present(self, how, what):
         try:
@@ -288,20 +333,6 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         super(PlaceholderBasicTests, self).setUp()
 
-    def _login(self):
-        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-        
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
-        password_input.submit()
-        self.wait_page_loaded()
-
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
-
     def test_copy_from_language(self):
         self._login()
         self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
@@ -451,35 +482,7 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
 
 class AddPluginTest(CMSLiveTests):
-    def _login(self):
-        get_user_model().objects.create_superuser(
-            'admin', 'admin@example.org', 'admin'
-        )
-        url = '{0}/?{1}'.format(
-            self.live_server_url,
-            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        )
-        self.driver.get(url)
-
-        self.assertRaises(
-            NoSuchElementException,
-            self.driver.find_element_by_class_name,
-            'cms_toolbar-item_logout'
-        )
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys('admin')
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys('admin')
-        password_input.submit()
-        self.wait_page_loaded()
-
-        self.assertTrue(
-            self.driver.find_element_by_class_name(
-                'cms_toolbar-item-navigation'
-            )
-        )
-
-    def test_add_text_plugin(self):
+    def test_add_style_plugin(self):
         page = create_page('Home', 'simple.html', 'en', published=True)
 
         placeholder_id = page.placeholders.all()[0].pk
@@ -521,3 +524,102 @@ class AddPluginTest(CMSLiveTests):
         self.assertEqual(Style.objects.count(), 1)
         link = Style.objects.get()
         self.assertEqual(link.class_name, "new")
+
+    def test_add_plugin_in_text_plugin(self):
+        page = create_page('Home', 'simple.html', 'en', published=True)
+
+        placeholder = page.placeholders.all()[0]
+
+        text_plugin = add_plugin(
+            placeholder=placeholder,
+            language='en',
+            plugin_type='TextPlugin',
+            body='Test'
+        )
+
+        page.publish('en')
+
+        self._login()
+
+        # Double click plugin
+        plugin_element = self.driver.find_element_by_css_selector(
+            'div.cms_plugin-{0}'.format(text_plugin.pk)
+        )
+
+        chain = ActionChains(self.driver)
+        chain.double_click(plugin_element)
+        chain.perform()
+
+        # Wait for iframe to pop up
+        self.wait_page_loaded()
+
+        # Switch to iframe
+        iframe = self.driver.find_element_by_css_selector(
+            'div.cms_modal-frame iframe'
+        )
+        self.driver.switch_to.frame(iframe)
+
+        # Find and click the CMSPlugin CKEditor plugin button
+        cmsplugin = self.driver.find_element_by_css_selector(
+            'span.cke_button__cmsplugins_label'
+        )
+        cmsplugin.click()
+
+        # The dropdown to select the CMSPlugin is inside yet another iframe,
+        # currently just hope it's the second iframe.
+        # TODO: Find a more reliable way to find the correct iframe
+        _, dropdown = self.driver.find_elements_by_tag_name('iframe')
+        self.driver.switch_to.frame(dropdown)
+
+        # Find the link plugin
+        link = self.driver.find_element_by_css_selector('a[rel="LinkPlugin"]')
+        link.click()
+
+        self.wait_page_loaded()
+
+        self.driver.switch_to.parent_frame()
+
+        dialog = self.driver.find_element_by_css_selector(
+            'iframe.cke_dialog_ui_html'
+        )
+
+        # Switch to the Add Link dialog
+        self.driver.switch_to.frame(dialog)
+
+        name = self.driver.find_element_by_id('id_name')
+        name.send_keys('Example')
+
+        url = self.driver.find_element_by_id('id_url')
+        url.send_keys('http://www.example.org/')
+        url.submit()
+
+        self.wait_page_loaded()
+
+        self.assertEqual(Link.objects.count(), 1)
+        link_plugin = Link.objects.get()
+        self.assertEqual(link_plugin.name, 'Example')
+        self.assertEqual(link_plugin.url, 'http://www.example.org/')
+        self.assertEqual(link_plugin.parent_id, text_plugin.pk)
+
+        # back to plugin view
+        self.driver.switch_to.parent_frame()
+        # back to actual page
+        self.driver.switch_to.parent_frame()
+        save_button = self.driver.find_element_by_css_selector(
+            'div.cms_btn-action.default'
+        )
+        save_button.click()
+
+        self.wait_page_loaded()
+
+        self.assertEqual(Link.objects.count(), 1)
+        link_plugin = Link.objects.get()
+        self.assertEqual(link_plugin.name, 'Example')
+        self.assertEqual(link_plugin.url, 'http://www.example.org/')
+        self.assertEqual(link_plugin.parent_id, text_plugin.pk)
+
+        paragraph = self.driver.find_element_by_css_selector(
+            'div.cms_plugin-{0} p'.format(text_plugin.pk)
+        )
+
+        self.assertIn('Example', paragraph.text)

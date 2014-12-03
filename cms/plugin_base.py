@@ -188,6 +188,11 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 
     def has_add_permission(self, request):
+        """
+        By default requires the user to have permission to add the plugin
+        instance and add permission of the object to which the plugin is
+        added (eg a page).
+        """
         if 'placeholder_id' not in request.GET:
             return False
         if not super(CMSPluginBase, self).has_add_permission(request):
@@ -196,11 +201,9 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return placeholder.has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
-        """Permission handling change - if user is allowed to change the page
-        he must be also allowed to add/change/delete plugins..
-
-        Not sure if there will be plugin permission requirement in future, but
-        if, then this must be changed.
+        """
+        By default requires the user to have permission to change the plugin
+        instance and the object, to which the plugin is attached (eg a page).
         """
         if obj:
             return obj.has_change_permission(request)
