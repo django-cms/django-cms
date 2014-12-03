@@ -22,8 +22,8 @@ class PageUserAdmin(admin_class, GenericCmsPermissionAdmin):
     add_form = PageUserForm
     model = PageUser
     
-    def queryset(self, request):
-        qs = super(PageUserAdmin, self).queryset(request)
+    def get_queryset(self, request):
+        qs = super(PageUserAdmin, self).get_queryset(request)
         try:
             user_id_set = get_subordinate_users(request.user).values_list('id', flat=True)
             return qs.filter(pk__in=user_id_set)

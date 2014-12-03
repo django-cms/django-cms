@@ -41,7 +41,7 @@ class PagePermissionInlineAdmin(TabularInline):
             return ['user']
         return []
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
         all permissions. Otherwise can user see only permissions for 
@@ -77,7 +77,7 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_move_page')
         formset_cls = super(PagePermissionInlineAdmin, self
         ).get_formset(request, obj=None, exclude=exclude, **kwargs)
-        qs = self.queryset(request)
+        qs = self.get_queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)
         formset_cls._queryset = qs
@@ -102,13 +102,13 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         flag, he can't change assign can_publish permissions.
         """
         formset_cls = super(PagePermissionInlineAdmin, self).get_formset(request, obj, **kwargs)
-        qs = self.queryset(request)
+        qs = self.get_queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)
         formset_cls._queryset = qs
         return formset_cls
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Returns a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.

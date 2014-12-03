@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-import warnings
-
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, patterns, include
 from django.contrib.formtools.wizard.views import normalize_name
-from django.db import connection
 from django.db.models import signals
-from django.db.models.fields.related import ManyToManyField
-from django.db.models.fields.related import ReverseManyRelatedObjectsDescriptor
 from django.template.defaultfilters import slugify
 from django.utils import six
 from django.utils.translation import get_language, deactivate_all, activate
@@ -16,7 +11,7 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
-from cms.utils.django_load import load, get_subclasses
+from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import force_unicode, is_installed
@@ -151,66 +146,6 @@ class PluginPool(object):
         """
         if self.patched:
             return
-        table_names = connection.introspection.table_names()
-        subs = get_subclasses(CMSPlugin)
-        for model in subs:
-            if not model._meta.abstract:
-
-                splitter = '%s_' % model._meta.app_label
-                table_name = model._meta.db_table
-
-                #
-                # Checks to see if this plugin's model's table's name is
-                # properly named with the app_label as the prefix (not
-                # 'cmsplugin')
-                #
-                if (table_name not in table_names and splitter in table_name):
-                    proper_table_name = table_name
-                    splitted = table_name.split(splitter, 1)
-                    bad_table_name = 'cmsplugin_%s' % splitted[1]
-                    if bad_table_name in table_names:
-                        model._meta.db_table = bad_table_name
-                        warnings.warn(
-                            'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
-
-                for att_name in model.__dict__.keys():
-                    att = model.__dict__[att_name]
-
-                    #
-                    # Checks to see if this plugin's model contains an M2M
-                    # field, whose 'through' table is properly named with the
-                    # app_label as the prefix (and not 'cmsplugin')
-                    #
-                    if isinstance(att, ManyToManyField):
-                        table_name = att.rel.through._meta.db_table
-                        if (table_name not in table_names and splitter in table_name):
-                            proper_table_name = table_name
-                            splitted = proper_table_name.split(splitter, 1)
-                            bad_table_name = 'cmsplugin_%s' % splitted[1]
-                            if bad_table_name in table_names:
-                                att.rel.through._meta.db_table = bad_table_name
-                                warnings.warn(
-                                    'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                        bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
-
-                    #
-                    # Checks to see if this plugin's model contains an M2M
-                    # field, whose 'through' table is properly named with the
-                    # app_label as the prefix (and not 'cmsplugin')
-                    #
-                    elif isinstance(att, ReverseManyRelatedObjectsDescriptor):
-                        table_name = att.through._meta.db_table
-                        if (table_name not in table_names and splitter in table_name):
-                            proper_table_name = table_name
-                            splitted = proper_table_name.split(splitter, 1)
-                            bad_table_name = 'cmsplugin_%s' % splitted[1]
-                            if bad_table_name in table_names:
-                                att.through._meta.db_table = bad_table_name
-                                warnings.warn(
-                                    'please rename the table "%s" to "%s" in %s\nThe compatibility code will be removed in 3.1' % (
-                                        bad_table_name, proper_table_name, model._meta.app_label), DeprecationWarning)
-
         self.patched = True
 
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):

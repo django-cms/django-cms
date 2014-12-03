@@ -15,8 +15,12 @@ django CMS
 
 Open source enterprise content management system based on the django framework.
 
-.. ATTENTION:: This is the **develop** branch. For the latest stable release,
-   please see use the **master** branch.
+.. ATTENTION:: This is the **develop** branch. It's the branch for features that
+   will go into django CMS 3.1. The **master** branch is the current stable release,
+   the one released on PyPI.
+   
+   **support/3.0.x** will be our *next stable release*, the most
+   appropriate branch for fixes and patches that will go into the next **master**.
 
 ********
 Features
@@ -57,7 +61,7 @@ the details on how to install, extend and use the django CMS.
 Tutorial
 ********
 
-https://github.com/divio/django-cms-tutorial
+http://docs.django-cms.org/en/latest/introduction/index.html
 
 ***********
 Quick Start

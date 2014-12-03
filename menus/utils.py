@@ -2,7 +2,6 @@
 from __future__ import with_statement
 from contextlib import contextmanager
 import inspect
-import warnings
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_1_6
@@ -142,19 +141,6 @@ class DefaultLanguageChanger(object):
             if url:
                 return url
         return '%s%s' % (self.get_page_path(lang), self.app_path)
-
-
-def simple_language_changer(func):
-    warnings.warn("simple_language_changer is deprecated and will be removed in "
-        "2.5! This is the default behaviour now for non CMS managed views and is no longer needed.",
-        DeprecationWarning)
-
-    def _wrapped(request, *args, **kwargs):
-        set_language_changer(request, DefaultLanguageChanger(request))
-        return func(request, *args, **kwargs)
-    _wrapped.__name__ = func.__name__
-    _wrapped.__doc__ = func.__doc__
-    return _wrapped
 
 
 @contextmanager

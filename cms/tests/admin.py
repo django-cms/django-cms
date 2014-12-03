@@ -312,7 +312,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 397)):
+            with self.assertNumQueries(FuzzyInt(300, 405)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -329,7 +329,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 385)):
+            with self.assertNumQueries(FuzzyInt(300, 392)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -662,6 +662,9 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'no': 'data'})
             old = page.in_navigation
             response = self.admin_class.change_innavigation(request, page.pk)
+            # These asserts are for #3589
+            self.assertContains(response, 'lang="en"')
+            self.assertContains(response, './%s/en/preview/' % page.pk)
             self.assertEqual(response.status_code, 200)
             page = self.reload(page)
             self.assertEqual(old, not page.in_navigation)

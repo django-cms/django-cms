@@ -3,8 +3,7 @@ from django.http import HttpResponse
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from menus.templatetags.menu_tags import PageLanguageUrl
-from menus.utils import (simple_language_changer, find_selected,
-                         language_changer_decorator)
+from menus.utils import find_selected, language_changer_decorator
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
@@ -26,23 +25,6 @@ class MenuUtilsTests(CMSTestCase):
 
         response = self.client.get('/en/sample/login3/')
         self.assertContains(response, '<h1>/fr/sample/login3/</h1>')
-
-    def test_simple_language_changer(self):
-        func = self.get_simple_view()
-        decorated_view = simple_language_changer(func)
-        # check we maintain the view name
-        self.assertEqual(func.__name__, decorated_view.__name__)
-        request = self.get_request('/', 'en')
-        response = decorated_view(request)
-        self.assertEqual(response.content, b'')
-        fake_context = {'request': request}
-        tag = DumbPageLanguageUrl()
-        output = tag.get_context(fake_context, 'en')
-        url = output['content']
-        self.assertEqual(url, '/en/')
-        output = tag.get_context(fake_context, 'ja')
-        url = output['content']
-        self.assertEqual(url, '/ja/')
 
     def test_default_language_changer(self):
         view = self.get_simple_view()
