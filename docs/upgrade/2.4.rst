@@ -128,7 +128,7 @@ Removed the MultilingualMiddleware
 
 We removed the MultilingualMiddleware. This removed rather some unattractive
 monkey-patching of the ``reverse()`` function as well. As a benefit we now
-support localisation of urls and Apphook urls with standard Django helpers.
+support localisation of URLs and apphook URLs with standard Django helpers.
 
 
 For django 1.4 more infos can be found here:
