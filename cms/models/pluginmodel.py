@@ -349,22 +349,22 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         if not self.parent_id:
             try:
                 url = force_unicode(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                                   args=[self.pk]))
             except NoReverseMatch:
                 url = force_unicode(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                                   args=[self.pk]))
             breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors().reverse():
             try:
                 url = force_unicode(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                                   args=[parent.pk]))
             except NoReverseMatch:
                 url = force_unicode(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.module_name),
+                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                                   args=[parent.pk]))
             breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
         return breadcrumb

@@ -753,12 +753,12 @@ class CMSEditableObject(InclusionTag):
                 # current instance
                 if not editmode:
                     view_url = 'admin:%s_%s_add' % (
-                        instance._meta.app_label, instance._meta.module_name)
+                        instance._meta.app_label, instance._meta.model_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
                         view_url = 'admin:%s_%s_change' % (
-                            instance._meta.app_label, instance._meta.module_name)
+                            instance._meta.app_label, instance._meta.model_name)
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
@@ -766,7 +766,7 @@ class CMSEditableObject(InclusionTag):
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
-                            instance._meta.app_label, instance._meta.module_name)
+                            instance._meta.app_label, instance._meta.model_name)
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:

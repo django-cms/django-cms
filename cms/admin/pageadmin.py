@@ -108,7 +108,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         from django.conf.urls import patterns, url
 
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(
