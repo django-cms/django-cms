@@ -43,7 +43,7 @@ class PageExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=page)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(extension.pk,),
                                             current_app=self.admin_site.name)
                 return HttpResponseRedirect(change_url)
@@ -84,7 +84,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=title)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(extension.pk,),
                                             current_app=self.admin_site.name)
                 return HttpResponseRedirect(change_url)
