@@ -13,7 +13,7 @@ Requirements
 ************
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
-* `Django`_ 1.6.x or 1.7.x
+* `Django`_ 1.4.5, 1.5.x, 1.6.x or 1.7.x
 * `South`_ 1.0.1 (Only required for Django 1.6.x)
 * `django-classy-tags`_ 0.5 or higher
 * `django-mptt`_ (0.5.2, 0.6.0, 0.6.1)
