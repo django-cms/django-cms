@@ -306,6 +306,16 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
                 # subclassing cms_plugin_instance (one to one relation)
                 value = getattr(self.cms_plugin_instance, field.name)
                 setattr(obj, field.name, value)
+        # When adding an object, it won't have a position
+        if not obj.position:
+            if obj.parent_id:
+                obj.position = CMSPlugin.objects.filter(
+                    parent_id=obj.parent_id
+                ).count()
+            else:
+                obj.position = CMSPlugin.objects.filter(
+                    placeholder_id=obj.placeholder_id
+                ).count()
 
         # remember the saved object
         self.saved_object = obj
