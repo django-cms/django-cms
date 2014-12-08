@@ -48,7 +48,7 @@ Since we added a new app, we need to update our database::
 
 Start the server again.
 
-The weblog application comes with a django CMS AppHook, so add a new django CMS
+The weblog application comes with a django CMS apphook, so add a new django CMS
 page, and add the weblog application to it as you did for Polls in the previous
 tutorial. *You may need to restart your server at this point.*
 

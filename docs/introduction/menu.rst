@@ -52,7 +52,7 @@ What's happening here:
 * ... and then create a ``NavigationNode`` object from each one
 * ... and return a list of these ``NavigationNodes``
 
-This menu class is not active until attached to the AppHook we created earlier.
+This menu class is not active until attached to the apphook we created earlier.
 So open your ``cms_app.py`` and add::
 
     menus = [PollsMenu]
