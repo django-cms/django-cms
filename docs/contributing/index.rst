@@ -22,6 +22,7 @@ All activity in the community is governed by our :doc:`code_of_conduct`.
 
     development
     contributing
+    management
     testing
     code_of_conduct
 
