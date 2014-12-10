@@ -5,6 +5,7 @@ from cms.tests.alias import *  # nopyflakes
 from cms.tests.admin import *  # nopyflakes
 from cms.tests.api import *  # nopyflakes
 from cms.tests.apphooks import *  # nopyflakes
+from cms.tests.django_load import *  # nopyflakes
 from cms.tests.docs import *  # nopyflakes
 from cms.tests.extensions import *  # nopyflakes
 from cms.tests.forms import *  # nopyflakes

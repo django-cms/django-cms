@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from operator import attrgetter
+import warnings
+
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, patterns, include
 from django.contrib.formtools.wizard.views import normalize_name
@@ -151,8 +154,7 @@ class PluginPool(object):
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         self.discover_plugins()
         self.set_plugin_meta()
-        plugins = list(self.plugins.values())
-        plugins.sort(key=lambda obj: force_unicode(obj.name))
+        plugins = sorted(self.plugins.values(), key=attrgetter('name'))
         final_plugins = []
         template = page and page.get_template() or None
         allowed_plugins = get_placeholder_conf(
@@ -172,19 +174,13 @@ class PluginPool(object):
         if final_plugins or placeholder:
             plugins = final_plugins
 
-        # plugins sorted by modules
-        plugins = sorted(plugins, key=lambda obj: force_unicode(obj.module))
-        return plugins
+        return sorted(plugins, key=attrgetter('module'))
 
     def get_text_enabled_plugins(self, placeholder, page):
         plugins = self.get_all_plugins(placeholder, page)
         plugins += self.get_all_plugins(placeholder, page, 'text_only_plugins')
-        final = []
-        for plugin in plugins:
-            if plugin.text_enabled:
-                if plugin not in final:
-                    final.append(plugin)
-        return final
+        return sorted((p for p in set(plugins) if p.text_enabled),
+                      key=attrgetter('module', 'name'))
 
     def get_plugin(self, name):
         """

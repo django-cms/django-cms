@@ -32,11 +32,7 @@ class NavigationNode(object):
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
         self.visible = visible
-        
-        if attr:
-            self.attr = attr
-        else:
-            self.attr = {} # To avoid declaring a dict in defaults...
+        self.attr = attr or {} # To avoid declaring a dict in defaults...
             
     def __repr__(self):
         return "<Navigation Node: %s>" % smart_str(self.title)
@@ -51,15 +47,10 @@ class NavigationNode(object):
         return self.attr.get(name, None)
     
     def get_descendants(self):
-        nodes = []
-        for node in self.children:
-            nodes.append(node)
-            nodes += node.get_descendants()
-        return nodes
+        return sum(([node] + node.get_descendants() for node in self.children), [])
 
     def get_ancestors(self):
-        nodes = []
         if getattr(self, 'parent', None):
-            nodes.append(self.parent)
-            nodes += self.parent.get_ancestors()
-        return nodes
+            return [self.parent] + self.parent.get_ancestors()
+        else:
+            return []
