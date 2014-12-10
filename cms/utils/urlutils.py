@@ -18,13 +18,8 @@ def levelize_path(path):
     >>> levelize_path(path)
     ['/application/item/new', '/application/item', '/application']
     """
-    parts = path.rstrip("/").split("/")
-    paths = []
-    for i in range(len(parts), 0, -1):
-        sub_path = ('/').join(parts[:i])
-        if sub_path:
-            paths.append(sub_path)
-    return paths
+    parts = tuple(filter(None, path.split('/')))
+    return ['/' + '/'.join(parts[:n]) for n in range(len(parts), 0, -1)]
 
 
 def urljoin(*segments):
@@ -42,16 +37,9 @@ def urljoin(*segments):
     >>> urljoin('/a', '')
     u'/a/'
     """
-    cleaned_segments = map(lambda segment: force_unicode(segment).strip("/"), segments)
-    nonempty_segments = filter(lambda segment: segment > "", cleaned_segments)
-    url = ("/").join(nonempty_segments)
-    
-    if segments[0].startswith("/") and not url.startswith("/"):
-        url = "/" + url
-    
-    if settings.APPEND_SLASH and not url.endswith("/"):
-        url += "/"
-    return url
+    url  = '/' if segments[0].startswith('/') else ''
+    url += '/'.join(filter(None, (force_unicode(s).strip('/') for s in segments)))
+    return url + '/' if settings.APPEND_SLASH else url
 
 
 def is_media_request(request):
