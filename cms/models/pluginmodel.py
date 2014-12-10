@@ -286,7 +286,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             new_plugin.parent = parent
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
-        new_plugin.position = CMSPlugin.objects.filter(parent=parent, language=target_language, placeholder=target_placeholder).count()
         if no_signals:
             from cms.signals import pre_save_plugins
 
@@ -306,8 +305,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.depth = new_plugin.depth
             plugin_instance.path = new_plugin.path
             plugin_instance.numchild = new_plugin.numchild
-            # added to retain the position when creating a public copy of a plugin
-            plugin_instance.position = new_plugin.position
             plugin_instance._no_reorder = True
             plugin_instance.save()
             #new_plugin._inst = plugin_instance
