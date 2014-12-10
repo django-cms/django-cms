@@ -663,7 +663,10 @@ class CMSToolbar(RenderBlock):
     def render_tag(self, context, name, nodelist):
         # render JS
         request = context.get('request', None)
-        toolbar = getattr(request, 'toolbar', None)
+        if request.user.is_anonymous():
+            toolbar = None
+        else:
+            toolbar = getattr(request, 'toolbar', None)
         if toolbar:
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
