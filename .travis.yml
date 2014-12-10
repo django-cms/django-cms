@@ -12,10 +12,6 @@ env:
   global:
     - SAUCE_USERNAME=digi604
     - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
-    - PIP_ACCEL_S3_BUCKET=travisci.pip-cache.django-cms.org
-    - PIP_ACCEL_S3_PREFIX=travis
-    - secure: "ZGA13cE7KNq3toapVy8j5jfUHcaJkhbcFQTkMVn8XCmRnJOYUltFC7pagoR7u89jwdkgivknSTaMzwg6IQp3zUn4kMje1v3vKBqWvft6aK0Z3XTaUNWIrW7vAzZlrJsGnFajFxmgPpwZLXux79C9YE/MfMhtkvxmJDwPeIsUevc=" # AWS_ACCESS_KEY_ID
-    - secure: "pAOA0Lj+KYpJU8NeWEsxIETgPwTt1uULapDhiJAOUFMu1qH3uygwxNjD19N5CTPscyGMMmDIk3igYvrhW9w8PM8OgsoKcjoslZl/amLodF3+sYu9JYEid3O5raMT/gkXHQp06kV22co+x+nxUideeUQm33bMtVGGJbe+m+AZHok=" # AWS_SECRET_ACCESS_KEY
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
