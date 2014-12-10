@@ -15,7 +15,7 @@ Key points:
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@django-cms.org`_.
 
-        Please don't raise it on:
+        Please **do not** raise it on:
 
         * IRC
         * GitHub
