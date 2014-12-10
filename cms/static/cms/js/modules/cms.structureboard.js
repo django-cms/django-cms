@@ -295,6 +295,8 @@ $(document).ready(function () {
 			this.interval = setInterval(function () {
 				$(window).trigger('resize.sideframe');
 			}, interval);
+
+			$(window).trigger('structureboard_shown.sideframe');
 		},
 
 		_hideBoard: function () {
@@ -309,6 +311,8 @@ $(document).ready(function () {
 
 			// clear interval
 			clearInterval(this.interval);
+
+			$(window).trigger('structureboard_hidden.sideframe');
 		},
 
 		_resizeBoard: function () {
