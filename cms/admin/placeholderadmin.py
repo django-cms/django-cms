@@ -43,7 +43,7 @@ class FrontendEditableAdminMixin(object):
         from django.conf.urls import patterns, url
         from cms.urls import SLUG_REGEXP
 
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(
@@ -74,7 +74,7 @@ class FrontendEditableAdminMixin(object):
             }
             return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
         if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
-                                                             self.model._meta.module_name)):
+                                                             self.model._meta.model_name)):
             context = {
                 'opts': opts,
                 'message': force_unicode(_("You do not have permission to edit this item"))
@@ -127,7 +127,7 @@ class PlaceholderAdminMixin(object):
         from django.conf.urls import patterns, url
         from cms.urls import SLUG_REGEXP
 
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(

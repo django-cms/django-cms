@@ -144,7 +144,7 @@ class BasicToolbar(CMSToolbar):
             opts = User._meta
 
             if self.request.user.has_perm('%s.%s' % (opts.app_label, opts.get_change_permission())):
-                user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.module_name))
+                user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
