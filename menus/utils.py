@@ -21,13 +21,10 @@ def cut_levels(nodes, level):
     """
     For cutting the nav_extender levels if you have a from_level in the navigation.
     """
-    result = []
     if nodes:
         if nodes[0].level == level:
             return nodes
-    for node in nodes:
-        result += cut_levels(node.children, level)
-    return result
+    return sum((cut_levels(node.children, level) for node in nodes), [])
 
 
 def find_selected(nodes):
@@ -109,10 +106,7 @@ class DefaultLanguageChanger(object):
                     else:
                         return page.get_absolute_url(language=lang, fallback=True)
         else:
-            if settings.USE_I18N:
-                return '/%s/' % lang
-            else:
-                return "/"
+            return '/%s/' % lang if settings.USE_I18N else '/'
 
     def __call__(self, lang):
         page_language = get_language_from_request(self.request)
