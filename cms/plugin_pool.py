@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from operator import attrgetter
-import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, patterns, include
