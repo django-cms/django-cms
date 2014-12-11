@@ -770,133 +770,34 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def undo(self, request, object_id):
         if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
-        from reversion.models import Revision
-        from cms.utils.page_resolver import is_valid_url
-        import reversion
 
         page = get_object_or_404(Page, pk=object_id)
-        old_titles = list(page.title_set.all())
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
-        versions = reversion.get_for_object(page)
-        if page.revision_id:
-            current_revision = Revision.objects.get(pk=page.revision_id)
-        else:
-            try:
-                current_version = versions[0]
-            except IndexError:
-                return HttpResponseBadRequest("no current revision found")
-            current_revision = current_version.revision
         try:
-            previous_version = versions.filter(revision__pk__lt=current_revision.pk)[0]
-        except IndexError:
-            return HttpResponseBadRequest("no previous revision found")
-        previous_revision = previous_version.revision
-        # clear all plugins
-        placeholders = page.placeholders.all()
-        placeholder_ids = []
-        for placeholder in placeholders:
-            placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
-        for plugin in plugins:
-            plugin._no_reorder = True
-            plugin.delete()
-        # TODO: delete placeholders instead of finding duplicates for 3.1
-        #page.placeholders.all().delete()
+            page.undo(request)
+        except IndexError as e:
+            return HttpResponseBadRequest(e.message)
 
-        previous_revision.revert(True)
-        rev_page = get_object_or_404(Page, pk=page.pk)
-        rev_page.revision_id = previous_revision.pk
-        rev_page.publisher_public_id = page.publisher_public_id
-        rev_page.save()
-        new_placeholders = rev_page.placeholders.all()
-        slots = {}
-        for new_ph in new_placeholders:
-            if not new_ph.slot in slots:
-                slots[new_ph.slot] = new_ph
-            else:
-                if new_ph in placeholder_ids:
-                    new_ph.delete()
-                elif slots[new_ph.slot] in placeholder_ids:
-                    slots[new_ph.slot].delete()
-        new_titles = rev_page.title_set.all()
-        for title in new_titles:
-            try:
-                is_valid_url(title.path, rev_page)
-            except ValidationError:
-                for old_title in old_titles:
-                    if old_title.language == title.language:
-                        title.slug = old_title.slug
-                        title.save()
-                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         return HttpResponse("ok")
 
     @require_POST
     def redo(self, request, object_id):
         if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
-        from reversion.models import Revision
-        import reversion
-        from cms.utils.page_resolver import is_valid_url
 
         page = get_object_or_404(Page, pk=object_id)
-        old_titles = list(page.title_set.all())
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
-        versions = reversion.get_for_object(page)
-        if page.revision_id:
-            current_revision = Revision.objects.get(pk=page.revision_id)
-        else:
-            try:
-                current_version = versions[0]
-            except IndexError:
-                return HttpResponseBadRequest("no current revision found")
-            current_revision = current_version.revision
         try:
-            previous_version = versions.filter(revision__pk__gt=current_revision.pk).order_by('pk')[0]
-        except IndexError:
-            return HttpResponseBadRequest("no next revision found")
-        next_revision = previous_version.revision
-        # clear all plugins
-        placeholders = page.placeholders.all()
-        placeholder_ids = []
-        for placeholder in placeholders:
-            placeholder_ids.append(placeholder.pk)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
-        for plugin in plugins:
-            plugin._no_reorder = True
-            plugin.delete()
-        # TODO: 3.1 remove the placeholder matching from below and just delete them
-        #page.placeholders.all().delete()
-        next_revision.revert(True)
-        rev_page = get_object_or_404(Page, pk=page.pk)
-        rev_page.revision_id = next_revision.pk
-        rev_page.publisher_public_id = page.publisher_public_id
-        rev_page.save()
-        new_placeholders = rev_page.placeholders.all()
-        slots = {}
-        for new_ph in new_placeholders:
-            if not new_ph.slot in slots:
-                slots[new_ph.slot] = new_ph
-            else:
-                if new_ph in placeholder_ids:
-                    new_ph.delete()
-                elif slots[new_ph.slot] in placeholder_ids:
-                    slots[new_ph.slot].delete()
-        new_titles = rev_page.title_set.all()
-        for title in new_titles:
-            try:
-                is_valid_url(title.path, rev_page)
-            except ValidationError:
-                for old_title in old_titles:
-                    if old_title.language == title.language:
-                        title.slug = old_title.slug
-                        title.save()
-                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
+            page.redo(request)
+        except IndexError as e:
+            return HttpResponseBadRequest(e.message)
+
         return HttpResponse("ok")
 
     @require_POST
