@@ -348,10 +348,7 @@ class RenderPlugin(InclusionTag):
         if not plugin:
             return {'content': ''}
 
-        try:
-            placeholder = context['cms_placeholder_instance']
-        except KeyError:
-            placeholder = plugin.placeholder
+        placeholder = plugin.placeholder
 
         processors = self.get_processors(context, plugin, placeholder)
 
