@@ -1057,7 +1057,6 @@ class StaticPlaceholderNode(Tag):
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
-        context.update({'cms_placeholder_instance': placeholder})
         content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
         return content
 register.tag(StaticPlaceholderNode)
