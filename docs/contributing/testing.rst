@@ -4,7 +4,7 @@
 Running and writing tests
 #########################
 
-Good code needs tests. 
+Good code needs tests.
 
 A project like django CMS simply can't afford to incorporate new code that
 doesn't come with its own tests.
@@ -32,18 +32,23 @@ There's more than one way to do this, but here's one to help you get started::
 
     # create a virtual environment
     virtualenv test-django-cms
-    # activate it 
+
+    # activate it
     cd test-django-cms/
     source bin/activate
+
     # get django CMS from GitHub
     git clone git@github.com:divio/django-cms.git
+
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
-    pip install -r django-cms/test_requirements/django-1.4.txt 
-    # run the test suite
-    python develop.py test
+    pip install -r django-cms/test_requirements/django-1.6.txt
 
-It can take a few minutes to run.
+    # run the test suite
+    python django-cms/develop.py test
+
+It can take a few minutes to run. Note that the selenium tests included in the
+test suite require that you have Firefox installed.
 
 When you run tests against your own new code, don't forget that it's useful to
 repeat them for different versions of Python and Django.
@@ -163,7 +168,7 @@ What we need
 ============
 
 We have a wide and comprehensive library of unit-tests and integration tests
-with good coverage. 
+with good coverage.
 
 Generally tests should be:
 
@@ -176,4 +181,3 @@ Generally tests should be:
   it wrong.
 * Easy to understand. If your test code isn't obvious, please add comments on
   what it's doing.
-  
