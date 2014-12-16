@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from itertools import groupby
-import operator
+from itertools import groupby, starmap
+from operator import attrgetter, itemgetter
 import warnings
 
 from django.contrib.sites.models import Site, SITE_CACHE
@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
 from django.template.loader_tags import ExtendsNode, BlockNode
+from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
 from sekizai.helpers import is_variable_extend_node
 
@@ -17,13 +18,15 @@ try:
 except ImportError:
     from django.template.loader_tags import IncludeNode
 
+from cms.api import add_plugin
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request, permissions
+from cms.utils import get_language_from_request
 from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
+from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (validate_placeholder_name,
                                    get_placeholder_conf)
 
@@ -193,11 +196,8 @@ def requires_reload(action, plugins):
     """
     Returns True if ANY of the plugins require a page reload when action is taking place.
     """
-    for plugin in plugins:
-        plugin_class = plugin.get_plugin_class_instance()
-        if plugin_class.requires_reload(action):
-            return True
-    return False
+    return any(p.get_plugin_class_instance().requires_reload(action)
+               for p in plugins)
 
 
 def assign_plugins(request, placeholders, template, lang=None, no_fallback=False):
@@ -206,32 +206,23 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     cast them down to the concrete instances in one query
     per type.
     """
-    placeholders = list(placeholders)
     if not placeholders:
         return
+    placeholders = tuple(placeholders)
     lang = lang or get_language_from_request(request)
-    request_lang = lang
-    qs = get_cmsplugin_queryset(request).filter(placeholder__in=placeholders, language=request_lang).order_by(
-        'placeholder', 'path')
-    plugins = list(qs)
+    qs = get_cmsplugin_queryset(request)
+    qs = qs.filter(placeholder__in=placeholders, language=lang)
+    plugins = list(qs.order_by('placeholder', 'path'))
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-
-    if not no_fallback:
-        for placeholder in placeholders:
-            found = False
-            for plugin in plugins:
-                if plugin.placeholder_id == placeholder.pk:
-                    found = True
-                    break
-            if found:
-                continue
-            elif placeholder and get_placeholder_conf("language_fallback", placeholder.slot, template, False):
-                if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-                    continue
-                fallbacks = get_fallback_languages(lang)
-                for fallback_language in fallbacks:
-                    assign_plugins(request, [placeholder], template, fallback_language, no_fallback=True)
+    if (not no_fallback and
+        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode)):
+        disjoint_placeholders = (ph for ph in placeholders
+                                 if all(ph.pk != p.placeholder_id for p in plugins))
+        for placeholder in disjoint_placeholders:
+            if get_placeholder_conf("language_fallback", placeholder.slot, template, False):
+                for fallback_language in get_fallback_languages(lang):
+                    assign_plugins(request, (placeholder,), template, fallback_language, no_fallback=True)
                     fallback_plugins = placeholder._plugins_cache
                     if fallback_plugins:
                         plugins += fallback_plugins
@@ -239,14 +230,14 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     # If no plugin is present, create default plugins if enabled)
     if not plugins:
         plugins = create_default_plugins(request, placeholders, template, lang)
-    plugin_list = downcast_plugins(plugins, placeholders)
+    plugins = downcast_plugins(plugins, placeholders)
     # split the plugins up by placeholder
-    groups = dict((key, list(plugins)) for key, plugins in groupby(plugin_list, operator.attrgetter('placeholder_id')))
-
-    for group in groups:
-        groups[group] = build_plugin_tree(groups[group])
+    # Plugins should still be sorted by placeholder
+    groups = dict((ph_id, build_plugin_tree(ph_plugins))
+                  for ph_id, ph_plugins
+                  in groupby(plugins, attrgetter('placeholder_id')))
     for placeholder in placeholders:
-        setattr(placeholder, '_plugins_cache', list(groups.get(placeholder.pk, [])))
+        setattr(placeholder, '_plugins_cache', groups.get(placeholder.pk, []))
 
 
 def create_default_plugins(request, placeholders, template, lang):
@@ -255,65 +246,57 @@ def create_default_plugins(request, placeholders, template, lang):
     a "default_plugins" configuration value in settings.
     return all plugins, children, grandchildren (etc.) created
     """
-    from cms.api import add_plugin
-    plugins = list()
-    for placeholder in placeholders:
-        default_plugins = get_placeholder_conf("default_plugins", placeholder.slot, template, None)
-        if not default_plugins:
-            continue
-        if not placeholder.has_add_permission(request):
-            continue
-        for conf in default_plugins:
-            if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
-                continue
-            plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
-            plugins.append(plugin)
+    def _create_default_plugins(placeholder, confs, parent=None):
+        """
+        Auxillary function that builds all of a placeholder's default plugins
+        at the current level and drives the recursion down the tree.
+        Returns the plugins at the current level along with all descendants.
+        """
+        plugins, descendants = [], []
+        addable_confs = (conf for conf in confs
+                         if has_plugin_permission(request.user,
+                                                  conf['plugin_type'], 'add'))
+        for conf in addable_confs:
+            plugin = add_plugin(placeholder, conf['plugin_type'], lang,
+                                target=parent, **conf['values'])
             if 'children' in conf:
-                children = create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
-                plugins+=children
+                args = placeholder, conf['children'], plugin
+                descendants += _create_default_plugins(*args)
             plugin.notify_on_autoadd(request, conf)
-    return plugins
+            plugins.append(plugin)
+        if parent:
+            parent.notify_on_autoadd_children(request, conf, plugins)
+        return plugins + descendants
 
 
-def create_default_children_plugins(request, placeholder, lang, parent_plugin, children_conf):
+    unfiltered_confs = ((ph, get_placeholder_conf('default_plugins',
+                                                  ph.slot, template))
+                        for ph in placeholders)
+    # Empty confs must be filtered before filtering on add permission
+    mutable_confs = ((ph, default_plugin_confs)
+                     for ph, default_plugin_confs
+                     in filter(itemgetter(1), unfiltered_confs)
+                     if ph.has_add_permission(request))
+    return sum(starmap(_create_default_plugins, mutable_confs), [])
+
+
+def build_plugin_tree(plugins):
     """
-    Create all default children plugins in the given ``placeholder``.
-    If a child have children, this function recurse.
-    Return all children and grandchildren (etc.) created
+    Accepts an iterable of plugins and assigns tuples, sorted by position, of
+    children plugins to their respective parents.
+    Returns a sorted list of root plugins.
     """
-    from cms.api import add_plugin
-    children = list()
-    grandchildren = list()
-    for conf in children_conf:
-        if not permissions.has_plugin_permission(request.user, conf['plugin_type'], "add"):
-            continue
-        plugin = add_plugin(placeholder, conf['plugin_type'], lang, **conf['values'])
-        plugin.parent = parent_plugin
-        plugin.save()
-        if 'children' in conf:
-            grandchildren+= create_default_children_plugins(request, placeholder, lang, plugin, conf['children'])
-        plugin.notify_on_autoadd(request, conf)
-        children.append(plugin)
-    parent_plugin.notify_on_autoadd_children(request, conf, children)
-    return children + grandchildren
-
-
-def build_plugin_tree(plugin_list):
-    root = []
-    cache = {}
-    for plugin in plugin_list:
-        plugin.child_plugin_instances = []
-        cache[plugin.pk] = plugin
-        if not plugin.parent_id:
-            root.append(plugin)
-        else:
-            parent = cache[plugin.parent_id]
-            parent.child_plugin_instances.append(plugin)
-    root.sort(key=lambda x: x.position)
-    for plugin in plugin_list:
-        if plugin.child_plugin_instances and len(plugin.child_plugin_instances) > 1:
-            plugin.child_plugin_instances.sort(key=lambda x: x.position)
-    return root
+    cache = dict((p.pk, p) for p in plugins)
+    by_parent_id = attrgetter('parent_id')
+    nonroots = sorted(filter(by_parent_id, cache.values()),
+                      key=attrgetter('parent_id', 'position'))
+    families = ((cache[parent_id], tuple(children))
+                for parent_id, children
+                in groupby(nonroots, by_parent_id))
+    for parent, children in families:
+        parent.child_plugin_instances = children
+    return sorted(filterfalse(by_parent_id, cache.values()),
+                  key=attrgetter('position'))
 
 
 def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
@@ -342,18 +325,10 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
                         if not cls.cache:
                             pl.cache_placeholder = False
             # make the equivalent list of qs, but with downcasted instances
-    plugin_list = []
-    for p in queryset:
-        if p.pk in plugin_lookup:
-            plugin_list.append(plugin_lookup[p.pk])
-        else:
-            plugin_list.append(p)
-    return plugin_list
+    return [plugin_lookup.get(plugin.pk, plugin) for plugin in queryset]
 
 
 def get_plugins_for_page(request, page, lang=None):
-    from cms.utils.plugins import get_placeholders
-
     if not page:
         return []
     lang = lang or get_language_from_request(request)

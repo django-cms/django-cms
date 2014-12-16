@@ -363,8 +363,34 @@ class RenderPlugin(InclusionTag):
             )
         }
 
-
 register.tag(RenderPlugin)
+
+
+class RenderPluginBlock(InclusionTag):
+    """
+    Acts like the CMS's templatetag 'render_model_block' but with a plugin
+    instead of a model. This is used to link from a block of markup to a
+    plugin's changeform.
+
+    This is useful for UIs that have some plugins hidden from display in
+    preview mode, but the CMS author needs to expose a way to edit them
+    anyway. It is also useful for just making duplicate or alternate means of
+    triggering the change form for a plugin.
+    """
+
+    name = 'render_plugin_block'
+    template = "cms/toolbar/render_plugin_block.html"
+    options = Options(
+        Argument('plugin'),
+        blocks=[('endrender_plugin_block', 'nodelist')],
+    )
+
+    def get_context(self, context, plugin, nodelist):
+        context['inner'] = nodelist.render(context)
+        context['plugin'] = plugin
+        return context
+
+register.tag(RenderPluginBlock)
 
 
 class PluginChildClasses(InclusionTag):

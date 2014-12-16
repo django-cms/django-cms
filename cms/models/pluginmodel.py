@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date
+from operator import itemgetter
 import json
 
 import os
@@ -21,6 +22,7 @@ from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.six.moves import filter
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import signals, Model
 
@@ -46,14 +48,12 @@ class PluginModelBase(ModelBase):
         new_class = super(PluginModelBase, cls).__new__(cls, name, bases, attrs)
 
         # if there is a RenderMeta in attrs, use this one
-        if attr_meta:
-            meta = attr_meta
-        else:
-            # else try to use the one from the superclass (if present)
-            meta = getattr(new_class, '_render_meta', None)
-        for field in new_class._meta.fields:
-            if field.name in ['path', 'numchild', 'depth']:
-                field.editable = False
+        # else try to use the one from the superclass (if present)
+        meta = attr_meta or getattr(new_class, '_render_meta', None)
+        treebeard_view_fields = (f for f in new_class._meta.fields
+                                 if f.name in ('depth', 'numchild', 'path'))
+        for field in treebeard_view_fields:
+            field.editable = False
         # set a new BoundRenderMeta to prevent leaking of state
         new_class._render_meta = BoundRenderMeta(meta)
         return new_class
@@ -104,12 +104,11 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         # On Python 2.4, there is something wierd with __reduce__,
         # and as a result, the super call will cause an infinite recursion.
         # See #10547 and #12121.
-        defers = []
-        for field in self._meta.fields:
-            if isinstance(self.__class__.__dict__.get(field.attname), DeferredAttribute):
-                defers.append(field.attname)
+        deferred_fields = [f for f in self._meta.fields
+                           if isinstance(self.__class__.__dict__.get(f.attname),
+                                         DeferredAttribute)]
         model = self._meta.proxy_for_model
-        return (model_unpickle, (model, defers), data)
+        return (model_unpickle, (model, deferred_fields), data)
 
     def __str__(self):
         return force_unicode(self.pk)
@@ -217,20 +216,14 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         Get src URL for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        if instance:
-            return plugin.icon_src(instance)
-        else:
-            return u''
+        return plugin.icon_src(instance) if instance else u''
 
     def get_instance_icon_alt(self):
         """
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        if instance:
-            return force_unicode(plugin.icon_alt(instance))
-        else:
-            return u''
+        return force_unicode(plugin.icon_alt(instance)) if instance else u''
 
     def save(self, no_signals=False, *args, **kwargs):
         if no_signals:  # ugly hack because of mptt
@@ -342,9 +335,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     def get_breadcrumb(self):
         from cms.models import Page
 
-        model = self.placeholder._get_attached_model()
-        if not model:
-            model = Page
+        model = self.placeholder._get_attached_model() or Page
         breadcrumb = []
         if not self.parent_id:
             try:
@@ -397,29 +388,23 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         pass
 
     def get_translatable_content(self):
-        fields = []
-        for field in self._meta.fields:
-            if ((isinstance(field, models.CharField) or isinstance(field, models.TextField)) and not field.choices and
-                    field.editable and field.name not in self.translatable_content_excluded_fields and field):
-                fields.append(field)
-
-        translatable_fields = {}
-        for field in fields:
-            content = getattr(self, field.name)
-            if content:
-                translatable_fields[field.name] = content
-
-        return translatable_fields
+        """
+        Returns {field_name: field_contents} for translatable fields, where
+        field_contents > ''
+        """
+        fields = (f for f in self._meta.fields
+                  if isinstance(f, (models.CharField, models.TextField)) and
+                     f.editable and not f.choices and
+                     f.name not in self.translatable_content_excluded_fields)
+        return dict(filter(itemgetter(1),
+                           ((f.name, getattr(self, f.name)) for f in fields)))
 
     def set_translatable_content(self, fields):
         for field, value in fields.items():
             setattr(self, field, value)
         self.save()
-        # verify that all fields have been set
-        for field, value in fields.items():
-            if getattr(self, field) != value:
-                return False
-        return True
+        return all(getattr(self, field) == value
+                   for field, value in fields.items())
 
     def delete(self, no_mp=False, *args, **kwargs):
         if no_mp:
