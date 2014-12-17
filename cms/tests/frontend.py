@@ -46,8 +46,8 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
     def setUpClass(cls):
         super(CMSLiveTests, cls).setUpClass()
         cache.clear()
-        if os.environ.get('SELENIUM', '') != '':
-            #skip selenium tests
+        if os.environ.get('SELENIUM', '') == '0':
+            #  skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
             capabilities = webdriver.DesiredCapabilities.CHROME
@@ -55,15 +55,26 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             capabilities['platform'] = 'OS X 10.9'
             capabilities['name'] = 'django CMS'
             capabilities['build'] = os.environ.get("TRAVIS_BUILD_NUMBER")
-            capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"]
+            capabilities['tags'] = [
+                os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"
+            ]
             username = os.environ.get("SAUCE_USERNAME")
             access_key = os.environ.get("SAUCE_ACCESS_KEY")
-            capabilities["tunnel-identifier"] = os.environ.get("TRAVIS_JOB_NUMBER")
-            hub_url = "http://%s:%s@ondemand.saucelabs.com/wd/hub" % (username, access_key)
-            cls.driver = webdriver.Remote(desired_capabilities=capabilities, command_executor=hub_url)
+            capabilities["tunnel-identifier"] = os.environ.get(
+                "TRAVIS_JOB_NUMBER"
+            )
+            hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
+                username,
+                access_key
+            )
+            cls.driver = webdriver.Remote(
+                desired_capabilities=capabilities,
+                command_executor=hub_url
+            )
             cls.driver.implicitly_wait(30)
         else:
-            cls.driver = webdriver.Firefox()
+            driver = os.environ.get('SELENIUM_DRIVER_CLASS', 'Firefox')
+            cls.driver = getattr(webdriver, driver)()
             cls.driver.implicitly_wait(5)
         cls.accept_next_alert = True
 
@@ -74,16 +85,21 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
 
     def tearDown(self):
         super(CMSLiveTests, self).tearDown()
-        Page.objects.all().delete() # somehow the sqlite transaction got lost.
+        Page.objects.all().delete()  # somehow the sqlite transaction got lost.
         cache.clear()
 
     def _login(self):
         session = import_module(settings.SESSION_ENGINE).SessionStore()
         session.save()
         request = AttributeObject(session=session, META={})
-        get_user_model().objects.create_superuser(
-            'admin', 'admin@example.org', 'admin'
+        user_instance, _ = get_user_model().objects.get_or_create(
+            username='admin'
         )
+        user_instance.set_password('admin')
+        user_instance.is_superuser = True
+        user_instance.is_active = True
+        user_instance.is_staff = True
+        user_instance.save()
         user = authenticate(username='admin', password='admin')
         login(request, user)
         session.save()
@@ -299,13 +315,15 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         'LANGUAGES': (('en', 'English'),
                       ('it', 'Italian')),
         'CMS_LANGUAGES': {
-            1: [ {'code' : 'en',
-                  'name': 'English',
-                  'public': True},
-                 {'code': 'it',
-                  'name': 'Italian',
-                  'public': True},
-            ],
+            1: [{
+                'code': 'en',
+                'name': 'English',
+                'public': True
+            }, {
+                'code': 'it',
+                'name': 'Italian',
+                'public': True
+            }],
             'default': {
                 'public': True,
                 'hide_untranslated': False,
@@ -313,7 +331,6 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         },
         'SITE_ID': 1,
     }
-
 
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
@@ -445,40 +462,66 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
         self.placeholder_name = 'cms_placeholder-5'
 
-        self.user = self._create_user("testuser", is_staff=True)
-        self.user.user_permissions = Permission.objects.exclude(codename="edit_static_placeholder")
+        self.username = 'testuser'
+
+        self.user = self._create_user(self.username, is_staff=True)
+        self.user.user_permissions = Permission.objects.exclude(
+            codename="edit_static_placeholder"
+        )
 
         self.driver.implicitly_wait(2)
 
         super(StaticPlaceholderPermissionTests, self).setUp()
 
     def test_static_placeholders_permissions(self):
-
         # login
-        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        url = '%s/?%s' % (
+            self.live_server_url,
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        )
         self.driver.get(url)
 
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(
+            NoSuchElementException,
+            self.driver.find_element_by_class_name, 'cms_toolbar-item_logout'
+        )
         username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
+        username_input.send_keys(self.username)
         password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
+        password_input.send_keys(self.username)
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name(
+            'cms_toolbar-item-navigation'
+        ))
 
-        # test static placeholder permission (content of static placeholders is NOT editable)
-        self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, self.placeholder_name)
+        # test static placeholder permission (content of static placeholders
+        # is NOT editable)
+        self.driver.get('{0}/en/?{1}'.format(
+            self.live_server_url,
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.assertRaises(
+            NoSuchElementException,
+            self.driver.find_element_by_class_name, self.placeholder_name
+        )
 
         # update userpermission
-        edit_permission = Permission.objects.get(codename="edit_static_placeholder")
-        self.user.user_permissions.add( edit_permission )
+        edit_permission = Permission.objects.get(
+            codename="edit_static_placeholder"
+        )
+        self.user.user_permissions.add(edit_permission)
 
-        # test static placeholder permission (content of static placeholders is editable)
-        self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertTrue(self.driver.find_element_by_class_name(self.placeholder_name))
+        # test static placeholder permission (content of static placeholders
+        # is editable)
+        self.driver.get('{0}/en/?{1}'.format(
+            self.live_server_url,
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.assertTrue(
+            self.driver.find_element_by_class_name(self.placeholder_name)
+        )
 
 
 class AddPluginTest(CMSLiveTests):
