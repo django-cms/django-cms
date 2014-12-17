@@ -45,7 +45,10 @@ There's more than one way to do this, but here's one to help you get started::
     pip install -r django-cms/test_requirements/django-1.6.txt
 
     # run the test suite
-    python django-cms/develop.py test
+    # note that you must be in the django-cms directory when you do this,
+    # otherwise you'll get "Template not found" errors
+    cd django-cms
+    python develop.py test
 
 It can take a few minutes to run. Note that the selenium tests included in the
 test suite require that you have Firefox installed.
