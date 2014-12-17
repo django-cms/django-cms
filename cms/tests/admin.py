@@ -311,7 +311,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 397)):
+            with self.assertNumQueries(FuzzyInt(300, 405)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -328,7 +328,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 385)):
+            with self.assertNumQueries(FuzzyInt(300, 392)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -342,7 +342,7 @@ class AdminTestCase(AdminTestsBase):
                     continue
                 if not admin_instance.search_fields:
                     continue
-                url = admin_reverse('cms_%s_changelist' % model._meta.module_name)
+                url = admin_reverse('cms_%s_changelist' % model._meta.model_name)
                 response = self.client.get('%s?q=1' % url)
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
@@ -460,7 +460,7 @@ class AdminTestCase(AdminTestsBase):
                                        created_by=admin_user, published=True, parent=second_level_page_top)
         self.assertEqual(Page.objects.all().count(), 4)
 
-        url = admin_reverse('cms_%s_changelist' % Page._meta.module_name)
+        url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
         request = self.get_request(url)
 
         request.session = {}
@@ -502,7 +502,7 @@ class AdminTestCase(AdminTestsBase):
         third_level_page = create_page('level3', "nav_playground.html", "en",
                                        created_by=admin_user, published=True, parent=second_level_page_top)
 
-        url = admin_reverse('cms_%s_changelist' % Page._meta.module_name)
+        url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
 
         if get_user_model().USERNAME_FIELD == 'email':
             self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
@@ -551,7 +551,7 @@ class AdminTestCase(AdminTestsBase):
         # Add a es-mx translation for this page
         create_title("es-mx", es_title, page, slug="es_pagina")
 
-        url = admin_reverse('cms_%s_changelist' % Page._meta.module_name)
+        url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
         url_pat = '<a href="{0}/{1}/preview/"[^>]*>{2}</a>'
 
         with self.login_user_context(admin_guy):
@@ -661,6 +661,9 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'no': 'data'})
             old = page.in_navigation
             response = self.admin_class.change_innavigation(request, page.pk)
+            # These asserts are for #3589
+            self.assertContains(response, 'lang="en"')
+            self.assertContains(response, './%s/en/preview/' % page.pk)
             self.assertEqual(response.status_code, 200)
             page = self.reload(page)
             self.assertEqual(old, not page.in_navigation)

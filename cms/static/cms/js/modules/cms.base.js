@@ -12,8 +12,8 @@ window.Class = window.Class || undefined;
 
 // ensuring CMS namespace is set correctly
 var CMS = {
-	'$': (jQuery) ? jQuery.noConflict() : undefined,
-	'Class': (Class) ? Class.noConflict() : undefined,
+	'$': (typeof jQuery === 'function') ? jQuery : undefined,
+	'Class': (typeof Class === 'function') ? Class : undefined,
 	'API': {}
 };
 
@@ -72,7 +72,9 @@ $(document).ready(function () {
 
 			// add timeout if provided
 			parent.setTimeout(function () {
-				(url) ? parent.location.href = url : parent.location.reload();
+				if (url) { parent.location.href = url; }
+				// ensure page is always reloaded #3413
+				parent.location.reload()
 			}, timeout || 0);
 		},
 

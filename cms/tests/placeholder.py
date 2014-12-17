@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
-import warnings
-from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
 from django.contrib import admin
@@ -24,7 +22,6 @@ from djangocms_text_ckeditor.models import Text
 from sekizai.context import SekizaiContext
 
 from cms import constants
-from cms.admin.placeholderadmin import PlaceholderAdmin, PlaceholderAdminMixin
 from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
@@ -35,10 +32,10 @@ from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from cms.test_utils.project.placeholderapp.models import (
-    Example1,
-    TwoPlaceholderExample,
     DynamicPlaceholderSlotExample,
-    MultilingualExample1
+    Example1,
+    MultilingualExample1,
+    TwoPlaceholderExample,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
@@ -49,6 +46,7 @@ from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
 from cms.utils.plugins import get_placeholders, assign_plugins
+from cms.utils.urlutils import admin_reverse
 
 
 class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
@@ -653,17 +651,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         # get languages
         langs = [lang['code'] for lang in placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
-
-    def test_deprecated_PlaceholderAdmin(self):
-        admin_site = admin.sites.AdminSite()
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            pa = PlaceholderAdmin(Placeholder, admin_site)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
-            self.assertTrue("PlaceholderAdminMixin with admin.ModelAdmin" in str(w[-1].message))
-            self.assertIsInstance(pa, admin.ModelAdmin, 'PlaceholderAdmin not admin.ModelAdmin')
-            self.assertIsInstance(pa, PlaceholderAdminMixin, 'PlaceholderAdmin not PlaceholderAdminMixin')
 
     @override_settings(TEMPLATE_LOADERS=(
         ('django.template.loaders.cached.Loader', (

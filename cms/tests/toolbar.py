@@ -2,10 +2,10 @@
 from __future__ import with_statement
 import datetime
 import re
-from cms.utils.urlutils import admin_reverse
 
-from django.template.defaultfilters import truncatewords
+from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
@@ -19,16 +19,17 @@ from cms.models import Page, UserSettings, PagePermission
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
-from cms.test_utils.project.placeholderapp.models import (Example1,
+from cms.test_utils.project.placeholderapp.models import (Example1, CharPksExample,
                                                           MultilingualExample1)
-from cms.test_utils.project.placeholderapp.views import (detail_view,
+from cms.test_utils.project.placeholderapp.views import (detail_view, detail_view_char,
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered)
 from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.util.context_managers import SettingsOverride, UserLoginContext
 from cms.utils.compat import DJANGO_1_4
 from cms.utils.conf import get_cms_setting
+from cms.utils.urlutils import admin_reverse
 from cms.views import details
 
 
@@ -1248,6 +1249,83 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<div class="cms_plugin cms_plugin-cms-page-changelist-%s cms_render_model cms_render_model_block"><h3>Menu</h3></div>' % page.pk)
+
+
+class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
+
+    def get_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[CharPksExample]
+
+    def test_url_char_pk(self):
+        """
+        Tests whether the frontend admin matches the edit_fields url with alphanumeric pks
+        """
+        ex = CharPksExample(
+            char_1='one',
+            slug='some-Special_slug_123',
+        )
+        ex.save()
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            response = self.client.get(admin_reverse('placeholderapp_charpksexample_edit_field', args=(ex.pk, 'en')),
+                                       data={'edit_fields': 'char_1'})
+            # if we get a response pattern matches
+            self.assertEqual(response.status_code, 200)
+
+    def test_url_numeric_pk(self):
+        """
+        Tests whether the frontend admin matches the edit_fields url with numeric pks
+        """
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        superuser = self.get_superuser()
+        with UserLoginContext(self, superuser):
+            response = self.client.get(admin_reverse('placeholderapp_example1_edit_field', args=(ex.pk, 'en')),
+                                       data={'edit_fields': 'char_1'})
+            # if we get a response pattern matches
+            self.assertEqual(response.status_code, 200)
+
+    def test_view_char_pk(self):
+        """
+        Tests whether the admin urls triggered when the toolbar is active works
+        (i.e.: no NoReverseMatch is raised) with alphanumeric pks
+        """
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex = CharPksExample(
+            char_1='one',
+            slug='some-Special_slug_123',
+        )
+        ex.save()
+        superuser = self.get_superuser()
+        request = self.get_page_request(page, superuser, edit=True)
+        response = detail_view_char(request, ex.pk)
+        # if we get a response pattern matches
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_numeric_pk(self):
+        """
+        Tests whether the admin urls triggered when the toolbar is active works
+        (i.e.: no NoReverseMatch is raised) with numeric pks
+        """
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        superuser = self.get_superuser()
+        request = self.get_page_request(page, superuser, edit=True)
+        response = detail_view(request, ex.pk)
+        # if we get a response pattern matches
+        self.assertEqual(response.status_code, 200)
 
 
 class ToolbarAPITests(TestCase):

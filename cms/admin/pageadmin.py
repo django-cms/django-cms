@@ -108,7 +108,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         from django.conf.urls import patterns, url
 
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(
@@ -1225,7 +1225,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         pluginopts = CMSPlugin._meta
 
         try:
-            obj = self.queryset(request).get(pk=unquote(object_id))
+            obj = self.get_queryset(request).get(pk=unquote(object_id))
         except self.model.DoesNotExist:
             # Don't raise Http404 just yet, because we haven't checked
             # permissions yet. We don't want an unauthenticated user to be able
@@ -1333,7 +1333,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         page = get_object_or_404(Page, pk=page_id)
         if page.has_change_permission(request):
             page.toggle_in_navigation()
-            return admin_utils.render_admin_menu_item(request, page)
+            language = request.GET.get('language') or get_language_from_request(request)
+            return admin_utils.render_admin_menu_item(request, page, language=language)
         return HttpResponseForbidden(force_unicode(_("You do not have permission to change this page's in_navigation status")))
 
     def descendants(self, request, page_id, language):

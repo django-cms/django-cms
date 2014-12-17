@@ -81,16 +81,6 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     return default
 
 
-def get_page_from_placeholder_if_exists(placeholder):
-    import warnings
-
-    warnings.warn(
-        "The get_page_from_placeholder_if_exists function is deprecated. Use placeholder.page instead",
-        DeprecationWarning
-    )
-    return placeholder.page if placeholder else None
-
-
 def validate_placeholder_name(name):
     if not isinstance(name, six.string_types):
         raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
@@ -117,18 +107,15 @@ class MLNGPlaceholderActions(PlaceholderNoAction):
     can_copy = True
 
     def copy(self, target_placeholder, source_language, fieldname, model, target_language, **kwargs):
+        from cms.utils.copy_plugins import copy_plugins_to
         trgt = model.objects.get(**{fieldname: target_placeholder})
         src = model.objects.get(master=trgt.master, language_code=source_language)
 
         source_placeholder = getattr(src, fieldname, None)
         if not source_placeholder:
             return False
-        plugins = source_placeholder.get_plugins_list()
-        cache = {}
-        new_plugins = []
-        for p in plugins:
-            new_plugins.append(p.copy_plugin(target_placeholder, target_language, cache))
-        return new_plugins
+        return copy_plugins_to(source_placeholder.get_plugins_list(),
+                               target_placeholder, target_language)
 
     def get_copy_languages(self, placeholder, model, fieldname, **kwargs):
         manager = model.objects

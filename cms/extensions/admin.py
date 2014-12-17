@@ -28,8 +28,8 @@ class PageExtensionAdmin(ExtensionAdmin):
             raise PermissionDenied()
         obj.delete()
 
-    def queryset(self, request):
-        return super(PageExtensionAdmin, self).queryset(request).filter(extended_object__publisher_is_draft=True)
+    def get_queryset(self, request):
+        return super(PageExtensionAdmin, self).get_queryset(request).filter(extended_object__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
@@ -43,7 +43,7 @@ class PageExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=page)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(extension.pk,),
                                             current_app=self.admin_site.name)
                 return HttpResponseRedirect(change_url)
@@ -69,8 +69,8 @@ class TitleExtensionAdmin(ExtensionAdmin):
             raise PermissionDenied()
         obj.delete()
 
-    def queryset(self, request):
-        return super(TitleExtensionAdmin, self).queryset(request).filter(extended_object__page__publisher_is_draft=True)
+    def get_queryset(self, request):
+        return super(TitleExtensionAdmin, self).get_queryset(request).filter(extended_object__page__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
@@ -84,7 +84,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=title)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.module_name),
+                                            (opts.app_label, opts.model_name),
                                             args=(extension.pk,),
                                             current_app=self.admin_site.name)
                 return HttpResponseRedirect(change_url)

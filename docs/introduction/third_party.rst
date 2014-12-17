@@ -46,11 +46,13 @@ Since we added a new app, we need to update our database::
 
     python manage.py migrate
 
-Start the server again. The weblog application comes with a django CMS AppHook,
-so add a new django CMS page, and add the weblog application to it as you did
-for Polls in the previous tutorial.
+Start the server again.
 
-On the new page, you should find the weblog application at work.
+The weblog application comes with a django CMS AppHook, so add a new django CMS
+page, and add the weblog application to it as you did for Polls in the previous
+tutorial. *You may need to restart your server at this point.*
+
+Publish the new page, and you should find the weblog application at work there.
 
 You can add new weblog posts using the admin, but also have a look at the
 toolbar. You can now select "Blog" > "Add Blog Post..." from it and add a new

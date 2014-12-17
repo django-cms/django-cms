@@ -18,7 +18,7 @@ class PageManager(PublisherManager):
     instances.
     """
 
-    def get_query_set(self):
+    def get_queryset(self):
         """Change standard model queryset to our own.
         """
         return PageQuerySet(self.model)
@@ -40,13 +40,13 @@ class PageManager(PublisherManager):
     # manager, maybe some of them can be just accessible over queryset...?
 
     def on_site(self, site=None):
-        return self.get_query_set().on_site(site)
+        return self.get_queryset().on_site(site)
 
     def published(self, site=None):
-        return self.get_query_set().published(site=site)
+        return self.get_queryset().published(site=site)
 
     def get_home(self, site=None):
-        return self.get_query_set().get_home(site)
+        return self.get_queryset().get_home(site)
 
     def search(self, q, language=None, current_site_only=True):
         """Simple search function
@@ -55,7 +55,7 @@ class PageManager(PublisherManager):
         """
         from cms.plugin_pool import plugin_pool
 
-        qs = self.get_query_set()
+        qs = self.get_queryset()
         qs = qs.public()
 
         if current_site_only:
@@ -109,10 +109,10 @@ class TitleManager(PublisherManager):
 
     # created new public method to meet test case requirement and to get a list of titles for published pages
     def public(self):
-        return self.get_query_set().filter(publisher_is_draft=False, published=True)
+        return self.get_queryset().filter(publisher_is_draft=False, published=True)
 
     def drafts(self):
-        return self.get_query_set().filter(publisher_is_draft=True)
+        return self.get_queryset().filter(publisher_is_draft=True)
 
     def set_or_create(self, request, page, form, language):
         """

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import json
+
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.helpers import AdminForm
 from django.utils.decorators import method_decorator
-import json
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
@@ -14,7 +15,6 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.utils.plugins import requires_reload, has_reached_plugin_limit
-from django.contrib.admin import ModelAdmin
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -22,7 +22,6 @@ from django.template.defaultfilters import force_escape, escapejs
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.decorators.http import require_POST
-import warnings
 from django.template.response import TemplateResponse
 
 from django.contrib.admin.util import get_deleted_objects
@@ -43,13 +42,14 @@ class FrontendEditableAdminMixin(object):
         Register the url for the single field edit view
         """
         from django.conf.urls import patterns, url
+        from cms.urls import SLUG_REGEXP
 
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(
             '',
-            pat(r'edit-field/([0-9]+)/([a-z\-]+)/$', self.edit_field),
+            pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         )
         return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
 
@@ -74,7 +74,8 @@ class FrontendEditableAdminMixin(object):
                 'message': force_unicode(_("Field %s not found")) % raw_fields
             }
             return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
-        if not request.user.has_perm("%s_change" % self.model._meta.module_name):
+        if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
+                                                             self.model._meta.model_name)):
             context = {
                 'opts': opts,
                 'message': force_unicode(_("You do not have permission to edit this item"))
@@ -125,17 +126,18 @@ class PlaceholderAdminMixin(object):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         from django.conf.urls import patterns, url
+        from cms.urls import SLUG_REGEXP
 
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.module_name)
+        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = patterns(
             '',
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
-            pat(r'edit-plugin/([0-9]+)/$', self.edit_plugin),
-            pat(r'delete-plugin/([0-9]+)/$', self.delete_plugin),
-            pat(r'clear-placeholder/([0-9]+)/$', self.clear_placeholder),
+            pat(r'edit-plugin/(%s)/$' % SLUG_REGEXP, self.edit_plugin),
+            pat(r'delete-plugin/(%s)/$' % SLUG_REGEXP, self.delete_plugin),
+            pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         )
         return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
@@ -257,10 +259,10 @@ class PlaceholderAdminMixin(object):
         self.post_add_plugin(request, placeholder, plugin)
         response = {
             'url': force_unicode(
-                admin_reverse("%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                admin_reverse("%s_%s_edit_plugin" % (self.model._meta.app_label, self.model._meta.model_name),
                         args=[plugin.pk])),
             'delete': force_unicode(
-                admin_reverse("%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.module_name),
+                admin_reverse("%s_%s_delete_plugin" % (self.model._meta.app_label, self.model._meta.model_name),
                         args=[plugin.pk])),
             'breadcrumb': plugin.get_breadcrumb(),
         }
@@ -556,16 +558,3 @@ class PlaceholderAdminMixin(object):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context,
                                 current_app=self.admin_site.name)
 
-
-class PlaceholderAdmin(PlaceholderAdminMixin, ModelAdmin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class PlaceholderAdmin is deprecated and will be removed in 3.1. "
-            "Instead, combine PlaceholderAdminMixin with admin.ModelAdmin.", DeprecationWarning)
-        super(PlaceholderAdmin, self).__init__(*args, **kwargs)
-
-
-class FrontendEditableAdmin(FrontendEditableAdminMixin):
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Class FrontendEditableAdmin is deprecated and will be removed in 3.1. "
-            "Instead, use FrontendEditableAdminMixin.", DeprecationWarning)
-        super(FrontendEditableAdmin, self).__init__(*args, **kwargs)
