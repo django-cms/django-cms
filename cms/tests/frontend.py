@@ -157,14 +157,14 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
 
     def is_alert_present(self):
         try:
-            self.driver.switch_to_alert()
+            self.driver.switch_to.alert()
         except NoAlertPresentException:
             return False
         return True
 
     def close_alert_and_get_its_text(self):
         try:
-            alert = self.driver.switch_to_alert()
+            alert = self.driver.switch_to.alert()
             alert_text = alert.text
             if self.accept_next_alert:
                 alert.accept()
