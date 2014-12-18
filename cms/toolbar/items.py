@@ -451,7 +451,7 @@ class ButtonList(BaseItem):
         self.buttons.append(item)
         return item
 
-    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=URL_CHANGE):
+    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
         item = SideframeButton(name, url,
                       active=active,
                       disabled=disabled,
