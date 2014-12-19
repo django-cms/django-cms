@@ -181,7 +181,7 @@ class PageSmartLinkWidget(TextInput):
             }
         });
     })
-})(django.jQuery);
+})(CMS.$);
 </script>''' % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
@@ -198,7 +198,7 @@ class PageSmartLinkWidget(TextInput):
             'all': ('cms/js/select2/select2.css',
                     'cms/js/select2/select2-bootstrap.css',)
         }
-        js = (#'cms/js/libs/jquery.min.js',
+        js = ('cms/js/modules/cms.base.js',
               'cms/js/select2/select2.js',)
 
 
