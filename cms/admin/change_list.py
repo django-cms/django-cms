@@ -2,7 +2,6 @@
 import bisect
 from cms.models import Title, Page, EmptyTitle
 from cms.utils import get_language_list
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
@@ -75,10 +74,7 @@ class CMSChangeList(ChangeList):
             permissions = Page.permissions.get_change_id_list(request.user, site)
             if permissions != Page.permissions.GRANT_ALL:
                 qs = qs.filter(pk__in=permissions)
-                # root_query_set is a read-only property in Django 1.6
-                # and will be removed in Django 1.8.
-                queryset_attr = 'root_query_set' if DJANGO_1_5 else 'root_queryset'
-                setattr(self, queryset_attr, self.root_query_set.filter(pk__in=permissions))
+                self.root_queryset = self.root_queryset.filter(pk__in=permissions)
             self.real_queryset = True
             qs = qs.filter(site=self._current_site)
         return qs
@@ -97,9 +93,9 @@ class CMSChangeList(ChangeList):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
             if not self.is_filtered():
-                self.full_result_count = self.result_count = self.root_query_set.count()
+                self.full_result_count = self.result_count = self.root_queryset.count()
             else:
-                self.full_result_count = self.root_query_set.count()
+                self.full_result_count = self.root_queryset.count()
 
     def set_items(self, request):
         site = self.current_site()
