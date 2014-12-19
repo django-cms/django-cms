@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -49,7 +50,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
     #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
     if get_cms_setting('PERMISSION'):
-        # jstree metadata generator 
+        # jstree metadata generator
         md = []
 
         #if not has_add_page_permission:
@@ -70,7 +71,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
             global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
                 request.user, page.site_id).exists()
             request.user._global_add_perm_cache = global_add_perm
-        if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
+        if request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts)) and global_add_perm:
             has_add_on_same_level_permission = True
     from cms.utils import permissions
     if not has_add_on_same_level_permission and page.parent_id:

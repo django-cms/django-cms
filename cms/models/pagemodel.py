@@ -4,6 +4,7 @@ from cms.publisher.errors import PublisherCantPublish
 from os.path import join
 
 from django.utils.timezone import now
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
@@ -1013,7 +1014,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             user = request.user
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        return (user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
                 and self.has_generic_permission(request, "change"))
 
     def has_delete_permission(self, request, user=None):
@@ -1022,7 +1023,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             user = request.user
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+        return (user.has_perm(opts.app_label + '.' + get_permission_codename('delete', opts))
                 and self.has_generic_permission(request, "delete"))
 
     def has_publish_permission(self, request, user=None):

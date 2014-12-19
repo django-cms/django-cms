@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.sites.models import Site
 
@@ -143,7 +144,7 @@ class BasicToolbar(CMSToolbar):
         if User in admin.site._registry:
             opts = User._meta
 
-            if self.request.user.has_perm('%s.%s' % (opts.app_label, opts.get_change_permission())):
+            if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
                 user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
