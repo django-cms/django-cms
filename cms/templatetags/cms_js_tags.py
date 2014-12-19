@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
+import json
 import warnings
+
 from classytags.core import Tag, Options
 from cms.utils.encoder import SafeJSONEncoder
-from cms.utils.compat import DJANGO_1_4
 from django import template
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.text import javascript_quote
 from django.utils.safestring import mark_safe
-if DJANGO_1_4:
-    from django.utils import simplejson as json
-else:
-    import json
+
 register = template.Library()
 
 

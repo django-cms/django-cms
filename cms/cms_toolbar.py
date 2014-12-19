@@ -18,7 +18,6 @@ from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.i18n import get_language_tuple, force_language
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
@@ -185,8 +184,6 @@ class BasicToolbar(CMSToolbar):
             name = user.get_full_name()
             if name:
                 return name
-            elif DJANGO_1_4:
-                return user.username
             else:
                 return user.get_username()
         except (AttributeError, NotImplementedError):
