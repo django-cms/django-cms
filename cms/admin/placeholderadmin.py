@@ -221,7 +221,12 @@ class PlaceholderAdminMixin(object):
         plugin_type = request.POST['plugin_type']
         placeholder_id = request.POST.get('placeholder_id', None)
         placeholder = get_object_or_404(Placeholder, pk=placeholder_id)
-        parent_id = request.POST.get('plugin_parent', None)
+        # TODO: Remove this when a djangocms-text-ckeditor stable version with
+        # support for plugin_parent is released
+        if 'parent_id' in request.POST:
+            parent_id = request.POST.get('parent_id', None)
+        else:
+            parent_id = request.POST.get('plugin_parent', None)
         language = request.POST.get('plugin_language') or get_language_from_request(request)
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
             return HttpResponseForbidden(force_unicode(_('You do not have permission to add a plugin')))
@@ -417,7 +422,12 @@ class PlaceholderAdminMixin(object):
         """
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
-        parent_id = request.POST.get('plugin_parent', None)
+        # TODO: Remove this when a djangocms-text-ckeditor stable version with
+        # support for plugin_parent is released
+        if 'parent_id' in request.POST:
+            parent_id = request.POST.get('parent_id', None)
+        else:
+            parent_id = request.POST.get('plugin_parent', None)
         language = request.POST.get('plugin_language', None)
         source_placeholder = plugin.placeholder
         if not parent_id:
