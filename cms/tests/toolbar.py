@@ -9,7 +9,7 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, override
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page, create_title, add_plugin
@@ -1206,20 +1206,23 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         request.GET['edit_fields'] = 'char_2'
 
-        response = exadmin.edit_field(request, exm.pk, "en")
-        self.assertContains(response, 'id="id_char_2"')
-        self.assertContains(response, 'value="two"')
+        with override('en'):
+            response = exadmin.edit_field(request, exm.pk, "en")
+            self.assertContains(response, 'id="id_char_2"')
+            self.assertContains(response, 'value="two"')
 
-        response = exadmin.edit_field(request, exm.pk, "fr")
-        self.assertContains(response, 'id="id_char_2"')
-        self.assertContains(response, 'value="deux"')
-
-        with SettingsOverride(LANGUAGE_CODE="fr"):
-            request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
-            request.GET['edit_fields'] = 'char_2'
+        with override('fr'):
             response = exadmin.edit_field(request, exm.pk, "fr")
             self.assertContains(response, 'id="id_char_2"')
             self.assertContains(response, 'value="deux"')
+
+        with override('fr'):
+            with SettingsOverride(LANGUAGE_CODE="fr"):
+                request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
+                request.GET['edit_fields'] = 'char_2'
+                response = exadmin.edit_field(request, exm.pk, "fr")
+                self.assertContains(response, 'id="id_char_2"')
+                self.assertContains(response, 'value="deux"')
 
     def test_edit_page(self):
         language = "en"
