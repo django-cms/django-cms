@@ -19,7 +19,6 @@ from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.utils import i18n, page as page_utils
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
@@ -441,10 +440,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self.created_by = self.changed_by
         if commit:
             if no_signals:  # ugly hack because of mptt
-                if DJANGO_1_5:
-                    self.save_base(cls=self.__class__, **kwargs)
-                else:
-                    self.save_base(**kwargs)
+                self.save_base(**kwargs)
             else:
                 if not self.depth:
                     if self.parent_id:
@@ -467,11 +463,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
-
-        if not DJANGO_1_5 and 'cls' in kwargs:
-            del kwargs['cls']
-        ret = super(Page, self).save_base(*args, **kwargs)
-        return ret
+        return super(Page, self).save_base(*args, **kwargs)
 
     def is_new_dirty(self):
         if self.pk:
