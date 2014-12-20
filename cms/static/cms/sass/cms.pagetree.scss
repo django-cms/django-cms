@@ -133,10 +133,6 @@ $color-background-blue-hover: #e6f6fd;
 		span { display:inline !important; }
 	}
 }
-// set the overflow to hidden at smaller resolution to hide longer titles in the pagetree
-@media only screen and (max-width: 800px){
-	#sitemap li .cont { overflow:hidden !important; }
-}
 
 // filter button on top right
 #changelist-filter-button { line-height:30px;
