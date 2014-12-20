@@ -9,7 +9,7 @@ from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
 
 from cms.exceptions import PluginLimitReached
-from cms.models import Page
+from cms.models import Page, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_fallback_languages
@@ -166,6 +166,29 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
                             pl.cache_placeholder = False
             # make the equivalent list of qs, but with downcasted instances
     return [plugin_lookup.get(plugin.pk, plugin) for plugin in queryset]
+
+
+def reorder_plugins(placeholder, parent_id, language, order):
+    plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder, language=language).order_by('position')
+    x = 0
+    for level_plugin in plugins:
+        if order:
+            x = 0
+            found = False
+            for pk in order:
+                if level_plugin.pk == int(pk):
+                    level_plugin.position = x
+                    level_plugin.save()
+                    found = True
+                    break
+                x += 1
+            if not found:
+                return False
+        else:
+            level_plugin.position = x
+            level_plugin.save()
+            x += 1
+    return plugins
 
 
 def get_plugins_for_page(request, page, lang=None):
