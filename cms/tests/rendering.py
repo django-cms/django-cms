@@ -271,7 +271,6 @@ class RenderingTestCase(CMSTestCase):
             '<h1>%s</h1>' % render_uncached_placeholder_body,
             r
         )
-
         self.assertIn(
             '<h2></h2>',
             r
@@ -281,7 +280,6 @@ class RenderingTestCase(CMSTestCase):
             '<h3>%s</h3>' % render_uncached_placeholder_body,
             r
         )
-
 
     def test_render_uncached_placeholder_tag_no_use_cache(self):
         """
@@ -294,16 +292,15 @@ class RenderingTestCase(CMSTestCase):
 
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
 
-        t = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
+        template = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
 
         cache_key = ex1.placeholder.get_cache_key(u"en")
         cache_value_before = cache.get(cache_key)
-        r = self.render(t, self.test_page, {'ex1': ex1})
+        self.render(template, self.test_page, {'ex1': ex1})
         cache_value_after = cache.get(cache_key)
 
         self.assertEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_after)
-
 
     def test_render_placeholder_tag_use_cache(self):
         """
@@ -316,17 +313,16 @@ class RenderingTestCase(CMSTestCase):
 
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
 
-        t = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
+        template = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
 
         cache_key = ex1.placeholder.get_cache_key(u"en")
         cache_value_before = cache.get(cache_key)
-        r = self.render(t, self.test_page, {'ex1': ex1})
+        self.render(template, self.test_page, {'ex1': ex1})
         cache_value_after = cache.get(cache_key)
 
         self.assertNotEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_before)
         self.assertIsNotNone(cache_value_after)
-
 
     def test_show_placeholder(self):
         """
