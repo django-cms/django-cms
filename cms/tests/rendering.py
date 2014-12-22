@@ -13,7 +13,9 @@ from cms.plugin_rendering import render_plugins, PluginContext, render_placehold
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.test_utils.util.mock import AttributeObject
+from cms.utils.compat import DJANGO_1_5
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -243,6 +245,88 @@ class RenderingTestCase(SettingsOverrideTestCase):
             '<h3>%s</h3>' % render_placeholder_body,
             r
         )
+
+    def test_render_uncached_placeholder_tag(self):
+        """
+        Tests the {% render_uncached_placeholder %} templatetag.
+        """
+        render_uncached_placeholder_body = "I'm the render uncached placeholder body"
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
+
+        t = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>
+<h2>{% render_uncached_placeholder ex1.placeholder as tempvar %}</h2>
+<h3>{{ tempvar }}</h3>
+{% endblock content %}
+'''
+        r = self.render(t, self.test_page, {'ex1': ex1})
+        self.assertIn(
+            '<h1>%s</h1>' % render_uncached_placeholder_body,
+            r
+        )
+
+        self.assertIn(
+            '<h2></h2>',
+            r
+        )
+
+        self.assertIn(
+            '<h3>%s</h3>' % render_uncached_placeholder_body,
+            r
+        )
+
+
+    def test_render_uncached_placeholder_tag_no_use_cache(self):
+        """
+        Tests that {% render_uncached_placeholder %} does not populate cache.
+        """
+        render_uncached_placeholder_body = "I'm the render uncached placeholder body"
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
+
+        t = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
+
+        cache_key = ex1.placeholder.get_cache_key(u"en")
+        cache_value_before = cache.get(cache_key)
+        r = self.render(t, self.test_page, {'ex1': ex1})
+        cache_value_after = cache.get(cache_key)
+
+        self.assertEqual(cache_value_before, cache_value_after)
+        self.assertIsNone(cache_value_after)
+
+
+    def test_render_placeholder_tag_use_cache(self):
+        """
+        Tests that {% render_placeholder %} populates cache.
+        """
+        render_placeholder_body = "I'm the render placeholder body"
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+
+        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+
+        t = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
+
+        cache_key = ex1.placeholder.get_cache_key(u"en")
+        cache_value_before = cache.get(cache_key)
+        r = self.render(t, self.test_page, {'ex1': ex1})
+        cache_value_after = cache.get(cache_key)
+
+        self.assertNotEqual(cache_value_before, cache_value_after)
+        self.assertIsNone(cache_value_before)
+        self.assertIsNotNone(cache_value_after)
+
 
     def test_show_placeholder(self):
         """
