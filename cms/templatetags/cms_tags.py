@@ -1142,19 +1142,19 @@ class RenderPlaceholder(AsTag):
 register.tag(RenderPlaceholder)
 
 
-class RenderPlaceholderUncached(RenderPlaceholder):
+class RenderUncachedPlaceholder(RenderPlaceholder):
     """
     Uncached version of RenderPlaceholder
     This templatetag will neither get the result from cache, nor will update
     the cache value for the given placeholder
     """
-    name = 'render_placeholder_uncached'
+    name = 'render_uncached_placeholder'
 
     def _get_value(self, context, editable=True, **kwargs):
         kwargs['nocache'] = True
-        return super(RenderPlaceholderUncached, self)._get_value(context, editable, **kwargs)
+        return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
 
-register.tag(RenderPlaceholderUncached)
+register.tag(RenderUncachedPlaceholder)
 
 NULL = object()
 
