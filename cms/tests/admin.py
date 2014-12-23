@@ -76,6 +76,15 @@ class AdminTestsBase(CMSTestCase):
 
 
 class AdminTestCase(AdminTestsBase):
+
+    def test_extension_not_in_admin(self):
+        admin_user, staff = self._get_guys()
+        with self.login_user_context(admin_user):
+            request = self.get_request('/admin/cms/page/1/', 'en',)
+            response = site.index(request)
+            self.assertNotContains(response, '/mytitleextension/')
+            self.assertNotContains(response, '/mypageextension/')
+
     def test_permissioned_page_list(self):
         """
         Makes sure that a user with restricted page permissions can view
