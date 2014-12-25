@@ -478,7 +478,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         mcol1 = self.reload(mcol1)
         self.assertEqual(mcol1.get_descendants().count(), 2)
 
-        with self.assertNumQueries(FuzzyInt(0, 200)):
+        with self.assertNumQueries(FuzzyInt(0, 207)):
             page_en.publish('en')
 
     def test_plugin_validation(self):
