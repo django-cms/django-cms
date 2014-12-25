@@ -292,9 +292,8 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
             new_plugin._no_reorder = True
         new_plugin.save()
         if plugin_instance:
-            if plugin_instance.__class__ == CMSPlugin:
-                # get a new instance so references do not get mixed up
-                plugin_instance = CMSPlugin.objects.get(pk=plugin_instance.pk)
+            # get a new instance so references do not get mixed up
+            plugin_instance = plugin_instance.__class__.objects.get(pk=plugin_instance.pk)
             plugin_instance.pk = new_plugin.pk
             plugin_instance.id = new_plugin.pk
             plugin_instance.placeholder = target_placeholder
