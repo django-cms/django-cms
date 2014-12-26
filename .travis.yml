@@ -39,7 +39,7 @@ install:
   - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install
     -q mysql-python ; fi
 
-script: coverage run --rcfile=.coverage.rc develop.py test --migrate
+script: coverage run --rcfile=.coverage.rc manage.py test
 
 after_success: coveralls --config_file=.coverage.rc --coveralls_yaml=.coveralls.yml
 
