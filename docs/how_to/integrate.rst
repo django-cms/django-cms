@@ -14,7 +14,7 @@ Requirements
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
 * `Django`_ 1.4.5, 1.5.x, 1.6.x or 1.7.x
-* `South`_ 1.0.1 (Only required for Django 1.6.x)
+* `South`_ 1.0.1 or higher (Only required up to Django 1.6)
 * `django-classy-tags`_ 0.5 or higher
 * `django-mptt`_ (0.5.2, 0.6.0, 0.6.1)
 * `django-sekizai`_ 0.7 or higher
@@ -137,7 +137,7 @@ its dependencies:
     # lock-in their version, specify them
     Django>=1.7
 
-    South==1.0.1 # Only needed for Django < 1.7
+    South==1.0.2 # Only needed for Django < 1.7
     django-mptt==0.6.1
     django-sekizai==0.7
     django-classy-tags==0.5
@@ -605,7 +605,7 @@ Initial database setup
 
 django CMS uses Django 1.7's built-in support for database migrations to manage
 creating and altering database tables. django CMS still offers South-style migrations
-for users of Django 1.6.x but as noted above, strictly requires South==1.0.1.
+for users of Django up to 1.6 but as noted above, strictly requires South>=1.0.1.
 
 Fresh install
 -------------
