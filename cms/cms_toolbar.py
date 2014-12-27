@@ -99,9 +99,6 @@ class BasicToolbar(CMSToolbar):
     Basic Toolbar for site and languages menu
     """
 
-    def __init__(self, request, toolbar, is_current_app, app_path):
-        super(BasicToolbar, self).__init__(request, toolbar, is_current_app, app_path)
-
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
 
@@ -110,6 +107,8 @@ class BasicToolbar(CMSToolbar):
 
         self.add_admin_menu()
         self.add_language_menu()
+        user_settings = self.request.toolbar.get_user_settings()
+        self.clipboard = user_settings.clipboard
 
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
