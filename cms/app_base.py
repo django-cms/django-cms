@@ -4,5 +4,15 @@ class CMSApp(object):
     urls = None
     menus = []
     app_name = None
+    app_config = None
     permissions = True
     exclude_permissions = []
+
+    def get_configs(self):
+        raise NotImplemented('Configured AppHooks must implement this method')
+
+    def get_config(self, namespace):
+        raise NotImplemented('Configured AppHooks must implement this method')
+
+    def get_config_add_url(self):
+        raise NotImplemented('Configured AppHooks must implement this method')
