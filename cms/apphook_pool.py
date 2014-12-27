@@ -43,7 +43,7 @@ class ApphookPool(object):
             warnings.warn("You define a 'menu' attribute on CMS application %r, "
                 "but the 'menus' attribute is empty, did you make a typo?" % app.__name__)
 
-        self.apps[app.__name__] = app
+        self.apps[app.__name__] = app()
         return app
 
     def discover_apps(self):
