@@ -160,8 +160,8 @@ class RenderingTestCase(SettingsOverrideTestCase):
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
         with SettingsOverride(
-                CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor',),
-                CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor',),
+                CMS_PLUGIN_PROCESSORS=('cms.tests.test_rendering.sample_plugin_processor',),
+                CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.test_rendering.sample_plugin_context_processor',),
         ):
             def test_passed_plugin_context_processor(instance, placeholder, context):
                 return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
