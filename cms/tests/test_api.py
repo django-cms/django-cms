@@ -18,7 +18,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.test_utils.util.mock import AttributeObject
-from cms.tests.apphooks import APP_MODULE, APP_NAME
+from cms.tests.test_apphooks import APP_MODULE, APP_NAME
 from cms.utils.compat.dj import get_user_model
 
 

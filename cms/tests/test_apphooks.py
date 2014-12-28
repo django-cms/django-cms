@@ -15,7 +15,7 @@ from cms.models import Title
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.tests.menu_utils import DumbPageLanguageUrl
+from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting

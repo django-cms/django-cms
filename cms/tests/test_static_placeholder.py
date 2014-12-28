@@ -5,7 +5,7 @@ import json
 from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
-from cms.tests.plugins import PluginsTestBaseCase
+from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.compat.dj import force_unicode
 from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.sites import site

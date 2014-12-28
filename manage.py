@@ -244,5 +244,4 @@ if __name__ == '__main__':
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
         ALLOWED_HOSTS=['localhost'],
-        TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',
     )

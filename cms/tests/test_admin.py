@@ -46,9 +46,9 @@ class AdminTestsBase(CMSTestCase):
         return site._registry[Page]
 
     def _get_guys(self, admin_only=False, use_global_permissions=True):
-        admiN_user = self.get_superuser()
+        admin_user = self.get_superuser()
         if admin_only:
-            return admiN_user
+            return admin_user
         USERNAME = 'test'
 
         if get_user_model().USERNAME_FIELD == 'email':
@@ -73,7 +73,7 @@ class AdminTestsBase(CMSTestCase):
                 can_move_page=True,
             )
             gpp.sites = Site.objects.all()
-        return admiN_user, normal_guy
+        return admin_user, normal_guy
 
 
 class AdminTestCase(AdminTestsBase):

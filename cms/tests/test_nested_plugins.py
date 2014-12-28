@@ -9,7 +9,7 @@ from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.tests.plugins import PluginsTestBaseCase
+from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.compat.tests import UnittestCompatMixin

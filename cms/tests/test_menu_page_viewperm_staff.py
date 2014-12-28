@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-from cms.tests.menu_page_viewperm import ViewPermissionTests
+from cms.tests.test_menu_page_viewperm import ViewPermissionTests
 from cms.utils.compat.dj import get_user_model
 
 __all__ = [
