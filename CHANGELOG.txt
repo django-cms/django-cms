@@ -293,3 +293,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added branch policy documentaion
 
 === 3.1 (unreleased) ===
+- Added template tag ``...|json`` which shall be used instead of ``...|js``,
+  because the latter is vulnerable to XSS attacks when used in combination
+  with unvalidated data.
