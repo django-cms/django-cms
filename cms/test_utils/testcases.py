@@ -167,7 +167,7 @@ class BaseCMSTestCase(object):
         This is a non superuser staff
         """
         staff = self._create_user("staff", is_staff=True, is_superuser=False,
-                                  add_permissions=True)
+                                  add_default_permissions=True)
         return staff
 
     def get_new_page_data(self, parent_id=''):
