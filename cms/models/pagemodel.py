@@ -1224,7 +1224,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         return xframe_options
 
-    def undo(self, request):
+    def undo(self):
         """
         Revert the current page to the previous revision
         """
@@ -1248,9 +1248,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             raise
         previous_revision = previous_version.revision
 
-        self._apply_revision(request, previous_revision)
+        self._apply_revision(previous_revision)
 
-    def redo(self, request):
+    def redo(self):
         """
         Revert the current page to the next revision
         """
@@ -1274,13 +1274,15 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             raise
         next_revision = previous_version.revision
 
-        self._apply_revision(request, next_revision)
+        self._apply_revision(next_revision)
 
-    def _apply_revision(self, request, target_revision):
+    def _apply_revision(self, target_revision):
         """
         Revert to a specific revision
         """
         from cms.utils.page_resolver import is_valid_url
+        # Get current titles
+        old_titles = list(self.title_set.all())
 
         # remove existing plugins / placeholders in the current page version
         placeholder_ids = self.placeholders.all().values_list('pk', flat=True)
@@ -1310,8 +1312,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     slots[new_ph.slot].delete()
 
         # check reverted titles for slug collisions
-        old_titles = list(self.title_set.all())
         new_titles = rev_page.title_set.all()
+        clean = True
         for title in new_titles:
             try:
                 is_valid_url(title.path, rev_page)
@@ -1320,7 +1322,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     if old_title.language == title.language:
                         title.slug = old_title.slug
                         title.save()
-                        messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
+                        clean = False
+        return clean
 
 
 def _reversion():
