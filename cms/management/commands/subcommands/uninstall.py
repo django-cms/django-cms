@@ -3,9 +3,6 @@ from django.core.management.base import LabelCommand
 from django.utils.six.moves import input
 
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import Page
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 
 
 class UninstallApphooksCommand(LabelCommand):
@@ -14,6 +11,7 @@ class UninstallApphooksCommand(LabelCommand):
     help = 'Uninstalls (sets to null) specified apphooks for all pages'
 
     def handle_label(self, label, **options):
+        from cms.models import Page
         queryset = Page.objects.filter(application_urls=label)
         number_of_apphooks = queryset.count()
 
@@ -38,6 +36,8 @@ class UninstallPluginsCommand(LabelCommand):
     help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
 
     def handle_label(self, label, **options):
+        from cms.models.pluginmodel import CMSPlugin
+        from cms.plugin_pool import plugin_pool
         plugin_pool.get_all_plugins()
         queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()

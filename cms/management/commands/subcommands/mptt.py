@@ -1,4 +1,3 @@
-from cms.models import Page, CMSPlugin
 from django.core.management.base import NoArgsCommand
 
 
@@ -9,6 +8,7 @@ class FixMPTTCommand(NoArgsCommand):
         """
         Repairs the MPTT tree
         """
+        from cms.models import Page, CMSPlugin
         self.stdout.write(u"fixing mptt page tree")
         Page._tree_manager.rebuild()
         last = None
