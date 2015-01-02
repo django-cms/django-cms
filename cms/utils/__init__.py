@@ -33,7 +33,7 @@ def get_template_from_request(request, obj=None, no_current_page=False):
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
-        return template    
+        return template
     return get_cms_setting('TEMPLATES')[0][0]
 
 
