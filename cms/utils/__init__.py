@@ -2,8 +2,9 @@
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from django.conf import settings
 from django.core.files.storage import get_storage_class
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.functional import LazyObject
-
+from django.utils.html import conditional_escape
 from cms import constants
 from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_site_id  # nopyflakes
@@ -76,3 +77,19 @@ class ConfiguredStorage(LazyObject):
         self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
 
 configured_storage = ConfiguredStorage()
+
+
+class SafeJSONEncoder(DjangoJSONEncoder):
+    def _recursive_escape(self, o, esc=conditional_escape):
+        if isinstance(o, dict):
+            return type(o)((esc(k), self._recursive_escape(v)) for (k, v) in o.iteritems())
+        if isinstance(o, (list, tuple)):
+            return type(o)(self._recursive_escape(v) for v in o)
+        try:
+            return type(o)(esc(o))
+        except ValueError:
+            return esc(o)
+
+    def encode(self, o):
+        value = self._recursive_escape(o)
+        return super(SafeJSONEncoder, self).encode(value)
