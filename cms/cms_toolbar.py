@@ -274,8 +274,8 @@ class PageToolbar(CMSToolbar):
     def post_template_populate(self):
         self.init_placeholders_from_request()
 
-        self.add_publish_button()
         self.add_draft_live()
+        self.add_publish_button()
 
     # Buttons
 
