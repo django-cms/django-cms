@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import Page
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 from django.core.management.base import NoArgsCommand
 
 class ListApphooksCommand(NoArgsCommand):
     
     help = 'Lists all apphooks in pages'
     def handle_noargs(self, **options):
+        from cms.models import Page
         urls = Page.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
         for url in urls:
             self.stdout.write(u'%s\n' % url)
@@ -23,6 +21,8 @@ def plugin_report():
     #         'unsaved_instances': those with no corresponding model instance,
     #     },
     # ]
+    from cms.plugin_pool import plugin_pool
+    from cms.models.pluginmodel import CMSPlugin
     plugin_report = []
     all_plugins = CMSPlugin.objects.order_by("plugin_type")
     plugin_types = list(set(all_plugins.values_list("plugin_type", flat=True)))
@@ -56,6 +56,7 @@ class ListPluginsCommand(NoArgsCommand):
 
     help = 'Lists all plugins in CMSPlugin'
     def handle_noargs(self, **options):
+        from cms.models.pluginmodel import CMSPlugin
         self.stdout.write(u"==== Plugin report ==== \n\n")
         self.stdout.write(u"There are %s plugin types in your database \n" % len(plugin_report()))
         for plugin in plugin_report():   

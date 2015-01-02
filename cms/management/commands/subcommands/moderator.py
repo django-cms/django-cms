@@ -2,8 +2,6 @@
 from logging import getLogger
 
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import CMSPlugin, Title
-from cms.models.pagemodel import Page
 from django.core.management.base import NoArgsCommand
 
 
@@ -25,6 +23,8 @@ class ModeratorOnCommand(NoArgsCommand):
         have the same plugins listed. If both versions exist and have content,
         the public page has precedence. Otherwise, the draft version is used.
         """
+        from cms.models import CMSPlugin, Title
+        from cms.models.pagemodel import Page
         log.info('Reverting drafts to public versions')
         for page in Page.objects.public():
             for language in page.get_languages():

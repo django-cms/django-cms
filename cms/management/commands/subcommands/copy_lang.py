@@ -3,8 +3,6 @@ from django.conf import settings
 
 from django.core.management.base import BaseCommand, CommandError
 
-from cms.api import copy_plugins_to_language
-from cms.models import Page, StaticPlaceholder, EmptyTitle
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import get_language_list
 
@@ -14,6 +12,8 @@ class CopyLangCommand(BaseCommand):
     help = u'duplicate the cms content from one lang to another (to boot a new lang) using draft pages'
 
     def handle(self, *args, **kwargs):
+        from cms.api import copy_plugins_to_language
+        from cms.models import Page, StaticPlaceholder, EmptyTitle
         verbose = 'verbose' in args
         only_empty = 'force-copy' not in args
         site = [arg.split("=")[1] for arg in args if arg.startswith("site")]
