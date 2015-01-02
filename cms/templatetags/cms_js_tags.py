@@ -52,16 +52,15 @@ def bool(value):
     else:
         return 'false'
 
-   
+
 class JavascriptString(Tag):
     name = 'javascript_string'
-    
     options = Options(
         blocks=[
             ('end_javascript_string', 'nodelist'),
         ]
     )
-    
+
     def render_tag(self, context, **kwargs):
         rendered = self.nodelist.render(context)
         return u"'%s'" % javascript_quote(rendered.strip())
