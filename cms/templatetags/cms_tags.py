@@ -361,10 +361,7 @@ class RenderPlugin(InclusionTag):
         if not plugin:
             return {'content': ''}
 
-        try:
-            placeholder = context['cms_placeholder_instance']
-        except KeyError:
-            placeholder = plugin.placeholder
+        placeholder = plugin.placeholder
 
         processors = self.get_processors(context, plugin, placeholder)
 
@@ -1094,7 +1091,6 @@ class StaticPlaceholderNode(Tag):
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
-        context.update({'cms_placeholder_instance': placeholder})
         content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
         return content
 register.tag(StaticPlaceholderNode)
