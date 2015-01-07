@@ -76,7 +76,7 @@ def _verify_apphook(apphook, namespace):
     apphook_pool.discover_apps()
     if isinstance(apphook, CMSApp):
         try:
-            assert apphook in apphook_pool.apps.values()
+            assert apphook.__class__ in [app.__class__ for app in apphook_pool.apps.values()]
         except AssertionError:
             print(apphook_pool.apps.values())
             raise
