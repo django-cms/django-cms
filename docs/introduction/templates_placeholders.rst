@@ -8,7 +8,7 @@ you can make your own HTML templates CMS-ready.
 Templates
 #########
 
-You can use HTML templates to customize the look of your website, define
+You can use HTML templates to customise the look of your website, define
 Placeholders to mark sections for managed content and use special tags to
 generate menus and more.
 
