@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
-
 from cms import constants
 from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_site_id  # nopyflakes
@@ -33,7 +32,7 @@ def get_template_from_request(request, obj=None, no_current_page=False):
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
-        return template    
+        return template
     return get_cms_setting('TEMPLATES')[0][0]
 
 
