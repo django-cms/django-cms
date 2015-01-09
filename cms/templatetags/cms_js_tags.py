@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import warnings
 from classytags.core import Tag, Options
-from cms.utils import SafeJSONEncoder
+from cms.utils.encoder import SafeJSONEncoder
 from cms.utils.compat import DJANGO_1_4
 from django import template
 from django.core.serializers.json import DjangoJSONEncoder
