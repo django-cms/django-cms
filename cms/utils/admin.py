@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
 import json
 
-import django
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 from django.utils.encoding import smart_str
 
+from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 from cms.models import Page, GlobalPagePermission
 from cms.utils import get_language_from_request
 from cms.utils import get_language_list
 from cms.utils import get_cms_setting
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
+from cms.utils.compat import DJANGO_1_4
 
 NOT_FOUND_RESPONSE = "NotFound"
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 
 def jsonify_request(response):
@@ -26,8 +24,10 @@ def jsonify_request(response):
          * content: original response content
     """
     content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
-    return HttpResponse(json.dumps(content),
-                        content_type="application/json")
+    if DJANGO_1_4:
+        return HttpResponse(json.dumps(content), mimetype="text/html; charset=utf-8")
+    else:
+        return HttpResponse(json.dumps(content), content_type="text/html; charset=utf-8")
 
 
 publisher_classes = {
