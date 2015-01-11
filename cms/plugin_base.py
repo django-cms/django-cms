@@ -135,7 +135,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         },
     }
 
-
     def __init__(self, model=None, admin_site=None):
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
@@ -153,10 +152,10 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
                           'and it will be removed in version 3.2; please move'
                           'template in plugin classes', DeprecationWarning)
             return getattr(instance, 'render_template', False)
-        elif getattr(self, 'render_template', False):
-            return getattr(self, 'render_template', False)
         elif hasattr(self, 'get_render_template'):
             return self.get_render_template(context, instance, placeholder)
+        elif getattr(self, 'render_template', False):
+            return getattr(self, 'render_template', False)
 
     def render(self, context, instance, placeholder):
         context['instance'] = instance
