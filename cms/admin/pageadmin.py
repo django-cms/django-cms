@@ -39,13 +39,13 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.admin import jsonify_request
+from cms.utils.compat import DJANGO_1_4
 from cms.utils.compat.dj import force_unicode, is_installed
 from cms.utils.compat.urls import unquote
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import find_placeholder_relation
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
 from cms.utils.plugins import current_site
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.transaction import wrap_transaction
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
@@ -1356,7 +1356,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def resolve(self, request):
         if not request.user.is_staff:
-            return HttpResponse('', content_type='text/plain')
+            if DJANGO_1_4:
+                return HttpResponse('', mimetype='text/plain')
+            else:
+                return HttpResponse('', content_type='text/plain')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             try:
@@ -1473,7 +1476,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     }
                 )
 
-            return HttpResponse(json.dumps(results), content_type='application/json')
+            if DJANGO_1_4:
+                return HttpResponse(json.dumps(results), mimetype='application/json')
+            else:
+                return HttpResponse(json.dumps(results), content_type='application/json')
 
         else:
             return HttpResponseForbidden()
