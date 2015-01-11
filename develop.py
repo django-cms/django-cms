@@ -189,22 +189,6 @@ def shell():
     call_command('shell')
 
 
-class swallow_all_output(object):
-    def __init__(self):
-        self.output = StringIO()
-        self.original_stdout = sys.stdout
-        self.original_stderr = sys.stderr
-        sys.stdout = self.output
-        sys.stderr = self.output
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, *_):
-        sys.stdout = self.original_stdout
-        sys.stderr = self.original_stderr
-
-
 def makemigrations(migrate_plugins=True, merge=False, squash=False):
     applications = [
         # core applications
@@ -239,8 +223,7 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
                 print('WARNING: The app: {0} could not be found.'.format(application))
             else:
                 try:
-                    with swallow_all_output():
-                        call_command('schemamigration', application, auto=True)
+                    call_command('schemamigration', application, auto=True)
                 except SystemExit:
                     pass
     else:
@@ -287,7 +270,7 @@ def main():
 
     if args['pyflakes']:
         return static_analysis.pyflakes((cms, menus))
-    
+
     if args['authors']:
         return generate_authors()
 
