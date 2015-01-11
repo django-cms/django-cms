@@ -210,8 +210,9 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
         # core applications
         'cms', 'menus',
         # testing applications
-        'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
-        'objectpermissionsapp', 'bunch_of_plugins', 'emailuserapp', 'mti_pluginapp',
+        'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp',
+        'fakemlng', 'one_thing', 'extensionapp', 'objectpermissionsapp',
+        'bunch_of_plugins', 'mti_pluginapp',
     ]
     if os.environ.get("AUTH_USER_MODEL") == "emailuserapp.EmailUser":
         applications.append('emailuserapp')
