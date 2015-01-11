@@ -1,20 +1,25 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
+
 import contextlib
 import multiprocessing
 import pkgutil
 import pyclbr
 import subprocess
-from django.core.exceptions import DjangoRuntimeWarning
 import os
 import sys
 import warnings
 
-from docopt import docopt
+from django.utils.six.moves import StringIO
+
 from django import VERSION
+from django.core.exceptions import DjangoRuntimeWarning
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command, CommandError
 from django.utils import autoreload
 from django.utils.encoding import force_text
-from django.core.management import call_command, CommandError
+
+from docopt import docopt
 
 import cms
 from cms.test_utils.cli import configure
@@ -185,7 +190,6 @@ def shell():
 
 
 def makemigrations(migrate_plugins=True, merge=False, squash=False):
-    from django.core.management import call_command
     applications = [
         # core applications
         'cms', 'menus',
@@ -203,10 +207,27 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
             'djangocms_flash', 'djangocms_video',
         ])
     if DJANGO_1_6:
+        from south.exceptions import NoMigrations
+        from south.migration import Migrations
+
         if merge:
             raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
         for application in applications:
-            call_command('schemamigration', application, auto=True)
+            try:
+                Migrations(application)
+            except NoMigrations:
+                print('ATTENTION: No migrations found for {0}, creating initial migrations.'.format(application))
+                try:
+                    call_command('schemamigration', application, initial=True)
+                except SystemExit:
+                    pass
+            except ImproperlyConfigured:
+                print('WARNING: The app: {0} could not be found.'.format(application))
+            else:
+                try:
+                    call_command('schemamigration', application, auto=True)
+                except SystemExit:
+                    pass
     else:
         call_command('makemigrations', *applications, merge=merge)
 
@@ -251,7 +272,7 @@ def main():
 
     if args['pyflakes']:
         return static_analysis.pyflakes((cms, menus))
-    
+
     if args['authors']:
         return generate_authors()
 
