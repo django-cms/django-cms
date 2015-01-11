@@ -262,6 +262,26 @@ class CMSPlugin(with_metaclass(PluginModelBase, MPTTModel)):
     def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
         """
         Copy this plugin and return the new plugin.
+
+        The logic of this method is the following:
+
+         # get a new generic plugin instance
+         # assign the position in the plugin tree
+         # save it to let mptt calculate the tree attributes
+         # then get a copy of the current plugin instance
+         # assign to it the id of the generic plugin instance above;
+           this will effectively change the generic plugin created above
+           into a concrete one
+         # copy the tree related attributes from the generic plugin to
+           the concrete one
+         # save the concrete plugin
+         # trigger the copy relations
+         # return the generic plugin instance
+
+        This copy logic is required because we don't know what the fields of
+        the real plugin are. By getting another instance of it at step 4 and
+        then overwriting its ID at step 5, the ORM will copy the custom
+        fields for us.
         """
         try:
             plugin_instance, cls = self.get_plugin_instance()
