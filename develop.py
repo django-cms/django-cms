@@ -191,8 +191,10 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
         'cms', 'menus',
         # testing applications
         'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
-        'objectpermissionsapp', 'bunch_of_plugins', 'emailuserapp'
+        'objectpermissionsapp', 'bunch_of_plugins',
     ]
+    if os.environ.get("AUTH_USER_MODEL") == "emailuserapp.EmailUser":
+        applications.append('emailuserapp')
     if migrate_plugins:
         applications.extend([
             # official plugins
