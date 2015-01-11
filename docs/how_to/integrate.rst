@@ -495,6 +495,27 @@ setting should look like::
     }
 
 
+Given django CMS's support for Django 1.6.x, Django 1.7 (or later) users have to
+specify where the migrations are situated using the ``MIGRATION_MODULES``
+setting::
+
+    MIGRATION_MODULES = {
+        'cms': 'cms.migrations_django',
+        'menus': 'menus.migrations_django',
+
+        # Add also the following modules if you're using these plugins:
+        'djangocms_file': 'djangocms_file.migrations_django',
+        'djangocms_flash': 'djangocms_flash.migrations_django',
+        'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
+        'djangocms_inherit': 'djangocms_inherit.migrations_django',
+        'djangocms_link': 'djangocms_link.migrations_django',
+        'djangocms_picture': 'djangocms_picture.migrations_django',
+        'djangocms_snippet': 'djangocms_snippet.migrations_django',
+        'djangocms_teaser': 'djangocms_teaser.migrations_django',
+        'djangocms_video': 'djangocms_video.migrations_django',
+        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+    }
+
 URL configuration
 =================
 
@@ -604,8 +625,9 @@ Initial database setup
 ======================
 
 django CMS uses Django 1.7's built-in support for database migrations to manage
-creating and altering database tables. django CMS still offers South-style migrations
-for users of Django up to 1.6 but as noted above, strictly requires South>=1.0.1.
+creating and altering database tables. django CMS still offers South-style
+migrations for users of Django up to 1.6 but as noted above, strictly requires
+South>=1.0.1 in this case.
 
 Fresh install
 -------------
