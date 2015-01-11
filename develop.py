@@ -10,7 +10,7 @@ import os
 import sys
 import warnings
 
-from django.utils.six.moves import StringIO
+from StringIO import StringIO
 
 from django import VERSION
 from django.core.exceptions import DjangoRuntimeWarning
@@ -187,6 +187,22 @@ def makemessages():
 def shell():
     from django.core.management import call_command
     call_command('shell')
+
+
+class capture_all_output(object):
+    def __init__(self):
+        self.output = StringIO()
+        self.original_stdout = sys.stdout
+        self.original_stderr = sys.stderr
+        sys.stdout = self.output
+        sys.stderr = self.output
+
+    def __enter__(self):
+        return self.output.getvalue()
+
+    def __exit__(self, *_):
+        sys.stdout = self.original_stdout
+        sys.stderr = self.original_stderr
 
 
 def makemigrations(migrate_plugins=True, merge=False, squash=False):
