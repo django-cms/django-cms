@@ -291,3 +291,17 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Updates to community and project governance documentation
 - Added list of retired core developers
 - Added branch policy documentaion
+
+=== 3.0.8 (2015-01-11) ===
+- Add require_parent option to CMS_PLACEHOLDER_CONF
+- Fix django-mptt version depenency to be PEP440 compatible
+- Fix some Django 1.4 compatibility issues
+- Add toolbar sanity check
+- Fix behavior with CMSPluginBase.get_render_template()
+- Fix issue on django >= 1.6 with page form fields.
+- Resolve jQuery namespace issues in admin page tree and changeform
+- Fix issues for PageField in Firefox/Safari
+- Fix some Python 3.4 compatibility issue when using proxy modles
+- Fix corner case in plugin copy
+- Documentation fixes
+- Minor code cleanups
