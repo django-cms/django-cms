@@ -10,7 +10,7 @@ example below, though yours may have a different name) in the toolbar.
    :figwidth: 300
    :align: right
 
-This reveals the :ref:`side-frame` for page administration.
+This reveals the :ref:`side-frame <side-frame>` for page administration.
 
 .. figure:: /images/no-pages.png
 

@@ -124,6 +124,7 @@ def configure(db_url, **extra):
             'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.bunch_of_plugins',
             'cms.test_utils.project.extensionapp',
+            'cms.test_utils.project.mti_pluginapp',
             'reversion',
             'sekizai',
             'hvad',
@@ -270,8 +271,6 @@ def configure(db_url, **extra):
         defaults['INSTALLED_APPS'].append('south')
     else:
         defaults['MIGRATION_MODULES'] = {
-            'cms': 'cms.migrations',
-            'menus': 'menus.migrations',
             'djangocms_column': 'djangocms_column.migrations_django',
             'djangocms_file': 'djangocms_file.migrations_django',
             'djangocms_flash': 'djangocms_flash.migrations_django',
@@ -283,18 +282,6 @@ def configure(db_url, **extra):
             'djangocms_teaser': 'djangocms_teaser.migrations_django',
             'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
             'djangocms_video': 'djangocms_video.migrations_django',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations_django',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations_django',
-            'fileapp': 'cms.test_utils.project.fileapp.migrations_django',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations_django',
-            'sampleapp': 'cms.test_utils.project.sampleapp.migrations_django',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations_django',
-            'fakemlng': 'cms.test_utils.project.fakemlng.migrations_django',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations_django',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations_django',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations_django',
-            'extensionapp': 'cms.test_utils.project.extensionapp.migrations_django',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations_django',
         }
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')

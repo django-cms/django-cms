@@ -116,12 +116,14 @@ $(document).ready(function () {
 			$('body').bind('mousemove.cms', function (e) {
 				// so lets figure out where we are
 				var offset = 20;
-				var bound = $(document).width();
-				var pos = e.pageX + tooltip.outerWidth(true) + offset;
+				var relX = e.pageX - $(tooltip).offsetParent().offset().left;
+				var relY = e.pageY - $(tooltip).offsetParent().offset().top;
+				var bound = $(tooltip).offsetParent().width();
+				var pos = relX + tooltip.outerWidth(true) + offset;
 
 				tooltip.css({
-					'left': (pos >= bound) ? e.pageX - tooltip.outerWidth(true) - offset : e.pageX + offset,
-					'top': e.pageY - 12
+					'left': (pos >= bound) ? relX - tooltip.outerWidth(true) - offset : relX + offset,
+					'top': relY - 12
 				});
 			});
 

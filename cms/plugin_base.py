@@ -135,7 +135,6 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         },
     }
 
-
     def __init__(self, model=None, admin_site=None):
         if admin_site:
             super(CMSPluginBase, self).__init__(self.model, admin_site)
@@ -153,15 +152,23 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
                           'and it will be removed in version 3.2; please move'
                           'template in plugin classes', DeprecationWarning)
             return getattr(instance, 'render_template', False)
-        elif getattr(self, 'render_template', False):
-            return getattr(self, 'render_template', False)
         elif hasattr(self, 'get_render_template'):
             return self.get_render_template(context, instance, placeholder)
+        elif getattr(self, 'render_template', False):
+            return getattr(self, 'render_template', False)
 
     def render(self, context, instance, placeholder):
         context['instance'] = instance
         context['placeholder'] = placeholder
         return context
+
+    @classmethod
+    def get_require_parent(cls, slot, page):
+        template = page and page.get_template() or None
+
+        # config overrides..
+        require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
+        return require_parent
 
     @property
     def parent(self):
@@ -284,36 +291,24 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return fieldsets
 
     def get_child_classes(self, slot, page):
-        template = None
-        if page:
-            template = page.template
+        template = page and page.get_template() or None
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
-        child_classes = ph_conf.get(self.__class__.__name__, None)
-        if child_classes is not None:
+        child_classes = ph_conf.get(self.__class__.__name__, self.child_classes)
+        if child_classes:
             return child_classes
-        if self.child_classes:
-            return self.child_classes
-        else:
-            from cms.plugin_pool import plugin_pool
-            installed_plugins = plugin_pool.get_all_plugins(slot, page)
-            return [cls.__name__ for cls in installed_plugins]
+        from cms.plugin_pool import plugin_pool
+        installed_plugins = plugin_pool.get_all_plugins(slot, page)
+        return [cls.__name__ for cls in installed_plugins]
 
     def get_parent_classes(self, slot, page):
-        template = None
-        if page:
-            template = page.template
+        template = page and page.get_template() or None
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
-        parent_classes = ph_conf.get(self.__class__.__name__, None)
-        if parent_classes is not None:
-            return parent_classes
-        elif self.parent_classes:
-            return self.parent_classes
-        else:
-            return None
+        parent_classes = ph_conf.get(self.__class__.__name__, self.parent_classes)
+        return parent_classes
 
     def get_action_options(self):
         return self.action_options

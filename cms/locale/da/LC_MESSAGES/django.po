@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 16:49+0100\n"
-"PO-Revision-Date: 2014-11-27 15:51+0000\n"
+"POT-Creation-Date: 2015-01-12 09:31+0100\n"
+"PO-Revision-Date: 2015-01-11 21:30+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/django-cms/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -81,7 +81,7 @@ msgid "Logout"
 msgstr "Log ud"
 
 #: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
-#: migrations_django/0002_auto_20140816_1918.py:150 models/settingmodels.py:12
+#: models/settingmodels.py:12
 msgid "Language"
 msgstr "Sprog"
 
@@ -217,7 +217,7 @@ msgstr "Avancerede indstillinger"
 msgid "Generic"
 msgstr "Generisk"
 
-#: plugin_base.py:280
+#: plugin_base.py:287
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Der er ikke flere indstillinger for dette plugin. Tryk venligst gem."
 
@@ -328,8 +328,7 @@ msgstr "Du har valgt en apphook med et \"app_navn\".\nDu skal indtaste et unikt 
 msgid "A instance name with this name already exists."
 msgstr "Et instansnavn med dette navn findes allerede."
 
-#: admin/forms.py:347 migrations_django/0001_initial.py:72
-#: migrations_django/0001_initial.py:135 models/permissionmodels.py:71
+#: admin/forms.py:347 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "bruger"
@@ -503,12 +502,12 @@ msgstr "Fejl! Du har ikke rettigheder til at flytte denne side. Genindlæs venli
 msgid "Page moved"
 msgstr "Side flyttet"
 
-#: admin/pageadmin.py:1002 admin/placeholderadmin.py:256
-#: admin/placeholderadmin.py:302
+#: admin/pageadmin.py:1002 admin/placeholderadmin.py:257
+#: admin/placeholderadmin.py:306
 msgid "Language must be set to a supported language!"
 msgstr "Sprog skal sættes til et understøttet sprog!"
 
-#: admin/pageadmin.py:1007 admin/placeholderadmin.py:321
+#: admin/pageadmin.py:1007 admin/placeholderadmin.py:325
 msgid "You do not have permission to copy these plugins."
 msgstr "Du har ikke rettigheder til at kopiere disse plugins."
 
@@ -565,8 +564,8 @@ msgstr "Der findes kun en oversættelse af denne side"
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Titel og plugins med sproget %(language)s blev slettet"
 
-#: admin/pageadmin.py:1288 admin/placeholderadmin.py:512
-#: admin/placeholderadmin.py:551
+#: admin/pageadmin.py:1288 admin/placeholderadmin.py:522
+#: admin/placeholderadmin.py:561
 msgid "Are you sure?"
 msgstr "Er du sikker?"
 
@@ -578,7 +577,7 @@ msgstr "Du har ikke rettigheder til at ændre i denne sides i_navigation status"
 msgid "Page Types"
 msgstr "Sidetyper"
 
-#: admin/pageadmin.py:1404
+#: admin/pageadmin.py:1407
 msgid "You do not have permission to edit this page"
 msgstr "Du har ikke rettigheder til at redigere denne side"
 
@@ -602,55 +601,55 @@ msgstr "Bruger- og grupperettigheder"
 msgid "Page permissions management"
 msgstr "Siderettighedeshåndtering"
 
-#: admin/placeholderadmin.py:75
+#: admin/placeholderadmin.py:76
 #, python-format
 msgid "Field %s not found"
 msgstr "Feltet %s blev ikke fundet"
 
-#: admin/placeholderadmin.py:82
+#: admin/placeholderadmin.py:83
 msgid "You do not have permission to edit this item"
 msgstr "Du har ikke rettigheder til at redigere dette element"
 
-#: admin/placeholderadmin.py:232
+#: admin/placeholderadmin.py:233
 msgid "You do not have permission to add a plugin"
 msgstr "Du har ikke rettigheder til at tilføje et plugin"
 
-#: admin/placeholderadmin.py:258
+#: admin/placeholderadmin.py:259
 msgid "Parent plugin language must be same as language!"
 msgstr "Forældreplugin sprog skal være det samme som indstillet sprog!"
 
-#: admin/placeholderadmin.py:356
+#: admin/placeholderadmin.py:363
 msgid "You do not have permission to edit this plugin"
 msgstr "Du har ikke rettigheder til at redigere dette plugin"
 
-#: admin/placeholderadmin.py:439
+#: admin/placeholderadmin.py:446
 msgid "You have no permission to move this plugin"
 msgstr "Du har ikke rettigheder til at flytte dette plugin"
 
-#: admin/placeholderadmin.py:489 admin/placeholderadmin.py:500
+#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
 msgid "You do not have permission to delete this plugin"
 msgstr "Du har ikke rettigheder til at slette dette plugin"
 
-#: admin/placeholderadmin.py:504
+#: admin/placeholderadmin.py:514
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s pluginet \"%(obj)s\" blev slettet."
 
-#: admin/placeholderadmin.py:510 admin/placeholderadmin.py:549
+#: admin/placeholderadmin.py:520 admin/placeholderadmin.py:559
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Kan ikke slette %(name)s"
 
-#: admin/placeholderadmin.py:530 admin/placeholderadmin.py:541
+#: admin/placeholderadmin.py:540 admin/placeholderadmin.py:551
 msgid "You do not have permission to clear this placeholder"
 msgstr "Du har ikke rettigheder til at tømme denne placeholder"
 
-#: admin/placeholderadmin.py:544
+#: admin/placeholderadmin.py:554
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "Placeholderen \"%(obj)s\" blev tømt."
 
-#: admin/placeholderadmin.py:554
+#: admin/placeholderadmin.py:564
 msgid "placeholder"
 msgstr "placeholder"
 
@@ -669,220 +668,6 @@ msgstr "Vælg en gyldig side"
 #: forms/widgets.py:221
 msgid "Add Another"
 msgstr "Tilføj endnu en"
-
-#: migrations_django/0001_initial.py:26 migrations_django/0001_initial.py:60
-#: migrations_django/0001_initial.py:83 migrations_django/0001_initial.py:123
-#: migrations_django/0002_auto_20140816_1918.py:55
-#: migrations_django/0002_auto_20140816_1918.py:99
-#: migrations_django/0002_auto_20140816_1918.py:121
-#: migrations_django/0002_auto_20140816_1918.py:149
-msgid "ID"
-msgstr ""
-
-#: migrations_django/0001_initial.py:27 models/pluginmodel.py:75
-msgid "position"
-msgstr "position"
-
-#: migrations_django/0001_initial.py:28
-#: migrations_django/0002_auto_20140816_1918.py:122 models/pluginmodel.py:76
-#: models/titlemodels.py:15
-msgid "language"
-msgstr "sprog"
-
-#: migrations_django/0001_initial.py:29 models/pluginmodel.py:77
-msgid "plugin_name"
-msgstr "plugin navn"
-
-#: migrations_django/0001_initial.py:30
-#: migrations_django/0002_auto_20140816_1918.py:131 models/pluginmodel.py:78
-#: models/titlemodels.py:28
-msgid "creation date"
-msgstr "oprettelsesdato"
-
-#: migrations_django/0001_initial.py:61 migrations_django/0001_initial.py:124
-#: models/permissionmodels.py:75
-msgid "can edit"
-msgstr "kan redigere"
-
-#: migrations_django/0001_initial.py:62 migrations_django/0001_initial.py:125
-#: models/permissionmodels.py:76
-msgid "can add"
-msgstr "kan tilføje"
-
-#: migrations_django/0001_initial.py:63 migrations_django/0001_initial.py:126
-#: models/permissionmodels.py:77
-msgid "can delete"
-msgstr "kan slette"
-
-#: migrations_django/0001_initial.py:64 migrations_django/0001_initial.py:127
-#: models/permissionmodels.py:78
-msgid "can change advanced settings"
-msgstr "kan ændre avancerede indstillinger"
-
-#: migrations_django/0001_initial.py:65 migrations_django/0001_initial.py:128
-#: models/permissionmodels.py:79
-msgid "can publish"
-msgstr "kan publicere"
-
-#: migrations_django/0001_initial.py:66 migrations_django/0001_initial.py:129
-#: models/permissionmodels.py:80
-msgid "can change permissions"
-msgstr "can ændre rettigheder"
-
-#: migrations_django/0001_initial.py:67 migrations_django/0001_initial.py:130
-#: models/permissionmodels.py:81
-msgid "can move"
-msgstr "kan flytte"
-
-#: migrations_django/0001_initial.py:68 migrations_django/0001_initial.py:131
-#: models/permissionmodels.py:82
-msgid "view restricted"
-msgstr "se begrænsede"
-
-#: migrations_django/0001_initial.py:69 models/permissionmodels.py:106
-msgid "can recover pages"
-msgstr "kan genskabe sider"
-
-#: migrations_django/0001_initial.py:70 migrations_django/0001_initial.py:133
-#: models/permissionmodels.py:72
-msgid "group"
-msgstr "gruppe"
-
-#: migrations_django/0001_initial.py:71 models/permissionmodels.py:107
-msgid "sites"
-msgstr "websites"
-
-#: migrations_django/0001_initial.py:84 models/pagemodel.py:56
-msgid "created by"
-msgstr "oprettet af"
-
-#: migrations_django/0001_initial.py:85 models/pagemodel.py:57
-msgid "changed by"
-msgstr "ændret af"
-
-#: migrations_django/0001_initial.py:88 models/pagemodel.py:62
-#: templates/admin/cms/page/tree/menu_item.html:73
-msgid "publication date"
-msgstr "offentliggørelsesdato"
-
-#: migrations_django/0001_initial.py:89 models/pagemodel.py:64
-#: templates/admin/cms/page/tree/menu_item.html:74
-msgid "publication end date"
-msgstr "offentliggørelsens udløbsdato"
-
-#: migrations_django/0001_initial.py:90 models/pagemodel.py:71
-msgid "in navigation"
-msgstr "i navigationen"
-
-#: migrations_django/0001_initial.py:91 models/pagemodel.py:72
-msgid "soft root"
-msgstr "soft root"
-
-#: migrations_django/0001_initial.py:92 models/pagemodel.py:74
-msgid "id"
-msgstr "id"
-
-#: migrations_django/0001_initial.py:93 models/pagemodel.py:76
-msgid "attached menu"
-msgstr "vedhæftet menu"
-
-#: migrations_django/0001_initial.py:94 models/pagemodel.py:77
-#: templates/admin/cms/page/tree/menu_item.html:77
-msgid "template"
-msgstr "skabelon"
-
-#: migrations_django/0001_initial.py:95 models/pagemodel.py:83
-msgid "login required"
-msgstr "login krævet"
-
-#: migrations_django/0001_initial.py:96 models/pagemodel.py:84
-msgid "menu visibility"
-msgstr "menu synlighed"
-
-#: migrations_django/0001_initial.py:98 models/pagemodel.py:88
-msgid "application"
-msgstr "applikation"
-
-#: migrations_django/0001_initial.py:99 models/pagemodel.py:89
-msgid "application instance name"
-msgstr "applikation instansnavn"
-
-#: migrations_django/0001_initial.py:110 models/pagemodel.py:80
-msgid "site"
-msgstr "website"
-
-#: migrations_django/0001_initial.py:132 models/permissionmodels.py:124
-#: templates/admin/cms/page/permissions.html:15
-msgid "Grant on"
-msgstr "Tildel til"
-
-#: migrations_django/0001_initial.py:134
-#: migrations_django/0002_auto_20140816_1918.py:135 models/pagemodel.py:125
-#: models/permissionmodels.py:125 models/titlemodels.py:27
-#: test_utils/project/sampleapp/ns_urls.py:10
-msgid "page"
-msgstr "side"
-
-#: migrations_django/0002_auto_20140816_1918.py:56
-#: models/placeholdermodel.py:26
-msgid "slot"
-msgstr "åbning"
-
-#: migrations_django/0002_auto_20140816_1918.py:57
-#: models/placeholdermodel.py:27
-msgid "width"
-msgstr "bredde"
-
-#: migrations_django/0002_auto_20140816_1918.py:100
-#: models/static_placeholder.py:29
-msgid "static placeholder name"
-msgstr "statisk pladsholder navn"
-
-#: migrations_django/0002_auto_20140816_1918.py:101
-#: models/static_placeholder.py:32
-msgid "placeholder code"
-msgstr "pladsholder kode"
-
-#: migrations_django/0002_auto_20140816_1918.py:103
-#: models/static_placeholder.py:38
-msgid "creation_method"
-msgstr "oprettelse_metode"
-
-#: migrations_django/0002_auto_20140816_1918.py:104
-#: models/static_placeholder.py:34
-msgid "placeholder content"
-msgstr "pladsholder indhold"
-
-#: migrations_django/0002_auto_20140816_1918.py:123
-#: migrations_django/0002_auto_20140816_1918.py:124
-#: migrations_django/0002_auto_20140816_1918.py:125 models/titlemodels.py:16
-#: models/titlemodels.py:17 models/titlemodels.py:19
-msgid "title"
-msgstr "titel"
-
-#: migrations_django/0002_auto_20140816_1918.py:126 models/titlemodels.py:21
-msgid "description"
-msgstr "beskrivelse"
-
-#: migrations_django/0002_auto_20140816_1918.py:127 models/titlemodels.py:23
-msgid "slug"
-msgstr "slug"
-
-#: migrations_django/0002_auto_20140816_1918.py:128 models/titlemodels.py:24
-msgid "Path"
-msgstr "Sti"
-
-#: migrations_django/0002_auto_20140816_1918.py:129 models/titlemodels.py:25
-msgid "has url overwrite"
-msgstr "har adresse overskrivelse"
-
-#: migrations_django/0002_auto_20140816_1918.py:130 models/titlemodels.py:26
-msgid "redirect"
-msgstr "omdirigér"
-
-#: migrations_django/0002_auto_20140816_1918.py:132 models/titlemodels.py:31
-msgid "is published"
-msgstr "er publiceret"
 
 #: models/pagemodel.py:38
 msgid "for logged in users only"
@@ -908,25 +693,61 @@ msgstr "Kun dette website"
 msgid "Allow"
 msgstr "Tillad"
 
+#: models/pagemodel.py:56
+msgid "created by"
+msgstr "oprettet af"
+
+#: models/pagemodel.py:57
+msgid "changed by"
+msgstr "ændret af"
+
+#: models/pagemodel.py:62 templates/admin/cms/page/tree/menu_item.html:73
+msgid "publication date"
+msgstr "offentliggørelsesdato"
+
 #: models/pagemodel.py:63
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "Hvornår siden skal gå live. Status være \"Publiceret\" for at gå live."
 
+#: models/pagemodel.py:64 templates/admin/cms/page/tree/menu_item.html:74
+msgid "publication end date"
+msgstr "offentliggørelsens udløbsdato"
+
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Hvornår siden skal udløbe. Lad feltet være tomt, hvis den ikke skal udløbe."
 
+#: models/pagemodel.py:71
+msgid "in navigation"
+msgstr "i navigationen"
+
+#: models/pagemodel.py:72
+msgid "soft root"
+msgstr "soft root"
+
 #: models/pagemodel.py:73
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alle sider placeret over denne i navigationen bliver ikke vist i navigationen."
+
+#: models/pagemodel.py:74
+msgid "id"
+msgstr "id"
 
 #: models/pagemodel.py:75
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Et unikt navn der bliver brugt med page_url skabelon tagget for at linke til denne side"
+
+#: models/pagemodel.py:76
+msgid "attached menu"
+msgstr "vedhæftet menu"
+
+#: models/pagemodel.py:77 templates/admin/cms/page/tree/menu_item.html:77
+msgid "template"
+msgstr "skabelon"
 
 #: models/pagemodel.py:78
 msgid "The template used to render the content."
@@ -936,9 +757,34 @@ msgstr "Skabelonen der bliver brugt til at rendere indholdet."
 msgid "The site the page is accessible at."
 msgstr "Websitet som siden er tilgængelig på."
 
+#: models/pagemodel.py:80
+msgid "site"
+msgstr "website"
+
+#: models/pagemodel.py:83
+msgid "login required"
+msgstr "login krævet"
+
+#: models/pagemodel.py:84
+msgid "menu visibility"
+msgstr "menu synlighed"
+
 #: models/pagemodel.py:86
 msgid "limit when this page is visible in the menu"
 msgstr "begræns hvornår denne side er synlig i menuen"
+
+#: models/pagemodel.py:88
+msgid "application"
+msgstr "applikation"
+
+#: models/pagemodel.py:89
+msgid "application instance name"
+msgstr "applikation instansnavn"
+
+#: models/pagemodel.py:125 models/permissionmodels.py:125
+#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
+msgid "page"
+msgstr "side"
 
 #: models/pagemodel.py:126
 msgid "pages"
@@ -972,13 +818,53 @@ msgstr "Side efterkommere"
 msgid "Page and descendants"
 msgstr "Side og efterkommere"
 
+#: models/permissionmodels.py:72
+msgid "group"
+msgstr "gruppe"
+
+#: models/permissionmodels.py:75
+msgid "can edit"
+msgstr "kan redigere"
+
+#: models/permissionmodels.py:76
+msgid "can add"
+msgstr "kan tilføje"
+
+#: models/permissionmodels.py:77
+msgid "can delete"
+msgstr "kan slette"
+
+#: models/permissionmodels.py:78
+msgid "can change advanced settings"
+msgstr "kan ændre avancerede indstillinger"
+
+#: models/permissionmodels.py:79
+msgid "can publish"
+msgstr "kan publicere"
+
+#: models/permissionmodels.py:80
+msgid "can change permissions"
+msgstr "can ændre rettigheder"
+
 #: models/permissionmodels.py:80
 msgid "on page level"
 msgstr "på side niveau"
 
+#: models/permissionmodels.py:81
+msgid "can move"
+msgstr "kan flytte"
+
+#: models/permissionmodels.py:82
+msgid "view restricted"
+msgstr "se begrænsede"
+
 #: models/permissionmodels.py:82
 msgid "frontend view restriction"
 msgstr "frontend adgangsbegrænsning"
+
+#: models/permissionmodels.py:106
+msgid "can recover pages"
+msgstr "kan genskabe sider"
 
 #: models/permissionmodels.py:106
 msgid "can recover any deleted page"
@@ -988,6 +874,10 @@ msgstr "kan genskabe enhver slettet side"
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "Hvis intet er valgt har brugeren adgang til alle websites."
 
+#: models/permissionmodels.py:107
+msgid "sites"
+msgstr "websites"
+
 #: models/permissionmodels.py:112
 msgid "Page global permission"
 msgstr "Global siderettighed"
@@ -995,6 +885,10 @@ msgstr "Global siderettighed"
 #: models/permissionmodels.py:113
 msgid "Pages global permissions"
 msgstr "Globale siderettigheder"
+
+#: models/permissionmodels.py:124 templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "Tildel til"
 
 #: models/permissionmodels.py:130
 msgid "Page permission"
@@ -1015,6 +909,30 @@ msgstr "Brugergruppe (side)"
 #: models/permissionmodels.py:157
 msgid "User groups (page)"
 msgstr "Brugergrupper (side)"
+
+#: models/placeholdermodel.py:26
+msgid "slot"
+msgstr "åbning"
+
+#: models/placeholdermodel.py:27
+msgid "width"
+msgstr "bredde"
+
+#: models/pluginmodel.py:75
+msgid "position"
+msgstr "position"
+
+#: models/pluginmodel.py:76 models/titlemodels.py:15
+msgid "language"
+msgstr "sprog"
+
+#: models/pluginmodel.py:77
+msgid "plugin_name"
+msgstr "plugin navn"
+
+#: models/pluginmodel.py:78 models/titlemodels.py:28
+msgid "creation date"
+msgstr "oprettelsesdato"
 
 #: models/pluginmodel.py:139
 msgid "<Empty>"
@@ -1040,15 +958,31 @@ msgstr "efter skabelon"
 msgid "by code"
 msgstr "efter kode"
 
+#: models/static_placeholder.py:29
+msgid "static placeholder name"
+msgstr "statisk pladsholder navn"
+
 #: models/static_placeholder.py:30
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr "Beskrivende navn til at identificere denne statiske pladsholder. Bliver ikke vist til brugere."
 
+#: models/static_placeholder.py:32
+msgid "placeholder code"
+msgstr "pladsholder kode"
+
 #: models/static_placeholder.py:33
 msgid "To render the static placeholder in templates."
 msgstr "For at rendere den statiske pladsholder i skabeloner."
+
+#: models/static_placeholder.py:34
+msgid "placeholder content"
+msgstr "pladsholder indhold"
+
+#: models/static_placeholder.py:38
+msgid "creation_method"
+msgstr "oprettelse_metode"
 
 #: models/static_placeholder.py:44
 msgid "static placeholder"
@@ -1062,6 +996,10 @@ msgstr "statiske pladsholdere"
 msgid "A static placeholder with the same site and code already exists"
 msgstr "En statisk pladsholder med samme side og kode findes i forvejen."
 
+#: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
+msgid "title"
+msgstr "titel"
+
 #: models/titlemodels.py:18
 msgid "overwrite the title (html title tag)"
 msgstr "overskriv titlen (html titel tag)"
@@ -1070,9 +1008,33 @@ msgstr "overskriv titlen (html titel tag)"
 msgid "overwrite the title in the menu"
 msgstr "overskriv titlen i menuen"
 
+#: models/titlemodels.py:21
+msgid "description"
+msgstr "beskrivelse"
+
 #: models/titlemodels.py:22
 msgid "The text displayed in search engines."
 msgstr "Tekst der vises i søgemaskiner."
+
+#: models/titlemodels.py:23
+msgid "slug"
+msgstr "slug"
+
+#: models/titlemodels.py:24
+msgid "Path"
+msgstr "Sti"
+
+#: models/titlemodels.py:25
+msgid "has url overwrite"
+msgstr "har adresse overskrivelse"
+
+#: models/titlemodels.py:26
+msgid "redirect"
+msgstr "omdirigér"
+
+#: models/titlemodels.py:31
+msgid "is published"
+msgstr "er publiceret"
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
@@ -1243,8 +1205,8 @@ msgstr "Der er sket en fejl. Genindlæs venligst siden."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Er du sikker på at du vil %%s denne side?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Er du sikker på at du vil %s denne side?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format
@@ -1566,52 +1528,52 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr "Et templatetag kunne ikke finde sidee med parametrene `%(page_lookup)s`. Adressen for forespørgelsen var: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:139 test_utils/cli.py:150
+#: test_utils/cli.py:140 test_utils/cli.py:151
 msgid "English"
 msgstr "Engelsk"
 
-#: test_utils/cli.py:140 test_utils/cli.py:162 test_utils/cli.py:185
+#: test_utils/cli.py:141 test_utils/cli.py:163 test_utils/cli.py:186
 msgid "French"
 msgstr "Fransk"
 
-#: test_utils/cli.py:141 test_utils/cli.py:156 test_utils/cli.py:179
-#: test_utils/cli.py:198
+#: test_utils/cli.py:142 test_utils/cli.py:157 test_utils/cli.py:180
+#: test_utils/cli.py:199
 msgid "German"
 msgstr "Tysk"
 
-#: test_utils/cli.py:142 test_utils/cli.py:167
+#: test_utils/cli.py:143 test_utils/cli.py:168
 msgid "Brazilian Portuguese"
 msgstr "brasiliansk portugisisk"
 
-#: test_utils/cli.py:143 test_utils/cli.py:192
+#: test_utils/cli.py:144 test_utils/cli.py:193
 msgid "Dutch"
 msgstr "Hollandsk"
 
-#: test_utils/cli.py:208
+#: test_utils/cli.py:209
 msgid "two columns"
 msgstr "to kolonner"
 
-#: test_utils/cli.py:209
+#: test_utils/cli.py:210
 msgid "three columns"
 msgstr "tre kolonner"
 
-#: test_utils/cli.py:210
+#: test_utils/cli.py:211
 msgid "navigation examples"
 msgstr "navigationseksempler"
 
-#: test_utils/cli.py:218
+#: test_utils/cli.py:219
 msgid "sidebar column"
 msgstr "sidebar kolonne"
 
-#: test_utils/cli.py:223
+#: test_utils/cli.py:224
 msgid "left column"
 msgstr "venstre kolonne"
 
-#: test_utils/cli.py:228
+#: test_utils/cli.py:229
 msgid "Add a link"
 msgstr "Tilføj et link"
 
-#: test_utils/cli.py:234
+#: test_utils/cli.py:235
 msgid "right column"
 msgstr "højre kolonne"
 

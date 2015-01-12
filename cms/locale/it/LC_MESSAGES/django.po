@@ -7,7 +7,7 @@
 # Denis Darii <sinednx@gmail.com>, 2011
 # Francesco Moggia <f.moggia@gmail.com>, 2013
 # yakky <i.spalletti@nephila.it>, 2011
-# yakky <i.spalletti@nephila.it>, 2013-2014
+# yakky <i.spalletti@nephila.it>, 2013-2015
 # yakky <i.spalletti@nephila.it>, 2012
 # karim79 <karim@gorjux.net>, 2011
 # Marco Barberis <mbarberis@gmail.com>, 2011
@@ -21,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 16:49+0100\n"
-"PO-Revision-Date: 2014-11-27 15:51+0000\n"
+"POT-Creation-Date: 2015-01-12 09:31+0100\n"
+"PO-Revision-Date: 2015-01-11 21:20+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,7 @@ msgid "Logout"
 msgstr "Logout"
 
 #: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
-#: migrations_django/0002_auto_20140816_1918.py:150 models/settingmodels.py:12
+#: models/settingmodels.py:12
 msgid "Language"
 msgstr "Lingua"
 
@@ -225,7 +225,7 @@ msgstr "Opzioni avanzate"
 msgid "Generic"
 msgstr "Generico"
 
-#: plugin_base.py:280
+#: plugin_base.py:287
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Questo plugin non prevede altre impostazioni. Premi salva."
 
@@ -336,8 +336,7 @@ msgstr "Hai selezionato un'applicazione con un \"app_name\".\n                  
 msgid "A instance name with this name already exists."
 msgstr "Esiste già un'istanza con questo nome."
 
-#: admin/forms.py:347 migrations_django/0001_initial.py:72
-#: migrations_django/0001_initial.py:135 models/permissionmodels.py:71
+#: admin/forms.py:347 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "utente"
@@ -511,12 +510,12 @@ msgstr "Errore! Non hai il permesso per spostare questa pagina. Ricarica la pagi
 msgid "Page moved"
 msgstr "Pagina spostata"
 
-#: admin/pageadmin.py:1002 admin/placeholderadmin.py:256
-#: admin/placeholderadmin.py:302
+#: admin/pageadmin.py:1002 admin/placeholderadmin.py:257
+#: admin/placeholderadmin.py:306
 msgid "Language must be set to a supported language!"
 msgstr "La lingua deve essere scelta tra le lingue supportate!"
 
-#: admin/pageadmin.py:1007 admin/placeholderadmin.py:321
+#: admin/pageadmin.py:1007 admin/placeholderadmin.py:325
 msgid "You do not have permission to copy these plugins."
 msgstr "Non hai i permessi per copiare questi plugin."
 
@@ -573,8 +572,8 @@ msgstr "Esiste solo una traduzione per questa pagina"
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Il titolo e i plugin con lingua %(language)s sono stati eliminati"
 
-#: admin/pageadmin.py:1288 admin/placeholderadmin.py:512
-#: admin/placeholderadmin.py:551
+#: admin/pageadmin.py:1288 admin/placeholderadmin.py:522
+#: admin/placeholderadmin.py:561
 msgid "Are you sure?"
 msgstr "Sei sicuro?"
 
@@ -586,7 +585,7 @@ msgstr "Non disponi del permesso per modificare lo status di in_navigation per q
 msgid "Page Types"
 msgstr "Tipi Pagina"
 
-#: admin/pageadmin.py:1404
+#: admin/pageadmin.py:1407
 msgid "You do not have permission to edit this page"
 msgstr "Non hai i permessi per modificare questa pagina"
 
@@ -610,55 +609,55 @@ msgstr "Permessi utenti e gruppi"
 msgid "Page permissions management"
 msgstr "Pagina di gestione dei permessi"
 
-#: admin/placeholderadmin.py:75
+#: admin/placeholderadmin.py:76
 #, python-format
 msgid "Field %s not found"
 msgstr "Campo %s non trovato"
 
-#: admin/placeholderadmin.py:82
+#: admin/placeholderadmin.py:83
 msgid "You do not have permission to edit this item"
 msgstr "Non hai i permessi per modificare questo elemento"
 
-#: admin/placeholderadmin.py:232
+#: admin/placeholderadmin.py:233
 msgid "You do not have permission to add a plugin"
 msgstr "Non sei autorizzato/a ad aggiungere un plugin"
 
-#: admin/placeholderadmin.py:258
+#: admin/placeholderadmin.py:259
 msgid "Parent plugin language must be same as language!"
 msgstr "Il linguaggio del plugin di livello superiore deve essere lo stesso!"
 
-#: admin/placeholderadmin.py:356
+#: admin/placeholderadmin.py:363
 msgid "You do not have permission to edit this plugin"
 msgstr "Non hai i permessi  per modificare questo plugin"
 
-#: admin/placeholderadmin.py:439
+#: admin/placeholderadmin.py:446
 msgid "You have no permission to move this plugin"
 msgstr "Non hai i permessi per spostare questo plugin"
 
-#: admin/placeholderadmin.py:489 admin/placeholderadmin.py:500
+#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
 msgid "You do not have permission to delete this plugin"
 msgstr "Non hai le autorizzazni per rimuovere questo plugin"
 
-#: admin/placeholderadmin.py:504
+#: admin/placeholderadmin.py:514
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "Plugin %(name)s \"%(obj)s\" rimosso con successo."
 
-#: admin/placeholderadmin.py:510 admin/placeholderadmin.py:549
+#: admin/placeholderadmin.py:520 admin/placeholderadmin.py:559
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Non è possibile rimuovere %(name)s"
 
-#: admin/placeholderadmin.py:530 admin/placeholderadmin.py:541
+#: admin/placeholderadmin.py:540 admin/placeholderadmin.py:551
 msgid "You do not have permission to clear this placeholder"
 msgstr "Non hai i permessi per svuotare questo placeholder"
 
-#: admin/placeholderadmin.py:544
+#: admin/placeholderadmin.py:554
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "Placeholder \"%(obj)s\" svuotato con successo."
 
-#: admin/placeholderadmin.py:554
+#: admin/placeholderadmin.py:564
 msgid "placeholder"
 msgstr "placeholder"
 
@@ -677,220 +676,6 @@ msgstr "Seleziona una pagina valida"
 #: forms/widgets.py:221
 msgid "Add Another"
 msgstr "Aggiungi un altro"
-
-#: migrations_django/0001_initial.py:26 migrations_django/0001_initial.py:60
-#: migrations_django/0001_initial.py:83 migrations_django/0001_initial.py:123
-#: migrations_django/0002_auto_20140816_1918.py:55
-#: migrations_django/0002_auto_20140816_1918.py:99
-#: migrations_django/0002_auto_20140816_1918.py:121
-#: migrations_django/0002_auto_20140816_1918.py:149
-msgid "ID"
-msgstr "ID"
-
-#: migrations_django/0001_initial.py:27 models/pluginmodel.py:75
-msgid "position"
-msgstr "posizione"
-
-#: migrations_django/0001_initial.py:28
-#: migrations_django/0002_auto_20140816_1918.py:122 models/pluginmodel.py:76
-#: models/titlemodels.py:15
-msgid "language"
-msgstr "lingua"
-
-#: migrations_django/0001_initial.py:29 models/pluginmodel.py:77
-msgid "plugin_name"
-msgstr "nome plugin"
-
-#: migrations_django/0001_initial.py:30
-#: migrations_django/0002_auto_20140816_1918.py:131 models/pluginmodel.py:78
-#: models/titlemodels.py:28
-msgid "creation date"
-msgstr "data di creazione"
-
-#: migrations_django/0001_initial.py:61 migrations_django/0001_initial.py:124
-#: models/permissionmodels.py:75
-msgid "can edit"
-msgstr "può modificare"
-
-#: migrations_django/0001_initial.py:62 migrations_django/0001_initial.py:125
-#: models/permissionmodels.py:76
-msgid "can add"
-msgstr "può aggiungere"
-
-#: migrations_django/0001_initial.py:63 migrations_django/0001_initial.py:126
-#: models/permissionmodels.py:77
-msgid "can delete"
-msgstr "può eliminare"
-
-#: migrations_django/0001_initial.py:64 migrations_django/0001_initial.py:127
-#: models/permissionmodels.py:78
-msgid "can change advanced settings"
-msgstr "può modificare le impostazioni avanzate"
-
-#: migrations_django/0001_initial.py:65 migrations_django/0001_initial.py:128
-#: models/permissionmodels.py:79
-msgid "can publish"
-msgstr "può pubblicare"
-
-#: migrations_django/0001_initial.py:66 migrations_django/0001_initial.py:129
-#: models/permissionmodels.py:80
-msgid "can change permissions"
-msgstr "può cambiare i permessi"
-
-#: migrations_django/0001_initial.py:67 migrations_django/0001_initial.py:130
-#: models/permissionmodels.py:81
-msgid "can move"
-msgstr "può spostare"
-
-#: migrations_django/0001_initial.py:68 migrations_django/0001_initial.py:131
-#: models/permissionmodels.py:82
-msgid "view restricted"
-msgstr "vista limitata"
-
-#: migrations_django/0001_initial.py:69 models/permissionmodels.py:106
-msgid "can recover pages"
-msgstr "può recuperare le pagine"
-
-#: migrations_django/0001_initial.py:70 migrations_django/0001_initial.py:133
-#: models/permissionmodels.py:72
-msgid "group"
-msgstr "gruppo"
-
-#: migrations_django/0001_initial.py:71 models/permissionmodels.py:107
-msgid "sites"
-msgstr "siti"
-
-#: migrations_django/0001_initial.py:84 models/pagemodel.py:56
-msgid "created by"
-msgstr "creato da"
-
-#: migrations_django/0001_initial.py:85 models/pagemodel.py:57
-msgid "changed by"
-msgstr "modificato da"
-
-#: migrations_django/0001_initial.py:88 models/pagemodel.py:62
-#: templates/admin/cms/page/tree/menu_item.html:73
-msgid "publication date"
-msgstr "data di pubblicazione"
-
-#: migrations_django/0001_initial.py:89 models/pagemodel.py:64
-#: templates/admin/cms/page/tree/menu_item.html:74
-msgid "publication end date"
-msgstr "data fine pubblicazione"
-
-#: migrations_django/0001_initial.py:90 models/pagemodel.py:71
-msgid "in navigation"
-msgstr "in navigazione"
-
-#: migrations_django/0001_initial.py:91 models/pagemodel.py:72
-msgid "soft root"
-msgstr "soft root"
-
-#: migrations_django/0001_initial.py:92 models/pagemodel.py:74
-msgid "id"
-msgstr "id"
-
-#: migrations_django/0001_initial.py:93 models/pagemodel.py:76
-msgid "attached menu"
-msgstr "menu allegato"
-
-#: migrations_django/0001_initial.py:94 models/pagemodel.py:77
-#: templates/admin/cms/page/tree/menu_item.html:77
-msgid "template"
-msgstr "template"
-
-#: migrations_django/0001_initial.py:95 models/pagemodel.py:83
-msgid "login required"
-msgstr "è richiesto il login"
-
-#: migrations_django/0001_initial.py:96 models/pagemodel.py:84
-msgid "menu visibility"
-msgstr "visibilità menu"
-
-#: migrations_django/0001_initial.py:98 models/pagemodel.py:88
-msgid "application"
-msgstr "applicazione"
-
-#: migrations_django/0001_initial.py:99 models/pagemodel.py:89
-msgid "application instance name"
-msgstr "nome dell'istanza dell'applicazione"
-
-#: migrations_django/0001_initial.py:110 models/pagemodel.py:80
-msgid "site"
-msgstr "sito"
-
-#: migrations_django/0001_initial.py:132 models/permissionmodels.py:124
-#: templates/admin/cms/page/permissions.html:15
-msgid "Grant on"
-msgstr "Concesso su"
-
-#: migrations_django/0001_initial.py:134
-#: migrations_django/0002_auto_20140816_1918.py:135 models/pagemodel.py:125
-#: models/permissionmodels.py:125 models/titlemodels.py:27
-#: test_utils/project/sampleapp/ns_urls.py:10
-msgid "page"
-msgstr "pagina"
-
-#: migrations_django/0002_auto_20140816_1918.py:56
-#: models/placeholdermodel.py:26
-msgid "slot"
-msgstr "slot"
-
-#: migrations_django/0002_auto_20140816_1918.py:57
-#: models/placeholdermodel.py:27
-msgid "width"
-msgstr "larghezza"
-
-#: migrations_django/0002_auto_20140816_1918.py:100
-#: models/static_placeholder.py:29
-msgid "static placeholder name"
-msgstr "Nome segnaposto statico"
-
-#: migrations_django/0002_auto_20140816_1918.py:101
-#: models/static_placeholder.py:32
-msgid "placeholder code"
-msgstr "Codice segnaposto"
-
-#: migrations_django/0002_auto_20140816_1918.py:103
-#: models/static_placeholder.py:38
-msgid "creation_method"
-msgstr "Metodo di creazione"
-
-#: migrations_django/0002_auto_20140816_1918.py:104
-#: models/static_placeholder.py:34
-msgid "placeholder content"
-msgstr "Contenuto del segnaposto"
-
-#: migrations_django/0002_auto_20140816_1918.py:123
-#: migrations_django/0002_auto_20140816_1918.py:124
-#: migrations_django/0002_auto_20140816_1918.py:125 models/titlemodels.py:16
-#: models/titlemodels.py:17 models/titlemodels.py:19
-msgid "title"
-msgstr "titolo"
-
-#: migrations_django/0002_auto_20140816_1918.py:126 models/titlemodels.py:21
-msgid "description"
-msgstr "descrizione"
-
-#: migrations_django/0002_auto_20140816_1918.py:127 models/titlemodels.py:23
-msgid "slug"
-msgstr "slug"
-
-#: migrations_django/0002_auto_20140816_1918.py:128 models/titlemodels.py:24
-msgid "Path"
-msgstr "Percorso"
-
-#: migrations_django/0002_auto_20140816_1918.py:129 models/titlemodels.py:25
-msgid "has url overwrite"
-msgstr "può sovrascrivere l'URL"
-
-#: migrations_django/0002_auto_20140816_1918.py:130 models/titlemodels.py:26
-msgid "redirect"
-msgstr "redirect"
-
-#: migrations_django/0002_auto_20140816_1918.py:132 models/titlemodels.py:31
-msgid "is published"
-msgstr "è pubblicato"
 
 #: models/pagemodel.py:38
 msgid "for logged in users only"
@@ -916,25 +701,61 @@ msgstr "Solo questo sito"
 msgid "Allow"
 msgstr "Consenti"
 
+#: models/pagemodel.py:56
+msgid "created by"
+msgstr "creato da"
+
+#: models/pagemodel.py:57
+msgid "changed by"
+msgstr "modificato da"
+
+#: models/pagemodel.py:62 templates/admin/cms/page/tree/menu_item.html:73
+msgid "publication date"
+msgstr "data di pubblicazione"
+
 #: models/pagemodel.py:63
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "Quando la pagina dovrebbe andare online. Lo stato della pagina deve essere \\ \"Pubblicato \" per far si che la pagina possa andare online."
 
+#: models/pagemodel.py:64 templates/admin/cms/page/tree/menu_item.html:74
+msgid "publication end date"
+msgstr "data fine pubblicazione"
+
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Quando far scadere la pagina. Lascia vuoto per non farla mai scadere."
 
+#: models/pagemodel.py:71
+msgid "in navigation"
+msgstr "in navigazione"
+
+#: models/pagemodel.py:72
+msgid "soft root"
+msgstr "soft root"
+
 #: models/pagemodel.py:73
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Tutti gli antenati non verranno visualizzati nella barra di navigazione"
+
+#: models/pagemodel.py:74
+msgid "id"
+msgstr "id"
 
 #: models/pagemodel.py:75
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Identificativo univoco usato con il templatetag page_url per riferirsi a questa pagina"
+
+#: models/pagemodel.py:76
+msgid "attached menu"
+msgstr "menu allegato"
+
+#: models/pagemodel.py:77 templates/admin/cms/page/tree/menu_item.html:77
+msgid "template"
+msgstr "template"
 
 #: models/pagemodel.py:78
 msgid "The template used to render the content."
@@ -944,9 +765,34 @@ msgstr "Il template utilizzato per il rendering del contenuto."
 msgid "The site the page is accessible at."
 msgstr "Il sito da cui la pagina è accessibile."
 
+#: models/pagemodel.py:80
+msgid "site"
+msgstr "sito"
+
+#: models/pagemodel.py:83
+msgid "login required"
+msgstr "è richiesto il login"
+
+#: models/pagemodel.py:84
+msgid "menu visibility"
+msgstr "visibilità menu"
+
 #: models/pagemodel.py:86
 msgid "limit when this page is visible in the menu"
 msgstr "limita visibilità della pagina nel menu"
+
+#: models/pagemodel.py:88
+msgid "application"
+msgstr "applicazione"
+
+#: models/pagemodel.py:89
+msgid "application instance name"
+msgstr "nome dell'istanza dell'applicazione"
+
+#: models/pagemodel.py:125 models/permissionmodels.py:125
+#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
+msgid "page"
+msgstr "pagina"
 
 #: models/pagemodel.py:126
 msgid "pages"
@@ -980,13 +826,53 @@ msgstr "Pagina discendente"
 msgid "Page and descendants"
 msgstr "Pagina e discendenti"
 
+#: models/permissionmodels.py:72
+msgid "group"
+msgstr "gruppo"
+
+#: models/permissionmodels.py:75
+msgid "can edit"
+msgstr "può modificare"
+
+#: models/permissionmodels.py:76
+msgid "can add"
+msgstr "può aggiungere"
+
+#: models/permissionmodels.py:77
+msgid "can delete"
+msgstr "può eliminare"
+
+#: models/permissionmodels.py:78
+msgid "can change advanced settings"
+msgstr "può modificare le impostazioni avanzate"
+
+#: models/permissionmodels.py:79
+msgid "can publish"
+msgstr "può pubblicare"
+
+#: models/permissionmodels.py:80
+msgid "can change permissions"
+msgstr "può cambiare i permessi"
+
 #: models/permissionmodels.py:80
 msgid "on page level"
 msgstr "il livello di pagina"
 
+#: models/permissionmodels.py:81
+msgid "can move"
+msgstr "può spostare"
+
+#: models/permissionmodels.py:82
+msgid "view restricted"
+msgstr "vista limitata"
+
 #: models/permissionmodels.py:82
 msgid "frontend view restriction"
 msgstr "Restrizione visualizzazione frontend"
+
+#: models/permissionmodels.py:106
+msgid "can recover pages"
+msgstr "può recuperare le pagine"
 
 #: models/permissionmodels.py:106
 msgid "can recover any deleted page"
@@ -996,6 +882,10 @@ msgstr "può recuperare qualsiasi pagina cancellata"
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "Se non selezionato, l'utente ha i permessi estesi a tutti i siti."
 
+#: models/permissionmodels.py:107
+msgid "sites"
+msgstr "siti"
+
 #: models/permissionmodels.py:112
 msgid "Page global permission"
 msgstr "Permesso globale per la pagina"
@@ -1003,6 +893,10 @@ msgstr "Permesso globale per la pagina"
 #: models/permissionmodels.py:113
 msgid "Pages global permissions"
 msgstr "Permessi globali per le pagine"
+
+#: models/permissionmodels.py:124 templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "Concesso su"
 
 #: models/permissionmodels.py:130
 msgid "Page permission"
@@ -1023,6 +917,30 @@ msgstr "Gruppo utenti (pagina)"
 #: models/permissionmodels.py:157
 msgid "User groups (page)"
 msgstr "Gruppi utenti (pagina)"
+
+#: models/placeholdermodel.py:26
+msgid "slot"
+msgstr "slot"
+
+#: models/placeholdermodel.py:27
+msgid "width"
+msgstr "larghezza"
+
+#: models/pluginmodel.py:75
+msgid "position"
+msgstr "posizione"
+
+#: models/pluginmodel.py:76 models/titlemodels.py:15
+msgid "language"
+msgstr "lingua"
+
+#: models/pluginmodel.py:77
+msgid "plugin_name"
+msgstr "nome plugin"
+
+#: models/pluginmodel.py:78 models/titlemodels.py:28
+msgid "creation date"
+msgstr "data di creazione"
 
 #: models/pluginmodel.py:139
 msgid "<Empty>"
@@ -1048,15 +966,31 @@ msgstr "per template"
 msgid "by code"
 msgstr "per codice"
 
+#: models/static_placeholder.py:29
+msgid "static placeholder name"
+msgstr "Nome segnaposto statico"
+
 #: models/static_placeholder.py:30
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr "Un nome descrittivo per identificare questo segnaposto statico. Non visibile agli utenti."
 
+#: models/static_placeholder.py:32
+msgid "placeholder code"
+msgstr "Codice segnaposto"
+
 #: models/static_placeholder.py:33
 msgid "To render the static placeholder in templates."
 msgstr "Per riportare il segnaposto statico nei template."
+
+#: models/static_placeholder.py:34
+msgid "placeholder content"
+msgstr "Contenuto del segnaposto"
+
+#: models/static_placeholder.py:38
+msgid "creation_method"
+msgstr "Metodo di creazione"
 
 #: models/static_placeholder.py:44
 msgid "static placeholder"
@@ -1070,6 +1004,10 @@ msgstr "segnaposto statici"
 msgid "A static placeholder with the same site and code already exists"
 msgstr "Esiste già un segnaposto statico con lo stesso codice per lo stesso sito"
 
+#: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
+msgid "title"
+msgstr "titolo"
+
 #: models/titlemodels.py:18
 msgid "overwrite the title (html title tag)"
 msgstr "sovrascrivere il titolo (tag html title)"
@@ -1078,9 +1016,33 @@ msgstr "sovrascrivere il titolo (tag html title)"
 msgid "overwrite the title in the menu"
 msgstr "sovrascrivere il titolo nel menu"
 
+#: models/titlemodels.py:21
+msgid "description"
+msgstr "descrizione"
+
 #: models/titlemodels.py:22
 msgid "The text displayed in search engines."
 msgstr "Il testo mostrato dai motori di ricerca."
+
+#: models/titlemodels.py:23
+msgid "slug"
+msgstr "slug"
+
+#: models/titlemodels.py:24
+msgid "Path"
+msgstr "Percorso"
+
+#: models/titlemodels.py:25
+msgid "has url overwrite"
+msgstr "sovrascrive l'URL "
+
+#: models/titlemodels.py:26
+msgid "redirect"
+msgstr "redirect"
+
+#: models/titlemodels.py:31
+msgid "is published"
+msgstr "è pubblicato"
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
@@ -1190,7 +1152,7 @@ msgstr "La pagina non eredita permessi."
 
 #: templates/admin/cms/page/submit_row.html:8
 msgid "Basic Infos"
-msgstr "Impostazioni base"
+msgstr "Info di base"
 
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save as new"
@@ -1247,12 +1209,12 @@ msgstr "Per modifiche all'interno dell'albero potrebbe essere necessario ricaric
 
 #: templates/admin/cms/page/tree/base.html:56
 msgid "An error occured. Please reload the page"
-msgstr "Si è verificato un errore. Sei pregato di ricaricare la pagina"
+msgstr "Si è verificato un errore. Per favore, ricarica la pagina"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Confermi di voler %%s questa pagina?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Confermi di voler %s questa pagina?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format
@@ -1574,52 +1536,52 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr "Un template tag non può trovare la pagina con argomenti di lookup `%(page_lookup)s `. \nL'URL della richiesta era: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:139 test_utils/cli.py:150
+#: test_utils/cli.py:140 test_utils/cli.py:151
 msgid "English"
 msgstr "Inglese"
 
-#: test_utils/cli.py:140 test_utils/cli.py:162 test_utils/cli.py:185
+#: test_utils/cli.py:141 test_utils/cli.py:163 test_utils/cli.py:186
 msgid "French"
 msgstr "Francese"
 
-#: test_utils/cli.py:141 test_utils/cli.py:156 test_utils/cli.py:179
-#: test_utils/cli.py:198
+#: test_utils/cli.py:142 test_utils/cli.py:157 test_utils/cli.py:180
+#: test_utils/cli.py:199
 msgid "German"
 msgstr "Tedesco"
 
-#: test_utils/cli.py:142 test_utils/cli.py:167
+#: test_utils/cli.py:143 test_utils/cli.py:168
 msgid "Brazilian Portuguese"
 msgstr "Portoghese Brasiliano"
 
-#: test_utils/cli.py:143 test_utils/cli.py:192
+#: test_utils/cli.py:144 test_utils/cli.py:193
 msgid "Dutch"
 msgstr "Olandese"
 
-#: test_utils/cli.py:208
+#: test_utils/cli.py:209
 msgid "two columns"
 msgstr "due colonne"
 
-#: test_utils/cli.py:209
+#: test_utils/cli.py:210
 msgid "three columns"
 msgstr "tre colonne"
 
-#: test_utils/cli.py:210
+#: test_utils/cli.py:211
 msgid "navigation examples"
 msgstr "Esempio navigazione"
 
-#: test_utils/cli.py:218
+#: test_utils/cli.py:219
 msgid "sidebar column"
 msgstr "colore di sfondo"
 
-#: test_utils/cli.py:223
+#: test_utils/cli.py:224
 msgid "left column"
 msgstr "colonna a sinistra"
 
-#: test_utils/cli.py:228
+#: test_utils/cli.py:229
 msgid "Add a link"
 msgstr "Aggiungi un collegamento"
 
-#: test_utils/cli.py:234
+#: test_utils/cli.py:235
 msgid "right column"
 msgstr "colonna a destra"
 

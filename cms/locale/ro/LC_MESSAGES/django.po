@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Catalin Dragomirescu <diversesite@gmail.com>, 2014
+# costel <costel@vrancea.org>, 2014
 # Denis Darii <sinednx@gmail.com>, 2011
 # IlieLipan <ilie_lipan@yahoo.com>, 2012
 # Julian C <jcuotpc@gmail.com>, 2014
@@ -12,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 16:49+0100\n"
-"PO-Revision-Date: 2014-11-27 15:51+0000\n"
+"POT-Creation-Date: 2015-01-12 09:31+0100\n"
+"PO-Revision-Date: 2015-01-11 21:30+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django-cms/language/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -31,90 +32,90 @@ msgstr "django CMS"
 
 #: cms_plugins.py:18
 msgid "Placeholder"
-msgstr ""
+msgstr "Înlocuitor"
 
 #: cms_plugins.py:31
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: cms_plugins.py:54 cms_plugins.py:63
 msgid "Create Alias"
-msgstr ""
+msgstr "Creează alias"
 
 #: cms_toolbar.py:90
 msgid "Structure"
-msgstr ""
+msgstr "Structură"
 
 #: cms_toolbar.py:91
 msgid "Content"
-msgstr ""
+msgstr "Conținut"
 
 #: cms_toolbar.py:122
 msgid "Sites"
-msgstr "site-uri"
+msgstr "Site-uri"
 
 #: cms_toolbar.py:123
 msgid "Admin Sites"
-msgstr "Admin"
+msgstr "Site-uri admin"
 
 #: cms_toolbar.py:130
 msgid "Administration"
-msgstr ""
+msgstr "Administrare"
 
 #: cms_toolbar.py:134
 msgid "User settings"
-msgstr ""
+msgstr "Setări utilizator"
 
 #: cms_toolbar.py:148
 msgid "Users"
-msgstr "utilizatori"
+msgstr "Utilizatori"
 
 #: cms_toolbar.py:167 tests/toolbar.py:392 tests/toolbar.py:407
 #: tests/toolbar.py:439
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Deautintificare %s"
 
 #: cms_toolbar.py:167
 msgid "Logout"
 msgstr "Logout"
 
 #: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
-#: migrations_django/0002_auto_20140816_1918.py:150 models/settingmodels.py:12
+#: models/settingmodels.py:12
 msgid "Language"
 msgstr "Limbă"
 
 #: cms_toolbar.py:302
 msgid "Publish changes"
-msgstr ""
+msgstr "Publică schimbările"
 
 #: cms_toolbar.py:304
 msgid "Publish page now"
-msgstr ""
+msgstr "Publică pagina"
 
 #: cms_toolbar.py:346 cms_toolbar.py:431
 msgid "Page settings"
-msgstr ""
+msgstr "Setari pagină"
 
 #: cms_toolbar.py:366
 #, python-format
 msgid "Add %(language)s Translation"
-msgstr ""
+msgstr "Adauga traducere în %(language)s"
 
 #: cms_toolbar.py:374
 #, python-format
 msgid "Delete %(language)s Translation"
-msgstr ""
+msgstr "Șterge traducere in limba %(language)s"
 
 #: cms_toolbar.py:383
 #, python-format
 msgid "Copy all plugins from %s"
-msgstr ""
+msgstr "Copiază toate pluginurile de la %s"
 
 #: cms_toolbar.py:384
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
-msgstr ""
+msgstr "Sunteți sigur ca doriți să copiați toate puginurile de la %s?"
 
 #: cms_toolbar.py:398
 msgid "Pages"
@@ -122,23 +123,23 @@ msgstr "Pagini"
 
 #: cms_toolbar.py:406 templates/admin/cms/page/permissions.html:5
 msgid "Page"
-msgstr "Pagina"
+msgstr "Pagină"
 
 #: cms_toolbar.py:409
 msgid "Add Page"
-msgstr ""
+msgstr "Adaugă pagina"
 
 #: cms_toolbar.py:412
 msgid "New Page"
-msgstr ""
+msgstr "Pagină nouă"
 
 #: cms_toolbar.py:413
 msgid "New Sub Page"
-msgstr ""
+msgstr "Sub pagină noua"
 
 #: cms_toolbar.py:414
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "Dedublează aceasta pagina"
 
 #: cms_toolbar.py:426
 msgid "Edit this Page"
@@ -158,31 +159,31 @@ msgstr "Permisii"
 
 #: cms_toolbar.py:462 admin/pageadmin.py:343
 msgid "Publishing dates"
-msgstr ""
+msgstr "Dăți de publicare"
 
 #: cms_toolbar.py:468
 msgid "Hide in navigation"
-msgstr ""
+msgstr "Ascunde in navigare"
 
 #: cms_toolbar.py:468
 msgid "Display in navigation"
-msgstr ""
+msgstr "Arata in navigare"
 
 #: cms_toolbar.py:475
 msgid "Unpublish page"
-msgstr "cerere de a anula publicarea"
+msgstr "Anulează publicarea"
 
 #: cms_toolbar.py:478
 msgid "Publish page"
-msgstr ""
+msgstr "Publică pagina"
 
 #: cms_toolbar.py:489
 msgid "Delete page"
-msgstr ""
+msgstr "Sterge pagina"
 
 #: cms_toolbar.py:498
 msgid "Save as Page Type"
-msgstr ""
+msgstr "Salvează ca tip pagină"
 
 #: cms_toolbar.py:503 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
@@ -190,23 +191,23 @@ msgstr "Istorie"
 
 #: cms_toolbar.py:521
 msgid "Undo"
-msgstr ""
+msgstr "Revocare"
 
 #: cms_toolbar.py:522
 msgid "Redo"
-msgstr ""
+msgstr "Refă"
 
 #: cms_toolbar.py:527
 msgid "Are you sure you want to revert to live?"
-msgstr ""
+msgstr "Ești sigur că vrei sa schimbi la live?"
 
 #: cms_toolbar.py:528
 msgid "Revert to live"
-msgstr ""
+msgstr "Schimba la live"
 
 #: cms_toolbar.py:530
 msgid "View history"
-msgstr ""
+msgstr "Vezi istoric"
 
 #: plugin_base.py:83
 msgid "Advanced options"
@@ -214,11 +215,11 @@ msgstr "Opţiuni avansate"
 
 #: plugin_base.py:100
 msgid "Generic"
-msgstr ""
+msgstr "Generic"
 
-#: plugin_base.py:280
+#: plugin_base.py:287
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "Nu mai sunt si alte setari pentru acest plugin.Va rugam salvați."
 
 #: admin/forms.py:65 admin/forms.py:175 admin/forms.py:217
 msgid "The current language of the content fields."
@@ -226,7 +227,7 @@ msgstr "Limbajul curent a câmpurilor de conţinut."
 
 #: admin/forms.py:66
 msgid "Page type"
-msgstr ""
+msgstr "Tip pagină"
 
 #: admin/forms.py:67
 msgid "Title"
@@ -238,7 +239,7 @@ msgstr "Titlul predefinit"
 
 #: admin/forms.py:69
 msgid "Slug"
-msgstr "Slug"
+msgstr "Descriere URL"
 
 #: admin/forms.py:70
 msgid "The part of the title that is used in the URL"
@@ -263,7 +264,7 @@ msgstr "Înlocuește ceea ce este afişat în partea de sus a browser-ului sau �
 
 #: admin/forms.py:76
 msgid "Description meta tag"
-msgstr ""
+msgstr "Decriere meta tag"
 
 #: admin/forms.py:78
 msgid "A description of the page used by search engines."
@@ -275,7 +276,7 @@ msgstr "O altă pagină cu acest slug există deja"
 
 #: admin/forms.py:163
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Câmp descriere URL nu trebuie sa fie gol"
 
 #: admin/forms.py:197
 msgid "Application"
@@ -295,11 +296,11 @@ msgstr "Păstraţi acest câmp gol dacă percursul standard ar trebui să fie ut
 
 #: admin/forms.py:205
 msgid "X Frame Options"
-msgstr ""
+msgstr "Opțiuni X Frame"
 
 #: admin/forms.py:206
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "Daca aceasta pagină poate fi încorporată în alte pagini sau sit-uri"
 
 #: admin/forms.py:211
 msgid "Redirect"
@@ -311,7 +312,7 @@ msgstr "Redirecţionează la aceast URL."
 
 #: admin/forms.py:212
 msgid "Start typing..."
-msgstr ""
+msgstr "Incepe să scrii..."
 
 #: admin/forms.py:269
 msgid "A page with this reverse URL id exists already."
@@ -321,14 +322,13 @@ msgstr "O pagină cu acest URL id există deja."
 msgid ""
 "You selected an apphook with an \"app_name\".\n"
 "                            You must enter a unique instance name."
-msgstr ""
+msgstr "Ai slectat un apphook cu nume de aplicatie \"app_name\".\nTrebuie sa introduci un nume unic."
 
 #: admin/forms.py:307
 msgid "A instance name with this name already exists."
-msgstr ""
+msgstr "O altă instanță cu același nume există deja."
 
-#: admin/forms.py:347 migrations_django/0001_initial.py:72
-#: migrations_django/0001_initial.py:135 models/permissionmodels.py:71
+#: admin/forms.py:347 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "utilizator"
@@ -345,7 +345,7 @@ msgstr "Permisiunea de a adauga pagina, de asemenea, are nevoie de permisiunea d
 
 #: admin/forms.py:443
 msgid "can_view"
-msgstr "can_view"
+msgstr "poate_vedea"
 
 #: admin/forms.py:454
 msgid "Please select user or group first."
@@ -391,7 +391,7 @@ msgstr "Parolă nouă"
 
 #: admin/forms.py:516
 msgid "New password confirmation"
-msgstr "Confirmarea noii parole"
+msgstr "Confirmare parolă"
 
 #: admin/forms.py:541
 msgid "Email notification requires valid email address."
@@ -417,15 +417,15 @@ msgstr "Setări avansate"
 
 #: admin/pageadmin.py:349
 msgid "Change Permissions"
-msgstr ""
+msgstr "Schimbă permisiuni"
 
 #: admin/pageadmin.py:397
 msgid "Add Page Type"
-msgstr ""
+msgstr "Adaugă tip pagină"
 
 #: admin/pageadmin.py:401
 msgid "Add Page Copy"
-msgstr ""
+msgstr "Adaugă copie pagină"
 
 #: admin/pageadmin.py:607
 #, python-format
@@ -435,7 +435,7 @@ msgstr "Plugin-ul %(plugin_name)s a fost adăugat la %(placeholder)s"
 #: admin/pageadmin.py:615
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
-msgstr ""
+msgstr "Am copiat pluginurie la %(placeholder)s"
 
 #: admin/pageadmin.py:626
 #, python-format
@@ -457,7 +457,7 @@ msgstr "Plugin-ul %(plugin_name)s din poziția %(position)s din %(placeholder)s 
 #: admin/pageadmin.py:658
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
-msgstr ""
+msgstr "Toate pluginurile din tabelul \"%(name)s\" au fost șterse."
 
 #: admin/pageadmin.py:677
 msgid "You do not have permission to change pages."
@@ -474,40 +474,40 @@ msgstr "Nu aveți permisiunea necesară sa schimbați această pagină"
 
 #: admin/pageadmin.py:843 admin/pageadmin.py:909
 msgid "Page reverted but slug stays the same because of url collisions."
-msgstr ""
+msgstr "Pagina a fost restaurată dar descrierea URL a rămas la fel din cauza interferenței cu URL."
 
 #: admin/pageadmin.py:917
 msgid "You do not have permission to change the template"
-msgstr ""
+msgstr "Nu ai permisiunea să schimbi acest șablon."
 
 #: admin/pageadmin.py:921
 msgid "Template not valid"
-msgstr ""
+msgstr "Șablon necorespunzător"
 
 #: admin/pageadmin.py:926
 #, python-format
 msgid "Template changed to %s"
-msgstr ""
+msgstr "Șablonul a fost schimbat la %s"
 
 #: admin/pageadmin.py:929
 msgid "The template was successfully changed"
-msgstr ""
+msgstr "Acest șablon a fost schimbat cu succes."
 
 #: admin/pageadmin.py:951
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
+msgstr "Eroare!Nu ai premisiunea de schimbare a acestui șablon.Reîncarcă pagina."
 
 #: admin/pageadmin.py:956
 msgid "Page moved"
-msgstr ""
+msgstr "Pagină mutată"
 
-#: admin/pageadmin.py:1002 admin/placeholderadmin.py:256
-#: admin/placeholderadmin.py:302
+#: admin/pageadmin.py:1002 admin/placeholderadmin.py:257
+#: admin/placeholderadmin.py:306
 msgid "Language must be set to a supported language!"
 msgstr "Limba trebuie setată din limbile acceptate!"
 
-#: admin/pageadmin.py:1007 admin/placeholderadmin.py:321
+#: admin/pageadmin.py:1007 admin/placeholderadmin.py:325
 msgid "You do not have permission to copy these plugins."
 msgstr ""
 
@@ -564,8 +564,8 @@ msgstr "Există o singură traducere pentru această pagină"
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Titlu şi plugin-urile cu limba %(language)s  au fost şterse"
 
-#: admin/pageadmin.py:1288 admin/placeholderadmin.py:512
-#: admin/placeholderadmin.py:551
+#: admin/pageadmin.py:1288 admin/placeholderadmin.py:522
+#: admin/placeholderadmin.py:561
 msgid "Are you sure?"
 msgstr "Esti sigur?"
 
@@ -577,7 +577,7 @@ msgstr "Nu aveți permisiunile necesare să schimbați statusul in_navigation al
 msgid "Page Types"
 msgstr ""
 
-#: admin/pageadmin.py:1404
+#: admin/pageadmin.py:1407
 msgid "You do not have permission to edit this page"
 msgstr "Nu aveți permisiunea necesară sa editati această pagină"
 
@@ -601,55 +601,55 @@ msgstr "Utilizator & Permisii de grup"
 msgid "Page permissions management"
 msgstr "Managementul permisiunilor paginilor"
 
-#: admin/placeholderadmin.py:75
+#: admin/placeholderadmin.py:76
 #, python-format
 msgid "Field %s not found"
 msgstr ""
 
-#: admin/placeholderadmin.py:82
+#: admin/placeholderadmin.py:83
 msgid "You do not have permission to edit this item"
 msgstr ""
 
-#: admin/placeholderadmin.py:232
+#: admin/placeholderadmin.py:233
 msgid "You do not have permission to add a plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:258
+#: admin/placeholderadmin.py:259
 msgid "Parent plugin language must be same as language!"
 msgstr ""
 
-#: admin/placeholderadmin.py:356
+#: admin/placeholderadmin.py:363
 msgid "You do not have permission to edit this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:439
+#: admin/placeholderadmin.py:446
 msgid "You have no permission to move this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:489 admin/placeholderadmin.py:500
+#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
 msgid "You do not have permission to delete this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:504
+#: admin/placeholderadmin.py:514
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:510 admin/placeholderadmin.py:549
+#: admin/placeholderadmin.py:520 admin/placeholderadmin.py:559
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: admin/placeholderadmin.py:530 admin/placeholderadmin.py:541
+#: admin/placeholderadmin.py:540 admin/placeholderadmin.py:551
 msgid "You do not have permission to clear this placeholder"
 msgstr ""
 
-#: admin/placeholderadmin.py:544
+#: admin/placeholderadmin.py:554
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:554
+#: admin/placeholderadmin.py:564
 msgid "placeholder"
 msgstr ""
 
@@ -668,220 +668,6 @@ msgstr ""
 #: forms/widgets.py:221
 msgid "Add Another"
 msgstr "Adaugă altul"
-
-#: migrations_django/0001_initial.py:26 migrations_django/0001_initial.py:60
-#: migrations_django/0001_initial.py:83 migrations_django/0001_initial.py:123
-#: migrations_django/0002_auto_20140816_1918.py:55
-#: migrations_django/0002_auto_20140816_1918.py:99
-#: migrations_django/0002_auto_20140816_1918.py:121
-#: migrations_django/0002_auto_20140816_1918.py:149
-msgid "ID"
-msgstr ""
-
-#: migrations_django/0001_initial.py:27 models/pluginmodel.py:75
-msgid "position"
-msgstr "poziţie"
-
-#: migrations_django/0001_initial.py:28
-#: migrations_django/0002_auto_20140816_1918.py:122 models/pluginmodel.py:76
-#: models/titlemodels.py:15
-msgid "language"
-msgstr "limbă"
-
-#: migrations_django/0001_initial.py:29 models/pluginmodel.py:77
-msgid "plugin_name"
-msgstr "nume plugin"
-
-#: migrations_django/0001_initial.py:30
-#: migrations_django/0002_auto_20140816_1918.py:131 models/pluginmodel.py:78
-#: models/titlemodels.py:28
-msgid "creation date"
-msgstr "data creării"
-
-#: migrations_django/0001_initial.py:61 migrations_django/0001_initial.py:124
-#: models/permissionmodels.py:75
-msgid "can edit"
-msgstr "poate edita"
-
-#: migrations_django/0001_initial.py:62 migrations_django/0001_initial.py:125
-#: models/permissionmodels.py:76
-msgid "can add"
-msgstr "poate adăuga"
-
-#: migrations_django/0001_initial.py:63 migrations_django/0001_initial.py:126
-#: models/permissionmodels.py:77
-msgid "can delete"
-msgstr "poate şterge"
-
-#: migrations_django/0001_initial.py:64 migrations_django/0001_initial.py:127
-#: models/permissionmodels.py:78
-msgid "can change advanced settings"
-msgstr "poate schimba setările avansate"
-
-#: migrations_django/0001_initial.py:65 migrations_django/0001_initial.py:128
-#: models/permissionmodels.py:79
-msgid "can publish"
-msgstr "poate publica"
-
-#: migrations_django/0001_initial.py:66 migrations_django/0001_initial.py:129
-#: models/permissionmodels.py:80
-msgid "can change permissions"
-msgstr "poate schimba permisiunile"
-
-#: migrations_django/0001_initial.py:67 migrations_django/0001_initial.py:130
-#: models/permissionmodels.py:81
-msgid "can move"
-msgstr "poate mișca"
-
-#: migrations_django/0001_initial.py:68 migrations_django/0001_initial.py:131
-#: models/permissionmodels.py:82
-msgid "view restricted"
-msgstr "Restricţii de vizualizare"
-
-#: migrations_django/0001_initial.py:69 models/permissionmodels.py:106
-msgid "can recover pages"
-msgstr "poate recupera pagini"
-
-#: migrations_django/0001_initial.py:70 migrations_django/0001_initial.py:133
-#: models/permissionmodels.py:72
-msgid "group"
-msgstr "grup"
-
-#: migrations_django/0001_initial.py:71 models/permissionmodels.py:107
-msgid "sites"
-msgstr "site-uri"
-
-#: migrations_django/0001_initial.py:84 models/pagemodel.py:56
-msgid "created by"
-msgstr "creat de"
-
-#: migrations_django/0001_initial.py:85 models/pagemodel.py:57
-msgid "changed by"
-msgstr "modificat de"
-
-#: migrations_django/0001_initial.py:88 models/pagemodel.py:62
-#: templates/admin/cms/page/tree/menu_item.html:73
-msgid "publication date"
-msgstr "data publicării"
-
-#: migrations_django/0001_initial.py:89 models/pagemodel.py:64
-#: templates/admin/cms/page/tree/menu_item.html:74
-msgid "publication end date"
-msgstr "data terminării publicării"
-
-#: migrations_django/0001_initial.py:90 models/pagemodel.py:71
-msgid "in navigation"
-msgstr "în navigare"
-
-#: migrations_django/0001_initial.py:91 models/pagemodel.py:72
-msgid "soft root"
-msgstr "soft root"
-
-#: migrations_django/0001_initial.py:92 models/pagemodel.py:74
-msgid "id"
-msgstr "id"
-
-#: migrations_django/0001_initial.py:93 models/pagemodel.py:76
-msgid "attached menu"
-msgstr ""
-
-#: migrations_django/0001_initial.py:94 models/pagemodel.py:77
-#: templates/admin/cms/page/tree/menu_item.html:77
-msgid "template"
-msgstr "şablon"
-
-#: migrations_django/0001_initial.py:95 models/pagemodel.py:83
-msgid "login required"
-msgstr "autentificare cerută"
-
-#: migrations_django/0001_initial.py:96 models/pagemodel.py:84
-msgid "menu visibility"
-msgstr ""
-
-#: migrations_django/0001_initial.py:98 models/pagemodel.py:88
-msgid "application"
-msgstr "aplicație"
-
-#: migrations_django/0001_initial.py:99 models/pagemodel.py:89
-msgid "application instance name"
-msgstr ""
-
-#: migrations_django/0001_initial.py:110 models/pagemodel.py:80
-msgid "site"
-msgstr "site"
-
-#: migrations_django/0001_initial.py:132 models/permissionmodels.py:124
-#: templates/admin/cms/page/permissions.html:15
-msgid "Grant on"
-msgstr "De acord"
-
-#: migrations_django/0001_initial.py:134
-#: migrations_django/0002_auto_20140816_1918.py:135 models/pagemodel.py:125
-#: models/permissionmodels.py:125 models/titlemodels.py:27
-#: test_utils/project/sampleapp/ns_urls.py:10
-msgid "page"
-msgstr "pagină"
-
-#: migrations_django/0002_auto_20140816_1918.py:56
-#: models/placeholdermodel.py:26
-msgid "slot"
-msgstr "slot"
-
-#: migrations_django/0002_auto_20140816_1918.py:57
-#: models/placeholdermodel.py:27
-msgid "width"
-msgstr "lăţime"
-
-#: migrations_django/0002_auto_20140816_1918.py:100
-#: models/static_placeholder.py:29
-msgid "static placeholder name"
-msgstr ""
-
-#: migrations_django/0002_auto_20140816_1918.py:101
-#: models/static_placeholder.py:32
-msgid "placeholder code"
-msgstr ""
-
-#: migrations_django/0002_auto_20140816_1918.py:103
-#: models/static_placeholder.py:38
-msgid "creation_method"
-msgstr ""
-
-#: migrations_django/0002_auto_20140816_1918.py:104
-#: models/static_placeholder.py:34
-msgid "placeholder content"
-msgstr ""
-
-#: migrations_django/0002_auto_20140816_1918.py:123
-#: migrations_django/0002_auto_20140816_1918.py:124
-#: migrations_django/0002_auto_20140816_1918.py:125 models/titlemodels.py:16
-#: models/titlemodels.py:17 models/titlemodels.py:19
-msgid "title"
-msgstr "titlu"
-
-#: migrations_django/0002_auto_20140816_1918.py:126 models/titlemodels.py:21
-msgid "description"
-msgstr "descriere"
-
-#: migrations_django/0002_auto_20140816_1918.py:127 models/titlemodels.py:23
-msgid "slug"
-msgstr "slug"
-
-#: migrations_django/0002_auto_20140816_1918.py:128 models/titlemodels.py:24
-msgid "Path"
-msgstr "Calea"
-
-#: migrations_django/0002_auto_20140816_1918.py:129 models/titlemodels.py:25
-msgid "has url overwrite"
-msgstr "Are suprascrierea URL-ului"
-
-#: migrations_django/0002_auto_20140816_1918.py:130 models/titlemodels.py:26
-msgid "redirect"
-msgstr "redirecţionare"
-
-#: migrations_django/0002_auto_20140816_1918.py:132 models/titlemodels.py:31
-msgid "is published"
-msgstr "este publicat"
 
 #: models/pagemodel.py:38
 msgid "for logged in users only"
@@ -907,25 +693,61 @@ msgstr ""
 msgid "Allow"
 msgstr ""
 
+#: models/pagemodel.py:56
+msgid "created by"
+msgstr "creat de"
+
+#: models/pagemodel.py:57
+msgid "changed by"
+msgstr "modificat de"
+
+#: models/pagemodel.py:62 templates/admin/cms/page/tree/menu_item.html:73
+msgid "publication date"
+msgstr "data publicării"
+
 #: models/pagemodel.py:63
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "Când pagina va apărea live. Statusul trebuie să fie \"Publicat\" pentru ca pagina sa apară live."
 
+#: models/pagemodel.py:64 templates/admin/cms/page/tree/menu_item.html:74
+msgid "publication end date"
+msgstr "data terminării publicării"
+
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Cand expira pagina. Lasa gol ca sa nu expire niciodata."
 
+#: models/pagemodel.py:71
+msgid "in navigation"
+msgstr "în navigare"
+
+#: models/pagemodel.py:72
+msgid "soft root"
+msgstr "soft root"
+
 #: models/pagemodel.py:73
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Toti superiorii nu vor fi afisati in navigare"
+
+#: models/pagemodel.py:74
+msgid "id"
+msgstr "id"
 
 #: models/pagemodel.py:75
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
+
+#: models/pagemodel.py:76
+msgid "attached menu"
+msgstr ""
+
+#: models/pagemodel.py:77 templates/admin/cms/page/tree/menu_item.html:77
+msgid "template"
+msgstr "şablon"
 
 #: models/pagemodel.py:78
 msgid "The template used to render the content."
@@ -935,9 +757,34 @@ msgstr ""
 msgid "The site the page is accessible at."
 msgstr "Site-ul este accesibil la pagina."
 
+#: models/pagemodel.py:80
+msgid "site"
+msgstr "site"
+
+#: models/pagemodel.py:83
+msgid "login required"
+msgstr "autentificare cerută"
+
+#: models/pagemodel.py:84
+msgid "menu visibility"
+msgstr ""
+
 #: models/pagemodel.py:86
 msgid "limit when this page is visible in the menu"
 msgstr ""
+
+#: models/pagemodel.py:88
+msgid "application"
+msgstr "aplicație"
+
+#: models/pagemodel.py:89
+msgid "application instance name"
+msgstr ""
+
+#: models/pagemodel.py:125 models/permissionmodels.py:125
+#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
+msgid "page"
+msgstr "pagină"
 
 #: models/pagemodel.py:126
 msgid "pages"
@@ -971,13 +818,53 @@ msgstr "Descendenții paginii"
 msgid "Page and descendants"
 msgstr "Pagina și descendenții"
 
+#: models/permissionmodels.py:72
+msgid "group"
+msgstr "grup"
+
+#: models/permissionmodels.py:75
+msgid "can edit"
+msgstr "poate edita"
+
+#: models/permissionmodels.py:76
+msgid "can add"
+msgstr "poate adăuga"
+
+#: models/permissionmodels.py:77
+msgid "can delete"
+msgstr "poate şterge"
+
+#: models/permissionmodels.py:78
+msgid "can change advanced settings"
+msgstr "poate schimba setările avansate"
+
+#: models/permissionmodels.py:79
+msgid "can publish"
+msgstr "poate publica"
+
+#: models/permissionmodels.py:80
+msgid "can change permissions"
+msgstr "poate schimba permisiunile"
+
 #: models/permissionmodels.py:80
 msgid "on page level"
 msgstr "la nivel de pagina"
 
+#: models/permissionmodels.py:81
+msgid "can move"
+msgstr "poate mișca"
+
+#: models/permissionmodels.py:82
+msgid "view restricted"
+msgstr "Restricţii de vizualizare"
+
 #: models/permissionmodels.py:82
 msgid "frontend view restriction"
 msgstr ""
+
+#: models/permissionmodels.py:106
+msgid "can recover pages"
+msgstr "poate recupera pagini"
 
 #: models/permissionmodels.py:106
 msgid "can recover any deleted page"
@@ -987,6 +874,10 @@ msgstr "poate recupera orice pagina stearsa"
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
 
+#: models/permissionmodels.py:107
+msgid "sites"
+msgstr "site-uri"
+
 #: models/permissionmodels.py:112
 msgid "Page global permission"
 msgstr "Permisii globale"
@@ -994,6 +885,10 @@ msgstr "Permisii globale"
 #: models/permissionmodels.py:113
 msgid "Pages global permissions"
 msgstr "Permisii globale de pagini"
+
+#: models/permissionmodels.py:124 templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "De acord"
 
 #: models/permissionmodels.py:130
 msgid "Page permission"
@@ -1015,9 +910,33 @@ msgstr "Grup de utilizatori (pagina)"
 msgid "User groups (page)"
 msgstr "Grupuri de utilizatori (pagina)"
 
+#: models/placeholdermodel.py:26
+msgid "slot"
+msgstr "slot"
+
+#: models/placeholdermodel.py:27
+msgid "width"
+msgstr "lăţime"
+
+#: models/pluginmodel.py:75
+msgid "position"
+msgstr "poziţie"
+
+#: models/pluginmodel.py:76 models/titlemodels.py:15
+msgid "language"
+msgstr "limbă"
+
+#: models/pluginmodel.py:77
+msgid "plugin_name"
+msgstr "nume plugin"
+
+#: models/pluginmodel.py:78 models/titlemodels.py:28
+msgid "creation date"
+msgstr "data creării"
+
 #: models/pluginmodel.py:139
 msgid "<Empty>"
-msgstr ""
+msgstr "<Gol>"
 
 #: models/settingmodels.py:13
 msgid "The language for the admin interface and toolbar"
@@ -1039,14 +958,30 @@ msgstr ""
 msgid "by code"
 msgstr ""
 
+#: models/static_placeholder.py:29
+msgid "static placeholder name"
+msgstr ""
+
 #: models/static_placeholder.py:30
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
 msgstr ""
 
+#: models/static_placeholder.py:32
+msgid "placeholder code"
+msgstr ""
+
 #: models/static_placeholder.py:33
 msgid "To render the static placeholder in templates."
+msgstr ""
+
+#: models/static_placeholder.py:34
+msgid "placeholder content"
+msgstr ""
+
+#: models/static_placeholder.py:38
+msgid "creation_method"
 msgstr ""
 
 #: models/static_placeholder.py:44
@@ -1061,6 +996,10 @@ msgstr ""
 msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
+#: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
+msgid "title"
+msgstr "titlu"
+
 #: models/titlemodels.py:18
 msgid "overwrite the title (html title tag)"
 msgstr "Rescrie titlul (tagul html al titlului)"
@@ -1069,9 +1008,33 @@ msgstr "Rescrie titlul (tagul html al titlului)"
 msgid "overwrite the title in the menu"
 msgstr "Rescrie titlul in meniu"
 
+#: models/titlemodels.py:21
+msgid "description"
+msgstr "descriere"
+
 #: models/titlemodels.py:22
 msgid "The text displayed in search engines."
 msgstr ""
+
+#: models/titlemodels.py:23
+msgid "slug"
+msgstr "slug"
+
+#: models/titlemodels.py:24
+msgid "Path"
+msgstr "Calea"
+
+#: models/titlemodels.py:25
+msgid "has url overwrite"
+msgstr "Are suprascrierea URL-ului"
+
+#: models/titlemodels.py:26
+msgid "redirect"
+msgstr "redirecţionare"
+
+#: models/titlemodels.py:31
+msgid "is published"
+msgstr "este publicat"
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
@@ -1099,7 +1062,7 @@ msgstr "Nume de utilizator:"
 #: templates/admin/cms/mail/page_user_change.html:11
 #: templates/admin/cms/mail/page_user_change.txt:6
 msgid "Password:"
-msgstr "Parola:"
+msgstr "Parolă:"
 
 #: templates/admin/cms/page/change_form.html:5
 #: templates/admin/cms/page/close_frame.html:4
@@ -1115,12 +1078,12 @@ msgstr[2] "Te rog corecteaza erorile."
 
 #: templates/admin/cms/page/change_form.html:62
 msgid "All permissions"
-msgstr "Toate permisele"
+msgstr "Toate permisiunile"
 
 #: templates/admin/cms/page/change_form.html:63
 #: templates/admin/cms/page/tree/base.html:80
 msgid "Loading..."
-msgstr "Se incarca ..."
+msgstr "Se incarcă ..."
 
 #: templates/admin/cms/page/change_form.html:75
 #: templates/admin/cms/page/submit_row.html:14
@@ -1243,7 +1206,7 @@ msgstr "A aparut o eroare. Te rog sa reincarci pagina"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
+msgid "Are you sure you want to %s this page?"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:73
@@ -1566,52 +1529,52 @@ msgid ""
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
-#: test_utils/cli.py:139 test_utils/cli.py:150
+#: test_utils/cli.py:140 test_utils/cli.py:151
 msgid "English"
 msgstr "Engleză"
 
-#: test_utils/cli.py:140 test_utils/cli.py:162 test_utils/cli.py:185
+#: test_utils/cli.py:141 test_utils/cli.py:163 test_utils/cli.py:186
 msgid "French"
 msgstr "Franceză"
 
-#: test_utils/cli.py:141 test_utils/cli.py:156 test_utils/cli.py:179
-#: test_utils/cli.py:198
+#: test_utils/cli.py:142 test_utils/cli.py:157 test_utils/cli.py:180
+#: test_utils/cli.py:199
 msgid "German"
 msgstr "Germană"
 
-#: test_utils/cli.py:142 test_utils/cli.py:167
+#: test_utils/cli.py:143 test_utils/cli.py:168
 msgid "Brazilian Portuguese"
 msgstr ""
 
-#: test_utils/cli.py:143 test_utils/cli.py:192
+#: test_utils/cli.py:144 test_utils/cli.py:193
 msgid "Dutch"
 msgstr "Olandeză"
 
-#: test_utils/cli.py:208
+#: test_utils/cli.py:209
 msgid "two columns"
 msgstr "două coloane"
 
-#: test_utils/cli.py:209
+#: test_utils/cli.py:210
 msgid "three columns"
 msgstr "trei coloane"
 
-#: test_utils/cli.py:210
+#: test_utils/cli.py:211
 msgid "navigation examples"
 msgstr "exemple de navigare"
 
-#: test_utils/cli.py:218
+#: test_utils/cli.py:219
 msgid "sidebar column"
 msgstr ""
 
-#: test_utils/cli.py:223
+#: test_utils/cli.py:224
 msgid "left column"
 msgstr ""
 
-#: test_utils/cli.py:228
+#: test_utils/cli.py:229
 msgid "Add a link"
 msgstr ""
 
-#: test_utils/cli.py:234
+#: test_utils/cli.py:235
 msgid "right column"
 msgstr ""
 

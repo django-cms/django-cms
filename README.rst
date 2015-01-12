@@ -1,7 +1,7 @@
 ##########
 django CMS
 ##########
-.. image:: https://api.travis-ci.org/divio/django-cms.svg?branch=develop
+.. image:: https://travis-ci.org/divio/django-cms.svg?branch=support%2F3.0.x
     :target: http://travis-ci.org/divio/django-cms
 .. image:: https://pypip.in/v/django-cms/badge.svg
     :target: https://pypi.python.org/pypi/django-cms/
