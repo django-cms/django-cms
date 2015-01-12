@@ -199,6 +199,12 @@ class ToolbarTests(ToolbarTestBase):
         self.assertNotContains(response, 'cms_form-login')
         self.assertNotContains(response, 'cms_toolbar')
 
+    def test_admin_logout_staff(self):
+        with SettingsOverride(CMS_PERMISSION=True):
+            with self.login_user_context(self.get_staff()):
+                response = self.client.get('/en/admin/logout/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                self.assertTrue(response.status_code, 200)
+
     def test_show_toolbar_without_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)
