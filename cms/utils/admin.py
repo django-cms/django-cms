@@ -25,9 +25,9 @@ def jsonify_request(response):
     """
     content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
     if DJANGO_1_4:
-        return HttpResponse(json.dumps(content), mimetype="text/html; charset=utf-8")
+        return HttpResponse(json.dumps(content), mimetype="application/json")
     else:
-        return HttpResponse(json.dumps(content), content_type="text/html; charset=utf-8")
+        return HttpResponse(json.dumps(content), content_type="application/json")
 
 
 publisher_classes = {
