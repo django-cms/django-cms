@@ -1202,8 +1202,8 @@ msgstr "Došlo je do greške. Molimo osvježite stranicu"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Da li želite %%s ovu stranicu?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Da li želite %s ovu stranicu?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

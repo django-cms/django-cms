@@ -1208,8 +1208,8 @@ msgstr "Сталась помилка. Будь-ласка, перезавант
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Ви дійсно впевнені, що хочете %%s цю сторінку?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Ви дійсно впевнені, що хочете %s цю сторінку?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

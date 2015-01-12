@@ -1201,7 +1201,7 @@ msgstr "發生一個錯誤。請重新載入網頁"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
+msgid "Are you sure you want to %s this page?"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:73

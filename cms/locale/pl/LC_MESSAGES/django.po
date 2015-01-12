@@ -1213,8 +1213,8 @@ msgstr "Wystąpił błąd. Proszę przeładować stronę."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Czy na pewno chesz %%s tę stronę?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Czy na pewno chesz %s tę stronę?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

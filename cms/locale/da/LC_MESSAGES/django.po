@@ -1205,8 +1205,8 @@ msgstr "Der er sket en fejl. Genindlæs venligst siden."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Er du sikker på at du vil %%s denne side?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Er du sikker på at du vil %s denne side?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

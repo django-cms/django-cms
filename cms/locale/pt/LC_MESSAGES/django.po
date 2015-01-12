@@ -1205,8 +1205,8 @@ msgstr "Ocorreu um erro. Por favor, recarrege a página"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Confirma que pretende %%s esta página?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Confirma que pretende %s esta página?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

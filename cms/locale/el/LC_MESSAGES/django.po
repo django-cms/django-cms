@@ -1205,8 +1205,8 @@ msgstr "Κάποιο σφάλμα συνέβει. Παρακαλώ ανανεώ�
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Είσαι σίγουρος να διαγράψεις αυτή %%s  την σελίδας?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Είσαι σίγουρος να διαγράψεις αυτή %s  την σελίδας?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

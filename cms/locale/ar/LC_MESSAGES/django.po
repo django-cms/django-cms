@@ -1210,8 +1210,8 @@ msgstr "حدث خطأ ما. الرجاء إعادة تحميل الصفحة."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "هل أنت متأكد أنك تريد  %%s لهذه الصفحة؟"
+msgid "Are you sure you want to %s this page?"
+msgstr "هل أنت متأكد أنك تريد  %s لهذه الصفحة؟"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

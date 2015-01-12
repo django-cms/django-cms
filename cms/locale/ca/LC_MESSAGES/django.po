@@ -1202,8 +1202,8 @@ msgstr "S'ha produït un error. Si us plau, torneu a carregar la pàgina"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Segur que voleu %%s aquesta pàgina?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Segur que voleu %s aquesta pàgina?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

@@ -1207,8 +1207,8 @@ msgstr "خطایی رخ داد. صفحه با دوباره بارگذاری کن
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "شما مطمئنید می خواهید این صفحه  %%s کنید ؟"
+msgid "Are you sure you want to %s this page?"
+msgstr "شما مطمئنید می خواهید این صفحه  %s کنید ؟"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

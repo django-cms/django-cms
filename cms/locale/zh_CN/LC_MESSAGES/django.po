@@ -1208,8 +1208,8 @@ msgstr "发生错误，请刷新当前页面"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "您确定您想 %%s 当前页面吗？"
+msgid "Are you sure you want to %s this page?"
+msgstr "您确定您想 %s 当前页面吗？"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

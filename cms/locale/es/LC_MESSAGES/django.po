@@ -1211,8 +1211,8 @@ msgstr "Ha ocurrido un error, por favor recarge la página"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "¿Está seguro de que desea %%s esta página?"
+msgid "Are you sure you want to %s this page?"
+msgstr "¿Está seguro de que desea %s esta página?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

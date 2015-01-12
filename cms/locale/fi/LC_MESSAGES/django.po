@@ -1204,8 +1204,8 @@ msgstr "Virhe tapahtui. Ole hyvä ja lataa sivu uudestaan."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Haluatko varmasti %%s tämän sivun?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Haluatko varmasti %s tämän sivun?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

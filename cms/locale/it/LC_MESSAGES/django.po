@@ -1213,8 +1213,8 @@ msgstr "Si è verificato un errore. Per favore, ricarica la pagina"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Confermi di voler %%s questa pagina?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Confermi di voler %s questa pagina?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

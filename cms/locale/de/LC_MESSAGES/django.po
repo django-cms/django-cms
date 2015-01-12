@@ -1212,8 +1212,8 @@ msgstr "Ein Fehler ist aufgetreten. Bitte laden Sie die Seite neu."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Sind sie sicher, dass sie diese Seite %%s wollen?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Sind sie sicher, dass sie diese Seite %s wollen?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

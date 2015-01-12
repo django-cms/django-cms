@@ -1214,8 +1214,8 @@ msgstr "Возникла ошибка. Пожалуйста перезагруз
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Вы уверены, что хотите эту страницу %%s?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Вы уверены, что хотите эту страницу %s?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format

@@ -1216,8 +1216,8 @@ msgstr "Er is een fout opgetreden. Herlaad a.u.b. de pagina."
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %%s this page?"
-msgstr "Weet u zeker dat u deze pagina wilt %%s?"
+msgid "Are you sure you want to %s this page?"
+msgstr "Weet u zeker dat u deze pagina wilt %s?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format
