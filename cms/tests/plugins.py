@@ -1580,3 +1580,45 @@ class BrokenPluginTests(TestCase):
                 plugin_pool.discovered = False
                 self.assertRaises(ImportError, plugin_pool.discover_plugins)
 
+class MTIPluginsTestCase(PluginsTestBaseCase):
+    def test_add_edit_plugin(self):
+        from cms.test_utils.project.mti_pluginapp.models import TestPluginBetaModel
+
+        """
+        Test that we can instantiate and use a MTI plugin
+        """
+
+        # Create a page
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        # Add the MTI plugin
+        plugin_data = {
+            'plugin_type': "TestPluginBeta",
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEqual(response.status_code, 200)
+        plugin_id = self.get_response_pk(response)
+        self.assertEqual(plugin_id, CMSPlugin.objects.all()[0].pk)
+
+        # Test we can open the change form for the MTI plugin
+        edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT, plugin_id)
+        response = self.client.get(edit_url)
+        self.assertEqual(response.status_code, 200)
+
+        # Edit the MTI plugin
+        data = {
+            "alpha": "ALPHA",
+            "beta": "BETA"
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEqual(response.status_code, 200)
+
+        # Test that the change was properly stored in the DB
+        plugin_model = TestPluginBetaModel.objects.all()[0]
+        self.assertEqual("ALPHA", plugin_model.alpha)
+        self.assertEqual("BETA", plugin_model.beta)
