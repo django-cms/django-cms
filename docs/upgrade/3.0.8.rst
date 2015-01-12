@@ -8,7 +8,7 @@
 What's new in 3.0.8
 *******************
 
-* Add :settings:`require_parent <CMS_PLACEHOLDER_CONF>`_ option to ``CMS_PLACEHOLDER_CONF``
+* Add :setting:`require_parent <CMS_PLACEHOLDER_CONF>` option to ``CMS_PLACEHOLDER_CONF``
 
 Bug Fixes
 =========
