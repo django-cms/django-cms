@@ -661,7 +661,7 @@ class CMSToolbar(RenderBlock):
         # render JS
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)
-        if toolbar:
+        if toolbar and request.user.is_staff:
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
@@ -685,7 +685,8 @@ class CMSToolbar(RenderBlock):
         if not toolbar.show_toolbar:
             return rendered_contents
         # render the toolbar content
-        request.toolbar.post_template_populate()
+        if toolbar and request.user.is_staff:
+            request.toolbar.post_template_populate()
         with force_language(language):
             context['clipboard'] = clipboard
             content = render_to_string('cms/toolbar/toolbar.html', context)
