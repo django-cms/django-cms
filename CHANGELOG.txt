@@ -308,3 +308,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 === 3.0.9 (2015-01-11) ===
 - Revert a change that caused a regression in toolbar login
+- Fix an error in a translated phrase
+- Fix error when moving items in the page tree
+
