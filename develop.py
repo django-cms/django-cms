@@ -10,7 +10,7 @@ import os
 import sys
 import warnings
 
-from StringIO import StringIO
+from six import StringIO
 
 from django import VERSION
 from django.core.exceptions import DjangoRuntimeWarning
@@ -331,8 +331,7 @@ def main():
             }
 
             if args['test']:
-                configs['SESSION_ENGINE'] = ""
-                "django.contrib.sessions.backends.cache"
+                configs['SESSION_ENGINE'] = "django.contrib.sessions.backends.cache"
 
             # Command line option takes precedent over environment variable
             auth_user_model = args['--user']
