@@ -1116,6 +1116,7 @@ class RenderPlaceholder(AsTag):
         request = context.get('request', None)
         placeholder = kwargs.get('placeholder')
         width = kwargs.get('width')
+        nocache = kwargs.get('nocache', False)
         language = kwargs.get('language')
 
         if not request:
@@ -1125,7 +1126,8 @@ class RenderPlaceholder(AsTag):
         if not hasattr(request, 'placeholders'):
             request.placeholders = []
         request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language, editable=editable))
+        return safe(placeholder.render(context, width, lang=language,
+                                       editable=editable, use_cache=not nocache))
 
     def get_value_for_context(self, context, **kwargs):
         return self._get_value(context, editable=False, **kwargs)
@@ -1135,6 +1137,20 @@ class RenderPlaceholder(AsTag):
 
 register.tag(RenderPlaceholder)
 
+
+class RenderUncachedPlaceholder(RenderPlaceholder):
+    """
+    Uncached version of RenderPlaceholder
+    This templatetag will neither get the result from cache, nor will update
+    the cache value for the given placeholder
+    """
+    name = 'render_uncached_placeholder'
+
+    def _get_value(self, context, editable=True, **kwargs):
+        kwargs['nocache'] = True
+        return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
+
+register.tag(RenderUncachedPlaceholder)
 
 NULL = object()
 
