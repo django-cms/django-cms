@@ -4,7 +4,6 @@ from os.path import join
 
 from django.conf import settings
 from django.contrib.auth import get_permission_codename
-from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -1249,9 +1248,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         previous_revision = previous_version.revision
 
         clean = self._apply_revision(previous_revision)
-        if clean:
-            return Page.objects.get(self.pk)
-        return Page.objects.get(self.pk), clean
+        return Page.objects.get(pk=self.pk), clean
 
     def redo(self):
         """
@@ -1278,7 +1275,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         next_revision = previous_version.revision
 
         clean = self._apply_revision(next_revision)
-        return Page.objects.get(self.pk), clean
+        return Page.objects.get(pk=self.pk), clean
 
     def _apply_revision(self, target_revision):
         """
