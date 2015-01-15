@@ -14,13 +14,6 @@ else:
 register = template.Library()
 
 
-@register.filter
-def js(value):
-    warnings.warn("The template filter '...|js' is vulnerable to XSS attacks, please use '...|json' instead.",
-                  DeprecationWarning, stacklevel=2)
-    return json.dumps(value, cls=DjangoJSONEncoder)
-
-
 @register.filter('json')
 def json_filter(value):
     """
