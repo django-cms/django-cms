@@ -4,7 +4,7 @@
 Running and writing tests
 #########################
 
-Good code needs tests. 
+Good code needs tests.
 
 A project like django CMS simply can't afford to incorporate new code that
 doesn't come with its own tests.
@@ -32,21 +32,67 @@ There's more than one way to do this, but here's one to help you get started::
 
     # create a virtual environment
     virtualenv test-django-cms
-    # activate it 
+
+    # activate it
     cd test-django-cms/
     source bin/activate
+
     # get django CMS from GitHub
     git clone git@github.com:divio/django-cms.git
+
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
-    pip install -r django-cms/test_requirements/django-1.4.txt 
+    pip install -Ur django-cms/test_requirements/django-1.6.txt
+
     # run the test suite
+    # note that you must be in the django-cms directory when you do this,
+    # otherwise you'll get "Template not found" errors
+    cd django-cms
     python develop.py test
 
-It can take a few minutes to run.
+
+It can take a few minutes to run. Note that the selenium tests included in the
+test suite require that you have Firefox installed.
 
 When you run tests against your own new code, don't forget that it's useful to
 repeat them for different versions of Python and Django.
+
+Problems running the tests
+==========================
+
+We are working to improve the performance and reliability of our test suite. We're aware of certain
+problems, but need feedback from people using a wide range of systems and configurations in order
+to benefit from their experience.
+
+Please use the open issue `#3684 Test suite is error-prone
+<https://github.com/divio/django-cms/issues/3684>`_ on our GitHub repository to report such
+problems.
+
+If you can help *improve* the test suite, your input will be especially valuable.
+
+OS X users
+----------
+
+In some versions of OS X, getttext needs to be installed so that it is
+available to Django. If you run the tests and find that various tests in
+``cms.tests.frontend`` and ``cms.tests.reversion_tests.ReversionTestCase``
+raise errors, it's likely that you have this problem.
+
+A solution is::
+
+    brew install gettext && brew link --force gettext
+
+(This requires the installation of `Homebrew <http://brew.sh>`_)
+
+ERROR: test_copy_to_from_clipboard (cms.tests.frontend.PlaceholderBasicTests)
+-----------------------------------------------------------------------------
+
+You may find that a single frontend test raises an error. This sometimes happens, for some users,
+when the entire suite is run. To work around this you can invoke the test class on its own::
+
+    develop.py test cms.PlaceholderBasicTests
+
+and it should then run without errors.
 
 Advanced testing options
 ========================
@@ -163,7 +209,7 @@ What we need
 ============
 
 We have a wide and comprehensive library of unit-tests and integration tests
-with good coverage. 
+with good coverage.
 
 Generally tests should be:
 
@@ -176,4 +222,3 @@ Generally tests should be:
   it wrong.
 * Easy to understand. If your test code isn't obvious, please add comments on
   what it's doing.
-  

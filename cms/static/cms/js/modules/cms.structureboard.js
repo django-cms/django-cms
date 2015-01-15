@@ -316,6 +316,7 @@ $(document).ready(function () {
 			var id = null;
 			var area = null;
 			var min = null;
+			var areaParentOffset = null;
 
 			// start calculating
 			this.placeholders.each(function (index, item) {
@@ -327,9 +328,13 @@ $(document).ready(function () {
 				item.height(area.outerHeight(true));
 				// set min width
 				min = (item.width()) ? 0 : 150;
+				// as area is "css positioned" and jquery offset function is relative to the
+				// document (not the first relative/absolute parent) we need to substract
+				// first relative/absolute parent offset.
+				areaParentOffset = $(area).offsetParent().offset();
 				area.css({
-					'top': item.offset().top - 5,
-					'left': item.offset().left - min,
+					'top': item.offset().top - areaParentOffset.top - 5,
+					'left': item.offset().left - areaParentOffset.left - min,
 					'width': item.width() + min
 				});
 			});

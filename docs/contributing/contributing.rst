@@ -16,7 +16,7 @@ Key points:
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@django-cms.org`_.
 
-        Please don't raise it on:
+        Please **do not** raise it on:
 
         * IRC
         * GitHub
@@ -24,6 +24,7 @@ Key points:
 
         or in any other public forum until we have had a chance to deal with it.
 
+..  _community-resources:
 
 *********
 Community
@@ -52,7 +53,6 @@ only for the stuff we host on GitHub:
 #. When you feel your code is good enough for inclusion, "send us a `pull
    request`_", by using the nice GitHub web interface.
 
-
 *****************
 Contributing Code
 *****************
@@ -79,9 +79,11 @@ The `GitHub help`_ is very well written and will get you started on using git
 and GitHub in a jiffy. It is an invaluable resource for newbies and old timers
 alike.
 
-
 Syntax and conventions
 ======================
+
+Python
+------
 
 We try to conform to `PEP8`_ as much as possible. A few highlights:
 
@@ -91,9 +93,14 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
   is "it should look good in a terminal-base editor" (eg vim), but we try not be
   [Godwin's law] about it.
 
-It is worth to mention that we use **tabs** within HTML, SASS/SCSS and JavaScript.
-Please refrain from using spaces anywhere except if it helps code readability.
+HTML, CSS and JavaScript
+------------------------
 
+As of django CMS 3.1, we will use spaces within frontend code, not tabs as previously. In the
+meantime, please continue using tabs - all tabs will be converted to spaces in a single commit
+for 3.1.
+
+Frontend code should be formatted for readability. If in doubt, follow existing examples, or ask.
 
 Process
 =======
@@ -107,7 +114,7 @@ This is how you fix a bug or add a feature:
 #. Open a pull request.
 
 And at any point in that process, you can add: *discuss discuss discuss*,
-because it's always useful for everyone to pass ideas around and look at thngs
+because it's always useful for everyone to pass ideas around and look at things
 together.
 
 :ref:`testing` is really important: a pull request that lowers our testing
@@ -118,7 +125,6 @@ that the fix works.
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
 
-
 **************************
 Contributing Documentation
 **************************
@@ -127,8 +133,8 @@ Perhaps considered "boring" by hard-core coders, documentation is sometimes even
 more important than code! This is what brings fresh blood to a project, and
 serves as a reference for old timers. On top of this, documentation is the one
 area where less technical people can help most - you just need to write
-semi-decent English. People need to understand you. We don't care about style or
-correctness.
+simple, unfussy English. Elegance of style is a secondary consideration, and
+your prose can be improved later if necessary.
 
 Documentation should be:
 
@@ -138,6 +144,7 @@ Documentation should be:
 - accessible - you should assume the reader to be moderately familiar with
   Python and Django, but not anything else. Link to documentation of libraries
   you use, for example, even if they are "obvious" to you
+- wrapped at 100 characters per line
 
 Merging documentation is pretty fast and painless.
 
@@ -208,6 +215,21 @@ Inline markup
 * use strong emphasis - ``**Add page**`` around:
     * buttons that perform an action
 
+Rules for using technical words
+-------------------------------
+
+There should be one consistent way of rendering any technical word, depending on its context.
+Please follow these rules:
+
+* in general use, simply use the word as if it were any ordinary word, with no capitalisation or
+  highlighting: "Your placeholder can now be used."
+* at the start of sentences or titles, capitalise in the usual way: "Placeholder management guide"
+* when introducing the term for the the first time, or for the first time in a document, you may
+  highlight it to draw attention to it: "**Placeholders** are special model fields".
+* when the word refers specifically to an object in the code, highlight it as a literal:
+  "``Placeholder`` methods can be overwritten as required" - when appropriate, link the term to
+  further reference documentation as well as simply highlighting it.
+
 References
 ----------
 
@@ -223,7 +245,6 @@ For translators we have a `Transifex account
 <https://www.transifex.com/projects/p/django-cms/>`_ where you can translate
 the .po files and don't need to install git or mercurial to be able to
 contribute. All changes there will be automatically sent to the project.
-
 
     .. raw:: html
 

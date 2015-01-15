@@ -56,7 +56,7 @@ For the purposes of this tutorial, it's recommended that you answer the
 installer's questions as follows - where our suggestions differ from the
 default, they're highlighted below:
 
-* Database configuration (in URL format) [default sqlite://localhost/project.db]:
+* Database configuration (in URL format): sqlite://localhost/project.db
 * django CMS version: stable
 * Django version: **1.6**
 * Activate Django I18N / L10N setting: yes

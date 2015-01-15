@@ -17,6 +17,15 @@ guidance of a **technical board**.
 
 All activity in the community is governed by our :doc:`code_of_conduct`.
 
+.. toctree::
+    :maxdepth: 2
+
+    development
+    contributing
+    management
+    testing
+    code_of_conduct
+
 *************
 Branch policy
 *************
@@ -29,14 +38,6 @@ Branch policy
 
 If in doubt, ask on the #django-cms IRC channel on `freenode`_ or the
 `django-cms-developers`_ email list!
-
-.. toctree::
-    :maxdepth: 2
-
-    development
-    contributing
-    testing
-    code_of_conduct
 
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/
