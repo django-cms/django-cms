@@ -39,37 +39,23 @@ class CMSToolbar(ToolbarAPIMixin):
         self.populated = False
         self.post_template_populated = False
         self.menus = {}
-        self.request = request
-        self.login_form = CMSToolbarLoginForm(request=request)
-        self.is_staff = self.request.user.is_staff
-        self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
+        self.obj = None
+        self.redirect_url = None
+        self.request = None
+        self.is_staff = None
+        self.edit_mode = None
         self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         self.disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
-        self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
-        self.use_draft = self.is_staff and self.edit_mode or self.build_mode
-        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
-        if self.request.session.get('cms_toolbar_disabled', False):
-            self.show_toolbar = False
-        self.obj = None
-        self.redirect_url = None
-        if settings.USE_I18N:
-            self.language = get_language_from_request(request)
-        else:
-            self.language = settings.LANGUAGE_CODE
-
-        # We need to store the current language in case the user's preferred language is different.
-        self.toolbar_language = self.language
-
-        user_settings = self.get_user_settings()
-        if user_settings:
-            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
-                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
-                self.toolbar_language = user_settings.language
-            else:
-                user_settings.language = self.language
-                user_settings.save()
-            self.clipboard = user_settings.clipboard
+        self.build_mode = None
+        self.use_draft = None
+        self.show_toolbar = None
+        self.login_form = None
+        self.clipboard = None
+        self.language = None
+        self.toolbar_language = None
+        self.show_toolbar = True
+        self.init_toolbar(request)
 
         with force_language(self.language):
             try:
@@ -103,6 +89,38 @@ class CMSToolbar(ToolbarAPIMixin):
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, toolbars[key].check_current_app(key, self.app_name), self.app_name)
             self.toolbars[key] = toolbar
+
+    def init_toolbar(self, request):
+        self.request = request
+        self.is_staff = self.request.user.is_staff
+        self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
+        self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
+        self.use_draft = self.is_staff and self.edit_mode or self.build_mode
+        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.login_form = CMSToolbarLoginForm(request=request)
+        if self.request.session.get('cms_toolbar_disabled', False):
+            self.show_toolbar = False
+        if settings.USE_I18N:
+            self.language = get_language_from_request(request)
+        else:
+            self.language = settings.LANGUAGE_CODE
+
+        # We need to store the current language in case the user's preferred language is different.
+        self.toolbar_language = self.language
+
+        user_settings = self.get_user_settings()
+        if user_settings:
+            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
+                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
+                self.toolbar_language = user_settings.language
+            else:
+                user_settings.language = self.language
+                user_settings.save()
+            self.clipboard = user_settings.clipboard
+
+        if hasattr(self, 'toolbars'):
+            for key, toolbar in self.toolbars.items():
+                self.toolbars[key].request = self.request
 
     def get_user_settings(self):
         user_settings = None

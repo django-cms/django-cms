@@ -655,6 +655,7 @@ class CMSToolbar(RenderBlock):
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)
         if toolbar:
+            toolbar.init_toolbar(request)
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
