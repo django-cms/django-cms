@@ -14,7 +14,7 @@ generate menus and more.
 
 You can define multiple templates, with different layouts or built-in
 components, and choose them for each page as required. A page's template
-switched for another at any time.
+can be switched for another at any time.
 
 You'll find the site's templates in ``mysite/templates``. If you didn't change
 the automatically-created home page's template, it's ``feature.html``.

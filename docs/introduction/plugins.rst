@@ -2,7 +2,7 @@
 Plugins
 #######
 
-In this tutorial we're going to take a Django poll app and integrate it intoœ the CMS.
+In this tutorial we're going to take a Django poll app and integrate it into the CMS.
 
 Install the polls app
 #####################
@@ -104,7 +104,7 @@ So our workspace looks like this::
 The Plugin Model
 ================
 
-In your poll application’s ``models.py`` add the following:
+In your poll application’s ``models.py`` add the following::
 
     from django.db import models
     from cms.models import CMSPlugin
@@ -120,7 +120,7 @@ In your poll application’s ``models.py`` add the following:
 .. note::
 
     django CMS plugins inherit from :class:`cms.models.CMSPlugin` (or a
-    subclass thereof) and not :class:`models.Mod el <django.db.models.Model>`.
+    subclass thereof) and not :class:`models.Model <django.db.models.Model>`.
 
 The Plugin Class
 ================
@@ -129,11 +129,11 @@ Now create a file ``cms_plugins.py`` in the same folder your models.py is in.
 The plugin class is responsible for providing django CMS with the necessary
 information to render your plugin.
 
-For our poll plugin, we're going to write the following plugin class:
+For our poll plugin, we're going to write the following plugin class::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from djangocms_polls.models import PollPlugin
+    from polls_plugin.models import PollPlugin
     from django.utils.translation import ugettext as _
 
 
@@ -183,7 +183,7 @@ something like this::
         <input type="submit" value="Vote" />
     </form>
 
-Now add ``djangocms_polls`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
+Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
 
     python manage.py schemamigration polls_plugin --init
     python manage.py migrate polls_plugin

@@ -244,12 +244,6 @@ clause.
 
 .. warning::
 
-    :class:`cms.models.pluginmodel.CMSPlugin` subclasses cannot be further
-    subclassed at the moment. In order to make your plugin models reusable,
-    please use abstract base models.
-
-.. warning::
-
     You cannot name your model fields the same as any installed plugins lower-
     cased model name, due to the implicit one-to-one relation Django uses for
     subclassed models. If you use all core plugins, this includes: ``file``,

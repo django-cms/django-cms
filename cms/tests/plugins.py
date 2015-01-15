@@ -51,7 +51,7 @@ from djangocms_link.forms import LinkForm
 from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
-from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
+from djangocms_text_ckeditor.utils import plugin_tags_to_id_list, plugin_to_tag
 
 
 @contextmanager
@@ -261,6 +261,63 @@ class PluginsTestCase(PluginsTestBaseCase):
             '&lt;script&gt;var bar="hacked"&lt;/script&gt;'
         )
 
+    def test_copy_plugins_method(self):
+        """
+        Test that CMSPlugin copy does not have side effects
+        """
+        # create some objects
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
+        ph_en = page_en.placeholders.get(slot="body")
+        ph_de = page_de.placeholders.get(slot="body")
+
+        # add the text plugin
+        text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
+        self.assertEqual(text_plugin_en.pk, CMSPlugin.objects.all()[0].pk)
+
+        # add a *nested* link plugin
+        link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
+                                        name="A Link", url="https://www.django-cms.org")
+        #
+        text_plugin_en.body += plugin_to_tag(link_plugin_en)
+        text_plugin_en.save()
+
+        # the call above to add a child makes a plugin reload required here.
+        text_plugin_en = self.reload(text_plugin_en)
+
+        # setup the plugins to copy
+        plugins = [text_plugin_en, link_plugin_en]
+        # save the old ids for check
+        old_ids = [plugin.pk for plugin in plugins]
+        new_plugins = []
+        plugins_ziplist = []
+        old_parent_cache = {}
+
+        # This is a stripped down version of cms.copy_plugins.copy_plugins_to
+        # to low-level testing the copy process
+        for plugin in plugins:
+            new_plugins.append(plugin.copy_plugin(ph_de, 'de', old_parent_cache))
+            plugins_ziplist.append((new_plugins[-1], plugin))
+
+        for idx, plugin in enumerate(plugins):
+            inst, _ = new_plugins[idx].get_plugin_instance()
+            new_plugins[idx] = inst
+            new_plugins[idx].post_copy(plugin, plugins_ziplist)
+
+        for idx, plugin in enumerate(plugins):
+            # original plugin instance reference should stay unmodified
+            self.assertEqual(old_ids[idx], plugin.pk)
+            # new plugin instance should be different from the original
+            self.assertNotEqual(new_plugins[idx], plugin.pk)
+
+            # text plugins (both old and new) should contain a reference
+            # to the link plugins
+            if plugin.plugin_type == 'TextPlugin':
+                self.assertTrue('link.png' in plugin.body)
+                self.assertTrue('plugin_obj_%s' % plugin.get_children()[0].pk in plugin.body)
+                self.assertTrue('link.png' in new_plugins[idx].body)
+                self.assertTrue('plugin_obj_%s' % new_plugins[idx].get_children()[0].pk in new_plugins[idx].body)
+
     def test_copy_plugins(self):
         """
         Test that copying plugins works as expected.
@@ -361,7 +418,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         mcol1 = self.reload(mcol1)
         self.assertEqual(mcol1.get_descendants().count(), 2)
 
-        with self.assertNumQueries(FuzzyInt(0, 200)):
+        with self.assertNumQueries(FuzzyInt(0, 207)):
             page_en.publish('en')
 
     def test_plugin_validation(self):
@@ -1435,3 +1492,45 @@ class BrokenPluginTests(TestCase):
                 plugin_pool.discovered = False
                 self.assertRaises(ImportError, plugin_pool.discover_plugins)
 
+class MTIPluginsTestCase(PluginsTestBaseCase):
+    def test_add_edit_plugin(self):
+        from cms.test_utils.project.mti_pluginapp.models import TestPluginBetaModel
+
+        """
+        Test that we can instantiate and use a MTI plugin
+        """
+
+        # Create a page
+        page_data = self.get_new_page_data()
+        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        page = Page.objects.all()[0]
+
+        # Add the MTI plugin
+        plugin_data = {
+            'plugin_type': "TestPluginBeta",
+            'plugin_language': settings.LANGUAGES[0][0],
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        self.assertEqual(response.status_code, 200)
+        plugin_id = self.get_response_pk(response)
+        self.assertEqual(plugin_id, CMSPlugin.objects.all()[0].pk)
+
+        # Test we can open the change form for the MTI plugin
+        edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT, plugin_id)
+        response = self.client.get(edit_url)
+        self.assertEqual(response.status_code, 200)
+
+        # Edit the MTI plugin
+        data = {
+            "alpha": "ALPHA",
+            "beta": "BETA"
+        }
+        response = self.client.post(edit_url, data)
+        self.assertEqual(response.status_code, 200)
+
+        # Test that the change was properly stored in the DB
+        plugin_model = TestPluginBetaModel.objects.all()[0]
+        self.assertEqual("ALPHA", plugin_model.alpha)
+        self.assertEqual("BETA", plugin_model.beta)

@@ -29,6 +29,7 @@ from django.db import router
 from django.http import HttpResponseRedirect
 
 from cms.utils import copy_plugins, permissions
+from cms.utils.compat import DJANGO_1_4
 from cms.utils.i18n import get_language_list
 from cms.utils.transaction import wrap_transaction
 
@@ -303,7 +304,10 @@ class PlaceholderAdminMixin(object):
             )
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+        if DJANGO_1_4:
+            return HttpResponse(json.dumps(json_response), mimetype='application/json')
+        else:
+            return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
@@ -443,7 +447,10 @@ class PlaceholderAdminMixin(object):
                 x += 1
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+        if DJANGO_1_4:
+            return HttpResponse(json.dumps(json_response), mimetype='application/json')
+        else:
+            return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):

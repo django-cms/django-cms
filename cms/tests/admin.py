@@ -79,6 +79,14 @@ class AdminTestsBase(CMSTestCase):
 
 class AdminTestCase(AdminTestsBase):
 
+    def test_extension_not_in_admin(self):
+        admin_user, staff = self._get_guys()
+        with self.login_user_context(admin_user):
+            request = self.get_request('/admin/cms/page/1/', 'en',)
+            response = site.index(request)
+            self.assertNotContains(response, '/mytitleextension/')
+            self.assertNotContains(response, '/mypageextension/')
+
     def test_permissioned_page_list(self):
         """
         Makes sure that a user with restricted page permissions can view
@@ -312,7 +320,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 405)):
+            with self.assertNumQueries(FuzzyInt(300, 407)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
@@ -329,7 +337,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 392)):
+            with self.assertNumQueries(FuzzyInt(300, 394)):
                 response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 

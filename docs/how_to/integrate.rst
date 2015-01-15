@@ -13,8 +13,8 @@ Requirements
 ************
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
-* `Django`_ 1.6.x or 1.7.x
-* `South`_ 1.0.1 (Only required for Django 1.6.x)
+* `Django`_ 1.4.5, 1.5.x, 1.6.x or 1.7.x
+* `South`_ 1.0.1 or higher (Only required up to Django 1.6)
 * `django-classy-tags`_ 0.5 or higher
 * `django-treebeard`_ 2.0
 * `django-sekizai`_ 0.7 or higher
@@ -45,7 +45,7 @@ minimal additional configuration and are well-proven.
 Text Editors
 ------------
 
-* `Django CMS CKEditor`_ for a WYSIWYG editor 2.1.1 or higher
+* `Django CMS CKEditor`_ for a WYSIWYG editor 2.4.0 or higher
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
@@ -139,7 +139,7 @@ its dependencies:
     # lock-in their version, specify them
     Django>=1.7
 
-    South==1.0.1 # Only needed for Django < 1.7
+    South==1.0.2 # Only needed for Django < 1.7
     django-treebeard==2.0
     django-sekizai==0.7
     django-classy-tags==0.5
@@ -149,9 +149,9 @@ its dependencies:
 
     # Optional, recommended packages
     Pillow>=2
-    django-filer==0.9.8
+    django-filer==0.9.9
     cmsplugin-filer==0.10.1
-    django-reversion==1.8
+    django-reversion==1.8.5
 
 .. note::
 
@@ -310,7 +310,7 @@ This includes django CMS itself as well as its dependenices and
 other highly recommended applications/libraries::
 
     'cms',  # django CMS itself
-    'treebeard',  # utilities for implementing a tree using materialised paths
+    'treebeard',  # utilities for implementing a tree
     'menus',  # helper for model independent hierarchical website navigation
     'south',  # Only needed for Django < 1.7
     'sekizai',  # for javascript and css management
@@ -375,8 +375,6 @@ and add it to :setting:`django:INSTALLED_APPS`:
 
 * ``'reversion'``
 
-.. _django-reversion: https://github.com/etianen/django-reversion
-
 You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_CLASSES`
 at the right position::
 
@@ -386,7 +384,6 @@ at the right position::
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.doc.XViewMiddleware',
         'django.middleware.common.CommonMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
@@ -497,6 +494,27 @@ setting should look like::
     }
 
 
+Given django CMS's support for Django 1.6.x, Django 1.7 (or later) users have to
+specify where the migrations are situated using the ``MIGRATION_MODULES``
+setting::
+
+    MIGRATION_MODULES = {
+        'cms': 'cms.migrations_django',
+        'menus': 'menus.migrations_django',
+
+        # Add also the following modules if you're using these plugins:
+        'djangocms_file': 'djangocms_file.migrations_django',
+        'djangocms_flash': 'djangocms_flash.migrations_django',
+        'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
+        'djangocms_inherit': 'djangocms_inherit.migrations_django',
+        'djangocms_link': 'djangocms_link.migrations_django',
+        'djangocms_picture': 'djangocms_picture.migrations_django',
+        'djangocms_snippet': 'djangocms_snippet.migrations_django',
+        'djangocms_teaser': 'djangocms_teaser.migrations_django',
+        'djangocms_video': 'djangocms_video.migrations_django',
+        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+    }
+
 URL configuration
 =================
 
@@ -600,14 +618,13 @@ as the last thing before the closing ``</head>`` HTML tag and the
 HTML tag.
 
 
-.. _django-sekizai: https://github.com/ojii/django-sekizai
-
 Initial database setup
 ======================
 
 django CMS uses Django 1.7's built-in support for database migrations to manage
-creating and altering database tables. django CMS still offers South-style migrations
-for users of Django 1.6.x but as noted above, strictly requires South==1.0.1.
+creating and altering database tables. django CMS still offers South-style
+migrations for users of Django up to 1.6 but as noted above, strictly requires
+South>=1.0.1 in this case.
 
 Fresh install
 -------------

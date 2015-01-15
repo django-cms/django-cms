@@ -100,10 +100,10 @@ class PageSelectWidget(MultiWidget):
     };
     var handlePageChange = function(page_id) {
         if (page_id) {
-            $("#id_%(name)s_2 option").removeAttr('selected');
-            $("#id_%(name)s_2 option[value=" + page_id + "]").attr('selected','selected');
+            $("#id_%(name)s_2 option").prop('selected', false);
+            $("#id_%(name)s_2 option[value=" + page_id + "]").prop('selected', true);
         } else {
-            $("#id_%(name)s_2 option[value=]").attr('selected','selected');
+            $("#id_%(name)s_2 option[value=]").prop('selected', true);
         };
     };
     $("#id_%(name)s_0").change(function(){
@@ -181,7 +181,7 @@ class PageSmartLinkWidget(TextInput):
             }
         });
     })
-})(django.jQuery);
+})(CMS.$);
 </script>''' % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
@@ -198,7 +198,7 @@ class PageSmartLinkWidget(TextInput):
             'all': ('cms/js/select2/select2.css',
                     'cms/js/select2/select2-bootstrap.css',)
         }
-        js = (#'cms/js/libs/jquery.min.js',
+        js = ('cms/js/modules/cms.base.js',
               'cms/js/select2/select2.js',)
 
 
