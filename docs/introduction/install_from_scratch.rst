@@ -46,6 +46,10 @@ Django project called ``mysite``::
 
     djangocms -p . mysite
 
+.. warning:: be aware that the directory provided as ``-p`` is the project root
+             directory (the one that will hold the ``manage.py`` file), that it
+             must be empty and in case of a failed installation will be removed.
+
 Windows users may need to do a little extra to make sure Python files are associated correctly if that doesn't work right away::
 
     assoc .py=Python.file
