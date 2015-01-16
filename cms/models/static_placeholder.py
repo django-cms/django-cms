@@ -2,6 +2,7 @@ import uuid
 
 from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.copy_plugins import copy_plugins_to
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -74,12 +75,11 @@ class StaticPlaceholder(models.Model):
         if request.user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        return request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
 
     def has_publish_permission(self, request):
         if request.user.is_superuser:
             return True
         opts = self._meta
-        return request.user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and \
+        return request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts)) and \
                request.user.has_perm(opts.app_label + '.' + 'publish_page')
-
