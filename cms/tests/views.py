@@ -15,7 +15,6 @@ from cms.models import PagePermission
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
 from menus.menu_pool import menu_pool
@@ -201,10 +200,7 @@ class ContextTests(SettingsOverrideTestCase):
         with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             with self.assertNumQueries(FuzzyInt(0, 12)) as context:
                 response = self.client.get("/en/plain_view/")
-                if DJANGO_1_5:
-                    num_queries = len(context.connection.queries) - context.starting_queries
-                else:
-                    num_queries = len(context.captured_queries)
+                num_queries = len(context.captured_queries)
                 self.assertFalse('CMS_TEMPLATE' in response.context)
         cache.clear()
         menu_pool.clear()
@@ -231,10 +227,7 @@ class ContextTests(SettingsOverrideTestCase):
             # Baseline number of queries
             with self.assertNumQueries(FuzzyInt(13, 17)) as context:
                 response = self.client.get("/en/page-2/")
-                if DJANGO_1_5:
-                    num_queries_page = len(context.connection.queries) - context.starting_queries
-                else:
-                    num_queries_page = len(context.captured_queries)
+                num_queries_page = len(context.captured_queries)
         cache.clear()
         menu_pool.clear()
 

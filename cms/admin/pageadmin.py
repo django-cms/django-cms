@@ -39,7 +39,6 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils import helpers, permissions, get_language_from_request, admin as admin_utils, copy_plugins
 from cms.utils.i18n import get_language_list, get_language_tuple, get_language_object, force_language
 from cms.utils.admin import jsonify_request
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.compat.dj import force_unicode, is_installed
 from cms.utils.compat.urls import unquote
 from cms.utils.conf import get_cms_setting
@@ -359,12 +358,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return self.change_view(request, object_id, extra_context={'show_permissions': True, 'title': _("Change Permissions")})
 
     def get_inline_instances(self, request, obj=None):
-        if DJANGO_1_4:
-            inlines = super(PageAdmin, self).get_inline_instances(request)
-            if hasattr(self, '_current_page'):
-                obj = self._current_page
-        else:
-            inlines = super(PageAdmin, self).get_inline_instances(request, obj)
+        inlines = super(PageAdmin, self).get_inline_instances(request, obj)
         if get_cms_setting('PERMISSION') and obj:
             filtered_inlines = []
             for inline in inlines:
@@ -445,12 +439,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         extra_context.update(self.get_unihandecode_context(tab_language))
 
-        # get_inline_instances will need access to 'obj' so that it can
-        # determine if current user has enough rights to see PagePermissionInlineAdmin
-        # because in django versions <1.5 get_inline_instances doesn't receive 'obj'
-        # as a parameter, the workaround is to set it as an attribute...
-        if DJANGO_1_4:
-            self._current_page = obj
         response = super(PageAdmin, self).change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
@@ -1366,10 +1354,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def resolve(self, request):
         if not request.user.is_staff:
-            if DJANGO_1_4:
-                return HttpResponse('', mimetype='text/plain')
-            else:
-                return HttpResponse('', content_type='text/plain')
+            return HttpResponse('', content_type='text/plain')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             try:
@@ -1485,12 +1470,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         'redirect_url': page.get_absolute_url(language=language_code)
                     }
                 )
-
-            if DJANGO_1_4:
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            else:
-                return HttpResponse(json.dumps(results), content_type='application/json')
-
+            return HttpResponse(json.dumps(results), content_type='application/json')
         else:
             return HttpResponseForbidden()
 

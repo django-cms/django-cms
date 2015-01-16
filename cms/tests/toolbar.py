@@ -27,7 +27,6 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
 from cms.test_utils.testcases import (SettingsOverrideTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import SettingsOverride, UserLoginContext
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from cms.views import details
@@ -356,8 +355,6 @@ class ToolbarTests(ToolbarTestBase):
             name = user.get_full_name()
             if name:
                 return name
-            elif DJANGO_1_4:
-                return user.username
             else:
                 return user.get_username()
         except (AttributeError, NotImplementedError):
@@ -940,7 +937,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,"'edit_plugin': '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
-    
+
     def test_view_url(self):
         user = self.get_staff()
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -1374,4 +1371,3 @@ class ToolbarAPITests(TestCase):
         result += 2
         self.assertEqual(result.item, item)
         self.assertEqual(result.index, 4)
-

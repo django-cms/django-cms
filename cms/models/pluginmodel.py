@@ -10,7 +10,6 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.helpers import reversion_register
@@ -227,10 +226,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
 
     def save(self, no_signals=False, *args, **kwargs):
         if no_signals:  # ugly hack because of mptt
-            if DJANGO_1_5:
-                super(CMSPlugin, self).save_base(cls=self.__class__)
-            else:
-                super(CMSPlugin, self).save_base()
+            super(CMSPlugin, self).save_base()
         else:
             if not self.depth:
                 if self.parent_id or self.parent:
@@ -389,7 +385,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
 
     def notify_on_autoadd(self, request, conf):
         """
-        Method called when we auto add this plugin via default_plugins in 
+        Method called when we auto add this plugin via default_plugins in
         CMS_PLACEHOLDER_CONF.
         Some specific plugins may have some special stuff to do when they are
         auto added.
@@ -398,10 +394,10 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
 
     def notify_on_autoadd_children(self, request, conf, children):
         """
-        Method called when we auto add children to this plugin via 
+        Method called when we auto add children to this plugin via
         default_plugins/<plugin>/children in CMS_PLACEHOLDER_CONF.
         Some specific plugins may have some special stuff to do when we add
-        children to them. ie : TextPlugin must update its content to add HTML 
+        children to them. ie : TextPlugin must update its content to add HTML
         tags to be able to see his children in WYSIWYG.
         """
         pass
