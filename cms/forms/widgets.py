@@ -289,6 +289,7 @@ class ApplicationConfigSelect(Select):
         super(ApplicationConfigSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
+        print("value", value)
         output = [super(ApplicationConfigSelect, self).render(name, value, attrs, choices)]
         output.append('<script>\n')
         output.append('var apphooks_configuration = {\n')
@@ -299,6 +300,7 @@ class ApplicationConfigSelect(Select):
         for application, cms_app in self.app_configs.items():
             output.append("'%s': '%s'" % (application, cms_app.get_config_add_url()))
         output.append('\n};\n')
+        output.append('var apphooks_configuration_value = \'%s\';\n' % value)
         output.append('</script>')
 
         related_url = ''
