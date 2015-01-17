@@ -8,6 +8,10 @@ class CMSApp(object):
     permissions = True
     exclude_permissions = []
 
+    def __init__(self):
+        if self.app_config:
+            self.app_config.cmsapp = self
+
     def get_configs(self):
         raise NotImplemented('Configured AppHooks must implement this method')
 
