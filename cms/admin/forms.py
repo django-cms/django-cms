@@ -272,9 +272,9 @@ class AdvancedSettingsForm(forms.ModelForm):
                 if self.data.get('application_urls', False) and self.data['application_urls'] in app_configs:
                     self.fields['application_configs'].choices = [(config.pk, force_text(config)) for config in app_configs[self.data['application_urls']].get_configs()]
 
-                apphook = self.initial['application_urls']
-                config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
-                self.fields['application_configs'].initial = config.pk
+                    apphook = self.initial['application_urls']
+                    config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
+                    self.fields['application_configs'].initial = config.pk
 
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial
