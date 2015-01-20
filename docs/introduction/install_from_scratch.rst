@@ -46,9 +46,10 @@ Django project called ``mysite``::
 
     djangocms -p . mysite
 
-.. warning:: directory ``.`` is meant to be empty at this stage and djangocms-installer will check
-             for this; if you add some content to this directory before running the installer
-             because of you project layout, please use ``-s`` flag to skip the check.
+.. warning:: djangocms-installer expects directory ``.`` to be empty at this stage, and will
+             check for this, and will warn if it's not.
+             You can get it to skip the check and go ahead anyway using  the ``-s`` flag;
+             **note that this may overwrite existing files**.
 
 
 Windows users may need to do a little extra to make sure Python files are associated correctly if that doesn't work right away::
