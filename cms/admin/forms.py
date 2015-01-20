@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models.fields import BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
@@ -272,9 +272,23 @@ class AdvancedSettingsForm(forms.ModelForm):
                 if self.data.get('application_urls', False) and self.data['application_urls'] in app_configs:
                     self.fields['application_configs'].choices = [(config.pk, force_text(config)) for config in app_configs[self.data['application_urls']].get_configs()]
 
-                    apphook = self.initial['application_urls']
-                    config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
-                    self.fields['application_configs'].initial = config.pk
+                    apphook = self.data.get('application_urls', False)
+                    try:
+                        config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
+                        self.fields['application_configs'].initial = config.pk
+                    except ObjectDoesNotExist:
+                        # Provided apphook configuration doesn't exist (anymore),
+                        # just skip it
+                        # The user will choose another value anyway
+                        pass
+                else:
+                    # If app_config apphook is not selected, drop any value
+                    # for application_configs do avoid the field dato for
+                    # being validated by the field itself
+                    try:
+                        del self.data['application_configs']
+                    except KeyError:
+                        pass
 
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial

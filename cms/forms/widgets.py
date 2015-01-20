@@ -289,7 +289,6 @@ class ApplicationConfigSelect(Select):
         super(ApplicationConfigSelect, self).__init__(attrs, choices)
 
     def render(self, name, value, attrs=None, choices=()):
-        print("value", value)
         output = [super(ApplicationConfigSelect, self).render(name, value, attrs, choices)]
         output.append('<script>\n')
         output.append('var apphooks_configuration = {\n')
