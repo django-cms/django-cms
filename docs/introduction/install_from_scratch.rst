@@ -46,6 +46,11 @@ Django project called ``mysite``::
 
     djangocms -p . mysite
 
+.. warning:: directory ``.`` is meant to be empty at this stage and djangocms-installer will check
+             for this; if you add some content to this directory before running the installer
+             because of you project layout, please use ``-s`` flag to skip the check.
+
+
 Windows users may need to do a little extra to make sure Python files are associated correctly if that doesn't work right away::
 
     assoc .py=Python.file
