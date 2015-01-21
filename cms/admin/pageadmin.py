@@ -44,7 +44,6 @@ from cms.utils.compat.urls import unquote
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import find_placeholder_relation
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
-from cms.utils.plugins import current_site
 from cms.utils.transaction import wrap_transaction
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
@@ -687,6 +686,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path_info + '?' + ERROR_FLAG + '=1')
         cl.set_items(request)
+
+        from cms.utils.plugins import current_site
 
         site_id = request.GET.get('site__exact', None)
         if site_id is None:
