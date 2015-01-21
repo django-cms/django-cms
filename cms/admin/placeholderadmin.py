@@ -14,7 +14,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
-from cms.utils.plugins import requires_reload, has_reached_plugin_limit
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -209,6 +208,7 @@ class PlaceholderAdminMixin(object):
     @method_decorator(require_POST)
     @xframe_options_sameorigin
     def add_plugin(self, request):
+        from cms.utils.plugins import has_reached_plugin_limit
         """
         POST request should have the following data:
 
@@ -272,6 +272,7 @@ class PlaceholderAdminMixin(object):
     @xframe_options_sameorigin
     @wrap_transaction
     def copy_plugins(self, request):
+        from cms.utils.plugins import requires_reload, has_reached_plugin_limit
         """
         POST request should have the following data:
 
@@ -407,6 +408,7 @@ class PlaceholderAdminMixin(object):
     @method_decorator(require_POST)
     @xframe_options_sameorigin
     def move_plugin(self, request):
+        from cms.utils.plugins import requires_reload, has_reached_plugin_limit
         """
         POST request with following parameters:
         -plugin_id
