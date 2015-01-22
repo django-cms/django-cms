@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 from logging import Logger
-from cms.publisher.errors import PublisherCantPublish
 from os.path import join
 
-from django.utils.timezone import now
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.core.cache import cache
-from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.utils import six
+from django.utils.timezone import now
 from django.utils.translation import get_language, ugettext_lazy as _
+
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
@@ -19,18 +20,19 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
+
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
 
 @python_2_unicode_compatible
-class Page(with_metaclass(PageMetaClass, MP_Node)):
+class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     """
     A simple hierarchical page model
     """
