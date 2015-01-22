@@ -30,7 +30,7 @@ from menus.menu_pool import menu_pool
 
 def get_permission_acessor(obj):
     User = get_user_model()
-    
+
     if isinstance(obj, (PageUser, User,)):
         rel_name = 'user_permissions'
     else:
@@ -113,7 +113,7 @@ class PageForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         slug = cleaned_data.get('slug', '')
-        
+
         page = self.instance
         lang = cleaned_data.get('language', None)
         # No language, can not go further, but validation failed already
@@ -328,7 +328,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     """
     Page permission inline admin form used in inline admin. Required, because
     user and group queryset must be changed. User can see only users on the same
-    level or under him in choosen page tree, and users which were created by him, 
+    level or under him in choosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
     page = forms.ModelChoiceField(Page.objects.all(), label=_('user'), widget=HiddenInput(), required=True)
@@ -392,7 +392,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to 
+            # page but after he does this, he will not have permissions to
             # access this page anymore, so avoid this
             raise forms.ValidationError(_("Add page permission requires also "
                                           "access to children, or descendants, otherwise added page "
@@ -422,6 +422,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         return instance
 
     class Meta:
+        fields = '__all__'
         model = PagePermission
 
 
@@ -441,6 +442,7 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
         return self.cleaned_data
 
     class Meta:
+        fields = '__all__'
         model = GlobalPagePermission
 
 
@@ -483,6 +485,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
                                          'Send email notification to user about username or password change. Requires user email.'))
 
     class Meta:
+        fields = '__all__'
         model = PageUser
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -537,7 +540,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """Create user, assign him to staff users, and create permissions for 
+        """Create user, assign him to staff users, and create permissions for
         him if required. Also assigns creator to user.
         """
         Super = self._password_change and PageUserForm or UserCreationForm
