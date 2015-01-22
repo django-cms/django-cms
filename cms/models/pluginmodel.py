@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 from datetime import date
-from operator import itemgetter
 import json
-
+from operator import itemgetter
 import os
-from treebeard.mp_tree import MP_Node
 import warnings
-from cms.exceptions import DontUsePageAttributeWarning
-from cms.models.placeholdermodel import Placeholder
-from cms.plugin_rendering import PluginContext, render_plugin
-from cms.utils import get_cms_setting
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.helpers import reversion_register
-from cms.utils.urlutils import admin_reverse
+
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
+from django.db.models import signals, Model
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
-from django.utils import timezone
+from django.utils import six, timezone
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import filter
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import signals, Model
+
+from cms.exceptions import DontUsePageAttributeWarning
+from cms.models.placeholdermodel import Placeholder
+from cms.plugin_rendering import PluginContext, render_plugin
+from cms.utils import get_cms_setting
+from cms.utils.helpers import reversion_register
+from cms.utils.urlutils import admin_reverse
+
+from treebeard.mp_tree import MP_Node
 
 
 class BoundRenderMeta(object):
@@ -59,7 +60,7 @@ class PluginModelBase(ModelBase):
 
 
 @python_2_unicode_compatible
-class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
+class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.

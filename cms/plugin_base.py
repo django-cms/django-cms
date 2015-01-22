@@ -1,26 +1,26 @@
 # -*- coding: utf-8 -*-
 import json
+import re
 import warnings
 
-try:
-    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
-                                              ModelAdminMetaClass)
-except ImportError:
-    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
-import re
-
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.utils import get_cms_setting
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.placeholder import get_placeholder_conf
-from cms.exceptions import SubClassNeededError, Deprecated
-from cms.models import CMSPlugin
-from django.core.urlresolvers import reverse
+from django import forms
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
-from django.forms.models import ModelForm
+from django.core.urlresolvers import reverse
+from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _
+try:  # Django 1.6, 1.7
+    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
+        ModelAdminMetaClass)
+except:  # Django 1.8+
+    ModelAdminMetaClass = forms.MediaDefiningClass
+
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
+from cms.exceptions import SubClassNeededError, Deprecated
+from cms.models import CMSPlugin
+from cms.utils import get_cms_setting
+from cms.utils.placeholder import get_placeholder_conf
 
 
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
@@ -58,7 +58,7 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
             form_attrs = {
                 'Meta': type('Meta', (object,), form_meta_attrs)
             }
-            new_plugin.form = type('%sForm' % name, (ModelForm,), form_attrs)
+            new_plugin.form = type('%sForm' % name, (forms.ModelForm,), form_attrs)
         # Set the default fieldsets
         if not new_plugin.fieldsets:
             basic_fields = []
@@ -92,7 +92,7 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
 
 
 @python_2_unicode_compatible
-class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
     module = _("Generic")  # To be overridden in child classes
