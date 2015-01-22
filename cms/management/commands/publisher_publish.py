@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from optparse import make_option
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import NoArgsCommand, CommandError
 from django.utils.translation import activate
+
 from cms.utils.compat.dj import force_unicode
 
 class Command(NoArgsCommand):
@@ -44,7 +47,6 @@ class Command(NoArgsCommand):
 
     def publish_pages(self, include_unpublished, language, site):
         from cms.models import Page
-        from cms.utils.compat.dj import get_user_model
         from cms.utils.permissions import set_current_user
 
         # thread locals middleware needs to know, who are we - login as a first

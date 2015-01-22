@@ -2,9 +2,9 @@
 from __future__ import with_statement
 
 from django.test.utils import override_settings
+from django.contrib.auth import get_user_model
 
 from cms.tests.menu_page_viewperm import ViewPermissionTests
-from cms.utils.compat.dj import get_user_model
 
 __all__ = [
     'ViewPermissionComplexMenuStaffNodeTests',

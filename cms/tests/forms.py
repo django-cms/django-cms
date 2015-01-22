@@ -4,6 +4,7 @@ from datetime import datetime
 
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
 from cms.utils.permissions import set_current_user
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from cms.admin import forms
@@ -14,7 +15,6 @@ from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.dj import get_user_model
 
 
 class Mock_PageSelectFormField(PageSelectFormField):

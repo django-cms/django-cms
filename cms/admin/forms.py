@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -15,7 +16,7 @@ from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle, \
     GlobalPagePermission
-from cms.utils.compat.dj import get_user_model, force_unicode
+from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple

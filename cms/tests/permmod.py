@@ -3,13 +3,13 @@ from __future__ import with_statement
 
 from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
-from django.contrib.auth.models import (AnonymousUser, Group, Permission)
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.utils import override_settings
-
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
@@ -27,7 +27,6 @@ from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
 from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.test_utils.util.request_factory import RequestFactory
-from cms.utils.compat.dj import get_user_model, user_related_name
 from cms.utils.compat.urls import unquote
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
@@ -971,7 +970,7 @@ class ViewPermissionTests(PermissionTestsBase):
     def test_page_permissions_view_groups(self):
         user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         group = Group.objects.create(name='testgroup')
-        user_set = getattr(group, user_related_name)
+        user_set = getattr(group, 'user_set')
         user_set.add(user)
         request = self.get_request(user)
         page = create_page('A', 'nav_playground.html', 'en')
@@ -1001,7 +1000,7 @@ class PagePermissionTests(PermissionTestsBase):
         """
         user = self._create_user("user", is_staff=True)
         group = Group.objects.create(name='testgroup')
-        user_set = getattr(group, user_related_name)
+        user_set = getattr(group, 'user_set')
         user_set.add(user)
         page = create_page('A', 'nav_playground.html', 'en')
         page_permission = PagePermission.objects.create(

@@ -4,6 +4,7 @@ import itertools
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
@@ -41,7 +42,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import force_unicode, get_user_model
+from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf

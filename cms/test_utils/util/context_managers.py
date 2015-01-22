@@ -5,12 +5,11 @@ from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.signals import request_started
 from django.db import reset_queries
 from django.utils.six.moves import StringIO
 from django.utils.translation import get_language, activate
-
-from cms.utils.compat.dj import get_user_model
 
 
 class NULL:

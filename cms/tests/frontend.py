@@ -4,6 +4,7 @@ import datetime
 import os
 import time
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -26,7 +27,6 @@ from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat import DJANGO_1_6
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 
 if DJANGO_1_6:

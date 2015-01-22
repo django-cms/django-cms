@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import copy
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.http import Http404, HttpResponseRedirect
@@ -16,7 +17,6 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_languages
 
 

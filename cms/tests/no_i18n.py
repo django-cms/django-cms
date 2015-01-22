@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches
 from django.template import Template
 from django.test.utils import override_settings
@@ -10,7 +11,6 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT,
                                       URL_CMS_PLUGIN_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
-from cms.utils.compat.dj import get_user_model
 
 
 @override_settings(

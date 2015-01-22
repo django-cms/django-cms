@@ -4,6 +4,7 @@ import sys
 import warnings
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -17,7 +18,6 @@ from menus.menu_pool import menu_pool
 
 from cms.models import Page
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.utils.compat.dj import get_user_model
 from cms.utils.compat.urls import urljoin, unquote
 from cms.utils.permissions import set_current_user
 

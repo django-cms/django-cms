@@ -10,6 +10,7 @@ from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
@@ -36,7 +37,7 @@ from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_P
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_6
-from cms.utils.compat.dj import get_user_model, force_unicode
+from cms.utils.compat.dj import force_unicode
 
 
 class AdminTestsBase(CMSTestCase):
