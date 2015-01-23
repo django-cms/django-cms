@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.db import router
+from django.db import router, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest,
     HttpResponseForbidden, HttpResponseRedirect)
 from django.shortcuts import render_to_response, get_object_or_404
@@ -27,7 +27,6 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins, permissions, get_language_from_request, get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.plugins import requires_reload, has_reached_plugin_limit
-from cms.utils.transaction import wrap_transaction
 from cms.utils.urlutils import admin_reverse
 
 
@@ -267,7 +266,7 @@ class PlaceholderAdminMixin(object):
 
     @method_decorator(require_POST)
     @xframe_options_sameorigin
-    @wrap_transaction
+    @transaction.atomic
     def copy_plugins(self, request):
         """
         POST request should have the following data:
