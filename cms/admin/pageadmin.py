@@ -7,6 +7,7 @@ import sys
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
@@ -105,14 +106,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def get_urls(self):
         """Get the admin urls
         """
-        from django.conf.urls import patterns, url
-
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
-        url_patterns = patterns(
-            '',
-
+        url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
             pat(r'^([0-9]+)/dates/$', self.dates),
             pat(r'^([0-9]+)/permission-settings/$', self.permissions),
@@ -135,7 +132,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^add-page-type/$', self.add_page_type),
             pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
-        )
+        ]
 
         if plugin_pool.get_all_plugins():
             url_patterns += plugin_pool.get_patterns()

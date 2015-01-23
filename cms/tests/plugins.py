@@ -6,6 +6,7 @@ import os
 
 from django import http
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.core import urlresolvers
 from django.core.cache import cache
@@ -70,10 +71,9 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
         return http.HttpResponse("It works")
 
     def get_plugin_urls(self):
-        from django.conf.urls import patterns, url
-        return patterns('',
+        return [
             url(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
-        )
+        ]
 plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 

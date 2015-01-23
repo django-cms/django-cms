@@ -2,7 +2,7 @@
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import url, patterns, include
+from django.conf.urls import url, include
 from django.contrib.formtools.wizard.views import normalize_name
 from django.db.models import signals
 from django.template.defaultfilters import slugify
@@ -202,9 +202,9 @@ class PluginPool(object):
             for plugin in self.get_all_plugins():
                 p = plugin()
                 slug = slugify(force_text(normalize_name(p.__class__.__name__)))
-                url_patterns += patterns('',
-                                         url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
-                )
+                url_patterns += [
+                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                ]
         finally:
             # Reactivate translation
             activate(lang)
