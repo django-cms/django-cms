@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from logging import Logger
-from cms.publisher.errors import PublisherCantPublish
 from os.path import join
 
 from django.utils.timezone import now
@@ -11,7 +10,9 @@ from django.core.cache import cache
 from django.conf import settings
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import get_language, ugettext_lazy as _
+
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
@@ -19,8 +20,8 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
@@ -133,7 +134,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 title = None
         if title is None:
             title = u""
-        return force_unicode(title)
+        return force_text(title)
 
     def __repr__(self):
         # This is needed to solve the infinite recursion when

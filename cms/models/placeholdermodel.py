@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from cms.utils.urlutils import admin_reverse
-from django.db import models
-from django.template.defaultfilters import title
-from django.utils.encoding import force_text
-from django.utils.timezone import get_current_timezone_name
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib import admin
+from django.db import models
+from django.template.defaultfilters import title
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.timezone import get_current_timezone_name
+from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
+from cms.utils.urlutils import admin_reverse
 
 
 @python_2_unicode_compatible

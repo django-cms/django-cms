@@ -13,14 +13,13 @@ from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.utils import get_cms_setting
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
 from django.core.urlresolvers import reverse
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.utils.encoding import smart_str
+from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -266,7 +265,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+        return "%s - %s" % (force_text(self.name), force_text(instance))
 
     def get_fieldsets(self, request, obj=None):
         """

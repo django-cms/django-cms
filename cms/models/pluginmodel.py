@@ -10,7 +10,6 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.helpers import reversion_register
 from cms.utils.urlutils import admin_reverse
@@ -20,6 +19,7 @@ from django.db import models
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import timezone
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import filter
 from django.utils.translation import ugettext_lazy as _
@@ -110,7 +110,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         return (model_unpickle, (model, deferred_fields), data)
 
     def __str__(self):
-        return force_unicode(self.pk)
+        return force_text(self.pk)
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -120,7 +120,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
-            return force_unicode(instance)
+            return force_text(instance)
         return _("<Empty>")
 
     def get_plugin_class(self):
@@ -222,7 +222,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return force_unicode(plugin.icon_alt(instance)) if instance else u''
+        return force_text(plugin.icon_alt(instance)) if instance else u''
 
     def save(self, no_signals=False, *args, **kwargs):
         if no_signals:  # ugly hack because of mptt
@@ -349,25 +349,25 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         breadcrumb = []
         if not self.parent_id:
             try:
-                url = force_unicode(
+                url = force_text(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                                   args=[self.pk]))
             except NoReverseMatch:
-                url = force_unicode(
+                url = force_text(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                                   args=[self.pk]))
-            breadcrumb.append({'title': force_unicode(self.get_plugin_name()), 'url': url})
+            breadcrumb.append({'title': force_text(self.get_plugin_name()), 'url': url})
             return breadcrumb
         for parent in self.get_ancestors().reverse():
             try:
-                url = force_unicode(
+                url = force_text(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                                   args=[parent.pk]))
             except NoReverseMatch:
-                url = force_unicode(
+                url = force_text(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                                   args=[parent.pk]))
-            breadcrumb.append({'title': force_unicode(parent.get_plugin_name()), 'url': url})
+            breadcrumb.append({'title': force_text(parent.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):

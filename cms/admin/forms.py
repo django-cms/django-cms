@@ -9,6 +9,7 @@ from django.db.models.fields import BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
 from cms.apphook_pool import apphook_pool
@@ -16,7 +17,6 @@ from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle, \
     GlobalPagePermission
-from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
@@ -147,7 +147,7 @@ class PageForm(forms.ModelForm):
                     if hasattr(exc, 'messages'):
                         errors = exc.messages
                     else:
-                        errors = [force_unicode(exc.message)]
+                        errors = [force_text(exc.message)]
                     self._errors['slug'] = ErrorList(errors)
         return cleaned_data
 

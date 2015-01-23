@@ -2,9 +2,9 @@
 from cms.utils.conf import get_cms_setting
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils.encoding import force_text
 from django.utils.http import urlencode
 from cms.utils.compat.urls import urlparse
-from cms.utils.compat.dj import force_unicode
 import re
 
 # checks validity of absolute / relative url
@@ -38,7 +38,7 @@ def urljoin(*segments):
     u'/a/'
     """
     url  = '/' if segments[0].startswith('/') else ''
-    url += '/'.join(filter(None, (force_unicode(s).strip('/') for s in segments)))
+    url += '/'.join(filter(None, (force_text(s).strip('/') for s in segments)))
     return url + '/' if settings.APPEND_SLASH else url
 
 

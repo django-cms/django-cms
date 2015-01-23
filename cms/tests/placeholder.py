@@ -16,6 +16,7 @@ from django.template.context import Context, RequestContext
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.encoding import force_text
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -42,7 +43,6 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import force_unicode
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
@@ -806,7 +806,7 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = force_unicode(ph)
+        result = force_text(ph)
         self.assertEqual(result, u'test')
 
     def test_excercise_get_attached_model(self):

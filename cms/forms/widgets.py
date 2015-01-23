@@ -13,7 +13,6 @@ from django.utils.translation import ugettext as _
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
-from cms.utils.compat.dj import force_unicode
 
 
 class PageSelectWidget(MultiWidget):
@@ -58,7 +57,7 @@ class PageSelectWidget(MultiWidget):
             initial_value = u''
         else:
             initial_value = initial
-        if force_unicode(initial_value) != force_unicode(data_value):
+        if force_text(initial_value) != force_text(data_value):
             return True
         return False
 
@@ -187,7 +186,7 @@ class PageSmartLinkWidget(TextInput):
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': force_unicode(self.ajax_url)
+            'ajax_url': force_text(self.ajax_url)
         }]
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
