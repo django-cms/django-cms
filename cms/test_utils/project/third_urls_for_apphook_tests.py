@@ -1,10 +1,7 @@
 from cms.utils.compat.dj import is_installed
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-try:
-    from django.conf.urls.i18n import i18n_patterns
-except ImportError:
-    from i18nurls.i18n import i18n_patterns
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 
 admin.autodiscover()
