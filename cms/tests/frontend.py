@@ -8,7 +8,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
-from django.test import LiveServerTestCase
 from django.utils import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -27,11 +26,17 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat import DJANGO_1_6
 from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 
+if DJANGO_1_6:
+    from django.test import LiveServerTestCase as StaticLiveServerTestCase
+else:
+    from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-class CMSLiveTests(LiveServerTestCase, CMSTestCase):
+
+class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
     @classmethod
     def setUpClass(cls):
         super(CMSLiveTests, cls).setUpClass()
