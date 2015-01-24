@@ -34,7 +34,7 @@ $(document).ready(function () {
 			this.clipboard = $('.cms_clipboard');
 
 			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
 			this.timer = function () {};
 			this.interval = function () {};
 			this.state = false;
