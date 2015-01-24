@@ -10,7 +10,7 @@ class CMSApp(object):
 
     def __init__(self):
         if self.app_config:
-            if hasattr(self.app_config, 'cmsapp'):
+            if getattr(self.app_config, 'cmsapp', None):
                 raise RuntimeError(
                     'Only one AppHook per AppHookConfiguration must exists.\n'
                     'AppHook %s already defined for %s AppHookConfig' % (
