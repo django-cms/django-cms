@@ -50,19 +50,17 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             #  skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
-            capabilities = webdriver.DesiredCapabilities.CHROME
+            capabilities = dict(**webdriver.DesiredCapabilities.CHROME)
             capabilities['version'] = '31'
             capabilities['platform'] = 'OS X 10.9'
             capabilities['name'] = 'django CMS'
-            capabilities['build'] = os.environ.get("TRAVIS_BUILD_NUMBER")
+            capabilities['build'] = os.environ["TRAVIS_BUILD_NUMBER"]
             capabilities['tags'] = [
                 os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"
             ]
-            username = os.environ.get("SAUCE_USERNAME")
-            access_key = os.environ.get("SAUCE_ACCESS_KEY")
-            capabilities["tunnel-identifier"] = os.environ.get(
-                "TRAVIS_JOB_NUMBER"
-            )
+            capabilities["tunnel-identifier"] = os.environ["TRAVIS_JOB_NUMBER"]
+            username = os.environ["SAUCE_USERNAME"]
+            access_key = os.environ["SAUCE_ACCESS_KEY"]
             hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
                 username,
                 access_key
@@ -114,7 +112,7 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             'name': settings.SESSION_COOKIE_NAME,
             'value': session.session_key,
             'path': '/',
-            'domain': urlparse(self.live_server_url).hostname
+            'domain': urlparse(self.driver.current_url).hostname
         })
         self.driver.get('{0}/?{1}'.format(
             self.live_server_url,
