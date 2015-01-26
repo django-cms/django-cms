@@ -38,7 +38,7 @@ from cms.test_utils.project.placeholderapp.models import (
     TwoPlaceholderExample,
 )
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.dj import force_unicode, get_user_model
@@ -156,6 +156,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
 
+    @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs(self):
         """
         Checks #1366 error condition.
@@ -163,44 +164,43 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         containing an hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
-        with SettingsOverride(CMS_PERMISSION=False):
-            ex = Example1(
-                char_1='one',
-                char_2='two',
-                char_3='tree',
-                char_4='four'
-            )
-            ex.save()
-            ph1 = ex.placeholder
-            ###
-            # add the test plugin
-            ###
-            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
-            test_plugin.save()
-            pl_url = "%sedit-plugin/%s/" % (
-                admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
-                test_plugin.pk)
-            response = self.client.post(pl_url, {})
-            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph1 = ex.placeholder
+        ###
+        # add the test plugin
+        ###
+        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin.save()
+        pl_url = "%sedit-plugin/%s/" % (
+            admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
+            test_plugin.pk)
+        response = self.client.post(pl_url, {})
+        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
+    @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs_page(self):
         """
         Sibling test of the above, on a page.
         #1366 does not apply to placeholder defined in a page
         """
-        with SettingsOverride(CMS_PERMISSION=False):
-            page = create_page('page', 'col_two.html', 'en')
-            ph1 = page.placeholders.get(slot='col_left')
-            ###
-            # add the test plugin
-            ###
-            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
-            test_plugin.save()
-            pl_url = "%sedit-plugin/%s/" % (
-                admin_reverse('cms_page_change', args=(page.pk,)),
-                test_plugin.pk)
-            response = self.client.post(pl_url, {})
-            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        page = create_page('page', 'col_two.html', 'en')
+        ph1 = page.placeholders.get(slot='col_left')
+        ###
+        # add the test plugin
+        ###
+        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin.save()
+        pl_url = "%sedit-plugin/%s/" % (
+            admin_reverse('cms_page_change', args=(page.pk,)),
+            test_plugin.pk)
+        response = self.client.post(pl_url, {})
+        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
@@ -263,7 +263,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'limits': {},
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             #test no inheritance
             returned = get_placeholder_conf('plugins', 'main')
             self.assertEqual(returned, TEST_CONF['main']['plugins'])
@@ -289,7 +289,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
         context = NoPushPopContext()
         context['request'] = self.get_request()
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             render_placeholder(ph, context)
             self.assertTrue('width' in context)
             self.assertEqual(context['width'], 10)
@@ -376,7 +376,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             del(placeholder_de._plugins_cache)
             cache.clear()
@@ -436,7 +436,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## English page should have deutsch text
             content_en = render_placeholder(placeholder_en, context_en)
             self.assertRegexpMatches(content_en, "^de body$")
@@ -474,7 +474,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             # call assign plugins first, as this is what is done in real cms life
             # for all placeholders in a page at once
             assign_plugins(context_en['request'],
@@ -510,7 +510,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 ]
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
             context = NoPushPopContext()
@@ -560,7 +560,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             },
         }
 
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
             context = NoPushPopContext()
@@ -584,7 +584,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         page.reload()
         for placeholder in page.placeholders.all():
             add_plugin(placeholder, "TextPlugin", "en", body="body")
-        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
@@ -880,7 +880,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 response = admin_instance.add_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -900,7 +900,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 response = admin_instance.add_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -923,7 +923,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_2 = add_plugin(**data)
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
                 response = admin_instance.move_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -948,7 +948,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_1 = add_plugin(**data)
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
                 response = admin_instance.move_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -970,7 +970,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_1 = add_plugin(**data)
         add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
                                                  'plugin_order': 1, })
                 response = admin_instance.move_plugin(request) # first
@@ -986,7 +986,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 response = admin_instance.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
@@ -1110,7 +1110,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1127,7 +1127,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)

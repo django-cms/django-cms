@@ -33,7 +33,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_6
@@ -828,8 +827,7 @@ class AdminTests(AdminTestsBase):
         }
         admin_user = self.get_admin()
         url = admin_reverse('cms_page_add_plugin')
-        with SettingsOverride(CMS_PERMISSION=False,
-                              CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.placeholders.get(slot='body')
             add_plugin(body, 'TextPlugin', 'en', body='text')
@@ -852,8 +850,7 @@ class AdminTests(AdminTestsBase):
         }
         admin_user = self.get_admin()
         url = admin_reverse('cms_page_add_plugin')
-        with SettingsOverride(CMS_PERMISSION=False,
-                              CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
             page = create_page('somepage', 'nav_playground.html', 'en')
             body = page.placeholders.get(slot='body')
             add_plugin(body, 'TextPlugin', 'en', body='text')
@@ -1272,7 +1269,7 @@ class AdminFormsTests(AdminTestsBase):
         user.is_superuser = True
         user.pk = 1
         request = type('Request', (object,), {'user': user})
-        with SettingsOverride():
+        with self.settings():
             data = {
                 'title': 'TestPage',
                 'slug': 'test-page',
@@ -1576,7 +1573,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
         Expected a username only 2 times in the content, but a relationship
         between usercount and pagesize
         """
-        with SettingsOverride(CMS_PERMISSION=True):
+        with self.settings(CMS_PERMISSION=True):
             admin_user = self.get_superuser()
             PAGE_NAME = 'TestPage'
             USER_NAME = 'test_size_user_0'

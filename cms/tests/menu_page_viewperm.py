@@ -3,6 +3,7 @@ from __future__ import with_statement
 
 from django.contrib.sites.models import Site
 from django.contrib.auth.models import AnonymousUser, Group
+from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.menu import get_visible_pages
@@ -10,7 +11,7 @@ from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model, user_related_name
 from menus.menu_pool import menu_pool
 
@@ -20,7 +21,7 @@ __all__ = [
 ]
 
 
-class ViewPermissionTests(SettingsOverrideTestCase):
+class ViewPermissionTests(CMSTestCase):
     """
     Test various combinations of view permissions pages and menus
     Focus on the different grant types and inheritance options of grant on
@@ -269,14 +270,14 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         return dict((page.get_absolute_url(language=language), page) for page in pages)
 
 
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='all',
+)
 class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
     """
     Test CMS_PUBLIC_FOR=all group access and menu nodes rendering
     """
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
-    }
 
     def test_public_pages_anonymous_norestrictions(self):
         """
@@ -516,6 +517,10 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self.assertViewAllowed(urls["/en/page_d/page_d_a/"], user)
 
 
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='all',
+)
 class ViewPermissionTreeBugTests(ViewPermissionTests):
     """Test issue 1113
     https://github.com/divio/django-cms/issues/1113
@@ -523,10 +528,6 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     grant_on=ACCESS_PAGE_AND_CHILDREN or ACCESS_PAGE_AND_DESCENDANTS to page 6
     Test if this affects the menu entries and page visibility
     """
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
-    }
     GROUPNAME_6 = 'group_6_ACCESS_PAGE'
 
     def _setup_pages(self):

@@ -3,17 +3,20 @@ from __future__ import with_statement
 
 from django.core.cache import cache
 from django.template import Template, RequestContext
+from django.test.utils import override_settings
 from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
+from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import ChangeModel
 from cms.test_utils.util.mock import AttributeObject
+from cms.views import details
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -36,10 +39,10 @@ def sample_plugin_context_processor(instance, placeholder, original_context):
     }
 
 
-class RenderingTestCase(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html')],
-    }
+@override_settings(
+    CMS_TEMPLATES=[(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html')],
+)
+class RenderingTestCase(CMSTestCase):
 
     def setUp(self):
         super(RenderingTestCase, self).setUp()
@@ -135,51 +138,49 @@ class RenderingTestCase(SettingsOverrideTestCase):
     def strip_rendered(self, content):
         return content.strip().replace(u"\n", u"")
 
+    @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, template, page, context_vars={}):
-        with SettingsOverride(CMS_TEMPLATES=[(TEMPLATE_NAME, '')]):
-            c = self.get_context(page, context_vars)
-            t = Template(template)
-            r = t.render(c)
-            return self.strip_rendered(r)
+        c = self.get_context(page, context_vars)
+        t = Template(template)
+        r = t.render(c)
+        return self.strip_rendered(r)
 
+    @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def test_details_view(self):
         """
         Tests that the `detail` view is working.
         """
-        with SettingsOverride(CMS_TEMPLATES=[(TEMPLATE_NAME, '')]):
-            from cms.views import details
+        response = details(self.get_request(self.test_page), '')
+        response.render()
+        r = self.strip_rendered(response.content.decode('utf8'))
+        self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
 
-            response = details(self.get_request(self.test_page), '')
-            response.render()
-            r = self.strip_rendered(response.content.decode('utf8'))
-            self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
-
+    @override_settings(
+        CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor',),
+        CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor',),
+    )
     def test_processors(self):
         """
         Tests that default plugin context processors are working, that plugin processors and plugin context processors
         can be defined in settings and are working and that extra plugin context processors can be passed to PluginContext.
         """
-        with SettingsOverride(
-                CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor',),
-                CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor',),
-        ):
-            def test_passed_plugin_context_processor(instance, placeholder, context):
-                return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
+        def test_passed_plugin_context_processor(instance, placeholder, context):
+            return {'test_passed_plugin_context_processor': 'test_passed_plugin_context_processor_ok'}
 
-            t = u'{% load cms_tags %}' + \
-                u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|{{ test_plugin_context_processor }}'
-            instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
-            instance.render_template = Template(t)
-            context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
-                                    self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
-            plugin_rendering._standard_processors = {}
-            c = render_plugins((instance,), context, self.test_placeholders['main'])
-            r = "".join(c)
-            self.assertEqual(r, u'1|' + self.test_data[
-                'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
-                                self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' + self.test_data[
-                                    'text_main'] + '|main|original_context_var_ok')
-            plugin_rendering._standard_processors = {}
+        t = u'{% load cms_tags %}' + \
+            u'{{ plugin.counter }}|{{ plugin.instance.body }}|{{ test_passed_plugin_context_processor }}|{{ test_plugin_context_processor }}'
+        instance, plugin = CMSPlugin.objects.all()[0].get_plugin_instance()
+        instance.render_template = Template(t)
+        context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
+                                self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
+        plugin_rendering._standard_processors = {}
+        c = render_plugins((instance,), context, self.test_placeholders['main'])
+        r = "".join(c)
+        self.assertEqual(r, u'1|' + self.test_data[
+            'text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
+                            self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' + self.test_data[
+                                'text_main'] + '|main|original_context_var_ok')
+        plugin_rendering._standard_processors = {}
 
     def test_placeholder(self):
         """
@@ -195,7 +196,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['no_extra'])
         cache.clear()
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
+        with self.settings(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['extra'])
 
@@ -261,7 +262,7 @@ class RenderingTestCase(SettingsOverrideTestCase):
         r = self.render(t, self.test_page4)
         self.assertEqual(r, self.test_data4['no_extra'])
         cache.clear()
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
+        with self.settings(CMS_PLACEHOLDER_CONF=self.test_data4['placeholderconf']):
             r = self.render(t, self.test_page4)
             self.assertEqual(r, self.test_data4['extra'])
 
@@ -322,48 +323,46 @@ class RenderingTestCase(SettingsOverrideTestCase):
     # To ensure compatible behaviour, test that page_url swallows any
     # Page.DoesNotExist exceptions when NOT in DEBUG mode.
     #
+    @override_settings(DEBUG=False)
     def test_page_url_on_bogus_page(self):
-        with SettingsOverride(DEBUG=False):
-            template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
-            output = self.render(template, self.test_page, {'test_page': self.test_page2})
-            self.assertEqual(output, '')
+        template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
+        output = self.render(template, self.test_page, {'test_page': self.test_page2})
+        self.assertEqual(output, '')
 
     #
     # To ensure compatible behaviour, test that page_url will raise a
     # Page.DoesNotExist exception when the page argument does not eval to a
     # valid page
     #
+    @override_settings(DEBUG=True)
     def test_page_url_on_bogus_page_in_debug(self):
-        from cms.models import Page
-
-        with SettingsOverride(DEBUG=True):
-            template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
-            self.assertRaises(
-                Page.DoesNotExist,
-                self.render,
-                template,
-                self.test_page,
-                {'test_page': self.test_page2}
-            )
+        template = u'{% load cms_tags %}{% page_url "bogus_page" %}'
+        self.assertRaises(
+            Page.DoesNotExist,
+            self.render,
+            template,
+            self.test_page,
+            {'test_page': self.test_page2}
+        )
 
     #
     # In the 'as varname' form, ensure that the tag will always swallow
     # Page.DoesNotExist exceptions both when DEBUG is False and...
     #
+    @override_settings(DEBUG=False)
     def test_page_url_as_on_bogus_page(self):
-        with SettingsOverride(DEBUG=False):
-            template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
-            output = self.render(template, self.test_page, {'test_page': self.test_page2})
-            self.assertEqual(output, '')
+        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
+        output = self.render(template, self.test_page, {'test_page': self.test_page2})
+        self.assertEqual(output, '')
 
     #
     # ...when it is True.
     #
+    @override_settings(DEBUG=True)
     def test_page_url_as_on_bogus_page_in_debug(self):
-        with SettingsOverride(DEBUG=True):
-            template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
-            output = self.render(template, self.test_page, {'test_page': self.test_page2})
-            self.assertEqual(output, '')
+        template = u'{% load cms_tags %}{% page_url "bogus_page" as test_url %}{{ test_url }}'
+        output = self.render(template, self.test_page, {'test_page': self.test_page2})
+        self.assertEqual(output, '')
 
     def test_page_attribute(self):
         """

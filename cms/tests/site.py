@@ -9,7 +9,6 @@ from cms.api import create_page
 from cms.models import Page, Placeholder
 from cms.utils import get_cms_setting
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class SiteTestCase(CMSTestCase):
@@ -20,7 +19,7 @@ class SiteTestCase(CMSTestCase):
 
     def setUp(self):
         self.assertEqual(Site.objects.all().count(), 1)
-        with SettingsOverride(SITE_ID=1):
+        with self.settings(SITE_ID=1):
             u = self._create_user("test", True, True)
 
             # setup sites
@@ -35,14 +34,14 @@ class SiteTestCase(CMSTestCase):
 
     def test_site_framework(self):
         #Test the site framework, and test if it's possible to disable it
-        with SettingsOverride(SITE_ID=self.site2.pk):
+        with self.settings(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
 
             response = self.client.get("/en/admin/cms/page/?site__exact=%s" % self.site3.pk)
             self.assertEqual(response.status_code, 200)
             create_page("page_3b", "nav_playground.html", "de", site=self.site3)
 
-        with SettingsOverride(SITE_ID=self.site3.pk):
+        with self.settings(SITE_ID=self.site3.pk):
             create_page("page_3a", "nav_playground.html", "nl", site=self.site3)
 
             # with param
@@ -51,7 +50,7 @@ class SiteTestCase(CMSTestCase):
 
             self.assertEqual(Page.objects.drafts().on_site().count(), 2)
 
-        with SettingsOverride(SITE_ID=self.site2.pk):
+        with self.settings(SITE_ID=self.site2.pk):
             # without param
             self.assertEqual(Page.objects.drafts().on_site().count(), 1)
 
@@ -68,8 +67,8 @@ class SiteTestCase(CMSTestCase):
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[3][1]['public'] = True
 
-        with SettingsOverride(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="de"):
-            with SettingsOverride(SITE_ID=self.site2.pk):
+        with self.settings(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="de"):
+            with self.settings(SITE_ID=self.site2.pk):
                 pages["2"][0] = create_page("page_2", "nav_playground.html", "de",
                                             site=self.site2)
                 pages["2"][0].publish('de')
@@ -92,7 +91,7 @@ class SiteTestCase(CMSTestCase):
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
 
-            with SettingsOverride(SITE_ID=self.site3.pk):
+            with self.settings(SITE_ID=self.site3.pk):
                 pages["3"][0] = create_page("page_3", "nav_playground.html", "de",
                                             site=self.site3)
                 pages["3"][0].publish('de')
@@ -116,7 +115,7 @@ class SiteTestCase(CMSTestCase):
                     self.assertEqual(response.status_code, 200)
 
     def test_site_delete(self):
-        with SettingsOverride(SITE_ID=self.site2.pk):
+        with self.settings(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
             self.assertEqual(Placeholder.objects.count(), 2)
             self.site2.delete()

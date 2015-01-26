@@ -10,7 +10,6 @@ from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.compat.tests import UnittestCompatMixin
 
@@ -435,7 +434,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         mptt values are correctly showing a parent child relationship
         of a nested plugin
         """
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
@@ -494,7 +493,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         page two (copy target)
         Verify copied page, placeholders, plugins and body text
         """
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)
@@ -703,7 +702,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     col_right: 1 text plugin with nested link plugin
         verify the copied page structure
         """
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             # setup page 1
             page_one = create_page(u"Three Placeholder", u"col_three.html", u"en",
                                    position=u"last-child", published=True, in_navigation=True)

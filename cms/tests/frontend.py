@@ -8,6 +8,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
+from django.test.utils import override_settings
 from django.utils import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -23,8 +24,6 @@ from cms.exceptions import AppAlreadyRegistered
 from cms.models import CMSPlugin, Page, Placeholder
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat import DJANGO_1_6
 from cms.utils.compat.dj import get_user_model
@@ -231,47 +230,46 @@ class ToolbarBasicTests(CMSLiveTests):
         self.wait_page_loaded()
         self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
 
+    @override_settings(DEBUG=True)
     def test_basic_add_pages(self):
-        with SettingsOverride(DEBUG=True):
-            User = get_user_model()
-            self.assertEqual(Page.objects.all().count(), 0)
-            self.assertTrue(User.objects.all().count(), 1)
-            driver = self.driver
-            driver.get(self.base_url + "/de/")
-            driver.find_element_by_id("add-page").click()
-            driver.find_element_by_id("id_username").clear()
-            driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
-            driver.find_element_by_id("id_password").clear()
-            driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
-            driver.find_element_by_css_selector("input[type=\"submit\"]").click()
-            driver.find_element_by_name("_save").click()
-            driver.find_element_by_link_text(u"Seite hinzufügen").click()
-            driver.find_element_by_id("id_title").clear()
-            driver.find_element_by_id("id_title").send_keys("SubPage")
-            driver.find_element_by_name("_save").click()
+        User = get_user_model()
+        self.assertEqual(Page.objects.all().count(), 0)
+        self.assertTrue(User.objects.all().count(), 1)
+        driver = self.driver
+        driver.get(self.base_url + "/de/")
+        driver.find_element_by_id("add-page").click()
+        driver.find_element_by_id("id_username").clear()
+        driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
+        driver.find_element_by_id("id_password").clear()
+        driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
+        driver.find_element_by_css_selector("input[type=\"submit\"]").click()
+        driver.find_element_by_name("_save").click()
+        driver.find_element_by_link_text(u"Seite hinzufügen").click()
+        driver.find_element_by_id("id_title").clear()
+        driver.find_element_by_id("id_title").send_keys("SubPage")
+        driver.find_element_by_name("_save").click()
 
 
-class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
-    settings_overrides = {
-        'LANGUAGE_CODE': 'en',
-        'LANGUAGES': (('en', 'English'),
-                      ('it', 'Italian')),
-        'CMS_LANGUAGES': {
-            1: [ {'code' : 'en',
-                  'name': 'English',
-                  'public': True},
-                 {'code': 'it',
-                  'name': 'Italian',
-                  'public': True},
-            ],
-            'default': {
-                'public': True,
-                'hide_untranslated': False,
-            }
+@override_settings(
+    LANGUAGE_CODE='en',
+    LANGUAGES=(('en', 'English'),
+               ('it', 'Italian')),
+    CMS_LANGUAGES={
+        1: [{'code' : 'en',
+             'name': 'English',
+             'public': True},
+            {'code': 'it',
+             'name': 'Italian',
+             'public': True},
+        ],
+        'default': {
+            'public': True,
+            'hide_untranslated': False,
         },
-        'SITE_ID': 1,
-    }
-
+    },
+    SITE_ID=1,
+)
+class PlaceholderBasicTests(CMSLiveTests):
 
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
@@ -402,11 +400,11 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self.assertEqual(len(plugins), 2)
 
 
-class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
-    settings_overrides = {
-        'SITE_ID': 1,
-        'CMS_PERMISSION': False,
-    }
+@override_settings(
+    SITE_ID=1,
+    CMS_PERMISSION=False,
+)
+class StaticPlaceholderPermissionTests(CMSLiveTests):
 
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
