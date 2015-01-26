@@ -44,7 +44,7 @@ Now run the application's migrations using ``south``::
 
     python manage.py migrate polls
 
-At this point you should be able to add create polls and choices in the Django
+At this point you should be able to create polls and choices in the Django
 admin - localhost:8000/admin/ - and fill them in at ``/polls/``.
 
 However, in pages of the polls application we only have minimal templates, and
