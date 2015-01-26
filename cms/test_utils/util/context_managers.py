@@ -10,6 +10,10 @@ from django.db import reset_queries
 from django.template import context
 from django.utils.six.moves import StringIO
 from django.utils.translation import get_language, activate
+try:
+    from django.utils.translation.trans_real import reset_cache
+except ImportError:  # Django 1.6
+    reset_cache = lambda **kwargs: None
 
 from cms.utils.compat.dj import get_user_model
 
@@ -31,7 +35,13 @@ class SettingsOverride(object):
 
     def __init__(self, **overrides):
         self.overrides = overrides
-        self.special_handlers = {
+        self.enter_handlers = {
+            'LANGUAGES': reset_cache,
+            'LANGUAGE_CODE': reset_cache,
+        }
+        self.exit_handlers = {
+            'LANGUAGES': reset_cache,
+            'LANGUAGE_CODE': reset_cache,
             'TEMPLATE_CONTEXT_PROCESSORS': self.template_context_processors,
         }
 
@@ -40,6 +50,9 @@ class SettingsOverride(object):
         for key, value in self.overrides.items():
             self.old[key] = getattr(settings, key, NULL)
             setattr(settings, key, value)
+            handler = self.enter_handlers.get(key)
+            if handler:
+                handler(setting=key)
 
     def __exit__(self, type, value, traceback):
         for key, value in self.old.items():
@@ -47,9 +60,11 @@ class SettingsOverride(object):
                 setattr(settings, key, value)
             else:
                 delattr(settings,key) # do not pollute the context!
-            self.special_handlers.get(key, lambda:None)()
+            handler = self.exit_handlers.get(key)
+            if handler:
+                handler(setting=key)
 
-    def template_context_processors(self):
+    def template_context_processors(self, **kwargs):
         context._standard_context_processors = None
 
 

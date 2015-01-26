@@ -20,7 +20,7 @@ from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import AppAlreadyRegistered
-from cms.models import Page, CMSPlugin
+from cms.models import CMSPlugin, Page, Placeholder
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
@@ -415,8 +415,6 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
         self.base_url = self.live_server_url
 
-        self.placeholder_name = 'cms_placeholder-5'
-
         self.user = self._create_user("testuser", is_staff=True)
         self.user.user_permissions = Permission.objects.exclude(codename="edit_static_placeholder")
 
@@ -440,9 +438,12 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
         self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
 
+        pk = Placeholder.objects.filter(slot='logo').order_by('id')[0].pk
+        placeholder_name = 'cms_placeholder-%s' % pk
+
         # test static placeholder permission (content of static placeholders is NOT editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, self.placeholder_name)
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, placeholder_name)
 
         # update userpermission
         edit_permission = Permission.objects.get(codename="edit_static_placeholder")
@@ -450,4 +451,4 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
         # test static placeholder permission (content of static placeholders is editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertTrue(self.driver.find_element_by_class_name(self.placeholder_name))
+        self.assertTrue(self.driver.find_element_by_class_name(placeholder_name))
