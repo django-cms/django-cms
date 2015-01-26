@@ -13,8 +13,8 @@ addons:
 
 env:
   global:
-    - secure: M+3SprdbdJKnK/Hf4EWkEY88OJaPq3ZY2v0xEdKCCq2IVrtNtSj3f3YkpYHiLWUM55AZ8Bc0m0Eizsfdyn59FQynFwzOhYsrhigWCCA7T9JbH0rZEJqNY22Z2H5F8Xm3f4qJx6eozlsHK+cguij3TJNrVPYG5y9S/+kylW1+WSA=
-    - secure: HdA4aiN8py/MKwLftOBP9ji/jt3kguvol+DPGs8lZ+LcLSBB67D1sCeTzcv4IHeDEFPWMQAbEQ3V9tc9LFjpKR9w5bROw4+QHqC5zLHne/Hpu4AB1GdGSuXse/M5/GvhWiprVBz9eHnzlYmw4QGUOHR7uBZ2NYkDIe61wrm+i0o=
+    - secure: "dyJE69B+QOE1AMV59MSV1nSsmucJY52ziEdwLFWzLQE6v9bK83jihGGzrxnEM1FEpS6hD8y9/TjnFUArYRnPnOGOnA7HGetpHj6fUcJbSBYYYZy2E5264tRwy1wM2sL45aSB9Hc9fXdGt4SvPDqE+bZQbUIP6yxaRc8iGIanxTU="
+    - secure: "VjvD6t2JfpZAExS3MBCyT3mOfhVxieIVllJajxiPNtQ020aF8eeyaqa804GYY8MJ/lNK/uclpKNZUURpexgHrQ+9vUJ0BHuFlwsDzWSyrr+ShL+O2C7cE0hKoop1TIrZvdHjSzpb31tIGItL3Gk16cVKYwcAULrmHh15QEOo4eg="
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
