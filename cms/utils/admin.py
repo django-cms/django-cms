@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -12,7 +13,6 @@ from cms.models import Page, GlobalPagePermission
 from cms.utils import get_language_from_request
 from cms.utils import get_language_list
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_4
 
 NOT_FOUND_RESPONSE = "NotFound"
 
@@ -24,10 +24,7 @@ def jsonify_request(response):
          * content: original response content
     """
     content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
-    if DJANGO_1_4:
-        return HttpResponse(json.dumps(content), mimetype="application/json")
-    else:
-        return HttpResponse(json.dumps(content), content_type="application/json")
+    return HttpResponse(json.dumps(content), content_type="application/json")
 
 
 publisher_classes = {
@@ -49,7 +46,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
     #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
     if get_cms_setting('PERMISSION'):
-        # jstree metadata generator 
+        # jstree metadata generator
         md = []
 
         #if not has_add_page_permission:
@@ -70,7 +67,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
             global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
                 request.user, page.site_id).exists()
             request.user._global_add_perm_cache = global_add_perm
-        if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
+        if request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts)) and global_add_perm:
             has_add_on_same_level_permission = True
     from cms.utils import permissions
     if not has_add_on_same_level_permission and page.parent_id:
@@ -117,7 +114,4 @@ def render_admin_menu_item(request, page, template=None, language=None):
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered, language))
     # add mimetype to help out IE
-    if DJANGO_1_4:
-        return render_to_response(template, context, mimetype="text/html; charset=utf-8")
-    else:
-        return render_to_response(template, context, content_type="text/html; charset=utf-8")
+    return render_to_response(template, context, content_type="text/html; charset=utf-8")

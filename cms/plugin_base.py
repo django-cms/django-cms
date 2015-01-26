@@ -23,7 +23,6 @@ except ImportError:
 
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.utils import get_cms_setting, get_language_list
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.urlutils import admin_reverse
@@ -346,11 +345,10 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         """
         self.object_successfully_changed = True
 
-        if not DJANGO_1_4:
-            post_url_continue = reverse('admin:cms_page_edit_plugin',
-                    args=(obj._get_pk_val(),),
-                    current_app=self.admin_site.name)
-            kwargs.setdefault('post_url_continue', post_url_continue)
+        post_url_continue = reverse('admin:cms_page_edit_plugin',
+                args=(obj._get_pk_val(),),
+                current_app=self.admin_site.name)
+        kwargs.setdefault('post_url_continue', post_url_continue)
         return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
 
     def log_addition(self, request, obj):

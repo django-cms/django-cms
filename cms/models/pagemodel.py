@@ -4,6 +4,7 @@ from cms.publisher.errors import PublisherCantPublish
 from os.path import join
 
 from django.utils.timezone import now
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
@@ -19,7 +20,6 @@ from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.utils import i18n, page as page_utils
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
@@ -441,10 +441,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self.created_by = self.changed_by
         if commit:
             if no_signals:  # ugly hack because of mptt
-                if DJANGO_1_5:
-                    self.save_base(cls=self.__class__, **kwargs)
-                else:
-                    self.save_base(**kwargs)
+                self.save_base(**kwargs)
             else:
                 if not self.depth:
                     if self.parent_id:
@@ -467,11 +464,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
-
-        if not DJANGO_1_5 and 'cls' in kwargs:
-            del kwargs['cls']
-        ret = super(Page, self).save_base(*args, **kwargs)
-        return ret
+        return super(Page, self).save_base(*args, **kwargs)
 
     def is_new_dirty(self):
         if self.pk:
@@ -1013,7 +1006,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             user = request.user
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        return (user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
                 and self.has_generic_permission(request, "change"))
 
     def has_delete_permission(self, request, user=None):
@@ -1022,7 +1015,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             user = request.user
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+        return (user.has_perm(opts.app_label + '.' + get_permission_codename('delete', opts))
                 and self.has_generic_permission(request, "delete"))
 
     def has_publish_permission(self, request, user=None):

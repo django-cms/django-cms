@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth import get_permission_codename
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
@@ -38,10 +39,10 @@ def has_page_add_permission(request):
     Return true if the current user has permission to add a new page. This is
     just used for general add buttons - only superuser, or user with can_add in
     globalpagepermission can add page.
-    
+
     Special case occur when page is going to be added from add page button in
     change list - then we have target and position there, so check if user can
-    add page under target page will occur. 
+    add page under target page will occur.
     """
     opts = Page._meta
     if request.user.is_superuser:
@@ -61,7 +62,7 @@ def has_page_add_permission(request):
             return False
         global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
             request.user, site).exists()
-        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
+        if (request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts))
                 and global_add_perm):
             return True
         if position in ("first-child", "last-child"):
@@ -72,7 +73,7 @@ def has_page_add_permission(request):
     else:
         global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
             request.user, site).exists()
-        if (request.user.has_perm(opts.app_label + '.' + opts.get_add_permission())
+        if (request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts))
                 and global_add_perm):
             return True
     return False
@@ -103,7 +104,7 @@ def has_page_change_permission(request):
     global_change_perm = GlobalPagePermission.objects.user_has_change_permission(
         request.user, site).exists()
     return request.user.is_superuser or (
-        request.user.has_perm(opts.app_label + '.' + opts.get_change_permission())
+        request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
         and global_change_perm or has_any_page_change_permissions(request))
 
 
@@ -143,21 +144,21 @@ def get_any_page_view_permissions(request, page):
 def get_user_permission_level(user):
     """
     Returns highest user level from the page/permission hierarchy on which
-    user haves can_change_permission. Also takes look into user groups. Higher 
-    level equals to lover number. Users on top of hierarchy have level 0. Level 
+    user haves can_change_permission. Also takes look into user groups. Higher
+    level equals to lover number. Users on top of hierarchy have level 0. Level
     is the same like page.level attribute.
-    
+
     Example:
                               A,W                    level 0
                             /    \
                           user    B,GroupE           level 1
                         /     \
                       C,X     D,Y,W                  level 2
-        
+
         Users A, W have user level 0. GroupE and all his users have user level 1
         If user D is a member of GroupE, his user level will be 1, otherwise is
         2.
-    
+
     """
     if (user.is_superuser or
             GlobalPagePermission.objects.with_can_change_permissions(user).exists()):
@@ -175,29 +176,29 @@ def get_subordinate_users(user):
     """
     Returns users queryset, containing all subordinate users to given user
     including users created by given user and not assigned to any page.
-    
+
     Not assigned users must be returned, because they shouldn't get lost, and
-    user should still have possibility to see them. 
-    
+    user should still have possibility to see them.
+
     Only users created_by given user which are on the same, or lover level are
     returned.
-    
+
     If user haves global permissions or is a superuser, then he can see all the
     users.
-    
+
     This function is currently used in PagePermissionInlineAdminForm for limit
-    users in permission combobox. 
-    
+    users in permission combobox.
+
     Example:
                               A,W                    level 0
                             /    \
                           user    B,GroupE           level 1
                 Z       /     \
                       C,X     D,Y,W                  level 2
-                      
+
         Rules: W was created by user, Z was created by user, but is not assigned
         to any page.
-        
+
         Will return [user, C, X, D, Y, Z]. W was created by user, but is also
         assigned to higher level.
     """
@@ -212,7 +213,7 @@ def get_subordinate_users(user):
     try:
         user_level = get_user_permission_level(user)
     except NoPermissionsException:
-        # no permission so only staff and no page permissions 
+        # no permission so only staff and no page permissions
         qs = get_user_model().objects.distinct().filter(
                 Q(is_staff=True) &
                 Q(pageuser__created_by=user) &
@@ -262,7 +263,7 @@ def has_global_change_permissions_permission(request):
     opts = GlobalPagePermission._meta
     user = request.user
     if user.is_superuser or (
-        user.has_perm(opts.app_label + '.' + opts.get_change_permission()) and
+        user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts)) and
         has_global_page_permission(request, can_change=True)):
         return True
     return False
@@ -281,9 +282,9 @@ def has_generic_permission(page_id, user, attr, site):
 def get_user_sites_queryset(user):
     """
     Returns queryset of all sites available for given user.
-    
+
     1.  For superuser always returns all sites.
-    2.  For global user returns all sites he haves in global page permissions 
+    2.  For global user returns all sites he haves in global page permissions
         together with any sites he is assigned to over an page.
     3.  For standard user returns just sites he is assigned to over pages.
     """
