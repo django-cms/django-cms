@@ -26,8 +26,6 @@ class CMSToolbarLoginForm(AuthenticationForm):
         kwargs['prefix'] = kwargs.get('prefix', 'cms')
         super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)
 
-    def check_for_test_cookie(self): pass  # for some reason this test fails in our case. but login works.
-
 
 class CMSToolbar(ToolbarAPIMixin):
     """
