@@ -9,7 +9,8 @@ python:
 sudo: false
 
 env:
-  - DISPLAY=:99.0
+  global:
+    - DISPLAY=:99.0
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
