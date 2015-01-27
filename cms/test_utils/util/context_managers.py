@@ -2,7 +2,7 @@
 import sys
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
-from tempfile import template, mkdtemp
+from tempfile import template, mkdtemp, _exists
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -74,12 +74,8 @@ class TemporaryDirectory:
         return self.name
 
     def cleanup(self):
-        try:
-            from tempfile import _exists
-            if _exists(self.name):
-                _rmtree(self.name)
-        except ImportError:
-            pass
+        if _exists(self.name):
+            _rmtree(self.name)
 
     def __exit__(self, exc, value, tb):
         self.cleanup()

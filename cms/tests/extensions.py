@@ -69,7 +69,7 @@ class ExtensionsTestCase(TestCase):
             from django.apps import apps
             del apps.all_models['cms']['testpageextension']
             del apps.all_models['cms']['testtitleextension']
-        except ImportError:
+        except ImportError:  # Django 1.6
             pass
 
     def get_page_extension_class(self):

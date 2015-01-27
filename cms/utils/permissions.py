@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from threading import local
+
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
@@ -8,10 +10,6 @@ from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
 
-try: # pragma: no cover
-    from threading import local
-except ImportError: # pragma: no cover
-    from django.utils._threading_local import local
 
 # thread local support
 _thread_locals = local()

@@ -1651,18 +1651,9 @@ class BrokenPluginTests(TestCase):
         exist.
         """
         new_apps = ['cms.test_utils.project.brokenpluginapp']
-        try:
-            from django.apps import apps
-            apps.set_installed_apps(new_apps)
-
+        with self.settings(INSTALLED_APPS=new_apps):
             plugin_pool.discovered = False
             self.assertRaises(ImportError, plugin_pool.discover_plugins)
-
-            apps.unset_installed_apps()
-        except ImportError:
-            with self.settings(INSTALLED_APPS=new_apps):
-                plugin_pool.discovered = False
-                self.assertRaises(ImportError, plugin_pool.discover_plugins)
 
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):

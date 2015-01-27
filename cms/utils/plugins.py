@@ -16,7 +16,7 @@ from sekizai.helpers import is_variable_extend_node
 
 try:
     from django.template.loader_tags import ConstantIncludeNode as IncludeNode
-except ImportError:
+except ImportError:  # Django 1.6 ^^ (the latter also exists on 1.6 though)
     from django.template.loader_tags import IncludeNode
 
 from cms.api import add_plugin

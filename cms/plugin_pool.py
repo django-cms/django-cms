@@ -112,10 +112,7 @@ class PluginPool(object):
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
         if is_installed('reversion'):
-            try:
-                from reversion.registration import RegistrationError
-            except ImportError:
-                from reversion.revisions import RegistrationError
+            from reversion.revisions import RegistrationError
             try:
                 reversion_register(plugin.model)
             except RegistrationError:
