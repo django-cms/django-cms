@@ -50,6 +50,11 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             #  skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
+            if not all([
+                    os.environ.get('SAUCE_USERNAME', None),
+                    os.environ.get('SAUCE_ACCESS_KEY', None)
+            ]):
+                raise unittest.SkipTest("Cannot connect to Sauce Labs")
             capabilities = dict(**webdriver.DesiredCapabilities.CHROME)
             capabilities['version'] = '31'
             capabilities['platform'] = 'OS X 10.9'
