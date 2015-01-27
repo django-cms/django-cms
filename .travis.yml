@@ -8,10 +8,13 @@ python:
 
 sudo: false
 
+addons:
+  sauce_connect: true
+
 env:
   global:
-    - SAUCE_USERNAME=digi604
-    - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
+    - secure: "dyJE69B+QOE1AMV59MSV1nSsmucJY52ziEdwLFWzLQE6v9bK83jihGGzrxnEM1FEpS6hD8y9/TjnFUArYRnPnOGOnA7HGetpHj6fUcJbSBYYYZy2E5264tRwy1wM2sL45aSB9Hc9fXdGt4SvPDqE+bZQbUIP6yxaRc8iGIanxTU="
+    - secure: "VjvD6t2JfpZAExS3MBCyT3mOfhVxieIVllJajxiPNtQ020aF8eeyaqa804GYY8MJ/lNK/uclpKNZUURpexgHrQ+9vUJ0BHuFlwsDzWSyrr+ShL+O2C7cE0hKoop1TIrZvdHjSzpb31tIGItL3Gk16cVKYwcAULrmHh15QEOo4eg="
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0

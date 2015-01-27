@@ -221,34 +221,21 @@ $(document).ready(function () {
 		// public methods
 		addPlugin: function (type, name, parent) {
 			// cancel request if already in progress
-			if(CMS.API.locked) return false;
-			CMS.API.locked = true;
-
-			var that = this;
-			var data = {
+			var params = {
 				'placeholder_id': this.options.placeholder_id,
 				'plugin_type': type,
-				'plugin_parent': parent || '',
-				'plugin_language': this.options.plugin_language,
-				'csrfmiddlewaretoken': this.csrf
+				'plugin_language': this.options.plugin_language
 			};
-
-			$.ajax({
-				'type': 'POST',
-				'url': this.options.urls.add_plugin,
-				'data': data,
-				'success': function (data) {
-					CMS.API.locked = false;
-					that.newPlugin = data;
-					that.editPlugin(data.url, name, data.breadcrumb);
-				},
-				'error': function (jqXHR) {
-					CMS.API.locked = false;
-					var msg = CMS.config.lang.error;
-					// trigger error
-					that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
-				}
+			if (parent){
+				params['plugin_parent'] = parent;
+			}
+			var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
+			var modal = new CMS.Modal({
+				'newPlugin': this.newPlugin || false,
+				'onClose': this.options.onClose || false,
+				'redirectOnClose': this.options.redirectOnClose || false
 			});
+			modal.open(url, name);
 		},
 
 		editPlugin: function (url, name, breadcrumb) {

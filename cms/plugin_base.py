@@ -1,27 +1,34 @@
 # -*- coding: utf-8 -*-
 import json
+import re
 import warnings
 
-try:
-    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
-                                              ModelAdminMetaClass)
-except ImportError:
-    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
-import re
-
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.utils import get_cms_setting
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.exceptions import SubClassNeededError, Deprecated
-from cms.models import CMSPlugin
+from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib import admin
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
+                                              ModelAdminMetaClass)
+except ImportError:
+    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
+
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
+from cms.utils import get_cms_setting, get_language_list
+from cms.utils.compat.metaclasses import with_metaclass
+from cms.utils.placeholder import get_placeholder_conf
+from cms.utils.urlutils import admin_reverse
+from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
+from cms.exceptions import SubClassNeededError, Deprecated, PluginLimitReached
+from cms.models import CMSPlugin, Placeholder
 
 
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
@@ -186,15 +193,107 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
 
-    def has_add_permission(self, request, *args, **kwargs):
-        """Permission handling change - if user is allowed to change the page
-        he must be also allowed to add/change/delete plugins..
-
-        Not sure if there will be plugin permission requirement in future, but
-        if, then this must be changed.
+    def has_add_permission(self, request):
         """
-        return self.cms_plugin_instance.has_change_permission(request)
-    has_delete_permission = has_change_permission = has_add_permission
+        By default requires the user to have permission to add the plugin
+        instance and add permission of the object to which the plugin is
+        added (eg a page).
+        """
+        if 'placeholder_id' not in request.GET:
+            return False
+        if not super(CMSPluginBase, self).has_add_permission(request):
+            return False
+        placeholder = Placeholder.objects.get(pk=request.GET['placeholder_id'])
+        return placeholder.has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        """
+        By default requires the user to have permission to change the plugin
+        instance and the object, to which the plugin is attached (eg a page).
+        """
+        if obj:
+            return obj.has_change_permission(request)
+        else:
+            return self.has_add_permission(request)
+    has_delete_permission = has_change_permission
+
+    def get_form(self, request, obj=None, **kwargs):
+        form_class = super(CMSPluginBase, self).get_form(request, obj, **kwargs)
+
+        if obj:
+            return form_class
+
+        plugin_type = self.__class__.__name__
+
+        class Form(form_class):
+            def __init__(self, *args, **kwargs):
+                super(Form, self).__init__(*args, **kwargs)
+                self.instance.language = request.GET['plugin_language']
+                self.instance.placeholder_id = request.GET['placeholder_id']
+                self.instance.parent_id = request.GET.get(
+                    'plugin_parent', None
+                )
+                self.instance.plugin_type = plugin_type
+
+        return Form
+
+    def add_view_check_request(self, request):
+        from cms.utils.plugins import has_reached_plugin_limit
+        plugin_type = self.__class__.__name__
+
+        placeholder = get_object_or_404(
+            Placeholder, pk=request.GET['placeholder_id']
+        )
+
+        language = request.GET['plugin_language']
+        if language not in get_language_list():
+            return HttpResponseBadRequest(force_unicode(
+                _("Language must be set to a supported language!")
+            ))
+
+        if request.GET.get('plugin_parent', None):
+            get_object_or_404(
+                CMSPlugin, pk=request.GET['plugin_parent']
+            )
+
+        if not self.has_add_permission(request):
+            return HttpResponseForbidden(force_unicode(
+                _('You do not have permission to add a plugin')
+            ))
+
+        if placeholder.page:
+            template = placeholder.page.get_template()
+        else:
+            template = None
+        try:
+            has_reached_plugin_limit(
+                placeholder,
+                plugin_type,
+                language,
+                template=template
+            )
+        except PluginLimitReached as er:
+            return HttpResponseBadRequest(er)
+
+        return True
+
+    def add_view(self, request, form_url='', extra_context=None):
+        result = self.add_view_check_request(request)
+
+        if isinstance(result, HttpResponse):
+            return result
+
+        return super(CMSPluginBase, self).add_view(
+            request, form_url, extra_context
+        )
+
+    def response_post_save_add(self, request, obj):
+        """
+        Always redirect to index. Usually CMS Plugins aren't registred with
+        an admin site directly and the add_view is accessed via frontend
+        editing.
+        """
+        return HttpResponseRedirect(admin_reverse('index'))
 
     def save_model(self, request, obj, form, change):
         """
@@ -213,6 +312,16 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
                 # subclassing cms_plugin_instance (one to one relation)
                 value = getattr(self.cms_plugin_instance, field.name)
                 setattr(obj, field.name, value)
+        # When adding an object, it won't have a position
+        if not obj.position:
+            if obj.parent_id:
+                obj.position = CMSPlugin.objects.filter(
+                    parent_id=obj.parent_id
+                ).count()
+            else:
+                obj.position = CMSPlugin.objects.filter(
+                    placeholder_id=obj.placeholder_id
+                ).count()
 
         # remember the saved object
         self.saved_object = obj

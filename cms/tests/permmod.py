@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
@@ -149,14 +150,15 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         with self.login_user_context(user):
             placeholder = page.placeholders.all()[0]
             post_data = {
+                'body': 'Test'
+            }
+            url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
                 'plugin_language': 'en',
-                'plugin_parent': '',
                 'placeholder_id': placeholder.pk,
                 'plugin_type': 'TextPlugin'
-            }
-            url = URL_CMS_PLUGIN_ADD
+            })
             response = self.client.post(url, post_data)
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             return response.content.decode('utf8')
 
     def test_super_can_add_page_to_root(self):

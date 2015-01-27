@@ -4,6 +4,7 @@ import json
 import datetime
 from cms import api
 from cms.utils.urlutils import admin_reverse
+from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
@@ -1003,18 +1004,17 @@ class PluginPermissionTests(AdminTestsBase):
         else:
             self.client.login(username='admin', password='admin')
 
-        url = admin_reverse('cms_page_add_plugin')
-        data = {
+        url = admin_reverse('cms_page_add_plugin') + '?' + urlencode({
             'plugin_type': 'TextPlugin',
             'placeholder_id': self._placeholder.pk,
             'plugin_language': 'en',
-            'plugin_parent': '',
-        }
-        response = self.client.post(url, data)
+
+        })
+        response = self.client.post(url, {})
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self._give_permission(admin, Text, 'add')
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 302)
 
     def test_plugin_edit_requires_permissions(self):
         """User tries to edit a plugin but has no permissions. He can edit the plugin after he got the permissions"""
@@ -1244,7 +1244,7 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.get(admin_url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-    def test_plugin_add_returns_valid_pk_for_plugin(self):
+    def test_plugin_add_with_permissions_redirects(self):
         admin_user = self._get_admin()
         self._give_cms_permissions(admin_user)
         self._give_permission(admin_user, Text, 'add')
@@ -1252,18 +1252,13 @@ class PluginPermissionTests(AdminTestsBase):
         username = getattr(admin_user, get_user_model().USERNAME_FIELD)
         self.client.login(username=username, password='admin')
 
-        url = admin_reverse('cms_page_add_plugin')
-        data = {
+        url = admin_reverse('cms_page_add_plugin') + '?' + urlencode({
             'plugin_type': 'TextPlugin',
             'placeholder_id': self._placeholder.pk,
             'plugin_language': 'en',
-            'plugin_parent': '',
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertEqual(response['content-type'], 'application/json')
-        pk = response.content.decode('utf8').split("edit-plugin/")[1].split("/")[0]
-        self.assertTrue(CMSPlugin.objects.filter(pk=int(pk)).exists())
+        })
+        response = self.client.post(url, {})
+        self.assertEqual(response.status_code, 302)
 
 
 class AdminFormsTests(AdminTestsBase):
