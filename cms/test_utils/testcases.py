@@ -14,11 +14,11 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
+from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.models import Page
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.utils.compat.urls import urljoin, unquote
 from cms.utils.permissions import set_current_user
 
 

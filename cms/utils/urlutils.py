@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from cms.utils.conf import get_cms_setting
+import re
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from cms.utils.compat.urls import urlparse
-import re
+from django.utils.six.moves.urllib.parse import urlparse
+
+from cms.utils.conf import get_cms_setting
 
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')

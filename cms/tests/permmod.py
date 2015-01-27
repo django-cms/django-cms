@@ -10,6 +10,7 @@ from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.utils import override_settings
+from django.utils.six.moves.urllib.parse import unquote
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
@@ -27,7 +28,6 @@ from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
 from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.test_utils.util.request_factory import RequestFactory
-from cms.utils.compat.urls import unquote
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
 from cms.utils.permissions import (has_page_add_permission,
