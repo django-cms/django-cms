@@ -8,9 +8,6 @@ python:
 
 sudo: false
 
-addons:
-  sauce_connect: true
-
 env:
   global:
     - secure: "dyJE69B+QOE1AMV59MSV1nSsmucJY52ziEdwLFWzLQE6v9bK83jihGGzrxnEM1FEpS6hD8y9/TjnFUArYRnPnOGOnA7HGetpHj6fUcJbSBYYYZy2E5264tRwy1wM2sL45aSB9Hc9fXdGt4SvPDqE+bZQbUIP6yxaRc8iGIanxTU="

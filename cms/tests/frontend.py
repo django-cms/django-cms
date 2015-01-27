@@ -63,7 +63,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             capabilities['tags'] = [
                 os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"
             ]
-            capabilities["tunnel-identifier"] = os.environ["TRAVIS_JOB_NUMBER"]
             username = os.environ["SAUCE_USERNAME"]
             access_key = os.environ["SAUCE_ACCESS_KEY"]
             hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
