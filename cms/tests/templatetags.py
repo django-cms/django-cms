@@ -383,4 +383,3 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request)
         with self.assertNumQueries(4):
             template.render(context)
-

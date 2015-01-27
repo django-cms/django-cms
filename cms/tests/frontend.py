@@ -289,7 +289,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
     def _login(self):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
-        
+
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
@@ -369,7 +369,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         drag = ActionChains(self.driver).click_and_hold(
             clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
-        );
+        )
 
         drag.perform()
 

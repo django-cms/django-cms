@@ -24,7 +24,7 @@ if hasattr(reversion.models, 'VERSION_CHANGE'):
 
 
 class BasicReversionTestCase(CMSTestCase):
-    def setUp(self):        
+    def setUp(self):
         self.user = self._create_user("test", True, True)
 
     def test_number_revisions(self):

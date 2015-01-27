@@ -38,7 +38,7 @@ class SettingsTests(CMSTestCase):
                 ImproperlyConfigured,
                 get_cms_setting, 'TEMPLATES'
             )
-    
+
     def test_create_page_without_inheritance_override(self):
         with SettingsOverride(CMS_TEMPLATE_INHERITANCE=False):
             for template in get_cms_setting('TEMPLATES'):

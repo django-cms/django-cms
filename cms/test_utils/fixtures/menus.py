@@ -8,7 +8,7 @@ class MenusFixture(object):
     def create_fixtures(self):
         """
         Tree from fixture:
-            
+
             + P1
             | + P2
             |   + P3
@@ -20,7 +20,7 @@ class MenusFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
@@ -37,7 +37,7 @@ class ExtendedMenusFixture(object):
     def create_fixtures(self):
         """
         Tree from fixture:
-            
+
             + P1
             | + P2
             |   + P3
@@ -52,7 +52,7 @@ class ExtendedMenusFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_MODERATOR=False, CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
@@ -72,19 +72,19 @@ class SubMenusFixture(object):
     def create_fixtures(self):
         """
         Tree from fixture:
-            
+
             + P1
             | + P2
             |   + P3
             + P4
             | + P5
-            + P6 
+            + P6
               + P7 (not in menu)
               + P8
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
         with SettingsOverride(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
@@ -110,7 +110,7 @@ class SoftrootFixture(object):
                 bbb
                     333
                     444
-        
+
         # all in nav, published and NOT softroot
         """
         defaults = {

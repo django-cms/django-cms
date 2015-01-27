@@ -77,7 +77,7 @@ class Title(models.Model):
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
 
-         # Published pages should always have a publication date
+        # Published pages should always have a publication date
         # if the page is published we set the publish date if not set yet.
         if self.page.publication_date is None and self.published:
             self.page.publication_date = timezone.now() - timedelta(seconds=5)

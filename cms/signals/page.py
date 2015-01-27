@@ -107,5 +107,3 @@ def update_home(instance, **kwargs):
         page._publisher_keep_state = True
         page._home_checked = True
         page.save()
-
-

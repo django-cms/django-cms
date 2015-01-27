@@ -21,14 +21,14 @@ class EmailUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users are required to have an email address.')
         email = self.normalize_email(email)
-        
+
         user = self.model(
             email=email,
             is_staff=is_staff, is_active=True,
             is_superuser=is_superuser, last_login=now,
             date_joined=now, **extra_fields
         )
-        
+
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -43,13 +43,13 @@ class EmailUserManager(BaseUserManager):
 
 class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
     """
-    An abstract user model that is an alternative to the standard AbstractUser.  The 
-    sole difference is that AbstractEmailUser does not have a username field, and uses 
+    An abstract user model that is an alternative to the standard AbstractUser.  The
+    sole difference is that AbstractEmailUser does not have a username field, and uses
     the email field as the primary identifier by default.
 
     Email and password are required. Other fields are optional.
     """
-    
+
     email = models.EmailField(
        'email address',
         blank=True,
@@ -68,7 +68,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
         max_length=30,
         blank=True
     )
-    
+
     is_staff = models.BooleanField(
         'staff status',
         default=False,
@@ -80,7 +80,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
         default=True,
         help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.'
     )
-    
+
     date_joined = models.DateTimeField('date joined', default=timezone.now)
 
     objects = EmailUserManager()

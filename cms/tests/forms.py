@@ -281,5 +281,3 @@ class PermissionFormTestCase(CMSTestCase):
         form = PageUserGroupForm(data=data, files=None, instance=instance)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
-
-

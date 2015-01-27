@@ -87,5 +87,3 @@ def pre_save_globalpagepermission(instance, raw, **kwargs):
 
 def pre_delete_globalpagepermission(instance, **kwargs):
     _clear_users_permissions(instance)
-
-

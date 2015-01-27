@@ -20,5 +20,3 @@ class UserSettings(models.Model):
 
     def __str__(self):
         return force_unicode(self.user)
-
-

@@ -37,7 +37,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
     RIGHT = RIGHT
-    
+
     def __init__(self):
         self.items = []
         self.menus = {}

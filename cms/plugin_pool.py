@@ -212,4 +212,3 @@ class PluginPool(object):
 
 
 plugin_pool = PluginPool()
-

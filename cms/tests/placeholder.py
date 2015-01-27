@@ -244,7 +244,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'plugins': ['TextPlugin', 'LinkPlugin'],
                 'default_plugins':[
                     {
-                        'plugin_type':'TextPlugin', 
+                        'plugin_type':'TextPlugin',
                         'values':{
                             'body':'<p>Some default text</p>'
                         },
@@ -500,12 +500,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'col_left': {
                 'default_plugins' : [
                     {
-                        'plugin_type':'TextPlugin', 
-                        'values':{'body':'<p>en default body 1</p>'}, 
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 1</p>'},
                     },
                     {
-                        'plugin_type':'TextPlugin', 
-                        'values':{'body':'<p>en default body 2</p>'}, 
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 2</p>'},
                     },
                 ]
             },
@@ -524,7 +524,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         """
         Validate a default textplugin with a nested default link plugin
         """
-        
+
         class NoPushPopContext(Context):
             def push(self):
                 pass
@@ -664,7 +664,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         which is retained by the cached template loader, and future
         renders of that template will render the super block twice.
         """
-    
+
         self.assertNotIn('one',
             get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
@@ -694,7 +694,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         output = template.render(Context({}))
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
-          
+
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
@@ -1182,5 +1182,3 @@ class PlaceholderI18NTest(CMSTestCase):
         response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/%d/' % ex.pk)
         self.assertNotContains(response,
                                """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
-
-

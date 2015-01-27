@@ -25,9 +25,9 @@ class Section(models.Model):
 class ArticlePluginModel(CMSPlugin):
     title = models.CharField(max_length=50)
     sections = models.ManyToManyField('Section')
-    
+
     def __str__(self):
         return self.title
-    
+
     def copy_relations(self, oldinstance):
         self.sections = oldinstance.sections.all()
