@@ -49,31 +49,9 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         if os.environ.get('SELENIUM', '') == '0':
             #  skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
-        if os.environ.get("TRAVIS_BUILD_NUMBER"):
-            capabilities = dict(**webdriver.DesiredCapabilities.CHROME)
-            capabilities['version'] = '31'
-            capabilities['platform'] = 'OS X 10.9'
-            capabilities['name'] = 'django CMS'
-            capabilities['build'] = os.environ["TRAVIS_BUILD_NUMBER"]
-            capabilities['tags'] = [
-                os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"
-            ]
-            capabilities["tunnel-identifier"] = os.environ["TRAVIS_JOB_NUMBER"]
-            username = os.environ["SAUCE_USERNAME"]
-            access_key = os.environ["SAUCE_ACCESS_KEY"]
-            hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
-                username,
-                access_key
-            )
-            cls.driver = webdriver.Remote(
-                desired_capabilities=capabilities,
-                command_executor=hub_url
-            )
-            cls.driver.implicitly_wait(30)
-        else:
-            driver = os.environ.get('SELENIUM_DRIVER_CLASS', 'Firefox')
-            cls.driver = getattr(webdriver, driver)()
-            cls.driver.implicitly_wait(5)
+        driver = os.environ.get('SELENIUM_DRIVER_CLASS', 'Firefox')
+        cls.driver = getattr(webdriver, driver)()
+        cls.driver.implicitly_wait(5)
         cls.accept_next_alert = True
 
     @classmethod
