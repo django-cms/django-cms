@@ -8,12 +8,12 @@ from cms.utils.compat.dj import force_unicode
 import re
 
 # checks validity of absolute / relative url
-any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$') 
+any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
 
 
 def levelize_path(path):
     """Splits given path to list of paths removing latest level in each step.
-    
+
     >>> path = '/application/item/new'
     >>> levelize_path(path)
     ['/application/item/new', '/application/item', '/application']
@@ -24,16 +24,16 @@ def levelize_path(path):
 
 def urljoin(*segments):
     """Joins url segments together and appends trailing slash if required.
-    
+
     >>> urljoin('a', 'b', 'c')
     u'a/b/c/'
-    
+
     >>> urljoin('a', '//b//', 'c')
     u'a/b/c/'
-    
+
     >>> urljoin('/a', '/b/', '/c/')
     u'/a/b/c/'
-    
+
     >>> urljoin('/a', '')
     u'/a/'
     """

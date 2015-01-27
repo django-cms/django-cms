@@ -148,14 +148,14 @@ class ExtensionsTestCase(TestCase):
 class ExtensionAdminTestCase(AdminTestsBase):
     def setUp(self):
         User = get_user_model()
-        
+
         self.admin, self.normal_guy = self._get_guys()
 
         if get_user_model().USERNAME_FIELD == 'email':
             self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'test2@test.com')
         else:
             self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'no_page_permission')
-        
+
         self.no_page_permission_user.is_staff = True
         self.no_page_permission_user.is_active = True
         self.no_page_permission_user.save()

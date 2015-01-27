@@ -18,7 +18,7 @@ class ArticlePlugin(CMSPluginBase):
                         'article_qs': article_qs,
                         'placeholder': placeholder})
         return context
-    
+
 plugin_pool.register_plugin(ArticlePlugin)
 
 

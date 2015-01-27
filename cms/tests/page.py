@@ -391,7 +391,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c, position="left")
         self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
-    
+
     def test_public_exceptions(self):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_b = create_page("page_b", "nav_playground.html", "en")
@@ -990,7 +990,7 @@ class PagesTestCase(CMSTestCase):
         )
 
         page = create_page(
-            title='subpage', 
+            title='subpage',
             template='nav_playground.html',
             language='en',
             published=True,

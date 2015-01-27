@@ -395,7 +395,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
 
         drag = ActionChains(self.driver).click_and_hold(
             clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
-        );
+        )
 
         drag.perform()
 

@@ -103,4 +103,3 @@ class TitleExtensionAdmin(ExtensionAdmin):
             except self.model.DoesNotExist:
                 pass
         return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)
-

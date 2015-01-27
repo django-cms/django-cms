@@ -44,7 +44,7 @@ class PagePermissionInlineAdmin(TabularInline):
     def get_queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise can user see only permissions for 
+        all permissions. Otherwise can user see only permissions for
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to itself)
         """

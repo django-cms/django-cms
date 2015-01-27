@@ -23,7 +23,7 @@ class NonRootCase(CMSTestCase):
     def create_some_pages(self):
         """
         Creates the following structure:
-        
+
         + P1
         | + P2
         |   + P3

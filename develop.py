@@ -10,8 +10,6 @@ import os
 import sys
 import warnings
 
-from six import StringIO
-
 from django import VERSION
 from django.core.exceptions import DjangoRuntimeWarning
 from django.core.exceptions import ImproperlyConfigured

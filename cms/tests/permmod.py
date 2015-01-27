@@ -46,31 +46,31 @@ def fake_tree_attrs(page):
 
 class PermissionModeratorTests(SettingsOverrideTestCase):
     """Permissions and moderator together
-    
+
     Fixtures contains 3 users and 1 published page and some other stuff
-    
+
     Users:
         1. `super`: superuser
         2. `master`: user with permissions to all applications
         3. `slave`: user assigned to page `slave-home`
-    
+
     Pages:
         1. `home`:
             - published page
             - master can do anything on its subpages, but not on home!
-            
+
         2. `master`:
             - published page
             - created by super
             - `master` can do anything on it and its descendants
             - subpages:
-        
+
         3.       `slave-home`:
                     - not published
                     - assigned slave user which can add/change/delete/
                       move/publish this page and its descendants
                     - `master` user want to moderate this page and all descendants
-                    
+
         4. `pageA`:
             - created by super
             - master can add/change/delete on it and descendants
@@ -200,7 +200,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 
             self.assertTrue(has_generic_permission(page.pk, self.user_slave, "publish", 1))
 
-            # publish as slave, published as user_master before 
+            # publish as slave, published as user_master before
             publish_page(page, self.user_slave, 'en')
             # user_slave is moderator for this page
             # approve / publish as user_slave
@@ -229,7 +229,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # add page
         page = create_page("page", "nav_playground.html", "en",
                            parent=self.slave_page, created_by=self.user_slave)
-        # same as test_slave_can_add_page_under_slave_home        
+        # same as test_slave_can_add_page_under_slave_home
 
         # must not have public object yet
         self.assertFalse(page.publisher_public)
@@ -306,10 +306,10 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
         self.assertFalse(subpage.publisher_public)
 
-        # publish both of them in reverse order 
+        # publish both of them in reverse order
         subpage = publish_page(subpage, self.user_master, 'en')
 
-        # subpage should not be published, because parent is not published 
+        # subpage should not be published, because parent is not published
         # yet, should be marked as `publish when parent`
         self.assertFalse(subpage.publisher_public)
 
@@ -340,7 +340,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         # tree id must be the same
         self.assertEqual(page.path[0:4], subpage.path[0:4])
 
-        # publish both of them  
+        # publish both of them
         page = self.reload(page)
         page = publish_page(page, self.user_super, 'en')
         # reload subpage, there were an path change
@@ -359,7 +359,7 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
         self.check_published_page_attributes(subpage)
 
     def test_super_add_page_to_root(self):
-        """Create page which is not under moderation in root, and check if 
+        """Create page which is not under moderation in root, and check if
         some properties are correct.
         """
         # create page under root
@@ -573,32 +573,32 @@ class PermissionModeratorTests(SettingsOverrideTestCase):
 class PatricksMoveTest(SettingsOverrideTestCase):
     """
     Fixtures contains 3 users and 1 published page and some other stuff
-    
+
     Users:
         1. `super`: superuser
         2. `master`: user with permissions to all applications
         3. `slave`: user assigned to page `slave-home`
-    
+
     Pages:
         1. `home`:
             - published page
             - master can do anything on its subpages, but not on home!
-            
+
         2. `master`:
             - published page
             - crated by super
             - `master` can do anything on it and its descendants
             - subpages:
-        
+
         3.       `slave-home`:
                     - not published
                     - assigned slave user which can add/change/delete/
                       move/publish/moderate this page and its descendants
                     - `master` user want to moderate this page and all descendants
-                    
+
         4. `pageA`:
             - created by super
-            - master can add/change/delete on it and descendants 
+            - master can add/change/delete on it and descendants
     """
     settings_overrides = {
         'CMS_PERMISSION': True,
@@ -694,33 +694,33 @@ class PatricksMoveTest(SettingsOverrideTestCase):
 
     def test_patricks_move(self):
         """
-        
+
         Tests permmod when moving trees of pages.
 
         1. build following tree (master node is approved and published)
-        
+
                  slave-home
                 /    |    \
                A     B     C
-                   /  \     
-                  D    E     
-                    /  |  \ 
-                   F   G   H               
+                   /  \
+                  D    E
+                    /  |  \
+                   F   G   H
 
         2. perform move operations:
             1. move G under C
             2. move E under G
-            
+
                  slave-home
                 /    |    \
                A     B     C
                    /        \
                   D          G
-                              \   
+                              \
                                E
                              /   \
-                            F     H       
-        
+                            F     H
+
         3. approve nodes in following order:
             1. approve H
             2. approve G
