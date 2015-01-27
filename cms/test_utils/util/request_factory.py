@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import SimpleCookie
-from django.test.client import (FakePayload, MULTIPART_CONTENT, encode_multipart, 
+from django.test.client import (FakePayload, MULTIPART_CONTENT, encode_multipart,
     BOUNDARY, CONTENT_TYPE_RE)
 from django.utils import six
 from django.utils.encoding import smart_str

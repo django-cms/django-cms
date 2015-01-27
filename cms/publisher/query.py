@@ -6,6 +6,6 @@ class PublisherQuerySet(QuerySet):
     """
     def drafts(self):
         return self.filter(publisher_is_draft=True)
-    
+
     def public(self):
         return self.filter(publisher_is_draft=False)

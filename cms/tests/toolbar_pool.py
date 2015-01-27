@@ -61,4 +61,3 @@ class ToolbarPoolTests(CMSTestCase):
                 response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 self.assertEqual(response.status_code, 200)
         toolbar_pool.toolbars = toolbars
-

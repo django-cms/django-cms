@@ -229,8 +229,8 @@ class ViewPermissionTests(SettingsOverrideTestCase):
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """
-        helper function to check the expected_granted_pages are 
-        not in the restricted_pages list and 
+        helper function to check the expected_granted_pages are
+        not in the restricted_pages list and
         all visible pages are in the expected_granted_pages
         """
         # log the user in if present
@@ -347,7 +347,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
             'page_d_d'
         ]
         urls = self.get_url_dict(all_pages)
-        
+
         if get_user_model().USERNAME_FIELD == 'email':
             user = get_user_model().objects.get(email='user_1@django-cms.org')
         else:
@@ -393,7 +393,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_2')
         urls = self.get_url_dict(all_pages)
-        
+
         if get_user_model().USERNAME_FIELD == 'email':
             user = get_user_model().objects.get(email='user_2@django-cms.org')
         else:
@@ -436,7 +436,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         ]
         self.assertGrantedVisibility(all_pages, granted, username='user_3')
         urls = self.get_url_dict(all_pages)
-        
+
         if get_user_model().USERNAME_FIELD == 'email':
             user = get_user_model().objects.get(email='user_3@django-cms.org')
         else:
@@ -475,7 +475,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
             user = get_user_model().objects.get(email='user_4@django-cms.org')
         else:
             user = get_user_model().objects.get(username='user_4')
-        
+
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_b/"], user)
         self.assertViewAllowed(urls["/en/page_b/page_b_b/page_b_b_a/"], user)
@@ -507,7 +507,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
             user = get_user_model().objects.get(email='user_5@django-cms.org')
         else:
             user = get_user_model().objects.get(username='user_5')
-        
+
         # call /
         self.assertViewNotAllowed(urls["/en/page_b/"], user)
         self.assertViewNotAllowed(urls["/en/page_b/page_b_b/"], user)
@@ -568,7 +568,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
 
     def _setup_permviewbug(self):
         """
-        Setup group_6_ACCESS_PAGE view restriction 
+        Setup group_6_ACCESS_PAGE view restriction
         """
         page = Page.objects.drafts().get(title_set__title="page_6")
         group = Group.objects.get(name__iexact=self.GROUPNAME_6)
@@ -619,5 +619,3 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         self.assertViewAllowed(urls[url], user)
         url = "/en/page_5/page_6/"
         self.assertViewAllowed(urls[url], user)
-
-

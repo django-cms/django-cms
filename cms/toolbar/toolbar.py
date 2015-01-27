@@ -292,4 +292,3 @@ class CMSToolbar(ToolbarAPIMixin):
                 result = getattr(toolbar, func_name)()
                 if isinstance(result, HttpResponse):
                     return result
-

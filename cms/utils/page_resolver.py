@@ -77,16 +77,16 @@ def get_page_from_path(path, preview=False, draft=False):
 def get_page_from_request(request, use_path=None):
     """
     Gets the current page from a request object.
-    
+
     URLs can be of the following form (this should help understand the code):
     http://server.whatever.com/<some_path>/"pages-root"/some/page/slug
-    
+
     <some_path>: This can be anything, and should be stripped when resolving
-        pages names. This means the CMS is not installed at the root of the 
+        pages names. This means the CMS is not installed at the root of the
         server's URLs.
     "pages-root" This is the root of Django urls for the CMS. It is, in essence
         an empty page slug (slug == '')
-        
+
     The page slug can then be resolved to a Page model object
     """
 

@@ -18,4 +18,3 @@ class TestPluginBetaModel(TestPluginAlphaModel):
     another concrete plugin via MTI or Multi-Table Inheritence.
     """
     beta = models.CharField('name', blank=False, default='test plugin beta', max_length=32)
-

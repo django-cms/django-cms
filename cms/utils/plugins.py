@@ -94,7 +94,7 @@ def _extend_nodelist(extend_node):
 
 def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
     from cms.templatetags.cms_tags import Placeholder
-    
+
     placeholders = []
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.

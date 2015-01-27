@@ -190,4 +190,3 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         with self.login_user_context(self.get_superuser()):
             response = self.client.post(url, data={'name': 'Name', 'code': 'content'})
             self.assertEqual(response.status_code, 302)
-

@@ -14,7 +14,7 @@ from cms.test_utils.util.context_managers import SettingsOverride
 
 class SiteTestCase(CMSTestCase):
     """Site framework specific test cases.
-    
+
     All stuff which is changing settings.SITE_ID for tests should come here.
     """
 

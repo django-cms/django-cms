@@ -202,7 +202,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_add_cancel_plugin(self):
         """
-        Test that you can cancel a new plugin before editing and 
+        Test that you can cancel a new plugin before editing and
         that the plugin is removed.
         """
         # add a new text plugin

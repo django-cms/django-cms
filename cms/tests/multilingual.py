@@ -25,12 +25,12 @@ TEMPLATE_NAME = 'tests/rendering/base.html'
 def get_primary_lanaguage(current_site=None):
     """Fetch the first language of the current site settings."""
     current_site = current_site or Site.objects.get_current()
-    return get_languages()[current_site.id][0]['code']    
-    
+    return get_languages()[current_site.id][0]['code']
+
 def get_secondary_lanaguage(current_site=None):
     """Fetch the other language of the current site settings."""
     current_site = current_site or Site.objects.get_current()
-    return get_languages()[current_site.id][1]['code']    
+    return get_languages()[current_site.id][1]['code']
 
 class MultilingualTestCase(SettingsOverrideTestCase):
     settings_overrides = {
@@ -44,27 +44,27 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         Test that a page can be created
         and that a new language can be created afterwards in the admin pages
         """
-        
+
         # Create a new page
-        
+
         # Use the very first language in the list of languages
         # for the current site
         current_site = Site.objects.get_current()
         TESTLANG = get_primary_lanaguage(current_site=current_site)
         page_data = self.get_new_page_data_dbfields(
-            site=current_site, 
+            site=current_site,
             language=TESTLANG
         )
 
         page = create_page(**page_data)
         title = page.get_title_obj()
-        
+
         # A title is set?
         self.assertNotEqual(title, None)
-        
+
         # Publish and unpublish the page
         page.publish(TESTLANG)
-        
+
         page.unpublish(TESTLANG)
         page = page.reload()
 
@@ -72,19 +72,19 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(), page_data['slug'])
         self.assertEqual(page.placeholders.all().count(), 2)
-        
+
         # Were public instances created?
         title = Title.objects.drafts().get(slug=page_data['slug'])
-    
+
         # Test that it's the default language
         self.assertEqual(title.language, TESTLANG)
-            
+
         # Do stuff using admin pages
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            
+
             page_data = self.get_pagedata_from_dbfields(page_data)
-            
+
             # Publish page using the admin
             page_data['published'] = True
             self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
@@ -92,7 +92,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
             page = page.reload()
             self.assertTrue(page.is_published(TESTLANG))
-            
+
             # Create a different language using the edit admin page
             # This test case is bound in actual experience...
             # pull#1604
@@ -101,28 +101,28 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data2['slug'] = 'ein-slug'
             TESTLANG2 = get_secondary_lanaguage(current_site=current_site)
             page_data2['language'] = TESTLANG2
-            
+
             # Ensure that the language version is not returned
             # since it does not exist
             self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyTitle))
-            
+
             # Now create it
             self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),
                              page_data2)
-            
+
             page = page.reload()
-            
+
             # Test the new language version
             self.assertEqual(page.get_title(language=TESTLANG2), page_data2['title'])
             self.assertEqual(page.get_slug(language=TESTLANG2), page_data2['slug'])
-            
+
             # Test the default language version (TESTLANG)
             self.assertEqual(page.get_slug(language=TESTLANG, fallback=False), page_data['slug'])
             self.assertEqual(page.get_title(language=TESTLANG, fallback=False), page_data['title'])
             self.assertEqual(page.get_slug(fallback=False), page_data['slug'])
             self.assertEqual(page.get_title(fallback=False), page_data['title'])
-    
-    
+
+
     def test_multilingual_page(self):
         TESTLANG = get_primary_lanaguage()
         TESTLANG2 = get_secondary_lanaguage()
@@ -345,4 +345,3 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             self.assertEqual(response.status_code, 200)
-

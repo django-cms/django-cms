@@ -64,11 +64,11 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             final.append(node)
             node.parent = None
         if not node.ancestor and not node.selected and not node.descendant:
-            # cut inactive nodes to extra_inactive, but not of descendants of 
+            # cut inactive nodes to extra_inactive, but not of descendants of
             # the selected node
             cut_after(node, extra_inactive, removed)
         if node.level > to_level and node.parent:
-            # remove nodes that are too deep, but not nodes that are on 
+            # remove nodes that are too deep, but not nodes that are on
             # from_level (local root nodes)
             remove(node, removed)
         if node.selected:
@@ -128,7 +128,7 @@ class ShowMenu(InclusionTag):
         if next_page:
             children = next_page.children
         else:
-        #new menu... get all the data so we can save a lot of queries
+            # new menu... get all the data so we can save a lot of queries
             nodes = menu_pool.get_nodes(request, namespace, root_id)
             if root_id: # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
@@ -252,9 +252,9 @@ register.tag(ShowSubMenu)
 class ShowBreadcrumb(InclusionTag):
     """
     Shows the breadcrumb from the node that has the same url as the current request
-    
+
     - start level: after which level should the breadcrumb start? 0=home
-    - template: template used to render the breadcrumb 
+    - template: template used to render the breadcrumb
     """
     name = 'show_breadcrumb'
     template = 'menu/dummy.html'
