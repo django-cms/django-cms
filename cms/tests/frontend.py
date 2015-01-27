@@ -94,15 +94,21 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         session = import_module(settings.SESSION_ENGINE).SessionStore()
         session.save()
         request = AttributeObject(session=session, META={})
-        user_instance, _ = get_user_model().objects.get_or_create(
-            username='admin'
+        user_model = get_user_model()
+        username = 'admin@example.com'
+        password = 'admin'
+        user_instance, _ = user_model.objects.get_or_create(
+            **{user_model.USERNAME_FIELD: username}
         )
-        user_instance.set_password('admin')
+        user_instance.set_password(password)
         user_instance.is_superuser = True
         user_instance.is_active = True
         user_instance.is_staff = True
         user_instance.save()
-        user = authenticate(username='admin', password='admin')
+        user = authenticate(**{
+            user_model.USERNAME_FIELD: username,
+            'password': password
+        })
         login(request, user)
         session.save()
 
