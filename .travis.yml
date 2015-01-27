@@ -8,8 +8,13 @@ python:
 
 sudo: false
 
+addons:
+  sauce_connect: true
+
 env:
-  - DISPLAY=:99.0
+  global:
+    - secure: "dyJE69B+QOE1AMV59MSV1nSsmucJY52ziEdwLFWzLQE6v9bK83jihGGzrxnEM1FEpS6hD8y9/TjnFUArYRnPnOGOnA7HGetpHj6fUcJbSBYYYZy2E5264tRwy1wM2sL45aSB9Hc9fXdGt4SvPDqE+bZQbUIP6yxaRc8iGIanxTU="
+    - secure: "VjvD6t2JfpZAExS3MBCyT3mOfhVxieIVllJajxiPNtQ020aF8eeyaqa804GYY8MJ/lNK/uclpKNZUURpexgHrQ+9vUJ0BHuFlwsDzWSyrr+ShL+O2C7cE0hKoop1TIrZvdHjSzpb31tIGItL3Gk16cVKYwcAULrmHh15QEOo4eg="
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
@@ -29,10 +34,6 @@ before_script:
   - sh -c "if [ '$DATABASE_URL' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql
     -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
     fi"
-
-before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
 
 install:
   - pip install -q -r "test_requirements/django-$DJANGO.txt"
