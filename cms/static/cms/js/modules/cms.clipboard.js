@@ -30,7 +30,7 @@ $(document).ready(function () {
 			this.triggerRemove = this.clipboard.find('.cms_clipboard-empty a');
 
 			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
 			this.timer = function () {};
 
 			// setup initial stuff
