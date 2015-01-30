@@ -107,6 +107,7 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         user_instance.save()
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
+        self.wait_page_loaded()
 
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(username)
