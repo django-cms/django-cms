@@ -120,6 +120,8 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         self.driver.add_cookie({
             'name': settings.SESSION_COOKIE_NAME,
             'value': session.session_key,
+            'path': '/',
+            'domain': urlparse(self.driver.current_url).hostname
         })
         self.driver.get('{0}/?{1}'.format(
             self.live_server_url,
