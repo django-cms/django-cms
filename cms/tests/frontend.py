@@ -4,15 +4,12 @@ import datetime
 import os
 import time
 
-from django.conf import settings
-from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test import LiveServerTestCase
 from django.utils import unittest
-from django.utils.importlib import import_module
 from djangocms_link.models import Link
 from djangocms_style.models import Style
 from selenium import webdriver
@@ -24,7 +21,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
-from urllib.parse import urlparse
 
 from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
@@ -35,7 +31,6 @@ from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
-from cms.test_utils.util.mock import AttributeObject
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
