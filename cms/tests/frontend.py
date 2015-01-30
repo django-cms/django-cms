@@ -37,7 +37,6 @@ from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat.dj import get_user_model
-from cms.utils.compat.urls import urlparse
 from cms.utils.conf import get_cms_setting
 
 
@@ -263,6 +262,7 @@ class ToolbarBasicTests(CMSLiveTests):
 
         url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/%s' % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
+        self.wait_page_loaded()
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
