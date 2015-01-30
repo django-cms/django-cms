@@ -75,14 +75,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             cls.driver.implicitly_wait(5)
         cls.accept_next_alert = True
 
-    @property
-    def live_server_url(self):
-        host = os.environ.get("SELENIUM_HOST_OVERERIDE", None)
-        if host:
-            return 'http://%s:%s' % (host, self.server_thread.port)
-        else:
-            return super(CMSLiveTests, self).live_server_url
-
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
