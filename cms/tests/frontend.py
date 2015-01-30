@@ -24,6 +24,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoAlertPresentException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
+from urllib.parse import urlparse
 
 from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
