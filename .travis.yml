@@ -8,10 +8,15 @@ python:
 
 sudo: false
 
+addons:
+  hosts:
+    - travis-build.dev
+
 env:
   global:
     - secure: "dyJE69B+QOE1AMV59MSV1nSsmucJY52ziEdwLFWzLQE6v9bK83jihGGzrxnEM1FEpS6hD8y9/TjnFUArYRnPnOGOnA7HGetpHj6fUcJbSBYYYZy2E5264tRwy1wM2sL45aSB9Hc9fXdGt4SvPDqE+bZQbUIP6yxaRc8iGIanxTU="
     - secure: "VjvD6t2JfpZAExS3MBCyT3mOfhVxieIVllJajxiPNtQ020aF8eeyaqa804GYY8MJ/lNK/uclpKNZUURpexgHrQ+9vUJ0BHuFlwsDzWSyrr+ShL+O2C7cE0hKoop1TIrZvdHjSzpb31tIGItL3Gk16cVKYwcAULrmHh15QEOo4eg="
+    - SELENIUM_HOST_OVERRIDE=travis-build.dev
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0

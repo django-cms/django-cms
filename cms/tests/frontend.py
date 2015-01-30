@@ -34,6 +34,7 @@ from cms.models import Page, CMSPlugin
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.util import sauce_connect
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.test_utils.testcases import CMSTestCase
@@ -65,6 +66,7 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             ]
             username = os.environ["SAUCE_USERNAME"]
             access_key = os.environ["SAUCE_ACCESS_KEY"]
+            sauce_connect.connect(username, access_key)
             hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
                 username,
                 access_key
@@ -80,9 +82,18 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             cls.driver.implicitly_wait(5)
         cls.accept_next_alert = True
 
+    @property
+    def live_server_url(self):
+        host = os.environ.get("SELENIUM_HOST_OVERERIDE", None)
+        if host:
+            return 'http://%s:%s' % (host, self.server_thread.port)
+        else:
+            return super(CMSLiveTests, self).live_server_url
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
+        sauce_connect.disconnect()
         super(CMSLiveTests, cls).tearDownClass()
 
     def tearDown(self):
