@@ -30,11 +30,10 @@ from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import AppAlreadyRegistered
-from cms.models import Page, CMSPlugin
+from cms.models import Page, CMSPlugin, Title
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util import sauce_connect
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.test_utils.testcases import CMSTestCase
@@ -50,50 +49,14 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         if os.environ.get('SELENIUM', '') == '0':
             #  skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
-        if os.environ.get("TRAVIS_BUILD_NUMBER"):
-            if not all([
-                    os.environ.get('SAUCE_USERNAME', None),
-                    os.environ.get('SAUCE_ACCESS_KEY', None)
-            ]):
-                raise unittest.SkipTest("Cannot connect to Sauce Labs")
-            capabilities = dict(**webdriver.DesiredCapabilities.CHROME)
-            capabilities['version'] = '31'
-            capabilities['platform'] = 'OS X 10.9'
-            capabilities['name'] = 'django CMS'
-            capabilities['build'] = os.environ["TRAVIS_BUILD_NUMBER"]
-            capabilities['tags'] = [
-                os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"
-            ]
-            username = os.environ["SAUCE_USERNAME"]
-            access_key = os.environ["SAUCE_ACCESS_KEY"]
-            sauce_connect.connect(username, access_key)
-            hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
-                username,
-                access_key
-            )
-            cls.driver = webdriver.Remote(
-                desired_capabilities=capabilities,
-                command_executor=hub_url
-            )
-            cls.driver.implicitly_wait(30)
-        else:
-            driver = os.environ.get('SELENIUM_DRIVER_CLASS', 'Firefox')
-            cls.driver = getattr(webdriver, driver)()
-            cls.driver.implicitly_wait(5)
+        driver = os.environ.get('SELENIUM_DRIVER_CLASS', 'Firefox')
+        cls.driver = getattr(webdriver, driver)()
+        cls.driver.implicitly_wait(5)
         cls.accept_next_alert = True
-
-    @property
-    def live_server_url(self):
-        host = os.environ.get("SELENIUM_HOST_OVERERIDE", None)
-        if host:
-            return 'http://%s:%s' % (host, self.server_thread.port)
-        else:
-            return super(CMSLiveTests, self).live_server_url
 
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-        sauce_connect.disconnect()
         super(CMSLiveTests, cls).tearDownClass()
 
     def tearDown(self):
@@ -249,6 +212,7 @@ class ToolbarBasicTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
+        self.wait_page_loaded()
         self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
@@ -301,6 +265,7 @@ class ToolbarBasicTests(CMSLiveTests):
                     apphook=Example1App)
         url = '%s/%s/?%s' % (self.live_server_url, 'apphook/detail/class/%s' % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
+        self.wait_page_loaded()
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -316,6 +281,9 @@ class ToolbarBasicTests(CMSLiveTests):
             self.assertTrue(User.objects.all().count(), 1)
             driver = self.driver
             driver.get(self.base_url + "/de/")
+            self.wait_page_loaded()
+            qs = Title.objects.filter(title='SubPage')
+            self.assertEqual(qs.count(), 0)
             driver.find_element_by_id("add-page").click()
             driver.find_element_by_id("id_username").clear()
             driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
@@ -327,6 +295,9 @@ class ToolbarBasicTests(CMSLiveTests):
             driver.find_element_by_id("id_title").clear()
             driver.find_element_by_id("id_title").send_keys("SubPage")
             driver.find_element_by_name("_save").click()
+            self.wait_page_loaded()
+            qs = Title.objects.filter(title='SubPage')
+            self.assertEqual(qs.count(), 1)
 
 
 class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
