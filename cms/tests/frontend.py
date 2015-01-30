@@ -34,7 +34,6 @@ from cms.models import Page, CMSPlugin
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util import sauce_connect
 from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.test_utils.testcases import CMSTestCase
@@ -66,7 +65,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             ]
             username = os.environ["SAUCE_USERNAME"]
             access_key = os.environ["SAUCE_ACCESS_KEY"]
-            sauce_connect.connect(username, access_key)
             hub_url = "http://{0}:{1}@ondemand.saucelabs.com/wd/hub".format(
                 username,
                 access_key
@@ -93,7 +91,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
-        sauce_connect.disconnect()
         super(CMSLiveTests, cls).tearDownClass()
 
     def tearDown(self):
@@ -102,9 +99,6 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         cache.clear()
 
     def _login(self):
-        session = import_module(settings.SESSION_ENGINE).SessionStore()
-        session.save()
-        request = AttributeObject(session=session, META={})
         user_model = get_user_model()
         username = 'admin@example.com'
         password = 'admin'
@@ -116,29 +110,14 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         user_instance.is_active = True
         user_instance.is_staff = True
         user_instance.save()
-        user = authenticate(**{
-            user_model.USERNAME_FIELD: username,
-            'password': password
-        })
-        login(request, user)
-        session.save()
+        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.driver.get(url)
 
-        # We need to "warm up" the webdriver as we can only set cookies on the
-        # current domain
-        self.driver.get(self.live_server_url)
-        # While we don't care about the page fully loading, Django will freak
-        # out if we 'abort' this request, so we wait patiently for it to finish
-        self.wait_page_loaded()
-        self.driver.add_cookie({
-            'name': settings.SESSION_COOKIE_NAME,
-            'value': session.session_key,
-            'path': '/',
-            'domain': urlparse(self.driver.current_url).hostname
-        })
-        self.driver.get('{0}/?{1}'.format(
-            self.live_server_url,
-            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
+        username_input = self.driver.find_element_by_id("id_cms-username")
+        username_input.send_keys(username)
+        password_input = self.driver.find_element_by_id("id_cms-password")
+        password_input.send_keys(password)
+        password_input.submit()
         self.wait_page_loaded()
 
     def wait_until(self, callback, timeout=10):
