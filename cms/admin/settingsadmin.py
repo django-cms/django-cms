@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
+
+import json
 from functools import update_wrapper
-from cms.utils.urlutils import admin_reverse
-from django.http import HttpResponseRedirect, HttpResponse
-from django.contrib.auth.admin import csrf_protect_m
-from django.contrib.admin import ModelAdmin
 
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
+from django.contrib.auth.admin import csrf_protect_m
+from django.http import HttpResponseRedirect, HttpResponse
 
 from cms.models import UserSettings
-import json
 from cms.utils.transaction import wrap_transaction
+from cms.utils.urlutils import admin_reverse
 
 
 class SettingsAdmin(ModelAdmin):
@@ -58,7 +59,10 @@ class SettingsAdmin(ModelAdmin):
         if request.method == "POST":
             request.session['cms_settings'] = request.POST['settings']
             request.session.save()
-        return HttpResponse(json.dumps(request.session.get('cms_settings', '')), mimetype="application/json")
+        return HttpResponse(
+            json.dumps(request.session.get('cms_settings', '')),
+            mimetype="application/json"
+        )
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
