@@ -77,7 +77,8 @@ class MenuPool(object):
         self.menus = {}
         self.modifiers = []
         self.discovered = False
-        
+        self._expanded = False
+
     def discover_menus(self):
         if self.discovered:
             return
@@ -85,7 +86,32 @@ class MenuPool(object):
         from menus.modifiers import register
         register()
         self.discovered = True
-        
+        self._expanded = False
+
+    def _expand_menus(self):
+        """
+        Expands the menu_pool by converting any found CMSAttachMenu entries to
+        one entry for each page they are attached to. and instantiates menus
+        from the existing menu classes.
+        """
+        # Ideally, this would have been done in discover_menus(), but the pages
+        # aren't loaded when that executes. This private method is used to
+        # perform the expansion just before any # menus are built.
+        if self._expanded:
+            return
+        expanded_menus = {}
+        for menu_class_name, menu in self.menus.items():
+            if hasattr(menu, "get_pages"):
+                for page in menu.get_pages():
+                    namespace = "{0}:{1}".format(menu_class_name, page.pk)
+                    menu_inst = menu()
+                    menu_inst.page = page
+                    expanded_menus[namespace] = menu_inst
+            else:
+                expanded_menus[menu_class_name] = menu()
+        self._expanded = True
+        self.menus = expanded_menus
+
     def clear(self, site_id=None, language=None, all=False):
         '''
         This invalidates the cache for a given menu (site_id and language)
@@ -104,7 +130,9 @@ class MenuPool(object):
         if menu.__name__ in self.menus.keys():
             raise NamespaceAlreadyRegistered(
                 "[%s] a menu with this name is already registered" % menu.__name__)
-        self.menus[menu.__name__] = menu()
+        # Note: menu is still the menu CLASS at this point. Will get
+        # instantiated in self._expand_menus()
+        self.menus[menu.__name__] = menu
 
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
@@ -141,8 +169,9 @@ class MenuPool(object):
 
         final_nodes = []
         for menu_class_name in self.menus:
+            menu = self.menus[menu_class_name]
             try:
-                nodes = self.menus[menu_class_name].get_nodes(request)
+                nodes = menu.get_nodes(request)
             except NoReverseMatch:
                 # Apps might raise NoReverseMatch if an apphook does not yet
                 # exist, skip them instead of crashing
@@ -181,6 +210,7 @@ class MenuPool(object):
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None,
             breadcrumb=False):
         self.discover_menus()
+        self._expand_menus()
         if not site_id:
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(request, site_id)

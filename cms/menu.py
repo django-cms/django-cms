@@ -171,9 +171,12 @@ def page_to_node(page, home, cut):
     """
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
-    attr = {'soft_root': page.soft_root,
+    attr = {
+        'page': page,
+        'soft_root': page.soft_root,
         'auth_required': page.login_required,
-        'reverse_id': page.reverse_id, }
+        'reverse_id': page.reverse_id,
+    }
 
     parent_id = page.parent_id
     # Should we cut the Node from its parents?
@@ -208,7 +211,8 @@ def page_to_node(page, home, cut):
                 extenders.append(menu.__name__)
 
     if extenders:
-        attr['navigation_extenders'] = extenders
+        attr['navigation_extenders'] = [
+            "{0}:{1}".format(ext, page.pk) for ext in extenders]
 
     # Do we have a redirectURL?
     attr['redirect_url'] = page.get_redirect()  # save redirect URL if any
