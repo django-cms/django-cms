@@ -4,6 +4,7 @@ import sys
 from django.contrib.auth.models import Permission
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.core.urlresolvers import clear_url_caches, reverse
 from django.test.utils import override_settings
 from django.utils import six
@@ -562,7 +563,6 @@ class ApphooksTestCase(CMSTestCase):
         ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls',
     )
     def test_toolbar_staff(self):
-        # Test that the toolbar contains edito mode switcher if placeholders are available
         self.create_base_structure('Example1App', 'en')
         ex1 = Example1.objects.create(char_1='1', char_2='2', char_3='3', char_4='4', date_field=now())
         path = reverse('example_detail', kwargs={'pk': ex1.pk})
@@ -572,6 +572,7 @@ class ApphooksTestCase(CMSTestCase):
             response = self.client.get(path+"?edit")
         toolbar = CMSToolbar(response.context['request'])
         toolbar.populate()
+        response.context['request'].user = self.user
         placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
         placeholder_toolbar.populate()
         placeholder_toolbar.init_placeholders_from_request()
@@ -596,6 +597,17 @@ class ApphooksTestCase(CMSTestCase):
         response.context['request'].user = self.user
         toolbar = CMSToolbar(response.context['request'])
         toolbar.populate()
+        response.context['request'].user = self.user
+        placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
+        placeholder_toolbar.populate()
+        placeholder_toolbar.init_placeholders_from_request()
+        placeholder_toolbar.add_structure_mode()
+        self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 0)
+
+        permission = Permission.objects.get(codename='use_structure')
+        self.user.user_permissions.add(permission)
+
+        response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
         placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
         placeholder_toolbar.populate()
         placeholder_toolbar.init_placeholders_from_request()
@@ -605,8 +617,8 @@ class ApphooksTestCase(CMSTestCase):
         self.user = None
 
 
-@override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):
+    settings_overrides = {'ROOT_URLCONF': 'cms.test_utils.project.second_urls_for_apphook_tests'}
 
     def setUp(self):
         clear_app_resolvers()
