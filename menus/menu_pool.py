@@ -16,38 +16,39 @@ import copy
 
 logger = getLogger('menus')
 
+
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
     '''
     This is an easier to test "inner loop" building the menu tree structure
-    for one menu (one language, one site) 
+    for one menu (one language, one site)
     '''
-    done_nodes = {} # Dict of node.id:Node
+    done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
-    
-    # This is to prevent infinite loops - we need to compare the number of 
-    # times we see a specific node to "something", and for the time being, 
+
+    # This is to prevent infinite loops - we need to compare the number of
+    # times we see a specific node to "something", and for the time being,
     # it's the total number of nodes
     list_total_length = len(nodes)
-    
+
     while nodes:
-        # For when the node has a parent_id but we haven't seen it yet. 
+        # For when the node has a parent_id but we haven't seen it yet.
         # We must not append it to the final list in this case!
-        should_add_to_final_list = True 
-        
+        should_add_to_final_list = True
+
         node = nodes.pop(0)
-        
+
         # Increment the "seen" counter for this specific node.
-        node._counter = getattr(node,'_counter',0) + 1  
-        
+        node._counter = getattr(node, '_counter', 0) + 1
+
         # Implicit namespacing by menu.__name__
         if not node.namespace:
             node.namespace = menu_class_name
         if node.namespace not in done_nodes:
             # We need to create the namespace dict to avoid KeyErrors
-            done_nodes[node.namespace] = {} 
-        
+            done_nodes[node.namespace] = {}
+
         # If we have seen the parent_id already...
-        if node.parent_id in done_nodes[node.namespace] :
+        if node.parent_id in done_nodes[node.namespace]:
             # Implicit parent namespace by menu.__name__
             if not node.parent_namespace:
                 node.parent_namespace = menu_class_name
@@ -56,19 +57,20 @@ def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
             node.parent = parent
         # If it has a parent_id but we haven't seen it yet...
         elif node.parent_id:
-            # We check for infinite loops here, by comparing the number of 
+            # We check for infinite loops here, by comparing the number of
             # times we "saw" this node to the number of nodes in the list
             if node._counter < list_total_length:
                 nodes.append(node)
-            # Never add this node to the final list until it has a real 
+            # Never add this node to the final list until it has a real
             # parent (node.parent)
             should_add_to_final_list = False
-            
+
         if should_add_to_final_list:
             final_nodes.append(node)
             # add it to the "seen" list
             done_nodes[node.namespace][node.id] = node
     return final_nodes
+
 
 class MenuPool(object):
     def __init__(self):
@@ -91,11 +93,11 @@ class MenuPool(object):
         if all:
             cache_keys = CacheKey.objects.get_keys()
         else:
-            cache_keys = CacheKey.objects.get_keys(site_id, language)        
+            cache_keys = CacheKey.objects.get_keys(site_id, language)
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
         cache.delete_many(to_be_deleted)
         cache_keys.delete()
-    
+
     def register_menu(self, menu):
         from menus.base import Menu
         assert issubclass(menu, Menu)
@@ -107,19 +109,19 @@ class MenuPool(object):
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
-        if not modifier_class in self.modifiers:
+        if modifier_class not in self.modifiers:
             self.modifiers.append(modifier_class)
 
     def _build_nodes(self, request, site_id):
         """
-        This is slow. Caching must be used. 
+        This is slow. Caching must be used.
         One menu is built per language and per site.
-        
+
         Namespaces: they are ID prefixes to avoid node ID clashes when plugging
         multiple trees together.
-        
+
         - We iterate on the list of nodes.
-        - We store encountered nodes in a dict (with namespaces): 
+        - We store encountered nodes in a dict (with namespaces):
             done_nodes[<namespace>][<node's id>] = node
         - When a node has a parent defined, we lookup that parent in done_nodes
             if it's found:
@@ -136,7 +138,7 @@ class MenuPool(object):
         cached_nodes = cache.get(key, None)
         if cached_nodes:
             return cached_nodes
-        
+
         final_nodes = []
         for menu_class_name in self.menus:
             try:
@@ -147,35 +149,45 @@ class MenuPool(object):
                 nodes = []
                 toolbar = getattr(request, 'toolbar', None)
                 if toolbar and toolbar.is_staff:
-                    messages.error(request, _('Menu %s cannot be loaded. Please, make sure all its urls exist and can be resolved.') % menu_class_name)
-                    logger.error("Menu %s could not be loaded." % menu_class_name, exc_info=True)
+                    messages.error(request,
+                        _('Menu %s cannot be loaded. Please, make sure all '
+                          'its urls exist and can be resolved.') %
+                        menu_class_name)
+                    logger.error("Menu %s could not be loaded." %
+                        menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
-            final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
+            final_nodes += _build_nodes_inner_for_one_menu(
+                nodes, menu_class_name)
+
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
         # We need to have a list of the cache keys for languages and sites that
-        # span several processes - so we follow the Django way and share through 
+        # span several processes - so we follow the Django way and share through
         # the database. It's still cheaper than recomputing every time!
-        # This way we can selectively invalidate per-site and per-language, 
-        # since the cache shared but the keys aren't 
+        # This way we can selectively invalidate per-site and per-language,
+        # since the cache shared but the keys aren't
         CacheKey.objects.get_or_create(key=key, language=lang, site=site_id)
         return final_nodes
 
-    def apply_modifiers(self, nodes, request, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
+    def apply_modifiers(self, nodes, request, namespace=None, root_id=None,
+            post_cut=False, breadcrumb=False):
         if not post_cut:
             nodes = self._mark_selected(request, nodes)
         for cls in self.modifiers:
             inst = cls()
-            nodes = inst.modify(request, nodes, namespace, root_id, post_cut, breadcrumb)
+            nodes = inst.modify(
+                request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
 
-    def get_nodes(self, request, namespace=None, root_id=None, site_id=None, breadcrumb=False):
+    def get_nodes(self, request, namespace=None, root_id=None, site_id=None,
+            breadcrumb=False):
         self.discover_menus()
         if not site_id:
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(request, site_id)
         nodes = copy.deepcopy(nodes)
-        nodes = self.apply_modifiers(nodes, request, namespace, root_id, post_cut=False, breadcrumb=breadcrumb)
-        return nodes 
+        nodes = self.apply_modifiers(nodes, request, namespace, root_id,
+            post_cut=False, breadcrumb=breadcrumb)
+        return nodes
 
     def _mark_selected(self, request, nodes):
         sel = None
@@ -184,9 +196,11 @@ class MenuPool(object):
             node.ancestor = False
             node.descendant = False
             node.selected = False
-            if node.get_absolute_url() == request.path[:len(node.get_absolute_url())]:
+            if node.get_absolute_url() == request.path[
+                    :len(node.get_absolute_url())]:
                 if sel:
-                    if len(node.get_absolute_url()) > len(sel.get_absolute_url()):
+                    if len(node.get_absolute_url()) > len(
+                            sel.get_absolute_url()):
                         sel = node
                 else:
                     sel = node
