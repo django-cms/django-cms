@@ -54,6 +54,9 @@ $(document).ready(function () {
 			// cancel if there are no dragareas
 			if(!this.dragareas.length) return false;
 
+			// cancel if there is no structure / content switcher
+			if(!this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
+
 			// setup toolbar mode
 			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
 
