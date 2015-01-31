@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.http import HttpResponseRedirect, HttpResponse
+from django.utils.translation import override
 
 from cms.models import UserSettings
 from cms.utils.transaction import wrap_transaction
@@ -69,8 +70,24 @@ class SettingsAdmin(ModelAdmin):
         obj.save()
 
     def response_post_save_change(self, request, obj):
-        post_url = admin_reverse('index', current_app=self.admin_site.name)
-        return HttpResponseRedirect(post_url)
+        #
+        # When the user changes his language setting, we need to do two things:
+        # 1. Change the language-prefix for the sideframed admin view
+        # 2. Reload the whole window so that the new language affects the
+        #    toolbar, etc.
+        #
+        # To do this, we first redirect the sideframe to the correct new, URL,
+        # but we pass a GET param 'reload_window', which instructs JS on that
+        # page to strip (to avoid infinite redirection loops) that param then
+        # reload the whole window again.
+        #
+        with override(obj.language):
+            post_url = admin_reverse(
+                'cms_usersettings_change',
+                args=[obj.id, ],
+                current_app=self.admin_site.name
+            )
+        return HttpResponseRedirect("{0}?reload_window".format(post_url))
 
     def has_change_permission(self, request, obj=None):
         if obj and obj.user == request.user:
