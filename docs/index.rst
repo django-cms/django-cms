@@ -27,6 +27,19 @@ how to install, configure and customize it for their own projects will can
 refer to :doc:`/introduction/index`, :doc:`/how_to/index`, :doc:`/topics/index`
 and :doc:`/reference/index` sections.
 
+**************
+Join us online
+**************
+
+django CMS is supported by a friendly and very knowledgable community.
+
+Find us at:
+
+* in our IRC channel, #django-cms, on irc.freenode.net
+* our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_
+* our `django CMS developers email list <https://groups.google.com/forum/#!forum/django-cms-developers>`_
+
+
 ***************
 Why django CMS?
 ***************
