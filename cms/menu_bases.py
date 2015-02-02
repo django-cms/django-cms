@@ -12,8 +12,8 @@ from menus.base import Menu
 
 class CMSAttachMenu(Menu):
     cms_enabled = True
+    instance = None
     name = None
-    page = None
 
     def __init__(self, *args, **kwargs):
         super(CMSAttachMenu, self).__init__(*args, **kwargs)
