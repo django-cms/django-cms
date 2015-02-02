@@ -94,18 +94,21 @@ class MenuPool(object):
         one entry for each page they are attached to. and instantiates menus
         from the existing menu classes.
         """
+
         # Ideally, this would have been done in discover_menus(), but the pages
         # aren't loaded when that executes. This private method is used to
-        # perform the expansion just before any # menus are built.
+        # perform the expansion and instantiate the menus classes into menu-
+        # instances just before any menus are built.
+
         if self._expanded:
             return
         expanded_menus = {}
         for menu_class_name, menu in self.menus.items():
             if hasattr(menu, "get_pages"):
-                for page in menu.get_pages():
-                    namespace = "{0}:{1}".format(menu_class_name, page.pk)
+                for instance in menu.get_instances():
+                    namespace = "{0}:{1}".format(menu_class_name, instance.pk)
                     menu_inst = menu()
-                    menu_inst.page = page
+                    menu_inst.instance = instance
                     expanded_menus[namespace] = menu_inst
             else:
                 expanded_menus[menu_class_name] = menu()

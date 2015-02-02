@@ -37,10 +37,10 @@ class CMSAttachMenu(Menu):
         return apps
 
     @classmethod
-    def get_pages(cls):
+    def get_instances(cls):
         """
-        Return a list (queryset, really) of all CMS Page objects that are
-        currently using this CMSAttachMenu either directly as a
+        Return a list (queryset, really) of all CMS Page objects (in this case)
+        that are currently using this CMSAttachMenu either directly as a
         navigation_extender, or, as part of an apphook.
 
         Calling this DOES perform DB queries.
