@@ -104,7 +104,7 @@ class MenuPool(object):
             return
         expanded_menus = {}
         for menu_class_name, menu in self.menus.items():
-            if hasattr(menu, "get_pages"):
+            if hasattr(menu, "get_instances"):
                 for instance in menu.get_instances():
                     namespace = "{0}:{1}".format(menu_class_name, instance.pk)
                     menu_inst = menu()
