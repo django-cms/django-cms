@@ -80,11 +80,11 @@ def has_any_page_change_permissions(request):
     if not request.user.is_authenticated():
         return False
     return request.user.is_superuser or PagePermission.objects.filter(
-            page__site=current_site(request)
-        ).filter((
-            Q(user=request.user) |
-            Q(group__in=request.user.groups.all())
-        )).exists()
+        page__site=current_site(request)
+    ).filter(
+        Q(user=request.user) |
+        Q(group__in=request.user.groups.all())
+    ).exists()
 
 
 def has_page_change_permission(request):
@@ -242,17 +242,15 @@ def get_subordinate_groups(user):
     except NoPermissionsException:
         # no permission no records
         # page_id_allow_list is empty
-        qs = Group.objects.distinct().filter(
-         Q(pageusergroup__created_by=user) &
-         Q(pagepermission__page=None)
+        return Group.objects.distinct().filter(
+            Q(pageusergroup__created_by=user) &
+            Q(pagepermission__page=None)
         )
-        return qs
 
-    qs = Group.objects.distinct().filter(
-         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
+    return Group.objects.distinct().filter(
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
         | (Q(pageusergroup__created_by=user) & Q(pagepermission__page=None))
     )
-    return qs
 
 
 def has_global_change_permissions_permission(request):

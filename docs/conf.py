@@ -204,8 +204,8 @@ latex_paper_size = 'a4'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'djangocms.tex', u'django cms Documentation',
-   u'Patrick Lauber', 'manual'),
+    ('index', 'djangocms.tex', u'django cms Documentation',
+     u'Patrick Lauber', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top
