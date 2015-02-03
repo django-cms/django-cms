@@ -335,7 +335,7 @@ class NavExtender(Modifier):
                     home.selected = True
                 else:
                     home.selected = False
-                    # remove all nodes that are nav_extenders and not assigned
+        # remove all nodes that are nav_extenders and not assigned
         for node in removed:
             nodes.remove(node)
         return nodes
