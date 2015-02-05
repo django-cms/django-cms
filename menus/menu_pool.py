@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
+
 from logging import getLogger
+
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import NoReverseMatch
+from django.utils.translation import get_language
+from django.utils.translation import ugettext_lazy as _
+
 from cms.utils import get_cms_setting
 from cms.utils.django_load import load
 
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.core.cache import cache
-from django.core.urlresolvers import NoReverseMatch
-from django.utils.translation import get_language
+from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
-from django.utils.translation import ugettext_lazy as _
-from django.contrib import messages
+
 import copy
 
 logger = getLogger('menus')
@@ -91,7 +97,7 @@ class MenuPool(object):
     def _expand_menus(self):
         """
         Expands the menu_pool by converting any found CMSAttachMenu entries to
-        one entry for each page they are attached to. and instantiates menus
+        one entry for each instance they are attached to. and instantiates menus
         from the existing menu classes.
         """
 
@@ -103,15 +109,32 @@ class MenuPool(object):
         if self._expanded:
             return
         expanded_menus = {}
-        for menu_class_name, menu in self.menus.items():
-            if hasattr(menu, "get_instances"):
-                for instance in menu.get_instances():
-                    namespace = "{0}:{1}".format(menu_class_name, instance.pk)
-                    menu_inst = menu()
+        for menu_class_name, menu_cls in self.menus.items():
+            # In order to be eligible for "expansion", the menu_cls must, in
+            # fact, be an intantiable class. We are lenient about this here,
+            # though, because the CMS has previously allowed attaching
+            # CMSAttachMenu's as objects rather than classes.
+            if isinstance(menu_cls, Menu):
+                # A Menu **instance** was registered, this is non-standard, but
+                # acceptable. However, it cannot be "expanded", so, just add it
+                # as-is to the list of expanded_menus.
+                expanded_menus[menu_class_name] = menu_cls
+            elif hasattr(menu_cls, "get_instances"):
+                # It quacks like a CMSAttachMenu, expand away!
+                for instance in menu_cls.get_instances():
+                    namespace = "{0}:{1}".format(
+                        menu_class_name, instance.pk)
+                    menu_inst = menu_cls()
                     menu_inst.instance = instance
                     expanded_menus[namespace] = menu_inst
+            elif hasattr(menu_cls, "get_nodes"):
+                # This is another type of Menu, cannot be expended, but must be
+                # instantiated, none-the-less.
+                expanded_menus[menu_class_name] = menu_cls()
             else:
-                expanded_menus[menu_class_name] = menu()
+                raise ValidationError(
+                    "Something was registered as a menu, but isn't.")
+
         self._expanded = True
         self.menus = expanded_menus
 
@@ -127,15 +150,19 @@ class MenuPool(object):
         cache.delete_many(to_be_deleted)
         cache_keys.delete()
 
-    def register_menu(self, menu):
+    def register_menu(self, menu_cls):
         from menus.base import Menu
-        assert issubclass(menu, Menu)
-        if menu.__name__ in self.menus.keys():
+        assert issubclass(menu_cls, Menu)
+        # If we should register a menu after we've already expanded the existing
+        # ones, we need to mark it as such.
+        self._expanded = False
+        if menu_cls.__name__ in self.menus.keys():
             raise NamespaceAlreadyRegistered(
-                "[%s] a menu with this name is already registered" % menu.__name__)
-        # Note: menu is still the menu CLASS at this point. Will get
-        # instantiated in self._expand_menus()
-        self.menus[menu.__name__] = menu
+                "[{0}] a menu with this name is already registered".format(
+                    menu_cls.__name__))
+        # Note: menu_cls should still be the menu CLASS at this point. It will
+        # be instantiated in self._expand_menus().
+        self.menus[menu_cls.__name__] = menu_cls
 
     def register_modifier(self, modifier_class):
         from menus.base import Modifier
@@ -160,6 +187,8 @@ class MenuPool(object):
             else:
                 the node is put at the bottom of the list
         """
+        # Before we do anything, make sure that the menus are expanded.
+        self._expand_menus()
         # Cache key management
         lang = get_language()
         prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
@@ -213,7 +242,6 @@ class MenuPool(object):
     def get_nodes(self, request, namespace=None, root_id=None, site_id=None,
             breadcrumb=False):
         self.discover_menus()
-        self._expand_menus()
         if not site_id:
             site_id = Site.objects.get_current().pk
         nodes = self._build_nodes(request, site_id)

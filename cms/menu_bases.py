@@ -43,7 +43,7 @@ class CMSAttachMenu(Menu):
         that are currently using this CMSAttachMenu either directly as a
         navigation_extender, or, as part of an apphook.
 
-        Calling this DOES perform DB queries.
+        Calling this DOES perform a DB query.
         """
         parent_apps = []
         for app in cls.get_apphooks():

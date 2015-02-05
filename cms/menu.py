@@ -210,9 +210,16 @@ def page_to_node(page, home, cut):
             for menu in app.menus:
                 extenders.append(menu.__name__)
 
-    if extenders:
-        attr['navigation_extenders'] = [
-            "{0}:{1}".format(ext, page.pk) for ext in extenders]
+    exts = []
+    for ext in extenders:
+        if hasattr(ext, "get_instances"):
+            # CMSAttachMenus are treated a bit differently to allow them to be
+            # able to be attached to multiple points in the navigation.
+            exts.append("{0}:{1}".format(ext, page.pk))
+        else:
+            exts.append(ext)
+    if exts:
+        attr['navigation_extenders'] = exts
 
     # Do we have a redirectURL?
     attr['redirect_url'] = page.get_redirect()  # save redirect URL if any

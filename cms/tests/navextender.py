@@ -25,10 +25,13 @@ class NavExtenderTestCase(NavextendersFixture, SettingsOverrideTestCase):
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
+        # NOTE: if we're going to directly manipulate this menu pool, we should
+        # at least be marking it as not _expanded.
         menu_pool.menus = {
             'CMSMenu': self.old_menu['CMSMenu'],
             'TestMenu': TestMenu()
         }
+        menu_pool._expanded = False
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
