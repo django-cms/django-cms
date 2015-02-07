@@ -675,7 +675,7 @@ class PagesTestCase(CMSTestCase):
             position=1,
             language=settings.LANGUAGES[0][0]
         )
-        plugin_base.add_root(instance=plugin_base)
+        plugin_base = plugin_base.add_root(instance=plugin_base)
 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)

@@ -742,8 +742,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
-        plugin_base.add_root(instance=plugin_base)
-        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
+        plugin_base = plugin_base.add_root(instance=plugin_base)
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
         plugin.save()
@@ -753,15 +752,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             placeholder=placeholder,
             position=0,
             language=self.FIRST_LANG)
-        plugin_base.add_child(instance=plugin_ref_1_base)
-        plugin_ref_1_base = CMSPlugin.objects.get(pk=plugin_ref_1_base.pk)
+        plugin_ref_1_base = plugin_base.add_child(instance=plugin_ref_1_base)
         plugin_ref_2_base = CMSPlugin(
             plugin_type='TextPlugin',
             placeholder=placeholder,
             position=1,
             language=self.FIRST_LANG)
-        plugin_base.add_child(instance=plugin_ref_2_base)
-        plugin_ref_2_base = CMSPlugin.objects.get(pk=plugin_ref_2_base.pk)
+        plugin_ref_2_base = plugin_base.add_child(instance=plugin_ref_2_base)
         plugin_ref_2 = Text(body='')
         plugin_ref_2_base.set_base_attr(plugin_ref_2)
 
