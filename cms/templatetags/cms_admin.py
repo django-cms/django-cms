@@ -29,9 +29,9 @@ class ShowAdminMenu(InclusionTag):
     def get_context(self, context, page):
         request = context['request']
 
-        if context.has_key("cl"):
+        if 'cl' in context:
             filtered = context['cl'].is_filtered()
-        elif context.has_key('filtered'):
+        elif 'filtered' in context:
             filtered = context['filtered']
         language = context['preview_language']
 
@@ -105,9 +105,9 @@ class ShowLazyAdminMenu(InclusionTag):
     def get_context(self, context, page):
         request = context['request']
 
-        if context.has_key("cl"):
+        if 'cl' in context:
             filtered = context['cl'].is_filtered()
-        elif context.has_key('filtered'):
+        elif 'filtered' in context:
             filtered = context['filtered']
 
         language = context['preview_language']

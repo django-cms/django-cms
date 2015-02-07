@@ -318,7 +318,7 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_default_language_changer_with_implicit_current_app(self):
-        titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'namespaced_app_ns')  # nopyflakes
+        self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'namespaced_app_ns')
         self.reload_urls()
         with force_language("en"):
             path = reverse('namespaced_app_ns:translated-url')
@@ -491,7 +491,7 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_toolbar_current_app_namespace(self):
-        en_title = self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')  # nopyflakes
+        self.create_base_structure(NS_APP_NAME, 'en', 'instance_ns')
         with force_language("en"):
             path = reverse('namespaced_app_ns:sample-settings')
         request = self.get_request(path)
@@ -513,7 +513,7 @@ class ApphooksTestCase(CMSTestCase):
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_toolbar_current_app_apphook_with_implicit_current_app(self):
-        en_title = self.create_base_structure(NS_APP_NAME, 'en', 'namespaced_app_ns')  # nopyflakes
+        self.create_base_structure(NS_APP_NAME, 'en', 'namespaced_app_ns')
         with force_language("en"):
             path = reverse('namespaced_app_ns:current-app')
         request = self.get_request(path)

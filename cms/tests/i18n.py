@@ -343,7 +343,7 @@ class TestLanguageFallbacks(CMSTestCase):
                  'name': 'French',
                  'public': True},
              ]
-         },
+        },
     )
     def test_session_language(self):
         page = api.create_page("home", "nav_playground.html", "en", published=True)
