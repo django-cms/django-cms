@@ -3,6 +3,7 @@ import copy
 import os
 from classytags.tests import DummyParser, DummyTokens
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core import mail
@@ -25,7 +26,6 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting, get_site_id
 from cms.utils.plugins import get_placeholders
-from cms.utils.compat.dj import get_user_model
 from sekizai.context import SekizaiContext
 
 

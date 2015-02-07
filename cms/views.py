@@ -3,7 +3,6 @@ from __future__ import with_statement
 import hashlib
 
 from django.conf import settings
-from django.conf.urls import patterns
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
@@ -161,9 +160,8 @@ def details(request, slug):
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
                 pattern_list += urlpatterns
-            urlpatterns = patterns('', *pattern_list)
             try:
-                view, args, kwargs = resolve('/', tuple(urlpatterns))
+                view, args, kwargs = resolve('/', tuple(pattern_list))
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass

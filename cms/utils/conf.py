@@ -6,9 +6,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.utils.six.moves.urllib.parse import urljoin
 
 from cms import constants
-from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']

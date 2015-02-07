@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import models
-from django.utils import importlib
-from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
+from django.utils import importlib
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
 from cms.utils.compat import DJANGO_1_6
-from cms.utils.compat.dj import (force_unicode, python_2_unicode_compatible,
-                                 is_user_swapped, user_model_label)
+from cms.utils.compat.dj import is_user_swapped, user_model_label
 from cms.utils.helpers import reversion_register
 
 # To avoid circular dependencies, don't use cms.compat.get_user_model, and
@@ -90,7 +90,7 @@ class AbstractPagePermission(models.Model):
         """Return audience by priority, so: All or User, Group
         """
         targets = filter(lambda item: item, (self.user, self.group,))
-        return ", ".join([force_unicode(t) for t in targets]) or 'No one'
+        return ", ".join([force_text(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
@@ -132,8 +132,8 @@ class PagePermission(AbstractPagePermission):
         app_label = 'cms'
 
     def __str__(self):
-        page = self.page_id and force_unicode(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
+        page = self.page_id and force_text(self.page) or "None"
+        return "%s :: %s has: %s" % (page, self.audience, force_text(dict(ACCESS_CHOICES)[self.grant_on]))
 
 
 class PageUser(User):

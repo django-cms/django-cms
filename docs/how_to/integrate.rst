@@ -33,7 +33,6 @@ Requirements
 .. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: https://github.com/html5lib/html5lib-python
-.. _django-i18nurls: https://github.com/brocaar/django-i18nurls
 .. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
 Recommended

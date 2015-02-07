@@ -6,12 +6,12 @@ from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.plugins import PluginsTestBaseCase
-from cms.utils.compat.dj import force_unicode
 from cms.utils.urlutils import admin_reverse
 from django.contrib.admin.sites import site
 from django.core.urlresolvers import reverse
 from django.template import Context
 from django.template.base import Template
+from django.utils.encoding import force_text
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
@@ -170,7 +170,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
                 reduced_list.append(
                     {
                         'id': plugin.pk, 'type': plugin.plugin_type, 'parent': plugin.parent_id,
-                        'position': plugin.position, 'desc': force_unicode(plugin.get_short_description()),
+                        'position': plugin.position, 'desc': force_text(plugin.get_short_description()),
                         'language': plugin.language, 'placeholder_id': static_placeholder_target.draft.pk
                     }
                 )

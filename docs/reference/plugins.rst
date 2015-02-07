@@ -272,7 +272,7 @@ By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
 The default implementation is as follows::
 
     def icon_alt(self, instance):
-        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+        return "%s - %s" % (force_text(self.name), force_text(instance))
 
 See also: `text_enabled`_, `icon_src`_
 

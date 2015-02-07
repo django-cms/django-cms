@@ -12,7 +12,6 @@ from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
 from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.utils import get_language_from_request
-from cms.utils.compat.dj import user_related_name
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
@@ -37,7 +36,7 @@ def get_visible_pages(request, pages, site=None):
     visible_page_ids = []
     restricted_pages = defaultdict(list)
     page_permissions = PagePermission.objects.filter(can_view=True).select_related(
-            'page').prefetch_related('group__' + user_related_name)
+            'page').prefetch_related('group__user_set')
 
     for perm in page_permissions:
         # collect the pages that are affected by permissions
@@ -110,7 +109,7 @@ def get_visible_pages(request, pages, site=None):
                 return True
             if not perm.group_id:
                 continue
-            user_set = getattr(perm.group, user_related_name)
+            user_set = getattr(perm.group, 'user_set')
             # Optimization equivalent to
             # if user_pk in user_set.values_list('pk', flat=True)
             if any(user_pk == user.pk for user in user_set.all()):

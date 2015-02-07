@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:
-    get_user_model = lambda: User
 
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING

@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.management import call_command
@@ -20,7 +21,6 @@ from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
-from cms.utils.compat.dj import get_user_model
 
 
 class PublisherCommandTests(TestCase):

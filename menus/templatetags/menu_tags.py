@@ -5,11 +5,11 @@ from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
 from cms.utils.i18n import force_language, get_language_objects
-from cms.utils.compat.dj import force_unicode
-from cms.utils.compat.urls import unquote
 from django import template
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils.encoding import force_text
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import get_language, ugettext
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
@@ -315,11 +315,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return force_unicode(ugettext(language))
+        return force_text(ugettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return force_unicode(ugettext(language))
+    return force_text(ugettext(language))
 
 
 def _short_language_marker(language, lang_code):

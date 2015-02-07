@@ -3,6 +3,7 @@ from __future__ import with_statement
 import copy
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
@@ -24,7 +25,6 @@ from cms.test_utils.util.context_managers import LanguageOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_user_model, user_related_name
 from cms.utils.i18n import force_language
 
 
@@ -1109,7 +1109,7 @@ class ViewPermissionMenuTests(CMSTestCase):
         user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         group = Group.objects.create(name='testgroup')
 
-        user_set = getattr(group, user_related_name)
+        user_set = getattr(group, 'user_set')
         user_set.add(user)
 
         request = self.get_request(user)
@@ -1124,7 +1124,7 @@ class ViewPermissionMenuTests(CMSTestCase):
         user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
         group = Group.objects.create(name='testgroup')
 
-        user_set = getattr(group, user_related_name)
+        user_set = getattr(group, 'user_set')
         user_set.add(user)
 
         request = self.get_request(user)

@@ -5,10 +5,10 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
 from django.utils import six
+from django.utils.encoding import force_text
 from sekizai.helpers import get_varname
 
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import force_unicode
 
 
 def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
@@ -42,8 +42,8 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
         modules = get_placeholder_conf("plugin_modules", slot, template, default={})
         names = get_placeholder_conf("plugin_labels", slot, template, default={})
         main_list.append({'value': plugin.value,
-                          'name': force_unicode(names.get(plugin.value, plugin.name)),
-                          'module': force_unicode(modules.get(plugin.value, plugin.module))})
+                          'name': force_text(names.get(plugin.value, plugin.name)),
+                          'module': force_text(modules.get(plugin.value, plugin.module))})
     return sorted(main_list, key=operator.itemgetter("module"))
 
 

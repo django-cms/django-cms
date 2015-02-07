@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import sys
 
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches, reverse
 from django.test.utils import override_settings
 from django.utils import six
@@ -17,7 +18,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from menus.utils import DefaultLanguageChanger

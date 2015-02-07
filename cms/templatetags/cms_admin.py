@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
-
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
@@ -10,19 +8,14 @@ from cms.utils.admin import get_admin_menu_item_context
 from cms.utils.permissions import get_any_page_view_permissions
 from django import template
 from django.conf import settings
-from cms.utils.compat.dj import force_unicode
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext
-import django
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 
 register = template.Library()
 
-if LooseVersion(django.get_version()) < LooseVersion('1.4'):
-    CMS_ADMIN_ICON_BASE = "%sadmin/img/admin/" % settings.STATIC_URL
-else:
-    CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
+CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
 class ShowAdminMenu(InclusionTag):
@@ -84,7 +77,7 @@ class TreePublishRow(Tag):
             else:
                 cls = "empty"
                 text = _("no content")
-        return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_unicode(text)))
+        return mark_safe('<span class="%s" title="%s"></span>' % (cls, force_text(text)))
 
 
 register.tag(TreePublishRow)

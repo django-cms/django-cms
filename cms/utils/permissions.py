@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth import get_permission_codename
+from threading import local
+
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
@@ -7,13 +9,7 @@ from django.db.models import Q
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
-from cms.utils.compat.dj import get_user_model, user_related_query_name
 
-
-try: # pragma: no cover
-    from threading import local
-except ImportError: # pragma: no cover
-    from django.utils._threading_local import local
 
 # thread local support
 _thread_locals = local()
@@ -306,10 +302,11 @@ def get_user_sites_queryset(user):
             # so he haves access to all sites
             return qs
     # add some pages if he has permission to add / change them
-    user_query = dict()
-    user_query['djangocms_pages__pagepermission__group__'+user_related_query_name] = user
-    query |= Q(Q(djangocms_pages__pagepermission__user=user) | Q(**user_query)) & \
-        (Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True)))
+    query |= (
+        Q(Q(djangocms_pages__pagepermission__user=user) |
+          Q(djangocms_pages__pagepermission__group__user=user)) &
+        Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True))
+    )
     return qs.filter(query).distinct()
 
 

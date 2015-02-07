@@ -10,12 +10,13 @@ from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse, QueryDict)
 from django.utils.datastructures import MultiValueDictKeyError
-from django.utils.encoding import smart_str
+from django.utils.encoding import force_text, smart_str
 from django.utils import timezone
 from django.utils.six.moves.urllib.parse import urlparse
 
@@ -36,7 +37,6 @@ from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_P
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_6
-from cms.utils.compat.dj import get_user_model, force_unicode
 
 
 class AdminTestsBase(CMSTestCase):
@@ -1494,19 +1494,19 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
             with self.assertNumQueries(FuzzyInt(40, 66)):
-                output = force_unicode(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
+                output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             with self.assertNumQueries(FuzzyInt(40, 60)):
-                output = force_unicode(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
+                output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(18, 34)):
-            force_unicode(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
+            force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
         with self.assertNumQueries(FuzzyInt(11, 13)):
-            force_unicode(self.client.get('/en/').content)
+            force_text(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):
         from django.core.cache import cache
@@ -1520,7 +1520,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         with self.login_user_context(user):
             with self.assertNumQueries(FuzzyInt(18, 33)):
-                force_unicode(self.client.get('/en/admin/cms/page/'))
+                force_text(self.client.get('/en/admin/cms/page/'))
 
     def test_smart_link_published_pages(self):
         admin, staff_guy = self._get_guys()

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-from django.contrib.sites.models import Site
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import create_page
@@ -12,7 +13,6 @@ from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.dj import get_user_model, user_related_name
 from menus.menu_pool import menu_pool
 
 __all__ = [
@@ -146,7 +146,7 @@ class ViewPermissionTests(CMSTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                user_set = getattr(group, user_related_name)
+                user_set = getattr(group, 'user_set')
                 user_set.add(user)
                 group.save()
 
@@ -563,7 +563,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        user_set = getattr(group, user_related_name)
+        user_set = getattr(group, 'user_set')
         user_set.add(user)
         group.save()
 

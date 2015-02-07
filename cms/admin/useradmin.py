@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
 from cms.admin.forms import PageUserForm, PageUserGroupForm
 from cms.admin.permissionadmin import GenericCmsPermissionAdmin
 from cms.exceptions import NoPermissionsException
 from cms.models import PageUser, PageUserGroup
-from cms.utils.compat.dj import get_user_model
 from cms.utils.compat.forms import UserAdmin
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_subordinate_users

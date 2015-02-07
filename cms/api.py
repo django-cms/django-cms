@@ -8,6 +8,7 @@ calling these methods!
 """
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
@@ -15,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
+
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -28,7 +30,6 @@ from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.permissions import _thread_locals

@@ -9,7 +9,6 @@ from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import user_related_query_name
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -181,10 +180,7 @@ class BasicPagePermissionManager(models.Manager):
         """Get all objects for given user, also takes look if user is in some
         group.
         """
-        query = dict()
-        query['group__' + user_related_query_name] = user
-
-        return self.filter(Q(user=user) | Q(**query))
+        return self.filter(Q(user=user) | Q(group__user=user))
 
     def with_can_change_permissions(self, user):
         """Set of objects on which user haves can_change_permissions. !But only

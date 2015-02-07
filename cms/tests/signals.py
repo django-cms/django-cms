@@ -2,11 +2,11 @@
 from __future__ import with_statement
 from contextlib import contextmanager
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from cms.api import create_page
 from cms.signals import urls_need_reloading
-from cms.utils.compat.dj import get_user_model
 
 
 class SignalTester(object):

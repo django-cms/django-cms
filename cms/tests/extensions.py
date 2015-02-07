@@ -2,6 +2,7 @@ from copy import deepcopy
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
@@ -15,7 +16,6 @@ from cms.test_utils.project.extensionapp.models import (MyPageExtension,
                                                         MyTitleExtension)
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.tests import AdminTestsBase
-from cms.utils.compat.dj import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
@@ -69,7 +69,7 @@ class ExtensionsTestCase(TestCase):
             from django.apps import apps
             del apps.all_models['cms']['testpageextension']
             del apps.all_models['cms']['testtitleextension']
-        except ImportError:
+        except ImportError:  # Django 1.6
             pass
 
     def get_page_extension_class(self):

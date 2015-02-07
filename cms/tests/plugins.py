@@ -6,6 +6,7 @@ import os
 
 from django import http
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.core import urlresolvers
 from django.core.cache import cache
@@ -70,10 +71,9 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
         return http.HttpResponse("It works")
 
     def get_plugin_urls(self):
-        from django.conf.urls import patterns, url
-        return patterns('',
+        return [
             url(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
-        )
+        ]
 plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 
@@ -233,7 +233,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = draft_page.placeholders.get(slot="col_left")
         live_placeholder = live_page.placeholders.get(slot="col_left")
 
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_1.pk).position, 0)
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_2.pk).position, 1)
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_3.pk).position, 2)
@@ -1651,18 +1651,9 @@ class BrokenPluginTests(TestCase):
         exist.
         """
         new_apps = ['cms.test_utils.project.brokenpluginapp']
-        try:
-            from django.apps import apps
-            apps.set_installed_apps(new_apps)
-
+        with self.settings(INSTALLED_APPS=new_apps):
             plugin_pool.discovered = False
             self.assertRaises(ImportError, plugin_pool.discover_plugins)
-
-            apps.unset_installed_apps()
-        except ImportError:
-            with self.settings(INSTALLED_APPS=new_apps):
-                plugin_pool.discovered = False
-                self.assertRaises(ImportError, plugin_pool.discover_plugins)
 
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):

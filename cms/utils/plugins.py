@@ -9,13 +9,14 @@ from django.shortcuts import get_object_or_404
 from django.template import NodeList, VariableNode, TemplateSyntaxError
 from django.template.loader import get_template
 from django.template.loader_tags import ExtendsNode, BlockNode
+from django.utils.encoding import force_text
 from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
 from sekizai.helpers import is_variable_extend_node
 
 try:
     from django.template.loader_tags import ConstantIncludeNode as IncludeNode
-except ImportError:
+except ImportError:  # Django 1.6 ^^ (the latter also exists on 1.6 though)
     from django.template.loader_tags import IncludeNode
 
 from cms.api import add_plugin
@@ -23,7 +24,6 @@ from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
-from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
@@ -360,7 +360,7 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 plugin_type=plugin_type,
             ).count()
             if type_count >= type_limit:
-                plugin_name = force_unicode(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})
