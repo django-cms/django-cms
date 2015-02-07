@@ -223,8 +223,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     page = page.reload()
 
     if parent:
-        page.move(target=parent, pos=position)
-        page = page.reload()
+        page = page.move(target=parent, pos=position)
 
     create_title(
         language=language,

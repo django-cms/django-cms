@@ -239,6 +239,13 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                 return
             super(CMSPlugin, self).save()
 
+    def reload(self):
+        return CMSPlugin.objects.get(pk=self.pk)
+
+    def move(self, target, pos=None):
+        super(CMSPlugin, self).move(target, pos)
+        return self.reload()
+
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'depth', 'path',
                      'numchild', 'pk', 'position']:
