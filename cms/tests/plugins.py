@@ -181,7 +181,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         Test that plugin position is saved after creation
         """
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                              slug="page1", published=True, in_navigation=True)
+                                  slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
 
         # We check created objects and objects from the DB to be sure the position value
@@ -199,6 +199,51 @@ class PluginsTestCase(PluginsTestBaseCase):
             ## Finally we render the placeholder to test the actual content
             rendered_placeholder = ph_en.render(self.get_context(page_en.get_absolute_url(), page=page_en), None)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the second")
+
+    def test_plugin_order_alt(self):
+        """
+        Test that plugin position is saved after creation
+        """
+        draft_page = api.create_page("PluginOrderPage", "col_two.html", "en",
+                                     slug="page1", published=False, in_navigation=True)
+        placeholder = draft_page.placeholders.get(slot="col_left")
+
+        # We check created objects and objects from the DB to be sure the position value
+        # has been saved correctly
+        text_plugin_2 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the second")
+        text_plugin_3 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the third")
+        # Publish to create a 'live' version
+        draft_page.publish('en')
+        draft_page = draft_page.reload()
+        placeholder = draft_page.placeholders.get(slot="col_left")
+
+        # Add a plugin and move it to the first position
+        text_plugin_1 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the first")
+        data = {
+            'placeholder_id': placeholder.id,
+            'plugin_id': text_plugin_1.id,
+            'plugin_parent': '',
+            'plugin_language': 'en',
+            'plugin_order[]': [text_plugin_1.id, text_plugin_2.id, text_plugin_3.id],
+        }
+        self.client.post(URL_CMS_PLUGIN_MOVE, data)
+
+        draft_page.publish('en')
+        draft_page = draft_page.reload()
+        live_page = draft_page.get_public_object()
+        placeholder = draft_page.placeholders.get(slot="col_left")
+        live_placeholder = live_page.placeholders.get(slot="col_left")
+
+        with SettingsOverride(CMS_PERMISSION=False):
+            self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_1.pk).position, 0)
+            self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_2.pk).position, 1)
+            self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_3.pk).position, 2)
+
+            ## Finally we render the placeholder to test the actual content
+            rendered_placeholder = placeholder.render(self.get_context(draft_page.get_absolute_url(), page=draft_page), None)
+            self.assertEqual(rendered_placeholder, "I'm the firstI'm the secondI'm the third")
+            rendered_live_placeholder = live_placeholder.render(self.get_context(live_page.get_absolute_url(), page=live_page), None)
+            self.assertEqual(rendered_live_placeholder, "I'm the firstI'm the secondI'm the third")
 
     def test_add_cancel_plugin(self):
         """

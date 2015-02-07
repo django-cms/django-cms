@@ -214,12 +214,13 @@ def configure(db_url, **extra):
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin'),
+                            'TextPlugin', 'MultiColumnPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("left column"),
                 'plugin_modules': {
                     'LinkPlugin': 'Different Grouper'
@@ -230,7 +231,8 @@ def configure(db_url, **extra):
             },
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin',
+                            'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {

@@ -157,7 +157,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
                 'source_plugin_id': sourceplugin.pk,
                 'target_language': 'en',
                 'target_placeholder_id': static_placeholder_target.draft.pk,
-                'targetplugin_id': targetplugin.pk,
+                'target_plugin_id': targetplugin.pk,
             })
             response = self.admin_class.copy_plugins(request)
 
