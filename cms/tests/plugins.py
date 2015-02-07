@@ -34,7 +34,6 @@ from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD,
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
     URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH)
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -191,7 +190,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         db_plugin_1 = CMSPlugin.objects.get(pk=text_plugin_1.pk)
         db_plugin_2 = CMSPlugin.objects.get(pk=text_plugin_2.pk)
 
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             self.assertEqual(text_plugin_1.position, 0)
             self.assertEqual(db_plugin_1.position, 0)
             self.assertEqual(text_plugin_2.position, 1)
@@ -1179,7 +1178,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             }
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(['LinkPlugin', 'PicturePlugin'],
                                 plugin.get_child_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ChildClassesPlugin)
@@ -1202,7 +1201,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             }
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(['TestPlugin'],
                                 plugin.get_parent_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ParentClassesPlugin)
@@ -1661,7 +1660,7 @@ class BrokenPluginTests(TestCase):
 
             apps.unset_installed_apps()
         except ImportError:
-            with SettingsOverride(INSTALLED_APPS=new_apps):
+            with self.settings(INSTALLED_APPS=new_apps):
                 plugin_pool.discovered = False
                 self.assertRaises(ImportError, plugin_pool.discover_plugins)
 

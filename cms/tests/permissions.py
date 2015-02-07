@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
+from django.test.utils import override_settings
+
 from cms.models import Page
 from cms.api import create_page, assign_user_to_page
 from cms.cache.permissions import (get_permission_cache, set_permission_cache,
                                    clear_user_permission_cache)
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import CMSTestCase
 
 
-class PermissionCacheTests(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-    }
+@override_settings(CMS_PERMISSION=True)
+class PermissionCacheTests(CMSTestCase):
 
     def setUp(self):
         self.user_super = self._create_user("super", is_staff=True,

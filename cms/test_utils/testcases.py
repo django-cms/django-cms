@@ -16,8 +16,7 @@ from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext,
-    SettingsOverride)
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.compat.dj import get_user_model
 from cms.utils.compat.urls import urljoin, unquote
 from cms.utils.permissions import set_current_user
@@ -389,22 +388,3 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
-
-
-class SettingsOverrideTestCase(CMSTestCase):
-    settings_overrides = {}
-
-    def _pre_setup(self):
-        self._enter_settings_override()
-        super(SettingsOverrideTestCase, self)._pre_setup()
-
-    def _enter_settings_override(self):
-        self._settings_ctx_manager = SettingsOverride(**self.settings_overrides)
-        self._settings_ctx_manager.__enter__()
-
-    def _post_teardown(self):
-        super(SettingsOverrideTestCase, self)._post_teardown()
-        self._exit_settings_override()
-
-    def _exit_settings_override(self):
-        self._settings_ctx_manager.__exit__(None, None, None)

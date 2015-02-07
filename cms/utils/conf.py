@@ -194,7 +194,7 @@ def _ensure_languages_settings(languages):
             lang_code != language_object['code']]
 
     languages['default'] = defaults
-    languages[VERIFIED] = True  # this will be busted by SettingsOverride and cause a re-check
+    languages[VERIFIED] = True  # this will be busted by @override_settings and cause a re-check
 
     return languages
 

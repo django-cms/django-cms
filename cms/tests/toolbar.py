@@ -8,6 +8,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
 from django.core.urlresolvers import reverse
@@ -24,15 +25,15 @@ from cms.test_utils.project.placeholderapp.models import (Example1, CharPksExamp
 from cms.test_utils.project.placeholderapp.views import (detail_view, detail_view_char,
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered)
-from cms.test_utils.testcases import (SettingsOverrideTestCase,
+from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
-from cms.test_utils.util.context_managers import SettingsOverride, UserLoginContext
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from cms.views import details
 
 
-class ToolbarTestBase(SettingsOverrideTestCase):
+class ToolbarTestBase(CMSTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
         path = path or page and page.get_absolute_url()
         if edit:
@@ -69,8 +70,8 @@ class ToolbarTestBase(SettingsOverrideTestCase):
         return superuser
 
 
+@override_settings(CMS_PERMISSION=False)
 class ToolbarTests(ToolbarTestBase):
-    settings_overrides = {'CMS_PERMISSION': False}
 
     def test_no_page_anon(self):
         request = self.get_page_request(None, self.get_anon(), '/')
@@ -118,13 +119,13 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + logout
         self.assertEqual(len(items), 0)
 
+    @override_settings(CMS_PERMISSIONS=True)
     def test_template_change_permission(self):
-        with SettingsOverride(CMS_PERMISSIONS=True):
-            page = create_page('test', 'nav_playground.html', 'en', published=True)
-            request = self.get_page_request(page, self.get_nonstaff())
-            toolbar = CMSToolbar(request)
-            items = toolbar.get_left_items() + toolbar.get_right_items()
-            self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        request = self.get_page_request(page, self.get_nonstaff())
+        toolbar = CMSToolbar(request)
+        items = toolbar.get_left_items() + toolbar.get_right_items()
+        self.assertEqual([item for item in items if item.css_class_suffix == 'templates'], [])
 
     def test_markup(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
@@ -248,16 +249,14 @@ class ToolbarTests(ToolbarTestBase):
         de_toolbar.post_template_populate()
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
+    @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
     def test_placeholder_name(self):
-        with SettingsOverride(CMS_PLACEHOLDER_CONF={
-            'col_left': {'name': 'PPPP'}
-        }):
-            superuser = self.get_superuser()
-            create_page("toolbar-page", "col_two.html", "en", published=True)
-            with self.login_user_context(superuser):
-                response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'PPPP')
+        superuser = self.get_superuser()
+        create_page("toolbar-page", "col_two.html", "en", published=True)
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'PPPP')
 
     def test_user_settings(self):
         superuser = self.get_superuser()
@@ -274,7 +273,7 @@ class ToolbarTests(ToolbarTestBase):
             setting = UserSettings.objects.get(user=superuser)
             setting.language = 'it'
             setting.save()
-            with SettingsOverride(LANGUAGES=(('en', 'english'),)):
+            with self.settings(LANGUAGES=(('en', 'english'),)):
                 response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 self.assertEqual(response.status_code, 200)
                 self.assertNotContains(response, '/it/')
@@ -1140,7 +1139,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
         self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
 
-        with SettingsOverride(LANGUAGE_CODE="fr"):
+        with self.settings(LANGUAGE_CODE="fr"):
             request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
             response = detail_view_multi(request, exm.pk)
             self.assertContains(
@@ -1161,7 +1160,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         exm.char_2 = "deux"
         exm.save()
 
-        with SettingsOverride(LANGUAGE_CODE="fr"):
+        with self.settings(LANGUAGE_CODE="fr"):
             request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
             response = detail_view_multi_unfiltered(request, exm.pk)
             self.assertContains(
@@ -1171,7 +1170,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
             self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
 
-        with SettingsOverride(LANGUAGE_CODE="de"):
+        with self.settings(LANGUAGE_CODE="de"):
             request = self.get_page_request(title.page, user, edit=True, lang_code="de")
             response = detail_view_multi_unfiltered(request, exm.pk)
             self.assertContains(
@@ -1214,7 +1213,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             self.assertContains(response, 'value="deux"')
 
         with override('fr'):
-            with SettingsOverride(LANGUAGE_CODE="fr"):
+            with self.settings(LANGUAGE_CODE="fr"):
                 request = self.get_page_request(title.page, user, edit=True, lang_code="fr")
                 request.GET['edit_fields'] = 'char_2'
                 response = exadmin.edit_field(request, exm.pk, "fr")
