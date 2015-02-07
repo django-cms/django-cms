@@ -189,7 +189,6 @@ class BaseCMSTestCase(object):
         self.counter += 1
         return page_data
 
-
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
                                    template='nav_playground.html', ):

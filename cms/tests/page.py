@@ -96,6 +96,34 @@ class PagesTestCase(CMSTestCase):
             title = Title.objects.drafts().get(slug=page_data['slug'])
             title = Title.objects.public().get(slug=page_data['slug'])
 
+    def test_create_tree_admin(self):
+        """
+        Test that a tree can be created via the admin
+        """
+        page_1 = self.get_new_page_data()
+
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            # create home and auto publish
+            response = self.client.post(URL_CMS_PAGE_ADD, page_1)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            title_home = Title.objects.drafts().get(slug=page_1['slug'])
+
+            page_2 = self.get_new_page_data(parent_id=title_home.page.pk)
+            page_3 = self.get_new_page_data(parent_id=title_home.page.pk)
+            page_4 = self.get_new_page_data(parent_id=title_home.page.pk)
+
+            response = self.client.post(URL_CMS_PAGE_ADD, page_2)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(URL_CMS_PAGE_ADD, page_3)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            title_left = Title.objects.drafts().get(slug=page_2['slug'])
+
+            response = self.client.post(URL_CMS_PAGE_ADD + '?target=%s&amp;position=right' % title_left.page.pk, page_4)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
     def test_create_page_api(self):
         page_data = {
             'title': 'root',
