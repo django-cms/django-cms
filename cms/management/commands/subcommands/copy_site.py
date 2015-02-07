@@ -9,21 +9,19 @@ from cms.models import Page
 
 class CopySiteCommand(BaseCommand):
     help = 'Copy the CMS pagetree from a specific SITE_ID.'
-    option_list = BaseCommand.option_list + (
-        make_option('--from', dest='from_site', default=None,
-            help='Specifies the SITE_ID to copy from.'),
-        make_option('--to', dest='to_site', default=None,
-            help='Specifies the SITE_ID to copy to.')
-    )
+    args = '<site_from site_to>'
 
     def handle(self, *args, **options):
-        from_site_id = options.get('from_site', None)
-        to_site_id = options.get('to_site', None)
+        try:
+            assert len(args) >= 2
 
-        if not from_site_id or not to_site_id:
-            raise CommandError("You must use --from and --to to use this command.")
+            from_site_id = int(args[0])
+            to_site_id = int(args[1])
 
-        from_site = self.get_site(from_site_id)
+            assert from_site_id != to_site_id
+        except AssertionError:
+            raise CommandError("Error: bad arguments -- Usage: manage.py cms copy-site <site_from> <site_to>")
+
         to_site = self.get_site(to_site_id)
 
         pages = Page.objects.drafts().filter(site=from_site_id, depth=1)
