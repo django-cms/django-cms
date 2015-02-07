@@ -48,7 +48,8 @@ def has_page_add_permission(request):
     target = request.GET.get('target', None)
     position = request.GET.get('position', None)
 
-    from cms.utils.plugins import current_site
+    from cms.utils.helpers import current_site
+
     site = current_site(request)
 
     if target:
@@ -76,7 +77,8 @@ def has_page_add_permission(request):
 
 
 def has_any_page_change_permissions(request):
-    from cms.utils.plugins import current_site
+    from cms.utils.helpers import current_site
+
     if not request.user.is_authenticated():
         return False
     return request.user.is_superuser or PagePermission.objects.filter(
@@ -94,7 +96,8 @@ def has_page_change_permission(request):
     In addition, if CMS_PERMISSION is enabled you also need to either have
     global can_change permission or just on this page.
     """
-    from cms.utils.plugins import current_site
+    from cms.utils.helpers import current_site
+
     opts = Page._meta
     site = current_site(request)
     global_change_perm = GlobalPagePermission.objects.user_has_change_permission(

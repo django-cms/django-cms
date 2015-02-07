@@ -45,8 +45,9 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
-from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
-from cms.utils.plugins import get_placeholders, assign_plugins
+from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
+                                   get_placeholder_conf, get_placeholders)
+from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
 

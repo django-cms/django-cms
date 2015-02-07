@@ -16,7 +16,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset, use_draft
-from cms.utils.plugins import current_site
+from cms.utils.helpers import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
