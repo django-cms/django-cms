@@ -150,6 +150,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         plugin_class = sourceplugin.get_plugin_class_instance()
         admin = self.get_admin()
 
+        self.maxDiff = None
         with self.login_user_context(admin):
             request = self.get_request(post_data={
                 'source_language': 'en',
@@ -157,7 +158,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
                 'source_plugin_id': sourceplugin.pk,
                 'target_language': 'en',
                 'target_placeholder_id': static_placeholder_target.draft.pk,
-                'targetplugin_id': targetplugin.pk,
+                'target_plugin_id': targetplugin.pk,
             })
             response = self.admin_class.copy_plugins(request)
 
