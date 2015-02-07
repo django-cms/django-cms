@@ -117,7 +117,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             ('publish_page', 'Can publish page'),
             ('edit_static_placeholder', 'Can edit static placeholders'),
         )
-        unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
+        unique_together = (("publisher_is_draft", "application_namespace"),
+                           ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('path',)
@@ -333,7 +334,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             placeholders = list(page.get_placeholders())
             origin_id = page.id
             # create a copy of this page by setting pk = None (=new instance)
-            page.old_pk = page.pk
+            page.old_pk = old_pk = page.pk
             page.pk = None
             page.path = None
             page.depth = None
@@ -351,12 +352,14 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 else:
                     page.parent = None
                 page.save()
-                page.move(target, pos=position)
+                if target:
+                    page = page.move(target, pos=position)
+                    page.old_pk = old_pk
             else:
                 count = 1
                 found = False
                 for prnt in tree:
-                    if tree[0].pk == self.pk and page.parent_id == self.pk and count==1:
+                    if tree[0].pk == self.pk and page.parent_id == self.pk and count == 1:
                         count += 1
                         continue
                     elif prnt.old_pk == page.parent_id:
@@ -370,9 +373,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     page.parent_id = None
                 page.save()
             tree.append(page)
-
-
-
 
             # copy permissions if necessary
             if get_cms_setting('PERMISSION') and copy_permissions:
@@ -733,9 +733,9 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             include the node itself
         """
         if include_self:
-            return self.__class__.get_tree(self)
+            return self.__class__.get_tree(self).filter(site_id=self.site_id)
         else:
-            return self.__class__.get_tree(self).exclude(pk=self.pk)
+            return self.__class__.get_tree(self).exclude(pk=self.pk).filter(site_id=self.site_id)
 
     def get_cached_ancestors(self):
         if not hasattr(self, "ancestors_ascending"):

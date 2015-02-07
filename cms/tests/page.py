@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from django.db import transaction
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.utils.i18n import force_language
 import os.path
@@ -390,6 +391,30 @@ class PagesTestCase(CMSTestCase):
             self.copy_page(page_a, page_b_a)
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
+
+    def test_copy_page_method(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        page_a = create_page("page_a", "nav_playground.html", "en", published=False)
+        page_a_a = create_page("page_a_a", "nav_playground.html", "en",
+                               parent=page_a, published=False, reverse_id="hello")
+        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a, published=False)
+        site = Site.objects.create(domain='whatever.com', name='whatever')
+
+        pages = Page.objects.drafts().filter(site_id=1, depth=1)
+        with transaction.atomic():
+            for page in pages:
+                page.copy_page(None, site)
+
+        with transaction.atomic():
+            for page in pages:
+                page.copy_page(None, site)
+
+        self.assertEqual(Page.objects.filter(site_id=1, depth=1).count(), 1)
+        self.assertEqual(Page.objects.filter(site_id=1).count(), 3)
+        self.assertEqual(Page.objects.filter(site_id=site.pk, depth=1).count(), 2)
+        self.assertEqual(Page.objects.filter(site_id=site.pk).count(), 6)
 
     def test_copy_self_page(self):
         """
