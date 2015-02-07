@@ -233,7 +233,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = draft_page.placeholders.get(slot="col_left")
         live_placeholder = live_page.placeholders.get(slot="col_left")
 
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_1.pk).position, 0)
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_2.pk).position, 1)
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_3.pk).position, 2)
