@@ -252,7 +252,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
 
          # get a new generic plugin instance
          # assign the position in the plugin tree
-         # save it to let mptt calculate the tree attributes
+         # save it to let mptt/treebeard calculate the tree attributes
          # then get a copy of the current plugin instance
          # assign to it the id of the generic plugin instance above;
            this will effectively change the generic plugin created above
@@ -278,7 +278,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         new_plugin.placeholder = target_placeholder
         # we assign a parent to our new plugin
         parent_cache[self.pk] = new_plugin
-        parent = None
         if self.parent:
             parent = parent_cache[self.parent_id]
             parent = CMSPlugin.objects.get(pk=parent.pk)
@@ -286,7 +285,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             new_plugin.parent = parent
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
-        new_plugin.position = self.position
         if no_signals:
             from cms.signals import pre_save_plugins
 
@@ -306,7 +304,6 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.depth = new_plugin.depth
             plugin_instance.path = new_plugin.path
             plugin_instance.numchild = new_plugin.numchild
-            plugin_instance.position = new_plugin.position
             plugin_instance._no_reorder = True
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)

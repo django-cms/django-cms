@@ -150,7 +150,6 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         plugin_class = sourceplugin.get_plugin_class_instance()
         admin = self.get_admin()
 
-        self.maxDiff = None
         with self.login_user_context(admin):
             request = self.get_request(post_data={
                 'source_language': 'en',
