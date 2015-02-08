@@ -226,19 +226,16 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return force_text(plugin.icon_alt(instance)) if instance else u''
 
     def save(self, no_signals=False, *args, **kwargs):
-        if no_signals:  # ugly hack because of mptt
-            super(CMSPlugin, self).save_base()
-        else:
-            if not self.depth:
-                if self.parent_id or self.parent:
-                    self.parent.add_child(instance=self)
-                else:
-                    if not self.position and not self.position == 0:
-                        self.position == CMSPlugin.objects.filter(parent__isnull=True,
-                                                                  placeholder_id=self.placeholder_id).count()
-                    self.add_root(instance=self)
-                return
-            super(CMSPlugin, self).save()
+        if not self.depth:
+            if self.parent_id or self.parent:
+                self.parent.add_child(instance=self)
+            else:
+                if not self.position and not self.position == 0:
+                    self.position == CMSPlugin.objects.filter(parent__isnull=True,
+                                                              placeholder_id=self.placeholder_id).count()
+                self.add_root(instance=self)
+            return
+        super(CMSPlugin, self).save()
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
