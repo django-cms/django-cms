@@ -1,8 +1,6 @@
 from django.conf import settings
 
-__all__ = [
-    'user_model_label', 'is_installed', 'installed_apps',
-]
+__all__ = ['is_installed', 'installed_apps']
 
 # import these directly from Django!
 from django.utils.encoding import (  # nopyflakes
@@ -25,8 +23,3 @@ except ImportError:  # Django 1.6
 
     def installed_apps():
         return settings.INSTALLED_APPS
-
-
-from django.contrib.auth.models import User as OriginalUser
-is_user_swapped = bool(OriginalUser._meta.swapped)
-user_model_label = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
