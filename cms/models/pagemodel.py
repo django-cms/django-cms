@@ -1150,8 +1150,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     if public_parent:
                         obj.parent_id = public_parent.pk
                         obj.parent = public_parent
-                        obj.add_root(instance=obj)
-                        obj = obj.reload()
+                        obj = obj.add_root(instance=obj)
                         obj = obj.move(target=public_parent, pos='first-child')
         else:
             # check if object was moved / structural tree change
