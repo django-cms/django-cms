@@ -25,8 +25,7 @@ from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
-
+from cms.utils.helpers import reversion_register, current_site
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
@@ -957,7 +956,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     def has_view_permission(self, request, user=None):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-        from cms.utils.plugins import current_site
 
         if not user:
             user = request.user
@@ -1191,7 +1189,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         Rescan and if necessary create placeholders in the current template.
         """
         # inline import to prevent circular imports
-        from cms.utils.plugins import get_placeholders
+        from cms.utils.placeholder import get_placeholders
 
         placeholders = get_placeholders(self.get_template())
         found = {}

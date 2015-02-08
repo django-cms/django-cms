@@ -44,9 +44,8 @@ from cms.utils.i18n import get_language_list, get_language_tuple, get_language_o
 from cms.utils.admin import jsonify_request
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
-from cms.utils.helpers import find_placeholder_relation
+from cms.utils.helpers import find_placeholder_relation, current_site
 from cms.utils.permissions import has_global_page_permission, has_generic_permission
-from cms.utils.plugins import current_site
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 
 require_POST = method_decorator(require_POST)

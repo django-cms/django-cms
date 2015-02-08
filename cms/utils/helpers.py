@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from django.contrib.sites.models import SITE_CACHE, Site
 from cms.utils.compat.dj import is_installed
+
+SITE_VAR = "site__exact"
 
 
 # modify reversions to match our needs if required...
@@ -122,3 +125,19 @@ class classproperty(object):
 
     def __get__(self, owner_self, owner_cls):
         return self.fget(owner_cls)
+
+
+def current_site(request):
+    if SITE_VAR in request.REQUEST:
+        site_pk = request.REQUEST[SITE_VAR]
+    else:
+        site_pk = request.session.get('cms_admin_site', None)
+    if site_pk:
+        try:
+            site = SITE_CACHE.get(site_pk) or Site.objects.get(pk=site_pk)
+            SITE_CACHE[site_pk] = site
+            return site
+        except Site.DoesNotExist:
+            return None
+    else:
+        return Site.objects.get_current()

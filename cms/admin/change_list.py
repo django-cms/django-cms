@@ -45,7 +45,8 @@ class CMSChangeList(ChangeList):
     real_queryset = False
 
     def __init__(self, request, *args, **kwargs):
-        from cms.utils.plugins import current_site
+        from cms.utils.helpers import current_site
+
         self._current_site = current_site(request)
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
@@ -76,7 +77,7 @@ class CMSChangeList(ChangeList):
         return qs
 
     def is_filtered(self):
-        from cms.utils.plugins import SITE_VAR
+        from cms.utils.helpers import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR, 'language', 'page_id'):
             if i in lookup_params:
