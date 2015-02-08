@@ -3,7 +3,7 @@ from __future__ import with_statement
 import copy
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission, Group, User
+from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.template import Template, TemplateSyntaxError
 from django.test.utils import override_settings
 from django.utils.translation import activate
@@ -55,6 +55,7 @@ class BaseMenuTest(CMSTestCase):
 
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
+
 
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """
@@ -930,7 +931,7 @@ class ViewPermissionMenuTests(CMSTestCase):
     def setUp(self):
         self.page = create_page('page', 'nav_playground.html', 'en')
         self.pages = [self.page]
-        self.user = User.objects.create_user('user', 'user@domain.com', 'user')
+        self.user = self.get_standard_user()
 
     def get_request(self, user=None):
         attrs = {
@@ -945,8 +946,8 @@ class ViewPermissionMenuTests(CMSTestCase):
         request.user.is_staff = True
         with self.assertNumQueries(1):
             """
-                The queries are:
-                PagePermission count query
+            The queries are:
+            PagePermission count query
             """
             result = get_visible_pages(request, self.pages)
             self.assertEqual(result, [self.page.pk])
@@ -1075,8 +1076,8 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
         self.site = a.site
 
-        self.user = User.objects.create_user('user', 'user@domain.com', 'user')
-        self.other = User.objects.create_user('other', 'other@domain.com', 'other')
+        self.user = self._create_user("standard", is_staff=False, is_superuser=False)
+        self.other = self._create_user("other", is_staff=False, is_superuser=False)
         PagePermission.objects.create(page=b1, user=self.user, can_view=True,
                                       grant_on=ACCESS_PAGE_AND_DESCENDANTS)
         PagePermission.objects.create(page=b2, user=self.other, can_view=True,

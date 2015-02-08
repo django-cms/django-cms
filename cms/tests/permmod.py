@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.contrib.admin.util import unquote
 
 from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
+from django.contrib.admin.util import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
@@ -782,8 +782,7 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         """
         This tests the plugin models patching when publishing from the command line
         """
-        User = get_user_model()
-        User.objects.create_superuser('djangocms', 'cms@example.com', '123456')
+        self.get_superuser()
         create_page("The page!", "nav_playground.html", "en", published=True)
         draft = Page.objects.drafts()[0]
         draft.reverse_id = 'a_test'  # we have to change *something*
@@ -820,15 +819,8 @@ class ModeratorSwitchCommandTest(CMSTestCase):
         plugin_pool.set_plugin_meta()
 
 
-@override_settings(
-    CMS_PERMISSION=False,
-    CMS_PUBLIC_FOR='staff',
-)
-class BasicViewPermissionTests(CMSTestCase):
-    """
-    Test functionality with CMS_PERMISSION set to false, as this is the
-    normal use case
-    """
+class ViewPermissionBaseTests(CMSTestCase):
+
     def setUp(self):
         self.page = create_page('testpage', 'nav_playground.html', 'en')
 
@@ -839,6 +831,17 @@ class BasicViewPermissionTests(CMSTestCase):
             'session': {},
         }
         return type('Request', (object,), attrs)
+
+
+@override_settings(
+    CMS_PERMISSION=False,
+    CMS_PUBLIC_FOR='staff',
+)
+class BasicViewPermissionTests(ViewPermissionBaseTests):
+    """
+    Test functionality with CMS_PERMISSION set to false, as this is the
+    normal use case
+    """
 
     @override_settings(CMS_PUBLIC_FOR="all")
     def test_unauth_public(self):
@@ -885,8 +888,7 @@ class BasicViewPermissionTests(CMSTestCase):
 
     @override_settings(CMS_PUBLIC_FOR="none")
     def test_normal_basic_auth(self):
-        user = get_user_model().objects.create(username="normal", is_active=True, is_staff=False)
-        request = self.get_request(user)
+        request = self.get_request(self.get_standard_user())
         with self.assertNumQueries(0):
             self.assertTrue(self.page.has_view_permission(request))
 
@@ -898,22 +900,11 @@ class BasicViewPermissionTests(CMSTestCase):
     CMS_PERMISSION=True,
     CMS_PUBLIC_FOR='none'
 )
-class UnrestrictedViewPermissionTests(CMSTestCase):
+class UnrestrictedViewPermissionTests(ViewPermissionBaseTests):
     """
         Test functionality with CMS_PERMISSION set to True but no restrictions
         apply to this specific page
     """
-
-    def setUp(self):
-        self.page = create_page('testpage', 'nav_playground.html', 'en')
-
-    def get_request(self, user=None):
-        attrs = {
-            'user': user or AnonymousUser(),
-            'REQUEST': {},
-            'session': {},
-            }
-        return type('Request', (object,), attrs)
 
     def test_unauth_non_access(self):
         request = self.get_request()
@@ -930,8 +921,7 @@ class UnrestrictedViewPermissionTests(CMSTestCase):
                          [])
 
     def test_global_access(self):
-        User = get_user_model()
-        user = User.objects.create(username="normal", is_active=True, is_staff=False)
+        user = self.get_standard_user()
         GlobalPagePermission.objects.create(can_view=True, user=user)
         request = self.get_request(user)
         with self.assertNumQueries(2):
@@ -948,8 +938,7 @@ class UnrestrictedViewPermissionTests(CMSTestCase):
                          [self.page.pk])
 
     def test_normal_denied(self):
-        user = get_user_model().objects.create(username="normal", is_active=True, is_staff=False)
-        request = self.get_request(user)
+        request = self.get_request(self.get_standard_user())
         with self.assertNumQueries(4):
             """
             The queries are:
@@ -971,25 +960,17 @@ class UnrestrictedViewPermissionTests(CMSTestCase):
     CMS_PERMISSION=True,
     CMS_PUBLIC_FOR='all'
 )
-class RestrictedViewPermissionTests(CMSTestCase):
+class RestrictedViewPermissionTests(ViewPermissionBaseTests):
     """
     Test functionality with CMS_PERMISSION set to True and view restrictions
     apply to this specific page
     """
     def setUp(self):
+        super(RestrictedViewPermissionTests, self).setUp()
         self.group = Group.objects.create(name='testgroup')
-        self.page = create_page('testpage', 'nav_playground.html', 'en')
         self.pages = [self.page]
         self.expected = [self.page.pk]
         PagePermission.objects.create(page=self.page, group=self.group, can_view=True, grant_on=ACCESS_PAGE)
-
-    def get_request(self, user=None):
-        attrs = {
-            'user': user or AnonymousUser(),
-            'REQUEST': {},
-            'session': {},
-            }
-        return type('Request', (object,), attrs)
 
     def test_unauthed(self):
         request = self.get_request()
@@ -1006,7 +987,7 @@ class RestrictedViewPermissionTests(CMSTestCase):
                          [])
 
     def test_page_permissions(self):
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
+        user = self.get_standard_user()
         request = self.get_request(user)
         PagePermission.objects.create(can_view=True, user=user, page=self.page, grant_on=ACCESS_PAGE)
         with self.assertNumQueries(3):
@@ -1025,7 +1006,7 @@ class RestrictedViewPermissionTests(CMSTestCase):
                          self.expected)
 
     def test_page_group_permissions(self):
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
+        user = self.get_standard_user()
         user.groups.add(self.group)
         request = self.get_request(user)
         with self.assertNumQueries(3):
@@ -1038,7 +1019,7 @@ class RestrictedViewPermissionTests(CMSTestCase):
                          self.expected)
 
     def test_global_permission(self):
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
+        user = self.get_standard_user()
         GlobalPagePermission.objects.create(can_view=True, user=user)
         request = self.get_request(user)
         with self.assertNumQueries(2):
@@ -1075,7 +1056,7 @@ class RestrictedViewPermissionTests(CMSTestCase):
                          [])
 
     def test_basic_perm(self):
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
+        user = self.get_standard_user()
         user.user_permissions.add(Permission.objects.get(codename='view_page'))
         request = self.get_request(user)
         with self.assertNumQueries(5):
