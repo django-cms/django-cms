@@ -3,7 +3,7 @@ import bisect
 from cms.models import Title, Page, EmptyTitle
 from cms.utils import get_language_list
 from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import get_user_sites_queryset, load_view_restrictions
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
@@ -111,6 +111,8 @@ class CMSChangeList(ChangeList):
                 pages = pages.filter(pk__in=perm_edit_ids)
 
         root_pages = []
+        # Cache view restrictions for the is_restricted template tag
+        load_view_restrictions(request, pages)
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
