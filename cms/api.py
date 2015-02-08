@@ -220,12 +220,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-    page.add_root(instance=page)
-    page = page.reload()
+    page = page.add_root(instance=page)
 
     if parent:
-        page.move(target=parent, pos=position)
-        page = page.reload()
+        page = page.move(target=parent, pos=position)
 
     create_title(
         language=language,
@@ -345,11 +343,10 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         parent_id=parent_id,
     )
 
-    plugin_base.add_root(instance=plugin_base)
+    plugin_base = plugin_base.add_root(instance=plugin_base)
 
     if target:
-        plugin_base.move(target, pos=position)
-        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
+        plugin_base = plugin_base.move(target, pos=position)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()

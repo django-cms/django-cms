@@ -182,17 +182,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.numchild = 0
             obj.depth = 0
             if parent:
-                parent.add_child(instance=obj)
+                saved_obj = parent.add_child(instance=obj)
             else:
-                obj.add_root(instance=obj)
-            new_pk = obj.pk
-            saved_obj = Page.objects.get(pk=new_pk)
-            obj.pk = pk
-            obj.path = saved_obj.path
-            obj.numchild = saved_obj.numchild
-            obj.depth = saved_obj.depth
-            saved_obj.delete()
-            obj.save(no_signals=True)
+                saved_obj = obj.add_root(instance=obj)
+            tmp_pk = saved_obj.pk
+            saved_obj.pk = pk
+            Page.objects.get(pk=tmp_pk).delete()
+            saved_obj.save(no_signals=True)
         else:
             if 'history' in request.path_info:
                 old_obj = Page.objects.get(pk=obj.pk)
@@ -219,7 +215,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 else:
                     obj.parent_id = target.parent_id
                 obj.save()
-                obj.move(target, pos=position)
+                obj = obj.move(target, pos=position)
         page_type_id = form.cleaned_data.get('page_type')
         copy_target_id = request.GET.get('copy_target')
         if copy_target_id or page_type_id:

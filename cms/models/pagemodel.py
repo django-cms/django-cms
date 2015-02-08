@@ -185,14 +185,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         else:
             self.parent_id = target.parent_id
         self.save()
-        self.move(target, pos=position)
+        moved_page = self.move(target, pos=position)
 
         # fire signal
         import cms.signals as cms_signals
+        cms_signals.page_moved.send(sender=Page, instance=moved_page)
 
-        cms_signals.page_moved.send(sender=Page, instance=self)
-        moved_page = Page.objects.get(pk=self.pk)
-        #self.save()  # always save the page after move, because of publisher
         # check the slugs
         page_utils.check_title_slugs(moved_page)
         ## Make sure to update the slug and path of the target page.
@@ -441,16 +439,13 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if created:
             self.created_by = self.changed_by
         if commit:
-            if no_signals:  # ugly hack because of mptt
-                self.save_base(**kwargs)
-            else:
-                if not self.depth:
-                    if self.parent_id:
-                        self.parent.add_child(instance=self)
-                    else:
-                        self.add_root(instance=self)
-                    return #add_root and add_child save as well
-                super(Page, self).save(**kwargs)
+            if not self.depth:
+                if self.parent_id:
+                    self.parent.add_child(instance=self)
+                else:
+                    self.add_root(instance=self)
+                return #add_root and add_child save as well
+            super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -1155,10 +1150,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     if public_parent:
                         obj.parent_id = public_parent.pk
                         obj.parent = public_parent
-                        obj.add_root(instance=obj)
-                        #public_parent = public_parent.reload()
-                        obj = obj.reload()
-                        obj.move(target=public_parent, pos='first-child')
+                        obj = obj.add_root(instance=obj)
+                        obj = obj.move(target=public_parent, pos='first-child')
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
@@ -1168,21 +1161,25 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 if public_prev_sib:
                     obj.parent_id = public_prev_sib.parent_id
                     obj.save()
-                    obj.move(public_prev_sib, pos="right")
+                    obj = obj.move(public_prev_sib, pos="right")
                 elif public_parent:
                     # move as a first child to parent
                     obj.parent_id = public_parent.pk
                     obj.save()
-                    obj.move(target=public_parent, pos='first-child')
+                    obj = obj.move(target=public_parent, pos='first-child')
                 else:
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.parent_id = next_sibling.parent_id
                         obj.save()
-                        obj.move(next_sibling.publisher_public, pos="left")
+                        obj = obj.move(next_sibling.publisher_public, pos="left")
             else:
                 obj.save()
+
+    def move(self, target, pos=None):
+        super(Page, self).move(target, pos)
+        return self.reload()
 
     def rescan_placeholders(self):
         """

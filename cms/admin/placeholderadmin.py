@@ -433,13 +433,12 @@ class PlaceholderAdminMixin(object):
                     return HttpResponseBadRequest(force_text('parent must be in the same language as plugin_language'))
                 plugin.parent_id = parent.pk
                 plugin.save()
-                plugin.move(parent, pos='last-child')
+                plugin = plugin.move(parent, pos='last-child')
         else:
             sibling = CMSPlugin.get_last_root_node()
             plugin.parent_id = None
             plugin.save()
-            plugin.move(sibling, pos='right')
-        plugin = CMSPlugin.objects.get(pk=plugin.pk)
+            plugin = plugin.move(sibling, pos='right')
         for child in [plugin] + list(plugin.get_descendants()):
             child.placeholder = placeholder
             child.language = language

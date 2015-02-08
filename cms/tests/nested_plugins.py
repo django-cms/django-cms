@@ -231,7 +231,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         plugin_5 = add_plugin(placeholder, u"TextPlugin", u"en", body=u"05")
         left = CMSPlugin.objects.filter(parent__isnull=True).order_by('path')[0]
         plugin_5 = self.reload(plugin_5)
-        plugin_5.move(left, pos='right')
+        plugin_5 = plugin_5.move(left, pos='right')
         self.reorder_positions(plugin_5)
         self.reorder_positions(plugin_2)
 
@@ -379,7 +379,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         old_parent = plugin_2.parent
         plugin_2.parent_id = plugin_1.parent_id
         plugin_2.save()
-        plugin_2.move(target=plugin_1, pos="left")
+        plugin_2 = plugin_2.move(target=plugin_1, pos="left")
         self.reorder_positions(parent=old_parent)
         self.reorder_positions(plugin_2)
         self.copy_placeholders_and_check_results([placeholder])
@@ -390,7 +390,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         old_parent = plugin_6.parent
         plugin_6.parent_id = plugin_7.parent_id
         plugin_6.save()
-        plugin_6.move(target=plugin_7, pos="right")
+        plugin_6 = plugin_6.move(target=plugin_7, pos="right")
         self.reorder_positions(parent=old_parent)
         self.reorder_positions(plugin_6)
         self.copy_placeholders_and_check_results([placeholder])
@@ -401,7 +401,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         old_parent = plugin_3.parent
         plugin_3.parent_id = plugin_2.parent_id
         plugin_3.save()
-        plugin_3.move(target=plugin_2, pos="left")
+        plugin_3 = plugin_3.move(target=plugin_2, pos="left")
         self.reorder_positions(parent=old_parent)
         self.reorder_positions(plugin_3)
         self.copy_placeholders_and_check_results([placeholder])
@@ -412,7 +412,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         old_parent = plugin_3.parent
         plugin_3.parent_id = plugin_2.pk
         plugin_3.save()
-        plugin_3.move(target=plugin_2, pos="first-child")
+        plugin_3 = plugin_3.move(target=plugin_2, pos="first-child")
         self.reorder_positions(CMSPlugin.objects.filter(placeholder_id=plugin_3.placeholder_id, language=plugin_3.language, depth=1)[0])
         self.reorder_positions(plugin_3)
         self.copy_placeholders_and_check_results([placeholder])
@@ -423,7 +423,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         old_parent = plugin_7.parent
         plugin_7.parent_id = plugin_3.parent_id
         plugin_7.save()
-        plugin_7.move(target=plugin_3, pos="right")
+        plugin_7 = plugin_7.move(target=plugin_3, pos="right")
         self.reorder_positions(parent=old_parent)
         self.reorder_positions(plugin_7)
         self.copy_placeholders_and_check_results([placeholder, ])
