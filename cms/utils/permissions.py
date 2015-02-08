@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from contextlib import contextmanager, defaultdict
+from collections import defaultdict
+from contextlib import contextmanager
 from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -121,7 +122,7 @@ def has_page_change_permission(request):
         and global_change_perm or has_any_page_change_permissions(request))
 
 
-def has_global_page_permission(request, site=None, **filters):
+def has_global_page_permission(request, site=None, user=None, **filters):
     """
     A helper function to check for global page permissions for the current user
     and site. Caches the result on a request basis, so multiple calls to this
@@ -132,9 +133,11 @@ def has_global_page_permission(request, site=None, **filters):
     :param filters: queryset filters, e.g. ``can_add = True``
     :return: ``True`` or ``False``
     """
-    if not request.user.is_authenticated():
+    if not user:
+        user = request.user
+    if not user.is_authenticated():
         return False
-    if not get_cms_setting('PERMISSION') or request.user.is_superuser:
+    if not get_cms_setting('PERMISSION') or user.is_superuser:
         return True
     if not hasattr(request, '_cms_global_perms'):
         request._cms_global_perms = {}
@@ -142,7 +145,7 @@ def has_global_page_permission(request, site=None, **filters):
     if site:
         key = (('site', site.pk if hasattr(site, 'pk') else int(site)),) + key
     if key not in request._cms_global_perms:
-        qs = GlobalPagePermission.objects.with_user(request.user).filter(**filters)
+        qs = GlobalPagePermission.objects.with_user(user).filter(**filters)
         if site:
             qs = qs.filter(Q(sites__in=[site]) | Q(sites__isnull=True))
         request._cms_global_perms[key] = qs.exists()

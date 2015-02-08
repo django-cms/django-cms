@@ -958,24 +958,27 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return _("default")
 
     def has_view_permission(self, request, user=None):
+        if not user:
+            user = request.user
         from cms.utils.permissions import get_any_page_view_permissions, has_global_page_permission
         can_see_unrestricted = get_cms_setting('PUBLIC_FOR') == 'all' or (
-            get_cms_setting('PUBLIC_FOR') == 'staff' and request.user.is_staff)
+            get_cms_setting('PUBLIC_FOR') == 'staff' and user.is_staff)
 
         # inherited and direct view permissions
         is_restricted = bool(get_any_page_view_permissions(request, self))
 
         if not is_restricted and can_see_unrestricted:
             return True
-        elif not request.user.is_authenticated():
+        elif not user.is_authenticated():
             return False
 
         if not is_restricted:
             # a global permission was given to the request's user
-            if has_global_page_permission(request, self.site_id, can_view=True):
+            if has_global_page_permission(request, self.site_id, user=user, can_view=True):
                 return True
+        else:
             # a specific permission was granted to the request's user
-            if self.get_draft_object().has_generic_permission(request, "view"):
+            if self.get_draft_object().has_generic_permission(request, "view", user=user):
                 return True
 
         # The user has a normal django permission to view pages globally

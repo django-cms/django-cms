@@ -885,8 +885,7 @@ class BasicViewPermissionTests(CMSTestCase):
 
     @override_settings(CMS_PUBLIC_FOR="none")
     def test_normal_basic_auth(self):
-        User = get_user_model()
-        user = User.objects.create(username="normal", is_active=True, is_staff=False)
+        user = get_user_model().objects.create(username="normal", is_active=True, is_staff=False)
         request = self.get_request(user)
         with self.assertNumQueries(0):
             self.assertTrue(self.page.has_view_permission(request))
