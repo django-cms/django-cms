@@ -293,11 +293,11 @@ class ApplicationConfigSelect(Select):
         output.append('<script>\n')
         output.append('var apphooks_configuration = {\n')
         for application, cms_app in self.app_configs.items():
-            output.append("'%s': [%s]" % (application, ",".join(["['%s', '%s']" % (config.pk, force_text(config)) for config in cms_app.get_configs()])))
+            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, force_text(config)) for config in cms_app.get_configs()])))
         output.append('\n};\n')
         output.append('var apphooks_configuration_url = {\n')
         for application, cms_app in self.app_configs.items():
-            output.append("'%s': '%s'" % (application, cms_app.get_config_add_url()))
+            output.append("'%s': '%s'," % (application, cms_app.get_config_add_url()))
         output.append('\n};\n')
         output.append('var apphooks_configuration_value = \'%s\';\n' % value)
         output.append('</script>')
