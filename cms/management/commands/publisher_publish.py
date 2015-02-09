@@ -5,7 +5,9 @@ from optparse import make_option
 from django.contrib.auth import get_user_model
 from django.core.management.base import NoArgsCommand, CommandError
 from django.utils.encoding import force_text
-from django.utils.translation import activate
+
+from cms.api import publish_pages
+from cms.utils.permissions import set_current_user
 
 
 class Command(NoArgsCommand):
@@ -43,15 +45,6 @@ class Command(NoArgsCommand):
         else:
             site = None
 
-        self.publish_pages(include_unpublished, language, site)
-
-    def publish_pages(self, include_unpublished, language, site):
-        from cms.models import Page
-        from cms.utils.permissions import set_current_user
-
-        # thread locals middleware needs to know, who are we - login as a first
-        # super user
-
         try:
             user = get_user_model().objects.filter(is_active=True, is_staff=True, is_superuser=True)[0]
         except IndexError:
@@ -59,34 +52,17 @@ class Command(NoArgsCommand):
 
         set_current_user(user) # set him as current user
 
-        qs = Page.objects.drafts()
-        if not include_unpublished:
-            qs = qs.filter(title_set__published=True).distinct()
-        if site:
-            qs = qs.filter(site_id=site)
-
-        pages_total, pages_published = qs.count(), 0
-
+        pages_published = 0
+        pages_total = 0
         self.stdout.write(u"\nPublishing public drafts....\n")
-        output_language = None
-        for i, page in enumerate(qs):
-            m = " "
-            add = True
-            titles = page.title_set
-            if not include_unpublished:
-                titles = titles.filter(published=True)
-            for lang in titles.values_list("language", flat=True):
-                if language is None or lang == language:
-                    if not output_language:
-                        output_language = lang
-                    if not page.publish(lang):
-                        add = False
-            # we may need to activate the first (main) language for proper page title rendering
-            activate(output_language)
+        index = 0
+        for page, add in publish_pages(include_unpublished, language, site):
+            m = '*' if add else ' '
+            self.stdout.write(u"%d.\t%s  %s [%d]\n" % (index + 1, m, force_text(page), page.id))
+            pages_total += 1
             if add:
                 pages_published += 1
-                m = "*"
-            self.stdout.write(u"%d.\t%s  %s [%d]\n" % (i + 1, m, force_text(page), page.id))
+            index += 1
 
         self.stdout.write(u"\n")
         self.stdout.write(u"=" * 40)
