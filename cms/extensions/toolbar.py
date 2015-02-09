@@ -123,7 +123,7 @@ class ExtensionToolbar(CMSToolbar):
         page = self._get_page()
         urls = []
         if language:
-            titles = page.get_title_object(language),
+            titles = page.get_title_obj(language),
         else:
             titles = page.title_set.all()
         # Titles
