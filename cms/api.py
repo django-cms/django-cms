@@ -9,6 +9,7 @@ calling these methods!
 import datetime
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
@@ -16,6 +17,7 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
+from django.utils.translation import activate
 
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
@@ -503,3 +505,43 @@ def copy_plugins_to_language(page, source_language, target_language,
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
+
+
+def publish_pages(include_unpublished, language, site):
+    """
+    Create published public version of selected drafts.
+    """
+    from cms.models import Page
+    from cms.utils.permissions import set_current_user
+
+    # thread locals middleware needs to know, who are we - login as a first
+    # super user
+
+    try:
+        user = get_user_model().objects.filter(is_active=True, is_staff=True, is_superuser=True)[0]
+    except IndexError:
+        raise User.DoesNotExist
+
+    set_current_user(user) # set him as current user
+
+    qs = Page.objects.drafts()
+    if not include_unpublished:
+        qs = qs.filter(title_set__published=True).distinct()
+    if site:
+        qs = qs.filter(site_id=site)
+
+    output_language = None
+    for i, page in enumerate(qs):
+        add = True
+        titles = page.title_set
+        if not include_unpublished:
+            titles = titles.filter(published=True)
+        for lang in titles.values_list("language", flat=True):
+            if language is None or lang == language:
+                if not output_language:
+                    output_language = lang
+                if not page.publish(lang):
+                    add = False
+        # we may need to activate the first (main) language for proper page title rendering
+        activate(output_language)
+        yield (page, add)
