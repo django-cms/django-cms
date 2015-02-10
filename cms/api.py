@@ -450,8 +450,9 @@ def publish_page(page, user, language):
         raise PermissionDenied()
     # Set the current_user to have the page's changed_by
     # attribute set correctly.
-    # 'user' is a User object, but current_user() just wants the username.
-    with current_user(user.username):
+    # 'user' is a user object, but current_user() just wants the username. Note
+    # that not all user models have `username`.
+    with current_user(unicode(user)):
         page.publish(language)
     return page.reload()
 
