@@ -32,7 +32,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals
+from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
 
@@ -448,7 +448,11 @@ def publish_page(page, user, language):
     request = FakeRequest(user)
     if not page.has_publish_permission(request):
         raise PermissionDenied()
-    page.publish(language)
+    # Set the current_user to have the page's changed_by
+    # attribute set correctly.
+    # 'user' is a User object, but current_user() just wants the username.
+    with current_user(user.username):
+        page.publish(language)
     return page.reload()
 
 

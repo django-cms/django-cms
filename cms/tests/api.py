@@ -224,6 +224,7 @@ class PythonAPITests(TestCase):
         page_attrs['published'] = False
         page = create_page(**page_attrs)
         self.assertFalse(page.is_published('en'))
+        self.assertEqual(page.changed_by, 'script')
         user = get_user_model().objects.create_user(username='user', email='user@django-cms.org',
                                                     password='user')
         # Initially no permission
@@ -239,3 +240,4 @@ class PythonAPITests(TestCase):
         # Reload the page to get updates.
         page = page.reload()
         self.assertTrue(page.is_published('en'))
+        self.assertEqual(page.changed_by, 'user')
