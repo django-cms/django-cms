@@ -439,7 +439,7 @@ class ExtraMenuItems(InclusionTag):
             plugin_class_inst = plugin.get_plugin_class_instance()
             item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
             if item:
-                items.append(item)
+                items += item
             plugin_classes = plugin_pool.get_all_plugins()
             for plugin_class in plugin_classes:
                 plugin_class_inst = plugin_class()
