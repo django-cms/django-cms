@@ -283,8 +283,10 @@ get_extra_placeholder_menu_items
 
 ``get_extra_placeholder_menu_items(self, request, placeholder)``
 
-overwrite to extends a placeholders context menu
-return a list of ``cms.plugin_base.PluginMenuItem`` instances
+Extends the context menu for all placeholders. To add one or more custom context
+menu items that are displayed in the context menu for all placeholders when in
+structure mode, override this method in a related plugin to return a list of
+``cms.plugin_base.PluginMenuItem`` instances.
 
 .. _get_extra_global_plugin_menu_items:
 
@@ -292,8 +294,11 @@ get_extra_global_plugin_menu_items
 ----------------------------------
 
 ``get_extra_global_plugin_menu_items(self, request, plugin)``
-extends all plugins context menu
-return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+Extends the context menu for all plugins. To add one or more custom context menu
+items that are displayed in the context menu for all plugins when in structure
+mode, override this method in a related plugin to return a list of
+``cms.plugin_base.PluginMenuItem`` instances.
 
 .. _get_extra_local_plugin_menu_items:
 
@@ -301,8 +306,11 @@ get_extra_local_plugin_menu_items
 ---------------------------------
 
 ``get_extra_local_plugin_menu_items(self, request, plugin)``
-extends the current plugins context menu
-return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+Extends the context menu for a specific plugin. To add one or more custom
+context menu items that are displayed in the context menu for a given plugin
+when in structure mode, override this method in the plugin to return a list of
+``cms.plugin_base.PluginMenuItem`` instances.
 
 ******************************************
 CMSPlugin Attributes and Methods Reference
