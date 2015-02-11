@@ -49,7 +49,7 @@ from djangocms_link.forms import LinkForm
 from djangocms_link.models import Link
 from djangocms_picture.models import Picture
 from djangocms_text_ckeditor.models import Text
-from djangocms_text_ckeditor.utils import plugin_tags_to_id_list
+from djangocms_text_ckeditor.utils import plugin_tags_to_id_list, plugin_to_tag
 
 
 class DumbFixturePlugin(CMSPluginBase):
@@ -321,6 +321,63 @@ class PluginsTestCase(PluginsTestBaseCase):
         txt = Text.objects.all()[0]
         self.assertEqual('&lt;script&gt;var bar="hacked"&lt;/script&gt;', txt.body)
 
+    def test_copy_plugins_method(self):
+        """
+        Test that CMSPlugin copy does not have side effects
+        """
+        # create some objects
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
+        ph_en = page_en.placeholders.get(slot="body")
+        ph_de = page_de.placeholders.get(slot="body")
+
+        # add the text plugin
+        text_plugin_en = api.add_plugin(ph_en, "TextPlugin", "en", body="Hello World")
+        self.assertEqual(text_plugin_en.pk, CMSPlugin.objects.all()[0].pk)
+
+        # add a *nested* link plugin
+        link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
+                                        name="A Link", url="https://www.django-cms.org")
+        #
+        text_plugin_en.body += plugin_to_tag(link_plugin_en)
+        text_plugin_en.save()
+
+        # the call above to add a child makes a plugin reload required here.
+        text_plugin_en = self.reload(text_plugin_en)
+
+        # setup the plugins to copy
+        plugins = [text_plugin_en, link_plugin_en]
+        # save the old ids for check
+        old_ids = [plugin.pk for plugin in plugins]
+        new_plugins = []
+        plugins_ziplist = []
+        old_parent_cache = {}
+
+        # This is a stripped down version of cms.copy_plugins.copy_plugins_to
+        # to low-level testing the copy process
+        for plugin in plugins:
+            new_plugins.append(plugin.copy_plugin(ph_de, 'de', old_parent_cache))
+            plugins_ziplist.append((new_plugins[-1], plugin))
+
+        for idx, plugin in enumerate(plugins):
+            inst, _ = new_plugins[idx].get_plugin_instance()
+            new_plugins[idx] = inst
+            new_plugins[idx].post_copy(plugin, plugins_ziplist)
+
+        for idx, plugin in enumerate(plugins):
+            # original plugin instance reference should stay unmodified
+            self.assertEqual(old_ids[idx], plugin.pk)
+            # new plugin instance should be different from the original
+            self.assertNotEqual(new_plugins[idx], plugin.pk)
+
+            # text plugins (both old and new) should contain a reference
+            # to the link plugins
+            if plugin.plugin_type == 'TextPlugin':
+                self.assertTrue('link.png' in plugin.body)
+                self.assertTrue('plugin_obj_%s' % plugin.get_children()[0].pk in plugin.body)
+                self.assertTrue('link.png' in new_plugins[idx].body)
+                self.assertTrue('plugin_obj_%s' % new_plugins[idx].get_children()[0].pk in new_plugins[idx].body)
+
     def test_copy_plugins(self):
         """
         Test that copying plugins works as expected.
@@ -421,7 +478,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         mcol1 = self.reload(mcol1)
         self.assertEqual(mcol1.get_descendants().count(), 2)
 
-        with self.assertNumQueries(FuzzyInt(0, 200)):
+        with self.assertNumQueries(FuzzyInt(0, 207)):
             page_en.publish('en')
 
     def test_plugin_validation(self):

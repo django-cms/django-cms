@@ -20,7 +20,11 @@ $(document).ready(function () {
 
 		if(apphooks_configuration[opt.val()]){
 			for(var i=0; i < apphooks_configuration[opt.val()].length; i++) {
-				appCfgs.append('<option value="' + apphooks_configuration[opt.val()][i][0] + '">' + apphooks_configuration[opt.val()][i][1] + '</option>')
+				selectedCfgs = '';
+				if(apphooks_configuration[opt.val()][i][0] == apphooks_configuration_value) {
+					selectedCfgs = 'selected="selected"';
+				}
+				appCfgs.append('<option ' + selectedCfgs + ' value="' + apphooks_configuration[opt.val()][i][0] + '">' + apphooks_configuration[opt.val()][i][1] + '</option>')
 			}
 			appCfgsAdd.attr('href', apphooks_configuration_url[opt.val()]);
 			appCfgsRow.removeClass('hidden');
@@ -42,7 +46,8 @@ $(document).ready(function () {
 
 	// Show it if we change to an app_hook that requires a namespace
 	appHooks.on('change', function(){
-		var self = $(this);
+		var self = $(this),
+			opt = self.find('option:selected');
 
 		appHooks.setupNamespaces();
 
@@ -52,16 +57,21 @@ $(document).ready(function () {
 			appNs.removeAttr('value');
 		}
 
-		// When we choose one that does NOT require a namespace, then make
-		// sure we reset to the previously set value, if any.
-		if (!opt.data('namespace')){
-			appNs.val(original_ns);
+		// When selecting back the original apphook we try
+		// to restore the original configuration
+		if(selected.val() == opt.val()) {
+			if(original_ns) {
+				appNs.val(original_ns);
+			}
 		}
-
-		// If nothing was previously there, suggest the default, if
-		// applicable.
-		if (!original_ns && opt.data('namespace')) {
+		// If new apphook has a namespace, suggest the default
+		else if (opt.data('namespace')) {
 			appNs.val(opt.data('namespace'));
+		}
+		// Cleanup the whole thing
+		else {
+			appNs.val('');
+			appNs.removeAttr('value');
 		}
 	});
 });
