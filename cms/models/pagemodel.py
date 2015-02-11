@@ -816,7 +816,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     language = lang
             if not found:
                 if self.title_cache.keys():
-                    language = self.title_cache.keys()[0]
+                    language = list(self.title_cache.keys())[0]
                 else:
                     language = None
         if not language:
