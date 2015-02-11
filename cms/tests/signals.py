@@ -29,21 +29,54 @@ def signal_tester(signal):
         signal.disconnect(env, weak=True)
     
 
-
 class SignalTests(TestCase):
     def test_urls_need_reloading_signal_create(self):
-        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         with signal_tester(urls_need_reloading) as env:
-            create_page("apphooked-page", "nav_playground.html", "en",
-                created_by=superuser, published=True, apphook="SampleApp")
+            self.client.get('/')
+            self.assertEqual(env.call_count, 0)
+            create_page(
+                "apphooked-page",
+                "nav_playground.html",
+                "en",
+                published=True,
+                apphook="SampleApp",
+                apphook_namespace="test"
+            )
             self.client.get('/')
             self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_delete(self):
-        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
-        page = create_page("apphooked-page", "nav_playground.html", "en",
-            created_by=superuser, published=True, apphook="SampleApp")
         with signal_tester(urls_need_reloading) as env:
+            self.client.get('/')
+            self.assertEqual(env.call_count, 0)
+            page = create_page(
+                "apphooked-page",
+                "nav_playground.html",
+                "en",
+                published=True,
+                apphook="SampleApp",
+                apphook_namespace="test"
+            )
             page.delete()
             self.client.get('/')
             self.assertEqual(env.call_count, 1)
+
+    def test_urls_need_reloading_signal_change_slug(self):
+        with signal_tester(urls_need_reloading) as env:
+            self.assertEqual(env.call_count, 0)
+            page = create_page(
+                "apphooked-page",
+                "nav_playground.html",
+                "en",
+                published=True,
+                apphook="SampleApp",
+                apphook_namespace="test"
+            )
+            self.client.get('/')
+            self.assertEqual(env.call_count, 1)
+            title = page.title_set.get(language="en")
+            title.slug += 'test'
+            title.save()
+            page.publish('en')
+            self.client.get('/')
+            self.assertEqual(env.call_count, 2)
