@@ -7,11 +7,13 @@ Internationalisation
 Multilingual URLs
 *****************
 
-If you use more than one language, django CMS urls need
-to be referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see the
-official django `documentation`_.
+If you use more than one language, django CMS urls, *including the admin URLS*, need to be
+referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see
+the official `Django documentation
+<https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns>`_
+on the subject.
 
-Main `urls.py` example::
+Here's an example of `urls.py`::
 
     from django.conf import settings
     from django.conf.urls import patterns, include, url
@@ -27,9 +29,10 @@ Main `urls.py` example::
 
     urlpatterns += staticfiles_urlpatterns()
 
+    # note the django CMS URLs included via i18n_patterns
     urlpatterns += i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
-        url(r'^', include('cms.urls')), # <--------- include the django cms urls via i18n_patterns
+        url(r'^', include('cms.urls')),
     )
 
 
