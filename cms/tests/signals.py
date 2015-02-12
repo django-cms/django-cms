@@ -6,7 +6,6 @@ from django.test import TestCase
 
 from cms.api import create_page
 from cms.signals import urls_need_reloading
-from cms.utils.compat.dj import get_user_model
 
 
 class SignalTester(object):
