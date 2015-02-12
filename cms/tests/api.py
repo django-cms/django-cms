@@ -240,4 +240,4 @@ class PythonAPITests(TestCase):
         # Reload the page to get updates.
         page = page.reload()
         self.assertTrue(page.is_published('en'))
-        self.assertEqual(page.changed_by, unicode(user))
+        self.assertEqual(page.changed_by, user.get_username())
