@@ -33,11 +33,11 @@ Join us online
 
 django CMS is supported by a friendly and very knowledgable community.
 
-Find us at:
+Find us:
 
 * in our IRC channel, #django-cms, on irc.freenode.net
-* our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_
-* our `django CMS developers email list <https://groups.google.com/forum/#!forum/django-cms-developers>`_
+* on our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ for **general** django CMS questions and discussion
+* on our `django CMS developers email list <https://groups.google.com/forum/#!forum/django-cms-developers>`_ for discussions about the **development of django CMS**
 
 
 ***************
