@@ -10,6 +10,7 @@ from cms.api import create_page, add_plugin
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
+from cms.templatetags.cms_tags import _clean_key, _get_cache_key
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride, ChangeModel
@@ -287,6 +288,24 @@ class RenderingTestCase(SettingsOverrideTestCase):
         template = u'{% load cms_tags %}{% show_uncached_placeholder "sub" test_page %}'
         output = self.render(template, self.test_page, {'test_page': self.test_page})
         self.assertEqual(output, self.test_data['text_sub'])
+
+    def test_show_uncached_placeholder_tag_no_use_cache(self):
+        """
+        Tests that {% show_uncached_placeholder %} does not populate cache.
+        """
+        template = '{% load cms_tags %}<h1>{% show_uncached_placeholder "sub" test_page %}</h1>'
+
+        base_key = _get_cache_key('_show_placeholder_for_page', self.test_page, "en",
+                                  self.test_page.site_id)
+        cache_key = _clean_key('%s_placeholder:%s' % (base_key, "sub"))
+
+        cache_value_before = cache.get(cache_key)
+        output = self.render(template, self.test_page, {'test_page': self.test_page})
+        cache_value_after = cache.get(cache_key)
+
+        self.assertEqual(output, '<h1>%s</h1>' % self.test_data['text_sub'])
+        self.assertEqual(cache_value_before, cache_value_after)
+        self.assertIsNone(cache_value_after)
 
     def test_page_url_by_pk(self):
         template = u'{%% load cms_tags %%}{%% page_url %s %%}' % self.test_page2.pk
