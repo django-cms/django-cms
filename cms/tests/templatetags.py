@@ -243,15 +243,13 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         cache.clear()
         from cms.test_utils import project
 
-        User = get_user_model()
-
         template_dir = os.path.join(os.path.dirname(project.__file__), 'templates', 'alt_plugin_templates',
                                     'show_placeholder')
         page = create_page('Test', 'col_two.html', 'en')
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='HIDDEN')
         request = RequestFactory().get('/')
-        request.user = User()
+        request.user = self.get_staff_user_with_no_permissions()
         request.current_page = page
         with SettingsOverride(TEMPLATE_DIRS=[template_dir]):
             template = Template(

@@ -105,7 +105,8 @@ def render_placeholder(placeholder, context_to_copy,
     request = context['request']
     if not hasattr(request, 'placeholders'):
         request.placeholders = []
-    request.placeholders.append(placeholder)
+    if placeholder.has_change_permission(request):
+        request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None

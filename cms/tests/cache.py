@@ -112,9 +112,10 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
             render2 = template.render(rctx)
-        with self.assertNumQueries(FuzzyInt(9, 13)):
-            response = self.client.get('/en/')
-            resp2 = response.content.decode('utf8').split("$$$")[1]
+        with self.settings(CMS_PAGE_CACHE=False):
+            with self.assertNumQueries(FuzzyInt(9, 13)):
+                response = self.client.get('/en/')
+                resp2 = response.content.decode('utf8').split("$$$")[1]
         self.assertNotEqual(render, render2)
         self.assertNotEqual(resp1, resp2)
 
