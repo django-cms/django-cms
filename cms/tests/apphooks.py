@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
+from django.contrib.auth.models import Permission
 
 from django.core.urlresolvers import clear_url_caches, reverse
 from django.utils import six
@@ -579,7 +580,8 @@ class ApphooksTestCase(CMSTestCase):
             path = reverse('example_detail', kwargs={'pk': ex1.pk})
 
             self.user = self._create_user('admin_staff', True, True)
-            response = self.client.get(path+"?edit")
+            with self.login_user_context(self.user):
+                response = self.client.get(path+"?edit")
             toolbar = CMSToolbar(response.context['request'])
             toolbar.populate()
             placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
@@ -589,7 +591,21 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 1)
 
             self.user = self._create_user('staff', True, False)
-            response = self.client.get(path+"?edit")
+            with self.login_user_context(self.user):
+                response = self.client.get(path+"?edit")
+            response.context['request'].user = self.user
+            toolbar = CMSToolbar(response.context['request'])
+            toolbar.populate()
+            placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
+            placeholder_toolbar.populate()
+            placeholder_toolbar.init_placeholders_from_request()
+            placeholder_toolbar.add_structure_mode()
+            self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 0)
+
+            self.user.user_permissions.add(Permission.objects.get(codename='change_example1'))
+            with self.login_user_context(self.user):
+                response = self.client.get(path+"?edit")
+            response.context['request'].user = self.user
             toolbar = CMSToolbar(response.context['request'])
             toolbar.populate()
             placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
