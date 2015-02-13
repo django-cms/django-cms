@@ -96,13 +96,15 @@ $(document).ready(function () {
 			$(document).bind('keydown', function (e) {
 				// check if we have an important focus
 				var fields = $('*:focus');
-				// cancel if there is no structure / content switcher
-				if(!this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 				// 32 = space
 				if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
+					// cancel if there is no structure / content switcher
+					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.hide();
 				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+					// cancel if there is no structure / content switcher
+					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.show();
 				}
