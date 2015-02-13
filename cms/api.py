@@ -510,12 +510,6 @@ def publish_pages(include_unpublished, language, site):
     """
     Create published public version of selected drafts.
     """
-    from cms.models import Page
-
-    # thread locals middleware needs to know, who are we - login as a first
-    # super user
-
-
     qs = Page.objects.drafts()
     if not include_unpublished:
         qs = qs.filter(title_set__published=True).distinct()
