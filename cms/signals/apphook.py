@@ -41,12 +41,25 @@ def apphook_post_title_checker(instance, **kwargs):
     old_title = getattr(instance, '_old_data', None)
     if not old_title:
         if instance.page.application_urls:
-            request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
+            request_finished.connect(
+                trigger_restart,
+                dispatch_uid=DISPATCH_UID
+            )
     else:
         old_values = (
-            old_title.published, old_title.page.application_urls, old_title.page.application_namespace, old_title.path)
+            old_title.published,
+            old_title.page.application_urls,
+            old_title.page.application_namespace,
+            old_title.path,
+            old_title.slug,
+        )
         new_values = (
-            instance.published, instance.page.application_urls, instance.page.application_namespace, instance.path)
+            instance.published,
+            instance.page.application_urls,
+            instance.page.application_namespace,
+            instance.path,
+            instance.slug,
+        )
         if old_values != new_values and (old_values[2] or new_values[2]):
             request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
 
