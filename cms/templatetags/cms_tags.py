@@ -1116,6 +1116,7 @@ class RenderPlaceholder(AsTag):
         request = context.get('request', None)
         placeholder = kwargs.get('placeholder')
         width = kwargs.get('width')
+        nocache = kwargs.get('nocache', False)
         language = kwargs.get('language')
 
         if not request:
@@ -1126,7 +1127,8 @@ class RenderPlaceholder(AsTag):
             request.placeholders = []
         if placeholder.has_change_permission(request):
             request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language, editable=editable))
+        return safe(placeholder.render(context, width, lang=language,
+                                       editable=editable, use_cache=not nocache))
 
     def get_value_for_context(self, context, **kwargs):
         return self._get_value(context, editable=False, **kwargs)
