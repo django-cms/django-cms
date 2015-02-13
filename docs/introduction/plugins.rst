@@ -183,7 +183,8 @@ something like this::
         <input type="submit" value="Vote" />
     </form>
 
-Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
+Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
+to add the plugin table (using South)::
 
     python manage.py schemamigration polls_plugin --init
     python manage.py migrate polls_plugin
