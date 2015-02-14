@@ -2,14 +2,17 @@
 Permissions
 ###########
 
-In django CMS you can set two types of permissions:
+In django CMS you can set three types of permissions:
 
 1. View restrictions for restricting front-end view access to users
-2. Page permissions for allowing staff users to only have rights on certain sections of certain sites
+1. Page permissions for allowing staff users to only have rights on certain sections of certain sites
+1. Mode permission for allowing staff users to only edit existing content and not add new one
 
-To enable these features, ``settings.py`` requires:
+To enable features 1. and 2., ``settings.py`` requires:
 
     CMS_PERMISSION = True
+
+The third one is controlled by the "**Can use Structure mode**" Django permission.
 
 *****************
 View restrictions
@@ -77,9 +80,27 @@ Using the *Pages global permissions* model you can give a set of permissions to 
 
 .. note:: You always **must** set the sites managed py the global permissions, even if you only have one site.
 
+.. _structure_mode_permissions:
 
+***************
+Mode permission
+***************
+
+.. versionchanged:: 3.1
+
+django CMS uses **Structure** and **Content** modes for different type of content editing;
+while the former allows full control over the plugins layout, positioning and to add new
+plugins to the page, the latter only allow editing existing plugins.
+
+Since version 3.1 the specific permission "**Can use Structure mode**" exists to allow restricting
+the access to structure mode; this allows to define different level of permissions on the
+same content.
+
+This permission also applies to ``PlaceholderField``s defined on models.
+
+****************
 File Permissions
-================
+****************
 
 django CMS does not take care of and no responsibility for controlling access to files. Please make sure to use either
 a prebuilt solution (like `django-filer <https://github.com/stefanfoulis/django-filer>`_) or to roll your own.
