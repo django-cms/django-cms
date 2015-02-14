@@ -96,7 +96,7 @@ Since version 3.1 the specific permission "**Can use Structure mode**" exists to
 the access to structure mode; this allows to define different level of permissions on the
 same content.
 
-This permission also applies to ``PlaceholderField``s defined on models.
+This permission also applies to ``PlaceholderField`` defined on models.
 
 ****************
 File Permissions
