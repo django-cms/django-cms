@@ -2,13 +2,12 @@
 import bisect
 from cms.models import Title, Page, EmptyTitle
 from cms.utils import get_language_list
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
-import django
+
 
 COPY_VAR = "copy"
 
@@ -20,7 +19,7 @@ def cache_tree_children(queryset):
     item, which would otherwise (if '_cached_children' is not set) cause a
     database query.
 
-    The queryset must be ordered by 'lft', or the function will put the children
+    The queryset must be ordered by 'path', or the function will put the children
     in the wrong order.
     """
     parents_dict = {}
@@ -46,11 +45,12 @@ class CMSChangeList(ChangeList):
     real_queryset = False
 
     def __init__(self, request, *args, **kwargs):
-        from cms.utils.plugins import current_site
+        from cms.utils.helpers import current_site
+
         self._current_site = current_site(request)
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
-            self.queryset = self.get_query_set(request)
+            self.queryset = self.get_queryset(request)
         except:
             raise
         self.get_results(request)
@@ -59,32 +59,25 @@ class CMSChangeList(ChangeList):
             request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
 
-    def get_query_set(self, request=None):
+    def get_queryset(self, request):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
         if 'language' in self.params:
             del self.params['language']
         if 'page_id' in self.params:
             del self.params['page_id']
-        if django.VERSION[1] > 3:
-            qs = super(CMSChangeList, self).get_query_set(request).drafts()
-        else:
-            qs = super(CMSChangeList, self).get_query_set().drafts()
-        if request:
-            site = self.current_site()
-            permissions = Page.permissions.get_change_id_list(request.user, site)
-            if permissions != Page.permissions.GRANT_ALL:
-                qs = qs.filter(pk__in=permissions)
-                # root_query_set is a read-only property in Django 1.6
-                # and will be removed in Django 1.8.
-                queryset_attr = 'root_query_set' if DJANGO_1_5 else 'root_queryset'
-                setattr(self, queryset_attr, self.root_query_set.filter(pk__in=permissions))
-            self.real_queryset = True
-            qs = qs.filter(site=self._current_site)
+        qs = super(CMSChangeList, self).get_queryset(request).drafts()
+        site = self.current_site()
+        permissions = Page.permissions.get_change_id_list(request.user, site)
+        if permissions != Page.permissions.GRANT_ALL:
+            qs = qs.filter(pk__in=permissions)
+            self.root_queryset = self.root_queryset.filter(pk__in=permissions)
+        self.real_queryset = True
+        qs = qs.filter(site=self._current_site)
         return qs
 
     def is_filtered(self):
-        from cms.utils.plugins import SITE_VAR
+        from cms.utils.helpers import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR, 'language', 'page_id'):
             if i in lookup_params:
@@ -97,15 +90,15 @@ class CMSChangeList(ChangeList):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
             if not self.is_filtered():
-                self.full_result_count = self.result_count = self.root_query_set.count()
+                self.full_result_count = self.result_count = self.root_queryset.count()
             else:
-                self.full_result_count = self.root_query_set.count()
+                self.full_result_count = self.root_queryset.count()
 
     def set_items(self, request):
         site = self.current_site()
         # Get all the pages, ordered by tree ID (it's convenient to build the
         # tree using a stack now)
-        pages = self.get_query_set(request).drafts().order_by('tree_id',  'lft').select_related('publisher_public')
+        pages = self.get_queryset(request).drafts().order_by('path').select_related('publisher_public')
 
         # Get lists of page IDs for which the current user has
         # "permission to..." on the current site.
@@ -120,17 +113,18 @@ class CMSChangeList(ChangeList):
         root_pages = []
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
-
         # Unfortunately we cannot use the MPTT builtin code for pre-caching
         # the children here, because MPTT expects the tree to be 'complete'
         # and otherwise complaints about 'invalid item order'
         cache_tree_children(pages)
         ids = dict((page.id, page) for page in pages)
-
+        parent_ids = {}
         for page in pages:
-
-            children = list(page.get_children())
-
+            if not page.parent_id in parent_ids:
+                parent_ids[page.parent_id] = []
+            parent_ids[page.parent_id].append(page)
+        for page in pages:
+            children = parent_ids.get(page.pk, [])
             # If the parent page is not among the nodes shown, this node should
             # be a "root node". The filtering for this has already been made, so
             # using the ids dictionary means this check is constant time
@@ -154,7 +148,7 @@ class CMSChangeList(ChangeList):
                 page.menu_level = 0
                 root_pages.append(page)
                 if page.parent_id:
-                    page.get_cached_ancestors(ascending=True)
+                    page.get_cached_ancestors()
                 else:
                     page.ancestors_ascending = []
 

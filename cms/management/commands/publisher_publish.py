@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from optparse import make_option
+
+from django.contrib.auth import get_user_model
 from django.core.management.base import NoArgsCommand, CommandError
+from django.utils.encoding import force_text
 from django.utils.translation import activate
-from cms.utils.compat.dj import force_unicode
+
 
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
@@ -44,7 +47,6 @@ class Command(NoArgsCommand):
 
     def publish_pages(self, include_unpublished, language, site):
         from cms.models import Page
-        from cms.utils.compat.dj import get_user_model
         from cms.utils.permissions import set_current_user
 
         # thread locals middleware needs to know, who are we - login as a first
@@ -84,7 +86,7 @@ class Command(NoArgsCommand):
             if add:
                 pages_published += 1
                 m = "*"
-            self.stdout.write(u"%d.\t%s  %s [%d]\n" % (i + 1, m, force_unicode(page), page.id))
+            self.stdout.write(u"%d.\t%s  %s [%d]\n" % (i + 1, m, force_text(page), page.id))
 
         self.stdout.write(u"\n")
         self.stdout.write(u"=" * 40)

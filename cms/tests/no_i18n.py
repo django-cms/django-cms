@@ -1,53 +1,49 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches
 from django.template import Template
+from django.test.utils import override_settings
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page
 from cms.models import Page, CMSPlugin
-from cms.test_utils.testcases import (SettingsOverrideTestCase,
+from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_EDIT,
                                       URL_CMS_PLUGIN_ADD,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
-from cms.test_utils.util.context_managers import SettingsOverride
-from cms.utils.compat.dj import get_user_model
 
 
-class TestNoI18N(SettingsOverrideTestCase):
-    settings_overrides = {
-        'LANGUAGE_CODE': 'en-us',
-        'LANGUAGES': None,
-        'CMS_LANGUAGES': None,
-        'USE_I18N': False,
-        'ROOT_URLCONF': 'cms.test_utils.project.urls_no18n',
-        'MIDDLEWARE_CLASSES': [
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-            #'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.doc.XViewMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'django.middleware.transaction.TransactionMiddleware',
-            'django.middleware.cache.FetchFromCacheMiddleware',
-            #'cms.middleware.language.LanguageCookieMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-        ],
-        'TEMPLATE_CONTEXT_PROCESSORS': [
-            "django.contrib.auth.context_processors.auth",
-            'django.contrib.messages.context_processors.messages',
-            #"django.core.context_processors.i18n",
-            "django.core.context_processors.debug",
-            "django.core.context_processors.request",
-            "django.core.context_processors.media",
-            'django.core.context_processors.csrf',
-            "cms.context_processors.cms_settings",
-            "sekizai.context_processors.sekizai",
-            "django.core.context_processors.static",
-        ],
-    }
+@override_settings(
+    LANGUAGE_CODE='en-us',
+    LANGUAGES=[],
+    CMS_LANGUAGES={},
+    USE_I18N=False,
+    ROOT_URLCONF='cms.test_utils.project.urls_no18n',
+    MIDDLEWARE_CLASSES=[
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.transaction.TransactionMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
+    ],
+    TEMPLATE_CONTEXT_PROCESSORS=[
+        "django.contrib.auth.context_processors.auth",
+        'django.contrib.messages.context_processors.messages',
+        "django.core.context_processors.debug",
+        "django.core.context_processors.request",
+        "django.core.context_processors.media",
+        'django.core.context_processors.csrf',
+        "cms.context_processors.cms_settings",
+        "sekizai.context_processors.sekizai",
+        "django.core.context_processors.static",
+    ],
+)
+class TestNoI18N(CMSTestCase):
 
     def setUp(self):
         clear_url_caches()
@@ -75,7 +71,7 @@ class TestNoI18N(SettingsOverrideTestCase):
             self.assertEqual(*lang)
 
     def test_page_language_url(self):
-        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_no18n'):
+        with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_no18n'):
             create_page("home", template="col_two.html", language="en-us", published=True)
             path = "/"
             context = self.get_context(path=path)
@@ -86,26 +82,24 @@ class TestNoI18N(SettingsOverrideTestCase):
             self.assertEqual(url, "%s" % path)
 
     def test_url_redirect(self):
-        with SettingsOverride(
-                ROOT_URLCONF='cms.test_utils.project.urls_no18n',
-                USE_I18N=True,
-                MIDDLEWARE_CLASSES=[
-                    'django.contrib.sessions.middleware.SessionMiddleware',
-                    'django.contrib.auth.middleware.AuthenticationMiddleware',
-                    'django.contrib.messages.middleware.MessageMiddleware',
-                    'django.middleware.csrf.CsrfViewMiddleware',
-                    'django.middleware.locale.LocaleMiddleware',
-                    'django.middleware.doc.XViewMiddleware',
-                    'django.middleware.common.CommonMiddleware',
-                    'django.middleware.transaction.TransactionMiddleware',
-                    'django.middleware.cache.FetchFromCacheMiddleware',
-                    #'cms.middleware.language.LanguageCookieMiddleware',
-                    'cms.middleware.user.CurrentUserMiddleware',
-                    'cms.middleware.page.CurrentPageMiddleware',
-                    'cms.middleware.toolbar.ToolbarMiddleware',
-                ],
-                CMS_LANGUAGES={1: []},
-                LANGUAGES=(('en-us', 'English'),)):
+        with self.settings(
+            USE_I18N=True,
+            MIDDLEWARE_CLASSES=[
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.middleware.locale.LocaleMiddleware',
+                'django.middleware.common.CommonMiddleware',
+                'django.middleware.transaction.TransactionMiddleware',
+                'django.middleware.cache.FetchFromCacheMiddleware',
+                'cms.middleware.user.CurrentUserMiddleware',
+                'cms.middleware.page.CurrentPageMiddleware',
+                'cms.middleware.toolbar.ToolbarMiddleware',
+            ],
+            CMS_LANGUAGES={1: []},
+            LANGUAGES=[('en-us', 'English')],
+        ):
             create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
             response = self.client.get('/', follow=False)
             self.assertEqual(response['Location'], 'http://testserver/foobar/')

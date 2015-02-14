@@ -2,9 +2,15 @@
 from __future__ import with_statement
 import uuid
 
+from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
+from django.test.utils import override_settings
+try:
+    from django.test.utils import override_system_checks
+except ImportError:
+    override_system_checks = None
 from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
@@ -15,25 +21,34 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
 
+TEST_INSTALLED_APPS = [
+    "django.contrib.auth",
+    "cms",
+    "menus",
+    "sekizai",
+    "cms.test_utils.project.sampleapp",
+    "treebeard",
+]
+if settings.AUTH_USER_MODEL == "emailuserapp.EmailUser":
+    TEST_INSTALLED_APPS.append("cms.test_utils.project.emailuserapp")
+
 
 class ManagementTestCase(CMSTestCase):
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_list_apphooks(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
-        with SettingsOverride(INSTALLED_APPS=apps):
-            create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
-            command = cms.Command()
-            command.stdout = out
-            command.handle("list", "apphooks", interactive=False)
-            self.assertEqual(out.getvalue(), "SampleApp\n")
+        create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+        command = cms.Command()
+        command.stdout = out
+        command.handle("list", "apphooks", interactive=False)
+        self.assertEqual(out.getvalue(), "SampleApp\n")
 
     def test_uninstall_apphooks_without_apphook(self):
         out = StringIO()
@@ -42,171 +57,190 @@ class ManagementTestCase(CMSTestCase):
         command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
         self.assertEqual(out.getvalue(), "no 'SampleApp' apphooks found\n")
 
+    def test_fix_tree(self):
+        create_page("home", "nav_playground.html", "en")
+        page1 = create_page("page", "nav_playground.html", "en")
+        page1.depth = 3
+        page1.numchild = 4
+        page1.path = "00100010"
+        page1.save()
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("fix-tree", interactive=False)
+        self.assertEqual(out.getvalue(), 'fixing page treefixing plugin treeall done')
+        page1 = page1.reload()
+        self.assertEqual(page1.path, "0002")
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 0)
+
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
-        with SettingsOverride(INSTALLED_APPS=apps):
-            create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
-            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
-            command = cms.Command()
-            command.stdout = out
-            command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
-            self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
-            self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
+        create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
+        command = cms.Command()
+        command.stdout = out
+        command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
+        self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
+        self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
 
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_list_plugins(self):
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
-        with SettingsOverride(INSTALLED_APPS=apps):
-            placeholder = Placeholder.objects.create(slot="test")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
-                                     name="A Link", url="https://www.django-cms.org")
-            self.assertEqual(
-                CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
-                2)
-            self.assertEqual(
-                CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(),
-                1)
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        link_plugin = add_plugin(placeholder, "LinkPlugin", "en",
+                                 name="A Link", url="https://www.django-cms.org")
+        self.assertEqual(
+            CMSPlugin.objects.filter(plugin_type=PLUGIN).count(),
+            2)
+        self.assertEqual(
+            CMSPlugin.objects.filter(plugin_type="LinkPlugin").count(),
+            1)
 
-            # create a CMSPlugin with an unsaved instance
-            instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
-            instanceless_plugin.save()
+        # create a CMSPlugin with an unsaved instance
+        instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")
+        instanceless_plugin.save()
 
-            # create a bogus CMSPlugin to simulate one which used to exist but
-            # is no longer installed
-            bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
-            bogus_plugin.save()
+        # create a bogus CMSPlugin to simulate one which used to exist but
+        # is no longer installed
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+        bogus_plugin.save()
 
-            report = plugin_report()
+        report = plugin_report()
 
-            # there should be reports for three plugin types
-            self.assertEqual(
-                len(report),
-                3)
+        # there should be reports for three plugin types
+        self.assertEqual(
+            len(report),
+            3)
 
-            # check the bogus plugin
-            bogus_plugins_report = report[0]
-            self.assertEqual(
-                bogus_plugins_report["model"],
-                None)
+        # check the bogus plugin
+        bogus_plugins_report = report[0]
+        self.assertEqual(
+            bogus_plugins_report["model"],
+            None)
 
-            self.assertEqual(
-                bogus_plugins_report["type"],
-                u'BogusPlugin')
+        self.assertEqual(
+            bogus_plugins_report["type"],
+            u'BogusPlugin')
 
-            self.assertEqual(
-                bogus_plugins_report["instances"][0],
-                bogus_plugin)
+        self.assertEqual(
+            bogus_plugins_report["instances"][0],
+            bogus_plugin)
 
-            # check the link plugin
-            link_plugins_report = report[1]
-            self.assertEqual(
-                link_plugins_report["model"],
-                link_plugin.__class__)
+        # check the link plugin
+        link_plugins_report = report[1]
+        self.assertEqual(
+            link_plugins_report["model"],
+            link_plugin.__class__)
 
-            self.assertEqual(
-                link_plugins_report["type"],
-                u'LinkPlugin')
+        self.assertEqual(
+            link_plugins_report["type"],
+            u'LinkPlugin')
 
-            self.assertEqual(
-                link_plugins_report["instances"][0].get_plugin_instance()[0],
-                link_plugin)
+        self.assertEqual(
+            link_plugins_report["instances"][0].get_plugin_instance()[0],
+            link_plugin)
 
-            # check the text plugins
-            text_plugins_report = report[2]
-            self.assertEqual(
-                text_plugins_report["model"],
-                TextPlugin.model)
+        # check the text plugins
+        text_plugins_report = report[2]
+        self.assertEqual(
+            text_plugins_report["model"],
+            TextPlugin.model)
 
-            self.assertEqual(
-                text_plugins_report["type"],
-                u'TextPlugin')
+        self.assertEqual(
+            text_plugins_report["type"],
+            u'TextPlugin')
 
-            self.assertEqual(
-                len(text_plugins_report["instances"]),
-                3)
+        self.assertEqual(
+            len(text_plugins_report["instances"]),
+            3)
 
-            self.assertEqual(
-                text_plugins_report["instances"][2],
-                instanceless_plugin)
+        self.assertEqual(
+            text_plugins_report["instances"][2],
+            instanceless_plugin)
 
-            self.assertEqual(
-                text_plugins_report["unsaved_instances"],
-                [instanceless_plugin])
+        self.assertEqual(
+            text_plugins_report["unsaved_instances"],
+            [instanceless_plugin])
 
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_delete_orphaned_plugins(self):
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
-        with SettingsOverride(INSTALLED_APPS=apps):
-            placeholder = Placeholder.objects.create(slot="test")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            add_plugin(placeholder, "LinkPlugin", "en",
-                       name="A Link", url="https://www.django-cms.org")
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        add_plugin(placeholder, "LinkPlugin", "en",
+                   name="A Link", url="https://www.django-cms.org")
 
-            instanceless_plugin = CMSPlugin(
-                language="en", plugin_type="TextPlugin")
-            instanceless_plugin.save()
+        instanceless_plugin = CMSPlugin(
+            language="en", plugin_type="TextPlugin")
+        instanceless_plugin.save()
 
-            # create a bogus CMSPlugin to simulate one which used to exist but
-            # is no longer installed
-            bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
-            bogus_plugin.save()
+        # create a bogus CMSPlugin to simulate one which used to exist but
+        # is no longer installed
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
+        bogus_plugin.save()
 
-            report = plugin_report()
+        report = plugin_report()
 
-            # there should be reports for three plugin types
-            self.assertEqual(
-                len(report),
-                3)
+        # there should be reports for three plugin types
+        self.assertEqual(
+            len(report),
+            3)
 
-            # check the bogus plugin
-            bogus_plugins_report = report[0]
-            self.assertEqual(
-                len(bogus_plugins_report["instances"]),
-                1)
+        # check the bogus plugin
+        bogus_plugins_report = report[0]
+        self.assertEqual(
+            len(bogus_plugins_report["instances"]),
+            1)
 
-            # check the link plugin
-            link_plugins_report = report[1]
-            self.assertEqual(
-                len(link_plugins_report["instances"]),
-                1)
+        # check the link plugin
+        link_plugins_report = report[1]
+        self.assertEqual(
+            len(link_plugins_report["instances"]),
+            1)
 
-            # check the text plugins
-            text_plugins_report = report[2]
-            self.assertEqual(
-                len(text_plugins_report["instances"]),
-                3)
+        # check the text plugins
+        text_plugins_report = report[2]
+        self.assertEqual(
+            len(text_plugins_report["instances"]),
+            3)
 
-            self.assertEqual(
-                len(text_plugins_report["unsaved_instances"]),
-                1)
+        self.assertEqual(
+            len(text_plugins_report["unsaved_instances"]),
+            1)
 
-            management.call_command(
-                'cms', 'delete_orphaned_plugins',
-                stdout=StringIO(), interactive=False)
-            report = plugin_report()
+        management.call_command(
+            'cms', 'delete_orphaned_plugins',
+            stdout=StringIO(), interactive=False)
+        report = plugin_report()
 
-            # there should be reports for two plugin types (one should have been deleted)
-            self.assertEqual(
-                len(report),
-                2)
+        # there should be reports for two plugin types (one should have been deleted)
+        self.assertEqual(
+            len(report),
+            2)
 
-            # check the link plugin
-            link_plugins_report = report[0]
-            self.assertEqual(
-                len(link_plugins_report["instances"]),
-                1)
+        # check the link plugin
+        link_plugins_report = report[0]
+        self.assertEqual(
+            len(link_plugins_report["instances"]),
+            1)
 
-            # check the text plugins
-            text_plugins_report = report[1]
-            self.assertEqual(
-                len(text_plugins_report["instances"]),
-                2)
+        # check the text plugins
+        text_plugins_report = report[1]
+        self.assertEqual(
+            len(text_plugins_report["instances"]),
+            2)
 
-            self.assertEqual(
-                len(text_plugins_report["unsaved_instances"]),
-                0)
+        self.assertEqual(
+            len(text_plugins_report["unsaved_instances"]),
+            0)
+
+    # in Django 1.7 (but not in 1.8), call_command() runs system checks. This
+    # can be removed when support for 1.7 is dropped
+    if override_system_checks:
+        test_delete_orphaned_plugins = override_system_checks([])(test_delete_orphaned_plugins)
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
@@ -215,18 +249,17 @@ class ManagementTestCase(CMSTestCase):
         command.handle("uninstall", "plugins", PLUGIN, interactive=False)
         self.assertEqual(out.getvalue(), "no 'TextPlugin' plugins found\n")
 
+    @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_plugins_with_plugin(self):
         out = StringIO()
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
-        with SettingsOverride(INSTALLED_APPS=apps):
-            placeholder = Placeholder.objects.create(slot="test")
-            add_plugin(placeholder, TextPlugin, "en", body="en body")
-            self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 1)
-            command = cms.Command()
-            command.stdout = out
-            command.handle("uninstall", "plugins", PLUGIN, interactive=False)
-            self.assertEqual(out.getvalue(), "1 'TextPlugin' plugins uninstalled\n")
-            self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 0)
+        placeholder = Placeholder.objects.create(slot="test")
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
+        self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 1)
+        command = cms.Command()
+        command.stdout = out
+        command.handle("uninstall", "plugins", PLUGIN, interactive=False)
+        self.assertEqual(out.getvalue(), "1 'TextPlugin' plugins uninstalled\n")
+        self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 0)
 
 
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):

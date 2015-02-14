@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.management import call_command
@@ -15,12 +16,11 @@ from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
-from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
+from cms.test_utils.testcases import CMSTestCase as TestCase
+from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
-from cms.utils.compat.dj import get_user_model
 
 
 class PublisherCommandTests(TestCase):
@@ -390,10 +390,10 @@ class PublishingTests(TestCase):
     def test_publish_wrong_lang(self):
         page = self.create_page("test_admin", published=False)
         superuser = self.get_superuser()
-        with SettingsOverride(
-                LANGUAGES=(('de', 'de'), ('en', 'en')),
-                CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
-            ):
+        with self.settings(
+            LANGUAGES=(('de', 'de'), ('en', 'en')),
+            CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
+        ):
             with self.login_user_context(superuser):
                 with force_language('de'):
                     response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
@@ -497,33 +497,33 @@ class PublishingTests(TestCase):
         pageC.reload().publish("en")
         pageA.publish('en')
 
-        drafts = Page.objects.drafts().order_by('tree_id', 'lft')
-        draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
-        self.assertEqual([('parent', 1, 8),
-                              ('pageA', 2, 3),
-                              ('pageB', 4, 5),
-                              ('pageC', 6, 7)], draft_titles)
-        public = Page.objects.public().order_by('tree_id', 'lft')
-        public_titles = [(p.get_title('en'), p.lft, p.rght) for p in public]
-        self.assertEqual([('parent', 1, 8),
-                              ('pageA', 2, 3),
-                              ('pageB', 4, 5),
-                              ('pageC', 6, 7)], public_titles)
+        drafts = Page.objects.drafts().order_by('path')
+        draft_titles = [(p.get_title('en'), p.path) for p in drafts]
+        self.assertEqual([('parent', "0001"),
+                              ('pageA', "00010001"),
+                              ('pageB', "00010002"),
+                              ('pageC', "00010003")], draft_titles)
+        public = Page.objects.public().order_by('path')
+        public_titles = [(p.get_title('en'), p.path) for p in public]
+        self.assertEqual([('parent', "0002"),
+                              ('pageA', "00020001"),
+                              ('pageB', "00020002"),
+                              ('pageC', "00020003")], public_titles)
 
         page.publish('en')
 
-        drafts = Page.objects.drafts().order_by('tree_id', 'lft')
-        draft_titles = [(p.get_title('en'), p.lft, p.rght) for p in drafts]
-        self.assertEqual([('parent', 1, 8),
-                              ('pageA', 2, 3),
-                              ('pageB', 4, 5),
-                              ('pageC', 6, 7)], draft_titles)
-        public = Page.objects.public().order_by('tree_id', 'lft')
-        public_titles = [(p.get_title('en'), p.lft, p.rght) for p in public]
-        self.assertEqual([('parent', 1, 8),
-                              ('pageA', 2, 3),
-                              ('pageB', 4, 5),
-                              ('pageC', 6, 7)], public_titles)
+        drafts = Page.objects.drafts().order_by('path')
+        draft_titles = [(p.get_title('en'), p.path) for p in drafts]
+        self.assertEqual([('parent', "0001"),
+                              ('pageA', "00010001"),
+                              ('pageB', "00010002"),
+                              ('pageC', "00010003")], draft_titles)
+        public = Page.objects.public().order_by('path')
+        public_titles = [(p.get_title('en'), p.path) for p in public]
+        self.assertEqual([('parent', "0002"),
+                              ('pageA', "00020001"),
+                              ('pageB', "00020002"),
+                              ('pageC', "00020003")], public_titles)
 
     def test_publish_ordering2(self):
         page = self.create_page('parent', published=False)
@@ -536,8 +536,8 @@ class PublishingTests(TestCase):
         pageC.publish('en')
         page.publish('en')
 
-        drafts = Page.objects.filter(publisher_is_draft=True).order_by('tree_id', 'lft')
-        publics = Page.objects.filter(publisher_is_draft=False).order_by('tree_id', 'lft')
+        drafts = Page.objects.filter(publisher_is_draft=True).order_by('path')
+        publics = Page.objects.filter(publisher_is_draft=False).order_by('path')
 
         x = 0
         for draft in drafts:
@@ -773,10 +773,12 @@ class PublishingTests(TestCase):
         page = self.create_page("Page", published=True)
         child = self.create_page("Child", parent=page, published=False)
         gchild2 = self.create_page("Grandchild2", parent=child, published=False)
-        self.create_page("Grandchild3", parent=child, published=False)
+        self.create_page("Grandchild3", parent=child, published=True)
         gchild = self.create_page("Grandchild", published=True)
+        gchild = gchild.reload()
+        child = child.reload()
         gchild.move_page(target=child, position='last-child')
-
+        gchild.reload()
         gchild.publish('en')
         self.assertFalse(child.is_published('en'))
         self.assertTrue(gchild.is_published('en'))
@@ -790,10 +792,8 @@ class PublishingTests(TestCase):
         self.assertEqual(gchild.get_publisher_state('en', force_reload=True), PUBLISHER_STATE_DEFAULT)
         gchild = gchild.reload()
         gchild2 = gchild2.reload()
-        self.assertEqual(gchild.lft, gchild.publisher_public.lft)
-        self.assertEqual(gchild.rght, gchild.publisher_public.rght)
-
-
+        self.assertEqual(gchild.path[4:], gchild.publisher_public.path[4:])
+        self.assertEqual(gchild.depth, gchild.publisher_public.depth)
 
     def test_republish_multiple_root(self):
         # TODO: The paths do not match expected behaviour
@@ -928,8 +928,8 @@ class PublishingTests(TestCase):
         create_page("subitem2", "nav_playground.html", "en", parent=item2,
                     published=True)
         item2 = item2.reload()
-        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
-        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
+        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('path'))
+        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('path'))
 
         self.assertEqual(len(not_drafts), 5)
         self.assertEqual(len(drafts), 5)
@@ -939,18 +939,13 @@ class PublishingTests(TestCase):
             # Check that a node doesn't become a root node magically
             self.assertEqual(bool(public.parent_id), bool(draft.parent_id))
             if public.parent:
-                # Let's assert the MPTT tree is consistent
-                self.assertTrue(public.lft > public.parent.lft)
-                self.assertTrue(public.rght < public.parent.rght)
-                self.assertEqual(public.tree_id, public.parent.tree_id)
+                self.assertEqual(public.path[0:4], public.parent.path[0:4])
                 self.assertTrue(public.parent in public.get_ancestors())
                 self.assertTrue(public in public.parent.get_descendants())
                 self.assertTrue(public in public.parent.get_children())
             if draft.parent:
                 # Same principle for the draft tree
-                self.assertTrue(draft.lft > draft.parent.lft)
-                self.assertTrue(draft.rght < draft.parent.rght)
-                self.assertEqual(draft.tree_id, draft.parent.tree_id)
+                self.assertEqual(draft.path[0:4], draft.parent.path[0:4])
                 self.assertTrue(draft.parent in draft.get_ancestors())
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
@@ -958,8 +953,8 @@ class PublishingTests(TestCase):
         # Now call publish again. The structure should not change.
         item2.publish('en')
 
-        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('lft'))
-        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('lft'))
+        not_drafts = list(Page.objects.filter(publisher_is_draft=False).order_by('path'))
+        drafts = list(Page.objects.filter(publisher_is_draft=True).order_by('path'))
 
         self.assertEqual(len(not_drafts), 5)
         self.assertEqual(len(drafts), 5)
@@ -968,20 +963,14 @@ class PublishingTests(TestCase):
             public = not_drafts[idx]
             # Check that a node doesn't become a root node magically
             self.assertEqual(bool(public.parent_id), bool(draft.parent_id))
+            self.assertEqual(public.numchild, draft.numchild)
             if public.parent:
-                # Let's assert the MPTT tree is consistent
-                self.assertTrue(public.lft > public.parent.lft)
-                self.assertTrue(public.rght < public.parent.rght)
-                self.assertEqual(public.tree_id, public.parent.tree_id)
+                self.assertEqual(public.path[0:4], public.parent.path[0:4])
                 self.assertTrue(public.parent in public.get_ancestors())
                 self.assertTrue(public in public.parent.get_descendants())
                 self.assertTrue(public in public.parent.get_children())
             if draft.parent:
-                # Same principle for the draft tree
-                self.assertTrue(draft.lft > draft.parent.lft)
-                self.assertTrue(draft.rght < draft.parent.rght)
-                self.assertEqual(draft.tree_id, draft.parent.tree_id)
+                self.assertEqual(draft.path[0:4], draft.parent.path[0:4])
                 self.assertTrue(draft.parent in draft.get_ancestors())
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
-

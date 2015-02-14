@@ -1,23 +1,20 @@
 # -*- coding: utf-8 -*-
 from functools import update_wrapper
 import os
-import pprint
-import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.utils.six.moves.urllib.parse import urljoin
 
 from cms import constants
-from cms.exceptions import CMSDeprecationWarning
-from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
 
 
-class VERIFIED: pass # need a unique identifier for CMS_LANGUAGES
+class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def default(name):
@@ -140,10 +137,15 @@ def get_templates():
     return templates
 
 
-def _ensure_languages_settings_new(languages):
+def _ensure_languages_settings(languages):
     valid_language_keys = ['code', 'name', 'fallbacks', 'hide_untranslated', 'redirect_on_fallback', 'public']
     required_language_keys = ['code', 'name']
     simple_defaults = ['public', 'redirect_on_fallback', 'hide_untranslated']
+
+    if not isinstance(languages, dict):
+        raise ImproperlyConfigured(
+            "CMS_LANGUAGES must be a dictionary with site IDs and 'default'"
+            " as keys. Please check the format.")
 
     defaults = languages.pop('default', {})
     default_fallbacks = defaults.get('fallbacks')
@@ -192,59 +194,9 @@ def _ensure_languages_settings_new(languages):
             lang_code != language_object['code']]
 
     languages['default'] = defaults
+    languages[VERIFIED] = True  # this will be busted by @override_settings and cause a re-check
 
     return languages
-
-
-def _get_old_language_conf(code, name, template):
-    language = template.copy()
-    language['code'] = code
-    language['name'] = name
-    default_fallbacks = dict(settings.CMS_LANGUAGES).keys()
-    if hasattr(settings, 'CMS_LANGUAGE_FALLBACK'):
-        if settings.CMS_LANGUAGE_FALLBACK:
-            if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-                language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-            else:
-                language['fallbacks'] = default_fallbacks
-        else:
-            language['fallbacks'] = []
-    else:
-        if hasattr(settings, 'CMS_LANGUAGE_CONF'):
-            language['fallbacks'] = settings.CMS_LANGUAGE_CONF.get(code, default_fallbacks)
-        else:
-            language['fallbacks'] = default_fallbacks
-    if hasattr(settings, 'CMS_FRONTEND_LANGUAGES'):
-        language['public'] = code in settings.CMS_FRONTEND_LANGUAGES
-    return language
-
-
-def _translate_legacy_languages_settings(languages):
-    new_languages = {}
-    lang_template = {'fallbacks': [], 'public': True, 'redirect_on_fallback': True,
-        'hide_untranslated': getattr(settings, 'CMS_HIDE_UNTRANSLATED', False)}
-    codes = dict(languages)
-    for site, site_languages in getattr(settings, 'CMS_SITE_LANGUAGES', {1: languages}).items():
-        new_languages[site] = []
-        for site_language in site_languages:
-            if site_language in codes:
-                new_languages[site].append(_get_old_language_conf(site_language, codes[site_language], lang_template))
-
-    pp = pprint.PrettyPrinter(indent=4)
-    warnings.warn("CMS_LANGUAGES has changed in django-cms 2.4\n"
-                  "You may replace CMS_LANGUAGES with the following:\n%s" % pp.pformat(new_languages),
-                  CMSDeprecationWarning)
-    new_languages['default'] = lang_template.copy()
-    return new_languages
-
-
-def _ensure_languages_settings(languages):
-    if isinstance(languages, dict):
-        verified_languages = _ensure_languages_settings_new(languages)
-    else:
-        verified_languages = _translate_legacy_languages_settings(languages)
-    verified_languages[VERIFIED] = True # this will be busted by SettingsOverride and cause a re-check
-    return verified_languages
 
 
 def get_languages():
@@ -255,10 +207,10 @@ def get_languages():
     if not settings.USE_I18N:
         return _ensure_languages_settings(
             {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
-    if not settings.LANGUAGE_CODE in dict(settings.LANGUAGES):
+    if settings.LANGUAGE_CODE not in dict(settings.LANGUAGES):
         raise ImproperlyConfigured(
-                        'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
-                    )
+            'LANGUAGE_CODE "%s" must have a matching entry in LANGUAGES' % settings.LANGUAGE_CODE
+        )
     languages = getattr(settings, 'CMS_LANGUAGES', {
         settings.SITE_ID: [{'code': code, 'name': _(name)} for code, name in settings.LANGUAGES]
     })

@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from cms.utils.urlutils import admin_reverse
-from django.db import models
-from django.template.defaultfilters import title
-from django.utils.encoding import force_text
-from django.utils.timezone import get_current_timezone_name
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib import admin
+from django.db import models
+from django.template.defaultfilters import title
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.timezone import get_current_timezone_name
+from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
+from cms.utils.urlutils import admin_reverse
 
 
 @python_2_unicode_compatible
@@ -40,16 +39,16 @@ class Placeholder(models.Model):
             qs = self.cmsplugin_set.filter(language=language)
         else:
             qs = self.cmsplugin_set.all()
-        qs = qs.order_by('-level').select_related()
+        qs = qs.order_by('-depth').select_related()
         for plugin in qs:
             inst, cls = plugin.get_plugin_instance()
             if inst and getattr(inst, 'cmsplugin_ptr', False):
                 inst.cmsplugin_ptr._no_reorder = True
                 inst._no_reorder = True
-                inst.delete(no_mptt=True)
+                inst.delete(no_mp=True)
             else:
                 plugin._no_reorder = True
-                plugin.delete(no_mptt=True)
+                plugin.delete(no_mp=True)
 
     def get_label(self):
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
@@ -154,8 +153,11 @@ class Placeholder(models.Model):
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
                 if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
-                    if field.count():
-                        self._attached_fields_cache.append(rel.field)
+                    try:
+                        if field.count():
+                            self._attached_fields_cache.append(rel.field)
+                    except:
+                        pass
         return self._attached_fields_cache
 
     def _get_attached_field(self):
@@ -173,9 +175,12 @@ class Placeholder(models.Model):
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
                 if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
-                    if field.count():
-                        self._attached_field_cache = rel.field
-                        break
+                    try:
+                        if field.count():
+                            self._attached_field_cache = rel.field
+                            break
+                    except:
+                        pass
         return self._attached_field_cache
 
     def _get_attached_field_name(self):
@@ -233,9 +238,9 @@ class Placeholder(models.Model):
 
     def get_plugins(self, language=None):
         if language:
-            return self.cmsplugin_set.filter(language=language).order_by('tree_id', 'lft')
+            return self.cmsplugin_set.filter(language=language).order_by('path')
         else:
-            return self.cmsplugin_set.all().order_by('tree_id', 'lft')
+            return self.cmsplugin_set.all().order_by('path')
 
     def get_filled_languages(self):
         """

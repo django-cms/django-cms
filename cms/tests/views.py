@@ -1,21 +1,22 @@
 from __future__ import with_statement
-import sys
-from copy import copy
 
+from copy import copy
 import re
+import sys
+
 from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.urlresolvers import clear_url_caches
 from django.http import Http404
 from django.template import Variable
+from django.test.utils import override_settings
+
 from cms.api import create_page
 from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
 from menus.menu_pool import menu_pool
@@ -25,10 +26,11 @@ APP_NAME = 'SampleApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
-class ViewTests(SettingsOverrideTestCase):
-    urls = 'cms.test_utils.project.urls'
-
-    settings_overrides = {'CMS_PERMISSION': True}
+@override_settings(
+    CMS_PERMISSION=True,
+    ROOT_URLCONF='cms.test_utils.project.urls',
+)
+class ViewTests(CMSTestCase):
 
     def setUp(self):
         clear_url_caches()
@@ -40,7 +42,7 @@ class ViewTests(SettingsOverrideTestCase):
         request = self.get_request('/')
         slug = ''
         self.assertRaises(Http404, _handle_no_page, request, slug)
-        with SettingsOverride(DEBUG=True):
+        with self.settings(DEBUG=True):
             request = self.get_request('/en/')
             slug = ''
             response = _handle_no_page(request, slug)
@@ -57,7 +59,7 @@ class ViewTests(SettingsOverrideTestCase):
             '%s.%s' % (APP_MODULE, APP_NAME),
         )
         create_page("page2", "nav_playground.html", "en", published=True)
-        with SettingsOverride(CMS_APPHOOKS=apphooks):
+        with self.settings(CMS_APPHOOKS=apphooks):
             apphook_pool.clear()
             response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
@@ -131,13 +133,13 @@ class ViewTests(SettingsOverrideTestCase):
                     login_required=True)
         plain_url = '/accounts/'
         login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
-        with SettingsOverride(LOGIN_URL=plain_url + '?signin'):
+        with self.settings(LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/en/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(login_rx.search(response['Location']))
         login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
-        with SettingsOverride(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
+        with self.settings(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
@@ -169,8 +171,8 @@ class ViewTests(SettingsOverrideTestCase):
         self.assertContains(response, "cms_toolbar-item_switch", 4, 200)
 
 
-class ContextTests(SettingsOverrideTestCase):
-    urls = 'cms.test_utils.project.urls'
+@override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
+class ContextTests(CMSTestCase):
 
     def test_context_current_page(self):
         """
@@ -198,18 +200,15 @@ class ContextTests(SettingsOverrideTestCase):
         menu_pool.clear()
         context._standard_context_processors = None
         # Number of queries when context processors is not enabled
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             with self.assertNumQueries(FuzzyInt(0, 12)) as context:
                 response = self.client.get("/en/plain_view/")
-                if DJANGO_1_5:
-                    num_queries = len(context.connection.queries) - context.starting_queries
-                else:
-                    num_queries = len(context.captured_queries)
+                num_queries = len(context.captured_queries)
                 self.assertFalse('CMS_TEMPLATE' in response.context)
         cache.clear()
         menu_pool.clear()
         # Number of queries when context processor is enabled
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=original_context):
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=original_context):
             # no extra query is run when accessing urls managed by standard
             # django applications
             with self.assertNumQueries(FuzzyInt(0, num_queries)):
@@ -227,19 +226,16 @@ class ContextTests(SettingsOverrideTestCase):
         menu_pool.clear()
 
         # Number of queries when context processors is not enabled
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=new_context):
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             # Baseline number of queries
             with self.assertNumQueries(FuzzyInt(13, 17)) as context:
                 response = self.client.get("/en/page-2/")
-                if DJANGO_1_5:
-                    num_queries_page = len(context.connection.queries) - context.starting_queries
-                else:
-                    num_queries_page = len(context.captured_queries)
+                num_queries_page = len(context.captured_queries)
         cache.clear()
         menu_pool.clear()
 
         # Number of queries when context processors is enabled
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=original_context):
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=original_context):
             # Exactly the same number of queries are executed with and without
             # the context_processor
             with self.assertNumQueries(num_queries_page):
@@ -251,7 +247,7 @@ class ContextTests(SettingsOverrideTestCase):
         page_2.template = 'INHERIT'
         page_2.save()
         page_2.publish('en')
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=original_context):
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=original_context):
             # One query more triggered as page inherits template from ancestor
             with self.assertNumQueries(num_queries_page + 1):
                 response = self.client.get("/en/page-2/")

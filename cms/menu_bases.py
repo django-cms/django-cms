@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 class CMSAttachMenu(Menu):
     cms_enabled = True
     name = None
-    
+
     def __init__(self, *args, **kwargs):
         super(CMSAttachMenu, self).__init__(*args, **kwargs)
         if self.cms_enabled and not self.name:

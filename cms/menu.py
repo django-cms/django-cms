@@ -12,12 +12,11 @@ from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
 from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.utils import get_language_from_request
-from cms.utils.compat.dj import user_related_name
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset, use_draft
-from cms.utils.plugins import current_site
+from cms.utils.helpers import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
@@ -37,27 +36,27 @@ def get_visible_pages(request, pages, site=None):
     visible_page_ids = []
     restricted_pages = defaultdict(list)
     page_permissions = PagePermission.objects.filter(can_view=True).select_related(
-            'page').prefetch_related('group__' + user_related_name)
+            'page').prefetch_related('group__user_set')
 
     for perm in page_permissions:
         # collect the pages that are affected by permissions
         if site and perm.page.site_id != site.pk:
             continue
-        if perm is not None and perm not in restricted_pages[perm.page.pk]:
+        if perm is not None and perm not in restricted_pages[perm.page_id]:
             # affective restricted pages gathering
-            # using mptt functions 
             # add the page with the perm itself
+
             if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]:
-                restricted_pages[perm.page.pk].append(perm)
+                restricted_pages[perm.page_id].append(perm)
                 restricted_pages[perm.page.publisher_public_id].append(perm)
                 # add children
-            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]:
+            if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN] and perm.page.numchild:
                 child_ids = perm.page.get_children().values_list('id', 'publisher_public_id')
                 for id, public_id in child_ids:
                     restricted_pages[id].append(perm)
                     restricted_pages[public_id].append(perm)
             # add descendants
-            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS]:
+            elif perm.grant_on in [ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS] and perm.page.numchild:
                 child_ids = perm.page.get_descendants().values_list('id', 'publisher_public_id')
                 for id, public_id in child_ids:
                     restricted_pages[id].append(perm)
@@ -110,7 +109,7 @@ def get_visible_pages(request, pages, site=None):
                 return True
             if not perm.group_id:
                 continue
-            user_set = getattr(perm.group, user_related_name)
+            user_set = getattr(perm.group, 'user_set')
             # Optimization equivalent to
             # if user_pk in user_set.values_list('pk', flat=True)
             if any(user_pk == user.pk for user in user_set.all()):
@@ -135,7 +134,7 @@ def get_visible_pages(request, pages, site=None):
                         is_setting_public_staff and request.user.is_staff)
             ):
                 # authenticated user, no restriction and public for all
-                # or 
+                # or
                 # authenticated staff user, no restriction and public for staff
                 to_add = True
             # check group and user memberships to restricted pages
@@ -143,7 +142,7 @@ def get_visible_pages(request, pages, site=None):
                 to_add = True
             elif has_global_perm():
                 to_add = True
-        # anonymous user, no restriction  
+        # anonymous user, no restriction
         elif not is_restricted and is_setting_public_all:
             to_add = True
             # store it
@@ -157,7 +156,7 @@ def page_to_node(page, home, cut):
     Transform a CMS page into a navigation node.
 
     :param page: the page you wish to transform
-    :param home: a reference to the "home" page (the page with tree_id=1)
+    :param home: a reference to the "home" page (the page with path="0001)
     :param cut: Should we cut page from its parent pages? This means the node will not
          have a parent anymore.
     """
@@ -176,7 +175,7 @@ def page_to_node(page, home, cut):
     #if parent_id and not page.parent.get_calculated_status():
     #    parent_id = None # ????
 
-    if page.limit_visibility_in_menu == None:
+    if page.limit_visibility_in_menu is None:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
@@ -226,13 +225,11 @@ class CMSMenu(Menu):
         filters = {
             'site': site,
         }
-
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
-
         if not use_draft(request):
             page_queryset = page_queryset.published()
-        pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
+        pages = page_queryset.filter(**filters).order_by("path")
         ids = {}
         nodes = []
         first = True
@@ -244,7 +241,7 @@ class CMSMenu(Menu):
         # cache view perms
         visible_pages = get_visible_pages(request, pages, site)
         for page in pages:
-            # Pages are ordered by tree_id, therefore the first page is the root
+            # Pages are ordered by path, therefore the first page is the root
             # of the page tree (a.k.a "home")
             if page.pk not in visible_pages:
                 # Don't include pages the user doesn't have access to
@@ -313,7 +310,7 @@ class NavExtender(Modifier):
                     if node.namespace == menu[0]:
                         removed.append(node)
         if breadcrumb:
-        # if breadcrumb and home not in navigation add node
+            # if breadcrumb and home not in navigation add node
             if breadcrumb and home and not home.visible:
                 home.visible = True
                 if request.path_info == home.get_absolute_url():
@@ -332,26 +329,26 @@ menu_pool.register_modifier(NavExtender)
 class SoftRootCutter(Modifier):
     """
     Ask evildmp/superdmp if you don't understand softroots!
-    
+
     Softroot description from the docs:
-    
+
         A soft root is a page that acts as the root for a menu navigation tree.
-    
+
         Typically, this will be a page that is the root of a significant new
         section on your site.
-    
+
         When the soft root feature is enabled, the navigation menu for any page
         will start at the nearest soft root, rather than at the real root of
         the site’s page hierarchy.
-    
+
         This feature is useful when your site has deep page hierarchies (and
         therefore multiple levels in its navigation trees). In such a case, you
         usually don’t want to present site visitors with deep menus of nested
         items.
-    
+
         For example, you’re on the page -Introduction to Bleeding-?, so the menu
         might look like this:
-    
+
             School of Medicine
                 Medical Education
                 Departments
@@ -377,12 +374,12 @@ class SoftRootCutter(Modifier):
                 Administration
                 Contact us
                 Impressum
-    
+
         which is frankly overwhelming.
-    
+
         By making -Department of Mediaeval Surgery-? a soft root, the menu
         becomes much more manageable:
-    
+
             Department of Mediaeval Surgery
                 Theory
                 Cures
@@ -399,7 +396,8 @@ class SoftRootCutter(Modifier):
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
-        if post_cut:
+        # or if no id argument is provided, indicating {% show_menu_below_id %}
+        if post_cut or root_id:
             return nodes
         selected = None
         root_nodes = []

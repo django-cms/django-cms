@@ -26,7 +26,6 @@ def signal_tester(signal):
         yield env
     finally:
         signal.disconnect(env, weak=True)
-    
 
 class SignalTests(TestCase):
     def test_urls_need_reloading_signal_create(self):

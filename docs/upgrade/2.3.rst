@@ -25,13 +25,13 @@ Toolbar isolation
 =================
 
 The toolbar JavaScript dependencies should now be properly isolated and no
-longer pollute the global JavaScript namespace. 
+longer pollute the global JavaScript namespace.
 
 
 Plugin cancel button fixed
 ==========================
 
-The cancel button in plugin change forms no longer saves the changes, but 
+The cancel button in plugin change forms no longer saves the changes, but
 actually cancels.
 
 
@@ -94,4 +94,4 @@ Pending deprecations
 
 The ``CMS_FLAT_URLS`` setting is deprecated and will be removed in version 2.4.
 The moderation feature (``CMS_MODERATOR = True``) will be deprecated in 2.4 and
-replaced with a simpler way of handling unpublished changes. 
+replaced with a simpler way of handling unpublished changes.

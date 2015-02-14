@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
-from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.utils.compat.dj import python_2_unicode_compatible
+
 from django.db import models
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+
+from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 from cms.utils.helpers import reversion_register
@@ -23,7 +25,7 @@ class Title(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
     has_url_overwrite = models.BooleanField(_("has url overwrite"), default=False, db_index=True, editable=False)
-    redirect = models.CharField(_("redirect"), max_length=255, blank=True, null=True)
+    redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
     page = models.ForeignKey(Page, verbose_name=_("page"), related_name="title_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
 
@@ -77,7 +79,7 @@ class Title(models.Model):
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
 
-         # Published pages should always have a publication date
+        # Published pages should always have a publication date
         # if the page is published we set the publish date if not set yet.
         if self.page.publication_date is None and self.published:
             self.page.publication_date = timezone.now() - timedelta(seconds=5)
