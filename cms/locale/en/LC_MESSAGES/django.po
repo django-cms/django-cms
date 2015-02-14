@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-12 09:31+0100\n"
+"POT-Creation-Date: 2015-02-14 14:06-0500\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -64,8 +64,8 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
-#: cms_toolbar.py:167 tests/toolbar.py:392 tests/toolbar.py:407
-#: tests/toolbar.py:439
+#: cms_toolbar.py:167 tests/toolbar.py:412 tests/toolbar.py:427
+#: tests/toolbar.py:459
 #, python-format
 msgid "Logout %s"
 msgstr ""
@@ -352,8 +352,8 @@ msgid "Please select user or group first."
 msgstr ""
 
 #: admin/forms.py:461 admin/forms.py:468 admin/forms.py:472
-#: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:771
+#: templates/admin/cms/usersettings/change_form.html:17
+#: templatetags/cms_tags.py:768
 msgid "Add"
 msgstr ""
 
@@ -1039,7 +1039,7 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:74
 #: templates/admin/cms/page/submit_row.html:4
 #: templates/admin/cms/page/tree/copy_premissions.html:19
-#: templates/admin/cms/usersettings/change_form.html:16
+#: templates/admin/cms/usersettings/change_form.html:25
 msgid "Save"
 msgstr ""
 
@@ -1156,7 +1156,7 @@ msgstr ""
 #: templates/admin/cms/page/history/recover_header.html:12
 #: templates/admin/cms/page/history/revision_header.html:6
 #: templates/admin/cms/page/tree/base.html:9
-#: templates/admin/cms/usersettings/change_form.html:5
+#: templates/admin/cms/usersettings/change_form.html:14
 msgid "Home"
 msgstr ""
 
@@ -1204,7 +1204,7 @@ msgstr "An error occurred. Please reload the page"
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
-msgid "Are you sure you want to %s this page?"
+msgid "Are you sure you want to %%s this page?"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:73
@@ -1408,8 +1408,8 @@ msgstr ""
 msgid "Drop a plugin here"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:762
-#: templatetags/cms_tags.py:765
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:759
+#: templatetags/cms_tags.py:762
 msgid "Edit"
 msgstr ""
 
@@ -1735,6 +1735,10 @@ msgstr ""
 
 #: test_utils/project/sampleapp/views.py:33
 msgid "Change Category"
+msgstr ""
+
+#: test_utils/project/templates/registration/logged_out.html:7
+msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
 
 #: utils/mail.py:37

@@ -14,18 +14,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-12 09:31+0100\n"
-"PO-Revision-Date: 2015-01-11 21:30+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"POT-Creation-Date: 2015-01-12 21:30+0100\n"
+"PO-Revision-Date: 2015-01-16 08:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Hungarian (http://www.transifex.com/projects/p/django-cms/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Poedit-Country: SWITZERLAND\n"
-"X-Poedit-Language: English\n"
-"X-Poedit-SourceCharset: utf-8\n"
 
 #: apps.py:9 templates/cms/toolbar/items/logo.html:2
 msgid "django CMS"
@@ -81,7 +78,7 @@ msgstr ""
 msgid "Logout"
 msgstr "Kilépés"
 
-#: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
+#: cms_toolbar.py:173 admin/forms.py:65 admin/forms.py:161 admin/forms.py:203
 #: models/settingmodels.py:12
 msgid "Language"
 msgstr "Nyelv"
@@ -158,7 +155,7 @@ msgstr "További beállítások"
 msgid "Permissions"
 msgstr "Jogosultságok"
 
-#: cms_toolbar.py:462 admin/pageadmin.py:343
+#: cms_toolbar.py:462 admin/pageadmin.py:353
 msgid "Publishing dates"
 msgstr "Közzététel dátumai"
 
@@ -222,149 +219,150 @@ msgstr "Álltalános"
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Ennek a bővítménynek nincs több beállítása. Kérem, nyomja meg a mentés gombot."
 
-#: admin/forms.py:65 admin/forms.py:175 admin/forms.py:217
+#: admin/forms.py:66 admin/forms.py:162 admin/forms.py:204
 msgid "The current language of the content fields."
 msgstr "A tartalom aktuális nyelve."
 
-#: admin/forms.py:66
+#: admin/forms.py:67
 msgid "Page type"
 msgstr "Oldal típus"
 
-#: admin/forms.py:67
+#: admin/forms.py:68
 msgid "Title"
 msgstr "Cím"
 
-#: admin/forms.py:68
+#: admin/forms.py:69
 msgid "The default title"
 msgstr "Alapértelmezett cím"
 
-#: admin/forms.py:69
+#: admin/forms.py:70
 msgid "Slug"
 msgstr "URL aliasz"
 
-#: admin/forms.py:70
+#: admin/forms.py:71
 msgid "The part of the title that is used in the URL"
 msgstr "A cím része, ami az URL-ben használandó"
 
-#: admin/forms.py:71
+#: admin/forms.py:72
 msgid "Menu Title"
 msgstr "Menü Cím"
 
-#: admin/forms.py:72
+#: admin/forms.py:73
 msgid "Overwrite what is displayed in the menu"
 msgstr "Felülírja a menüben megjelenő címet"
 
-#: admin/forms.py:73
+#: admin/forms.py:74
 msgid "Page Title"
 msgstr "Oldal Cím"
 
-#: admin/forms.py:74
+#: admin/forms.py:75
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Felülírja a title tag-ben megjelenő címet"
 
-#: admin/forms.py:76
+#: admin/forms.py:77
 msgid "Description meta tag"
 msgstr "\"Description\" meta tag"
 
-#: admin/forms.py:78
+#: admin/forms.py:79
 msgid "A description of the page used by search engines."
 msgstr "Keresők által használt leírás az oldalról"
 
-#: admin/forms.py:135
+#: admin/forms.py:128
 msgid "Another page with this slug already exists"
 msgstr "URL aliasz ütközés - már létezik egy oldal ezzel az URL aliasszal"
 
-#: admin/forms.py:163
+#: admin/forms.py:156
 msgid "Slug must not be empty."
 msgstr "Az URL aliasz nem lehet üres!"
 
-#: admin/forms.py:197
+#: admin/forms.py:184
 msgid "Application"
 msgstr "Alkalmazás"
 
-#: admin/forms.py:199
+#: admin/forms.py:186
 msgid "Hook application to this page."
 msgstr "Alkalmazás csatolása az oldalhoz"
 
-#: admin/forms.py:200
+#: admin/forms.py:187
 msgid "Overwrite URL"
 msgstr "URL felülírása"
 
-#: admin/forms.py:201
+#: admin/forms.py:188
 msgid "Keep this field empty if standard path should be used."
 msgstr "Hagyja ezt a mezőt üresen, ha az alapértelmezett útvonalat kívánja használni "
 
-#: admin/forms.py:205
+#: admin/forms.py:192
 msgid "X Frame Options"
 msgstr "X Frame opciók"
 
-#: admin/forms.py:206
+#: admin/forms.py:193
 msgid "Whether this page can be embedded in other pages or websites"
 msgstr "Megengedi az oldal beágyazását más oldalakba vagy webhelyekbe?"
 
-#: admin/forms.py:211
+#: admin/forms.py:198
 msgid "Redirect"
 msgstr "Átirányítás"
 
-#: admin/forms.py:212
+#: admin/forms.py:199
 msgid "Redirects to this URL."
 msgstr "Átirányítás erre az URL-re."
 
-#: admin/forms.py:212
+#: admin/forms.py:199
 msgid "Start typing..."
 msgstr ""
 
-#: admin/forms.py:269
+#: admin/forms.py:256
 msgid "A page with this reverse URL id exists already."
 msgstr "Az adott URL azonosítóval már létezik oldal."
 
-#: admin/forms.py:287
+#: admin/forms.py:274
 msgid ""
 "You selected an apphook with an \"app_name\".\n"
 "                            You must enter a unique instance name."
 msgstr ""
 
-#: admin/forms.py:307
+#: admin/forms.py:294
 msgid "A instance name with this name already exists."
 msgstr "Ilyen nevű példány már létezik."
 
-#: admin/forms.py:347 models/permissionmodels.py:71
+#: admin/forms.py:334 migrations/0001_initial.py:72
+#: migrations/0001_initial.py:135 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "felhasználó"
 
-#: admin/forms.py:411
+#: admin/forms.py:397
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "Az oldal létrehozása jogosultság igényli a gyermekekhez és leszármazottakhoz való hozzáférést is, egyébként a létrehozott oldalt az oldal készítője nem tudja majd szerkeszteni."
 
-#: admin/forms.py:416
+#: admin/forms.py:402
 msgid "Add page permission also requires edit page permission."
 msgstr "Az oldal létrehozása jogosultság egyúttal az oldal szerkesztése jogosultságot is igényli."
 
-#: admin/forms.py:443
+#: admin/forms.py:429
 msgid "can_view"
 msgstr "megtekinthető"
 
-#: admin/forms.py:454
+#: admin/forms.py:440
 msgid "Please select user or group first."
 msgstr "Először válasszon felhasználót vagy csoportot."
 
-#: admin/forms.py:461 admin/forms.py:468 admin/forms.py:472
+#: admin/forms.py:450 admin/forms.py:457 admin/forms.py:461
 #: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:771
+#: templatetags/cms_tags.py:760
 msgid "Add"
 msgstr "Új"
 
-#: admin/forms.py:462 admin/forms.py:469 admin/forms.py:473
+#: admin/forms.py:451 admin/forms.py:458 admin/forms.py:462
 #: templates/cms/toolbar/toolbar.html:36
 #: templates/cms/toolbar/items/live_draft.html:7
 msgid "Change"
 msgstr "Módosítás"
 
-#: admin/forms.py:463 admin/forms.py:470 admin/forms.py:474
+#: admin/forms.py:452 admin/forms.py:459 admin/forms.py:463
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/submit_row.html:7
 #: templates/admin/cms/page/tree/menu_item.html:66
@@ -372,213 +370,213 @@ msgstr "Módosítás"
 msgid "Delete"
 msgstr "Törlés"
 
-#: admin/forms.py:464
+#: admin/forms.py:453
 msgid "Recover (any) pages"
 msgstr "Oldalak visszaállítása (bármely)"
 
-#: admin/forms.py:492
+#: admin/forms.py:481
 msgid "Notify user"
 msgstr "Felhasználó értesítése"
 
-#: admin/forms.py:494
+#: admin/forms.py:483
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "Értesítés küldése a felhasználónak a felhasználói neve vagy jelszava megváltozásáról. Email cím szükséges."
 
-#: admin/forms.py:514
+#: admin/forms.py:503
 msgid "New password"
 msgstr "Új jelszó"
 
-#: admin/forms.py:516
+#: admin/forms.py:505
 msgid "New password confirmation"
 msgstr "Új jelszó megerősítése"
 
-#: admin/forms.py:541
+#: admin/forms.py:530
 msgid "Email notification requires valid email address."
 msgstr "Az email értesítéshez valós email címre van szükség."
 
-#: admin/forms.py:543
+#: admin/forms.py:532
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Az oldal létrehozási jogosultsághoz szüksége az oldal szerkesztési jogosultság!"
 
-#: admin/forms.py:545
+#: admin/forms.py:534
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "A felhasználó létrehozási jogosultsághoz szüksége a felhasználó szerkesztési jogosultság!"
 
-#: admin/forms.py:547
+#: admin/forms.py:536
 msgid "To add permissions you also need to edit them!"
 msgstr "A jogosultság hozzáadásához szükséges a szerkesztésük is!"
 
-#: admin/pageadmin.py:340 templates/admin/cms/page/submit_row.html:9
+#: admin/pageadmin.py:350 templates/admin/cms/page/submit_row.html:9
 msgid "Advanced Settings"
 msgstr "További beállítások"
 
-#: admin/pageadmin.py:349
+#: admin/pageadmin.py:359
 msgid "Change Permissions"
 msgstr "Jogosultságok megváltoztatása"
 
-#: admin/pageadmin.py:397
+#: admin/pageadmin.py:407
 msgid "Add Page Type"
 msgstr "Oldal típus hozzáadása"
 
-#: admin/pageadmin.py:401
+#: admin/pageadmin.py:411
 msgid "Add Page Copy"
 msgstr "Oldal másolat hozzáadása"
 
-#: admin/pageadmin.py:607
+#: admin/pageadmin.py:617
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s plugin hozzáadva a %(placeholder)s helyhez"
 
-#: admin/pageadmin.py:615
+#: admin/pageadmin.py:625
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
 msgstr "Plugin másolva ide: %(placeholder)s"
 
-#: admin/pageadmin.py:626
+#: admin/pageadmin.py:636
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s plugin szekesztve a %(position)s pozícióban, a %(placeholder)s helyen"
 
-#: admin/pageadmin.py:638
+#: admin/pageadmin.py:648
 msgid "Plugins were moved"
 msgstr "A bővítményeket eltávolították"
 
-#: admin/pageadmin.py:645
+#: admin/pageadmin.py:655
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr "%(plugin_name)s plugin %(position)s pozícióban és %(placeholder)s helyen már lézetik"
 
-#: admin/pageadmin.py:658
+#: admin/pageadmin.py:668
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr "Az össze plugin a \"%(name)s\" helyen törölve lett."
 
-#: admin/pageadmin.py:677
+#: admin/pageadmin.py:687
 msgid "You do not have permission to change pages."
 msgstr "Nincs jogosultsága az oldalak szerkesztéséhez."
 
-#: admin/pageadmin.py:689
+#: admin/pageadmin.py:699
 msgid "Database error"
 msgstr "Adatbázis hiba"
 
-#: admin/pageadmin.py:792 admin/pageadmin.py:859 admin/pageadmin.py:1189
-#: admin/pageadmin.py:1226
+#: admin/pageadmin.py:802 admin/pageadmin.py:869 admin/pageadmin.py:1199
+#: admin/pageadmin.py:1236
 msgid "You do not have permission to change this page"
 msgstr "Nincs joga az oldal a szerkesztéséhez"
 
-#: admin/pageadmin.py:843 admin/pageadmin.py:909
+#: admin/pageadmin.py:853 admin/pageadmin.py:919
 msgid "Page reverted but slug stays the same because of url collisions."
 msgstr ""
 
-#: admin/pageadmin.py:917
+#: admin/pageadmin.py:927
 msgid "You do not have permission to change the template"
 msgstr "Nincs jogosultsága megváltoztatni a sablont."
 
-#: admin/pageadmin.py:921
+#: admin/pageadmin.py:931
 msgid "Template not valid"
 msgstr "Érvénytelen sablon"
 
-#: admin/pageadmin.py:926
+#: admin/pageadmin.py:936
 #, python-format
 msgid "Template changed to %s"
 msgstr "Templát cserélve: %s"
 
-#: admin/pageadmin.py:929
+#: admin/pageadmin.py:939
 msgid "The template was successfully changed"
 msgstr "A sablon sikeresen megváltozott"
 
-#: admin/pageadmin.py:951
+#: admin/pageadmin.py:961
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Hiba! Nincs jogosultságod az oldal mozgatásához. Frissítsd az oldalt!"
 
-#: admin/pageadmin.py:956
+#: admin/pageadmin.py:966
 msgid "Page moved"
 msgstr "Oldal áthelyezve"
 
-#: admin/pageadmin.py:1002 admin/placeholderadmin.py:257
-#: admin/placeholderadmin.py:306
+#: admin/pageadmin.py:1012 admin/placeholderadmin.py:249
+#: admin/placeholderadmin.py:298
 msgid "Language must be set to a supported language!"
 msgstr "A beállított nyelvnek támogatott nyelvnek kell lennie!"
 
-#: admin/pageadmin.py:1007 admin/placeholderadmin.py:325
+#: admin/pageadmin.py:1017 admin/placeholderadmin.py:317
 msgid "You do not have permission to copy these plugins."
 msgstr "Nincs jogosultsága ezen pluginek másolásához."
 
-#: admin/pageadmin.py:1010
+#: admin/pageadmin.py:1020
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
 msgstr "Plugineket átmásoltuk %(source_language)s nyelvről %(target_language)s nyelvre."
 
-#: admin/pageadmin.py:1060
+#: admin/pageadmin.py:1070
 msgid "You do not have permission to publish this page"
 msgstr "Nincs joga az oldal publikálásához"
 
-#: admin/pageadmin.py:1077 admin/pageadmin.py:1089
+#: admin/pageadmin.py:1087 admin/pageadmin.py:1099
 msgid "Page not published! A parent page is not published yet."
 msgstr "Nem tettük közzé az oldalt! Még van közzé nem tett szülő oldal!"
 
-#: admin/pageadmin.py:1079
+#: admin/pageadmin.py:1089
 msgid "The content was successfully published."
 msgstr "A tartalom sikeresen publikálva."
 
-#: admin/pageadmin.py:1091
+#: admin/pageadmin.py:1101
 msgid "There was a problem publishing your content"
 msgstr "A tartalom publikálása közben hiba lépett fel"
 
-#: admin/pageadmin.py:1157
+#: admin/pageadmin.py:1167
 msgid "You do not have permission to unpublish this page"
 msgstr "Nincs jogosultsága az oldal visszavonására."
 
-#: admin/pageadmin.py:1159
+#: admin/pageadmin.py:1169
 msgid "This page was never published"
 msgstr "Az oldal még nem volt közzétett"
 
-#: admin/pageadmin.py:1162
+#: admin/pageadmin.py:1172
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "\"%(page)s\" oldal %(language)s nyelvű változatát sikeresen visszavonta."
 
-#: admin/pageadmin.py:1193
+#: admin/pageadmin.py:1203
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
 msgstr "Sikeresen visszaállított oldal: \"%s\"."
 
-#: admin/pageadmin.py:1230
+#: admin/pageadmin.py:1240
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
 
-#: admin/pageadmin.py:1236
+#: admin/pageadmin.py:1246
 msgid "There only exists one translation for this page"
 msgstr "Ennek az oldalnak csak egy fordítása létezik."
 
-#: admin/pageadmin.py:1265
+#: admin/pageadmin.py:1275
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "%(language)s nyelvű cím és plugin már létezik"
 
-#: admin/pageadmin.py:1288 admin/placeholderadmin.py:522
-#: admin/placeholderadmin.py:561
+#: admin/pageadmin.py:1298 admin/placeholderadmin.py:518
+#: admin/placeholderadmin.py:557
 msgid "Are you sure?"
 msgstr "Biztos benne?"
 
-#: admin/pageadmin.py:1328
+#: admin/pageadmin.py:1338
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Nincs joga az oldal menübeli pozíciójának változtatásához"
 
-#: admin/pageadmin.py:1350
+#: admin/pageadmin.py:1360
 msgid "Page Types"
 msgstr "Oldal típusok"
 
-#: admin/pageadmin.py:1407
+#: admin/pageadmin.py:1417
 msgid "You do not have permission to edit this page"
 msgstr "Nincs jogosultsága az oldal szerkesztéséhez"
 
@@ -602,55 +600,55 @@ msgstr "Felhasználó és Csoport jogok"
 msgid "Page permissions management"
 msgstr "Oldal jogainak kezelése"
 
-#: admin/placeholderadmin.py:76
+#: admin/placeholderadmin.py:75
 #, python-format
 msgid "Field %s not found"
 msgstr "A mező nem található: %s"
 
-#: admin/placeholderadmin.py:83
+#: admin/placeholderadmin.py:82
 msgid "You do not have permission to edit this item"
 msgstr "Nincs jogosultsága az elem szerkesztéséhez"
 
-#: admin/placeholderadmin.py:233
+#: admin/placeholderadmin.py:228
 msgid "You do not have permission to add a plugin"
 msgstr "Nincs jogosultsága plugin hozzáadásához."
 
-#: admin/placeholderadmin.py:259
+#: admin/placeholderadmin.py:251
 msgid "Parent plugin language must be same as language!"
 msgstr "A nyelvnek meg kell egyeznie a szülő plugin nyelvével!"
 
-#: admin/placeholderadmin.py:363
+#: admin/placeholderadmin.py:355
 msgid "You do not have permission to edit this plugin"
 msgstr "Nincs jogosultsága a plugin szerkesztéséhez"
 
-#: admin/placeholderadmin.py:446
+#: admin/placeholderadmin.py:438
 msgid "You have no permission to move this plugin"
 msgstr "Nincs jogosultsága a plugin mozgatásához"
 
-#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
+#: admin/placeholderadmin.py:495 admin/placeholderadmin.py:506
 msgid "You do not have permission to delete this plugin"
 msgstr "Nincs jogosultsága a plugin törléséhez"
 
-#: admin/placeholderadmin.py:514
+#: admin/placeholderadmin.py:510
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "A %(name)s plugin \"%(obj)s\" sikeres törölve."
 
-#: admin/placeholderadmin.py:520 admin/placeholderadmin.py:559
+#: admin/placeholderadmin.py:516 admin/placeholderadmin.py:555
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nem törölhetők %(name)s"
 
-#: admin/placeholderadmin.py:540 admin/placeholderadmin.py:551
+#: admin/placeholderadmin.py:536 admin/placeholderadmin.py:547
 msgid "You do not have permission to clear this placeholder"
 msgstr "Nincs jogosultsága ennek a helynek a törléséhez."
 
-#: admin/placeholderadmin.py:554
+#: admin/placeholderadmin.py:550
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "A \"%(obj)s\" hely sikeresen törölve."
 
-#: admin/placeholderadmin.py:564
+#: admin/placeholderadmin.py:560
 msgid "placeholder"
 msgstr "hely"
 
@@ -669,6 +667,152 @@ msgstr "Válasszon egy érvényes oldalt"
 #: forms/widgets.py:221
 msgid "Add Another"
 msgstr "Új hozzáadása"
+
+#: migrations/0001_initial.py:26 migrations/0001_initial.py:60
+#: migrations/0001_initial.py:83 migrations/0001_initial.py:123
+msgid "ID"
+msgstr ""
+
+#: migrations/0001_initial.py:27 models/pluginmodel.py:77
+msgid "position"
+msgstr "pozíció"
+
+#: migrations/0001_initial.py:28 models/pluginmodel.py:78
+#: models/titlemodels.py:15
+msgid "language"
+msgstr "nyelv"
+
+#: migrations/0001_initial.py:29 models/pluginmodel.py:79
+msgid "plugin_name"
+msgstr ""
+
+#: migrations/0001_initial.py:30 models/pluginmodel.py:80
+#: models/titlemodels.py:28
+msgid "creation date"
+msgstr "létrehozás dátuma"
+
+#: migrations/0001_initial.py:61 migrations/0001_initial.py:124
+#: models/permissionmodels.py:75
+msgid "can edit"
+msgstr "szerkeszthet?"
+
+#: migrations/0001_initial.py:62 migrations/0001_initial.py:125
+#: models/permissionmodels.py:76
+msgid "can add"
+msgstr "hozzáadhat?"
+
+#: migrations/0001_initial.py:63 migrations/0001_initial.py:126
+#: models/permissionmodels.py:77
+msgid "can delete"
+msgstr "törölhet?"
+
+#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
+#: models/permissionmodels.py:78
+msgid "can change advanced settings"
+msgstr "további beállításokat módosíthatja?"
+
+#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
+#: models/permissionmodels.py:79
+msgid "can publish"
+msgstr "publikálhat?"
+
+#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
+#: models/permissionmodels.py:80
+msgid "can change permissions"
+msgstr "hozzáférési jogokat módosíthat?"
+
+#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
+#: models/permissionmodels.py:81
+msgid "can move"
+msgstr "mozgathat?"
+
+#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
+#: models/permissionmodels.py:82
+msgid "view restricted"
+msgstr "a nézet korlátozott"
+
+#: migrations/0001_initial.py:69 models/permissionmodels.py:106
+msgid "can recover pages"
+msgstr "vissza állíthat oldalakat?"
+
+#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
+#: models/permissionmodels.py:72
+msgid "group"
+msgstr "csoport"
+
+#: migrations/0001_initial.py:71 models/permissionmodels.py:107
+msgid "sites"
+msgstr "szájt"
+
+#: migrations/0001_initial.py:84 models/pagemodel.py:56
+msgid "created by"
+msgstr "létrehozva"
+
+#: migrations/0001_initial.py:85 models/pagemodel.py:57
+msgid "changed by"
+msgstr "mádosítva"
+
+#: migrations/0001_initial.py:88 models/pagemodel.py:62
+#: templates/admin/cms/page/tree/menu_item.html:73
+msgid "publication date"
+msgstr "publikálás dátuma"
+
+#: migrations/0001_initial.py:89 models/pagemodel.py:64
+#: templates/admin/cms/page/tree/menu_item.html:74
+msgid "publication end date"
+msgstr "publikusság vége"
+
+#: migrations/0001_initial.py:90 models/pagemodel.py:71
+msgid "in navigation"
+msgstr "navigációban szerepel"
+
+#: migrations/0001_initial.py:91 models/pagemodel.py:72
+msgid "soft root"
+msgstr "Gyenge gyökér"
+
+#: migrations/0001_initial.py:92 models/pagemodel.py:74
+msgid "id"
+msgstr "azonosító"
+
+#: migrations/0001_initial.py:93 models/pagemodel.py:76
+msgid "attached menu"
+msgstr "kapcsolódó menü"
+
+#: migrations/0001_initial.py:94 models/pagemodel.py:77
+#: templates/admin/cms/page/tree/menu_item.html:77
+msgid "template"
+msgstr "sablon"
+
+#: migrations/0001_initial.py:95 models/pagemodel.py:83
+msgid "login required"
+msgstr "bejelentkezés szükséges"
+
+#: migrations/0001_initial.py:96 models/pagemodel.py:84
+msgid "menu visibility"
+msgstr "menü láthatósága"
+
+#: migrations/0001_initial.py:98 models/pagemodel.py:88
+msgid "application"
+msgstr "alkalmazás"
+
+#: migrations/0001_initial.py:99 models/pagemodel.py:89
+msgid "application instance name"
+msgstr "alkalmazás példány neve"
+
+#: migrations/0001_initial.py:110 models/pagemodel.py:80
+msgid "site"
+msgstr "webhely"
+
+#: migrations/0001_initial.py:132 models/permissionmodels.py:124
+#: templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "Engedélyezés"
+
+#: migrations/0001_initial.py:134 models/pagemodel.py:121
+#: models/permissionmodels.py:125 models/titlemodels.py:27
+#: test_utils/project/sampleapp/ns_urls.py:10
+msgid "page"
+msgstr "oldal"
 
 #: models/pagemodel.py:38
 msgid "for logged in users only"
@@ -694,61 +838,25 @@ msgstr "Csak ezen az oldalon"
 msgid "Allow"
 msgstr "Engedélyezés"
 
-#: models/pagemodel.py:56
-msgid "created by"
-msgstr "létrehozva"
-
-#: models/pagemodel.py:57
-msgid "changed by"
-msgstr "mádosítva"
-
-#: models/pagemodel.py:62 templates/admin/cms/page/tree/menu_item.html:73
-msgid "publication date"
-msgstr "publikálás dátuma"
-
 #: models/pagemodel.py:63
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "Mikor élesedjen az oldal. A státusznak \"Közzétett\" állapotúnak kell lennie az élesítéshez."
 
-#: models/pagemodel.py:64 templates/admin/cms/page/tree/menu_item.html:74
-msgid "publication end date"
-msgstr "publikusság vége"
-
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "Az oldal lejárati ideje. Hagyd üresen ha sosem jár le."
 
-#: models/pagemodel.py:71
-msgid "in navigation"
-msgstr "navigációban szerepel"
-
-#: models/pagemodel.py:72
-msgid "soft root"
-msgstr "Gyenge gyökér"
-
 #: models/pagemodel.py:73
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Nem minden ős fog látszani a navigációban."
-
-#: models/pagemodel.py:74
-msgid "id"
-msgstr "azonosító"
 
 #: models/pagemodel.py:75
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Egyedi azonosító, amelyet az url-ben használunk ennek az oldalnak a hivatkozásánál."
-
-#: models/pagemodel.py:76
-msgid "attached menu"
-msgstr "kapcsolódó menü"
-
-#: models/pagemodel.py:77 templates/admin/cms/page/tree/menu_item.html:77
-msgid "template"
-msgstr "sablon"
 
 #: models/pagemodel.py:78
 msgid "The template used to render the content."
@@ -758,44 +866,19 @@ msgstr "A tartalom megjelenítéséhez használt sablon."
 msgid "The site the page is accessible at."
 msgstr "A webhely, amelyiken az oldal elérhető."
 
-#: models/pagemodel.py:80
-msgid "site"
-msgstr "webhely"
-
-#: models/pagemodel.py:83
-msgid "login required"
-msgstr "bejelentkezés szükséges"
-
-#: models/pagemodel.py:84
-msgid "menu visibility"
-msgstr "menü láthatósága"
-
 #: models/pagemodel.py:86
 msgid "limit when this page is visible in the menu"
 msgstr "korlátozza, hogy mikor jelenjen meg ez az oldal a menüben"
 
-#: models/pagemodel.py:88
-msgid "application"
-msgstr "alkalmazás"
-
-#: models/pagemodel.py:89
-msgid "application instance name"
-msgstr "alkalmazás példány neve"
-
-#: models/pagemodel.py:125 models/permissionmodels.py:125
-#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
-msgid "page"
-msgstr "oldal"
-
-#: models/pagemodel.py:126
+#: models/pagemodel.py:122
 msgid "pages"
 msgstr "oldalak"
 
-#: models/pagemodel.py:823
+#: models/pagemodel.py:840
 msgid "Empty"
 msgstr "Üres"
 
-#: models/pagemodel.py:944
+#: models/pagemodel.py:961
 msgid "default"
 msgstr "alapértelmezett"
 
@@ -819,53 +902,13 @@ msgstr "Oldal leszármazottai"
 msgid "Page and descendants"
 msgstr "Oldal és leszérmazottai"
 
-#: models/permissionmodels.py:72
-msgid "group"
-msgstr "csoport"
-
-#: models/permissionmodels.py:75
-msgid "can edit"
-msgstr "szerkeszthet?"
-
-#: models/permissionmodels.py:76
-msgid "can add"
-msgstr "hozzáadhat?"
-
-#: models/permissionmodels.py:77
-msgid "can delete"
-msgstr "törölhet?"
-
-#: models/permissionmodels.py:78
-msgid "can change advanced settings"
-msgstr "további beállításokat módosíthatja?"
-
-#: models/permissionmodels.py:79
-msgid "can publish"
-msgstr "publikálhat?"
-
-#: models/permissionmodels.py:80
-msgid "can change permissions"
-msgstr "hozzáférési jogokat módosíthat?"
-
 #: models/permissionmodels.py:80
 msgid "on page level"
 msgstr "oldal szinten"
 
-#: models/permissionmodels.py:81
-msgid "can move"
-msgstr "mozgathat?"
-
-#: models/permissionmodels.py:82
-msgid "view restricted"
-msgstr "a nézet korlátozott"
-
 #: models/permissionmodels.py:82
 msgid "frontend view restriction"
 msgstr "frontend nézet korlátozás"
-
-#: models/permissionmodels.py:106
-msgid "can recover pages"
-msgstr "vissza állíthat oldalakat?"
 
 #: models/permissionmodels.py:106
 msgid "can recover any deleted page"
@@ -875,10 +918,6 @@ msgstr "bármelyik törölt oldalt visszaállíthatja?"
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "Ha egyiket sem jelöli ki, akkor a felhasználónak mindegyik webhelyhez lesz hozzáférése."
 
-#: models/permissionmodels.py:107
-msgid "sites"
-msgstr "szájt"
-
 #: models/permissionmodels.py:112
 msgid "Page global permission"
 msgstr "Oldal globális jogosultság"
@@ -886,10 +925,6 @@ msgstr "Oldal globális jogosultság"
 #: models/permissionmodels.py:113
 msgid "Pages global permissions"
 msgstr "Oldal globális jogosultságok"
-
-#: models/permissionmodels.py:124 templates/admin/cms/page/permissions.html:15
-msgid "Grant on"
-msgstr "Engedélyezés"
 
 #: models/permissionmodels.py:130
 msgid "Page permission"
@@ -919,23 +954,7 @@ msgstr "horgony"
 msgid "width"
 msgstr "szélesség"
 
-#: models/pluginmodel.py:75
-msgid "position"
-msgstr "pozíció"
-
-#: models/pluginmodel.py:76 models/titlemodels.py:15
-msgid "language"
-msgstr "nyelv"
-
-#: models/pluginmodel.py:77
-msgid "plugin_name"
-msgstr "plugin"
-
-#: models/pluginmodel.py:78 models/titlemodels.py:28
-msgid "creation date"
-msgstr "létrehozás dátuma"
-
-#: models/pluginmodel.py:139
+#: models/pluginmodel.py:125
 msgid "<Empty>"
 msgstr "<Empty>"
 
@@ -1027,7 +1046,7 @@ msgstr "Útvonal"
 
 #: models/titlemodels.py:25
 msgid "has url overwrite"
-msgstr "URL felülírva"
+msgstr ""
 
 #: models/titlemodels.py:26
 msgid "redirect"
@@ -1036,6 +1055,17 @@ msgstr "átirányítás"
 #: models/titlemodels.py:31
 msgid "is published"
 msgstr "publikálva"
+
+#: south_migrations/0071_mptt_to_mp.py:54
+#, python-format
+msgid "Path Overflow from: '%s'"
+msgstr ""
+
+#: south_migrations/0071_mptt_to_mp.py:104
+msgid ""
+"The new node is too deep in the tree, try increasing the path.max_length "
+"property and UPDATE your database"
+msgstr ""
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
@@ -1144,8 +1174,8 @@ msgid "Page doesn't inherit any permissions."
 msgstr "Az oldalhoz nincs beállítva jogosultság."
 
 #: templates/admin/cms/page/submit_row.html:8
-msgid "Basic Infos"
-msgstr "Alapvető infók"
+msgid "Basic Settings"
+msgstr "Alapvető beállítások"
 
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save as new"
@@ -1202,7 +1232,7 @@ msgstr "A fastruktúra változásait szükséges lehet frissíteni."
 
 #: templates/admin/cms/page/tree/base.html:56
 msgid "An error occured. Please reload the page"
-msgstr "Hiba történt. Frissítsd az oldalt."
+msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
@@ -1407,8 +1437,8 @@ msgstr "Összes törlése"
 msgid "Drop a plugin here"
 msgstr "Húzz egy plugint ide"
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:762
-#: templatetags/cms_tags.py:765
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:751
+#: templatetags/cms_tags.py:754
 msgid "Edit"
 msgstr "Szerkesztés"
 
@@ -1749,63 +1779,14 @@ msgid_plural ""
 msgstr[0] "%(pages)s oldalhoz ugyanaz az url cím tartozik \"%(url)s\", mint a jelenlegi \"%(instance)s\" oldalhoz."
 msgstr[1] "Az jelenlegi \"%(instance)s\" oldalhoz tartozó \"%(url)s\" url cím  az alábbi oldalakon megegyezik: '%(pages)s'"
 
-#: utils/plugins.py:380
+#: utils/plugins.py:355
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "Ezen a helyen elérte a pluginek száma a maximálisat (%s)."
 
-#: utils/plugins.py:390
+#: utils/plugins.py:365
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr "Ezen a helyen a megengedett %(plugin_name)s bővítmények száma elérte a maximális mennyiséget (%(limit)s)."
-
-#~ msgid "No Plugin selected. Selected one on the left side"
-#~ msgstr "No Plugin selected. Select one on the left side"
-
-#~ msgid "Inherit the template of the nearest ancestor"
-#~ msgstr "Inherit from the parent page"
-
-#~ msgid "Email"
-#~ msgstr "email address"
-
-#~ msgid "last name"
-#~ msgstr "publish request"
-
-#~ msgid "Use latitude & longitude to fine tune the map position."
-#~ msgstr "Use latitude & longitude to fine tune the map position."
-
-#~ msgid "An email adress has priority over a text link."
-#~ msgstr "An email address has priority over a text link."
-
-#~ msgid ""
-#~ "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-#~ msgstr "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approval by you."
-
-#~ msgid "move req."
-#~ msgstr "move request"
-
-#~ msgid "url overwrite"
-#~ msgstr "URL overwrite"
-
-#~ msgid "req. app."
-#~ msgstr "approval required"
-
-#~ msgid "(requires approvement at %(moderation_level)s level)"
-#~ msgstr "(requires approval at %(moderation_level)s level)"
-
-#~ msgid "Request approvemet"
-#~ msgstr "Request approval"
-
-#~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - Page %s requires approval."
-
-#~ msgid "move"
-#~ msgstr "move request"
-
-#~ msgid "fgcolor"
-#~ msgstr "foreground color"
-
-#~ msgid "Wanted language has not been translated yet."
-#~ msgstr "Requested language has not been translated yet."

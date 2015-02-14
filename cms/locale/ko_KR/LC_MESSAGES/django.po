@@ -9,18 +9,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-12 09:31+0100\n"
-"PO-Revision-Date: 2015-01-11 21:30+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"POT-Creation-Date: 2015-01-12 21:30+0100\n"
+"PO-Revision-Date: 2015-01-16 08:44+0000\n"
+"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/projects/p/django-cms/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ko_KR\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Poedit-Country: SWITZERLAND\n"
-"X-Poedit-Language: English\n"
-"X-Poedit-SourceCharset: utf-8\n"
 
 #: apps.py:9 templates/cms/toolbar/items/logo.html:2
 msgid "django CMS"
@@ -76,7 +73,7 @@ msgstr ""
 msgid "Logout"
 msgstr "로그아웃"
 
-#: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
+#: cms_toolbar.py:173 admin/forms.py:65 admin/forms.py:161 admin/forms.py:203
 #: models/settingmodels.py:12
 msgid "Language"
 msgstr "언어"
@@ -153,7 +150,7 @@ msgstr "고급 설정"
 msgid "Permissions"
 msgstr "권한"
 
-#: cms_toolbar.py:462 admin/pageadmin.py:343
+#: cms_toolbar.py:462 admin/pageadmin.py:353
 msgid "Publishing dates"
 msgstr ""
 
@@ -217,149 +214,150 @@ msgstr ""
 msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
-#: admin/forms.py:65 admin/forms.py:175 admin/forms.py:217
+#: admin/forms.py:66 admin/forms.py:162 admin/forms.py:204
 msgid "The current language of the content fields."
 msgstr "내용의 현재 언어"
 
-#: admin/forms.py:66
+#: admin/forms.py:67
 msgid "Page type"
 msgstr ""
 
-#: admin/forms.py:67
+#: admin/forms.py:68
 msgid "Title"
 msgstr "제목"
 
-#: admin/forms.py:68
+#: admin/forms.py:69
 msgid "The default title"
 msgstr "기본 제목"
 
-#: admin/forms.py:69
+#: admin/forms.py:70
 msgid "Slug"
 msgstr "슬러그"
 
-#: admin/forms.py:70
+#: admin/forms.py:71
 msgid "The part of the title that is used in the URL"
 msgstr "URL 에서 사용되는 제목의 일부분"
 
-#: admin/forms.py:71
+#: admin/forms.py:72
 msgid "Menu Title"
 msgstr "메뉴 제목"
 
-#: admin/forms.py:72
+#: admin/forms.py:73
 msgid "Overwrite what is displayed in the menu"
 msgstr "메뉴에 표시되는 것을 덮어 씀"
 
-#: admin/forms.py:73
+#: admin/forms.py:74
 msgid "Page Title"
 msgstr "페이지 제목"
 
-#: admin/forms.py:74
+#: admin/forms.py:75
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "브라우져 창이나 북마크에 표시되는 것을 덮어 씀"
 
-#: admin/forms.py:76
+#: admin/forms.py:77
 msgid "Description meta tag"
 msgstr ""
 
-#: admin/forms.py:78
+#: admin/forms.py:79
 msgid "A description of the page used by search engines."
 msgstr "검색 엔진에 의해 사용되는 쉼표로 구분 된 키워드 목록입니다."
 
-#: admin/forms.py:135
+#: admin/forms.py:128
 msgid "Another page with this slug already exists"
 msgstr "다른 페이지에 이미 있는 슬러그 입니다"
 
-#: admin/forms.py:163
+#: admin/forms.py:156
 msgid "Slug must not be empty."
 msgstr ""
 
-#: admin/forms.py:197
+#: admin/forms.py:184
 msgid "Application"
 msgstr "어플리케이션"
 
-#: admin/forms.py:199
+#: admin/forms.py:186
 msgid "Hook application to this page."
 msgstr "이 페이지에 어플리케이션을 연결"
 
-#: admin/forms.py:200
+#: admin/forms.py:187
 msgid "Overwrite URL"
 msgstr "URL을 덮어 씀"
 
-#: admin/forms.py:201
+#: admin/forms.py:188
 msgid "Keep this field empty if standard path should be used."
 msgstr "기본 경로가 사용되면 이 항목을 비워 둠"
 
-#: admin/forms.py:205
+#: admin/forms.py:192
 msgid "X Frame Options"
 msgstr ""
 
-#: admin/forms.py:206
+#: admin/forms.py:193
 msgid "Whether this page can be embedded in other pages or websites"
 msgstr ""
 
-#: admin/forms.py:211
+#: admin/forms.py:198
 msgid "Redirect"
 msgstr "리다이렉트"
 
-#: admin/forms.py:212
+#: admin/forms.py:199
 msgid "Redirects to this URL."
 msgstr "이 URL 로 리다이렉트"
 
-#: admin/forms.py:212
+#: admin/forms.py:199
 msgid "Start typing..."
 msgstr ""
 
-#: admin/forms.py:269
+#: admin/forms.py:256
 msgid "A page with this reverse URL id exists already."
 msgstr "이 URL id 가 이미 존재하는 페이지"
 
-#: admin/forms.py:287
+#: admin/forms.py:274
 msgid ""
 "You selected an apphook with an \"app_name\".\n"
 "                            You must enter a unique instance name."
 msgstr ""
 
-#: admin/forms.py:307
+#: admin/forms.py:294
 msgid "A instance name with this name already exists."
 msgstr ""
 
-#: admin/forms.py:347 models/permissionmodels.py:71
+#: admin/forms.py:334 migrations/0001_initial.py:72
+#: migrations/0001_initial.py:135 models/permissionmodels.py:71
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "사용자"
 
-#: admin/forms.py:411
+#: admin/forms.py:397
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "페이지 추가 권한은 하위 페이지에 대한 접근을 요구함, 그렇지 않으면 추가된 페이지는 만든이가 바꿀 수 없음."
 
-#: admin/forms.py:416
+#: admin/forms.py:402
 msgid "Add page permission also requires edit page permission."
 msgstr "페이지 추가 권한은 페이지 편집 권한을 요구"
 
-#: admin/forms.py:443
+#: admin/forms.py:429
 msgid "can_view"
 msgstr "can_view"
 
-#: admin/forms.py:454
+#: admin/forms.py:440
 msgid "Please select user or group first."
 msgstr "먼저 사용자와 그룹을 선택해주세요."
 
-#: admin/forms.py:461 admin/forms.py:468 admin/forms.py:472
+#: admin/forms.py:450 admin/forms.py:457 admin/forms.py:461
 #: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:771
+#: templatetags/cms_tags.py:760
 msgid "Add"
 msgstr "추가"
 
-#: admin/forms.py:462 admin/forms.py:469 admin/forms.py:473
+#: admin/forms.py:451 admin/forms.py:458 admin/forms.py:462
 #: templates/cms/toolbar/toolbar.html:36
 #: templates/cms/toolbar/items/live_draft.html:7
 msgid "Change"
 msgstr "수정"
 
-#: admin/forms.py:463 admin/forms.py:470 admin/forms.py:474
+#: admin/forms.py:452 admin/forms.py:459 admin/forms.py:463
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/submit_row.html:7
 #: templates/admin/cms/page/tree/menu_item.html:66
@@ -367,213 +365,213 @@ msgstr "수정"
 msgid "Delete"
 msgstr "삭제"
 
-#: admin/forms.py:464
+#: admin/forms.py:453
 msgid "Recover (any) pages"
 msgstr "(어떤) 페이지를 복구함"
 
-#: admin/forms.py:492
+#: admin/forms.py:481
 msgid "Notify user"
 msgstr "사용자에게 알림"
 
-#: admin/forms.py:494
+#: admin/forms.py:483
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "username / password 가 바뀐 걸 사용자에게 알림. 사용자 이메일이 필요함"
 
-#: admin/forms.py:514
+#: admin/forms.py:503
 msgid "New password"
 msgstr "새 비밀번호"
 
-#: admin/forms.py:516
+#: admin/forms.py:505
 msgid "New password confirmation"
 msgstr "새 비밀번호 확인"
 
-#: admin/forms.py:541
+#: admin/forms.py:530
 msgid "Email notification requires valid email address."
 msgstr "이메일 알림은 유효한 이메일 주소가 필요함"
 
-#: admin/forms.py:543
+#: admin/forms.py:532
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "새 페이지 추가 권한은 페이지 수정 권한이 필요함!"
 
-#: admin/forms.py:545
+#: admin/forms.py:534
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "새 사용자 추가 권한은 사용자 수정 권한이 필요함!"
 
-#: admin/forms.py:547
+#: admin/forms.py:536
 msgid "To add permissions you also need to edit them!"
 msgstr "권한을 추가하려면 그것을 수정해야 함!"
 
-#: admin/pageadmin.py:340 templates/admin/cms/page/submit_row.html:9
+#: admin/pageadmin.py:350 templates/admin/cms/page/submit_row.html:9
 msgid "Advanced Settings"
 msgstr "고급 설정"
 
-#: admin/pageadmin.py:349
+#: admin/pageadmin.py:359
 msgid "Change Permissions"
 msgstr "권한 수정"
 
-#: admin/pageadmin.py:397
+#: admin/pageadmin.py:407
 msgid "Add Page Type"
 msgstr ""
 
-#: admin/pageadmin.py:401
+#: admin/pageadmin.py:411
 msgid "Add Page Copy"
 msgstr ""
 
-#: admin/pageadmin.py:607
+#: admin/pageadmin.py:617
 #, python-format
 msgid "%(plugin_name)s plugin added to %(placeholder)s"
 msgstr "%(plugin_name)s 플러그인은  %(placeholder)s 에게 추가 됨"
 
-#: admin/pageadmin.py:615
+#: admin/pageadmin.py:625
 #, python-format
 msgid "Copied plugins to %(placeholder)s"
 msgstr "%(placeholder)s 에 복사된 플러그인"
 
-#: admin/pageadmin.py:626
+#: admin/pageadmin.py:636
 #, python-format
 msgid ""
 "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 msgstr "%(plugin_name)s 플그러인은  %(position)s 위치에  %(placeholder)s 에게 수정 됨"
 
-#: admin/pageadmin.py:638
+#: admin/pageadmin.py:648
 msgid "Plugins were moved"
 msgstr "플러그인이 이동하였습니다."
 
-#: admin/pageadmin.py:645
+#: admin/pageadmin.py:655
 #, python-format
 msgid ""
 "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
 "deleted."
 msgstr "%(plugin_name)s 플러그인은  %(position)s 위치에  %(placeholder)s 에게 삭제 됨"
 
-#: admin/pageadmin.py:658
+#: admin/pageadmin.py:668
 #, python-format
 msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 msgstr "\"%(name)s\" 에 위치한 모든 플러그인들은 삭제되었습니다."
 
-#: admin/pageadmin.py:677
+#: admin/pageadmin.py:687
 msgid "You do not have permission to change pages."
 msgstr "이 페이지를 수정할 권한이 없습니다."
 
-#: admin/pageadmin.py:689
+#: admin/pageadmin.py:699
 msgid "Database error"
 msgstr "데이터베이스 오류"
 
-#: admin/pageadmin.py:792 admin/pageadmin.py:859 admin/pageadmin.py:1189
-#: admin/pageadmin.py:1226
+#: admin/pageadmin.py:802 admin/pageadmin.py:869 admin/pageadmin.py:1199
+#: admin/pageadmin.py:1236
 msgid "You do not have permission to change this page"
 msgstr "이 페이지를 수정할 권한이 없습니다"
 
-#: admin/pageadmin.py:843 admin/pageadmin.py:909
+#: admin/pageadmin.py:853 admin/pageadmin.py:919
 msgid "Page reverted but slug stays the same because of url collisions."
 msgstr ""
 
-#: admin/pageadmin.py:917
+#: admin/pageadmin.py:927
 msgid "You do not have permission to change the template"
 msgstr "이 템플릿을 수정할 권한이 없습니다."
 
-#: admin/pageadmin.py:921
+#: admin/pageadmin.py:931
 msgid "Template not valid"
 msgstr "템플릿이 잘못 됨"
 
-#: admin/pageadmin.py:926
+#: admin/pageadmin.py:936
 #, python-format
 msgid "Template changed to %s"
 msgstr "템플릿이 %s 로 변경됨"
 
-#: admin/pageadmin.py:929
+#: admin/pageadmin.py:939
 msgid "The template was successfully changed"
 msgstr "템플릿이 잘 바뀌었습니다."
 
-#: admin/pageadmin.py:951
+#: admin/pageadmin.py:961
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "에러! 이 페이지를 이동 할 수있는 권한이 없습니다.페이지를 다시로드하십시오"
 
-#: admin/pageadmin.py:956
+#: admin/pageadmin.py:966
 msgid "Page moved"
 msgstr "페이지가 옮겨짐"
 
-#: admin/pageadmin.py:1002 admin/placeholderadmin.py:257
-#: admin/placeholderadmin.py:306
+#: admin/pageadmin.py:1012 admin/placeholderadmin.py:249
+#: admin/placeholderadmin.py:298
 msgid "Language must be set to a supported language!"
 msgstr "지원 가능한 언어로 설정되어야 합니다!"
 
-#: admin/pageadmin.py:1007 admin/placeholderadmin.py:325
+#: admin/pageadmin.py:1017 admin/placeholderadmin.py:317
 msgid "You do not have permission to copy these plugins."
 msgstr "플러그인을 복사할 권한이 없습니다"
 
-#: admin/pageadmin.py:1010
+#: admin/pageadmin.py:1020
 #, python-format
 msgid "Copied plugins from %(source_language)s to %(target_language)s"
 msgstr " %(source_language)s 에서  %(target_language)s 로 복사된 플러그인"
 
-#: admin/pageadmin.py:1060
+#: admin/pageadmin.py:1070
 msgid "You do not have permission to publish this page"
 msgstr "이 페이지를 게시할 권한이 없습니다."
 
-#: admin/pageadmin.py:1077 admin/pageadmin.py:1089
+#: admin/pageadmin.py:1087 admin/pageadmin.py:1099
 msgid "Page not published! A parent page is not published yet."
 msgstr ""
 
-#: admin/pageadmin.py:1079
+#: admin/pageadmin.py:1089
 msgid "The content was successfully published."
 msgstr "컨텐츠가 성공적으로 게시되었습니다."
 
-#: admin/pageadmin.py:1091
+#: admin/pageadmin.py:1101
 msgid "There was a problem publishing your content"
 msgstr "컨텐츠를 게시하는 동안 문제가 발생하였습니다"
 
-#: admin/pageadmin.py:1157
+#: admin/pageadmin.py:1167
 msgid "You do not have permission to unpublish this page"
 msgstr ""
 
-#: admin/pageadmin.py:1159
+#: admin/pageadmin.py:1169
 msgid "This page was never published"
 msgstr "이 페이지는 게시된 적이 없습니다."
 
-#: admin/pageadmin.py:1162
+#: admin/pageadmin.py:1172
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr ""
 
-#: admin/pageadmin.py:1193
+#: admin/pageadmin.py:1203
 #, python-format
 msgid "The page \"%s\" was successfully reverted."
 msgstr "페이지 \"%s\" 가 잘 되돌아 갔습니다."
 
-#: admin/pageadmin.py:1230
+#: admin/pageadmin.py:1240
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "프라이머리 키 %(key)r 를 가진 %(name)s 가 존재하지 않음."
 
-#: admin/pageadmin.py:1236
+#: admin/pageadmin.py:1246
 msgid "There only exists one translation for this page"
 msgstr "이 페이지의 번역은 한 개만 있음"
 
-#: admin/pageadmin.py:1265
+#: admin/pageadmin.py:1275
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "%(language)s 언어의 제목과 플러그인은 삭제 되었음"
 
-#: admin/pageadmin.py:1288 admin/placeholderadmin.py:522
-#: admin/placeholderadmin.py:561
+#: admin/pageadmin.py:1298 admin/placeholderadmin.py:518
+#: admin/placeholderadmin.py:557
 msgid "Are you sure?"
 msgstr "확실 합니까 ?"
 
-#: admin/pageadmin.py:1328
+#: admin/pageadmin.py:1338
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "이 페이지의 '탐색중' 상태를 바꿀 권한이 없습니다."
 
-#: admin/pageadmin.py:1350
+#: admin/pageadmin.py:1360
 msgid "Page Types"
 msgstr ""
 
-#: admin/pageadmin.py:1407
+#: admin/pageadmin.py:1417
 msgid "You do not have permission to edit this page"
 msgstr "이 페이지를 수정할 권한이 없습니다"
 
@@ -597,55 +595,55 @@ msgstr "사용자 & 그룹 권한"
 msgid "Page permissions management"
 msgstr "페이지 권한 관리"
 
-#: admin/placeholderadmin.py:76
+#: admin/placeholderadmin.py:75
 #, python-format
 msgid "Field %s not found"
 msgstr "필드 %s를 찾지 못했습니다"
 
-#: admin/placeholderadmin.py:83
+#: admin/placeholderadmin.py:82
 msgid "You do not have permission to edit this item"
 msgstr "이 페이지를 수정할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:233
+#: admin/placeholderadmin.py:228
 msgid "You do not have permission to add a plugin"
 msgstr "플러그인을 추가할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:259
+#: admin/placeholderadmin.py:251
 msgid "Parent plugin language must be same as language!"
 msgstr ""
 
-#: admin/placeholderadmin.py:363
+#: admin/placeholderadmin.py:355
 msgid "You do not have permission to edit this plugin"
 msgstr "이 플러그인을 수정할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:446
+#: admin/placeholderadmin.py:438
 msgid "You have no permission to move this plugin"
 msgstr "이 플러그인을 이동 할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
+#: admin/placeholderadmin.py:495 admin/placeholderadmin.py:506
 msgid "You do not have permission to delete this plugin"
 msgstr "이 플러그인을 삭제 할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:514
+#: admin/placeholderadmin.py:510
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr " %(name)s 플러그인 \"%(obj)s\" 이 잘 삭제되었습니다."
 
-#: admin/placeholderadmin.py:520 admin/placeholderadmin.py:559
+#: admin/placeholderadmin.py:516 admin/placeholderadmin.py:555
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s 을 삭제할 수 없습니다."
 
-#: admin/placeholderadmin.py:540 admin/placeholderadmin.py:551
+#: admin/placeholderadmin.py:536 admin/placeholderadmin.py:547
 msgid "You do not have permission to clear this placeholder"
 msgstr "이 영역을 삭제할 권한이 없습니다"
 
-#: admin/placeholderadmin.py:554
+#: admin/placeholderadmin.py:550
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "\"%(obj)s 영역이 잘 삭제되었습니다."
 
-#: admin/placeholderadmin.py:564
+#: admin/placeholderadmin.py:560
 msgid "placeholder"
 msgstr "영역"
 
@@ -664,6 +662,152 @@ msgstr "유효한 페이지를 선택하세요"
 #: forms/widgets.py:221
 msgid "Add Another"
 msgstr "계속 추가"
+
+#: migrations/0001_initial.py:26 migrations/0001_initial.py:60
+#: migrations/0001_initial.py:83 migrations/0001_initial.py:123
+msgid "ID"
+msgstr ""
+
+#: migrations/0001_initial.py:27 models/pluginmodel.py:77
+msgid "position"
+msgstr "위치"
+
+#: migrations/0001_initial.py:28 models/pluginmodel.py:78
+#: models/titlemodels.py:15
+msgid "language"
+msgstr "언어"
+
+#: migrations/0001_initial.py:29 models/pluginmodel.py:79
+msgid "plugin_name"
+msgstr ""
+
+#: migrations/0001_initial.py:30 models/pluginmodel.py:80
+#: models/titlemodels.py:28
+msgid "creation date"
+msgstr "만든 날짜"
+
+#: migrations/0001_initial.py:61 migrations/0001_initial.py:124
+#: models/permissionmodels.py:75
+msgid "can edit"
+msgstr "수정 가능"
+
+#: migrations/0001_initial.py:62 migrations/0001_initial.py:125
+#: models/permissionmodels.py:76
+msgid "can add"
+msgstr "수정 가능"
+
+#: migrations/0001_initial.py:63 migrations/0001_initial.py:126
+#: models/permissionmodels.py:77
+msgid "can delete"
+msgstr "삭제 가능"
+
+#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
+#: models/permissionmodels.py:78
+msgid "can change advanced settings"
+msgstr "고급 설정 변경 가능"
+
+#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
+#: models/permissionmodels.py:79
+msgid "can publish"
+msgstr "게시 가능"
+
+#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
+#: models/permissionmodels.py:80
+msgid "can change permissions"
+msgstr "권한 수정 가능"
+
+#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
+#: models/permissionmodels.py:81
+msgid "can move"
+msgstr "이동 가능"
+
+#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
+#: models/permissionmodels.py:82
+msgid "view restricted"
+msgstr "제한된 보기"
+
+#: migrations/0001_initial.py:69 models/permissionmodels.py:106
+msgid "can recover pages"
+msgstr "페이지 복구 가능"
+
+#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
+#: models/permissionmodels.py:72
+msgid "group"
+msgstr "그룹"
+
+#: migrations/0001_initial.py:71 models/permissionmodels.py:107
+msgid "sites"
+msgstr "사이트들"
+
+#: migrations/0001_initial.py:84 models/pagemodel.py:56
+msgid "created by"
+msgstr "만든 이"
+
+#: migrations/0001_initial.py:85 models/pagemodel.py:57
+msgid "changed by"
+msgstr "수정한 이"
+
+#: migrations/0001_initial.py:88 models/pagemodel.py:62
+#: templates/admin/cms/page/tree/menu_item.html:73
+msgid "publication date"
+msgstr "발행 날짜"
+
+#: migrations/0001_initial.py:89 models/pagemodel.py:64
+#: templates/admin/cms/page/tree/menu_item.html:74
+msgid "publication end date"
+msgstr "발행 마지막 날짜"
+
+#: migrations/0001_initial.py:90 models/pagemodel.py:71
+msgid "in navigation"
+msgstr "탐색중"
+
+#: migrations/0001_initial.py:91 models/pagemodel.py:72
+msgid "soft root"
+msgstr "soft root"
+
+#: migrations/0001_initial.py:92 models/pagemodel.py:74
+msgid "id"
+msgstr "id"
+
+#: migrations/0001_initial.py:93 models/pagemodel.py:76
+msgid "attached menu"
+msgstr "첨부된 메뉴"
+
+#: migrations/0001_initial.py:94 models/pagemodel.py:77
+#: templates/admin/cms/page/tree/menu_item.html:77
+msgid "template"
+msgstr "템플릿"
+
+#: migrations/0001_initial.py:95 models/pagemodel.py:83
+msgid "login required"
+msgstr "로그인이 필요함"
+
+#: migrations/0001_initial.py:96 models/pagemodel.py:84
+msgid "menu visibility"
+msgstr "메뉴 가시성"
+
+#: migrations/0001_initial.py:98 models/pagemodel.py:88
+msgid "application"
+msgstr "어플리케이션"
+
+#: migrations/0001_initial.py:99 models/pagemodel.py:89
+msgid "application instance name"
+msgstr ""
+
+#: migrations/0001_initial.py:110 models/pagemodel.py:80
+msgid "site"
+msgstr "사이트"
+
+#: migrations/0001_initial.py:132 models/permissionmodels.py:124
+#: templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "허가"
+
+#: migrations/0001_initial.py:134 models/pagemodel.py:121
+#: models/permissionmodels.py:125 models/titlemodels.py:27
+#: test_utils/project/sampleapp/ns_urls.py:10
+msgid "page"
+msgstr "페이지"
 
 #: models/pagemodel.py:38
 msgid "for logged in users only"
@@ -689,61 +833,25 @@ msgstr ""
 msgid "Allow"
 msgstr ""
 
-#: models/pagemodel.py:56
-msgid "created by"
-msgstr "만든 이"
-
-#: models/pagemodel.py:57
-msgid "changed by"
-msgstr "수정한 이"
-
-#: models/pagemodel.py:62 templates/admin/cms/page/tree/menu_item.html:73
-msgid "publication date"
-msgstr "발행 날짜"
-
 #: models/pagemodel.py:63
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
 msgstr "페이지를 표시하려면  상태를 '게시'로 해야 합니다."
 
-#: models/pagemodel.py:64 templates/admin/cms/page/tree/menu_item.html:74
-msgid "publication end date"
-msgstr "발행 마지막 날짜"
-
 #: models/pagemodel.py:65
 msgid "When to expire the page. Leave empty to never expire."
 msgstr "페이지의 기한을 설정하려면, '기한 없음'을 비워 두세요."
 
-#: models/pagemodel.py:71
-msgid "in navigation"
-msgstr "탐색중"
-
-#: models/pagemodel.py:72
-msgid "soft root"
-msgstr "soft root"
-
 #: models/pagemodel.py:73
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "모든 상위 항목은 탐색중에 표시되지 않음."
-
-#: models/pagemodel.py:74
-msgid "id"
-msgstr "id"
 
 #: models/pagemodel.py:75
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
-
-#: models/pagemodel.py:76
-msgid "attached menu"
-msgstr "첨부된 메뉴"
-
-#: models/pagemodel.py:77 templates/admin/cms/page/tree/menu_item.html:77
-msgid "template"
-msgstr "템플릿"
 
 #: models/pagemodel.py:78
 msgid "The template used to render the content."
@@ -753,44 +861,19 @@ msgstr "콘텐츠를 렌더링하는 데 사용되는 템플릿"
 msgid "The site the page is accessible at."
 msgstr "이 페이지는 접근 가능하다"
 
-#: models/pagemodel.py:80
-msgid "site"
-msgstr "사이트"
-
-#: models/pagemodel.py:83
-msgid "login required"
-msgstr "로그인이 필요함"
-
-#: models/pagemodel.py:84
-msgid "menu visibility"
-msgstr "메뉴 가시성"
-
 #: models/pagemodel.py:86
 msgid "limit when this page is visible in the menu"
 msgstr "페이지가 메뉴에서 보여질 때만 제한 함"
 
-#: models/pagemodel.py:88
-msgid "application"
-msgstr "어플리케이션"
-
-#: models/pagemodel.py:89
-msgid "application instance name"
-msgstr ""
-
-#: models/pagemodel.py:125 models/permissionmodels.py:125
-#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
-msgid "page"
-msgstr "페이지"
-
-#: models/pagemodel.py:126
+#: models/pagemodel.py:122
 msgid "pages"
 msgstr "페이지"
 
-#: models/pagemodel.py:823
+#: models/pagemodel.py:840
 msgid "Empty"
 msgstr ""
 
-#: models/pagemodel.py:944
+#: models/pagemodel.py:961
 msgid "default"
 msgstr "기본"
 
@@ -814,53 +897,13 @@ msgstr "하위 페이지"
 msgid "Page and descendants"
 msgstr "페이지와 하위 페이지"
 
-#: models/permissionmodels.py:72
-msgid "group"
-msgstr "그룹"
-
-#: models/permissionmodels.py:75
-msgid "can edit"
-msgstr "수정 가능"
-
-#: models/permissionmodels.py:76
-msgid "can add"
-msgstr "수정 가능"
-
-#: models/permissionmodels.py:77
-msgid "can delete"
-msgstr "삭제 가능"
-
-#: models/permissionmodels.py:78
-msgid "can change advanced settings"
-msgstr "고급 설정 변경 가능"
-
-#: models/permissionmodels.py:79
-msgid "can publish"
-msgstr "게시 가능"
-
-#: models/permissionmodels.py:80
-msgid "can change permissions"
-msgstr "권한 수정 가능"
-
 #: models/permissionmodels.py:80
 msgid "on page level"
 msgstr "페이지 레벨에서"
 
-#: models/permissionmodels.py:81
-msgid "can move"
-msgstr "이동 가능"
-
-#: models/permissionmodels.py:82
-msgid "view restricted"
-msgstr "제한된 보기"
-
 #: models/permissionmodels.py:82
 msgid "frontend view restriction"
 msgstr "앞단 보기 제한"
-
-#: models/permissionmodels.py:106
-msgid "can recover pages"
-msgstr "페이지 복구 가능"
 
 #: models/permissionmodels.py:106
 msgid "can recover any deleted page"
@@ -870,10 +913,6 @@ msgstr "지워진 페이지 복구 가능"
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr "아무것도 선택하지 않으면, 사용자는 모든 사이트에 부여 된 권한을 가짐"
 
-#: models/permissionmodels.py:107
-msgid "sites"
-msgstr "사이트들"
-
 #: models/permissionmodels.py:112
 msgid "Page global permission"
 msgstr "전체적인 페이지 권한"
@@ -881,10 +920,6 @@ msgstr "전체적인 페이지 권한"
 #: models/permissionmodels.py:113
 msgid "Pages global permissions"
 msgstr "전체적인 페이지 권한"
-
-#: models/permissionmodels.py:124 templates/admin/cms/page/permissions.html:15
-msgid "Grant on"
-msgstr "허가"
 
 #: models/permissionmodels.py:130
 msgid "Page permission"
@@ -914,23 +949,7 @@ msgstr "항목"
 msgid "width"
 msgstr "넓이"
 
-#: models/pluginmodel.py:75
-msgid "position"
-msgstr "위치"
-
-#: models/pluginmodel.py:76 models/titlemodels.py:15
-msgid "language"
-msgstr "언어"
-
-#: models/pluginmodel.py:77
-msgid "plugin_name"
-msgstr "플러그인 이름"
-
-#: models/pluginmodel.py:78 models/titlemodels.py:28
-msgid "creation date"
-msgstr "만든 날짜"
-
-#: models/pluginmodel.py:139
+#: models/pluginmodel.py:125
 msgid "<Empty>"
 msgstr "<Empty>"
 
@@ -1022,7 +1041,7 @@ msgstr "경로"
 
 #: models/titlemodels.py:25
 msgid "has url overwrite"
-msgstr "URL 이 덮어 씌워짐"
+msgstr ""
 
 #: models/titlemodels.py:26
 msgid "redirect"
@@ -1031,6 +1050,17 @@ msgstr "리다이렉트"
 #: models/titlemodels.py:31
 msgid "is published"
 msgstr "게시 여부"
+
+#: south_migrations/0071_mptt_to_mp.py:54
+#, python-format
+msgid "Path Overflow from: '%s'"
+msgstr ""
+
+#: south_migrations/0071_mptt_to_mp.py:104
+msgid ""
+"The new node is too deep in the tree, try increasing the path.max_length "
+"property and UPDATE your database"
+msgstr ""
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
@@ -1138,8 +1168,8 @@ msgid "Page doesn't inherit any permissions."
 msgstr "페이지가 사용 권한을 상속하지 않습니다."
 
 #: templates/admin/cms/page/submit_row.html:8
-msgid "Basic Infos"
-msgstr "기본 정보"
+msgid "Basic Settings"
+msgstr ""
 
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save as new"
@@ -1196,7 +1226,7 @@ msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:56
 msgid "An error occured. Please reload the page"
-msgstr "에러 발생, 페이지를 다시 불러 오세요."
+msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:57
 #, python-format
@@ -1401,8 +1431,8 @@ msgstr "모두 비우기"
 msgid "Drop a plugin here"
 msgstr "여기에 플러그인을 놓기"
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:762
-#: templatetags/cms_tags.py:765
+#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:751
+#: templatetags/cms_tags.py:754
 msgid "Edit"
 msgstr "수정"
 
@@ -1742,63 +1772,14 @@ msgid_plural ""
 "\"%(instance)s\"."
 msgstr[0] "페이지  '%(pages)s' 는 현재 페이지 \"%(instance)s\" 와 같은 URL  '%(url)s' 이 있습니다."
 
-#: utils/plugins.py:380
+#: utils/plugins.py:355
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "이 영역은 이미 플러그인의 최대 수 (%s)를 가지고 있음."
 
-#: utils/plugins.py:390
+#: utils/plugins.py:365
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
 msgstr "이 영역은 이미 %(plugin_name)s   플러그인의 최대 수 (%(limit)s) 가 있습니다."
-
-#~ msgid "No Plugin selected. Selected one on the left side"
-#~ msgstr "No Plugin selected. Select one on the left side"
-
-#~ msgid "Inherit the template of the nearest ancestor"
-#~ msgstr "Inherit from the parent page"
-
-#~ msgid "Email"
-#~ msgstr "email address"
-
-#~ msgid "last name"
-#~ msgstr "publish request"
-
-#~ msgid "Use latitude & longitude to fine tune the map position."
-#~ msgstr "Use latitude & longitude to fine tune the map position."
-
-#~ msgid "An email adress has priority over a text link."
-#~ msgstr "An email address has priority over a text link."
-
-#~ msgid ""
-#~ "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-#~ msgstr "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approval by you."
-
-#~ msgid "move req."
-#~ msgstr "move request"
-
-#~ msgid "url overwrite"
-#~ msgstr "URL overwrite"
-
-#~ msgid "req. app."
-#~ msgstr "approval required"
-
-#~ msgid "(requires approvement at %(moderation_level)s level)"
-#~ msgstr "(requires approval at %(moderation_level)s level)"
-
-#~ msgid "Request approvemet"
-#~ msgstr "Request approval"
-
-#~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - Page %s requires approval."
-
-#~ msgid "move"
-#~ msgstr "move request"
-
-#~ msgid "fgcolor"
-#~ msgstr "foreground color"
-
-#~ msgid "Wanted language has not been translated yet."
-#~ msgstr "Requested language has not been translated yet."
