@@ -427,6 +427,33 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
 
+    @property
+    def add_url(self):
+        """
+        Returns a custom url to add plugin instances
+        """
+        return None
+
+    @property
+    def edit_url(self):
+        """
+        Returns a custom url to edit plugin instances
+        """
+        return None
+
+    @property
+    def move_url(self):
+        """
+        Returns a custom url to move plugin instances
+        """
+        return None
+
+    @property
+    def delete_url(self):
+        """
+        Returns a custom url to delete plugin instances
+        """
+        return None
 
 reversion_register(CMSPlugin)
 
