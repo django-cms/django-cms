@@ -4,6 +4,7 @@ from datetime import datetime
 from itertools import chain
 import re
 from classytags.values import StringValue
+from django.db.models import Model
 from cms.utils.urlutils import admin_reverse
 
 from django import template
@@ -545,6 +546,7 @@ class PageAttribute(AsTag):
 
 register.tag(PageAttribute)
 
+
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
                                site=None, cache_result=True):
     """
@@ -975,6 +977,8 @@ class CMSEditableObjectAdd(CMSEditableObject):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
         extra_context = self._get_empty_context(context, instance, None,
                                                 language, view_url, view_method,
                                                 editmode=False)
@@ -1022,6 +1026,8 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
         extra_context = self._get_empty_context(context, instance, None,
                                                 language, view_url, view_method,
                                                 editmode=False)

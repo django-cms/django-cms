@@ -400,7 +400,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request, {'category': Category()})
         with self.assertNumQueries(0):
             output = template.render(context)
-        expected = 'cms_plugin cms_plugin-sampleapp-category-add-None '
+        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
         'cms_render_model_add'
         self.assertIn(expected, output)
 
@@ -435,7 +435,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request, {'category': Category()})
         with self.assertNumQueries(0):
             output = template.render(context)
-        expected = 'cms_plugin cms_plugin-sampleapp-category-add-None '
+        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
         'cms_render_model_add'
         self.assertIn(expected, output)
 
