@@ -40,18 +40,6 @@ setup(
         'django-sekizai>=0.7',
         'djangocms-admin-style'
     ],
-    tests_require=[
-        'django-reversion==1.8.2',
-        'Pillow==2.5.3',
-        'Sphinx==1.2.2',
-        'Jinja2==2.7.3',
-        'Pygments==1.6',
-        'dj-database-url==0.3.0',
-        'django-hvad',
-        'djangocms-text-ckeditor>=2.1.1',
-        'djangocms-column',
-        'djangocms-style',
-    ],
     packages=find_packages(exclude=["project", "project.*"]),
     include_package_data=True,
     zip_safe=False,
