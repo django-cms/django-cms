@@ -382,3 +382,72 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         with self.assertNumQueries(4):
             template.render(context)
 
+    def test_render_model_add(self):
+        from django.core.cache import cache
+        from cms.test_utils.project.sampleapp.models import Category
+
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        template = Template(
+            "{% load cms_tags %}{% render_model_add category %}")
+        user = self._create_user("admin", True, True)
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = True
+        request.toolbar.is_staff = True
+        context = RequestContext(request, {'category': Category()})
+        with self.assertNumQueries(0):
+            output = template.render(context)
+        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
+        'cms_render_model_add'
+        self.assertIn(expected, output)
+
+        # Now test that it does NOT render when not in edit mode
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        context = RequestContext(request, {'category': Category()})
+        with self.assertNumQueries(0):
+            output = template.render(context)
+        expected = ''
+        self.assertEqual(expected, output)
+
+    def test_render_model_add_block(self):
+        from django.core.cache import cache
+        from cms.test_utils.project.sampleapp.models import Category
+
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        template = Template(
+            "{% load cms_tags %}{% render_model_add_block category %}wrapped{% endrender_model_add_block %}")
+        user = self._create_user("admin", True, True)
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.edit_mode = True
+        request.toolbar.is_staff = True
+        context = RequestContext(request, {'category': Category()})
+        with self.assertNumQueries(0):
+            output = template.render(context)
+        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
+        'cms_render_model_add'
+        self.assertIn(expected, output)
+
+        # Now test that it does NOT render when not in edit mode
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {}
+        request.toolbar = CMSToolbar(request)
+        context = RequestContext(request, {'category': Category()})
+        with self.assertNumQueries(0):
+            output = template.render(context)
+        expected = 'wrapped'
+        self.assertEqual(expected, output)

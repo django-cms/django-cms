@@ -9,6 +9,7 @@ class Example1App(CMSApp):
 
 apphook_pool.register(Example1App)
 
+
 class MultilingualExample1App(CMSApp):
     name = _("MultilingualExample1 App")
     urls = ["cms.test_utils.project.placeholderapp.urls_multi"]

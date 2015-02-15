@@ -554,13 +554,9 @@ It will render to something like:
         Icon and position can be customized via CSS by setting a background
         to the ``.cms_render_model_add img`` selector.
 
-..warning::
-
-    You **must** pass an instance of your model as instance parameter.
-
 **Arguments:**
 
-* ``instance``: instance of your model in the template
+* ``instance``: instance of your model, or model class to be added
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
   popup editor;
 * ``language`` (optional): the admin language tab to be linked. Useful only for
@@ -572,6 +568,12 @@ It will render to something like:
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
 
+..warning::
+
+    If passing a class, instead of an instance, and using ``view_method``,
+    please bear in mind that the method will be called over an **empty instance**
+    of the class, so attributes are all empty, and the instance does not
+    exists on the database.
 
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
