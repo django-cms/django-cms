@@ -229,7 +229,9 @@ class CMSToolbar(ToolbarAPIMixin):
             return
         self.populated = True
         # never populate the toolbar on is_staff=False
-        if not self.is_staff:
+        # FIXME: In 3.1 we should really update the request/staff status
+        # when toolbar is used in the cms_toolbar templatetag
+        if not self.request.user.is_staff:
             return
         if self.request.session.get('cms_log_latest', False):
             del self.request.session['cms_log_latest']
@@ -240,7 +242,9 @@ class CMSToolbar(ToolbarAPIMixin):
         if self.post_template_populated:
             return
         self.post_template_populated = True
-        if not self.is_staff:
+        # FIXME: In 3.1 we should really update the request/staff status
+        # when toolbar is used in the cms_toolbar templatetag
+        if not self.request.user.is_staff:
             return
         self._call_toolbar('post_template_populate')
 

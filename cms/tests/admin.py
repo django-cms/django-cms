@@ -1503,9 +1503,9 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(FuzzyInt(40, 60)):
                 output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(FuzzyInt(18, 34)):
+        with self.assertNumQueries(FuzzyInt(18, 45)):
             force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
-        with self.assertNumQueries(FuzzyInt(11, 13)):
+        with self.assertNumQueries(FuzzyInt(11, 29)):
             force_text(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):
