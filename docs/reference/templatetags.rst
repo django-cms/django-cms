@@ -633,6 +633,57 @@ It will render to something like:
 
     {% endblock %}
 
+
+render_model_add_block
+======================
+
+``render_model_add_block`` is similar to ``render_model_add`` but instead of
+emitting an icon that is linked to the add model form in a modal dialog, it
+wraps arbitrary markup with the same "link". This allows the developer to create
+front-end editing experiences better suited to the project.
+
+All arguments are identical to ``render_model_add``, but the templatetag is used
+in two parts to wrap the markup that should be wrapped.
+
+.. code-block:: html+django
+
+    {% render_model_add_block my_model_instance %}<div>New Object</div>{% endrender_model_add_block %}
+
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+      <div>New Object</div>
+    </div>
+
+
+.. warning::
+
+    You **must** pass an *instance* of your model as instance parameter. The
+    instance passed could be an existing models instance, or one newly created
+    in your view/plugin. It does not even have to be saved, it is introspected
+    by the templatetag to determine the desired model class.
+
+
+**Arguments:**
+
+* ``instance``: instance of your model in the template
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
+
+
 .. templatetag:: page_language_url
 
 
