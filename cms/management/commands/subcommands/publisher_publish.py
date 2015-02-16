@@ -11,7 +11,7 @@ from cms.api import publish_pages
 from cms.utils.permissions import set_current_user
 
 
-class Command(NoArgsCommand):
+class PublishCommand(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option(
             '--unpublished',
