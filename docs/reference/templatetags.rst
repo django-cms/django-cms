@@ -631,8 +631,6 @@ It will render to something like:
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
-    {% endblock %}
-
 
 render_model_add_block
 ======================
