@@ -1,6 +1,7 @@
 from __future__ import with_statement
 import sys
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
@@ -15,11 +16,9 @@ from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.apphooks import APP_MODULE, APP_NAME
-from cms.utils.compat.dj import get_user_model
 
 
 def _grant_page_permission(user, codename):
@@ -76,7 +75,7 @@ class PythonAPITests(TestCase):
     def test_invalid_template(self):
         kwargs = self._get_default_create_page_arguments()
         kwargs['template'] = "not_valid.htm"
-        with SettingsOverride(CMS_TEMPLATES=(("not_valid.htm", "notvalid"),)):
+        with self.settings(CMS_TEMPLATES=[("not_valid.htm", "notvalid")]):
             self.assertRaises(TemplateDoesNotExist, create_page, **kwargs)
             kwargs['template'] = TEMPLATE_INHERITANCE_MAGIC
         create_page(**kwargs)
@@ -88,7 +87,7 @@ class PythonAPITests(TestCase):
             '%s.%s' % (APP_MODULE, APP_NAME),
         )
 
-        with SettingsOverride(CMS_APPHOOKS=apphooks):
+        with self.settings(CMS_APPHOOKS=apphooks):
             apphook_pool.clear()
             apphook = apphook_pool.get_apphook(APP_NAME)
             page = create_page(apphook=apphook,
@@ -213,7 +212,6 @@ class PythonAPITests(TestCase):
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')
 
     def test_create_reverse_id_collision(self):
-
         create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)

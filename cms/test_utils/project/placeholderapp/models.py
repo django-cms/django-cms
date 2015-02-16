@@ -1,9 +1,11 @@
-from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import reverse
-from cms.utils import get_language_from_request
-from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
 from cms.models.fields import PlaceholderField
+from cms.utils import get_language_from_request
+from cms.utils.urlutils import admin_reverse
+
 from hvad.models import TranslatableModel, TranslatedFields
 
 

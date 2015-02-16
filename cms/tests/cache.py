@@ -4,7 +4,6 @@ from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin, SekizaiPlugin
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting
@@ -58,12 +57,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
+        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
             with self.assertNumQueries(FuzzyInt(13, 17)):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
-        with SettingsOverride(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
+        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
             with self.assertNumQueries(FuzzyInt(7, 11)):
                 self.client.get('/en/')
 
@@ -112,9 +111,10 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
             render2 = template.render(rctx)
-        with self.assertNumQueries(FuzzyInt(8, 12)):
-            response = self.client.get('/en/')
-            resp2 = response.content.decode('utf8').split("$$$")[1]
+        with self.settings(CMS_PAGE_CACHE=False):
+            with self.assertNumQueries(FuzzyInt(8, 13)):
+                response = self.client.get('/en/')
+                resp2 = response.content.decode('utf8').split("$$$")[1]
         self.assertNotEqual(render, render2)
         self.assertNotEqual(resp1, resp2)
 
@@ -131,7 +131,7 @@ class CacheTestCase(CMSTestCase):
         ]
         mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        with SettingsOverride(MIDDLEWARE_CLASSES=mw_classes):
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
@@ -184,7 +184,7 @@ class CacheTestCase(CMSTestCase):
             # set to False (disabled)
             #
             cache.clear()
-            with SettingsOverride(CMS_PAGE_CACHE=False):
+            with self.settings(CMS_PAGE_CACHE=False):
 
 
                 # Test that the page is initially uncached
@@ -211,7 +211,7 @@ class CacheTestCase(CMSTestCase):
         ]
         mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        with SettingsOverride(MIDDLEWARE_CLASSES=mw_classes):
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')

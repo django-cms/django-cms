@@ -15,12 +15,12 @@ system - amongst others.
 Divio AG
 ********
 
-django CMS was released under a BSD licence in 2009. It was created at `Divio 
-AG <https://divio.ch/>`_ of Zürich, Switzerland, by 
-`Patrick Lauber <https://github.com/digi604/>`_, who led its development for 
+django CMS was released under a BSD licence in 2009. It was created at `Divio
+AG <https://divio.ch/>`_ of Zürich, Switzerland, by
+`Patrick Lauber <https://github.com/digi604/>`_, who led its development for
 several years.
 
-Divio remains thoroughly committed to django CMS both as a high-quality technical 
+Divio remains thoroughly committed to django CMS both as a high-quality technical
 product and as a healthy open source project.
 
 Divio's role in steering the project's development is formalised in the

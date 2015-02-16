@@ -9,7 +9,6 @@ from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import user_related_query_name
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -181,10 +180,7 @@ class BasicPagePermissionManager(models.Manager):
         """Get all objects for given user, also takes look if user is in some
         group.
         """
-        query = dict()
-        query['group__' + user_related_query_name] = user
-
-        return self.filter(Q(user=user) | Q(**query))
+        return self.filter(Q(user=user) | Q(group__user=user))
 
     def with_can_change_permissions(self, user):
         """Set of objects on which user haves can_change_permissions. !But only
@@ -195,7 +191,7 @@ class BasicPagePermissionManager(models.Manager):
 
 
 class GlobalPagePermissionManager(BasicPagePermissionManager):
- 
+
     def user_has_permission(self, user, site_id, perm):
         """
         Provide a single point of entry for deciding whether any given global
@@ -206,17 +202,17 @@ class GlobalPagePermissionManager(BasicPagePermissionManager):
         # if the user can add to all sites
         all_sites = Q(**{perm: True, 'sites__isnull': True})
         return self.with_user(user).filter(this_site | all_sites)
- 
+
     def user_has_add_permission(self, user, site_id):
         return self.user_has_permission(user, site_id, 'can_add')
- 
+
     def user_has_change_permission(self, user, site_id):
         return self.user_has_permission(user, site_id, 'can_change')
- 
+
     def user_has_view_permission(self, user, site_id):
         return self.user_has_permission(user, site_id, 'can_view')
- 
-  
+
+
 class PagePermissionManager(BasicPagePermissionManager):
     """Page permission manager accessible under objects.
     """
@@ -277,7 +273,7 @@ class PagePermissionManager(BasicPagePermissionManager):
 
         if user.is_superuser or \
                 GlobalPagePermission.objects.with_can_change_permissions(user):
-        # everything for those guys
+            # everything for those guys
             return self.all()
 
         # get user level

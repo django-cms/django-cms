@@ -4,6 +4,7 @@ import itertools
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
@@ -15,6 +16,7 @@ from django.template.context import Context, RequestContext
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.encoding import force_text
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -38,14 +40,14 @@ from cms.test_utils.project.placeholderapp.models import (
     TwoPlaceholderExample,
 )
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import force_unicode, get_user_model
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
-from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
-from cms.utils.plugins import get_placeholders, assign_plugins
+from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
+                                   get_placeholder_conf, get_placeholders)
+from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
 
@@ -156,6 +158,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
 
+    @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs(self):
         """
         Checks #1366 error condition.
@@ -163,44 +166,43 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         containing an hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
-        with SettingsOverride(CMS_PERMISSION=False):
-            ex = Example1(
-                char_1='one',
-                char_2='two',
-                char_3='tree',
-                char_4='four'
-            )
-            ex.save()
-            ph1 = ex.placeholder
-            ###
-            # add the test plugin
-            ###
-            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
-            test_plugin.save()
-            pl_url = "%sedit-plugin/%s/" % (
-                admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
-                test_plugin.pk)
-            response = self.client.post(pl_url, {})
-            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph1 = ex.placeholder
+        ###
+        # add the test plugin
+        ###
+        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin.save()
+        pl_url = "%sedit-plugin/%s/" % (
+            admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
+            test_plugin.pk)
+        response = self.client.post(pl_url, {})
+        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
+    @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs_page(self):
         """
         Sibling test of the above, on a page.
         #1366 does not apply to placeholder defined in a page
         """
-        with SettingsOverride(CMS_PERMISSION=False):
-            page = create_page('page', 'col_two.html', 'en')
-            ph1 = page.placeholders.get(slot='col_left')
-            ###
-            # add the test plugin
-            ###
-            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
-            test_plugin.save()
-            pl_url = "%sedit-plugin/%s/" % (
-                admin_reverse('cms_page_change', args=(page.pk,)),
-                test_plugin.pk)
-            response = self.client.post(pl_url, {})
-            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        page = create_page('page', 'col_two.html', 'en')
+        ph1 = page.placeholders.get(slot='col_left')
+        ###
+        # add the test plugin
+        ###
+        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin.save()
+        pl_url = "%sedit-plugin/%s/" % (
+            admin_reverse('cms_page_change', args=(page.pk,)),
+            test_plugin.pk)
+        response = self.client.post(pl_url, {})
+        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
@@ -244,7 +246,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'plugins': ['TextPlugin', 'LinkPlugin'],
                 'default_plugins':[
                     {
-                        'plugin_type':'TextPlugin', 
+                        'plugin_type':'TextPlugin',
                         'values':{
                             'body':'<p>Some default text</p>'
                         },
@@ -263,7 +265,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'limits': {},
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             #test no inheritance
             returned = get_placeholder_conf('plugins', 'main')
             self.assertEqual(returned, TEST_CONF['main']['plugins'])
@@ -289,7 +291,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
         context = NoPushPopContext()
         context['request'] = self.get_request()
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             render_placeholder(ph, context)
             self.assertTrue('width' in context)
             self.assertEqual(context['width'], 10)
@@ -376,7 +378,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             del(placeholder_de._plugins_cache)
             cache.clear()
@@ -436,7 +438,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## English page should have deutsch text
             content_en = render_placeholder(placeholder_en, context_en)
             self.assertRegexpMatches(content_en, "^de body$")
@@ -474,7 +476,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             # call assign plugins first, as this is what is done in real cms life
             # for all placeholders in a page at once
             assign_plugins(context_en['request'],
@@ -500,17 +502,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             'col_left': {
                 'default_plugins' : [
                     {
-                        'plugin_type':'TextPlugin', 
-                        'values':{'body':'<p>en default body 1</p>'}, 
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 1</p>'},
                     },
                     {
-                        'plugin_type':'TextPlugin', 
-                        'values':{'body':'<p>en default body 2</p>'}, 
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 2</p>'},
                     },
                 ]
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
             context = NoPushPopContext()
@@ -524,7 +526,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         """
         Validate a default textplugin with a nested default link plugin
         """
-        
+
         class NoPushPopContext(Context):
             def push(self):
                 pass
@@ -560,7 +562,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             },
         }
 
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
             context = NoPushPopContext()
@@ -584,7 +586,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         page.reload()
         for placeholder in page.placeholders.all():
             add_plugin(placeholder, "TextPlugin", "en", body="body")
-        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
@@ -664,7 +666,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         which is retained by the cached template loader, and future
         renders of that template will render the super block twice.
         """
-    
+
         self.assertNotIn('one',
             get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
@@ -694,7 +696,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         output = template.render(Context({}))
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
-          
+
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
@@ -805,8 +807,123 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = force_unicode(ph)
+        result = force_text(ph)
         self.assertEqual(result, u'test')
+
+    def test_request_placeholders_permission_check_model(self):
+        # Setup instance
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        page_en = create_page('page_en', 'col_two.html', 'en')
+
+        class NoPushPopContext(SekizaiContext):
+            def push(self):
+                pass
+
+            pop = push
+
+        context_en = NoPushPopContext()
+
+        # request.placeholders is populated for superuser
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = self.get_superuser()
+        render_placeholder(ex.placeholder, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(ex.placeholder, context_en['request'].placeholders)
+
+        # request.placeholders is not populated for staff user with no permission
+        user = self.get_staff_user_with_no_permissions()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = user
+        render_placeholder(ex.placeholder, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 0)
+        self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
+
+        # request.placeholders is populated for staff user with permission on the model
+        user.user_permissions.add(Permission.objects.get(codename='change_example1'))
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = get_user_model().objects.get(pk=user.pk)
+        render_placeholder(ex.placeholder, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(ex.placeholder, context_en['request'].placeholders)
+
+    def test_request_placeholders_permission_check_page(self):
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+
+        class NoPushPopContext(SekizaiContext):
+            def push(self):
+                pass
+
+            pop = push
+
+        context_en = NoPushPopContext()
+
+        # request.placeholders is populated for superuser
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = self.get_superuser()
+        render_placeholder(placeholder_en, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(placeholder_en, context_en['request'].placeholders)
+
+        # request.placeholders is not populated for staff user with no permission
+        user = self.get_staff_user_with_no_permissions()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = user
+        render_placeholder(placeholder_en, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 0)
+        self.assertNotIn(placeholder_en, context_en['request'].placeholders)
+
+        # request.placeholders is populated for staff user with permission on the model
+        user.user_permissions.add(Permission.objects.get(codename='change_page'))
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = get_user_model().objects.get(pk=user.pk)
+        render_placeholder(placeholder_en, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(placeholder_en, context_en['request'].placeholders)
+
+    def test_request_placeholders_permission_check_templatetag(self):
+        """
+        Tests that {% render_placeholder %} templatetag check for placeholder permission
+        """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template = '{% load cms_tags %}{% render_placeholder ex1.placeholder %}'
+
+        context = RequestContext(self.get_request(language="en", page=page_en), {'ex1': ex1})
+
+        # request.placeholders is populated for superuser
+        context['request'] = self.get_request(language="en", page=page_en)
+        context['request'].user = self.get_superuser()
+        template_obj = Template(template)
+        template_obj.render(context)
+        self.assertEqual(len(context['request'].placeholders), 2)
+        self.assertIn(ex1.placeholder, context['request'].placeholders)
+
+        # request.placeholders is not populated for staff user with no permission
+        user = self.get_staff_user_with_no_permissions()
+        context['request'] = self.get_request(language="en", page=page_en)
+        context['request'].user = user
+        template_obj = Template(template)
+        template_obj.render(context)
+        self.assertEqual(len(context['request'].placeholders), 0)
+        self.assertNotIn(ex1.placeholder, context['request'].placeholders)
+
+        # request.placeholders is populated for staff user with permission on the model
+        user.user_permissions.add(Permission.objects.get(codename='change_example1'))
+        context['request'] = self.get_request(language="en", page=page_en)
+        context['request'].user = get_user_model().objects.get(pk=user.pk)
+        template_obj = Template(template)
+        template_obj.render(context)
+        self.assertEqual(len(context['request'].placeholders), 2)
+        self.assertIn(ex1.placeholder, context['request'].placeholders)
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
@@ -880,7 +997,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 response = admin_instance.add_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -900,7 +1017,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 response = admin_instance.add_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -923,7 +1040,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_2 = add_plugin(**data)
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
                 response = admin_instance.move_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -948,7 +1065,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_1 = add_plugin(**data)
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
                 response = admin_instance.move_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -970,7 +1087,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_1 = add_plugin(**data)
         add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
                                                  'plugin_order': 1, })
                 response = admin_instance.move_plugin(request) # first
@@ -986,7 +1103,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 response = admin_instance.add_plugin(request)
                 self.assertEqual(response.status_code, 200)
@@ -1110,7 +1227,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1127,7 +1244,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1182,5 +1299,3 @@ class PlaceholderI18NTest(CMSTestCase):
         response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/%d/' % ex.pk)
         self.assertNotContains(response,
                                """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")
-
-

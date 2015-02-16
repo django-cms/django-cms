@@ -36,7 +36,7 @@ def setup():
         # this in AppConfig and thus the patching is left for older version only
         from django.db.models import loading
         old_get_models = loading.AppCache.get_models
-        
+
         def get_models_patched(self, **kwargs):
             ret_value = old_get_models(self, **kwargs)
             from cms.plugin_pool import plugin_pool

@@ -2,7 +2,6 @@
 from __future__ import with_statement
 
 from django.conf import settings
-from django.conf.urls import patterns
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
@@ -229,8 +228,7 @@ def get_app_patterns():
             if app.permissions:
                 _set_permissions(current_patterns, app.exclude_permissions)
 
-            extra_patterns = patterns('', *current_patterns)
-            resolver.url_patterns_dict[lang] = extra_patterns
+            resolver.url_patterns_dict[lang] = current_patterns
         app_patterns.append(resolver)
         APP_RESOLVERS.append(resolver)
     return app_patterns

@@ -50,13 +50,13 @@ Plugin and apphook management commands
 
     The ``delete_orphaned_plugins`` command **permanently deletes** data from
     your database. You should make a backup of your database before using it!
-    
+
 Identifies and deletes orphaned plugins.
 
 Orphaned plugins are ones that exist in the CMSPlugins table, but:
 
 * have a plugin_type that is no longer even installed
-* have no corresponding saved instance in that particular plugin type's table  
+* have no corresponding saved instance in that particular plugin type's table
 
 Such plugins will cause problems when trying to use operations that need to copy
 pages (and thefore plugins), which includes ``cms moderator on`` as well as page
@@ -131,7 +131,7 @@ used moderation in the past.
 .. warning::
 
     This command **alters data** in your database. You should make a backup of
-    your database before using it! **Never** run this command without first 
+    your database before using it! **Never** run this command without first
     checking for orphaned plugins, using the ``cms list plugins`` command, and
     if necessary ``delete_orphaned_plugins``. Running  ``cms moderator`` with
     orphaned plugins will fail and leave bad data in your database.

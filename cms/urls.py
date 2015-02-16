@@ -8,10 +8,11 @@ from cms.views import details
 
 # This is a constant, really, but must live here due to import order
 SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
+
 if settings.APPEND_SLASH:
     regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
 else:
-    regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
+    regexp = r'^(?P<slug>%s)$' % SLUG_REGEXP
 
 if apphook_pool.get_apphooks():
     # If there are some application urls, use special resolver,

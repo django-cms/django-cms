@@ -10,9 +10,6 @@ import os
 import sys
 import warnings
 
-from six import StringIO
-
-from django import VERSION
 from django.core.exceptions import DjangoRuntimeWarning
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command, CommandError
@@ -68,7 +65,7 @@ Options:
 
 def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
     if os.environ.get("RUN_MAIN") != "true":
-        from cms.utils.compat.dj import get_user_model
+        from django.contrib.auth import get_user_model  # must be imported lazily
         if DJANGO_1_6:
             from south.management.commands import syncdb, migrate
             if migrate_cmd:
@@ -319,14 +316,12 @@ def main():
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            use_tz = VERSION[:2] >= (1, 4)
-
             configs = {
                 'db_url': db_url,
                 'ROOT_URLCONF': 'cms.test_utils.project.urls',
                 'STATIC_ROOT': STATIC_ROOT,
                 'MEDIA_ROOT': MEDIA_ROOT,
-                'USE_TZ': use_tz,
+                'USE_TZ': True,
                 'SOUTH_TESTS_MIGRATE': migrate,
             }
 
@@ -340,13 +335,7 @@ def main():
                 auth_user_model = os.environ.get("AUTH_USER_MODEL", None)
 
             if auth_user_model:
-                if VERSION[:2] < (1, 5):
-                    print()
-                    print("Custom user models are not supported "
-                          "before Django 1.5")
-                    print()
-                else:
-                    configs['AUTH_USER_MODEL'] = auth_user_model
+                configs['AUTH_USER_MODEL'] = auth_user_model
 
             configure(**configs)
 
