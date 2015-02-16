@@ -117,7 +117,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             ('publish_page', 'Can publish page'),
             ('edit_static_placeholder', 'Can edit static placeholders'),
         )
-        unique_together = (("publisher_is_draft", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
+        unique_together = (("publisher_is_draft", "site", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('path',)
