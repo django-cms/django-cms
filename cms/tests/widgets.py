@@ -23,7 +23,3 @@ class WidgetTestCases(CMSTestCase):
         widget = PageSmartLinkWidget(ajax_view='admin:cms_page_get_published_pagelist')
         widget.language = 'en'
         self.assertIn('page', widget.render("page", ''))
-
-
-
-

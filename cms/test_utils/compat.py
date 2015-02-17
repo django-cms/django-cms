@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# for Django 1.6/Python 2.6
+import unittest as stdut
 
 def _skipIf(check, message=''):
     def _deco(meth):
@@ -8,12 +9,10 @@ def _skipIf(check, message=''):
             return meth
     return _deco
 
-
 try:
     from django.utils import unittest as djut
 except ImportError:
     djut = None
-import unittest as stdut
 
 if hasattr(stdut, 'skipIf'):
     skipIf = stdut.skipIf

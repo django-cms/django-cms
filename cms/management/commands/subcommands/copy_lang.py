@@ -28,7 +28,7 @@ class CopyLangCommand(BaseCommand):
 
             from_lang = args[0]
             to_lang = args[1]
-            
+
             assert from_lang != to_lang
         except AssertionError:
             raise CommandError("Error: bad arguments -- Usage: manage.py cms copy-lang <lang_from> <lang_to>")

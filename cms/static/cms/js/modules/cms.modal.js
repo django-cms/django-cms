@@ -32,7 +32,7 @@ $(document).ready(function () {
 			this.toolbar = $('.cms_toolbar');
 
 			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
 			this.maximized = false;
 			this.minimized = false;
 			this.triggerMaximized = false;

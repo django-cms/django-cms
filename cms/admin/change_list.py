@@ -7,7 +7,7 @@ from cms.utils.permissions import get_user_sites_queryset
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
-import django
+
 
 COPY_VAR = "copy"
 
@@ -45,7 +45,8 @@ class CMSChangeList(ChangeList):
     real_queryset = False
 
     def __init__(self, request, *args, **kwargs):
-        from cms.utils.plugins import current_site
+        from cms.utils.helpers import current_site
+
         self._current_site = current_site(request)
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
@@ -58,29 +59,25 @@ class CMSChangeList(ChangeList):
             request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
 
-    def get_queryset(self, request=None):
+    def get_queryset(self, request):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
         if 'language' in self.params:
             del self.params['language']
         if 'page_id' in self.params:
             del self.params['page_id']
-        if django.VERSION[1] > 3:
-            qs = super(CMSChangeList, self).get_queryset(request).drafts()
-        else:
-            qs = super(CMSChangeList, self).get_queryset().drafts()
-        if request:
-            site = self.current_site()
-            permissions = Page.permissions.get_change_id_list(request.user, site)
-            if permissions != Page.permissions.GRANT_ALL:
-                qs = qs.filter(pk__in=permissions)
-                self.root_queryset = self.root_queryset.filter(pk__in=permissions)
-            self.real_queryset = True
-            qs = qs.filter(site=self._current_site)
+        qs = super(CMSChangeList, self).get_queryset(request).drafts()
+        site = self.current_site()
+        permissions = Page.permissions.get_change_id_list(request.user, site)
+        if permissions != Page.permissions.GRANT_ALL:
+            qs = qs.filter(pk__in=permissions)
+            self.root_queryset = self.root_queryset.filter(pk__in=permissions)
+        self.real_queryset = True
+        qs = qs.filter(site=self._current_site)
         return qs
 
     def is_filtered(self):
-        from cms.utils.plugins import SITE_VAR
+        from cms.utils.helpers import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR, 'language', 'page_id'):
             if i in lookup_params:

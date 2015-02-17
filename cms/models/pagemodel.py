@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 from logging import Logger
-from cms.publisher.errors import PublisherCantPublish
 from os.path import join
 
-from django.utils.timezone import now
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
 from django.core.cache import cache
-from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.utils import six
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.timezone import now
 from django.utils.translation import get_language, ugettext_lazy as _
+
 from cms import constants
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
@@ -19,18 +21,17 @@ from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.utils.compat.metaclasses import with_metaclass
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
+from cms.utils.helpers import reversion_register, current_site
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
 
 @python_2_unicode_compatible
-class Page(with_metaclass(PageMetaClass, MP_Node)):
+class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     """
     A simple hierarchical page model
     """
@@ -117,7 +118,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             ('publish_page', 'Can publish page'),
             ('edit_static_placeholder', 'Can edit static placeholders'),
         )
-        unique_together = (("publisher_is_draft", "site", "application_namespace"), ("reverse_id", "site", "publisher_is_draft"))
+        unique_together = (("publisher_is_draft", "application_namespace"),
+                           ("reverse_id", "site", "publisher_is_draft"))
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         ordering = ('path',)
@@ -133,7 +135,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 title = None
         if title is None:
             title = u""
-        return force_unicode(title)
+        return force_text(title)
 
     def __repr__(self):
         # This is needed to solve the infinite recursion when
@@ -184,14 +186,12 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         else:
             self.parent_id = target.parent_id
         self.save()
-        self.move(target, pos=position)
+        moved_page = self.move(target, pos=position)
 
         # fire signal
         import cms.signals as cms_signals
+        cms_signals.page_moved.send(sender=Page, instance=moved_page)
 
-        cms_signals.page_moved.send(sender=Page, instance=self)
-        moved_page = Page.objects.get(pk=self.pk)
-        #self.save()  # always save the page after move, because of publisher
         # check the slugs
         page_utils.check_title_slugs(moved_page)
         ## Make sure to update the slug and path of the target page.
@@ -335,7 +335,7 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             placeholders = list(page.get_placeholders())
             origin_id = page.id
             # create a copy of this page by setting pk = None (=new instance)
-            page.old_pk = page.pk
+            page.old_pk = old_pk = page.pk
             page.pk = None
             page.path = None
             page.depth = None
@@ -353,12 +353,14 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 else:
                     page.parent = None
                 page.save()
-                page.move(target, pos=position)
+                if target:
+                    page = page.move(target, pos=position)
+                    page.old_pk = old_pk
             else:
                 count = 1
                 found = False
                 for prnt in tree:
-                    if tree[0].pk == self.pk and page.parent_id == self.pk and count==1:
+                    if tree[0].pk == self.pk and page.parent_id == self.pk and count == 1:
                         count += 1
                         continue
                     elif prnt.old_pk == page.parent_id:
@@ -372,9 +374,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     page.parent_id = None
                 page.save()
             tree.append(page)
-
-
-
 
             # copy permissions if necessary
             if get_cms_setting('PERMISSION') and copy_permissions:
@@ -440,16 +439,13 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
         if created:
             self.created_by = self.changed_by
         if commit:
-            if no_signals:  # ugly hack because of mptt
-                self.save_base(**kwargs)
-            else:
-                if not self.depth:
-                    if self.parent_id:
-                        self.parent.add_child(instance=self)
-                    else:
-                        self.add_root(instance=self)
-                    return #add_root and add_child save as well
-                super(Page, self).save(**kwargs)
+            if not self.depth:
+                if self.parent_id:
+                    self.parent.add_child(instance=self)
+                else:
+                    self.add_root(instance=self)
+                return #add_root and add_child save as well
+            super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -738,9 +734,9 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
             include the node itself
         """
         if include_self:
-            return self.__class__.get_tree(self)
+            return self.__class__.get_tree(self).filter(site_id=self.site_id)
         else:
-            return self.__class__.get_tree(self).exclude(pk=self.pk)
+            return self.__class__.get_tree(self).exclude(pk=self.pk).filter(site_id=self.site_id)
 
     def get_cached_ancestors(self):
         if not hasattr(self, "ancestors_ascending"):
@@ -955,7 +951,6 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
 
     def has_view_permission(self, request, user=None):
         from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-        from cms.utils.plugins import current_site
 
         if not user:
             user = request.user
@@ -1155,10 +1150,8 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                     if public_parent:
                         obj.parent_id = public_parent.pk
                         obj.parent = public_parent
-                        obj.add_root(instance=obj)
-                        #public_parent = public_parent.reload()
-                        obj = obj.reload()
-                        obj.move(target=public_parent, pos='first-child')
+                        obj = obj.add_root(instance=obj)
+                        obj = obj.move(target=public_parent, pos='first-child')
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
@@ -1168,28 +1161,32 @@ class Page(with_metaclass(PageMetaClass, MP_Node)):
                 if public_prev_sib:
                     obj.parent_id = public_prev_sib.parent_id
                     obj.save()
-                    obj.move(public_prev_sib, pos="right")
+                    obj = obj.move(public_prev_sib, pos="right")
                 elif public_parent:
                     # move as a first child to parent
                     obj.parent_id = public_parent.pk
                     obj.save()
-                    obj.move(target=public_parent, pos='first-child')
+                    obj = obj.move(target=public_parent, pos='first-child')
                 else:
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
                         obj.parent_id = next_sibling.parent_id
                         obj.save()
-                        obj.move(next_sibling.publisher_public, pos="left")
+                        obj = obj.move(next_sibling.publisher_public, pos="left")
             else:
                 obj.save()
+
+    def move(self, target, pos=None):
+        super(Page, self).move(target, pos)
+        return self.reload()
 
     def rescan_placeholders(self):
         """
         Rescan and if necessary create placeholders in the current template.
         """
         # inline import to prevent circular imports
-        from cms.utils.plugins import get_placeholders
+        from cms.utils.placeholder import get_placeholders
 
         placeholders = get_placeholders(self.get_template())
         found = {}

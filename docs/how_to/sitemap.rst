@@ -32,4 +32,4 @@ django.contrib.sitemaps
 More information about :mod:`django.contrib.sitemaps` can be found in the official
 `Django documentation <http://docs.djangoproject.com/en/dev/ref/contrib/sitemaps/>`_.
 
- 
+

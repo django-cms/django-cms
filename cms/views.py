@@ -3,7 +3,6 @@ from __future__ import with_statement
 import hashlib
 
 from django.conf import settings
-from django.conf.urls import patterns
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
@@ -27,7 +26,6 @@ from cms.utils.i18n import get_redirect_on_fallback
 from cms.utils.i18n import get_language_list
 from cms.utils.i18n import is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
-from cms.test_utils.util.context_managers import SettingsOverride
 from django.utils.translation import get_language
 
 CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
@@ -111,16 +109,15 @@ def details(request, slug):
             for language in available_languages:
                 languages.append((language, language))
             if languages:
-                with SettingsOverride(LANGUAGES=languages, LANGUAGE_CODE=languages[0][0]):
-                    #get supported language
-                    new_language = get_language_from_request(request)
-                    if new_language in get_public_languages():
-                        with force_language(new_language):
-                            pages_root = reverse('pages-root')
-                            if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
-                                request.toolbar.redirect_url = pages_root
-                            elif pages_root not in own_urls:
-                                return HttpResponseRedirect(pages_root)
+                # get supported language
+                new_language = get_language_from_request(request)
+                if new_language in get_public_languages():
+                    with force_language(new_language):
+                        pages_root = reverse('pages-root')
+                        if hasattr(request, 'toolbar') and request.user.is_staff and request.toolbar.edit_mode:
+                            request.toolbar.redirect_url = pages_root
+                        elif pages_root not in own_urls:
+                            return HttpResponseRedirect(pages_root)
             elif not hasattr(request, 'toolbar') or not request.toolbar.redirect_url:
                 _handle_no_page(request, slug)
         else:
@@ -163,9 +160,8 @@ def details(request, slug):
             pattern_list = []
             for urlpatterns in get_app_urls(app.urls):
                 pattern_list += urlpatterns
-            urlpatterns = patterns('', *pattern_list)
             try:
-                view, args, kwargs = resolve('/', tuple(urlpatterns))
+                view, args, kwargs = resolve('/', tuple(pattern_list))
                 return view(request, *args, **kwargs)
             except Resolver404:
                 pass

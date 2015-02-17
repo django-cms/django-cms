@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from django.db import transaction
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.utils.i18n import force_language
 import os.path
@@ -13,6 +14,8 @@ from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.test.utils import override_settings
+from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now, make_aware, get_current_timezone
 
 from cms import constants
@@ -26,9 +29,9 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
-from cms.test_utils.util.context_managers import (LanguageOverride, SettingsOverride, UserLoginContext)
+from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import installed_apps, force_unicode
+from cms.utils.compat.dj import installed_apps
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
 
@@ -95,6 +98,34 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(Title.objects.all().count(), 4)
             title = Title.objects.drafts().get(slug=page_data['slug'])
             title = Title.objects.public().get(slug=page_data['slug'])
+
+    def test_create_tree_admin(self):
+        """
+        Test that a tree can be created via the admin
+        """
+        page_1 = self.get_new_page_data()
+
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            # create home and auto publish
+            response = self.client.post(URL_CMS_PAGE_ADD, page_1)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            title_home = Title.objects.drafts().get(slug=page_1['slug'])
+
+            page_2 = self.get_new_page_data(parent_id=title_home.page.pk)
+            page_3 = self.get_new_page_data(parent_id=title_home.page.pk)
+            page_4 = self.get_new_page_data(parent_id=title_home.page.pk)
+
+            response = self.client.post(URL_CMS_PAGE_ADD, page_2)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(URL_CMS_PAGE_ADD, page_3)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            title_left = Title.objects.drafts().get(slug=page_2['slug'])
+
+            response = self.client.post(URL_CMS_PAGE_ADD + '?target=%s&amp;position=right' % title_left.page.pk, page_4)
+            self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_create_page_api(self):
         page_data = {
@@ -363,6 +394,30 @@ class PagesTestCase(CMSTestCase):
 
         self.assertEqual(Page.objects.drafts().count() - count, 3)
 
+    def test_copy_page_method(self):
+        """
+        Test that a page can be copied via the admin
+        """
+        page_a = create_page("page_a", "nav_playground.html", "en", published=False)
+        page_a_a = create_page("page_a_a", "nav_playground.html", "en",
+                               parent=page_a, published=False, reverse_id="hello")
+        create_page("page_a_a_a", "nav_playground.html", "en", parent=page_a_a, published=False)
+        site = Site.objects.create(domain='whatever.com', name='whatever')
+
+        pages = Page.objects.drafts().filter(site_id=1, depth=1)
+        with transaction.atomic():
+            for page in pages:
+                page.copy_page(None, site)
+
+        with transaction.atomic():
+            for page in pages:
+                page.copy_page(None, site)
+
+        self.assertEqual(Page.objects.filter(site_id=1, depth=1).count(), 1)
+        self.assertEqual(Page.objects.filter(site_id=1).count(), 3)
+        self.assertEqual(Page.objects.filter(site_id=site.pk, depth=1).count(), 2)
+        self.assertEqual(Page.objects.filter(site_id=site.pk).count(), 6)
+
     def test_copy_self_page(self):
         """
         Test that a page can be copied via the admin
@@ -391,7 +446,7 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c, position="left")
         self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
-    
+
     def test_public_exceptions(self):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
         page_b = create_page("page_b", "nav_playground.html", "en")
@@ -408,7 +463,7 @@ class PagesTestCase(CMSTestCase):
         page = create_page("page_a", "nav_playground.html", "en", published=True)
         self.assertEqual(page.get_admin_tree_title(), 'page_a')
         page.title_cache = {}
-        self.assertEqual("Empty", force_unicode(page.get_admin_tree_title()))
+        self.assertEqual("Empty", force_text(page.get_admin_tree_title()))
         languages = {
             1: [
                 {
@@ -425,18 +480,18 @@ class PagesTestCase(CMSTestCase):
                     'fallbacks':['en']
                 },
         ]}
-        with SettingsOverride(CMS_LANGUAGES=languages):
+        with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
-                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', page_title="test2")}
-                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', menu_title="test2")}
-                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2')}
-                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-                self.assertEqual('test2', force_unicode(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
@@ -647,7 +702,7 @@ class PagesTestCase(CMSTestCase):
             position=1,
             language=settings.LANGUAGES[0][0]
         )
-        plugin_base.add_root(instance=plugin_base)
+        plugin_base = plugin_base.add_root(instance=plugin_base)
 
         plugin = Text(body='')
         plugin_base.set_base_attr(plugin)
@@ -741,14 +796,14 @@ class PagesTestCase(CMSTestCase):
         500.
         """
         yesterday = tz_now() - datetime.timedelta(days=1)
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en',
                                publication_end_date=yesterday, published=True)
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.status_code, 404)
 
     def test_existing_overwrite_url(self):
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             create_page('home', 'nav_playground.html', 'en', published=True)
             create_page('boo', 'nav_playground.html', 'en', published=True)
             data = {
@@ -850,7 +905,7 @@ class PagesTestCase(CMSTestCase):
     def test_slug_url_overwrite_clash(self):
         """ Tests if a URL-Override clashes with a normal page url
         """
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             create_page('home', 'nav_playground.html', 'en', published=True)
             bar = create_page('bar', 'nav_playground.html', 'en', published=False)
             foo = create_page('foo', 'nav_playground.html', 'en', published=True)
@@ -886,7 +941,7 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(is_valid_url(bar_s3.get_absolute_url('de'), bar_s3))
 
     def test_home_slug_not_accessible(self):
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             page = create_page('page', 'nav_playground.html', 'en', published=True)
             self.assertEqual(page.get_absolute_url('en'), '/en/')
             resp = self.client.get('/en/')
@@ -913,7 +968,7 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(Page.objects.public().get_home().get_slug(), 'home')
 
     def test_plugin_loading_queries(self):
-        with SettingsOverride(CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'),)):
+        with self.settings(CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'),)):
             page = create_page('home', 'placeholder_tests/base.html', 'en', published=True, slug='home')
             placeholders = list(page.placeholders.all())
             for i, placeholder in enumerate(placeholders):
@@ -990,7 +1045,7 @@ class PagesTestCase(CMSTestCase):
         )
 
         page = create_page(
-            title='subpage', 
+            title='subpage',
             template='nav_playground.html',
             language='en',
             published=True,
@@ -1070,7 +1125,7 @@ class PageAdminTest(PageAdminTestBase):
         plugin_2 = add_plugin(**data)
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''})
                 response = admin.move_plugin(request) # first
@@ -1099,7 +1154,7 @@ class PageAdminTest(PageAdminTestBase):
         plugin_1 = add_plugin(**data)
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(
                     {'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk, 'plugin_parent': ''})
                 response = admin.move_plugin(request) # first
@@ -1112,30 +1167,15 @@ class PageAdminTest(PageAdminTestBase):
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
 
 
+@override_settings(ROOT_URLCONF='cms.test_utils.project.noadmin_urls')
 class NoAdminPageTests(CMSTestCase):
-    urls = 'cms.test_utils.project.noadmin_urls'
-
-    def setUp(self):
-        admin = 'django.contrib.admin'
-        noadmin_apps = [app for app in installed_apps() if not app == admin]
-        try:
-            from django.apps import apps
-            apps.set_installed_apps(noadmin_apps)
-        except ImportError:
-            self._ctx = SettingsOverride(INSTALLED_APPS=noadmin_apps)
-            self._ctx.__enter__()
-
-    def tearDown(self):
-        try:
-            from django.apps import apps
-            apps.unset_installed_apps()
-        except ImportError:
-            self._ctx.__exit__(None, None, None)
 
     def test_get_page_from_request_fakeadmin_nopage(self):
-        request = self.get_request('/en/admin/')
-        page = get_page_from_request(request)
-        self.assertEqual(page, None)
+        noadmin_apps = [app for app in installed_apps() if app != 'django.contrib.admin']
+        with self.settings(INSTALLED_APPS=noadmin_apps):
+            request = self.get_request('/en/admin/')
+            page = get_page_from_request(request)
+            self.assertEqual(page, None)
 
 
 class PreviousFilteredSiblingsTests(CMSTestCase):
