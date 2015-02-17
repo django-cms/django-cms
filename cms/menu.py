@@ -12,12 +12,11 @@ from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
 from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
 from cms.utils import get_language_from_request
-from cms.utils.compat.dj import user_related_name
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.moderator import get_title_queryset, use_draft
-from cms.utils.plugins import current_site
+from cms.utils.helpers import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
 
@@ -37,7 +36,7 @@ def get_visible_pages(request, pages, site=None):
     visible_page_ids = []
     restricted_pages = defaultdict(list)
     page_permissions = PagePermission.objects.filter(can_view=True).select_related(
-            'page').prefetch_related('group__' + user_related_name)
+            'page').prefetch_related('group__user_set')
 
     for perm in page_permissions:
         # collect the pages that are affected by permissions
@@ -110,7 +109,7 @@ def get_visible_pages(request, pages, site=None):
                 return True
             if not perm.group_id:
                 continue
-            user_set = getattr(perm.group, user_related_name)
+            user_set = getattr(perm.group, 'user_set')
             # Optimization equivalent to
             # if user_pk in user_set.values_list('pk', flat=True)
             if any(user_pk == user.pk for user in user_set.all()):
@@ -135,7 +134,7 @@ def get_visible_pages(request, pages, site=None):
                         is_setting_public_staff and request.user.is_staff)
             ):
                 # authenticated user, no restriction and public for all
-                # or 
+                # or
                 # authenticated staff user, no restriction and public for staff
                 to_add = True
             # check group and user memberships to restricted pages
@@ -143,7 +142,7 @@ def get_visible_pages(request, pages, site=None):
                 to_add = True
             elif has_global_perm():
                 to_add = True
-        # anonymous user, no restriction  
+        # anonymous user, no restriction
         elif not is_restricted and is_setting_public_all:
             to_add = True
             # store it
@@ -176,7 +175,7 @@ def page_to_node(page, home, cut):
     #if parent_id and not page.parent.get_calculated_status():
     #    parent_id = None # ????
 
-    if page.limit_visibility_in_menu == None:
+    if page.limit_visibility_in_menu is None:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
@@ -311,7 +310,7 @@ class NavExtender(Modifier):
                     if node.namespace == menu[0]:
                         removed.append(node)
         if breadcrumb:
-        # if breadcrumb and home not in navigation add node
+            # if breadcrumb and home not in navigation add node
             if breadcrumb and home and not home.visible:
                 home.visible = True
                 if request.path_info == home.get_absolute_url():
@@ -330,26 +329,26 @@ menu_pool.register_modifier(NavExtender)
 class SoftRootCutter(Modifier):
     """
     Ask evildmp/superdmp if you don't understand softroots!
-    
+
     Softroot description from the docs:
-    
+
         A soft root is a page that acts as the root for a menu navigation tree.
-    
+
         Typically, this will be a page that is the root of a significant new
         section on your site.
-    
+
         When the soft root feature is enabled, the navigation menu for any page
         will start at the nearest soft root, rather than at the real root of
         the site’s page hierarchy.
-    
+
         This feature is useful when your site has deep page hierarchies (and
         therefore multiple levels in its navigation trees). In such a case, you
         usually don’t want to present site visitors with deep menus of nested
         items.
-    
+
         For example, you’re on the page -Introduction to Bleeding-?, so the menu
         might look like this:
-    
+
             School of Medicine
                 Medical Education
                 Departments
@@ -375,12 +374,12 @@ class SoftRootCutter(Modifier):
                 Administration
                 Contact us
                 Impressum
-    
+
         which is frankly overwhelming.
-    
+
         By making -Department of Mediaeval Surgery-? a soft root, the menu
         becomes much more manageable:
-    
+
             Department of Mediaeval Surgery
                 Theory
                 Cures

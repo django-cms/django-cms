@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth import get_permission_codename
+from threading import local
+
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.db.models import Q
@@ -7,13 +9,7 @@ from django.db.models import Q
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission
 from cms.plugin_pool import plugin_pool
-from cms.utils.compat.dj import get_user_model, user_related_query_name
 
-
-try: # pragma: no cover
-    from threading import local
-except ImportError: # pragma: no cover
-    from django.utils._threading_local import local
 
 # thread local support
 _thread_locals = local()
@@ -52,7 +48,8 @@ def has_page_add_permission(request):
     target = request.GET.get('target', None)
     position = request.GET.get('position', None)
 
-    from cms.utils.plugins import current_site
+    from cms.utils.helpers import current_site
+
     site = current_site(request)
 
     if target:
@@ -80,15 +77,16 @@ def has_page_add_permission(request):
 
 
 def has_any_page_change_permissions(request):
-    from cms.utils.plugins import current_site
+    from cms.utils.helpers import current_site
+
     if not request.user.is_authenticated():
         return False
     return request.user.is_superuser or PagePermission.objects.filter(
-            page__site=current_site(request)
-        ).filter((
-            Q(user=request.user) |
-            Q(group__in=request.user.groups.all())
-        )).exists()
+        page__site=current_site(request)
+    ).filter(
+        Q(user=request.user) |
+        Q(group__in=request.user.groups.all())
+    ).exists()
 
 
 def has_page_change_permission(request):
@@ -98,7 +96,8 @@ def has_page_change_permission(request):
     In addition, if CMS_PERMISSION is enabled you also need to either have
     global can_change permission or just on this page.
     """
-    from cms.utils.plugins import current_site
+    from cms.utils.helpers import current_site
+
     opts = Page._meta
     site = current_site(request)
     global_change_perm = GlobalPagePermission.objects.user_has_change_permission(
@@ -246,17 +245,15 @@ def get_subordinate_groups(user):
     except NoPermissionsException:
         # no permission no records
         # page_id_allow_list is empty
-        qs = Group.objects.distinct().filter(
-         Q(pageusergroup__created_by=user) &
-         Q(pagepermission__page=None)
+        return Group.objects.distinct().filter(
+            Q(pageusergroup__created_by=user) &
+            Q(pagepermission__page=None)
         )
-        return qs
 
-    qs = Group.objects.distinct().filter(
-         (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
+    return Group.objects.distinct().filter(
+        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__level__gte=user_level))
         | (Q(pageusergroup__created_by=user) & Q(pagepermission__page=None))
     )
-    return qs
 
 
 def has_global_change_permissions_permission(request):
@@ -306,10 +303,11 @@ def get_user_sites_queryset(user):
             # so he haves access to all sites
             return qs
     # add some pages if he has permission to add / change them
-    user_query = dict()
-    user_query['djangocms_pages__pagepermission__group__'+user_related_query_name] = user
-    query |= Q(Q(djangocms_pages__pagepermission__user=user) | Q(**user_query)) & \
-        (Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True)))
+    query |= (
+        Q(Q(djangocms_pages__pagepermission__user=user) |
+          Q(djangocms_pages__pagepermission__group__user=user)) &
+        Q(Q(djangocms_pages__pagepermission__can_add=True) | Q(djangocms_pages__pagepermission__can_change=True))
+    )
     return qs.filter(query).distinct()
 
 

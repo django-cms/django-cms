@@ -5,9 +5,8 @@ from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
-from cms.utils.plugins import downcast_plugins, build_plugin_tree
 from cms.utils.urlutils import admin_reverse
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.safestring import mark_safe
@@ -34,6 +33,7 @@ class AliasPlugin(CMSPluginBase):
     render_template = "cms/plugins/alias.html"
 
     def render(self, context, instance, placeholder):
+        from cms.utils.plugins import downcast_plugins, build_plugin_tree
         context['instance'] = instance
         context['placeholder'] = placeholder
         if instance.plugin_id:
@@ -67,11 +67,9 @@ class AliasPlugin(CMSPluginBase):
         ]
 
     def get_plugin_urls(self):
-        urlpatterns = [
+        return [
             url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
-        urlpatterns = patterns('', *urlpatterns)
-        return urlpatterns
 
     def create_alias(self, request):
         if not request.user.is_staff:

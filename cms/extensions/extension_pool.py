@@ -94,4 +94,3 @@ class ExtensionPool(object):
 
 
 extension_pool = ExtensionPool()
-

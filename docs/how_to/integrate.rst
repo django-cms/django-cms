@@ -16,7 +16,7 @@ Requirements
 * `Django`_ 1.4.5, 1.5.x, 1.6.x or 1.7.x
 * `South`_ 1.0.1 or higher (Only required up to Django 1.6)
 * `django-classy-tags`_ 0.5 or higher
-* `django-treebeard`_ 2.0
+* `django-treebeard`_ 3.0
 * `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.99 or higher
 * `djangocms-admin-style`_
@@ -33,7 +33,6 @@ Requirements
 .. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: https://github.com/html5lib/html5lib-python
-.. _django-i18nurls: https://github.com/brocaar/django-i18nurls
 .. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
 Recommended
@@ -140,7 +139,7 @@ its dependencies:
     Django>=1.7
 
     South==1.0.2 # Only needed for Django < 1.7
-    django-treebeard==2.0
+    django-treebeard==3.0
     django-sekizai==0.7
     django-classy-tags==0.5
     djangocms-admin-style==0.2.2

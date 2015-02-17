@@ -3,8 +3,8 @@ from __future__ import with_statement
 from datetime import datetime
 
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.permissions import set_current_user
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from cms.admin import forms
@@ -15,7 +15,6 @@ from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (get_site_choices, get_page_choices,
     update_site_and_page_choices)
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.dj import get_user_model
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -168,7 +167,7 @@ class PermissionFormTestCase(CMSTestCase):
             response = self.client.get("/en/admin/cms/page/%s/permissions/" % page.pk)
             self.assertEqual(response.status_code, 200)
 
-        with SettingsOverride(CMS_RAW_ID_USERS=True):
+        with self.settings(CMS_RAW_ID_USERS=True):
             data = {
                 'page': page.pk,
                 'grant_on': "hello",
@@ -281,5 +280,3 @@ class PermissionFormTestCase(CMSTestCase):
         form = PageUserGroupForm(data=data, files=None, instance=instance)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
-
-

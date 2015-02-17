@@ -4,6 +4,7 @@ from django.contrib.sites.models import Site
 from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.management import call_command
@@ -15,12 +16,11 @@ from cms.management.commands import publisher_publish
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
-from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
+from cms.test_utils.testcases import CMSTestCase as TestCase
+from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
-from cms.utils.compat.dj import get_user_model
 
 
 class PublisherCommandTests(TestCase):
@@ -390,10 +390,10 @@ class PublishingTests(TestCase):
     def test_publish_wrong_lang(self):
         page = self.create_page("test_admin", published=False)
         superuser = self.get_superuser()
-        with SettingsOverride(
-                LANGUAGES=(('de', 'de'), ('en', 'en')),
-                CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
-            ):
+        with self.settings(
+            LANGUAGES=(('de', 'de'), ('en', 'en')),
+            CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
+        ):
             with self.login_user_context(superuser):
                 with force_language('de'):
                     response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
@@ -974,4 +974,3 @@ class PublishingTests(TestCase):
                 self.assertTrue(draft.parent in draft.get_ancestors())
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
-

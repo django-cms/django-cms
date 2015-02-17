@@ -42,7 +42,7 @@ $(document).ready(function () {
 			this.timer = function () {};
 			this.timeout = 250;
 			this.focused = false;
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
 
 			// bind data element to the container
 			this.container.data('settings', this.options);

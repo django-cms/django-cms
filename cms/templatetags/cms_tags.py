@@ -273,8 +273,6 @@ class Placeholder(Tag):
 
     Keyword arguments:
     name -- the name of the placeholder
-    width -- additional width attribute (integer) which gets added to the plugin context
-    (deprecated, use `{% with 320 as width %}{% placeholder "foo"}{% endwith %}`)
     inherit -- optional argument which if given will result in inheriting
         the content of the placeholder with the same name on parent pages
     or -- optional argument which if given will make the template tag a block
@@ -452,7 +450,7 @@ class ExtraMenuItems(InclusionTag):
             plugin_class_inst = plugin.get_plugin_class_instance()
             item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
             if item:
-                items.append(item)
+                items += item
             plugin_classes = plugin_pool.get_all_plugins()
             for plugin_class in plugin_classes:
                 plugin_class_inst = plugin_class()
@@ -586,7 +584,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             raise
         return {'content': ''}
     watcher = Watcher(context)
-    content = render_placeholder(placeholder, context, placeholder_name)
+    content = render_placeholder(placeholder, context, placeholder_name, use_cache=cache_result)
     changes = watcher.get_changes()
     if cache_result:
         cache.set(cache_key, {'content': content, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
@@ -1108,6 +1106,7 @@ class RenderPlaceholder(AsTag):
         request = context.get('request', None)
         placeholder = kwargs.get('placeholder')
         width = kwargs.get('width')
+        nocache = kwargs.get('nocache', False)
         language = kwargs.get('language')
 
         if not request:
@@ -1116,8 +1115,10 @@ class RenderPlaceholder(AsTag):
             return ''
         if not hasattr(request, 'placeholders'):
             request.placeholders = []
-        request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language, editable=editable))
+        if placeholder.has_change_permission(request):
+            request.placeholders.append(placeholder)
+        return safe(placeholder.render(context, width, lang=language,
+                                       editable=editable, use_cache=not nocache))
 
     def get_value_for_context(self, context, **kwargs):
         return self._get_value(context, editable=False, **kwargs)
