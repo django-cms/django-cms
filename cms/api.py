@@ -506,7 +506,7 @@ def copy_plugins_to_language(page, source_language, target_language,
     return copied
 
 
-def publish_pages(include_unpublished, language, site):
+def publish_pages(include_unpublished=False, language=None, site=None):
     """
     Create published public version of selected drafts.
     """
@@ -514,7 +514,7 @@ def publish_pages(include_unpublished, language, site):
     if not include_unpublished:
         qs = qs.filter(title_set__published=True).distinct()
     if site:
-        qs = qs.filter(site_id=site)
+        qs = qs.filter(site=site)
 
     output_language = None
     for i, page in enumerate(qs):

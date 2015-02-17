@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from optparse import make_option
 
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.management.base import NoArgsCommand, CommandError
 from django.utils.encoding import force_text
 
@@ -40,8 +41,9 @@ class Command(NoArgsCommand):
         if site:
             try:
                 site = int(site)
-            except ValueError:
-                site = None
+                site = Site.objects.get(pk=site)
+            except (ValueError, Site.DoesNotExist):
+                raise CommandError("There is no site with given site id.")
         else:
             site = None
 
