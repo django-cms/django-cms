@@ -453,6 +453,33 @@ def publish_page(page, user, language):
     return page.reload()
 
 
+def publish_pages(include_unpublished=False, language=None, site=None):
+    """
+    Create published public version of selected drafts.
+    """
+    qs = Page.objects.drafts()
+    if not include_unpublished:
+        qs = qs.filter(title_set__published=True).distinct()
+    if site:
+        qs = qs.filter(site=site)
+
+    output_language = None
+    for i, page in enumerate(qs):
+        add = True
+        titles = page.title_set
+        if not include_unpublished:
+            titles = titles.filter(published=True)
+        for lang in titles.values_list("language", flat=True):
+            if language is None or lang == language:
+                if not output_language:
+                    output_language = lang
+                if not page.publish(lang):
+                    add = False
+        # we may need to activate the first (main) language for proper page title rendering
+        activate(output_language)
+        yield (page, add)
+
+
 def get_page_draft(page):
     """
     Returns the draft version of a page, regardless if the passed in
@@ -504,30 +531,3 @@ def copy_plugins_to_language(page, source_language, target_language,
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
-
-
-def publish_pages(include_unpublished=False, language=None, site=None):
-    """
-    Create published public version of selected drafts.
-    """
-    qs = Page.objects.drafts()
-    if not include_unpublished:
-        qs = qs.filter(title_set__published=True).distinct()
-    if site:
-        qs = qs.filter(site=site)
-
-    output_language = None
-    for i, page in enumerate(qs):
-        add = True
-        titles = page.title_set
-        if not include_unpublished:
-            titles = titles.filter(published=True)
-        for lang in titles.values_list("language", flat=True):
-            if language is None or lang == language:
-                if not output_language:
-                    output_language = lang
-                if not page.publish(lang):
-                    add = False
-        # we may need to activate the first (main) language for proper page title rendering
-        activate(output_language)
-        yield (page, add)
