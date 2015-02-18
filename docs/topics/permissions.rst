@@ -6,7 +6,7 @@ In django CMS you can set three types of permissions:
 
 1. View restrictions for restricting front-end view access to users
 1. Page permissions for allowing staff users to only have rights on certain sections of certain sites
-1. Mode permission for allowing staff users to only edit existing content and not add new one
+1. Mode permission which when left unset, restricts staff users to only editing, not adding new content
 
 To enable features 1. and 2., ``settings.py`` requires:
 
@@ -92,9 +92,8 @@ django CMS uses **Structure** and **Content** modes for different type of conten
 while the former allows full control over the plugins layout, positioning and to add new
 plugins to the page, the latter only allow editing existing plugins.
 
-Since version 3.1 the specific permission "**Can use Structure mode**" exists to allow restricting
-the access to structure mode; this allows to define different level of permissions on the
-same content.
+From version 3.1 the specific permission "**Can use Structure mode**" exists to permit access
+to Structure Mode. This allows defining a different level of permissions on the same content.
 
 This permission also applies to ``PlaceholderField`` defined on models.
 

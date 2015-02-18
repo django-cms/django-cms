@@ -49,8 +49,12 @@ Structure mode permission
 =========================
 
 The new "**Can use Structure mode**" permission has been added. Without this permission, a
-non-superuser cannot enter structure mode anymore: this allow more strict workflows which only
+non-superuser cannot enter structure mode anymore: this allow more strict workflow which only
 enable content update for certain users.
-This will require that **any** non-superuser which is supposed to be allowed to use
-structure mode, must be given the new permission.
-
+This change include data migration
+that adds the new permission to any staff user or group with
+`cms.change_page` permission; you can then later change this according to your permission
+model and workflow.
+Be aware that existing users cannot be migrated if running the django CMS
+migrations for the first time in the project, because permissions are not already in place;
+in this case users must be given the new permission manually.
