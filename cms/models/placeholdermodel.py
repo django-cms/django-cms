@@ -31,7 +31,7 @@ class Placeholder(models.Model):
     class Meta:
         app_label = 'cms'
         permissions = (
-            ("use_structure", "Can use Structure mode"),
+            (u"use_structure", u"Can use Structure mode"),
         )
 
     def __str__(self):
