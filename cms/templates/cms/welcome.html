@@ -1,0 +1,72 @@
+{% load staticfiles cms_tags sekizai_tags %}
+<!doctype html><html lang="{{ LANGUAGE_CODE }}">
+<head>
+	<meta charset="utf-8" />
+	<title>Welcome to django CMS</title>
+	<meta name="description" content="{% page_attribute "meta_description" %}" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<style type="text/css">
+		html,body,div,span,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,fieldset,legend,label,input,textarea,table,caption,
+		tbody,tfoot,thead,tr,th,td,cite,pre,strong,em,img,a,p,blockquote,q,code,dfn,samp,kbd,var,del,ins,sub,sup,acronym,
+		abbr,address,applet,object,iframe { font-size:100%; font-style:normal; font-weight:normal; text-align:left; vertical-align:baseline; margin:0; padding:0; border:none; background:transparent; }
+		body { background:#0f3e62; overflow:hidden; }
+
+		.wrapper { font:16px/24px "Helvetica Neue",Helvetica,Arial,sans-serif; font-weight:200;
+			background:#0f3e62 url("{% static 'cms/img/welcome-bg.png' %}") no-repeat 120% center; }
+		.inner { max-width:340px; min-width:320px; padding:10% 10px; margin:0 auto; }
+		.logo { display:block; padding:90px 0 0;
+			background: url("{% static 'cms/img/logo-white.png' %}") no-repeat left top; }
+
+		h1, p, a { font-weight:200; color:white; }
+		h1 { margin:0 0 15px; font-size:32px; line-height:38px; }
+		p { color:#ebebeb; padding:0 0 10px; margin:0; }
+		a { text-decoration:underline; font-weight:400; }
+		a:hover, a:active, a:focus { color:#ebebeb; }
+		code { color:white; font-size:11px; padding:0 3px; border-radius:3px; }
+
+		.buttons { padding:40px 0 50px; }
+		.btn { color:white; font-weight:200; text-decoration:none; padding:10px 15px; margin:0 20px 0 0; background:#009ff3;
+			background:-webkit-gradient(linear, 0 0, 0 bottom, from(#009ff3), to(#0e84da));
+			background:-moz-linear-gradient(#009ff3, #0e84da);
+			background:linear-gradient(#009ff3, #0e84da);}
+		.btn:hover { text-decoration:none; background:#0e84da; }
+
+		.footnote { color:#ccc; font-size:12px; line-height:18px; }
+
+		@media print, (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
+			.logo { background-image:url('{% static "cms/img/logo-white@2x.png" %}'); background-size:181px; }
+		}
+	</style>
+	{% render_block "css" %}
+</head>
+<body>
+{% cms_toolbar %}
+<div class="wrapper">
+	<div class="inner">
+		<h1 class="logo">Installation successful!</h1>
+		<p>Switch to <a href="/?{{ request.toolbar.edit_mode_url_on }}">edit mode</a>,<br />log in and start <a href="{% cms_admin_url "cms_page_add" %}?title=Home" id="add-page">adding pages</a>.</p>
+		<p class="buttons">
+			<a href="//docs.django-cms.org/" class="btn" target="_blank">Documentation</a>
+			<a href="//www.django-cms.org/" class="btn" target="_blank">Support</a>
+		</p>
+		<p class="footnote">
+			If you don't see the django CMS logo at the top, make sure you linked the <code>static/cms</code> folder to your static files.</p>
+		<p class="footnote">
+			You're seeing this message because you have <code>DEBUG = True</code> in your
+			django settings file and haven't added any pages yet.
+		</p>
+	</div>
+</div>
+{% render_block "js" %}
+<script type="text/javascript">
+if(window.CMS !== undefined) {
+	CMS.$('#add-page').bind('click', function (e) {
+		e.preventDefault();
+		var sideframe = new CMS.Sideframe();
+			sideframe.open('{% cms_admin_url "cms_page_add" %}?title=Home', true);
+	});
+}
+</script>
+
+</body>
+</html>

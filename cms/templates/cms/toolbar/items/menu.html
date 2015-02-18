@@ -1,0 +1,7 @@
+<li{% if sub_level %} class="cms_toolbar-item-navigation-children {% if active %}cms_toolbar-item-navigation-active{% endif %}"{% endif %}><a href="{{ url }}"><span>{{ title }}</span></a>
+	{% if items %}
+	<ul>
+		{% for item in items %}{{ item.render }}{% endfor %}
+	</ul>
+	{% endif %}
+</li>

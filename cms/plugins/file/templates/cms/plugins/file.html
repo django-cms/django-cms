@@ -1,9 +1,0 @@
-{% load i18n %}
-{% if object.file.url %}
-<p class="plugin_file">
-	<a href="{{ object.file.url }}">
-		{% if object.get_icon_url %}<img src="{{ object.get_icon_url }}" alt="" />{% endif %}
-		{% if object.title %}<span class="filetitle">{{ object.title }}{% else %}{{ object.get_file_name }}{% endif %} {% if object.file_exists %}<span class="filesize">({{ object.file.size|filesizeformat }})</span>{% else %}({% trans "file missing!" %}){% endif %}{% if object.title %}</span>{% endif %}
-	</a>
-</p>
-{% endif %}

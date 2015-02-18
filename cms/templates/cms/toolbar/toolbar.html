@@ -1,99 +1,124 @@
-{% load i18n sekizai_tags cms_js_tags cms_admin %}
-{% addtoblock "js" %}
-<script type="text/javascript">
-	var _jQuery = window.jQuery || null;
-	var _$ = window.$;
-</script>
-{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{% admin_static_url %}js/jquery.min.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.cookie.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/classy.min.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.setup.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.base.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.toolbar.js"></script>{% endaddtoblock %}
-{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/plugins/cms.placeholders.js"></script>{% endaddtoblock %}
-{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.toolbar.css?v1" media="all" />{% endaddtoblock %}
-{% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}cms/css/plugins/cms.placeholders.css?v1" media="all" />{% endaddtoblock %}
-{% addtoblock "js" %}
-<script type="text/javascript">
-CMS.$(document).ready(function () {
-	// initialize toolbar, pass options, items and allow public access
-	CMS.API.Toolbar = new CMS.Toolbar('#cms_toolbar', {{ CMS_TOOLBAR_CONFIG|safe }});
+{% load i18n l10n %}
 
-	// initialize placeholders, pass options and allow public access
-	CMS.API.Placeholders = new CMS.Placeholders('#cms_toolbar', {
-		'edit_mode': {{ request.toolbar.edit_mode|bool }},
-		'lang': {
-			'move_warning': {% javascript_string %}{% trans "The selected element can not be moved to the desired location." %}{% end_javascript_string %},
-			'delete_request': {% javascript_string %}{% trans "Are you sure you want to delete this plugin?" %}{% end_javascript_string %},
-			'cancel': {% javascript_string %}{% trans "Cancel" %}{% end_javascript_string %}
-		}
-	});
-});
-</script>
-{% endaddtoblock %}
-{% addtoblock "js" %}
-<script type="text/javascript">
-	window.jQuery = _jQuery || jQuery;
-	window.$ = _$ || jQuery;
-</script>
-{% endaddtoblock %}
-<div id="cms_toolbar" class="cms_reset" style="display:none;">
-	<!-- start: toolbar -->
+{% language request.toolbar.toolbar_language %}
+<div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}{% if debug %} cms_toolbar-debug{% endif %}" dir="ltr">
+
+	{# debug, tooltip #}
+	<div class="cms_debug-bar"></div>
+	<div class="cms_tooltip">{% trans "Double-click to edit" %}<span></span></div>
+
+	{# start: toolbar #}
 	<div class="cms_toolbar">
-		<div id="cms_toolbar-toggle">
-			<a href="#" class="cms_toolbar-btn cms_toolbar-btn_left">
-				<span class="cms_toolbar-btn_right cms_toolbar_icon-toggle">
-					<span class="cms_toolbar_icon">&nbsp;</span>
-				</span>
-			</a>
+		<div class="cms_toolbar-left">
+			{% include "cms/toolbar/items/logo.html" %}
+
+			{% if not user.is_authenticated %}
+			{% include "cms/toolbar/items/login.html" %}
+			{% else %}
+			<ul class="cms_toolbar-item cms_toolbar-item-navigation">
+				{% for item in request.toolbar.get_left_items %}
+					{{ item.render }}
+				{% endfor %}
+			</ul>
+			{% endif %}
 		</div>
-		<div id="cms_toolbar-toolbar">
-			<div class="cms_toolbar-left"></div>
-			<div class="cms_toolbar-right"></div>
+
+		<div class="cms_toolbar-right">
+			{% for item in request.toolbar.get_right_items %}
+				{{ item.render }}
+			{% endfor %}
+			{% if request.toolbar.can_change %}
+			<div class="cms_toolbar-item cms_toolbar-item_switch{% if not request.toolbar.edit_mode %} cms_toolbar-item_switch-active{% endif %}">
+				<a href="{% if request.toolbar.edit_mode %}?{{ request.toolbar.edit_mode_url_off }}{% else %}?{{ request.toolbar.edit_mode_url_on }}{% endif %}">
+					<span class="cms_toolbar-item_switch-on">{% trans "Live" %}</span>
+					<span class="cms_toolbar-item_switch-off">{% trans "Draft" %}</span>
+				</a>
+				<span class="cms_toolbar-item_switch-knob">{% trans "Change" %}</span>
+			</div>
+			{% endif %}
 		</div>
 	</div>
-	<!-- end: toolbar -->
+	<div class="cms_toolbar-trigger"><a href="#">{% trans "Toggle toolbar" %}</a></div>
+	{# end: toolbar #}
 
-	<!-- start: placeholders -->
-	<div id="cms_placeholder-dim"></div>
-	<div id="cms_placeholder-content"><div class="cms_placeholder-content_zone"></div><div class="cms_placeholder-content_inner cms_placeholder-content_loader"></div></div>
-	<div id="cms_placeholder-overlay">
-		<ul class="cms_placeholder-options">
-			<li class="first"><a href="#" class="cms_placeholder-icon cms_placeholder-icon_edit" rel="edit">{% trans "edit" %}</a></li>
-			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_up" rel="moveup">{% trans "up" %}</a></li>
-			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_down" rel="movedown">{% trans "down" %}</a></li>
-			<li><a href="#" class="cms_placeholder-icon cms_placeholder-icon_delete" rel="delete">{% trans "delete" %}</a></li>
-			<li>
-				<a href="#" class="cms_placeholder-icon cms_placeholder-icon_more" rel="more">{% trans "more" %}</a>
-				<ul class="cms_placeholder-options_more cms_placeholder-subnav">
-                    <li class="cms_placeholder-subnav-title add_child"><span>{% trans "Add child plugin" %}</span>
-                        <ul><li><span>&nbsp;</span></li></ul>
-                    </li>
-                    <li class="cms_placeholder-subnav-title move"><span>{% trans "Move to placeholder" %}</span>
-						<ul><li><span>&nbsp;</span></li></ul>
-					</li>
-				</ul>
-
-			</li>
-		</ul>
-		<div class="cms_placeholder-overlay_bg"></div>
+	{# start: messages #}
+	<div class="cms_messages">
+		<div class="cms_messages-close"></div>
+		<div class="cms_messages-inner"></div>
 	</div>
-	<div id="cms_placeholder-success"><div class="cms_placeholder-success_inner"></div></div>
-	<!-- end: placeholders -->
+	{# end: messages #}
 
-	<!-- template: anchor -->
-	{% include "cms/toolbar/items/anchor.html" %}
+	{# start: sidebar #}
+	<div class="cms_sideframe">
+		<div class="cms_sideframe-resize"><span class="cms_sideframe-knob"></span></div>
+		<div class="cms_sideframe-frame"></div>
+		<div class="cms_sideframe-shim"></div>
+		<div class="cms_sideframe-btn">
+			<div class="cms_sideframe-close"></div>
+			<div class="cms_sideframe-hide"></div>
+			<div class="cms_sideframe-maximize"></div>
+		</div>
+		<div class="cms_sideframe-copy"></div>
+	</div>
+	{# end: sidebar #}
 
-	<!-- template: switcher -->
-	{% include "cms/toolbar/items/switcher.html" %}
+	{# start: clipboard #}
+	{{ clipboard }}
+	{# end: clipboard #}
 
-	<!-- template: button -->
-	{% include "cms/toolbar/items/button.html" %}
+	{# start: modal #}
+	<div class="cms_modal">
+		<div class="cms_modal-head">
+			<span class="cms_modal-title">&nbsp;</span>
+			<span class="cms_modal-collapse">-</span>
+			<span class="cms_modal-maximize">+</span>
+			<span class="cms_modal-close">x</span>
+		</div>
+		<div class="cms_modal-body">
+			<div class="cms_modal-shim"></div>
+			<div class="cms_modal-frame"></div>
+		</div>
+		<div class="cms_modal-foot">
+			<div class="cms_modal-breadcrumb">
+				<span class="cms_modal-breadcrumb-title">{% trans "Start" %}</span>
+				<span class="cms_modal-breadcrumb-items">&nbsp;</span>
+			</div>
+			<div class="cms_modal-buttons"></div>
+			<div class="cms_modal-resize"></div>
+		</div>
+	</div>
+	{# end: modal #}
 
-	<!-- template: list -->
-	{% include "cms/toolbar/items/list.html" %}
+	{# start: structure #}
+	<div class="cms_structure">
+		<div class="cms_structure-content">
+			{% for placeholder in request.toolbar.placeholders.values %}
+			<div class="cms_dragarea cms_dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms_dragarea-static{% endif %}">
+				{% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
-	<!-- item: html - login -->
-	{% include "cms/toolbar/items/login.html" %}
+				{# <div class="cms_dragitem cms_dragitem-1888"> #}
+				<div class="cms_draggables">
+				{% with placeholder.slot as slot %}
+				{% for plugin in placeholder.get_cached_plugins %}
+					{% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+				{% endfor %}
+				{% endwith %}
+				</div>
+				{# </div> #}
+			</div>
+			{% endfor %}
+		</div>
+		<div class="cms_structure-dimmer"></div>
+	</div>
+	{# end: structure #}
+
+	{% if request.toolbar.redirect_url %}
+	<div class="cms_screenblock">
+		<div class="cms_screenblock-inner">
+			<h1>{% trans "This page has no preview!" %}</h1>
+			<p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
+		</div>
+	</div>
+	{% endif %}
 </div>
+{% endlanguage %}

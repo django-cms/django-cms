@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+{% load i18n l10n admin_static %}
+
+{% block title %}{% trans "Change a page" %}{% endblock %}
+
+{% block content %}
+<script>
+window.CMS || window.parent.CMS || document.write(
+	'<script src="{% static "cms/js/libs/jquery.min.js" %}" type="text/javascript"></script>' +
+	'<script src="{% static "cms/js/modules/cms.base.js" %}" type="text/javascript"></script>'
+);
+</script>
+<script>
+(function(Window) {
+// CMS.$ will be passed for $
+Window.CMS.$(document).ready(function () {
+	// the dataBridge is used to access plugin information from different ressources
+	Window.CMS.API.Helpers.dataBridge = {
+		'plugin_id': '{{ plugin_id|unlocalize }}',
+		'plugin_type': '{{ type }}',
+		'plugin_name': '{{ name }}',
+		'plugin_icon': '{{ icon }}',
+		'plugin_desc': '{{ alt }}'
+	};
+	// save current plugin
+	Window.CMS.API.Helpers.reloadBrowser(undefined, {{ window_close_timeout|default:500 }});
+});
+// we have a special case here cause the CMS namespace
+// can be either inside the current window or the parent
+})(window.parent || window);
+</script>
+{% endblock %}

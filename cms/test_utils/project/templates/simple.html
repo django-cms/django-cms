@@ -1,0 +1,11 @@
+{% load cms_tags sekizai_tags %}
+{% render_block "css" %}
+<style>
+	/* Add some padding so that the placeholder menu will be shown in the page  */
+	body { padding-top: 300px; }
+</style>
+
+{% cms_toolbar %}
+{% placeholder "placeholder" %}
+{% render_block "js" %}
+

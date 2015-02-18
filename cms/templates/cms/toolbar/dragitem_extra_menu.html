@@ -1,0 +1,3 @@
+{% for item in items %}
+<div class="cms_submenu-item"><a href="{{ item.url }}" data-rel="ajax"{% if item.data %} data-post="{{ item.data }}"{% endif %}{% if question %} data-text="{{ question }}"{% endif %} data-on-success="REFRESH_PAGE">{{ item.name }}</a></div>
+{% endfor %}

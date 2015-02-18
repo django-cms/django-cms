@@ -1,0 +1,28 @@
+- Put beer in fridge for cooling (see last step)
+- Create a release branch (locally)
+- Bump the version in cms/__init__.py
+- Build newest english translation (django-admin.py makemessages -l en)
+- Build newest english JS translations (django-admin.py makemessages -l en -d djangojs)
+- Pull translations (tx pull -f -a)
+- Compile translations (django-admin.py compilemessages)
+- Check CHANGELOG that all closed PRs are present.
+- Prepare blog post
+- update AUTHORS file (python develop.py authors)
+- Make a release commit
+- Tag release commit
+- Merge back into develop
+- Push develop to GitHub
+- Merge into master
+- Push master to GitHub (WITH --tags)
+- Release to PyPI (ONLY FOR FINAL VERSIONS!) (python setup.py sdist upload)
+- Release wheel (python setup.py bdist_wheel upload)
+- Bump version in develop branch to .dev1
+- Publish blog post
+- Tweet blog post
+- Post notice on django-users, django-cms and django-cms-developers mailing lists
+- Update IRC channel topic (/topic this is the new topic)
+- Add current version to RTD versions.
+- Set new version as default version on RTD
+- Make sure tutorials on the website still work
+- Make sure download button on homepage (website) is updated
+- Have a beer! (If anyone else is around, do a release party!)

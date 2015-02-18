@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
+from cms.utils.compat.dj import is_installed
+
 
 # modify reversions to match our needs if required...
-
-
 def reversion_register(model_class, fields=None, follow=(), format="json", exclude_fields=None):
     """CMS interface to reversion api - helper function. Registers model for 
     reversion only if reversion is available.
@@ -13,10 +12,9 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
     """
     
     # reversion's merely recommended, not required
-    if not 'reversion' in settings.INSTALLED_APPS:
+    if not is_installed('reversion'):
         return
     
-    from reversion.models import VERSION_CHANGE
     if fields and exclude_fields:
         raise ValueError("Just one of fields, exclude_fields arguments can be passed.")
     
@@ -38,7 +36,8 @@ def make_revision_with_plugins(obj, user=None, message=None):
     # we can safely import reversion - calls here always check for 
     # reversion in installed_applications first
     import reversion
-    from reversion.models import VERSION_CHANGE
+    if hasattr(reversion.models, 'VERSION_CHANGE'):
+        from reversion.models import VERSION_CHANGE
     """
     Only add to revision if it is a draft.
     """
@@ -46,24 +45,80 @@ def make_revision_with_plugins(obj, user=None, message=None):
     revision_context = reversion.revision_context_manager
     
     cls = obj.__class__
-    
-    if cls in revision_manager._registered_models:
+    if hasattr(revision_manager, '_registration_key_for_model'):
+        model_key = revision_manager._registration_key_for_model(cls)
+    else:
+        model_key = cls
+
+    if model_key in revision_manager._registered_models:
         
         placeholder_relation = find_placeholder_relation(obj)
 
-        if revision_context.is_active():      
+        if revision_context.is_active():
+            if user:
+                revision_context.set_user(user)
+            if message:
+                revision_context.set_comment(message)
             # add toplevel object to the revision
             adapter = revision_manager.get_adapter(obj.__class__)
-            revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
+            if hasattr(reversion.models, 'VERSION_CHANGE'):
+                revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
+            else:
+                revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj))
+            # add placeholders to the revision
+            for ph in obj.placeholders.all():
+                phadapter = revision_manager.get_adapter(ph.__class__)
+                if hasattr(reversion.models, 'VERSION_CHANGE'):
+                    revision_context.add_to_context(revision_manager, ph, phadapter.get_version_data(ph, VERSION_CHANGE))
+                else:
+                    revision_context.add_to_context(revision_manager, ph, phadapter.get_version_data(ph))
             # add plugins and subclasses to the revision
             filters = {'placeholder__%s' % placeholder_relation: obj}
             for plugin in CMSPlugin.objects.filter(**filters):
                 plugin_instance, admin = plugin.get_plugin_instance()
                 if plugin_instance:
                     padapter = revision_manager.get_adapter(plugin_instance.__class__)
-                    revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
+                    if hasattr(reversion.models, 'VERSION_CHANGE'):
+                        revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
+                    else:
+                        revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance))
                 bpadapter = revision_manager.get_adapter(plugin.__class__)
-                revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
-                
+                if hasattr(reversion.models, 'VERSION_CHANGE'):
+                    revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
+                else:
+                    revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin))
+
+
 def find_placeholder_relation(obj):
     return 'page'
+
+
+class classproperty(object):
+    """Like @property, but for classes, not just instances.
+
+    Example usage:
+
+        >>> from cms.utils.helpers import classproperty
+        >>> class A(object):
+        ...     @classproperty
+        ...     def x(cls):
+        ...         return 'x'
+        ...     @property
+        ...     def y(self):
+        ...         return 'y'
+        ...
+        >>> A.x
+        'x'
+        >>> A().x
+        'x'
+        >>> A.y
+        <property object at 0x2939628>
+        >>> A().y
+        'y'
+
+    """
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)

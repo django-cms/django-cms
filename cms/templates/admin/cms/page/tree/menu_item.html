@@ -1,0 +1,82 @@
+{% load cms_admin i18n %}
+<div class="cont {{ css_class }}{% if page.reverse_id == "page_types" %} cont-pagetype{% endif %}" data-page_id="{{ page.id }}">
+	<div class="col1">
+		{% if has_change_permission %}
+			{% language preview_language %}
+			<a href="{{ page.id }}/{{ preview_language }}/preview/" target="_parent" class="title" lang="{{ preview_language }}" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_admin_tree_title }}</a>
+			{% endlanguage %}
+		{% else %}
+			<span class="title" lang="{{ preview_language }}">{{ page.get_admin_tree_title }}</span>
+		{% endif %}
+	</div>
+	<div class="col2">
+		<span id="move-target-{{ page.id }}" class="move-target-container" >
+			{% if not CMS_PERMISSION or has_add_permission or has_add_page_permission %}{% spaceless %}
+				{# if permissions not enabled, user user haves global can_add page #}
+					{% if has_add_on_same_level_permission %}
+						<a href="#" class="move-target left" title="{% trans "insert above" %}">↑</a>
+						<a href="#" class="move-target right" title="{% trans "insert below" %}">↓</a>
+					{% endif %}
+				<a href="#" class="move-target last-child" title="{% trans "insert inside" %}">↘</a>
+			{% endspaceless %}{% endif %}
+		</span>
+
+		{% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}
+		{% if page.application_urls %}<div class="col-apphook"><a href="{{ page.id }}/advanced-settings/"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></a></div>{% endif %}
+		{% for lang in site_languages %}
+		<div class="col-language">
+			{% if has_change_permission %}
+				<a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/?language={{ lang }}{% endif %}" class="trigger-tooltip"{% if lang in page.languages %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
+				{% if lang in page.languages %}
+				<div class="language-tooltip" hidden="hidden">
+					{% trans "Pick an action:" %}
+					<a href="./{{ page.id }}/{{ lang }}/unpublish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}">{% trans "Unpublish" %}</a>
+					<a href="./{{ page.id }}/{{ lang }}/publish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}">{% trans "Publish" %}</a>
+				</div>
+				{% endif %}
+			{% else %}
+				{% tree_publish_row page lang %}
+			{% endif %}
+		</div>
+		{% endfor %}
+		<div class="col-navigation" title="{% if page.in_navigation %}{% trans "in menu" %}{% else %}{% trans "not in menu" %}{% endif %}">
+			<label>
+				<img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{% cms_admin_icon_base %}icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
+				{% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" {% if page.in_navigation %}checked="checked"{% endif %} value="{{ page.in_navigation|yesno:"1,0" }}" />{% endif %}
+			</label>
+		</div>
+		<div class="col-actions">
+
+			{% if has_change_permission %}
+			<a class="edit" href="{{ url }}{{ page.id }}/" data-alt-class="advanced-settings" data-alt-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
+			{# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}
+			<a href="#" class="copy" title="{% trans "Copy" %}" id="copy-link-{{ page.id }}"><span>{% trans "copy" %}</span></a>{% endif %}
+
+			{% if has_add_page_permission and has_add_on_same_level_permission %}
+				<a href="#" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+			{% else %}
+				{% if has_add_page_permission %}
+					{# if he can add page under current page, go directly to thi url #}
+					<a href="./add/?target={{ page.id }}&amp;position=last-child" class="addlink" title="{% trans "Add Child" %}" id="add-link-{{ page.id }}"><span>{% trans "add" %}</span></a>
+				{% endif %}
+			{% endif %}
+			{% if not filtered %}
+				{% if has_move_page_permission %}<a href="#" class="move" title="{% trans "Cut" %}" id="move-link-{{ page.id }}"><span>{% trans "cut" %}</span></a>{% endif %}
+			{% endif %}
+			{% if has_delete_permission %}<a href="{{ page.id }}/delete/" title="{% trans "Delete" %}" class="deletelink"><span>{% trans "delete" %}</span></a>{% endif %}
+		</div>
+
+		<div class="col-info">
+			<span class="info">
+				<span>{% trans "info" %}</span>
+				<div class="info-details">
+					{% if page.publication_date %}<mark>{% trans "publication date" %}:</mark> {{ page.publication_date|date:"Y-m-d" }}<br />{% endif %}
+					{% if page.publication_end_date %}<mark>{% trans "publication end date" %}:</mark> {{ page.publication_end_date|date:"Y-m-d" }}<br />{% endif %}
+					<mark>{% trans "is restricted" %}:</mark> {{ page|is_restricted:request }}<br />
+					{% if page.changed_by %}<mark>{% trans "last change by" %}:</mark> {{ page.changed_by }}<br />{% endif %}
+					{% if page.get_template_display %}<mark>{% trans "template" %}:</mark> {{ page.get_template_display }}{% endif %}
+				</div>
+			</span>
+		</div>
+	</div>
+</div>

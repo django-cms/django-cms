@@ -1,40 +1,28 @@
 # -*- coding: utf-8 -*-
-from cms.admin.forms import (GlobalPagePermissionAdminForm, 
-    PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm)
+from copy import deepcopy
+from django.contrib import admin
+from django.contrib.admin import site
+from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import ugettext as _
+
+from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
+from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
-from copy import deepcopy
-from distutils.version import LooseVersion
-from django.conf import settings
-from django.contrib import admin
-from django.template.defaultfilters import title
-from django.utils.translation import ugettext as _
-import django
 
+PERMISSION_ADMIN_INLINES = []
 
-
-DJANGO_1_3 = LooseVersion(django.get_version()) < LooseVersion('1.4')
-PAGE_ADMIN_INLINES = []
-
+user_model = get_user_model()
+admin_class = UserAdmin
+for model, admin_instance in site._registry.items():
+    if model == user_model:
+        admin_class = admin_instance.__class__
 
 class TabularInline(admin.TabularInline):
     pass
-
-if DJANGO_1_3 and 'reversion' in settings.INSTALLED_APPS:
-    """
-    Backwards compatibility for Django < 1.4 and django-reversion 1.6
-    """
-    class TabularInline(TabularInline):
-        def get_prepopulated_fields(self, request, obj=None):
-            return self.prepopulated_fields
-    from reversion.admin import helpers
-    class CompatInlineAdminFormSet(helpers.InlineAdminFormSet):
-        def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
-                readonly_fields=None, model_admin=None):
-            super(CompatInlineAdminFormSet, self).__init__(inline, formset, fieldsets, readonly_fields, model_admin)
-    helpers.InlineAdminFormSet = CompatInlineAdminFormSet
 
 
 class PagePermissionInlineAdmin(TabularInline):
@@ -43,8 +31,16 @@ class PagePermissionInlineAdmin(TabularInline):
     form = PagePermissionInlineAdminForm
     classes = ['collapse', 'collapsed']
     exclude = ['can_view']
-    extra = 0 # edit page load time boost
-    
+    extra = 0  # edit page load time boost
+
+    @classproperty
+    def raw_id_fields(cls):
+        # Dynamically set raw_id_fields based on settings
+        threshold = get_cms_setting('RAW_ID_USERS')
+        if threshold and get_user_model().objects.count() > threshold:
+            return ['user']
+        return []
+
     def queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
@@ -54,13 +50,13 @@ class PagePermissionInlineAdmin(TabularInline):
         """
         # can see only permissions for users which are under him in tree
 
-        ### here a exception can be thrown
+        # here an exception can be thrown
         try:
             qs = PagePermission.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)
         except NoPermissionsException:
             return self.objects.get_empty_query_set()
-    
+
     def get_formset(self, request, obj=None, **kwargs):
         """
         Some fields may be excluded here. User can change only
@@ -80,15 +76,16 @@ class PagePermissionInlineAdmin(TabularInline):
             if not obj.has_move_page_permission(request):
                 exclude.append('can_move_page')
         formset_cls = super(PagePermissionInlineAdmin, self
-            ).get_formset(request, obj=None, exclude=exclude, *kwargs)
+        ).get_formset(request, obj=None, exclude=exclude, **kwargs)
         qs = self.queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)
         formset_cls._queryset = qs
         return formset_cls
 
+
 class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
-    extra = 0 # edit page load time boost
+    extra = 0  # edit page load time boost
     form = ViewRestrictionInlineAdminForm
     verbose_name = _("View restriction")
     verbose_name_plural = _("View restrictions")
@@ -123,13 +120,15 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
     list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
-    
+
     form = GlobalPagePermissionAdminForm
-    
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'group__name')
-    
+    search_fields = []
+    for field in admin_class.search_fields:
+        search_fields.append("user__%s" % field)
+    search_fields.append('group__name')
+
     exclude = []
-    
+
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
 
@@ -138,6 +137,7 @@ class GenericCmsPermissionAdmin(object):
     """
     Custom mixin for permission-enabled admin interfaces.
     """
+
     def update_permission_fieldsets(self, request, obj=None):
         """
         Nobody can grant more than he haves, so check for user permissions
@@ -160,30 +160,30 @@ class GenericCmsPermissionAdmin(object):
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
         return fieldsets
-    
+
     def _has_change_permissions_permission(self, request):
         """
         User is able to add/change objects only if he haves can change
         permission on some page.
         """
         try:
-            user_level = get_user_permission_level(request.user)
+            get_user_permission_level(request.user)
         except NoPermissionsException:
             return False
         return True
-    
+
     def has_add_permission(self, request):
         return self._has_change_permissions_permission(request) and \
-            super(self.__class__, self).has_add_permission(request)
-    
+               super(self.__class__, self).has_add_permission(request)
+
     def has_change_permission(self, request, obj=None):
         return self._has_change_permissions_permission(request) and \
-            super(self.__class__, self).has_change_permission(request, obj)
+               super(self.__class__, self).has_change_permission(request, obj)
 
 
 if get_cms_setting('PERMISSION'):
     admin.site.register(GlobalPagePermission, GlobalPagePermissionAdmin)
-    PAGE_ADMIN_INLINES.extend([
+    PERMISSION_ADMIN_INLINES.extend([
         ViewRestrictionInlineAdmin,
         PagePermissionInlineAdmin,
     ])

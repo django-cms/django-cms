@@ -118,10 +118,14 @@
 - Fixed page change form (jQuery and permissions)
 - Fixed placeholder field permission checks
 
-==== 2.4.0 ===
+==== 2.4.0 (2013-4-17)===
 
 Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
 
+- Compatibility with Django 1.4 and 1.5 (1.3 support dropped)
+- Support for Python 2.5 dropped
+- CMS_MAX_PAGE_PUBLISH_REVERSIONS has been added
+- Reversion integration has changed to limit DB size
 - CMS_LANGUAGE setting has changed
 - CMS_HIDE_UNTRANSLATED setting removed
 - CMS_LANGUAGE_FALLBACK setting removed
@@ -130,6 +134,180 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_FRONTEND_LANGUAGES setting removed
 - MultilingualMiddleware has been removed
 - CMS_FLAT_URLS has been removed
+- CMS_MODERATOR has been removed and replaced with simple publisher.
+- PlaceholderAdmin has now language tabs and has support for django-hvad
+- Added `cms.middleware.language.LanguageCookieMiddleware`
+- Added CMS_RAW_ID_USERS
 
-==== NEXT ====
-- Fixed #1543: Nasty empty line in cms/plugins/link.html
+==== 2.4.1 (2013-4-22)===
+
+- USE_I18N=False fixed
+- some frontend css stuff fixed
+- check_copy_relations fixed for abstract classes
+- non public frontend languages fixed
+
+==== 2.4.2 (2013-5-29)===
+
+- Apphook edit mode bugfix
+- Added option to render_placeholder tag to set language
+- Huge permission cache invalidation speed up
+- Doc improvements
+- css cleanup in PlaceholderAdmin
+- Log change of page status done via AJAX
+- Use --noinput convention for delete_orphaned_plugins command
+- added Testing docs
+- fixed more issues with only one language
+- locales updated
+
+==== 3.0.0 (XXXXX) ===
+
+- Plugins are only editable in frontend
+- PluginEditor has been removed in backend
+- New frontend editing
+- New Toolbar
+- Plugin API for creating new plugins and moving has changed
+- render_to_response replaced with TemplateResponse in cms.views
+- CMS_SEO_FIELDS removed and seo fields better integrated
+- meta_keywords field removed as not relevant anymore
+- CMS_MENU_TITLE_OVERWRITE default changed to True
+- Toolbar has language switcher built in
+- User settings module added for saving the language of the user so when he switches languages the toolbar/interface
+  keeps the language.
+- language_chooser templatetag now only displays public languages, even when you are logged in as staff.
+- undo and redo functionality added in toolbar if django-reversion is installed.
+- page admin split in 3 different for basic, advanced and permissions
+- New show_editable_page_title templatetag to edit page title from the frontend
+- Removed PLACEHOLDER_FRONTEND_EDITING setting
+- Removed CMS_URL_OVERWRITE setting. Always enabled.
+- Removed CMS_MENU_TITLE_OVERWRITE settings. Always enabled.
+- Removed CMS_REDIRECTS. Always enabled.
+- Removed CMS_SOFTROOT. Always enabled.
+- Removed CMS_SHOW_START_DATE. Always enabled.
+- Removed CMS_SHOW_END_DATE. Always enabled.
+- Added (optional) language fallback for placeholders.
+- moved apphooks from title to page model so we need to add them only once.
+- request.current_app has been removed.
+- added a namespace field, reverse_id is not used anymore for apphook namespaces.
+- PlaceholderAdmin is deprecated and available as mixin class renamed to PlaceholderAdminMixin.
+- PlaceholderAdmin does not have LanguageTabs anymore. It only has a PluginAPI now.
+- PageAdmin uses the same Plugin API as PlaceholderAdmin
+- Toolbar API for your own apps added
+- twitter plugin removed
+- file plugin removed
+- flash plugin removed
+- googlemap plugin removed
+- inherit plugin removed
+- picture plugin removed
+- teaser plugin removed
+- video plugin removed
+- link plugin removed
+- snippet plugin removed
+- Object level permission support for Placeholder
+- Configuration for plugin custom modules and labels in the toolbar UI
+- Added copy-lang subcommand to copy content between languages
+- Added static_placeholder templatetag
+- Moved render_placeholder from placeholder_tags to cms_tags
+- django 1.6 support added
+- Frontedit editor for Django models
+- Extending the page & title model API
+- Placeholders can be configured to have plugins automatically added.
+- Publishing is now language independent and the tree-view has been updated to reflect this
+- Removed the plugin DB-name magic and added a compatibility layer
+- urls_need_reloading signal added when an apphook change is detected.
+- CMS_PAGE_CACHE, CMS_PLACEHOLDER_CACHE and CMS_PLUGIN_CACHE settings and functionality added. Default is True
+- Detect admin object creation and changes via toolbar and redirect to them.
+- Added support for custom user models
+- Added PageTypes
+- Added CMS_MAX_PAGE_HISTORY_REVERSIONS and changed default of CMS_MAX_PAGE_PUBLISH_REVERSIONS
+- Added option to {% static_placeholder %} to render only on the current site.
+
+==== 3.0.1 (2014-04-30) ===
+
+- Renamed NamespaceAllreadyRegistered to NamespaceAlreadyRegistered in menus/exceptions.py
+- Frontend editor UI fixes
+- Fix in cms fix-mptt command
+
+==== 3.0.2 (2014-05-21 ===
+- Add 'as' form to render_placeholder templatetag to save the result in context
+- Added changeable strings for "?edit", "?edit_off" and "?build" urls
+- utils.page_resolver was optimized. get_page_from_path() api changed
+
+==== 3.0.3 (2014-07-07) ===
+- Added an alias plugin for referencing plugins and placeholders
+- Added an api to change the context menus of plugins and placeholders from plugins
+- Apphooks respect the page permissions
+- Decorator for views with page permissions
+- #3266 - api.create_page respects site
+- Fixed how permissions are checked for static placeholder.
+- Reduced queries on placeholder.clear by 60%
+- auto-detect django-suit instead of using explicit setting
+- Added the ability to mark (Sub)Menu's 'active'.
+- fallback language fixes for pages
+- Implemented transaction.atomic in django 1.4/1.5 way
+- Added a automatic dynamic template directory for page templates
+
+==== 3.0.4 (2014-08-16) ===
+- Removed file cms/utils/compat/type_checks.py, use django.utils.six module instead
+- Removed file cms/utils/compat/string_io.py, use django.utils.six module instead
+- Removed file cms/utils/compat/input.py, use django.utils.six module instead
+- Use PY3 from django.utils.six instead of PY2 from cms.utils.compat to check Python version
+- Staticplaceholders have not their own permissions
+- Apphooks support now nested namespaces
+- Apphooks can now exclude module for page permission checking
+- fixed the permissions for plugins on apphook pages
+- Allow the use of custom admin sites that do not reside under the 'admin' namespace
+- Added django 1.7 migrations
+- updated docs
+- slots for placeholders can now be 255 characters long
+- Plugin pool initialises incorrectly if database is down during first request
+- some refactoring and simplifications
+
+==== 3.0.5 (2014-08-20) ===
+- Fixes 2 regressions introduced in 3.0.4
+- apphook and plugins can now be registered via decorator
+
+==== 3.0.6 (2014-10-07) ===
+- Experimental full Django 1.7 migrations support
+- Add CMSPlugin.get_render_model to get the plugin model at render time
+- Add simplified API to handle toolbar for page extensions
+- Extended custom user model support
+- Added option to publish all the pages in a language / site in publisher_publish command
+- Fixed a few frontend glitches
+- Fixed menu when hide untranslated is set to False
+- Fix sitemap ordering
+- Fix plugin table name generation fixes
+
+==== 3.0.7 (2014-11-27) ===
+- Complete Django 1.7 support
+- Numerous updates to the documentation
+- Numerous updates to the tutorial
+- Updates to better support South 1.0
+- Adds some new, user-facing documentation
+- Fixes an issue with placeholderadmin permissions
+- Numerous fixes for minor issues with the frontend UI
+- Fixes issue where the CMS would not reload pages properly if the URL contained a # symbol
+- Fixes an issue relating to 'limit_choices_to' in forms.MultiValueFields
+- Fixes PageField to work in Django 1.7 environments
+- Updates to community and project governance documentation
+- Added list of retired core developers
+- Added branch policy documentaion
+
+=== 3.0.8 (2015-01-11) ===
+- Add require_parent option to CMS_PLACEHOLDER_CONF
+- Fix django-mptt version depenency to be PEP440 compatible
+- Fix some Django 1.4 compatibility issues
+- Add toolbar sanity check
+- Fix behavior with CMSPluginBase.get_render_template()
+- Fix issue on django >= 1.6 with page form fields.
+- Resolve jQuery namespace issues in admin page tree and changeform
+- Fix issues for PageField in Firefox/Safari
+- Fix some Python 3.4 compatibility issue when using proxy modles
+- Fix corner case in plugin copy
+- Documentation fixes
+- Minor code cleanups
+
+=== 3.0.9 (2015-01-11) ===
+- Revert a change that caused a regression in toolbar login
+- Fix an error in a translated phrase
+- Fix error when moving items in the page tree
+

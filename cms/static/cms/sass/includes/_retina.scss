@@ -1,0 +1,31 @@
+@media print, (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 1.25dppx) {
+//######################################################################################################################
+// #RETINA#
+
+// #RETINA TOOLBAR#
+.cms_toolbar-item-navigation-children > a span,
+.cms_sideframe-btn div,
+.cms_clipboard ul a, .cms_clipboard-empty a,
+.cms_messages .cms_messages-close,
+.cms_modal-collapse, .cms_modal-close, .cms_modal-maximize, .cms_modal-resize,
+.cms_modal-breadcrumb a, .cms_modal-breadcrumb-title,
+.cms_toolbar-item-logo a, .cms_toolbar-trigger a,
+.cms_tooltip, .cms_placeholders-menu,
+.cms_toolbar-debug .cms_debug-bar {
+	background-image:url('../img/toolbar/sprite_toolbar@2x.png') !important;
+	background-size:190px !important; }
+
+#cms_toolbar .cms_loader {
+	background-image:url('../img/loader@2x.gif') !important;
+	background-size:32px !important; }
+
+
+// #RETINA PLACEHOLDER#
+.cms_submenu, .cms_submenu-quicksearch, .cms_placeholder-title:before,
+.cms_placeholder .cms_dragitem-collapsable,
+.cms_placeholder .cms_dragitem-collapsed {
+	background-image:url('../img/toolbar/sprite_toolbar@2x.png') !important;
+	background-size:190px !important; }
+
+// end of retina
+}

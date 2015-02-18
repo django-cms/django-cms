@@ -1,0 +1,237 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+#cms_toolbar {
+position:absolute; left:0; top:5px; z-index:9999999; width:100%;
+//######################################################################################################################
+// #TOOLBAR#
+.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
+	border-bottom:1px solid $color-grey !important; background-color:white; background:rgba($color-grey-5, 0);
+	@include background-image($gradient-toolbar); @include box-shadow(0 0 5px rgba(0, 0, 0, 0.2));
+	/* hack for ie9 */ background/**/:#fcfcfc;
+
+	.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
+	.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
+
+	.cms_toolbar-left .cms_toolbar-item { margin-left:10px; }
+	.cms_toolbar-right .cms_toolbar-item { margin-right:20px; }
+
+	// items
+	.cms_toolbar-item { float:left; }
+	.cms_toolbar-item-buttons a { border-bottom:none !important; }
+}
+
+// do some responsive magic
+@media only screen and (max-width: 800px) {
+	.cms_toolbar-right { display:none; }
+}
+
+//######################################################################################################################
+// #TOOLBAR/debug#
+&.cms_toolbar-debug {
+	.cms_toolbar { top:5px !important; }
+	.cms_toolbar-trigger { top:5px !important; }
+
+	.cms_debug-bar { position:fixed; left:0; top:0; z-index:99999999; width:100%; height:4px;
+		border-bottom:1px solid #ddd; background:#fdffc8 url('../img/toolbar/sprite_toolbar.png') repeat-x left -444px; }
+}
+&.cms_toolbar-debug #container { padding-top:35px !important; }
+
+//##################################################################################################################
+// #TOOLBAR/navigation#
+.cms_toolbar-item-navigation {
+	li { float:left; position:relative; zoom:1; }
+	li a { float:left; padding:5px 10px; zoom:1; cursor:default; }
+	li ul { display:none; }
+	> li:first-child > a span { font-weight:800; line-height:12px; }
+
+	// hover effect
+	.cms_toolbar-item-navigation-hover {
+		ul { position:absolute; left:0; top:30px;
+			display:block; min-width:180px; padding:4px 0;
+			@include border-radius(0 0 4px 4px);
+			border:1px solid white; border-top:none;
+			background-color:white; background:rgba(white, 0.97);
+			@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.4)); }
+		ul li { float:none; zoom:1; }
+		ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
+			padding:2px 10px 2px 15px; }
+		ul ul { @include border-radius(0 4px 4px 0); border-top:1px solid #f5f5f5; }
+
+		// second level
+		.cms_toolbar-item-navigation-children {
+			ul { display:none; left:100%; top:-5px; }
+			> a { cursor:default; }
+			> a span { display:block; background:url('../img/toolbar/sprite_toolbar.png') no-repeat right -270px; }
+		}
+
+		// anchor hover
+		> a { color:white;
+			background:adjust-hue($color-blue, 15deg);
+			@include background-image($gradient-blue); }
+		> a span { background-position:right -300px !important; }
+
+		// add active style
+		.cms_toolbar-item-navigation-active > a { font-weight:800; }
+	}
+
+	.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
+		border-bottom:1px solid $color-grey-10; }
+
+	.cms_toolbar-item-navigation-disabled {
+		a { cursor:default !important; @include opacity(0.2);
+			&:hover, &:active, &:focus { @include box-shadow(none); background:none !important;
+				color:black !important; } }
+		ul { display:none !important; }
+	}
+}
+.cms_toolbar-item-cms-mode-switcher { display:none; }
+
+//##################################################################################################################
+// #TOOLBAR/dialog#
+.cms_messages { display:none; position:fixed; z-index:999999; top:30px;
+	width:300px; min-height:14px; margin:0; padding:6px 10px 8px; background:rgba(black, 0.74);
+	@include border-radius(0 0 3px 3px);
+	color:white; font-size:12px; line-height:16px; font-weight:200;
+	* { color:white; font-size:12px; line-height:16px; font-weight:200; }
+
+	a { color:$color-blue; }
+	a:hover { text-decoration:underline; }
+	strong { color:lighten($color-blue, 10%); font-weight:200; }
+	ul { display:inline; color:white; }
+	ul li { display:inline; color:white; font-weight:200; }
+
+	.cms_messages-close { display:none; float:right; cursor:pointer;
+		width:20px; height:14px; margin-left:10px; position:relative; top:-2px; left:3px;
+		background:url('../img/toolbar/sprite_toolbar.png') no-repeat -100px -90px; }
+	.cms_messages-close:hover { background-position:-120px -90px; }
+}
+.cms_messages-error strong { color:$color-red; }
+
+//##################################################################################################################
+// #TOOLBAR/elements#
+// #TOOLBAR/elements/logo#
+.cms_toolbar-item-logo {
+	margin:0 !important;
+
+	a { display:block; width:92px; height:20px; margin:5px 0; @include hide-text();
+		background:url('../img/toolbar/sprite_toolbar.png') no-repeat left top;
+		&:hover, &:active, &:focus { background-position:left -20px; } }
+}
+
+// #TOOLBAR/elements/form#
+.cms_form-login {
+	padding:3px 0 0 0;
+
+	label { float:left; cursor:pointer; padding-left:10px; }
+	label span { padding-top:1px; @include inline-block(); }
+	input[type="text"], input[type="password"] { font-size:13px; line-height:13px; width:100px;
+		padding:3px 5px; margin:0; @include border-radius(3px);
+		color:$color-grey; border:1px solid lighten($color-grey, 45%);
+		@include box-shadow(0px 1px 0px white);
+
+		&:focus { border-color:$color-blue;
+			@include box-shadow(inset 0px 0px 2px $color-grey-10);
+			@include single-transition(outline 0.2s);
+		}
+	}
+	input[type="submit"] { display:block; color:white; font-size:12px; text-transform:uppercase; cursor:pointer;
+		height:23px; padding:1px 15px 0; @include border-radius(3px);
+		border:1px solid darken($color-grey, 20%);
+		background-color:$color-grey;
+		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
+		@include background-image($gradient-dark);
+
+		&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
+		&:active, &:focus { background:darken($color-grey-70, 50%); }
+	}
+
+	.cms_error { color:$color-red; }
+	.cms_error input { border:1px solid $color-red; }
+}
+
+// #TOOLBAR/elements/buttongroups#
+.cms_toolbar-item-buttons {
+	margin:4px 0 4px;
+
+	a { float:left; font-size:11px; line-height:1; padding:5px 12px; }
+	a:first-child { @include border-radius(3px 0 0 3px); }
+	a:last-child { @include border-radius(0 3px 3px 0); }
+	a:only-child { @include border-radius(3px); }
+}
+
+// #TOOLBAR/elements/toggler#
+.cms_toolbar-trigger { position:fixed; right:0; top:0; z-index:999999;
+	border-left:1px solid $color-grey; border-bottom:1px solid $color-grey;
+
+	a { display:block; width:30px; height:29px; @include hide-text();
+		color:$color-grey-70;
+		border-left:1px solid white; border-top:1px solid white;
+		background:$color-grey-5 url('../img/toolbar/sprite_toolbar.png') no-repeat -60px -40px;
+		&:hover, &:active, &:focus { background-position:-90px -40px; background-color:white; }
+	}
+ }
+// #TOOLBAR/elements/loader#
+.cms_toolbar-trigger-expanded a { background-position:0 -40px;
+	&:hover, &:active, &:focus { background-position:-30px -40px; }
+}
+.cms_toolbar-loader a { background:#fcfcfc url('../img/loader.gif') no-repeat center center !important;
+	background-size:20px 20px !important; }
+
+// #TOOLBAR/elements/switch#
+.cms_toolbar-item_switch { position:relative; left:0; top:0; margin:4px 0 4px; @include border-radius(20px);
+	border-top:1px solid $color-grey-10; background:darken($color-grey-5, 5%);
+	@include box-shadow(inset $color-grey-10 0px 1px 0px);
+	&:hover, &:active, &:focus { background-color:$color-grey-10; }
+
+	a { float:left;	position:relative; z-index:100; font-size:11px; line-height:11px;
+		text-transform:uppercase; letter-spacing:1px; padding:6px 14px 4px 28px;
+		color:black; @include text-shadow(0 1px 0 white); }
+	.cms_toolbar-item_switch-knob {
+		float:left; position:absolute; left:2px; top:1px; z-index:99; width:16px; height:16px;
+		@include border-radius(16px); @include hide-text();
+
+		border:1px solid black; background:$color-grey-70;
+		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
+		@include background-image($gradient-dark);
+	}
+	.cms_toolbar-item_switch-on { display:none; position:relative; top:-1px; }
+	.cms_toolbar-item_switch-off { display:inline; position:relative; top:-1px; }
+}
+.cms_toolbar-item_switch-active {
+	a {	padding:6px 28px 4px 14px; color:$color-green; }
+	.cms_toolbar-item_switch-knob { left:auto; right:2px;
+		border:1px solid lighten($color-green, 10%); background:lighten($color-green, 10%);
+		@include box-shadow(inset 0 1px 0 lighten($color-green, 30%));
+		@include background-image($gradient-green); }
+	.cms_toolbar-item_switch-on { display:inline; }
+	.cms_toolbar-item_switch-off { display:none; }
+}
+// highlight
+.cms_toolbar-item_switch-highlight {
+	a {	color:$color-blue; }
+	.cms_toolbar-item_switch-knob {
+		border:1px solid darken($color-blue, 10%); background:lighten($color-blue, 10%);
+		@include box-shadow(inset 0 1px 0 lighten($color-blue, 20%));
+		@include background-image($gradient-blue);
+	}
+}
+
+//##################################################################################################################
+// #TOOLBAR/blocker#
+.cms_screenblock { color:white; text-align:center;
+	position:fixed; right:0; top:0; z-index:100;
+	width:100%; height:100%;
+	background-color:black; background:rgba(black, 0.9); }
+
+.cms_screenblock .cms_screenblock-inner { margin-top:300px;
+	h1 { font-size:28px; line-height:30px; }
+	h1, p { color:$color-grey-20; text-align:center; }
+	a { color:white; }
+	a:hover { text-decoration:underline; }
+}
+
+// end of toolbar
+}

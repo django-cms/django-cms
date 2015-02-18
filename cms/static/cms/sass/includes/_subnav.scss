@@ -1,0 +1,54 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+#cms_toolbar {
+//######################################################################################################################
+// #SUBNAV#
+.cms_submenu { display:block; width:20px; height:15px; cursor:pointer; position:absolute; right: 5px;
+	background:url('../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
+
+.cms_submenu-lang { padding:0 5px; position:absolute; top:3px; right:3px;
+	border:1px solid $color-grey-10; background:white; @include border-radius(3px); }
+
+.cms_submenu-dropdown {
+	display:none; zoom:1; position:absolute; right:0; top:20px; z-index:999;
+	min-width:140px; max-height:230px; overflow:auto;
+	border:1px solid $color-grey-10; background:white;
+	@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
+
+	// force scrollbars on subnav menu
+	// not yet working on firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=77790
+	&::-webkit-scrollbar { -webkit-appearance:none; width:7px; background:$color-grey-10; }
+	&::-webkit-scrollbar-thumb { background-color:$color-grey-70;
+		border-left:1px solid $color-grey-10;
+		@include box-shadow(0 0 1px rgba(white,0.5));
+	}
+
+	.cms_submenu-item { zoom:1; }
+	.cms_submenu-item a, span { display:block; font-size:12px; line-height:15px; text-align:left; padding:4px 8px 3px 8px; }
+
+	.cms_submenu-item a { color:black;
+		&:hover, &:focus { color:white; background:adjust-hue($color-blue, 15deg); @include background-image($gradient-blue); }
+		&:first-child { border-top:none; } }
+	.cms_submenu-item span { cursor:default; font-weight:bold; color:black;
+		border-top:1px solid $color-grey-20; border-bottom:1px solid $color-grey-10; }
+	.cms_submenu-item:first-child span { border-top:none; }
+}
+
+.cms_submenu-quicksearch { display:none; position:absolute; right:-5px; top:-5px; z-index:1000;
+	cursor:default; text-align:right; height:25px; @include border-radius(4px);
+	background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
+.cms_submenu-quicksearch label { cursor:pointer; }
+.cms_submenu-quicksearch input { display:block; font-size:12px; color:white; text-align:right; -webkit-appearance:none;
+	width:109px; height:20px; padding:3px 1px 1px 5px; margin-right:25px; border:none; background:none; }
+
+// scrollhint
+.cms_submenu-scroll-hint { display:none;
+	color:$color-grey-20; font-size:12px; line-height:1; text-align:center;
+	position:absolute; left:0; bottom:0; width:100%; padding:5px 0 4px; background-color:$color-grey-10;
+}
+
+// end of toolbar
+}

@@ -1,0 +1,34 @@
+{% spaceless %}{% load i18n l10n sekizai_tags static cms_tags %}
+
+<div class="cms_plugin cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}{% if render_model_icon %} cms_render_model_icon{% elif render_model %} cms_render_model{% elif render_model_block %} cms_render_model cms_render_model_block{% elif render_model_add %} cms_render_model_add{% endif %}">{% if render_model_icon %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% elif render_model_add %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% else %}{{ rendered_content }}{% endif %}</div>
+
+{% addtoblock "js" %}
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+	new CMS.Plugin('cms_plugin-{% if generic %}{{ generic.app_label }}-{{ generic.module_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}', {
+		'type': {% if generic %}'generic'{% else %}'plugin'{% endif %},
+		'page_language': '{{ LANGUAGE_CODE }}',
+		'placeholder_id': '{{ instance.placeholder_id|unlocalize }}',
+		'plugin_name': '{{ instance.get_plugin_name|default:"" }}',
+		'plugin_type': '{{ instance.plugin_type }}',
+		'plugin_id': '{{ instance.pk|unlocalize }}',
+		'plugin_language': '{{ instance.language|default:"" }}',
+		'plugin_parent': '{{ instance.parent_id|unlocalize }}',
+		'plugin_order': '{{ instance.plugin_order }}',{% language request.toolbar.toolbar_language %}
+		'plugin_breadcrumb': {{ instance.get_breadcrumb_json|default:"[]" }},
+		'plugin_restriction': [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+		'onClose': {% if refresh_page %}'REFRESH_PAGE'{% else %}{% if redirect_on_close %}'{{ redirect_on_close }}'{% else %}false{% endif %}{% endif %},
+		'urls': {
+			'add_plugin': '{% if add_url %}{{ add_url }}{% else %}{% cms_admin_url "cms_page_add_plugin" %}}{% endif %}',
+			'edit_plugin': '{% if edit_url %}{{ edit_url }}{% elif instance %}{% cms_admin_url "cms_page_edit_plugin" instance.pk %}{% endif %}',
+			'move_plugin': '{% if move_url %}{{ move_url }}{% else %}{% cms_admin_url "cms_page_move_plugin" %}{% endif %}',
+			'delete_plugin': '{% if delete_url %}{{ delete_url }}{% elif instance %}{% cms_admin_url "cms_page_delete_plugin" instance.pk %}{% endif %}',
+			'copy_plugin': '{% cms_admin_url "cms_page_copy_plugins" %}'
+		} {% endlanguage %}
+	});
+});
+})(CMS.$);
+</script>{% endaddtoblock %}
+{% endspaceless %}

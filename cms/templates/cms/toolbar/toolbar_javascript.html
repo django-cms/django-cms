@@ -1,0 +1,83 @@
+{% load i18n l10n sekizai_tags admin_static cms_tags %}
+
+{% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />{% endaddtoblock %}
+
+{% addtoblock "js" %}
+<script>
+var _jQuery = window.jQuery || undefined;
+var _$ = window.$ || undefined;
+</script>
+<script src="{% static "cms/js/libs/jquery.min.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/libs/class.min.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/jquery.ui.nestedsortable.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.base.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.modal.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.sideframe.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.clipboard.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.plugins.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.structureboard.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.toolbar.js" %}" type="text/javascript"></script>
+{% language request.toolbar.toolbar_language %}
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+	// this is a global shared configuration
+	CMS.config = {
+		'mode': {% if request.toolbar.edit_mode %}'draft'{% else %}'live'{% endif %},
+		'auth': {% if user.is_authenticated %}true{% else %}false{% endif %},
+		'debug': {% if debug %}true{% else %}false{% endif %},
+		'csrf': '{{ csrf_token }}',
+		'request': {
+			'language': '{{ request.GET.language }}',
+			'model': '{{ request.toolbar.get_object_model }}',
+			'page_id': '{% if request.current_page.publisher_is_draft %}{{ request.current_page.pk }}{% else %}{{ request.current_page.publisher_public_id }}{% endif %}',
+			'pk': '{{ request.toolbar.get_object_pk }}',
+			'url': '{% language request.toolbar.language %}{% cms_admin_url "cms_page_resolve" %}{% endlanguage %}',
+			'tree': '{% language request.toolbar.language %}{% cms_admin_url "cms_page_changelist" %}{% endlanguage %}'
+		},
+		'lang': {
+			'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
+			'cancel': '{% trans "Cancel" %}',
+			'error': '<strong>{% trans "The following error occured:" %}</strong> ',
+			'success': '{% trans "Action successfull... reloading." %}',
+			'confirm': '{% trans "Are you sure you want to delete this plugin?" %}',
+			'publish': '{% trans "Are you sure you want to publish this page?" %}'
+		},
+		'urls': {
+			'settings': '{% cms_admin_url "cms_usersettings_session_store" %}', // url to save settings
+			'static': '{{ STATIC_URL }}'
+		},
+		'settings': {
+			'version': '{{ cms_version }}',
+			'toolbar': 'expanded',
+			'mode': 'edit',
+			'sideframe': { 'url': '' },
+			'states': []
+		},
+		'clipboard': {
+			'id': '{{ request.toolbar.clipboard.pk|unlocalize }}',
+			'url': '{% if request.toolbar.clipboard.pk %}{% cms_admin_url "cms_page_clear_placeholder" request.toolbar.clipboard.pk %}{% endif %}'
+		},
+		'messages': '{% if messages %}{% for message in messages %}{{ message }}{% endfor %}{% endif %}',
+		'error': '{% if request.toolbar.login_form.errors or cms_toolbar_login_error %}{% blocktrans %}<strong>Login failed.</strong> Please check your credentials and try again.{% endblocktrans %}{% endif %}',
+		'publisher': '{% if not request.current_page.publisher_is_draft and request.current_page.publisher_draft.is_dirty and user.is_authenticated %}{% trans "This page has unpublished changes." %}{% endif %}'
+	};
+	CMS.settings = CMS.API.Helpers.getSettings();
+
+	// extends API
+	$.extend(CMS.API, {
+		'Toolbar': new CMS.Toolbar(),
+		'Clipboard': new CMS.Clipboard(),
+		'StructureBoard': new CMS.StructureBoard()
+	});
+});
+})(CMS.$);
+</script>
+{% endlanguage %}
+<script>
+window.jQuery = _jQuery;
+window.$ = _$;
+</script>
+{% endaddtoblock %}

@@ -1,0 +1,66 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//##################################################
+// #IMPORT SETTINGS#
+@import "settings/default";
+
+//##################################################
+// #RESET#
+.cms_reset {
+	div, p, a, a:hover, a:active, a:focus, ul, li,
+	form, fieldset, label, input, textarea {
+		font:normal 13px/20px Helvetica,Arial,sans-serif;
+		color:#222; text-decoration:none; text-align:left; outline:none;
+		list-style-type:none; height:auto; padding:0; margin:0; border:none; background:none;
+	}
+}
+
+//##################################################
+// #TABS#
+// used in: /cms/admin/page/change_form
+#page_form_lang_tabs {
+	position:relative;
+
+	input.language_button { background:#ccc; }
+	input.selected { color:black; text-shadow:none; background:white; }
+	input.notfilled { color:#bbb; background:none; }
+
+	.lang_tabs_line {
+		position:absolute; left:0; bottom:-5px;
+		width:100%; height:5px;
+		background:white;
+	}
+}
+
+//##################################################
+// #DOALOG#
+// used in: /cms/admin/page/tree/copy_premissions
+.cms_dialog {
+	position:absolute; left:50%; top:50%; z-index:99999;
+	width:500px; height:200px; padding:25px; margin:-100px 0 0 -275px;
+	background:white; border:1px solid #ccc; @include border-radius(5px);
+
+	h1 { padding:0; margin:0 0 15px; }
+	form { padding:15px 0; margin:15px 0; border-top:1px solid #f3f3f3; }
+}
+
+//##################################################
+// #GLOBALS#
+.cms_toolbar-noscroll { position:fixed; overflow-y:scroll; width:100%; }
+// removed as of: //github.com/divio/django-cms/issues/2476
+// #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
+
+//##################################################
+// #TOOLBAR#
+@import "includes/common";
+@import "includes/content";
+@import "includes/toolbar";
+@import "includes/modal";
+@import "includes/sideframe";
+@import "includes/clipboard";
+@import "includes/structureboard";
+@import "includes/subnav";
+@import "includes/retina";

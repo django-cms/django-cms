@@ -1,24 +1,10 @@
 # -*- coding: utf-8 -*-
-from cms.models import Page, Title, CMSPlugin, Placeholder
-from cms.utils import get_language_from_request
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
-def save_all_plugins(request, page, placeholder, excludes=None):
+from cms.models import Page, Title, CMSPlugin, Placeholder
 
-    if not page.has_change_permission(request):
-        raise Http404
 
-    for plugin in CMSPlugin.objects.filter(placeholder=placeholder):
-        if excludes:
-            if plugin.pk in excludes:
-                continue
-        instance, admin = plugin.get_plugin_instance()
-        if instance:
-            instance.save()
-        else:
-            plugin.save()
-        
 def revert_plugins(request, version_id, obj):
     from reversion.models import Version
     version = get_object_or_404(Version, pk=version_id)
@@ -29,7 +15,6 @@ def revert_plugins(request, version_id, obj):
     titles = []
     others = []
     page = obj
-    lang = get_language_from_request(request)
     for rev in revs:
         obj = rev.object
         if obj.__class__ == Placeholder:

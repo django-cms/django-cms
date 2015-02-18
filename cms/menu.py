@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+
+from django.contrib.sites.models import Site
+from django.utils.translation import get_language
+
 from cms.apphook_pool import apphook_pool
-from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
-    ACCESS_PAGE_AND_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE)
+from cms.models.permissionmodels import ACCESS_DESCENDANTS
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS
+from cms.models.permissionmodels import ACCESS_CHILDREN
+from cms.models.permissionmodels import ACCESS_PAGE_AND_CHILDREN
+from cms.models.permissionmodels import ACCESS_PAGE
 from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
+from cms.utils.compat.dj import user_related_name
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_fallback_languages, hide_untranslated
 from cms.utils.page_resolver import get_page_queryset
-from cms.utils.moderator import get_title_queryset
+from cms.utils.moderator import get_title_queryset, use_draft
 from cms.utils.plugins import current_site
 from menus.base import Menu, NavigationNode, Modifier
 from menus.menu_pool import menu_pool
-
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.db.models.query_utils import Q
-from django.utils.translation import get_language
 
 
 def get_visible_pages(request, pages, site=None):
@@ -32,31 +34,23 @@ def get_visible_pages(request, pages, site=None):
     is_setting_public_all = public_for == 'all'
     is_setting_public_staff = public_for == 'staff'
     is_auth_user = request.user.is_authenticated()
-
     visible_page_ids = []
     restricted_pages = defaultdict(list)
-    pages_perms_q = Q()
-
-    for page in pages:
-        # taken from for_page as multiple at once version
-        page_q = Q(page__tree_id=page.tree_id) & (
-            Q(page__level__lte=page.level)
-        )
-        pages_perms_q |= page_q
-        
-    pages_perms_q &= Q(can_view=True)
-    page_permissions = PagePermission.objects.filter(pages_perms_q).select_related('page', 'group__users')
+    page_permissions = PagePermission.objects.filter(can_view=True).select_related(
+            'page').prefetch_related('group__' + user_related_name)
 
     for perm in page_permissions:
         # collect the pages that are affected by permissions
+        if site and perm.page.site_id != site.pk:
+            continue
         if perm is not None and perm not in restricted_pages[perm.page.pk]:
             # affective restricted pages gathering
             # using mptt functions 
             # add the page with the perm itself
-            if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN ,ACCESS_PAGE_AND_DESCENDANTS]:
+            if perm.grant_on in [ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS]:
                 restricted_pages[perm.page.pk].append(perm)
                 restricted_pages[perm.page.publisher_public_id].append(perm)
-            # add children
+                # add children
             if perm.grant_on in [ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN]:
                 child_ids = perm.page.get_children().values_list('id', 'publisher_public_id')
                 for id, public_id in child_ids:
@@ -72,30 +66,27 @@ def get_visible_pages(request, pages, site=None):
     # anonymous
     # no restriction applied at all
     if (not is_auth_user and
-        is_setting_public_all and 
+        is_setting_public_all and
         not restricted_pages):
         return [page.pk for page in pages]
-
 
     if site is None:
         site = current_site(request)
 
     # authenticated user and global permission
     if is_auth_user:
-        global_page_perm_q = Q(
-            Q(user=request.user) | Q(group__user=request.user)
-        ) & Q(can_view=True) & Q(Q(sites__in=[site.pk]) | Q(sites__isnull=True))
-        global_view_perms = GlobalPagePermission.objects.filter(global_page_perm_q).exists()
+        global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
+            request.user, site.pk).exists()
 
         #no page perms edge case - all visible
         if ((is_setting_public_all or (
-            is_setting_public_staff and request.user.is_staff))and 
+                is_setting_public_staff and request.user.is_staff)) and
             not restricted_pages and
             not global_view_perms):
             return [page.pk for page in pages]
         #no page perms edge case - none visible
-        elif (is_setting_public_staff and 
-            not request.user.is_staff and 
+        elif (is_setting_public_staff and
+            not request.user.is_staff and
             not restricted_pages and
             not global_view_perms):
             return []
@@ -105,6 +96,7 @@ def get_visible_pages(request, pages, site=None):
         if has_global_perm.cache < 0:
             has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
         return bool(has_global_perm.cache)
+
     has_global_perm.cache = -1
 
     def has_permission_membership(page):
@@ -113,16 +105,17 @@ def get_visible_pages(request, pages, site=None):
         """
         user_pk = request.user.pk
         page_pk = page.pk
-        has_perm = False
         for perm in restricted_pages[page_pk]:
             if perm.user_id == user_pk:
-                has_perm = True
+                return True
             if not perm.group_id:
                 continue
-            group_user_ids = perm.group.user_set.values_list('pk', flat=True)
-            if user_pk in group_user_ids:
-                has_perm = True
-        return has_perm
+            user_set = getattr(perm.group, user_related_name)
+            # Optimization equivalent to
+            # if user_pk in user_set.values_list('pk', flat=True)
+            if any(user_pk == user.pk for user in user_set.all()):
+                return True
+        return False
 
     for page in pages:
         to_add = False
@@ -138,9 +131,9 @@ def get_visible_pages(request, pages, site=None):
                 to_add = True
             # setting based handling of unrestricted pages
             elif not is_restricted and (
-                     is_setting_public_all or (
-                       is_setting_public_staff and request.user.is_staff)
-                     ): 
+                    is_setting_public_all or (
+                        is_setting_public_staff and request.user.is_staff)
+            ):
                 # authenticated user, no restriction and public for all
                 # or 
                 # authenticated staff user, no restriction and public for staff
@@ -153,10 +146,11 @@ def get_visible_pages(request, pages, site=None):
         # anonymous user, no restriction  
         elif not is_restricted and is_setting_public_all:
             to_add = True
-        # store it
+            # store it
         if to_add:
             visible_page_ids.append(page.pk)
     return visible_page_ids
+
 
 def page_to_node(page, home, cut):
     """
@@ -169,80 +163,76 @@ def page_to_node(page, home, cut):
     """
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
-    attr = {'soft_root':page.soft_root,
-            'auth_required':page.login_required,
-            'reverse_id':page.reverse_id,}
-    
+    attr = {'soft_root': page.soft_root,
+        'auth_required': page.login_required,
+        'reverse_id': page.reverse_id, }
+
     parent_id = page.parent_id
     # Should we cut the Node from its parents?
     if home and page.parent_id == home.pk and cut:
         parent_id = None
-    
+
     # possible fix for a possible problem
     #if parent_id and not page.parent.get_calculated_status():
     #    parent_id = None # ????
-    
+
     if page.limit_visibility_in_menu == None:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
         attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
         attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
-        
-    if page.pk == home.pk:
-        attr['is_home'] = True
-
+    attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
-    extenders = [] 
+    extenders = []
     if page.navigation_extenders:
         extenders.append(page.navigation_extenders)
-    # Is this page an apphook? If so, we need to handle the apphooks's nodes
+        # Is this page an apphook? If so, we need to handle the apphooks's nodes
     lang = get_language()
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
     if not hasattr(page, 'title_cache') or lang in page.title_cache:
-        try:
-            app_name = page.get_application_urls(fallback=False)
-        except Title.DoesNotExist:
-            app_name = None
+        app_name = page.get_application_urls(fallback=False)
         if app_name: # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
             for menu in app.menus:
                 extenders.append(menu.__name__)
-    
+
     if extenders:
         attr['navigation_extenders'] = extenders
-    
+
     # Do we have a redirectURL?
     attr['redirect_url'] = page.get_redirect()  # save redirect URL if any
 
     # Now finally, build the NavigationNode object and return it.
     ret_node = NavigationNode(
-        page.get_menu_title(), 
-        page.get_absolute_url(), 
-        page.pk, 
-        parent_id, 
+        page.get_menu_title(),
+        page.get_absolute_url(),
+        page.pk,
+        parent_id,
         attr=attr,
         visible=page.in_navigation,
     )
     return ret_node
 
+
 class CMSMenu(Menu):
-    
     def get_nodes(self, request):
         page_queryset = get_page_queryset(request)
         site = Site.objects.get_current()
         lang = get_language_from_request(request)
-        
+
         filters = {
-            'site':site,
+            'site': site,
         }
-        
+
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
-            
-        pages = page_queryset.published().filter(**filters).order_by("tree_id", "lft")
+
+        if not use_draft(request):
+            page_queryset = page_queryset.published()
+        pages = page_queryset.filter(**filters).order_by("tree_id", "lft")
         ids = {}
         nodes = []
         first = True
@@ -261,7 +251,6 @@ class CMSMenu(Menu):
                 continue
             if not home:
                 home = page
-            page.home_pk_cache = home.pk
             if first and page.pk != home.pk:
                 home_cut = True
             if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
@@ -284,7 +273,9 @@ class CMSMenu(Menu):
         for page in actual_pages:
             if page.title_cache:
                 nodes.append(page_to_node(page, home, home_cut))
-        return nodes  
+        return nodes
+
+
 menu_pool.register_menu(CMSMenu)
 
 
@@ -321,18 +312,20 @@ class NavExtender(Modifier):
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)
-        if breadcrumb:  
-            # if breadcrumb and home not in navigation add node
+        if breadcrumb:
+        # if breadcrumb and home not in navigation add node
             if breadcrumb and home and not home.visible:
                 home.visible = True
-                if request.path == home.get_absolute_url():
+                if request.path_info == home.get_absolute_url():
                     home.selected = True
                 else:
                     home.selected = False
-        # remove all nodes that are nav_extenders and not assigned 
+                    # remove all nodes that are nav_extenders and not assigned
         for node in removed:
             nodes.remove(node)
-        return nodes   
+        return nodes
+
+
 menu_pool.register_modifier(NavExtender)
 
 
@@ -403,9 +396,10 @@ class SoftRootCutter(Modifier):
                 Techniques
                 Instruments
     """
+
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         # only apply this modifier if we're pre-cut (since what we do is cut)
-        if post_cut or not get_cms_setting('SOFTROOT'):
+        if post_cut:
             return nodes
         selected = None
         root_nodes = []
@@ -415,7 +409,7 @@ class SoftRootCutter(Modifier):
                 selected = node
             if not node.parent:
                 root_nodes.append(node)
-        
+
         # if we found a selected ...
         if selected:
             # and the selected is a softroot
@@ -430,19 +424,19 @@ class SoftRootCutter(Modifier):
                 # if it's not a soft root, walk ancestors (upwards!)
                 nodes = self.find_ancestors_and_remove_children(selected, nodes)
         return nodes
-    
+
     def find_and_remove_children(self, node, nodes):
         for child in node.children:
             if child.attr.get("soft_root", False):
                 self.remove_children(child, nodes)
         return nodes
-    
+
     def remove_children(self, node, nodes):
         for child in node.children:
             nodes.remove(child)
             self.remove_children(child, nodes)
         node.children = []
-    
+
     def find_ancestors_and_remove_children(self, node, nodes):
         """
         Check ancestors of node for soft roots
@@ -462,5 +456,6 @@ class SoftRootCutter(Modifier):
             if child != node:
                 self.find_and_remove_children(child, nodes)
         return nodes
-    
+
+
 menu_pool.register_modifier(SoftRootCutter)

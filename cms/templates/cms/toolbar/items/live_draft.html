@@ -1,0 +1,8 @@
+{% load i18n %}
+<div class="cms_toolbar-item cms_toolbar-item_switch{% if not request.toolbar.edit_mode %} cms_toolbar-item_switch-active{% endif %}">
+    <a href="{% if request.toolbar.edit_mode %}?{{ request.toolbar.edit_mode_url_off }}{% else %}?{{ request.toolbar.edit_mode_url_on }}{% endif %}">
+        <span class="cms_toolbar-item_switch-on">{% trans "Live" %}</span>
+        <span class="cms_toolbar-item_switch-off">{% trans "Draft" %}</span>
+    </a>
+    <span class="cms_toolbar-item_switch-knob">{% trans "Change" %}</span>
+</div>

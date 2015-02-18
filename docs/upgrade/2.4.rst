@@ -1,6 +1,6 @@
-##################################
-2.4 release notes (IN DEVELOPMENT)
-##################################
+#################
+2.4 release notes
+#################
 
 *****************
 What's new in 2.4
@@ -13,20 +13,29 @@ What's new in 2.4
 
     2.4 introduces some changes that **require** action if you are upgrading
     from a previous version.
-    
+
     You will need to read the sections :ref:`migrations-upgrade` and
     :ref:`cms-moderator-upgrade` below.
+
+
+Introducing Django 1.5 support, dropped support for Django 1.3 and Python 2.5
+=============================================================================
+
+Django CMS 2.4 introduces Django 1.5 support.
+
+In django CMS 2.4 we dropped support for Django 1.3 and Python 2.5.
+Django 1.4 and Python 2.6 are now the minimum required versions.
 
 
 .. _migrations-upgrade:
 
 Migrations overhaul
 ===================
-In version 2.4 migrations have been completely rewritten to address issues with
-newer South releases.
+In version 2.4, migrations have been completely rewritten to address issues
+with newer South releases.
 
-To ease the upgrading process, all the migrations for the `cms` application have
-been consolidated into a single migration file, `0001_initial.py`.
+To ease the upgrading process, all the migrations for the `cms` application
+have been consolidated into a single migration file, `0001_initial.py`.
 
 *   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to 
 *   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
@@ -49,8 +58,7 @@ First, you'll need to upgrade to 2.3.3, to bring your migration history
 up-to-date with the new scheme. Then you'll need to perform the migrations for
 2.4.
 
-For the two-step upgrade process do the following in your project main directory
-::
+For the two-step upgrade process do the following in your project main directory::
 
     pip install django-cms==2.3.3
     python manage.py syncdb
@@ -63,20 +71,20 @@ Added delete orphaned plugins command
 
 Added a management command for deleting orphaned plugins from the database.
 
-The command can be run with:
+The command can be run with::
 
-	manage.py cms delete_orphaned_plugins
+    manage.py cms delete_orphaned_plugins
 
 Please read :ref:`cms-delete-orphaned-plugins-command` before using.
 
 .. _cms-moderator-upgrade:
 
-Addded a check command
+Added a check command
 ======================
 
 Added a management command to check your configuration and environment.
 
-To use th command, simply run:
+To use this command, simply run:
 
     manage.py cms check
 
@@ -90,30 +98,37 @@ can publish changes to the public site.
 
 .. admonition:: Management command required
 
-    To bring a previous version of your site's database up-to-date, you'll need
-    to run ``manage.py cms moderator on``. **Never run this command without
-    first checking for orphaned plugins**, using the ``cms list plugins``
-    command, and if necessary ``delete_orphaned_plugins``. Running ``cms
-    moderator`` with orphaned plugins will fail and leave bad data in your
-    database. See :ref:`cms-list-command` and
-    :ref:`cms-delete-orphaned-plugins-command`.
+    To bring a previous version of your site's database up-to-date, you'll
+    need to run ``manage.py cms moderator on``. **Never run this command
+    without first checking for orphaned plugins**, using the ``cms list
+    plugins`` command. If it reports problems, run ``manage.py cms
+    delete_orphaned_plugins``. Running ``cms moderator`` with orphaned plugins
+    will fail and leave bad data in your database. See :ref:`cms-list-command`
+    and :ref:`cms-delete-orphaned-plugins-command`.
+
+    Also, check if all your plugins define a
+    :meth:`~cms.models.CMSPlugin.copy_relations` method if required. You can do
+    this by running ``manage.py cms check`` and read the *Presence of
+    "copy_relations"* section. See :ref:`handling-relations` for guidance on
+    this topic.
 
 
-Added Fix MPTTT Management command
-==================================
+Added Fix MPTT Management command
+=================================
 
 Added a management command for fixing MPTT tree data.
 
-The command can be run with:
+The command can be run with::
 
-	manage.py cms fix-mptt
-	
+    manage.py cms fix-mptt
+
 
 Removed the MultilingualMiddleware
 ==================================
 
-We removed the MultilingualMiddleware. This removed the very ugly monkey patching of the
-reverse() function as well. As a benefit we now support localization of urls and Apphook urls with standard django helpers.
+We removed the MultilingualMiddleware. This removed rather some unattractive
+monkey-patching of the ``reverse()`` function as well. As a benefit we now
+support localisation of URLs and apphook URLs with standard Django helpers.
 
 
 For django 1.4 more infos can be found here:
@@ -128,11 +143,13 @@ of the new functionality in django 1.4 and can be found here:
 
 What you need to do:
 
-- Remove the MultilingualMiddleware from your settings.
-- Be sure the LocaleMiddleware is in your settings and that it comes after the SessionMiddleware.
-- Be sure that the cms.urls is included in a i18n_patterns::
+- Remove ``cms.middleware.multilingual.MultilingualURLMiddleware`` from your
+  settings.
+- Be sure ``django.middleware.locale.LocaleMiddleware`` is in your settings,
+  and that it comes after the SessionMiddleware.
+- Be sure that the ``cms.urls`` is included in a ``i18n_patterns``::
 
-        from django.conf.urls.defaults import *
+        from django.conf.urls import *
         from django.conf.urls.i18n import i18n_patterns
         from django.contrib import admin
         from django.conf import settings
@@ -152,9 +169,9 @@ What you need to do:
         ) + urlpatterns
 
 - Change your url and reverse calls to language namespaces. We now support the django way of
-  calling other language urls either via '{% language %}' templatetag or via 'activate("de")' function call in views.
+  calling other language urls either via ``{% language %}`` templatetag or via ``activate("de")`` function call in views.
 
-  Before ::
+  Before::
 
         {% url "de:myview" %}
 
@@ -166,6 +183,17 @@ What you need to do:
 
 - reverse urls now return the language prefix as well. So maybe there is some code that adds language prefixes. Remove
   this code.
+
+Added LanguageCookieMiddleware
+==============================
+
+To fix the behavior of django to determine the language every time from new, when you visit `/` on a page, this
+middleware saves the current language in a cookie with every response.
+
+To enable this middleware add the following to your `MIDDLEWARE_CLASSES` setting:
+
+    `cms.middleware.language.LanguageCookieMiddleware`
+
 
 CMS_LANGUAGES
 =============
@@ -223,7 +251,7 @@ The following settings are not needed any more and have been removed:
 - `CMS_SITE_LANGUAGES`
 - `CMS_FRONTEND_LANGUAGES`
 
-Please remove them from your settings.py
+Please remove them from your ``settings.py``.
 
 CMS_FLAT_URLS
 =============
@@ -235,25 +263,25 @@ Was marked deprecated in 2.3 and has now been removed.
 Plugins in Plugins
 ==================
 
-We added the ability to have plugins in plugins. Till now only the TextPlugin supportet this.
-For demonstration purposes we created a MultiColumn Plugin. The Possiblities for this are endless.
+We added the ability to have plugins in plugins. Until now only the TextPlugin supported this.
+For demonstration purposes we created a MultiColumn Plugin. The possibilities for this are endless.
 Imagine: StylePlugin, TablePlugin, GalleryPlugin etc.
 
 The column plugin can be found here:
 
-https://github.com/divio/djangocms-column
+    https://github.com/divio/djangocms-column
 
 At the moment the limitation is that plugins in plugins is only editable in the frontend.
 
 Here is the MultiColumn Plugin as an example::
-	
-	class MultiColumnPlugin(CMSPluginBase):
-	    model = MultiColumns
-	    name = _("Multi Columns")
-	    render_template = "cms/plugins/multi_column.html"
-	    allow_children = True
-	    child_classes = ["ColumnPlugin"]
-	
+
+    class MultiColumnPlugin(CMSPluginBase):
+        model = MultiColumns
+        name = _("Multi Columns")
+        render_template = "cms/plugins/multi_column.html"
+        allow_children = True
+        child_classes = ["ColumnPlugin"]
+
 There are 2 new properties for plugins:
 
 **allow_children**
@@ -270,17 +298,17 @@ If not provided you can add all plugins that are available in this placeholder.
 How to render your child plugins in the template
 ------------------------------------------------
 
-We introduce a new templatetag in the cms_tags called `{% render_plugin %}`
+We introduce a new templatetag in the cms_tags called ``{% render_plugin %}``
 Here is an example of how the MultiColumn plugin uses it::
-	
-	{% load cms_tags %}
-	<div class="multicolumn">
-	{% for plugin in instance.child_plugins %}
-    	{% render_plugin plugin %}
-	{% endfor %}
-	</div>
 
-As you can see the children are accessible via the plugins childrens attribute.
+    {% load cms_tags %}
+    <div class="multicolumn">
+    {% for plugin in instance.child_plugins %}
+        {% render_plugin plugin %}
+    {% endfor %}
+    </div>
+
+As you can see the children are accessible via the plugins children attribute.
 
 
 New way to handle django CMS settings
@@ -290,7 +318,7 @@ If you have code that needs to access django CMS settings (settings prefixed
 with ``CMS_`` or ``PLACEHOLDER_``) you would have used for example
 ``from django.conf import settings; settings.CMS_TEMPLATES``. This will no
 longer guarantee to return sane values, instead you should use
-``django.utils.conf.get_cms_setting`` which takes the name of the setting
+``cms.utils.conf.get_cms_setting`` which takes the name of the setting
 **without** the ``CMS_`` prefix as argument and returns the setting.
 
 Example of old, now deprecated style::
@@ -308,6 +336,58 @@ Should be replaced with the new API::
     get_cms_setting('PLACEHOLDER_FRONTEND_EDITING')
 
 
+Added ``cms.constants`` module
+==============================
+
+This release adds the ``cms.constants`` module which will hold generic django
+CMS constant values. Currently it only contains ``TEMPLATE_INHERITANCE_MAGIC``
+which used to live in ``cms.conf.global_settings`` but was moved to the new
+``cms.constants`` module in the settings overhaul mentioned above.
+
+
+django-reversion integration changes
+====================================
+
+`django-reversion`_ integration has changed. Because of huge databases after some time we introduce some changes
+to the way revisions are handled for pages.
+
+     1. Only publish revisions are saved. All other revisions are deleted when you publish a page.
+     2. By default only the latest 25 publish revisions are kept. You can change this behavior with the new
+        :setting:`CMS_MAX_PAGE_PUBLISH_REVERSIONS` setting.
+
+
+Changes to the show_sub_menu templatetag
+========================================
+
+the :ttag:`show_sub_menu` has received two new parameters.
+The first stays the same and is still: how many levels of menu should be displayed.
+
+The second: ``root_level`` (default=None), specifies at what level, if any, the menu should root at.
+For example, if root_level is 0 the menu will start at that level regardless of what level the current page is on.
+
+The third argument: ``nephews`` (default=100), specifies how many levels of nephews (children of siblings) are shown.
+
+
+PlaceholderAdmin support i18n
+=============================
+
+
+If you use placeholders in other apps or models we now support more than one language out of the box.
+If you just use the :class:`PlaceholderAdmin` it will display language tabs like the cms. If you
+use `django-hvad`_ it uses the hvad language tabs.
+
+If you want to disable this behavior you can set ``render_placeholder_language_tabs = False`` on your Admin
+class that extends PlaceholderAdmin. If you use a custom ``change_form_template`` be sure to have a look at
+``cms/templates/admin/placeholders/placeholder/change_form.html`` for how to incorporate language tabs.
+
+
+Added CMS_RAW_ID_USERS
+======================
+
+If you have a lot of users (500+) you can set this setting to a number after which admin User fields are displayed in
+a raw Id field. This improves performance a lot in the admin as it has not to load all the users into the html.
+
+
 ******************************
 Backwards incompatible changes
 ******************************
@@ -315,13 +395,15 @@ Backwards incompatible changes
 New minimum requirements for dependencies
 =========================================
 
-If you are running django 1.3.X you need to install django-i18nurls, if you want
-multilingual features. The cms.urls needs to be in a i18n url pattern.
+* Django 1.3 and Python 2.5 are no longer supported.
 
 
 ********************
 Pending deprecations
 ********************
 
-* ``simple_language_changer`` will be removed in version 2.5. A bugfix makes
+* ``simple_language_changer`` will be removed in version 3.0. A bugfix makes
   this redundant as every non managed url will behave like this.
+
+.. _django-reversion: https://github.com/etianen/django-reversion
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad

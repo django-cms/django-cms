@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% load cms_tags %}
 
 {% block content %}
-	<h2>Sample application page - on page {% page_attribute page_title %}</h2>
-	<h3>{{ message }}</h3>
-	{{ block.super }}
-	{% url extra_first %}
-	{% url extra_second %}
+<h2>Sample application page - on page {% page_attribute page_title %}</h2>
+<h3>{{ message }}</h3>
+<h4>{{ opts }}</h4>
+{{ block.super }}
+{% if app %}{% url 'namespaced_app_ns:extra_first' %}{% else %}{% url 'extra_first' %}{% endif %}
+{% if app %}{% url 'namespaced_app_ns:extra_second' %}{% else %}{% url 'extra_second' %}{% endif %}
 {% endblock content %}

@@ -1,0 +1,26 @@
+{% load i18n l10n cms_tags %}
+{% load url from future %}
+
+<div class="cms_dragbar cms_dragbar-{{ placeholder.pk|unlocalize }}">
+	{% language request.toolbar.toolbar_language %}
+	<div class="cms_submenu">
+		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
+		<div class="cms_submenu-dropdown">
+			<div class="cms_submenu-item cms_submenu-item-title"><span>{% trans "Settings" %}</span></div>
+			<div class="cms_submenu-item"><a data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
+			{% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
+				<div class="cms_submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
+			{% endif %}{% endfor %}
+			<div class="cms_submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+            {% extra_menu_items placeholder %}
+			{% plugin_child_classes placeholder %}
+		</div>
+	</div>
+	{% endlanguage %}
+
+	<div class="cms_dragbar-title">{{ placeholder.get_label }}</div>
+</div>
+
+<div class="cms_dragbar-empty-wrapper">
+	<div class="cms_droppable cms_dragbar-empty">{% trans "Drop a plugin here" %}</div>
+</div>

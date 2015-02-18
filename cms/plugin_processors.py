@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils.safestring import mark_safe
 
-def plugin_meta_context_processor(instance, placeholder):
+def plugin_meta_context_processor(instance, placeholder, context):
     return {
         'plugin_index': instance._render_meta.index, # deprecated template variable
         'plugin': {

@@ -1,0 +1,125 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_static admin_list cms_admin cms_js_tags %}
+
+{% block title %}{% trans "List of pages" %}{% endblock %}
+{% block bodyclass %}change-list{% endblock %}
+
+{% if not is_popup %}{% block breadcrumbs %}
+<div class="breadcrumbs">
+	<a href="../../">{% trans "Home" %}</a> &rsaquo;
+	<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+	{% if request.REQUEST.q %}
+	&rsaquo; {% trans "Search" %}
+	{% endif %}
+</div>
+{% endblock %}{% endif %}
+
+{% block coltype %}flex{% endblock %}
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" type="text/css" />
+{% if cl.is_filtered %}
+<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" type="text/css" />
+{% endif %}
+{% endblock extrastyle %}
+
+{% block extrahead %}
+{{ block.super }}
+{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}" type="text/javascript"></script>{% endblock jquery %}
+<script src="{% static "cms/js/libs/class.min.js" %}" type="text/javascript"></script>
+<!-- load changelist -->
+<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.base.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/cms.changelist.js" %}" type="text/javascript"></script>
+<!-- load jstree -->
+<script src="{% static "cms/js/jstree/_lib/_all.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/jstree/tree_component.js" %}" type="text/javascript"></script>
+<script>
+(function($) {
+// CMS.$ will be passed for $
+$(document).ready(function () {
+	// bind csrf token to the header
+	CMS.API.Helpers.csrf('{{ csrf_token }}');
+
+	// initialize tree
+	new CMS.TreeManager({
+		'settings': {
+			'permission': {{ CMS_PERMISSION|js }},
+			'debug': {{ DEBUG|js }},
+			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
+		},
+		'lang': {
+			'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
+			'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
+			'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
+			'publish': '{% filter escapejs %}{% trans "Are you sure you want to %s this page?" %}{% endfilter %}'
+		}
+	});
+});
+})(CMS.$);
+</script>
+{% endblock extrahead %}
+
+{% block content %}
+
+<div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
+
+{% block object-tools %}
+
+	<ul class="object-tools">
+		{% if has_recover_permission %}
+			<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
+		{% endif %}
+		{% if has_add_permission %}
+		<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
+		{% endif %}
+	</ul>
+
+	<div id="loader-message">{% trans "Loading..." %}</div>
+
+{% endblock %}
+<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
+{% block search %}
+
+<form action="." method="post">
+{% if cl.has_access_to_multiple_sites %}
+	<div id="site-selector">{% trans "Pages on:" %}
+		<select id="site-select" name="site__exact">
+			{% for site in cl.sites %}
+			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>
+			{% endfor %}
+		</select>
+		<input type="hidden" id="site-copy" name="copy" />
+		{% csrf_token %}
+	</div>
+{% else %}
+	<input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
+{% endif %}
+</form>
+
+{% search_form cl %}
+{% endblock %}
+{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+
+{% block filters %}
+{% if cl.has_filters %}
+<a href="#" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
+<div id="changelist-filter" style="display:none;">
+<h2>{% trans 'Filter' %}</h2>
+{% for spec in cl.filter_specs %}
+	{% clean_admin_list_filter cl spec %}
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% include "admin/cms/page/tree/base_header.html" %}
+
+</div>
+</div>
+
+<div id="dialogs"></div>
+
+{% endblock %}

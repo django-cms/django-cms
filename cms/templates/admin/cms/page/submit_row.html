@@ -1,0 +1,15 @@
+{% load i18n cms_tags %}
+
+<div class="submit-row" {% if is_popup %}style="overflow: auto;"{% endif %}>
+	{% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save" />{% endif %}
+
+	<p class="deletelink-box">
+	{% if show_delete_link %}<a href="delete/" class="deletelink">{% trans "Delete" %}</a>{% endif %}
+	{% if basic_info %}<a href="{% cms_admin_url 'cms_page_change' object_id %}?language={{ language }}" class="cms_btn-active basic_info">{% trans "Basic Infos" %}</a>{% endif %}
+	{% if advanced_settings %}<a href="{% cms_admin_url 'cms_page_advanced' object_id %}?language={{ language }}" class="cms_btn-active advanced_settings">{% trans "Advanced Settings" %}</a>{% endif %}
+	</p>
+
+	{% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" />{%endif%}
+	{% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" />{% endif %}
+	{% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" />{% endif %}
+</div>

@@ -6,6 +6,7 @@ from cms.management.commands.subcommands.list import ListCommand
 from cms.management.commands.subcommands.moderator import ModeratorCommand
 from cms.management.commands.subcommands.uninstall import UninstallCommand
 from cms.management.commands.subcommands.mptt import FixMPTTCommand
+from cms.management.commands.subcommands.copy_lang import CopyLangCommand
 from cms.management.commands.subcommands.delete_orphaned_plugins import DeleteOrphanedPluginsCommand
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -27,6 +28,7 @@ class Command(SubcommandsCommand):
         'list': ListCommand,
         'moderator': ModeratorCommand,
         'fix-mptt': FixMPTTCommand,
+        'copy-lang': CopyLangCommand,
         'delete_orphaned_plugins': DeleteOrphanedPluginsCommand,
         'check': CheckInstallation,
     }

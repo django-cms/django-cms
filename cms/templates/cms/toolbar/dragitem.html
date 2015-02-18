@@ -1,0 +1,37 @@
+{% load i18n l10n cms_tags %}
+{% load url from future %}
+
+<div class="cms_draggable cms_draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms_draggable-disabled{% endif %}">
+	<div class="cms_dragitem cms_dragitem-handler{% if plugin.child_plugin_instances %} cms_dragitem-collapsable{% endif %}">
+		{% language request.toolbar.toolbar_language %}
+		<div class="cms_switcher"></div>
+		<div class="cms_submenu">
+			<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
+			<div class="cms_submenu-dropdown">
+				<div class="cms_submenu-item cms_submenu-item-title"><span>{% trans "Settings" %}</span></div>
+				<div class="cms_submenu-item"><a data-rel="copy" href="#">{% trans "Copy" %}</a></div>
+				<div class="cms_submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
+				<div class="cms_submenu-item"><a data-rel="edit" href="#">{% trans "Edit" %}</a></div>
+				<div class="cms_submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
+                {% extra_menu_items plugin %}
+				{% plugin_child_classes plugin %}
+			</div>
+		</div>
+
+		{% if show_language %}<span class="cms_submenu-lang">{{ plugin.language }}</span>{% endif %}
+		<span class="cms_dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
+
+	</div>
+
+	{% if plugin.get_plugin_class.allow_children %}<div class="cms_draggables">{% endif %}
+	{% if plugin.get_plugin_class.allow_children and plugin.num_children == 0 %}
+		{# <div class="cms_reset cms_draggable cms_draggable-empty"><div class="cms_dragitem">{% trans "Drop a plugin here" %}</div></div> #}
+	{% endif %}
+	{% if plugin.child_plugin_instances %}
+		{% for child in plugin.child_plugin_instances %}
+			{# workaround because include tag does not allow recursive includes #}
+			{% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child %}{% endwith %}
+		{% endfor %}
+	{% endif %}
+	{% if plugin.get_plugin_class.allow_children %}</div>{% endif %}{% endlanguage %}
+</div>

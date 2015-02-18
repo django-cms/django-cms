@@ -1,251 +1,530 @@
 # -*- coding: utf-8 -*-
-import urllib
-from cms.toolbar.base import Toolbar
-from cms.toolbar.constants import LEFT, RIGHT
-from cms.toolbar.items import (Anchor, Switcher, TemplateHTML, ListItem, List,
-    GetButton)
-from cms.utils import cms_static_url
-from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import has_page_change_permission
-from django import forms
+
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import admin
+from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.sites.models import Site
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:
+    get_user_model = lambda: User
+
+from cms.api import get_page_draft
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
+from cms.models import Title, Page
+from cms.toolbar.items import TemplateItem
+from cms.toolbar_base import CMSToolbar
+from cms.toolbar_pool import toolbar_pool
+from cms.utils.compat import DJANGO_1_4
+from cms.utils.i18n import get_language_tuple, force_language
+from cms.utils.compat.dj import is_installed
+from cms.utils import get_cms_setting
+from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
+from cms.utils.urlutils import add_url_parameters, admin_reverse
+from menus.utils import DefaultLanguageChanger
 
 
-def _get_draft_page_id(toolbar):
-    page = toolbar.request.current_page
-    if page.publisher_is_draft:
-        return page.pk
-    else:
-        return page.publisher_public_id
-
-def _get_page_admin_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_change', args=(_get_draft_page_id(toolbar),))
-
-def _get_page_history_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_history', args=(_get_draft_page_id(toolbar),))
-
-def _get_add_child_url(context, toolbar, **kwargs):
-    data = {
-        'position': 'last-child',
-        'target': _get_draft_page_id(toolbar),
-    }
-    args = urllib.urlencode(data)
-    return '%s?%s' % (reverse('admin:cms_page_add'), args)
-
-def _get_add_sibling_url(context, toolbar, **kwargs):
-    data = {
-        'position': 'last-child',
-    }
-    if toolbar.request.current_page.parent_id:
-        data['target'] = toolbar.request.current_page.get_draft_object().parent_id
-    args = urllib.urlencode(data)
-    return '%s?%s' % (reverse('admin:cms_page_add'), args)
-
-def _get_delete_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_delete', args=(_get_draft_page_id(toolbar),))
-
-def _get_publish_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_publish_page', args=(_get_draft_page_id(toolbar),))
-
-def _get_revert_url(context, toolbar, **kwargs):
-    return reverse('admin:cms_page_revert_page', args=(_get_draft_page_id(toolbar),))
-
-def _page_is_dirty(request):
-    page = request.current_page
-    return page and page.published and page.get_draft_object().is_dirty()
+# Identifiers for search
+ADMIN_MENU_IDENTIFIER = 'admin-menu'
+LANGUAGE_MENU_IDENTIFIER = 'language-menu'
+TEMPLATE_MENU_BREAK = 'Template Menu Break'
+PAGE_MENU_IDENTIFIER = 'page'
+PAGE_MENU_ADD_IDENTIFIER = 'add_page'
+PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
+PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
+PAGE_MENU_THIRD_BREAK = 'Page Menu Third Break'
+PAGE_MENU_FOURTH_BREAK = 'Page Menu Fourth Break'
+PAGE_MENU_LAST_BREAK = 'Page Menu Last Break'
+HISTORY_MENU_IDENTIFIER = 'history'
+HISTORY_MENU_BREAK = 'History Menu Break'
+MANAGE_PAGES_BREAK = 'Manage Pages Break'
+ADMIN_SITES_BREAK = 'Admin Sites Break'
+ADMINISTRATION_BREAK = 'Administration Break'
+USER_SETTINGS_BREAK = 'User Settings Break'
+ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
+REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
+COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 
 
-class CMSToolbarLoginForm(forms.Form):
-    cms_username = forms.CharField()
-    cms_password = forms.CharField()
-
-
-class CMSToolbar(Toolbar):
+@toolbar_pool.register
+class PlaceholderToolbar(CMSToolbar):
     """
-    The default CMS Toolbar
+    Adds placeholder edit buttons if placeholders or static placeholders are detected in the template
     """
-    revert_button = GetButton(RIGHT, 'revert', _("Revert"),
-                              url=_get_revert_url, enable=_page_is_dirty)
 
-    edit_mode_switcher = Switcher(LEFT, 'editmode', 'edit', 'edit-off',
-                                  _('Edit mode'))
+    def init_from_request(self):
+        self.page = get_page_draft(self.request.current_page)
 
-    def __init__(self, request):
-        super(CMSToolbar, self).__init__(request)
-        self.init()
+    def init_placeholders_from_request(self):
+        self.placeholders = getattr(self.request, 'placeholders', [])
+        self.statics = getattr(self.request, 'static_placeholders', [])
 
-    def init(self):
-        """ Hook called when the toolbar is reinitialised """
+    def populate(self):
+        self.init_from_request()
 
-    @property
-    def is_staff(self):
-        return self.request.user.is_staff
+    def post_template_populate(self):
+        self.init_placeholders_from_request()
 
-    @property
-    def can_change(self):
-        return has_page_change_permission(self.request)
+        self.add_structure_mode()
 
-    @property
-    def edit_mode(self):
-        return self.is_staff and self.edit_mode_switcher.get_state(self.request)
+    def add_structure_mode(self):
+        if self.page and not self.page.application_urls:
+            if self.page.has_change_permission(self.request):
+                return self.add_structure_mode_item()
 
-    @property
-    def show_toolbar(self):
-        return self.is_staff or self.edit_mode_switcher.get_state(self.request)
+        elif self.placeholders:
+            return self.add_structure_mode_item()
 
-    @property
-    def current_page(self):
-        return self.request.current_page
+        for sp in self.statics:
+            if sp.has_change_permission(self.request):
+                return self.add_structure_mode_item()
 
-    def get_items(self, context, **kwargs):
-        """
-        Get the CMS items on the toolbar
-        """
-        items = [
-            Anchor(LEFT, 'logo', _('django CMS'), 'https://www.django-cms.org'),
-        ]
+    def add_structure_mode_item(self, extra_classes=('cms_toolbar-item-cms-mode-switcher',)):
+        build_mode = self.toolbar.build_mode
+        build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT, extra_classes=extra_classes)
+        switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
+        switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
 
-        self.page_states = []
 
-        # Store access property values to avoid having to recompute them
-        is_staff = self.is_staff
-        can_change = self.can_change
-        edit_mode = self.edit_mode
+@toolbar_pool.register
+class BasicToolbar(CMSToolbar):
+    """
+    Basic Toolbar for site and languages menu
+    """
 
-        if can_change:
-            items.append(
-                self.edit_mode_switcher
-            )
+    def init_from_request(self):
+        self.page = get_page_draft(self.request.current_page)
 
-        if is_staff:
+    def populate(self):
+        self.init_from_request()
 
-            current_page = self.request.current_page
+        self.add_admin_menu()
+        self.add_language_menu()
 
-            if current_page:
-                # publish button
-                if edit_mode:
-                    if current_page.has_publish_permission(self.request):
-                        items.append(
-                            GetButton(RIGHT, 'moderator', _("Publish"), _get_publish_url)
-                        )
-                    if self.revert_button.is_enabled_for(self.request):
-                        items.append(self.revert_button)
+    def add_admin_menu(self):
+        admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
 
-                # The 'templates' Menu
-                if can_change:
-                    items.append(self.get_template_menu(context, can_change, is_staff))
+        # Users button
+        self.add_users_button(admin_menu)
 
-                # The 'page' Menu
-                items.append(self.get_page_menu(context, can_change, is_staff))
-
-            # The 'Admin' Menu
-            items.append(self.get_admin_menu(context, can_change, is_staff))
-
-        if not self.request.user.is_authenticated():
-            items.append(
-                TemplateHTML(LEFT, 'login', 'cms/toolbar/items/login.html')
-            )
+        # sites menu
+        if get_cms_setting('PERMISSION'):
+            sites_queryset = get_user_sites_queryset(self.request.user)
         else:
-            items.append(
-                GetButton(RIGHT, 'logout', _('Logout'), '?cms-toolbar-logout',
-                          cms_static_url('images/toolbar/icons/icon_lock.png'))
-            )
-        return items
+            sites_queryset = Site.objects.all()
 
-    def get_template_menu(self, context, can_change, is_staff):
-        menu_items = []
-        page = self.request.current_page.get_draft_object()
-        url = reverse('admin:cms_page_change_template', args=(page.pk,))
-        for path, name in get_cms_setting('TEMPLATES'):
-            args = urllib.urlencode({'template': path})
-            css = 'template'
-            if page.get_template() == path:
-                css += ' active'
-            menu_items.append(
-                ListItem(css, name, '%s?%s' % (url, args), 'POST'),
-            )
-        return List(RIGHT, 'templates', _('Template'),
-                    '', items=menu_items)
+        if len(sites_queryset) > 1:
+            sites_menu = admin_menu.get_or_create_menu('sites', _('Sites'))
+            sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
+            sites_menu.add_break(ADMIN_SITES_BREAK)
+            for site in sites_queryset:
+                sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
+                                         active=site.pk == self.current_site.pk)
 
-    def get_page_menu(self, context, can_change, is_staff):
-        """
-        Builds the 'page menu'
-        """
-        menu_items = [
-            ListItem('overview', _('Move/add Pages'),
-                     reverse('admin:cms_page_changelist'),
-                     icon=cms_static_url('images/toolbar/icons/icon_sitemap.png')),
-        ]
-        menu_items.append(
-            ListItem('addchild', _('Add child page'),
-                     _get_add_child_url,
-                     icon=cms_static_url('images/toolbar/icons/icon_child.png'))
-        )
+        # admin
+        admin_menu.add_sideframe_item(_('Administration'), url=admin_reverse('index'))
+        admin_menu.add_break(ADMINISTRATION_BREAK)
 
-        menu_items.append(
-            ListItem('addsibling', _('Add sibling page'),
-                     _get_add_sibling_url,
-                     icon=cms_static_url('images/toolbar/icons/icon_sibling.png'))
-        )
+        # cms users
+        admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
+        admin_menu.add_break(USER_SETTINGS_BREAK)
 
-        menu_items.append(
-            ListItem('delete', _('Delete Page'), _get_delete_url,
-                     icon=cms_static_url('images/toolbar/icons/icon_delete.png'))
-        )
-        return List(RIGHT, 'page', _('Page'),
-                    cms_static_url('images/toolbar/icons/icon_page.png'),
-                    items=menu_items)
+        # logout
+        self.add_logout_button(admin_menu)
 
-    def get_admin_menu(self, context, can_change, is_staff):
-        """
-        Builds the 'admin menu' (the one with the cogwheel)
-        """
-        admin_items = [
-            ListItem('admin', _('Site Administration'),
-                     reverse('admin:index'),
-                     icon=cms_static_url('images/toolbar/icons/icon_admin.png')),
-        ]
-        if can_change and self.request.current_page:
-            admin_items.append(
-                ListItem('settings', _('Page Settings'),
-                         _get_page_admin_url,
-                         icon=cms_static_url('images/toolbar/icons/icon_page.png'))
-            )
-            if 'reversion' in settings.INSTALLED_APPS:
-                admin_items.append(
-                    ListItem('history', _('View History'),
-                             _get_page_history_url,
-                             icon=cms_static_url('images/toolbar/icons/icon_history.png'))
-                )
-        return List(RIGHT, 'admin', _('Admin'),
-                    cms_static_url('images/toolbar/icons/icon_admin.png'),
-                    items=admin_items)
+    def add_users_button(self, parent):
+        User = get_user_model()
 
-    def request_hook(self):
-        if self.request.method != 'POST':
-            return self._request_hook_get()
+        if User in admin.site._registry:
+            opts = User._meta
+
+            if self.request.user.has_perm('%s.%s' % (opts.app_label, opts.get_change_permission())):
+                user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.module_name))
+                parent.add_sideframe_item(_('Users'), url=user_changelist_url)
+
+    def add_logout_button(self, parent):
+        # If current page is not published or has view restrictions user is redirected to the home page:
+        # * published page: no redirect
+        # * unpublished page: redirect to the home page
+        # * published page with login_required: redirect to the home page
+        # * published page with view permissions: redirect to the home page
+
+        if (self.page and self.page.is_published(self.current_lang) and not self.page.login_required and
+                self.page.has_view_permission(self.request, AnonymousUser())):
+            on_success = self.toolbar.REFRESH_PAGE
         else:
-            return self._request_hook_post()
+            on_success = '/'
 
-    def _request_hook_get(self):
-        request = self.request
-        if 'cms-toolbar-logout' in request.GET:
-            logout(request)
-            return HttpResponseRedirect(request.path)
+        # We'll show "Logout Joe Bloggs" if the name fields in auth.User are completed, else "Logout jbloggs". If
+        # anything goes wrong, it'll just be "Logout".
 
-    def _request_hook_post(self):
-        request = self.request
-        # login hook
-        if 'cms-toolbar-login' in request.GET:
-            login_form = CMSToolbarLoginForm(request.POST)
-            if login_form.is_valid():
-                username = login_form.cleaned_data['cms_username']
-                password = login_form.cleaned_data['cms_password']
-                user = authenticate(username=username, password=password)
-                if user:
-                    login(request, user)
-                    self.init()
+        user_name = self.get_username()
+        logout_menu_text = _('Logout %s') % user_name if user_name else _('Logout')
+
+        parent.add_ajax_item(logout_menu_text, action=admin_reverse('logout'), active=True, on_success=on_success)
+
+    def add_language_menu(self):
+        if settings.USE_I18N:
+            language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
+            language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
+            for code, name in get_language_tuple(self.current_site.pk):
+                try:
+                    url = language_changer(code)
+                except NoReverseMatch:
+                    url = DefaultLanguageChanger(self.request)(code)
+                language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+
+    def get_username(self, user=None, default=''):
+        user = user or self.request.user
+        try:
+            name = user.get_full_name()
+            if name:
+                return name
+            elif DJANGO_1_4:
+                return user.username
+            else:
+                return user.get_username()
+        except (AttributeError, NotImplementedError):
+            return default
+
+
+@toolbar_pool.register
+class PageToolbar(CMSToolbar):
+    watch_models = [Page]
+
+    # Helpers
+
+    def init_from_request(self):
+        self.page = get_page_draft(self.request.current_page)
+        self.title = self.get_title()
+        self.permissions_activated = get_cms_setting('PERMISSION')
+
+    def init_placeholders_from_request(self):
+        self.placeholders = getattr(self.request, 'placeholders', [])
+        self.statics = getattr(self.request, 'static_placeholders', [])
+        self.dirty_statics = [sp for sp in self.statics if sp.dirty]
+
+    def get_title(self):
+        try:
+            return Title.objects.get(page=self.page, language=self.current_lang, publisher_is_draft=True)
+        except Title.DoesNotExist:
+            return None
+
+    def has_publish_permission(self):
+        if not hasattr(self, 'publish_permission'):
+            publish_permission = bool(self.page or self.statics)
+
+            if self.page:
+                publish_permission = self.page.has_publish_permission(self.request)
+
+            if self.statics:
+                publish_permission &= all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
+
+            self.publish_permission = publish_permission
+
+        return self.publish_permission
+
+    def has_page_change_permission(self):
+        if not hasattr(self, 'page_change_permission'):
+            # check global permissions if CMS_PERMISSIONS is active
+            global_permission = self.permissions_activated and has_page_change_permission(self.request)
+
+            # check if user has page edit permission
+            page_permission = self.page and self.page.has_change_permission(self.request)
+
+            self.page_change_permission = global_permission or page_permission
+
+        return self.page_change_permission
+
+    def page_is_pending(self, page, language):
+        return (page.publisher_public_id and
+                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
+
+    def in_apphook(self):
+        with force_language(self.toolbar.language):
+            try:
+                resolver = resolve(self.request.path_info)
+            except Resolver404:
+                return False
+            else:
+                from cms.views import details
+                return resolver.func != details
+
+    def get_on_delete_redirect_url(self):
+        parent, language = self.page.parent, self.current_lang
+
+        # if the current page has a parent in the request's current language redirect to it
+        if parent and language in parent.get_languages():
+            with force_language(language):
+                return parent.get_absolute_url(language=language)
+
+        # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
+        # page, if DEBUG == False this could cause a 404
+        return reverse('pages-root')
+
+    # Populate
+
+    def populate(self):
+        self.init_from_request()
+
+        self.change_admin_menu()
+        self.add_page_menu()
+        self.add_history_menu()
+        self.change_language_menu()
+
+    def post_template_populate(self):
+        self.init_placeholders_from_request()
+
+        self.add_publish_button()
+        self.add_draft_live()
+
+    # Buttons
+
+    def add_publish_button(self, classes=('cms_btn-action', 'cms_btn-publish',)):
+        # only do dirty lookups if publish permission is granted else button isn't added anyway
+        if self.toolbar.edit_mode and self.has_publish_permission():
+            classes = list(classes or [])
+            pk = self.page.pk if self.page else 0
+
+            dirty = (bool(self.dirty_statics) or
+                     (self.page and (self.page.is_dirty(self.current_lang) or
+                                     self.page_is_pending(self.page, self.current_lang))))
+
+            if dirty:
+                classes.append('cms_btn-publish-active')
+
+            if self.dirty_statics or (self.page and self.page.is_published(self.current_lang)):
+                title = _('Publish changes')
+            else:
+                title = _('Publish page now')
+                classes.append('cms_publish-page')
+
+            params = {}
+
+            if self.dirty_statics:
+                params['statics'] = ','.join(str(sp.pk) for sp in self.dirty_statics)
+
+            if self.in_apphook():
+                params['redirect'] = self.request.path_info
+
+            with force_language(self.current_lang):
+                url = admin_reverse('cms_page_publish_page', args=(pk, self.current_lang))
+
+            url = add_url_parameters(url, params)
+
+            self.toolbar.add_button(title, url=url, extra_classes=classes,
+                                    side=self.toolbar.RIGHT, disabled=not dirty)
+
+    def add_draft_live(self):
+        if self.page:
+            if self.toolbar.edit_mode and not self.title:
+                self.add_page_settings_button()
+
+            if self.page.has_change_permission(self.request) and self.page.is_published(self.current_lang):
+                return self.add_draft_live_item()
+
+        elif self.placeholders:
+            return self.add_draft_live_item()
+
+        for sp in self.statics:
+            if sp.has_change_permission(self.request):
+                return self.add_draft_live_item()
+
+    def add_draft_live_item(self, template='cms/toolbar/items/live_draft.html', extra_context=None):
+        context = {'request': self.request}
+        context.update(extra_context or {})
+        pos = len(self.toolbar.right_items)
+        self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
+
+    def add_page_settings_button(self, extra_classes=('cms_btn-action',)):
+        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.language)
+        self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
+
+    # Menus
+
+    def change_language_menu(self):
+        if self.toolbar.edit_mode and self.page:
+            language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
+            if not language_menu:
+                return None
+
+            languages = get_language_tuple(self.current_site.pk)
+            languages_dict = dict(languages)
+
+            remove = [(code, languages_dict.get(code, code)) for code in self.page.get_languages()]
+            add = [l for l in languages if l not in remove]
+            copy = [(code, name) for code, name in languages if code != self.current_lang and (code, name) in remove]
+
+            if add:
+                language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
+                page_change_url = admin_reverse('cms_page_change', args=(self.page.pk,))
+                title = _('Add %(language)s Translation')
+                for code, name in add:
+                    url = add_url_parameters(page_change_url, language=code)
+                    language_menu.add_modal_item(title % {'language': name}, url=url)
+
+            if remove:
+                language_menu.add_break(REMOVE_PAGE_LANGUAGE_BREAK)
+                translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
+                title = _('Delete %(language)s Translation')
+                disabled = len(remove) == 1
+                for code, name in remove:
+                    url = add_url_parameters(translation_delete_url, language=code)
+                    language_menu.add_modal_item(title % {'language': name}, url=url, disabled=disabled)
+
+            if copy:
+                language_menu.add_break(COPY_PAGE_LANGUAGE_BREAK)
+                page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
+                title = _('Copy all plugins from %s')
+                question = _('Are you sure you want copy all plugins from %s?')
+                for code, name in copy:
+                    language_menu.add_ajax_item(title % name, action=page_copy_url,
+                                                data={'source_language': code, 'target_language': self.current_lang},
+                                                question=question % name, on_success=self.toolbar.REFRESH_PAGE)
+
+    def change_admin_menu(self):
+        if self.has_page_change_permission():
+            admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+            url = admin_reverse('cms_page_changelist')  # cms page admin
+            params = {'language': self.toolbar.language}
+            if self.page:
+                params['page_id'] = self.page.pk
+            url = add_url_parameters(url, params)
+            admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
+
+    def add_page_menu(self):
+        if self.page and self.has_page_change_permission():
+            edit_mode = self.toolbar.edit_mode
+            refresh = self.toolbar.REFRESH_PAGE
+
+            # menu for current page
+            current_page_menu = self.toolbar.get_or_create_menu(PAGE_MENU_IDENTIFIER, _('Page'), position=1)
+
+            # page operations menu
+            add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Add Page'))
+            app_page_url = admin_reverse('cms_page_add')
+            add_page_menu_sideframe_items = (
+                (_('New Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.parent_id or ''}),
+                (_('New Sub Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.pk}),
+                (_('Duplicate this Page'), {'copy_target': self.page.pk})
+            )
+
+            for title, params in add_page_menu_sideframe_items:
+                params.update(language=self.toolbar.language)
+                add_page_menu.add_sideframe_item(title, url=add_url_parameters(app_page_url, params))
+
+            # first break
+            current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
+
+            # page edit
+            page_edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
+
+            # page settings
+            page_settings_url = admin_reverse('cms_page_change', args=(self.page.pk,))
+            page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.language)
+            current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=not edit_mode,
+                                             on_close=refresh)
+
+            # templates menu
+            if self.toolbar.build_mode or edit_mode:
+                templates_menu = current_page_menu.get_or_create_menu('templates', _('Templates'))
+                action = admin_reverse('cms_page_change_template', args=(self.page.pk,))
+                for path, name in get_cms_setting('TEMPLATES'):
+                    active = self.page.template == path
+                    if path == TEMPLATE_INHERITANCE_MAGIC:
+                        templates_menu.add_break(TEMPLATE_MENU_BREAK)
+                    templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
+                                                 on_success=refresh)
+
+            # second break
+            current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
+
+            # advanced settings
+            advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
+            advanced_url = add_url_parameters(advanced_url, language=self.toolbar.language)
+            advanced_disabled = not self.page.has_advanced_settings_permission(self.request) or not edit_mode
+            current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
+
+            # permissions
+            if self.permissions_activated:
+                permissions_url = admin_reverse('cms_page_permissions', args=(self.page.pk,))
+                permission_disabled = not edit_mode or not self.page.has_change_permissions_permission(self.request)
+                current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, disabled=permission_disabled)
+
+            # dates settings
+            dates_url = admin_reverse('cms_page_dates', args=(self.page.pk,))
+            current_page_menu.add_modal_item(_('Publishing dates'), url=dates_url, disabled=not edit_mode)
+
+            # third break
+            current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
+
+            # navigation toggle
+            nav_title = _('Hide in navigation') if self.page.in_navigation else _('Display in navigation')
+            nav_action = admin_reverse('cms_page_change_innavigation', args=(self.page.pk,))
+            current_page_menu.add_ajax_item(nav_title, action=nav_action, disabled=not edit_mode, on_success=refresh)
+
+            # publisher
+            if self.title:
+                if self.title.published:
+                    publish_title = _('Unpublish page')
+                    publish_url = admin_reverse('cms_page_unpublish', args=(self.page.pk, self.current_lang))
+                else:
+                    publish_title = _('Publish page')
+                    publish_url = admin_reverse('cms_page_publish_page', args=(self.page.pk, self.current_lang))
+                current_page_menu.add_ajax_item(publish_title, action=publish_url, disabled=not edit_mode,
+                                                on_success=refresh)
+
+            # fourth break
+            current_page_menu.add_break(PAGE_MENU_FOURTH_BREAK)
+
+            # delete
+            delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
+            on_delete_redirect_url = self.get_on_delete_redirect_url()
+            current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
+                                             disabled=not edit_mode)
+
+            # last break
+            current_page_menu.add_break(PAGE_MENU_LAST_BREAK)
+
+            # page type
+            page_type_url = admin_reverse('cms_page_add_page_type')
+            page_type_url = add_url_parameters(page_type_url, copy_target=self.page.pk, language=self.toolbar.language)
+            current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=not edit_mode)
+
+    def add_history_menu(self):
+        if self.toolbar.edit_mode and self.page:
+            refresh = self.toolbar.REFRESH_PAGE
+            history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
+
+            if is_installed('reversion'):
+                import reversion
+                from reversion.models import Revision
+
+                versions = reversion.get_for_object(self.page)
+                if self.page.revision_id:
+                    current_revision = Revision.objects.get(pk=self.page.revision_id)
+                    has_undo = versions.filter(revision__pk__lt=current_revision.pk).exists()
+                    has_redo = versions.filter(revision__pk__gt=current_revision.pk).exists()
+                else:
+                    has_redo = False
+                    has_undo = versions.count() > 1
+
+                undo_action = admin_reverse('cms_page_undo', args=(self.page.pk,))
+                redo_action = admin_reverse('cms_page_redo', args=(self.page.pk,))
+
+                history_menu.add_ajax_item(_('Undo'), action=undo_action, disabled=not has_undo, on_success=refresh)
+                history_menu.add_ajax_item(_('Redo'), action=redo_action, disabled=not has_redo, on_success=refresh)
+
+                history_menu.add_break(HISTORY_MENU_BREAK)
+
+            revert_action = admin_reverse('cms_page_revert_page', args=(self.page.pk, self.current_lang))
+            revert_question = _('Are you sure you want to revert to live?')
+            history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
+                                       disabled=not self.page.is_dirty(self.current_lang), on_success=refresh)
+            history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))
