@@ -207,17 +207,15 @@ def page_to_node(page, home, cut):
         app_name = page.get_application_urls(fallback=False)
         if app_name:  # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
-            for menu in app.menus:
-                extenders.append(menu.__name__)
-
+            extenders += app.menus
     exts = []
     for ext in extenders:
         if hasattr(ext, "get_instances"):
             # CMSAttachMenus are treated a bit differently to allow them to be
             # able to be attached to multiple points in the navigation.
-            exts.append("{0}:{1}".format(ext, page.pk))
+            exts.append("{0}:{1}".format(ext.__name__, page.pk))
         else:
-            exts.append(ext)
+            exts.append(ext.__name__)
     if exts:
         attr['navigation_extenders'] = exts
 
