@@ -214,8 +214,10 @@ def page_to_node(page, home, cut):
             # CMSAttachMenus are treated a bit differently to allow them to be
             # able to be attached to multiple points in the navigation.
             exts.append("{0}:{1}".format(ext.__name__, page.pk))
-        else:
+        elif hasattr(ext, '__name__'):
             exts.append(ext.__name__)
+        else:
+            exts.append(ext)
     if exts:
         attr['navigation_extenders'] = exts
 
