@@ -38,7 +38,7 @@ Usage:
     develop.py isolated test [<test-label>...] [--parallel] [--migrate]
                              [--xvfb]
     develop.py server [--port=<port>] [--bind=<bind>] [--migrate]
-                      [--user=<user>]
+                      [--user=<user>] [<application-name> <migration-number>]
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
@@ -63,7 +63,7 @@ Options:
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False, app_name=None, migration=None):
     if os.environ.get("RUN_MAIN") != "true":
         from django.contrib.auth import get_user_model  # must be imported lazily
         if DJANGO_1_6:
@@ -71,7 +71,11 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
             if migrate_cmd:
                 syncdb.Command().handle_noargs(interactive=False, verbosity=1,
                                                database='default')
-                migrate.Command().handle(interactive=False, verbosity=1)
+                if app_name:
+                    migrate.Command().handle(interactive=False, verbosity=1, app=app_name,
+                                             target=migration)
+                else:
+                    migrate.Command().handle(interactive=False, verbosity=1)
             else:
                 syncdb.Command().handle_noargs(interactive=False, verbosity=1,
                                                database='default',
@@ -79,7 +83,10 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
                 migrate.Command().handle(interactive=False, verbosity=1,
                                          fake=True)
         else:
-            call_command("migrate", database='default')
+            if app_name:
+                call_command("migrate", app_name, migration, database='default')
+            else:
+                call_command("migrate", database='default')
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
@@ -383,7 +390,9 @@ def main():
                 server(
                     args['--bind'],
                     args['--port'],
-                    args.get('--migrate', True)
+                    args.get('--migrate', True),
+                    args.get('<application-name>', None),
+                    args.get('<migration-number>', None)
                 )
             elif args['shell']:
                 shell()
