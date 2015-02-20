@@ -1,8 +1,8 @@
 ##########
 django CMS
 ##########
-.. image:: https://api.travis-ci.org/marksweb/django-cms.svg?branch=develop
-    :target: http://travis-ci.org/marksweb/django-cms
+.. image:: https://api.travis-ci.org/divio/django-cms.svg?branch=develop
+    :target: http://travis-ci.org/divio/django-cms
 .. image:: https://pypip.in/v/django-cms/badge.svg
     :target: https://crate.io/packages/django-cms/
 .. image:: https://pypip.in/d/django-cms/badge.svg
