@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import override
 
 from cms.models import UserSettings
+from cms.utils.compat import DJANGO_1_4
 from cms.utils.transaction import wrap_transaction
 from cms.utils.urlutils import admin_reverse
 
@@ -56,14 +57,25 @@ class SettingsAdmin(ModelAdmin):
         POST should have a settings parameter
         """
         if not request.user.is_staff:
-            return HttpResponse(json.dumps(""), mimetype="application/json")
+            if DJANGO_1_4:
+                return HttpResponse(json.dumps(""),
+                    mimetype="application/json")
+            else:
+                return HttpResponse(json.dumps(""),
+                    content_type="application/json")
         if request.method == "POST":
             request.session['cms_settings'] = request.POST['settings']
             request.session.save()
-        return HttpResponse(
-            json.dumps(request.session.get('cms_settings', '')),
-            mimetype="application/json"
-        )
+        if DJANGO_1_4:
+            return HttpResponse(
+                json.dumps(request.session.get('cms_settings', '')),
+                mimetype="application/json"
+            )
+        else:
+            return HttpResponse(
+                json.dumps(request.session.get('cms_settings', '')),
+                content_type="application/json"
+            )
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user
