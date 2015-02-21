@@ -9,7 +9,7 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
 from django.core.urlresolvers import reverse
@@ -177,7 +177,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        response_text = smart_text(response)
+        response_text = response.render().rendered_content
         self.assertTrue(re.search('edit_plugin.+/admin/custom/view/%s' % plugin_1.pk, response_text))
         self.assertTrue(re.search('move_plugin.+/admin/custom/move/', response_text))
         self.assertTrue(re.search('delete_plugin.+/admin/custom/delete/%s/' % plugin_1.pk, response_text))
