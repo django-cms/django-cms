@@ -23,7 +23,7 @@ def forwards(apps, schema_editor):
             if page_permission in group.permissions.all():
                 group.permissions.add(permission)
     except ContentType.DoesNotExist:
-        print(u'Cannot migrate users to use_structure permission, please add the permission manually')
+        print(u'Users not migrated to use_structure permission, please add the permission manually')
 
 
 def backwards(apps, schema_editor):
@@ -46,5 +46,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterModelOptions(
+            name='placeholder',
+            options={'permissions': (('use_structure', 'Can use Structure mode'),)},
+        ),
         migrations.RunPython(forwards, backwards)
     ]
