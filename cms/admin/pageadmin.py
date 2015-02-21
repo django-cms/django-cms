@@ -1357,9 +1357,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def resolve(self, request):
         if not request.user.is_staff:
             if DJANGO_1_4:
-                return HttpResponse('', mimetype='text/plain')
+                return HttpResponse('/', mimetype='text/plain')
             else:
-                return HttpResponse('', content_type='text/plain')
+                return HttpResponse('/', content_type='text/plain')
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             try:
