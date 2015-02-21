@@ -155,6 +155,17 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response,
                             '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
 
+    def test_markup_menu_items(self):
+        superuser = self.get_superuser()
+        create_page("toolbar-page", "col_two.html", "en", published=True)
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+                            '<div class="cms_submenu-item"><a href="/some/url/" data-rel="ajax"')
+        self.assertContains(response,
+                            '<div class="cms_submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
+
     def test_show_toolbar_to_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
                            published=True)
