@@ -362,6 +362,15 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
 class PluginMenuItem(object):
     def __init__(self, name, url, data, question=None, action='ajax'):
+        """
+        Creates an item in the plugin / placeholder menu
+
+        :param name: Item name (label)
+        :param url: URL the item points to. This URL will be called using POST
+        :param data: Data to be POSTed to the above URL
+        :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
+        :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+        """
         self.name = name
         self.url = url
         self.data = json.dumps(data)
