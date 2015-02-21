@@ -157,7 +157,7 @@ render_uncached_placeholder
 ===========================
 
 The same as :ttag:`render_placeholder`, but the placeholder contents will not be
-cached taken from the cache.
+cached or taken from the cache.
 
 Arguments:
 
