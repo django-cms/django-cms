@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.shortcuts import get_object_or_404
@@ -1223,6 +1224,110 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             cache.set('cms:xframe_options:%s' % self.pk, xframe_options)
 
         return xframe_options
+
+    def undo(self):
+        """
+        Revert the current page to the previous revision
+        """
+        import reversion
+
+        # Get current reversion version by matching the reversion_id for the page
+        versions = reversion.get_for_object(self)
+        if self.revision_id:
+            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+        else:
+            try:
+                current_version = versions[0]
+            except IndexError as e:
+                e.message = "no current revision found"
+                raise
+            current_revision = current_version.revision
+        try:
+            previous_version = versions.filter(revision__pk__lt=current_revision.pk)[0]
+        except IndexError as e:
+            e.message = "no previous revision found"
+            raise
+        previous_revision = previous_version.revision
+
+        clean = self._apply_revision(previous_revision)
+        return Page.objects.get(pk=self.pk), clean
+
+    def redo(self):
+        """
+        Revert the current page to the next revision
+        """
+        import reversion
+
+        # Get current reversion version by matching the reversion_id for the page
+        versions = reversion.get_for_object(self)
+        if self.revision_id:
+            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+        else:
+            try:
+                current_version = versions[0]
+            except IndexError as e:
+                e.message = "no current revision found"
+                raise
+            current_revision = current_version.revision
+        try:
+            previous_version = versions.filter(revision__pk__gt=current_revision.pk).order_by('pk')[0]
+        except IndexError as e:
+            e.message = "no next revision found"
+            raise
+        next_revision = previous_version.revision
+
+        clean = self._apply_revision(next_revision)
+        return Page.objects.get(pk=self.pk), clean
+
+    def _apply_revision(self, target_revision):
+        """
+        Revert to a specific revision
+        """
+        from cms.utils.page_resolver import is_valid_url
+        # Get current titles
+        old_titles = list(self.title_set.all())
+
+        # remove existing plugins / placeholders in the current page version
+        placeholder_ids = self.placeholders.all().values_list('pk', flat=True)
+        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
+        for plugin in plugins:
+            plugin._no_reorder = True
+            plugin.delete()
+        self.placeholders.all().delete()
+
+        # populate the page status data from the target version
+        target_revision.revert(True)
+        rev_page = get_object_or_404(Page, pk=self.pk)
+        rev_page.revision_id = target_revision.pk
+        rev_page.publisher_public_id = self.publisher_public_id
+        rev_page.save()
+
+        # cleanup placeholders
+        new_placeholders = rev_page.placeholders.all()
+        slots = {}
+        for new_ph in new_placeholders:
+            if not new_ph.slot in slots:
+                slots[new_ph.slot] = new_ph
+            else:
+                if new_ph in placeholder_ids:
+                    new_ph.delete()
+                elif slots[new_ph.slot] in placeholder_ids:
+                    slots[new_ph.slot].delete()
+
+        # check reverted titles for slug collisions
+        new_titles = rev_page.title_set.all()
+        clean = True
+        for title in new_titles:
+            try:
+                is_valid_url(title.path, rev_page)
+            except ValidationError:
+                for old_title in old_titles:
+                    if old_title.language == title.language:
+                        title.slug = old_title.slug
+                        title.save()
+                        clean = False
+        return clean
+
 
 def _reversion():
     exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']

@@ -276,10 +276,6 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page2_pk)
             self.assertEqual(Page.objects.all().count(), 5)
 
-
-
-
-
     def test_publish_limits(self):
         with self.login_user_context(self.user):
             with self.settings(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
