@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _, override
 from django.core.urlresolvers import reverse
 
 from cms.api import create_page, create_title, add_plugin
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -233,7 +233,8 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
-        request = self.get_page_request(page, self.get_staff(), edit=True)
+        user = self.get_staff()
+        request = self.get_page_request(page, user, edit=True)
         toolbar = CMSToolbar(request)
         toolbar.populate()
         toolbar.post_template_populate()
@@ -241,7 +242,19 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_publish_permission(request))
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit-mode + templates + page-menu + admin-menu + logout
+        # Logo + templates + page-menu + admin-menu + logout
+        self.assertEqual(len(items), 5)
+
+        # adding back structure mode permission
+        permission = Permission.objects.get(codename='use_structure')
+        user.user_permissions.add(permission)
+
+        request.user = get_user_model().objects.get(pk=user.pk)
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
+        items = toolbar.get_left_items() + toolbar.get_right_items()
+        # Logo + edit mode + templates + page-menu + admin-menu + logout
         self.assertEqual(len(items), 6)
 
     def test_no_change_button(self):
@@ -273,12 +286,14 @@ class ToolbarTests(ToolbarTestBase):
         en_toolbar = CMSToolbar(en_request)
         en_toolbar.populate()
         en_toolbar.post_template_populate()
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
+        # Logo + templates + page-menu + admin-menu + logout
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
+        # Logo + templates + page-menu + admin-menu + logout
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
     def test_placeholder_name(self):

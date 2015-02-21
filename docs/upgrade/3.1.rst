@@ -18,7 +18,7 @@ the tree got corrupted because of transactional errors.
 In 3.1 we replaced MPTT for MP (Materialized Path). MP is more efficient and has more error resistance then MPTT.
 It should make the whole django CMS experience way better, faster and reliable.
 
-Bofore upgrading
+Before upgrading
 ----------------
 
 Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
@@ -44,3 +44,17 @@ Migrations packages has been renamed to the standard layout:
 
 South 1.0.2 is now required to correctly handle the above layout; if you are upgrading from Django 1.7 / django CMS 3.0.x,
 please remove the old migration path from ``MIGRATION_MODULES`` settings.
+
+Structure mode permission
+=========================
+
+The new "**Can use Structure mode**" permission has been added. Without this permission, a
+non-superuser cannot enter structure mode anymore: this allow more strict workflow which only
+enable content update for certain users.
+This change include data migration
+that adds the new permission to any staff user or group with
+`cms.change_page` permission; you can then later change this according to your permission
+model and workflow.
+Be aware that existing users cannot be migrated if running the django CMS
+migrations for the first time in the project, because permissions are not already in place;
+in this case users must be given the new permission manually.

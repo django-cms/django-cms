@@ -82,9 +82,12 @@ class PlaceholderToolbar(CMSToolbar):
         build_mode = self.toolbar.build_mode
         build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT, extra_classes=extra_classes)
-        switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
-        switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
+
+        if self.request.user.has_perm("cms.use_structure"):
+            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                    extra_classes=extra_classes)
+            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
+            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
 
 
 @toolbar_pool.register
