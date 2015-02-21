@@ -182,6 +182,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(re.search('move_plugin.+/admin/custom/move/', response_text))
         self.assertTrue(re.search('delete_plugin.+/admin/custom/delete/%s/' % plugin_1.pk, response_text))
         self.assertTrue(re.search('add_plugin.+/admin/custom/view/', response_text))
+        self.assertTrue(re.search('copy_plugin.+/admin/custom/copy/', response_text))
 
         self.assertTrue(re.search('edit_plugin.+/en/admin/cms/page/edit-plugin/%s' % plugin_2.pk, response_text))
         self.assertTrue(re.search('delete_plugin.+/en/admin/cms/page/delete-plugin/%s/' % plugin_2.pk, response_text))

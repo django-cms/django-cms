@@ -437,3 +437,11 @@ Returns the url to call to delete a plugin instance; useful to implement plugin-
 logic in a custom view
 
 Default: None (``cms_page_delete_plugin`` view is used)
+
+copy_url
+--------
+
+Returns the url to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_copy_plugins`` view is used)

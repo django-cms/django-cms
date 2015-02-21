@@ -455,6 +455,13 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         """
         return None
 
+    @property
+    def copy_url(self):
+        """
+        Returns a custom url to copy plugin instances
+        """
+        return None
+
 reversion_register(CMSPlugin)
 
 

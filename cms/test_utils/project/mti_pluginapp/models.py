@@ -27,6 +27,10 @@ class TestPluginAlphaModel(CMSPlugin):
     def delete_url(self):
         return '/admin/custom/delete/%s/' % self.pk
 
+    @property
+    def copy_url(self):
+        return '/admin/custom/copy/'
+
 
 class TestPluginBetaModel(TestPluginAlphaModel):
     """
