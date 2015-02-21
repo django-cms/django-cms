@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
-from django.contrib.auth.models import Permission
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
