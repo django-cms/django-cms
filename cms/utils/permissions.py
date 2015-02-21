@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -28,6 +29,17 @@ def get_current_user():
     Returns current user, or None
     """
     return getattr(_thread_locals, 'user', None)
+
+
+@contextmanager
+def current_user(user):
+    """
+    Changes the current user just within a context.
+    """
+    old_user = get_current_user()
+    set_current_user(user)
+    yield
+    set_current_user(old_user)
 
 
 def has_page_add_permission(request):

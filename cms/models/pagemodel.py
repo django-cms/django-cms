@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from logging import Logger
+from logging import getLogger
 from os.path import join
 
 from django.conf import settings
@@ -29,6 +29,8 @@ from cms.utils.helpers import reversion_register, current_site
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
+
+logger = getLogger(__name__)
 
 @python_2_unicode_compatible
 class Page(six.with_metaclass(PageMetaClass, MP_Node)):
@@ -180,7 +182,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 if target.get_root().get_next_sibling().pk == public.get_root().pk:
                     target = target.publisher_public
                 else:
-                    Logger.warning('tree may need rebuilding: run manage.py cms fix-tree')
+                    logger.warning('tree may need rebuilding: run manage.py cms fix-tree')
         if position == 'first-child' or position == 'last-child':
             self.parent_id = target.pk
         else:
