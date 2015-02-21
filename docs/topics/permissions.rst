@@ -82,9 +82,9 @@ Using the *Pages global permissions* model you can give a set of permissions to 
 
 .. _structure_mode_permissions:
 
-***************
-Mode permission
-***************
+********************
+Edit mode permission
+********************
 
 .. versionchanged:: 3.1
 
