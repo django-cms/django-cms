@@ -110,7 +110,7 @@ Example::
     {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
 
 
-.. templatetag:: show_placeholder
+.. templatetag:: render_placeholder
 
 render_placeholder
 ==================
@@ -124,6 +124,10 @@ The :ttag:`render_placeholder` tag takes the following parameters:
 * ``width`` parameter for context sensitive plugins (optional)
 * ``language`` keyword plus ``language-code`` string to render content in the
   specified language (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+* ``as`` keyword followed by ``varname`` (optional): the templatetag output can
+  be saved as a context variable for later use.
 
 
 The following example renders the my_placeholder field from the mymodel_instance and will render
@@ -147,7 +151,29 @@ only the english plugins:
     When used in this manner, the placeholder will not be displayed for
     editing when the CMS is in edit mode.
 
+.. templatetag:: render_uncached_placeholder
 
+render_uncached_placeholder
+===========================
+
+The same as :ttag:`render_placeholder`, but the placeholder contents will not be
+cached or taken from the cache.
+
+Arguments:
+
+* :class:`~cms.models.fields.PlaceholderField` instance
+* ``width`` parameter for context sensitive plugins (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+* ``as`` keyword followed by ``varname`` (optional): the templatetag output can
+  be saved as a context variable for later use.
+
+Example::
+
+    {% render_uncached_placeholder mymodel_instance.my_placeholder language 'en' %}
+
+
+.. templatetag:: show_placeholder
 
 show_placeholder
 ================
@@ -168,6 +194,29 @@ Examples::
     {% show_placeholder "footer" "footer_container_page" %}
     {% show_placeholder "content" request.current_page.parent_id %}
     {% show_placeholder "teaser" request.current_page.get_root %}
+
+
+.. templatetag:: show_uncached_placeholder
+
+show_uncached_placeholder
+=========================
+
+The same as :ttag:`show_placeholder`, but the placeholder contents will not be
+cached or taken from the cache.
+
+Arguments:
+
+- ``placeholder_name``
+- ``page_lookup`` (see `page_lookup`_ for more information)
+- ``language`` (optional)
+- ``site`` (optional)
+
+Example::
+
+    {% show_uncached_placeholder "footer" "footer_container_page" %}
+
+
+.. templatetag:: page_lookup
 
 page_lookup
 ===========
@@ -208,25 +257,6 @@ inherit the content of its root-level ancestor::
         {% show_placeholder "teaser" request.current_page.get_root %}
     {% endplaceholder %}
 
-
-.. templatetag:: show_uncached_placeholder
-
-show_uncached_placeholder
-=========================
-
-The same as :ttag:`show_placeholder`, but the placeholder contents will not be
-cached.
-
-Arguments:
-
-- ``placeholder_name``
-- ``page_lookup`` (see `page_lookup`_ for more information)
-- ``language`` (optional)
-- ``site`` (optional)
-
-Example::
-
-    {% show_uncached_placeholder "footer" "footer_container_page" %}
 
 .. templatetag:: page_url
 
