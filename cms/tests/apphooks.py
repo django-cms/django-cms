@@ -593,7 +593,7 @@ class ApphooksTestCase(CMSTestCase):
             self.user = self._create_user('staff', True, False)
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            response.context['request'].user = self.user
+            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
             toolbar = CMSToolbar(response.context['request'])
             toolbar.populate()
             placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
@@ -605,7 +605,7 @@ class ApphooksTestCase(CMSTestCase):
             self.user.user_permissions.add(Permission.objects.get(codename='change_example1'))
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            response.context['request'].user = self.user
+            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
             toolbar = CMSToolbar(response.context['request'])
             toolbar.populate()
             placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)

@@ -358,17 +358,26 @@ class ToolbarTests(ToolbarTestBase):
                             published=True)
         page2 = create_page("test", "nav_playground.html", "en",
                             published=True)
+        page3 = create_page("non-pub", "nav_playground.html", "en",
+                            published=False)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
             url = admin_reverse('cms_page_resolve')
+            # first call returns the latest modified page with updated slug even if a different
+            # page has been requested
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
+            # following call returns the actual page requested
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/')
-        response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-        self.assertEqual(response.content.decode('utf-8'), '')
+            # non published page - staff user can access it
+            response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '/en/non-pub/')
+        # anonymous users should be redirected to the root page
+        response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
+        self.assertEqual(response.content.decode('utf-8'), '/')
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
