@@ -39,6 +39,7 @@ from cms.test_utils.project.placeholderapp.models import (
     MultilingualExample1,
     TwoPlaceholderExample,
 )
+from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
 from cms.test_utils.util.mock import AttributeObject
@@ -305,6 +306,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
+
+    def test_placeholder_field_db_table(self):
+        """
+        Test for #3891
+        """
+        example = Category.objects.create(
+            name='category',
+            parent=None
+        )
+        self.assertEqual(len(example.description._get_attached_fields()), 1)
 
     def test_placeholder_field_valid_slotname(self):
         self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
