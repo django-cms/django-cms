@@ -136,13 +136,8 @@ used moderation in the past.
     if necessary ``delete_orphaned_plugins``. Running  ``cms moderator`` with
     orphaned plugins will fail and leave bad data in your database.
 
-
-**************************************
-Additional commands
-**************************************
-
-``publisher_publish``
-======================
+``cms publisher_publish``
+=========================
 
 If you want to publish many pages at once, this command can help you. By default,
 this command publishes drafts for all public pages.
@@ -163,16 +158,16 @@ Example::
     publisher_publish
 
     #publish all drafts in all pages
-    publisher_publish --unpublished
+    cms publisher_publish --unpublished
 
     #publish drafts for public pages in deutsch
-    publisher_publish --language=de
+    cms publisher_publish --language=de
 
     #publish all drafts in deutsch
-    publisher_publish --unpublished --language=de
+    cms publisher_publish --unpublished --language=de
 
     #publish all drafts in deutsch, but only for site with id=2
-    publisher_publish --unpublished --language=de --site=2
+    cms publisher_publish --unpublished --language=de --site=2
 
 .. warning::
 

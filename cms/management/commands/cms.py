@@ -4,6 +4,7 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.management.commands.subcommands.check import CheckInstallation
 from cms.management.commands.subcommands.list import ListCommand
 from cms.management.commands.subcommands.moderator import ModeratorCommand
+from cms.management.commands.subcommands.publisher_publish import PublishCommand
 from cms.management.commands.subcommands.tree import FixTreeCommand
 from cms.management.commands.subcommands.uninstall import UninstallCommand
 from cms.management.commands.subcommands.copy_lang import CopyLangCommand
@@ -31,6 +32,7 @@ class Command(SubcommandsCommand):
         'copy-lang': CopyLangCommand,
         'delete_orphaned_plugins': DeleteOrphanedPluginsCommand,
         'check': CheckInstallation,
+        'publisher_publish': PublishCommand,
     }
 
     @property

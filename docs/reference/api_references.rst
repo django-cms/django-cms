@@ -166,6 +166,15 @@ Functions and constants
     :type user: :class:`django.contrib.auth.models.User` instance
     :param string language: The target language to publish to
 
+.. function:: publish_pages(include_unpublished=False, language=None, site=None)
+
+    Publishes multiple pages defined by parameters.
+
+    :param bool include_unpublished: Set to ``True`` to publish all drafts, including unpublished ones; otherwise, only already published pages will be republished
+    :param string language: If given, only pages in this language will be published; otherwise, all languages will be published
+    :param site: Specify a site to publish pages for specified site only; if not specified pages from all sites are published
+    :type site: :class:`django.contrib.sites.models.Site` instance
+
 .. function:: get_page_draft(page):
 
     Returns the draft version of a page, regardless if the passed in
