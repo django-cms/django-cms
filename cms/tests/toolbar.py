@@ -817,7 +817,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% load cms_tags %}
 
 {% block content %}
-{% render_model_add view.model %}
+{% render_model_add instance_class %}
 {% endblock content %}
 '''
         request = self.get_page_request(page, user, edit=True)
