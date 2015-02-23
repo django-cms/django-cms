@@ -309,12 +309,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_db_table(self):
         """
-        Test for #3891
+        Test for leaking Django 1.7 Model._meta.db_table monkeypatching
+        on sqlite See #3891
+        This test for a side-effect of the above which prevents placeholder
+        fields to return the 
         """
         example = Category.objects.create(
             name='category',
             parent=None
         )
+        self.assertEqual(example.description._get_attached_fields()[0].model, Category)
         self.assertEqual(len(example.description._get_attached_fields()), 1)
 
     def test_placeholder_field_valid_slotname(self):
