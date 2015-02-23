@@ -48,6 +48,7 @@ def current_app(request):
     context = RequestContext(request, {'app': app}, current_app=app)
     return render_to_response("sampleapp/app.html", context)
 
+
 def plain_view(request):
     context = RequestContext(request, {'content': 'plain text'})
     return render_to_response("sampleapp/plain.html", context)

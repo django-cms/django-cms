@@ -4,6 +4,7 @@ from datetime import datetime
 from itertools import chain
 import re
 from classytags.values import StringValue
+from django.db.models import Model
 from cms.utils.urlutils import admin_reverse
 
 from django import template
@@ -535,26 +536,6 @@ class PageAttribute(AsTag):
 register.tag(PageAttribute)
 
 
-class CleanAdminListFilter(InclusionTag):
-    template = 'admin/filter.html'
-    name = 'clean_admin_list_filter'
-
-    options = Options(
-        Argument('cl'),
-        Argument('spec'),
-    )
-
-    def get_context(self, context, cl, spec):
-        choices = sorted(list(spec.choices(cl)), key=lambda k: k['query_string'])
-        query_string = None
-        unique_choices = []
-        for choice in choices:
-            if choice['query_string'] != query_string:
-                unique_choices.append(choice)
-                query_string = choice['query_string']
-        return {'title': spec.title(), 'choices': unique_choices}
-
-
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
                                site=None, cache_result=True):
     """
@@ -985,12 +966,63 @@ class CMSEditableObjectAdd(CMSEditableObject):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
         extra_context = self._get_empty_context(context, instance, None,
                                                 language, view_url, view_method,
                                                 editmode=False)
         extra_context['render_model_add'] = True
         return extra_context
 register.tag(CMSEditableObjectAdd)
+
+
+class CMSEditableObjectAddBlock(CMSEditableObject):
+    """
+    Templatetag that links arbitrary content to the addform for the specified
+    model (based on the provided model instance).
+    """
+    name = 'render_model_add_block'
+    options = Options(
+        Argument('instance'),
+        Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
+        blocks=[('endrender_model_add_block', 'nodelist')],
+    )
+
+    def render_tag(self, context, **kwargs):
+        """
+        Renders the block and then inject the resulting HTML in the template
+        context
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        data['content'] = mark_safe(kwargs['nodelist'].render(data))
+        data['rendered_content'] = data['content']
+        output = render_to_string(template, data)
+        context.pop()
+        if kwargs.get('varname'):
+            context[kwargs['varname']] = output
+            return ''
+        else:
+            return output
+
+    def get_context(self, context, instance, language,
+                    view_url, view_method, varname, nodelist):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
+        extra_context = self._get_empty_context(context, instance, None,
+                                                language, view_url, view_method,
+                                                editmode=False)
+        extra_context['render_model_add'] = True
+        return extra_context
+register.tag(CMSEditableObjectAddBlock)
 
 
 class CMSEditableObjectBlock(CMSEditableObject):
