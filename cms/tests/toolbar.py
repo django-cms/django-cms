@@ -24,7 +24,7 @@ from cms.test_utils.project.placeholderapp.models import (Example1, CharPksExamp
                                                           MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import (detail_view, detail_view_char,
                                                          detail_view_multi,
-                                                         detail_view_multi_unfiltered)
+                                                         detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import UserLoginContext
@@ -808,6 +808,47 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
+
+    def test_add_tag_class(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_add instance_class %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        response = detail_view(request, ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+                'placeholderapp', 'example1', '0'))
+
+    def test_add_tag_classview(self):
+        user = self.get_staff()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template_text = '''{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block content %}
+{% render_model_add view.model %}
+{% endblock content %}
+'''
+        request = self.get_page_request(page, user, edit=True)
+        view_func = ClassDetail.as_view(template_string=template_text)
+        response = view_func(request, pk=ex1.pk, template_string=template_text)
+        self.assertContains(
+            response,
+            '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+                'placeholderapp', 'example1', '0'))
 
     def test_block_tag(self):
         user = self.get_staff()

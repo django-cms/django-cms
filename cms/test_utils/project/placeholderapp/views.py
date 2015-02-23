@@ -18,6 +18,7 @@ def _base_detail(request, instance, template_name='detail.html',
                  item_name="char_1", template_string='',):
     context = RequestContext(request)
     context['instance'] = instance
+    context['instance_class'] = instance.__class__
     context['item_name'] = item_name
     if template_string:
         template = Template(template_string)
@@ -30,6 +31,7 @@ def list_view_multi(request):
     context = RequestContext(request)
     context['examples'] = MultilingualExample1.objects.language(
         get_language_from_request(request)).all()
+    context['instance_class'] = MultilingualExample1
     return render_to_response('list.html', context)
 
 
@@ -51,6 +53,7 @@ def detail_view_multi_unfiltered(request, pk, template_name='detail_multi.html',
 def list_view(request):
     context = RequestContext(request)
     context['examples'] = Example1.objects.all()
+    context['instance_class'] = Example1
     return render_to_response('list.html', context)
 
 
@@ -71,3 +74,17 @@ def detail_view_char(request, pk, template_name='detail.html', item_name="char_1
 class ClassDetail(DetailView):
     model = Example1
     template_name = "detail.html"
+    template_string = ''
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.template_string:
+            context = RequestContext(self.request, context)
+            template = Template(self.template_string)
+            return HttpResponse(template.render(context))
+        else:
+            return super(ClassDetail, self).render_to_response(context, **response_kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ClassDetail, self).get_context_data(**kwargs)
+        context['instance_class'] = self.model
+        return context
