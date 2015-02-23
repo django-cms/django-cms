@@ -169,7 +169,16 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
 
 
 def reorder_plugins(placeholder, parent_id, language, order):
-    plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder, language=language).order_by('position')
+    """
+    Reorder the plugins according the order parameter
+
+    :param placeholder: placeholder instance which contains the given plugins
+    :param parent_id: parent of the given plugins
+    :param language: language
+    :param order: optional custom order (given as list of plugin primary keys)
+    """
+    plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder,
+                                       language=language).order_by('position')
     x = 0
     for level_plugin in plugins:
         if order:
