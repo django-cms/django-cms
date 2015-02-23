@@ -1649,8 +1649,6 @@ class BrokenPluginTests(TestCase):
         with self.settings(INSTALLED_APPS=new_apps):
             plugin_pool.discovered = False
             self.assertRaises(ImportError, plugin_pool.discover_plugins)
-            apps.unset_installed_apps()
-
 
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):
