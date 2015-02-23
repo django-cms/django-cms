@@ -20,7 +20,7 @@ class PlaceholderField(models.ForeignKey):
             del(kwargs['to'])
         kwargs.update({'null': True})  # always allow Null
         kwargs.update({'editable': False}) # never allow edits in admin
-        super(PlaceholderField, self).__init__(Placeholder, **kwargs)
+        super(PlaceholderField, self).__init__('cms.Placeholder', **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(PlaceholderField, self).deconstruct()
