@@ -570,6 +570,39 @@ class AdminTestCase(AdminTestsBase):
             response = self.client.get(url, {'language': 'es-mx'})
             self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'es-mx', es_title, ))
 
+    def test_empty_placeholder_in_correct_language(self):
+        """
+        Test that Cleaning a placeholder only affect current language contents
+        """
+        # create some objects
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        # add the text plugin to the en version of the page
+        text_plugin_en_1 = add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        text_plugin_en_2 = add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # creating a de title of the page and adding plugins to it
+        page_title_de = create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug())
+        text_plugin_de_1 = add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
+        text_plugin_de_2 = add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
+        text_plugin_de_3 = add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")
+
+        # before cleaning the de placeholder
+        self.assertEqual(ph.get_plugins('en').count(), 2)
+        self.assertEqual(ph.get_plugins('de').count(), 3)
+
+        admin_user, staff = self._get_guys()
+        with self.login_user_context(admin_user):
+            url = '%s?language=de' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+            response = self.client.post(url, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+
+        # After cleaning the de placeholder, en placeholder must still have all the plugins
+        self.assertEqual(ph.get_plugins('en').count(), 2)
+        self.assertEqual(ph.get_plugins('de').count(), 0)
+
 
 class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
