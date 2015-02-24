@@ -91,6 +91,29 @@ class ExtensionsTestCase(TestCase):
 
         return TestNoneExtension
 
+    def test_copy_extensions(self):
+        root = create_page('Root', "nav_playground.html", "en", published=True)
+        page = create_page('Test Page Extension', "nav_playground.html", "en",
+                           parent=root.get_draft_object())
+        page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
+        page_extension.save()
+        page.mypageextension = page_extension
+        title = page.get_title_obj()
+        title_extension = MyTitleExtension(extended_object=title, extra_title='title extension 1')
+        title_extension.save()
+        page.mytitleextension = title_extension
+
+        copied_page = page.copy_page(root.get_draft_object(), page.site, position='last-child')
+        copied_title = copied_page.title_set.get(language='en')
+
+        self.assertEqual(len(extension_pool.get_page_extensions(copied_page)), 1)
+        self.assertEqual(len(extension_pool.get_title_extensions(copied_title)), 1)
+
+        self.assertEqual(extension_pool.get_page_extensions(copied_page)[0].extra,
+                         page_extension.extra)
+        self.assertEqual(extension_pool.get_title_extensions(copied_title)[0].extra_title,
+                         title_extension.extra_title)
+
     def test_publish_page_extension(self):
         page = create_page('Test Page Extension', "nav_playground.html", "en")
         page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
