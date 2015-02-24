@@ -8,7 +8,7 @@ from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest,
-    HttpResponseForbidden, HttpResponseRedirect)
+                         HttpResponseForbidden, HttpResponseRedirect)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
@@ -27,7 +27,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins, permissions, get_language_from_request, get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.plugins import requires_reload, has_reached_plugin_limit
+from cms.utils.plugins import requires_reload, has_reached_plugin_limit, reorder_plugins
 from cms.utils.urlutils import admin_reverse
 
 
@@ -443,25 +443,10 @@ class PlaceholderAdminMixin(object):
             child.placeholder = placeholder
             child.language = language
             child.save()
-        plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder, language=language).order_by('position')
-        x = 0
-        for level_plugin in plugins:
-            if order:
-                x = 0
-                found = False
-                for pk in order:
-                    if level_plugin.pk == int(pk):
-                        level_plugin.position = x
-                        level_plugin.save()
-                        found = True
-                        break
-                    x += 1
-                if not found:
-                    return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
-            else:
-                level_plugin.position = x
-                level_plugin.save()
-                x += 1
+        plugins = reorder_plugins(placeholder, parent_id, language, order)
+        if not plugins:
+            return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
+
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
         return HttpResponse(json.dumps(json_response), content_type='application/json')

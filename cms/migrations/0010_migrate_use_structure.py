@@ -42,7 +42,7 @@ def backwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0008_auto_20150208_2149'),
+        ('cms', '0009_merge'),
     ]
 
     operations = [
