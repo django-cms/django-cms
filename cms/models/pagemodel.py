@@ -328,6 +328,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             tree[0].old_pk = tree[0].pk
 
         first = True
+        first_page = None
         # loop over all affected pages (self is included in descendants)
         for page in pages:
             titles = list(page.title_set.all())
@@ -353,6 +354,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 else:
                     page.parent = None
                 page.insert_at(target, position)
+                first_page = page
             else:
                 count = 1
                 found = False
@@ -419,7 +421,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             extension_pool.copy_extensions(Page.objects.get(pk=origin_id), page)
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
-        return page
+        return first_page
 
     def save(self, no_signals=False, commit=True, **kwargs):
         """
