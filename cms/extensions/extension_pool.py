@@ -106,16 +106,22 @@ class ExtensionPool(object):
                 draft_extension=None
             ).delete()
 
-    def get_page_extensions(self, page):
+    def get_page_extensions(self, page=None):
         extensions = []
         for extension in self.page_extensions:
-            extensions.extend(list(extension.objects.filter(extended_object=page)))
+            if page:
+                extensions.extend(list(extension.objects.filter(extended_object=page)))
+            else:
+                extensions.extend(list(extension.objects.all()))
         return extensions
 
-    def get_title_extensions(self, title):
+    def get_title_extensions(self, title=None):
         extensions = []
         for extension in self.title_extensions:
-            extensions.extend(list(extension.objects.filter(extended_object=title)))
+            if title:
+                extensions.extend(list(extension.objects.filter(extended_object=title)))
+            else:
+                extensions.extend(list(extension.objects.all()))
         return extensions
 
 extension_pool = ExtensionPool()
