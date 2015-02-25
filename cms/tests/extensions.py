@@ -91,6 +91,53 @@ class ExtensionsTestCase(TestCase):
 
         return TestNoneExtension
 
+    def test_copy_extensions(self):
+        root = create_page('Root', "nav_playground.html", "en", published=True)
+        page = create_page('Test Page Extension', "nav_playground.html", "en",
+                           parent=root.get_draft_object())
+        subpage = create_page('Test subpage Extension', "nav_playground.html", "en",
+                              parent=page)
+        page = Page.objects.get(pk=page.pk)
+        page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
+        page_extension.save()
+        page.mypageextension = page_extension
+        title = page.get_title_obj()
+        title_extension = MyTitleExtension(extended_object=title, extra_title='title extension 1')
+        title_extension.save()
+        page.mytitleextension = title_extension
+
+        subpage_extension = MyPageExtension(extended_object=subpage, extra='page extension 2')
+        subpage_extension.save()
+        subpage.mypageextension = subpage_extension
+        subtitle = subpage.get_title_obj()
+        subtitle_extension = MyTitleExtension(extended_object=subtitle, extra_title='title extension 2')
+        subtitle_extension.save()
+        subpage.mytitleextension = subtitle_extension
+
+        # asserting original extensions
+        self.assertEqual(len(extension_pool.get_page_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+
+        copied_page = page.copy_page(root.get_draft_object(), page.site, position='last-child')
+
+        # asserting original + copied extensions
+        self.assertEqual(len(extension_pool.get_page_extensions()), 4)
+        self.assertEqual(len(extension_pool.get_title_extensions()), 4)
+
+        # testing extension content
+        old_page_extensions = [page_extension, subpage_extension]
+        old_title_extension = [title_extension, subtitle_extension]
+        for index, new_page in enumerate([copied_page] + list(copied_page.get_descendants())):
+            self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
+                             old_page_extensions[index].extra)
+            self.assertEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].extra_title,
+                             old_title_extension[index].extra_title)
+            # check that objects are actually different
+            self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
+                                old_page_extensions[index].pk)
+            self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
+                                old_title_extension[index].pk)
+
     def test_publish_page_extension(self):
         page = create_page('Test Page Extension', "nav_playground.html", "en")
         page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
