@@ -579,14 +579,14 @@ class AdminTestCase(AdminTestsBase):
         ph = page_en.placeholders.get(slot="body")
 
         # add the text plugin to the en version of the page
-        text_plugin_en_1 = add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
-        text_plugin_en_2 = add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
 
         # creating a de title of the page and adding plugins to it
-        page_title_de = create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug())
-        text_plugin_de_1 = add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
-        text_plugin_de_2 = add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
-        text_plugin_de_3 = add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")
+        create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug())
+        add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")
 
         # before cleaning the de placeholder
         self.assertEqual(ph.get_plugins('en').count(), 2)
