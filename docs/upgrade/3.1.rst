@@ -24,6 +24,13 @@ Before upgrading
 Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
 
 
+System plugin attribute
+=======================
+
+:ref:`system_plugin` attribute has been added to :class:`CMSPluginBase`, it allows plugin
+to be added to any placeholder, overriding any placeholder configuration.
+
+
 Dropped support for Django 1.4 and 1.5
 ======================================
 
