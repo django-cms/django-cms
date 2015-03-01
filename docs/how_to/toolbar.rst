@@ -285,6 +285,7 @@ selected poll and its sub-methods::
 
         return render(request, 'polls/detail.html', {'poll': poll})
 
+.. _url_changes:
 
 ---------------------
 Detecting url changes
