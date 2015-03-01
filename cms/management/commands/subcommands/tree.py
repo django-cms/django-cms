@@ -1,0 +1,34 @@
+from cms.models import Page, CMSPlugin
+from django.core.management.base import NoArgsCommand
+
+
+class FixTreeCommand(NoArgsCommand):
+    help = 'Repairing Materialized Path Tree for Pages'
+
+    def handle_noargs(self, **options):
+        """
+        Repairs the tree
+        """
+        self.stdout.write(u"fixing page tree")
+        Page.fix_tree()
+        last = None
+        try:
+            first = Page.objects.filter(publisher_is_draft=True, parent__isnull=True).order_by('path')[0]
+        except IndexError:
+            first = None
+        for page in Page.objects.filter(publisher_is_draft=True, parent__isnull=True).order_by('site__pk', 'path'):
+            if last:
+                last = last.reload()
+                page = page.reload()
+                page.move(target=last, pos='right')
+            elif first and first.pk != page.pk:
+                page.move(target=first, pos='left')
+            last = page.reload()
+        for page in Page.objects.filter(publisher_is_draft=False, parent__isnull=True).order_by('publisher_public__path'):
+            page = page.reload()
+            public = page.publisher_public
+            page.move(target=public, pos='right')
+
+        self.stdout.write(u"fixing plugin tree")
+        CMSPlugin.fix_tree()
+        self.stdout.write(u"all done")

@@ -44,7 +44,7 @@ Now run the application's migrations using ``south``::
 
     python manage.py migrate polls
 
-At this point you should be able to add create polls and choices in the Django
+At this point you should be able to create polls and choices in the Django
 admin - localhost:8000/admin/ - and fill them in at ``/polls/``.
 
 However, in pages of the polls application we only have minimal templates, and
@@ -183,7 +183,8 @@ something like this::
         <input type="submit" value="Vote" />
     </form>
 
-Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
+Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
+to add the plugin table (using South)::
 
     python manage.py schemamigration polls_plugin --init
     python manage.py migrate polls_plugin

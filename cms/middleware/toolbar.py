@@ -102,15 +102,11 @@ class ToolbarMiddleware(object):
     def process_response(self, request, response):
         from django.utils.cache import add_never_cache_headers
 
-        found = False
-        if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            found = True
-        for placeholder in getattr(request, 'placeholders', []):
-            if not placeholder.cache_placeholder:
-                found = True
-                break
-        if found:
+        if ((hasattr(request, 'toolbar') and request.toolbar.edit_mode) or
+            not all(ph.cache_placeholder
+                    for ph in getattr(request, 'placeholders', ()))):
             add_never_cache_headers(response)
+
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:
             try:
                 pk = LogEntry.objects.filter(

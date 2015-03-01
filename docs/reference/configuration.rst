@@ -38,7 +38,8 @@ Required Settings
 CMS_TEMPLATES
 =============
 
-Default: ``()`` (Not a valid setting!)
+default
+    ``()`` (Not a valid setting!)
 
 A list of templates you can select for a page.
 
@@ -77,7 +78,8 @@ Basic Customisation
 CMS_TEMPLATE_INHERITANCE
 ========================
 
-Default: ``True``
+default
+    ``True``
 
 Enables the inheritance of templates from parent pages.
 
@@ -90,7 +92,8 @@ from the parent page* (unless the page is a root page).
 CMS_TEMPLATES_DIR
 =================
 
-Default: ``None``
+default
+    ``None``
 
 Instead of explicitly providing a set of templates via :setting:`CMS_TEMPLATES`
 a directory can be provided using this configuration.
@@ -134,7 +137,8 @@ for translation.
 CMS_PLACEHOLDER_CONF
 ====================
 
-Default: ``{}``
+default
+    ``{}``
 
 Used to configure placeholders. If not given, all plugins will be available in
 all placeholders.
@@ -223,14 +227,14 @@ plugins, as shown above with ``base.html content``.
     Each element of the list is a dictionary with following keys :
 
     ``plugin_type``
-        It's the plugin type to add to the placeholder
+        The plugin type to add to the placeholder
         Example : 'TextPlugin'
 
     ``values``
-        Dictionnary to use for the plugin creation.
+        Dictionary to use for the plugin creation.
         It depends on the ``plugin_type``. See the documentation of each
         plugin type to see which parameters are required and available.
-        Example for a Textplugin :
+        Example for a Textplugin:
         {'body':'<p>Lorem ipsum</p>'}
         Example for a LinkPlugin :
         {'name':'Django-CMS','url':'https://www.django-cms.org'}
@@ -238,7 +242,7 @@ plugins, as shown above with ``base.html content``.
     ``children``
         It is a list of dictionnaries to configure default plugins
         to add as children for the current plugin (it must accepts children).
-        Each dictionnary accepts same args than dictionnaries of
+        Each dictionary accepts same args than dictionnaries of
         ``default_plugins`` : ``plugin_type``, ``values``, ``children``
         (yes, it is recursive).
 
@@ -310,7 +314,8 @@ plugins, as shown above with ``base.html content``.
 CMS_PLUGIN_CONTEXT_PROCESSORS
 =============================
 
-Default: ``[]``
+default
+    ``[]``
 
 A list of plugin context processors. Plugin context processors are callables
 that modify all plugins' context *before* rendering. See
@@ -321,7 +326,8 @@ that modify all plugins' context *before* rendering. See
 CMS_PLUGIN_PROCESSORS
 =====================
 
-Default: ``[]``
+default
+    ``[]``
 
 A list of plugin processors. Plugin processors are callables that modify all
 plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
@@ -332,7 +338,8 @@ for more information.
 CMS_APPHOOKS
 ============
 
-Default: ``()``
+default:
+    ``()``
 
 A list of import paths for :class:`cms.app_base.CMSApp` subclasses.
 
@@ -358,7 +365,8 @@ I18N and L10N
 CMS_LANGUAGES
 =============
 
-Default: Value of :setting:`django:LANGUAGES` converted to this format
+default
+    Value of :setting:`django:LANGUAGES` converted to this format
 
 Defines the languages available in django CMS.
 
@@ -440,7 +448,8 @@ code
 ----
 String. RFC5646 code of the language.
 
-Example: ``"en"``.
+example
+    ``"en"``.
 
 .. note:: Is required for every language.
 
@@ -456,8 +465,10 @@ public
 ------
 Determines whether this language is accessible in the frontend. You may want for example to keep a language private until your content has been fully translated.
 
-Type: Boolean
-Default: ``True``
+type
+    Boolean
+default
+    ``True``
 
 .. setting::fallbacks
 
@@ -466,8 +477,10 @@ fallbacks
 A list of alternative languages, in order of preference, that are to be used if
 a page is not translated yet..
 
-Example: ``['de', 'fr']``
-Default: ``[]``
+example
+    ``['de', 'fr']``
+default
+    ``[]``
 
 .. setting::hide_untranslated
 
@@ -475,8 +488,10 @@ hide_untranslated
 -----------------
 Hide untranslated pages in menus
 
-Type: Boolean
-Default: ``True``
+type
+    Boolean
+default
+    ``True``
 
 .. setting::redirect_on_fallback
 
@@ -487,8 +502,15 @@ will redirect to the URL of the same page in the fallback language. If
 ``False``, the content will be displayed in the fallback language, but there
 will be no redirect.
 
-Type: Boolean
-Default:``True``
+Note that this applies to the fallback behaviour of *pages*. Within pages, *placeholders* will
+**not** by default adopt the same behaviour. If you want a placeholder to follow a page's fallback
+behaviour, you must set its ``language_fallback`` to ``True`` in :setting:`CMS_PLACEHOLDER_CONF`,
+above.
+
+type
+    Boolean
+default
+    ``True``
 
 
 Unicode support for automated slugs
@@ -505,7 +527,8 @@ unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
 CMS_UNIHANDECODE_HOST
 ---------------------
 
-default: ``None``
+default
+    ``None``
 
 Must be set to the URL where you host your unihandecode.js files. For licensing
 reasons, django CMS does not include unihandecode.js.
@@ -526,7 +549,8 @@ If set to ``None``, the default, unihandecode.js is not used.
 CMS_UNIHANDECODE_VERSION
 ------------------------
 
-default: ``None``
+default
+    ``None``
 
 Must be set to the version number (eg ``'1.0.0'``) you want to use. Together
 with :setting:`CMS_UNIHANDECODE_HOST` this setting is used to build the full
@@ -539,9 +563,10 @@ URLs for the javascript files. URLs are built like this:
 CMS_UNIHANDECODE_DECODERS
 -------------------------
 
-default: ``['ja', 'zh', 'vn', 'kr', 'diacritic']``
+default
+    ``['ja', 'zh', 'vn', 'kr', 'diacritic']``
 
-If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST``, you can add them to this setting.
+If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST`, you can add them to this setting.
 
 
 .. setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
@@ -549,7 +574,8 @@ If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST``, you ca
 CMS_UNIHANDECODE_DEFAULT_DECODER
 --------------------------------
 
-default: ``'diacritic'``
+default
+    ``'diacritic'``
 
 The default decoder to use when unihandecode.js support is enabled, but the
 current language does not provide a specific decoder in
@@ -588,7 +614,8 @@ Media Settings
 CMS_MEDIA_PATH
 ==============
 
-default: ``cms/``
+default
+    ``cms/``
 
 The path from :setting:`django:MEDIA_ROOT` to the media files located in ``cms/media/``
 
@@ -597,7 +624,8 @@ The path from :setting:`django:MEDIA_ROOT` to the media files located in ``cms/m
 CMS_MEDIA_ROOT
 ==============
 
-Default: :setting:`django:MEDIA_ROOT` + :setting:`CMS_MEDIA_PATH`
+default
+    :setting:`django:MEDIA_ROOT` + :setting:`CMS_MEDIA_PATH`
 
 The path to the media root of the cms media files.
 
@@ -606,7 +634,8 @@ The path to the media root of the cms media files.
 CMS_MEDIA_URL
 =============
 
-default: :setting:`django:MEDIA_URL` + :setting:`CMS_MEDIA_PATH`
+default
+    :setting:`django:MEDIA_URL` + :setting:`CMS_MEDIA_PATH`
 
 The location of the media files that are located in ``cms/media/cms/``
 
@@ -615,7 +644,8 @@ The location of the media files that are located in ``cms/media/cms/``
 CMS_PAGE_MEDIA_PATH
 ===================
 
-Default: ``'cms_page_media/'``
+default
+    ``'cms_page_media/'``
 
 By default, django CMS creates a folder called ``cms_page_media`` in your
 static files folder where all uploaded media files are stored. The media files
@@ -638,7 +668,8 @@ Advanced Settings
 CMS_PERMISSION
 ==============
 
-Default: ``False``
+default
+    ``False``
 
 When enabled, 3 new models are provided in Admin:
 
@@ -662,7 +693,8 @@ allowing them to see only a subset of the pages to which he is allowed access.
 CMS_RAW_ID_USERS
 ================
 
-Default: ``False``
+default
+    ``False``
 
 This setting only applies if :setting:`CMS_PERMISSION` is ``True``
 
@@ -689,7 +721,8 @@ performance.
 CMS_PUBLIC_FOR
 ==============
 
-Default: ``all``
+default
+    ``all``
 
 Determines whether pages without any view restrictions are public by default or
 staff only. Possible values are ``all`` and ``staff``.
@@ -704,7 +737,8 @@ This dictionary carries the various cache duration settings.
 ``'content'``
 -------------
 
-Default: ``60``
+default
+    ``60``
 
 Cache expiration (in seconds) for :ttag:`show_placeholder`, :ttag:`page_url`, :ttag:`placeholder` and :ttag:`static_placeholder`
 template tags.
@@ -716,7 +750,8 @@ template tags.
 ``'menus'``
 -----------
 
-Default: ``3600``
+default
+    ``3600``
 
 Cache expiration (in seconds) for the menu tree.
 
@@ -727,7 +762,8 @@ Cache expiration (in seconds) for the menu tree.
 ``'permissions'``
 -----------------
 
-Default: ``3600``
+default
+    ``3600``
 
 Cache expiration (in seconds) for view and other permissions.
 
@@ -736,7 +772,8 @@ Cache expiration (in seconds) for view and other permissions.
 CMS_CACHE_PREFIX
 ================
 
-Default: ``cms-``
+default
+    ``cms-``
 
 
 The CMS will prepend the value associated with this key to every cache access
@@ -758,7 +795,8 @@ Example::
 CMS_PAGE_CACHE
 ==============
 
-Default: ``True``
+default
+    ``True``
 
 Should the output of pages be cached?
 Takes the language, and timezone into account. Pages for logged in users are not cached.
@@ -770,7 +808,8 @@ If the toolbar is visible the page is not cached as well.
 CMS_PLACEHOLDER_CACHE
 =====================
 
-Default: ``True``
+default
+    ``True``
 
 Should the output of the various placeholder templatetags be cached?
 Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
@@ -781,7 +820,8 @@ present the placeholders will not be cached.
 CMS_PLUGIN_CACHE
 ================
 
-Default: ``True``
+default
+    ``True``
 
 Default value of the ``cache`` attribute of plugins. Should plugins be cached by default if not set explicitly?
 
@@ -793,7 +833,8 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
 CMS_MAX_PAGE_HISTORY_REVERSIONS
 ===============================
 
-Default: ``15``
+default
+    ``15``
 
 Configures how many undo steps are saved in the db excluding publish steps.
 In the page admin there is a ``History`` button to revert to previous version
@@ -806,7 +847,8 @@ By default the newest 15 edit revisions are kept.
 CMS_MAX_PAGE_PUBLISH_REVERSIONS
 ===============================
 
-Default: ``10``
+default
+    ``10``
 
 If `django-reversion`_ is installed everything you do with a page and all
 plugin changes will be saved in a revision.
@@ -828,7 +870,8 @@ that the revision table does not grow excessively large.
 CMS_TOOLBARS
 ============
 
-Default: ``None``
+default
+    ``None``
 
 If defined, specifies the list of toolbar modifiers to be used to populate the
 toolbar as import paths. Otherwise, all available toolbars from both the CMS and
@@ -852,7 +895,8 @@ Example::
 CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
 
-Default: ``Page.X_FRAME_OPTIONS_INHERIT``
+default
+    ``Page.X_FRAME_OPTIONS_INHERIT``
 
 This setting is the default value for a Page's X Frame Options setting.
 This should be an integer preferably taken from the Page object e.g.

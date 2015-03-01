@@ -17,14 +17,13 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
-from cms.test_utils.util.context_managers import SettingsOverride
 
 if hasattr(reversion.models, 'VERSION_CHANGE'):
     from reversion.models import VERSION_CHANGE
 
 
 class BasicReversionTestCase(CMSTestCase):
-    def setUp(self):        
+    def setUp(self):
         self.user = self._create_user("test", True, True)
 
     def test_number_revisions(self):
@@ -238,9 +237,48 @@ class ReversionTestCase(TransactionCMSTestCase):
             # test that CMSPlugin subclasses are recovered
             self.assertEqual(Text.objects.all().count(), 1)
 
+    def test_recover_path_collision(self):
+        with self.login_user_context(self.user):
+            self.assertEqual(Page.objects.count(), 2)
+            page_data2 = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data2)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            page_data3 = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data3)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page2 = Page.objects.all()[2]
+            page3 = Page.objects.all()[3]
+
+            self.assertEqual(page3.path, '0004')
+
+            ctype = ContentType.objects.get_for_model(Page)
+            revision = Revision.objects.order_by('-pk')[1]
+            version = Version.objects.filter(content_type=ctype, revision=revision)[0]
+            page2_pk = page2.pk
+            page2.delete()
+            self.assertEqual(Page.objects.count(), 3)
+            page_data4 = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data4)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page4 = Page.objects.all()[3]
+            self.assertEqual(Page.objects.count(), 4)
+            self.assertEqual(page4.path, '0005')
+
+            recover_url = URL_CMS_PAGE + "recover/"
+            response = self.client.get(recover_url)
+            self.assertEqual(response.status_code, 200)
+
+            recover_url += "%s/" % version.pk
+            response = self.client.get(recover_url)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(recover_url, page_data2)
+            self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page2_pk)
+            self.assertEqual(Page.objects.all().count(), 5)
+
     def test_publish_limits(self):
         with self.login_user_context(self.user):
-            with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
+            with self.settings(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
                 self.assertEqual(Revision.objects.all().count(), 5)

@@ -4,6 +4,7 @@ import sys
 import warnings
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -13,13 +14,11 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.translation import activate
+from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext,
-    SettingsOverride)
-from cms.utils.compat.dj import get_user_model
-from cms.utils.compat.urls import urljoin, unquote
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.permissions import set_current_user
 
 
@@ -170,6 +169,13 @@ class BaseCMSTestCase(object):
                                   add_default_permissions=True)
         return staff
 
+    def get_standard_user(self):
+        """
+        Used in security tests
+        """
+        standard = self._create_user("standard", is_staff=False, is_superuser=False)
+        return standard
+
     def get_new_page_data(self, parent_id=''):
         page_data = {
             'title': 'test page %d' % self.counter,
@@ -189,7 +195,6 @@ class BaseCMSTestCase(object):
         self.counter += 1
         return page_data
 
-
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
                                    template='nav_playground.html', ):
@@ -203,7 +208,6 @@ class BaseCMSTestCase(object):
         }
         self.counter = self.counter + 1
         return page_data
-
 
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
@@ -220,14 +224,13 @@ class BaseCMSTestCase(object):
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
 
-
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
         """
-        for page in qs.order_by('tree_id', 'lft'):
+        for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), lft: %s, rght: %s, tree_id: %s" % (ident, page,
-            page.pk, page.lft, page.rght, page.tree_id))
+            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -254,11 +257,11 @@ class BaseCMSTestCase(object):
             return
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
-    def copy_page(self, page, target_page):
+    def copy_page(self, page, target_page, position='last-child'):
         from cms.utils.page import get_available_slug
 
         data = {
-            'position': 'last-child',
+            'position': position,
             'target': target_page.pk,
             'site': 1,
             'copy_permissions': 'on',
@@ -273,8 +276,11 @@ class BaseCMSTestCase(object):
 
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-
-        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=target_page)
+        if position in ('first-child', 'last-child'):
+            parent = target_page
+        else:
+            parent = target_page.parent
+        copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=parent)
         return copied_page
 
     def move_page(self, page, target_page, position="first-child"):
@@ -349,15 +355,10 @@ class BaseCMSTestCase(object):
         if page.parent:
             self.assertEqual(page.parent_id, public_page.parent.publisher_draft.id)
 
-        self.assertEqual(page.level, public_page.level)
+        self.assertEqual(page.depth, public_page.depth)
 
-        # TODO: add check for siblings
-        draft_siblings = list(page.get_siblings(True).filter(
-            publisher_is_draft=True
-        ).order_by('tree_id', 'parent', 'lft'))
-        public_siblings = list(public_page.get_siblings(True).filter(
-            publisher_is_draft=False
-        ).order_by('tree_id', 'parent', 'lft'))
+        draft_siblings = list(Page.objects.filter(parent_id=page.parent_id, publisher_is_draft=True).order_by('path'))
+        public_siblings = list(Page.objects.filter(parent_id=public_page.parent_id, publisher_is_draft=False).order_by('path'))
         skip = 0
         for i, sibling in enumerate(draft_siblings):
             if not sibling.publisher_public_id:
@@ -391,22 +392,3 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
-
-
-class SettingsOverrideTestCase(CMSTestCase):
-    settings_overrides = {}
-
-    def _pre_setup(self):
-        self._enter_settings_override()
-        super(SettingsOverrideTestCase, self)._pre_setup()
-
-    def _enter_settings_override(self):
-        self._settings_ctx_manager = SettingsOverride(**self.settings_overrides)
-        self._settings_ctx_manager.__enter__()
-
-    def _post_teardown(self):
-        super(SettingsOverrideTestCase, self)._post_teardown()
-        self._exit_settings_override()
-
-    def _exit_settings_override(self):
-        self._settings_ctx_manager.__exit__(None, None, None)

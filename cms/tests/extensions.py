@@ -1,4 +1,8 @@
+from copy import deepcopy
+from cms.extensions.toolbar import ExtensionToolbar
+from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
@@ -10,9 +14,8 @@ from cms.extensions import PageExtension
 from cms.models import Page
 from cms.test_utils.project.extensionapp.models import (MyPageExtension,
                                                         MyTitleExtension)
-from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
+from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.tests import AdminTestsBase
-from cms.utils.compat.dj import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
@@ -66,7 +69,7 @@ class ExtensionsTestCase(TestCase):
             from django.apps import apps
             del apps.all_models['cms']['testpageextension']
             del apps.all_models['cms']['testtitleextension']
-        except ImportError:
+        except ImportError:  # Django 1.6
             pass
 
     def get_page_extension_class(self):
@@ -145,14 +148,14 @@ class ExtensionsTestCase(TestCase):
 class ExtensionAdminTestCase(AdminTestsBase):
     def setUp(self):
         User = get_user_model()
-        
+
         self.admin, self.normal_guy = self._get_guys()
 
         if get_user_model().USERNAME_FIELD == 'email':
             self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'test2@test.com')
         else:
             self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'no_page_permission')
-        
+
         self.no_page_permission_user.is_staff = True
         self.no_page_permission_user.is_active = True
         self.no_page_permission_user.save()
@@ -239,6 +242,48 @@ class ExtensionAdminTestCase(AdminTestsBase):
             )
             self.assertEqual(response.status_code, 403)
             self.assertTrue(MyPageExtension.objects.filter(extended_object=self.page).exists())
+
+    def test_toolbar_page_extension(self):
+        old_toolbars = deepcopy(toolbar_pool.toolbars)
+        class SampleExtension(ExtensionToolbar):
+            model = MyPageExtension  # The PageExtension / TitleExtension you are working with
+
+            def populate(self):
+                current_page_menu = self._setup_extension_toolbar()
+                if current_page_menu:
+                    position = 0
+                    page_extension, url = self.get_page_extension_admin()
+                    if url:
+                        current_page_menu.add_modal_item('TestItem', url=url,
+                                                         disabled=not self.toolbar.edit_mode,
+                                                         position=position)
+        toolbar_pool.register(SampleExtension)
+        with self.login_user_context(self.admin):
+            response = self.client.get('/en/?edit')
+            self.assertIn("TestItem", response.rendered_content)
+        toolbar_pool.toolbars = old_toolbars
+
+    def test_toolbar_title_extension(self):
+        old_toolbars = deepcopy(toolbar_pool.toolbars)
+
+        class SampleExtension(ExtensionToolbar):
+            model = MyTitleExtension
+
+            def populate(self):
+                current_page_menu = self._setup_extension_toolbar()
+                if current_page_menu:
+                    position = 0
+                    urls = self.get_title_extension_admin()
+                    for title_extension, url in urls:
+                        current_page_menu.add_modal_item('TestItem', url=url,
+                                                         disabled=not self.toolbar.edit_mode,
+                                                         position=position)
+        toolbar_pool.register(SampleExtension)
+        with self.login_user_context(self.admin):
+            response = self.client.get('/en/?edit')
+            self.assertIn("TestItem", response.rendered_content)
+        toolbar_pool.toolbars = old_toolbars
+
 
     def test_admin_title_extension(self):
         with self.login_user_context(self.admin):

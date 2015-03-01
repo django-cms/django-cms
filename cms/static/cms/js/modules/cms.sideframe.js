@@ -30,7 +30,7 @@ $(document).ready(function () {
 			this.body = $('html');
 
 			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
 			this.enforceReload = false;
 
 			// if the modal is initialized the first time, set the events

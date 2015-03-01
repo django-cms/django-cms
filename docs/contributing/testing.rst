@@ -180,6 +180,16 @@ Run a server locally for testing. This is similar to ``manage.py runserver``.
 
     Interface to bind to. Defaults to 127.0.0.1.
 
+.. option:: --migrate
+
+    Use migrations instead of plain syncdb.
+
+.. option:: application-name, migration-number
+
+    Options to specify a single migration to migrate to. When using Django 1.6
+    it only works if --migrate option is specified.
+
+
 
 ``develop.py shell``
 --------------------

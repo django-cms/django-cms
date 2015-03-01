@@ -99,13 +99,14 @@ class ExtensionToolbar(CMSToolbar):
         except self.model.DoesNotExist:
             page_extension = None
         try:
+            model_name = self.model.__name__.lower()
             if page_extension:
                 admin_url = admin_reverse(
-                    '%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
+                    '%s_%s_change' % (self.model._meta.app_label, model_name),
                     args=(page_extension.pk,))
             else:
                 admin_url = "%s?extended_object=%s" % (
-                    admin_reverse('%s_%s_add' % (self.model._meta.app_label, self.model._meta.model_name)),
+                    admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
                     self.page.pk)
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
@@ -123,7 +124,7 @@ class ExtensionToolbar(CMSToolbar):
         page = self._get_page()
         urls = []
         if language:
-            titles = page.get_title_object(language),
+            titles = page.get_title_obj(language),
         else:
             titles = page.title_set.all()
         # Titles
@@ -133,13 +134,14 @@ class ExtensionToolbar(CMSToolbar):
             except self.model.DoesNotExist:
                 title_extension = None
             try:
+                model_name = self.model.__name__.lower()
                 if title_extension:
                     admin_url = admin_reverse(
-                        '%s_%s_change' % (self.model._meta.app_label, self.model._meta.model_name),
+                        '%s_%s_change' % (self.model._meta.app_label, model_name),
                         args=(title_extension.pk,))
                 else:
                     admin_url = "%s?extended_object=%s" % (
-                        admin_reverse('%s_%s_add' % (self.model._meta.app_label, self.model._meta.model_name)),
+                        admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
                         title.pk)
             except NoReverseMatch:  # pragma: no cover
                 admin_url = None

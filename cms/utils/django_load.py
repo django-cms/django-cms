@@ -13,6 +13,7 @@ import imp
 import traceback # changed
 
 from django.utils.importlib import import_module
+from django.utils.six.moves import filter, map
 
 from .compat.dj import installed_apps
 
@@ -65,10 +66,8 @@ def iterload(modname, verbose=False, failfast=False):
 
     If failfast is True, import errors will not be surpressed.
     """
-    for app in installed_apps():
-        module = get_module(app, modname, verbose, failfast)
-        if module:
-            yield module
+    return filter(None, (get_module(app, modname, verbose, failfast)
+                         for app in installed_apps()))
 
 def load_object(import_path):
     """
@@ -98,17 +97,13 @@ def iterload_objects(import_paths):
     """
     Load a list of objects.
     """
-    for import_path in import_paths:
-        yield load_object(import_path)
+    return map(load_object, import_paths)
 
 def get_subclasses(c):
     """
     Get all subclasses of a given class
     """
-    subclasses = c.__subclasses__()
-    for d in list(subclasses):
-        subclasses.extend(get_subclasses(d))
-    return subclasses
+    return c.__subclasses__() + sum(map(get_subclasses, c.__subclasses__()), [])
 
 def load_from_file(module_path):
     """
