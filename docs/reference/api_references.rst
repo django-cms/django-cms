@@ -376,6 +376,11 @@ cms.toolbar.toolbar
 
         Language used by the toolbar.
 
+    .. attribute:: watch_models
+
+        A list of model this toolbar works on; used for redirections after editing
+        (:ref:`url_changes`).
+
     .. method:: add_item(item, position=None)
 
         Low level API to add items.
