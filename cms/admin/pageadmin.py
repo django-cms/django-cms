@@ -1360,6 +1360,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return HttpResponse('/', mimetype='text/plain')
             else:
                 return HttpResponse('/', content_type='text/plain')
+        obj = False
+        url = False
         if request.session.get('cms_log_latest', False):
             log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
             try:
@@ -1368,21 +1370,43 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 obj = None
             del request.session['cms_log_latest']
             if obj and obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
+                # This is a test if the object url can be retrieved
+                # In case it can't, object it's not taken into account
                 try:
-                    return HttpResponse(force_unicode(obj.get_absolute_url()), content_type='text/plain')
+                    force_unicode(obj.get_absolute_url())
                 except:
-                    pass
-        pk = request.REQUEST.get('pk')
-        full_model = request.REQUEST.get('model')
-        if pk and full_model:
-            app_label, model = full_model.split('.')
-            if pk and app_label:
-                ctype = ContentType.objects.get(app_label=app_label, model=model)
-                try:
-                    instance = ctype.get_object_for_this_type(pk=pk)
-                except ctype.model_class().DoesNotExist:
-                    return HttpResponse('/', content_type='text/plain')
-                return HttpResponse(force_unicode(instance.get_absolute_url()), content_type='text/plain')
+                    obj = None
+        if not obj:
+            pk = request.REQUEST.get('pk')
+            full_model = request.REQUEST.get('model')
+            if pk and full_model:
+                app_label, model = full_model.split('.')
+                if pk and app_label:
+                    ctype = ContentType.objects.get(app_label=app_label, model=model)
+                    try:
+                        obj = ctype.get_object_for_this_type(pk=pk)
+                    except ctype.model_class().DoesNotExist:
+                        obj = None
+                    try:
+                        force_unicode(obj.get_absolute_url())
+                    except:
+                        obj = None
+        if obj:
+            if not request.toolbar or not request.toolbar.edit_mode:
+                if isinstance(obj, Page):
+                    if obj.get_public_object():
+                        url = obj.get_public_object().get_absolute_url()
+                    else:
+                        url = '%s?%s' % (
+                            obj.get_draft_object().get_absolute_url(),
+                            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+                        )
+                else:
+                    url = obj.get_absolute_url()
+            else:
+                url = obj.get_absolute_url()
+        if url:
+            return HttpResponse(force_unicode(url), content_type='text/plain')
         return HttpResponse('', content_type='text/plain')
 
     def lookup_allowed(self, key, *args, **kwargs):
