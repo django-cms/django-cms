@@ -133,17 +133,37 @@ class PagesTestCase(CMSTestCase):
         """
         Test a slug collision
         """
-        create_page("home", 'nav_playground.html', "en")
+        root = create_page("home", 'nav_playground.html', "en", published=True)
         page = create_page("page", 'nav_playground.html', "en")
         subPage = create_page("subpage", 'nav_playground.html', "en", parent=page)
+        create_page("child-page", 'nav_playground.html', "en", parent=root)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
 
             response = self.client.get(URL_CMS_PAGE_ADD+"?target=%s&position=right&site=1" % subPage.pk)
             self.assertContains(response, 'value="%s"' % page.pk)
 
+            # slug collision between two child pages of the same node
             page_data = self.get_new_page_data(page.pk)
             page_data['slug'] = 'subpage'
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
+            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+
+            # slug collision between page with no parent and a child page of root
+            page_data = self.get_new_page_data()
+            page_data['slug'] = 'child-page'
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
+            self.assertContains(response, '<ul class="errorlist"><li>Another page with this slug already exists</li></ul>')
+
+            # slug collision between two top-level pages
+            page_data = self.get_new_page_data()
+            page_data['slug'] = 'page'
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
 
             self.assertEqual(response.status_code, 200)
@@ -181,9 +201,9 @@ class PagesTestCase(CMSTestCase):
                               published=True, parent=page1, slug="foo")
         page2 = create_page('test page 1_1', 'nav_playground.html', 'en',
                             published=True, slug="foo")
-        # Home page child has an invalid slug, while root page is ok. Root wins!
+        # Root (non home) page and child page has the same slug, both are invalid
         self.assertFalse(is_valid_page_slug(page1_1, page1_1.parent, "en", page1_1.get_slug("en"), page1_1.site))
-        self.assertTrue(is_valid_page_slug(page2, page2.parent, "en", page2.get_slug("en"), page2.site))
+        self.assertFalse(is_valid_page_slug(page2, page2.parent, "en", page2.get_slug("en"), page2.site))
 
     def test_slug_collisions_api_3(self):
         """ Checks for slug collisions on children of a non root page - uses API to create pages
