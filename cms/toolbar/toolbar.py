@@ -31,6 +31,7 @@ class CMSToolbar(ToolbarAPIMixin):
     """
     The default CMS Toolbar
     """
+    watch_models = []
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
@@ -213,6 +214,25 @@ class CMSToolbar(ToolbarAPIMixin):
     def get_object_pk(self):
         if self.obj:
             return self.obj.pk
+        return ''
+
+    def get_object_public_url(self):
+        if self.obj:
+            try:
+                return self.obj.get_public_url()
+            except:
+                pass
+        return ''
+
+    def get_object_draft_url(self):
+        if self.obj:
+            try:
+                return self.obj.get_draft_url()
+            except:
+                try:
+                    return self.obj.get_absolute_url()
+                except:
+                    pass
         return ''
 
     # Internal API
