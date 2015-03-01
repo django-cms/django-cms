@@ -2,14 +2,13 @@
 from __future__ import with_statement
 from cms.api import create_page
 from cms.models.pagemodel import Page
-from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class NavextendersFixture(object):
     def create_fixtures(self):
         """
         Tree from fixture:
-        
+
             page1
                 page2
                     page3
@@ -18,9 +17,9 @@ class NavextendersFixture(object):
         """
         defaults = {
             'template': 'nav_playground.html',
-            'language': 'en',            
+            'language': 'en',
         }
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             p1 = create_page('page1', published=True, in_navigation=True, **defaults)
             p4 = create_page('page4', published=True, in_navigation=True, **defaults)
             p1 = Page.objects.get(pk=p1.pk)

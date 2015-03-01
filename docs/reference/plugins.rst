@@ -272,7 +272,7 @@ By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
 The default implementation is as follows::
 
     def icon_alt(self, instance):
-        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+        return "%s - %s" % (force_text(self.name), force_text(instance))
 
 See also: `text_enabled`_, `icon_src`_
 
@@ -283,8 +283,10 @@ get_extra_placeholder_menu_items
 
 ``get_extra_placeholder_menu_items(self, request, placeholder)``
 
-overwrite to extends a placeholders context menu
-return a list of ``cms.plugin_base.PluginMenuItem`` instances
+Extends the context menu for all placeholders. To add one or more custom context
+menu items that are displayed in the context menu for all placeholders when in
+structure mode, override this method in a related plugin to return a list of
+``cms.plugin_base.PluginMenuItem`` instances.
 
 .. _get_extra_global_plugin_menu_items:
 
@@ -292,8 +294,11 @@ get_extra_global_plugin_menu_items
 ----------------------------------
 
 ``get_extra_global_plugin_menu_items(self, request, plugin)``
-extends all plugins context menu
-return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+Extends the context menu for all plugins. To add one or more custom context menu
+items that are displayed in the context menu for all plugins when in structure
+mode, override this method in a related plugin to return a list of
+``cms.plugin_base.PluginMenuItem`` instances.
 
 .. _get_extra_local_plugin_menu_items:
 
@@ -301,8 +306,11 @@ get_extra_local_plugin_menu_items
 ---------------------------------
 
 ``get_extra_local_plugin_menu_items(self, request, plugin)``
-extends the current plugins context menu
-return a list of ``cms.plugin_base.PluginMenuItem`` instances
+
+Extends the context menu for a specific plugin. To add one or more custom
+context menu items that are displayed in the context menu for a given plugin
+when in structure mode, override this method in the plugin to return a list of
+``cms.plugin_base.PluginMenuItem`` instances.
 
 ******************************************
 CMSPlugin Attributes and Methods Reference
@@ -397,3 +405,43 @@ Example::
     # returns True
 
 See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
+
+add_url
+-------
+
+Returns the url to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_add_plugin`` view is used)
+
+edit_url
+--------
+
+Returns the url to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_edit_plugin`` view is used)
+
+move_url
+--------
+
+Returns the url to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_move_plugin`` view is used)
+
+delete_url
+----------
+
+Returns the url to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_delete_plugin`` view is used)
+
+copy_url
+--------
+
+Returns the url to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_copy_plugins`` view is used)

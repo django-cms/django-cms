@@ -36,18 +36,18 @@ The following changes will need to be made in your settings.py file::
     ADMIN_MEDIA_PREFIX = '/static/admin'
     STATIC_ROOT = os.path.join(PROJECT_PATH, 'static')
     STATIC_URL = "/static/"
-   
+
 .. note::
 
     These are not django CMS settings.  Refer to the Django documentation on `staticfiles`_ for more information.
 
 .. _staticfiles: http://readthedocs.org/docs/django/en/latest/ref/contrib/staticfiles.html
-    
+
 .. note::
 
     Please make sure the ``static`` subfolder exists in your
     project and is writable.
-    
+
 .. note::
 
     PROJECT_PATH is the absolute path to your project.  See :ref:`configure-django-cms` for instructions on how to set PROJECT_PATH.
@@ -83,7 +83,7 @@ Make sure to add sekizai tags and ``cms_toolbar`` to your CMS templates.
 
 .. note::
 
-  ``cms_toolbar`` is only needed if you wish to use the front-end editing.  See :ref:`backwards-incompatible-changes` for more information  
+  ``cms_toolbar`` is only needed if you wish to use the front-end editing.  See :ref:`backwards-incompatible-changes` for more information
 
 Here is a simple example for a base template called ``base.html``:
 

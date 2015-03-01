@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth import get_permission_codename
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:
-    get_user_model = lambda: User
 
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
@@ -18,7 +15,6 @@ from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.i18n import get_language_tuple, force_language
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
@@ -47,6 +43,7 @@ USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
+TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 
 
 @toolbar_pool.register
@@ -86,9 +83,12 @@ class PlaceholderToolbar(CMSToolbar):
         build_mode = self.toolbar.build_mode
         build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT, extra_classes=extra_classes)
-        switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
-        switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
+
+        if self.request.user.has_perm("cms.use_structure"):
+            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                    extra_classes=extra_classes)
+            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
+            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
 
 
 @toolbar_pool.register
@@ -134,6 +134,10 @@ class BasicToolbar(CMSToolbar):
         admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
         admin_menu.add_break(USER_SETTINGS_BREAK)
 
+        # Disable toolbar
+        admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+        admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
+
         # logout
         self.add_logout_button(admin_menu)
 
@@ -143,8 +147,8 @@ class BasicToolbar(CMSToolbar):
         if User in admin.site._registry:
             opts = User._meta
 
-            if self.request.user.has_perm('%s.%s' % (opts.app_label, opts.get_change_permission())):
-                user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.module_name))
+            if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
+                user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
@@ -185,8 +189,6 @@ class BasicToolbar(CMSToolbar):
             name = user.get_full_name()
             if name:
                 return name
-            elif DJANGO_1_4:
-                return user.username
             else:
                 return user.get_username()
         except (AttributeError, NotImplementedError):

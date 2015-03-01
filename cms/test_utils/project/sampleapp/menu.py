@@ -6,7 +6,7 @@ from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool
 
 class SampleAppMenu(Menu):
-    
+
     def get_nodes(self, request):
         nodes = []
         for cat in Category.objects.all():
@@ -24,7 +24,7 @@ class SampleAppMenu(Menu):
         except NoReverseMatch:
             pass
         return nodes
-    
+
 menu_pool.register_menu(SampleAppMenu)
 
 class StaticMenu(CMSAttachMenu):
@@ -42,7 +42,7 @@ class StaticMenu(CMSAttachMenu):
         return nodes
 
 menu_pool.register_menu(StaticMenu)
-    
+
 class StaticMenu2(CMSAttachMenu):
     name = _("Static Menu2")
     def get_nodes(self, request):
@@ -58,4 +58,3 @@ class StaticMenu2(CMSAttachMenu):
         return nodes
 
 menu_pool.register_menu(StaticMenu2)
-    

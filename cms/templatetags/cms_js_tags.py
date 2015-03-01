@@ -1,24 +1,13 @@
 # -*- coding: utf-8 -*-
-import warnings
+import json
+
 from classytags.core import Tag, Options
 from cms.utils.encoder import SafeJSONEncoder
-from cms.utils.compat import DJANGO_1_4
 from django import template
-from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.text import javascript_quote
 from django.utils.safestring import mark_safe
-if DJANGO_1_4:
-    from django.utils import simplejson as json
-else:
-    import json
+
 register = template.Library()
-
-
-@register.filter
-def js(value):
-    warnings.warn("The template filter '...|js' is vulnerable to XSS attacks, please use '...|json' instead.",
-                  DeprecationWarning, stacklevel=2)
-    return json.dumps(value, cls=DjangoJSONEncoder)
 
 
 @register.filter('json')

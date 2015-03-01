@@ -7,29 +7,32 @@ Internationalisation
 Multilingual URLs
 *****************
 
-If you use more than one language, django CMS urls need
-to be referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see the
-official django `documentation`_.
+If you use more than one language, django CMS urls, *including the admin URLS*, need to be
+referenced via :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see
+the official `Django documentation
+<https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns>`_
+on the subject.
 
-Main `urls.py` example::
+Here's an example of `urls.py`::
 
     from django.conf import settings
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
     from django.contrib import admin
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     admin.autodiscover()
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
-    )
+    ]
 
     urlpatterns += staticfiles_urlpatterns()
 
+    # note the django CMS URLs included via i18n_patterns
     urlpatterns += i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
-        url(r'^', include('cms.urls')), # <--------- include the django cms urls via i18n_patterns
+        url(r'^', include('cms.urls')),
     )
 
 
@@ -134,5 +137,3 @@ Automated slug generation unicode characters
 If your site has languages which use non-ASCII character sets, you might want
 to enable :setting:`CMS_UNIHANDECODE_HOST` and :setting:`CMS_UNIHANDECODE_VERSION`
 to get automated slugs for those languages too.
-
-

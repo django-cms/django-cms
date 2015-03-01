@@ -6,7 +6,7 @@ from cms.menu_bases import CMSAttachMenu
 
 class TestMenu(CMSAttachMenu):
     name = "test menu"
-    
+
     def get_nodes(self, request):
         nodes = []
         n = NavigationNode('sample root page', "/", 1)

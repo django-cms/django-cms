@@ -34,7 +34,7 @@ $(document).ready(function () {
 			this.clipboard = $('.cms_clipboard');
 
 			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
 			this.timer = function () {};
 			this.interval = function () {};
 			this.state = false;
@@ -53,6 +53,9 @@ $(document).ready(function () {
 
 			// cancel if there are no dragareas
 			if(!this.dragareas.length) return false;
+
+			// cancel if there is no structure / content switcher
+			if(!this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 
 			// setup toolbar mode
 			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
@@ -95,9 +98,13 @@ $(document).ready(function () {
 				var fields = $('*:focus');
 				// 32 = space
 				if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
+					// cancel if there is no structure / content switcher
+					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.hide();
 				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+					// cancel if there is no structure / content switcher
+					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.show();
 				}

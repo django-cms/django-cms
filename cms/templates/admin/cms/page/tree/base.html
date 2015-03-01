@@ -46,8 +46,8 @@ $(document).ready(function () {
 	// initialize tree
 	new CMS.TreeManager({
 		'settings': {
-			'permission': {{ CMS_PERMISSION|js }},
-			'debug': {{ DEBUG|js }},
+			'permission': {{ CMS_PERMISSION|json }},
+			'debug': {{ DEBUG|json }},
 			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
 		},
 		'lang': {
