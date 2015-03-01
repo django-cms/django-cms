@@ -33,7 +33,7 @@ from cms.utils.urlutils import admin_reverse
 from cms.views import details
 
 
-class ToolbarTestBase(SettingsOverrideTestCase):
+class ToolbarTestBase(CMSTestCase):
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en', disable=False):
         path = path or page and page.get_absolute_url()
         if edit:
