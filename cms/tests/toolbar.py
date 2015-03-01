@@ -34,7 +34,7 @@ from cms.views import details
 
 
 class ToolbarTestBase(SettingsOverrideTestCase):
-    def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
+    def get_page_request(self, page, user, path=None, edit=False, lang_code='en', disable=False):
         path = path or page and page.get_absolute_url()
         if edit:
             path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
@@ -46,6 +46,8 @@ class ToolbarTestBase(SettingsOverrideTestCase):
             request.GET = {'edit': None}
         else:
             request.GET = {'edit_off': None}
+        if disable:
+            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)
@@ -182,6 +184,23 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, self.get_nonstaff(), edit=True)
         self.assertFalse(request.session.get('cms_build', True))
         self.assertFalse(request.session.get('cms_edit', True))
+
+    def test_hide_toolbar_disabled(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        # Edit mode should re-enable the toolbar in any case
+        request = self.get_page_request(page, self.get_staff(), edit=False, disable=True)
+        self.assertTrue(request.session.get('cms_toolbar_disabled'))
+        toolbar = CMSToolbar(request)
+        self.assertFalse(toolbar.show_toolbar)
+
+    def test_show_disabled_toolbar_with_edit(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), edit=True, disable=True)
+        self.assertFalse(request.session.get('cms_toolbar_disabled'))
+        toolbar = CMSToolbar(request)
+        self.assertTrue(toolbar.show_toolbar)
 
     def test_show_toolbar_without_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
