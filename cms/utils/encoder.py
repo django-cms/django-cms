@@ -9,6 +9,8 @@ class SafeJSONEncoder(DjangoJSONEncoder):
             return type(o)((esc(k), self._recursive_escape(v)) for (k, v) in o.iteritems())
         if isinstance(o, (list, tuple)):
             return type(o)(self._recursive_escape(v) for v in o)
+        if type(o) is bool:
+            return o
         try:
             return type(o)(esc(o))
         except ValueError:
