@@ -329,3 +329,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Remove compatibility with Django 1.4 / 1.5
 - General code cleanup
 - Simplify loading of view restrictions in the menu
+- south is not marked as optional; to use south on Django 1.6 install django-cms[south]

@@ -32,14 +32,16 @@ setup(
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Django>=1.4',
+        'Django>=1.6',
         'django-classy-tags>=0.5',
-        'south>=0.7.2',
         'html5lib',
         'django-treebeard==3.0',
         'django-sekizai>=0.7',
         'djangocms-admin-style'
     ],
+    extras_require={
+        'south': ['south>=1.0.0'],
+    },
     packages=find_packages(exclude=["project", "project.*"]),
     include_package_data=True,
     zip_safe=False,

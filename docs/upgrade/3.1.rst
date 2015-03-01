@@ -30,6 +30,13 @@ Dropped support for Django 1.4 and 1.5
 Starting from version 3.1 the supported Django versions are 1.6 and 1.7
 
 
+South is now an optional dependency
+===================================
+
+As south is now required for Django 1.6 only, it's marked as an optional dependency.
+To install south along with django CMS use ``pip install django-cms[south]``.
+
+
 ********************
 Incompatible changes
 ********************
