@@ -4,13 +4,15 @@ import datetime
 import re
 
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
-from django.core.urlresolvers import reverse
 
 from cms.api import create_page, create_title, add_plugin
 from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
@@ -68,6 +70,19 @@ class ToolbarTestBase(SettingsOverrideTestCase):
     def get_superuser(self):
         superuser = self._create_user('superuser', True, True)
         return superuser
+
+    def _fake_logentry(self, instance_id, user, text, model=Page):
+        LogEntry.objects.log_action(
+            user_id=user.id,
+            content_type_id=ContentType.objects.get_for_model(model).pk,
+            object_id=instance_id,
+            object_repr=text,
+            action_flag=CHANGE,
+        )
+        entry = LogEntry.objects.filter(user=user, action_flag__in=(CHANGE,))[0]
+        session = self.client.session
+        session['cms_log_latest'] = entry.pk
+        session.save()
 
 
 class ToolbarTests(ToolbarTestBase):
@@ -341,19 +356,31 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
-        create_page("home", "nav_playground.html", "en",
+        page = create_page("home", "nav_playground.html", "en",
                            published=True)
-        resolve_url = admin_reverse('cms_page_resolve')
+        resolve_url_on = '%s?%s' % (admin_reverse('cms_page_resolve'),
+                                    get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        resolve_url_off = '%s?%s' % (admin_reverse('cms_page_resolve'),
+                                     get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         with self.login_user_context(superuser):
-            response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
+            response = self.client.post(resolve_url_on, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
-            page_data = self.get_new_page_data()
+            page_data = self.get_new_page_data(parent_id=page.pk)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
 
-            response = self.client.post(resolve_url, {'pk': Page.objects.all()[2].pk, 'model': 'cms.page'})
+            # test redirection when toolbar is in edit mode
+            response = self.client.post(resolve_url_on, {'pk': Page.objects.all()[2].pk,
+                                                         'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
 
-    def test_page_edit_redirect(self):
+            self.client.post(URL_CMS_PAGE_ADD, page_data)
+
+            # test redirection when toolbar is not in edit mode
+            response = self.client.post(resolve_url_off, {'pk': Page.objects.all()[2].pk,
+                                                          'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '/en/')
+
+    def test_page_edit_redirect_editmode(self):
         page1 = create_page("home", "nav_playground.html", "en",
                             published=True)
         page2 = create_page("test", "nav_playground.html", "en",
@@ -364,7 +391,8 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
-            url = admin_reverse('cms_page_resolve')
+            url = '%s?%s' % (admin_reverse('cms_page_resolve'),
+                             get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             # first call returns the latest modified page with updated slug even if a different
             # page has been requested
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
@@ -378,6 +406,80 @@ class ToolbarTests(ToolbarTestBase):
         # anonymous users should be redirected to the root page
         response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
         self.assertEqual(response.content.decode('utf-8'), '/')
+
+    def test_page_edit_redirect_no_editmode(self):
+        page1 = create_page("home", "nav_playground.html", "en",
+                            published=True)
+        page2 = create_page("test", "nav_playground.html", "en",
+                            published=True, parent=page1)
+        page3 = create_page("non-pub-1", "nav_playground.html", "en",
+                            published=False, parent=page2)
+        page4 = create_page("non-pub-2", "nav_playground.html", "en",
+                            published=False, parent=page3)
+        superuser = self.get_superuser()
+        url = admin_reverse('cms_page_resolve')
+        with self.login_user_context(superuser):
+            # checking the redirect by passing URL parameters
+            # redirect to the same page
+            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), page1.get_absolute_url())
+            # redirect to the same page
+            response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url())
+            # redirect to the first published ancestor
+            response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
+                page3.get_absolute_url(),
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            )
+            # redirect to the first published ancestor
+            response = self.client.post(url, {'pk': page4.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
+                page4.get_absolute_url(),
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            )
+
+            # checking the redirect by setting the session data
+            self._fake_logentry(page1.get_draft_object().pk, superuser, 'test page')
+            response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), page1.get_public_object().get_absolute_url())
+
+            self._fake_logentry(page2.get_draft_object().pk, superuser, 'test page')
+            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), page2.get_public_object().get_absolute_url())
+
+            self._fake_logentry(page3.get_draft_object().pk, superuser, 'test page')
+            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
+                page3.get_absolute_url(),
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            )
+
+            self._fake_logentry(page4.get_draft_object().pk, superuser, 'test page')
+            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
+                page4.get_absolute_url(),
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            )
+
+    def test_page_edit_redirect_errors(self):
+        page1 = create_page("home", "nav_playground.html", "en",
+                            published=True)
+        page2 = create_page("test", "nav_playground.html", "en",
+                            published=True, parent=page1)
+        create_page("non-pub", "nav_playground.html", "en",
+                    published=False, parent=page2)
+        superuser = self.get_superuser()
+        url = admin_reverse('cms_page_resolve')
+
+        with self.login_user_context(superuser):
+            # logentry - non existing id - parameter is used
+            self._fake_logentry(9999, superuser, 'test page')
+            response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), page2.get_public_object().get_absolute_url())
+            # parameters - non existing id - no redirection
+            response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
+            self.assertEqual(response.content.decode('utf-8'), '')
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
@@ -407,7 +509,7 @@ class ToolbarTests(ToolbarTestBase):
             superuser.save()
 
         page = create_page("home", "nav_playground.html", "en",
-                            published=True)
+                           published=True)
         page.publish('en')
         self.get_page_request(page, superuser, '/')
         #
