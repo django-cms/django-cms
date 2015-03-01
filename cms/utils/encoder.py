@@ -15,7 +15,7 @@ class SafeJSONEncoder(DjangoJSONEncoder):
             return o
         try:
             return type(o)(esc(o))
-        except ValueError:
+        except (ValueError, TypeError):
             return self.default(o)
 
     def encode(self, o):
