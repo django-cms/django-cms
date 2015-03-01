@@ -157,6 +157,26 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         path = self.get_path(language, fallback) or self.get_slug(language, fallback)
         return reverse('pages-details-by-slug', kwargs={"slug": path})
 
+    def get_public_url(self, language=None, fallback=True):
+        """
+        Returns the URL of the published version of the current page.
+        Returns empty string if the page is not published.
+        """
+        try:
+            return self.get_public_object().get_absolute_url(language, fallback)
+        except:
+            return ''
+
+    def get_draft_url(self, language=None, fallback=True):
+        """
+        Returns the URL of the draft version of the current page.
+        Returns empty string if the draft page is not available.
+        """
+        try:
+            return self.get_draft_object().get_absolute_url(language, fallback)
+        except:
+            return ''
+
     def move_page(self, target, position='first-child'):
         """
         Called from admin interface when page is moved. Should be used on
