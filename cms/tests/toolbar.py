@@ -119,7 +119,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + logout
         self.assertEqual(len(items), 0)
 
-    @override_settings(CMS_PERMISSIONS=True)
+    @override_settings(CMS_PERMISSION=True)
     def test_template_change_permission(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
         request = self.get_page_request(page, self.get_nonstaff())
@@ -440,7 +440,7 @@ class ToolbarTests(ToolbarTestBase):
             superuser.save()
 
         page = create_page("home", "nav_playground.html", "en",
-                            published=True)
+                           published=True)
         page.publish('en')
         self.get_page_request(page, superuser, '/')
         #
@@ -468,6 +468,7 @@ class ToolbarTests(ToolbarTestBase):
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
 
+    @override_settings(CMS_PERMISSION=True)
     def test_toolbar_logout_redirect(self):
         """
         Tests the logount AjaxItem on_success parameter in four different conditions:

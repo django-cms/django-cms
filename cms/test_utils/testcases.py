@@ -169,6 +169,13 @@ class BaseCMSTestCase(object):
                                   add_default_permissions=True)
         return staff
 
+    def get_standard_user(self):
+        """
+        Used in security tests
+        """
+        standard = self._create_user("standard", is_staff=False, is_superuser=False)
+        return standard
+
     def get_new_page_data(self, parent_id=''):
         page_data = {
             'title': 'test page %d' % self.counter,
@@ -202,7 +209,6 @@ class BaseCMSTestCase(object):
         self.counter = self.counter + 1
         return page_data
 
-
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
         created from get_new_page_data so you can switch between test cases
@@ -217,7 +223,6 @@ class BaseCMSTestCase(object):
         page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
-
 
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.

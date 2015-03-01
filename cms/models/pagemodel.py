@@ -26,7 +26,7 @@ from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register, current_site
+from cms.utils.helpers import reversion_register
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
@@ -746,6 +746,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.ancestors_ascending = list(self.get_ancestors())
         return self.ancestors_ascending
 
+    def get_cached_descendants(self):
+        if not hasattr(self, "_cached_descendants"):
+            self._cached_descendants = list(self.get_descendants())
+        return self._cached_descendants
+
     # ## Title object access
 
     def get_title_obj(self, language=None, fallback=True, version_id=None, force_reload=False):
@@ -953,50 +958,33 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return _("default")
 
     def has_view_permission(self, request, user=None):
-        from cms.models.permissionmodels import PagePermission, GlobalPagePermission
-
         if not user:
             user = request.user
+        from cms.utils.permissions import get_any_page_view_permissions, has_global_page_permission
+        can_see_unrestricted = get_cms_setting('PUBLIC_FOR') == 'all' or (
+            get_cms_setting('PUBLIC_FOR') == 'staff' and user.is_staff)
 
-        if not self.publisher_is_draft:
-            return self.publisher_draft.has_view_permission(request, user)
-            # does any restriction exist?
-        # inherited and direct
-        is_restricted = PagePermission.objects.for_page(page=self).filter(can_view=True).exists()
-        if user.is_authenticated():
-            global_view_perms = GlobalPagePermission.objects.user_has_view_permission(
-                request.user, current_site(request)).exists()
+        # inherited and direct view permissions
+        is_restricted = bool(get_any_page_view_permissions(request, self))
 
+        if not is_restricted and can_see_unrestricted:
+            return True
+        elif not user.is_authenticated():
+            return False
+
+        if not is_restricted:
             # a global permission was given to the request's user
-            if global_view_perms:
+            if has_global_page_permission(request, self.site_id, user=user, can_view=True):
                 return True
-            elif not is_restricted:
-                if ((get_cms_setting('PUBLIC_FOR') == 'all') or
-                    (get_cms_setting('PUBLIC_FOR') == 'staff' and
-                        user.is_staff)):
-                    return True
-
-            # a restricted page and an authenticated user
-            elif is_restricted:
-                opts = self._meta
-                codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-                user_perm = user.has_perm(codename)
-                generic_perm = self.has_generic_permission(request, "view")
-                return user_perm or generic_perm
-
         else:
-            if is_restricted or not get_cms_setting('PUBLIC_FOR') == 'all':
-                # anyonymous user, page has restriction and global access is permitted
-                return False
-            else:
-                # anonymous user, no restriction saved in database
+            # a specific permission was granted to the request's user
+            if self.get_draft_object().has_generic_permission(request, "view", user=user):
                 return True
-                # Authenticated user
-                # Django wide auth perms "can_view" or cms auth perms "can_view"
+
+        # The user has a normal django permission to view pages globally
         opts = self._meta
         codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
-        return (user.has_perm(codename) or
-                self.has_generic_permission(request, "view"))
+        return request.user.has_perm(codename)
 
     def has_change_permission(self, request, user=None):
         opts = self._meta
