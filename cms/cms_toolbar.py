@@ -47,6 +47,7 @@ USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
+TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 
 
 @toolbar_pool.register
@@ -133,6 +134,10 @@ class BasicToolbar(CMSToolbar):
         # cms users
         admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
         admin_menu.add_break(USER_SETTINGS_BREAK)
+
+        # Disable toolbar
+        admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+        admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
 
         # logout
         self.add_logout_button(admin_menu)
