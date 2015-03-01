@@ -607,6 +607,29 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         MultilingualExample1.objects.all().delete()
         super(EditModelTemplateTagTest, self).tearDown()
 
+    def test_markup_toolbar_url_model(self):
+        superuser = self.get_superuser()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        # object
+        # check when in draft mode
+        request = self.get_page_request(page, superuser, edit=True)
+        response = detail_view(request, ex1.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            ex1.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        ))
+        # check when in live mode
+        request = self.get_page_request(page, superuser, edit=False)
+        response = detail_view(request, ex1.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            ex1.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.assertNotEqual(ex1.get_draft_url(), ex1.get_public_url())
+
     def test_anon(self):
         user = self.get_anon()
         page = create_page('Test', 'col_two.html', 'en', published=True)

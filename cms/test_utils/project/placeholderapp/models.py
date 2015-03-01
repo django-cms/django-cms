@@ -40,6 +40,12 @@ class Example1(models.Model):
     def get_absolute_url(self):
         return reverse("example_detail", args=(self.pk,))
 
+    def get_draft_url(self):
+        return self.get_absolute_url()
+
+    def get_public_url(self):
+        return '/public/view/'
+
     def set_static_url(self, request):
         language = get_language_from_request(request)
         if self.pk:
