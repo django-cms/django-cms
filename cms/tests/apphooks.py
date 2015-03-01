@@ -642,7 +642,8 @@ class ApphooksTestCase(CMSTestCase):
         with SettingsOverride(CMS_APPHOOKS=apphooks, ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
             self.create_base_structure('Example1App', 'en')
             url = admin_reverse('cms_page_resolve')
-            with self.login_user_context(self.superuser):
+            self.user = self._create_user('admin_staff', True, True)
+            with self.login_user_context(self.user):
                 # parameters - non page object
                 response = self.client.post(url, {'pk': ex1.pk, 'model': 'placeholderapp.example1'})
                 self.assertEqual(response.content.decode('utf-8'), ex1.get_absolute_url())
