@@ -79,7 +79,7 @@ class ToolbarTestBase(SettingsOverrideTestCase):
             object_repr=text,
             action_flag=CHANGE,
         )
-        entry = LogEntry.objects.filter(user=user, action_flag__in=(CHANGE,))[0]
+        entry = LogEntry.objects.filter(user=user, object_id=instance_id, action_flag__in=(CHANGE,))[0]
         session = self.client.session
         session['cms_log_latest'] = entry.pk
         session.save()
