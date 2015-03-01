@@ -34,7 +34,7 @@ from cms.views import details
 
 
 class ToolbarTestBase(CMSTestCase):
-    def get_page_request(self, page, user, path=None, edit=False, lang_code='en'):
+    def get_page_request(self, page, user, path=None, edit=False, lang_code='en', disable=False):
         path = path or page and page.get_absolute_url()
         if edit:
             path += '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
@@ -46,6 +46,8 @@ class ToolbarTestBase(CMSTestCase):
             request.GET = {'edit': None}
         else:
             request.GET = {'edit_off': None}
+        if disable:
+            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)
@@ -90,7 +92,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + admin-menu + logout
         self.assertEqual(len(items), 2, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 9, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
@@ -101,7 +103,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 8, admin_items)
+        self.assertEqual(len(admin_items), 10, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -214,6 +216,23 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(request.session.get('cms_build', True))
         self.assertFalse(request.session.get('cms_edit', True))
 
+    def test_hide_toolbar_disabled(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        # Edit mode should re-enable the toolbar in any case
+        request = self.get_page_request(page, self.get_staff(), edit=False, disable=True)
+        self.assertTrue(request.session.get('cms_toolbar_disabled'))
+        toolbar = CMSToolbar(request)
+        self.assertFalse(toolbar.show_toolbar)
+
+    def test_show_disabled_toolbar_with_edit(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        request = self.get_page_request(page, self.get_staff(), edit=True, disable=True)
+        self.assertFalse(request.session.get('cms_toolbar_disabled'))
+        toolbar = CMSToolbar(request)
+        self.assertTrue(toolbar.show_toolbar)
+
     def test_show_toolbar_login_anonymous(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
@@ -292,7 +311,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 7, admin_items)
+        self.assertEqual(len(admin_items), 9, admin_items)
 
     def test_button_consistency_staff(self):
         """

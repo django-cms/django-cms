@@ -45,9 +45,12 @@ class CMSToolbar(ToolbarAPIMixin):
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
         self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        self.disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
         self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        if self.request.session.get('cms_toolbar_disabled', False):
+            self.show_toolbar = False
         self.obj = None
         self.redirect_url = None
         if settings.USE_I18N:
