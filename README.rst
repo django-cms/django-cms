@@ -3,13 +3,13 @@ django CMS
 ##########
 .. image:: https://travis-ci.org/divio/django-cms.svg?branch=support%2F3.0.x
     :target: http://travis-ci.org/divio/django-cms
-.. image:: https://pypip.in/v/django-cms/badge.svg
+.. image:: https://pypip.in/v/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://pypip.in/d/django-cms/badge.svg
+.. image:: https://pypip.in/d/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://pypip.in/wheel/django-cms/badge.svg
+.. image:: https://pypip.in/wheel/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://pypip.in/license/django-cms/badge.svg
+.. image:: https://pypip.in/license/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
 
 
