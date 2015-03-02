@@ -100,10 +100,10 @@ class PageSelectWidget(MultiWidget):
     };
     var handlePageChange = function(page_id) {
         if (page_id) {
-            $("#id_%(name)s_2 option").prop('selected', false);
-            $("#id_%(name)s_2 option[value=" + page_id + "]").prop('selected', true);
+            $("#id_%(name)s_2 option").attr('selected', false);
+            $("#id_%(name)s_2 option[value=" + page_id + "]").attr('selected', true);
         } else {
-            $("#id_%(name)s_2 option[value=]").prop('selected', true);
+            $("#id_%(name)s_2 option[value=]").attr('selected', true);
         };
     };
     $("#id_%(name)s_0").change(function(){
