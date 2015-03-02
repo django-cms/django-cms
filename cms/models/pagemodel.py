@@ -29,6 +29,7 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from menus.menu_pool import menu_pool
 
+
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
@@ -422,6 +423,21 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
         return first_page
+
+    def delete(self, *args, **kwargs):
+        """
+        Disconnects title-related signals prior to delete pages
+        """
+        from django.db.models import signals
+        from cms.models.titlemodels import Title
+        from cms.signals.title import pre_delete_title
+
+        # title related signals are only meant to update attribute on the page
+        # given that the pages is going to be deleted, we don't need signal triggering
+        # this will avoid errors due to missing templates
+        signals.pre_delete.disconnect(pre_delete_title, sender=Title, dispatch_uid='cms_pre_delete_page')
+        super(Page, self).delete(*args, **kwargs)
+        signals.pre_delete.connect(pre_delete_title, sender=Title, dispatch_uid='cms_pre_delete_page')
 
     def save(self, no_signals=False, commit=True, **kwargs):
         """
