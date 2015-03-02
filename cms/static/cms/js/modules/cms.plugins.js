@@ -414,6 +414,9 @@ $(document).ready(function () {
 
 			// show publish button
 			$('.cms_btn-publish').addClass('cms_btn-publish-active').parent().show();
+
+			// enable revert to live
+			$('.cms_toolbar-revert').removeClass('cms_toolbar-item-navigation-disabled');
 		},
 
 		deletePlugin: function (url, name, breadcrumb) {

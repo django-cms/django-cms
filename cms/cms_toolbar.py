@@ -526,5 +526,6 @@ class PageToolbar(CMSToolbar):
             revert_action = admin_reverse('cms_page_revert_page', args=(self.page.pk, self.current_lang))
             revert_question = _('Are you sure you want to revert to live?')
             history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
-                                       disabled=not self.page.is_dirty(self.current_lang), on_success=refresh)
+                                       disabled=not self.page.is_dirty(self.current_lang),
+                                       on_success=refresh, extra_classes=('cms_toolbar-revert',))
             history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))
