@@ -3,7 +3,7 @@ import sys
 from django.core.management import color_style
 from django.core.urlresolvers import clear_url_caches
 from django.core.signals import request_finished
-from cms.models import Title
+from cms.models import Title, Page
 
 
 DISPATCH_UID = 'cms-restart'
@@ -70,8 +70,11 @@ def apphook_post_delete_title_checker(instance, **kwargs):
     """
     from cms.views import invalidate_cms_page_cache
     invalidate_cms_page_cache()
-    if instance.page.application_urls:
-        request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
+    try:
+        if instance.page.application_urls:
+            request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
+    except Page.DoesNotExist:
+        pass
 
 
 def apphook_post_delete_page_checker(instance, **kwargs):
