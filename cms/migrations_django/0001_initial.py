@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('position', models.PositiveSmallIntegerField(null=True, editable=False, blank=True, verbose_name='position')),
                 ('language', models.CharField(db_index=True, max_length=15, verbose_name="language", editable=False)),
-                ('plugin_type', models.CharField(verbose_name='plugin name', max_length=50, editable=False, db_index=True)),
+                ('plugin_type', models.CharField(verbose_name='plugin_name', max_length=50, editable=False, db_index=True)),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now, verbose_name='creation date', editable=False)),
                 ('changed_date', models.DateTimeField(auto_now=True)),
                 ('level', models.PositiveIntegerField(db_index=True, editable=False)),
