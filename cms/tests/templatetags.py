@@ -82,7 +82,8 @@ class TemplatetagTests(TestCase):
         self.assertTrue('"item1": 1' in filtered_dict)
         self.assertTrue('"item2": 2' in filtered_dict)
         self.assertTrue('"item3": 3' in filtered_dict)
-        self.assertEqual('"%s"' % now().today().isoformat()[:-3], json_filter(now().today()))
+        today = now().today()
+        self.assertEqual('"%s"' % today.isoformat()[:-3], json_filter(today))
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
