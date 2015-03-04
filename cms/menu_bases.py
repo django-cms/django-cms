@@ -52,7 +52,3 @@ class CMSAttachMenu(Menu):
             Q(application_urls__in=parent_apps)
             | Q(navigation_extenders=cls.__name__)
         )
-
-    def get_nodes(self, request):
-        """should return a list of NavigationNode instances."""
-        raise NotImplementedError
