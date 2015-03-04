@@ -2,6 +2,7 @@
 
 from itertools import chain
 
+from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.forms.widgets import Select, MultiWidget, TextInput
@@ -220,7 +221,7 @@ class UserSelectAdminWidget(Select):
                     (add_url, name))
             output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
-    
+
 
 class AppHookSelect(Select):
 
@@ -268,3 +269,42 @@ class AppHookSelect(Select):
         return '\n'.join(output)
 
 
+class ApplicationConfigSelect(Select):
+    """
+    Special widget -populate by javascript- that shows application configurations
+    depending on selected Apphooks.
+
+    Required data are injected in the page as javascript data that cms.app_hook_select.js
+    uses to create the appropriate data structure.
+
+    A stub 'add-another' link is created and filled in with the correct URL by the same
+    javascript.
+    """
+
+    class Media:
+        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
+
+    def __init__(self, attrs=None, choices=(), app_configs={}):
+        self.app_configs = app_configs
+        super(ApplicationConfigSelect, self).__init__(attrs, choices)
+
+    def render(self, name, value, attrs=None, choices=()):
+        output = [super(ApplicationConfigSelect, self).render(name, value, attrs, choices)]
+        output.append('<script>\n')
+        output.append('var apphooks_configuration = {\n')
+        for application, cms_app in self.app_configs.items():
+            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, force_text(config)) for config in cms_app.get_configs()])))
+        output.append('\n};\n')
+        output.append('var apphooks_configuration_url = {\n')
+        for application, cms_app in self.app_configs.items():
+            output.append("'%s': '%s'," % (application, cms_app.get_config_add_url()))
+        output.append('\n};\n')
+        output.append('var apphooks_configuration_value = \'%s\';\n' % value)
+        output.append('</script>')
+
+        related_url = ''
+        output.append('<a href="%s" class="add-another" id="add_%s" onclick="return showAddAnotherPopup(this);"> '
+                      % (related_url, name))
+        output.append('<img src="%s" width="10" height="10" alt="%s"/></a>'
+                      % (static('admin/img/icon_addlink.gif'), _('Add Another')))
+        return mark_safe(''.join(output))

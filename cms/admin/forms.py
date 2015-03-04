@@ -3,16 +3,17 @@ from django import forms
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models.fields import BooleanField
 from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
 from cms.apphook_pool import apphook_pool
 from cms.constants import PAGE_TYPES_ID
-from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect
+from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
 from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle
 from cms.utils.compat.dj import get_user_model, force_unicode
 from cms.utils.compat.forms import UserCreationForm
@@ -209,20 +210,26 @@ class AdvancedSettingsForm(forms.ModelForm):
     )
 
     redirect = PageSmartLinkField(label=_('Redirect'), required=False,
-                    help_text=_('Redirects to this URL.'), placeholder_text=_('Start typing...'),
-                    ajax_view='admin:cms_page_get_published_pagelist'
+                                  help_text=_('Redirects to this URL.'),
+                                  placeholder_text=_('Start typing...'),
+                                  ajax_view='admin:cms_page_get_published_pagelist'
     )
 
     language = forms.ChoiceField(label=_("Language"), choices=get_language_tuple(),
                                  help_text=_('The current language of the content fields.'))
 
+    # This is really a 'fake' field which does not correspond to any Page attribute
+    # But creates a stub field to be populate by js
+    application_configs = forms.ChoiceField(label=_('Application configurations'),
+                                            choices=(), required=False,)
     fieldsets = (
         (None, {
-            'fields': ('overwrite_url','redirect'),
+            'fields': ('overwrite_url', 'redirect'),
         }),
         ('Language independent options', {
             'fields': ('site', 'template', 'reverse_id', 'soft_root', 'navigation_extenders',
-            'application_urls', 'application_namespace', "xframe_options",)
+                       'application_urls', 'application_namespace', 'application_configs',
+                       'xframe_options',)
         })
     )
 
@@ -237,22 +244,51 @@ class AdvancedSettingsForm(forms.ModelForm):
         if not self.fields['language'].initial:
             self.fields['language'].initial = get_language()
         if 'navigation_extenders' in self.fields:
-            self.fields['navigation_extenders'].widget = forms.Select({},
-                [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
+            self.fields['navigation_extenders'].widget = forms.Select(
+                {}, [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
         if 'application_urls' in self.fields:
             # Prepare a dict mapping the apps by class name ('PollApp') to
             # their app_name attribute ('polls'), if any.
             app_namespaces = {}
+            app_configs = {}
             for hook in apphook_pool.get_apphooks():
                 app = apphook_pool.get_apphook(hook[0])
                 if app.app_name:
                     app_namespaces[hook[0]] = app.app_name
+                if app.app_config:
+                    app_configs[hook[0]] = app
 
             self.fields['application_urls'].widget = AppHookSelect(
-                attrs={'id':'application_urls'},
-                app_namespaces=app_namespaces,
+                attrs={'id': 'application_urls'},
+                app_namespaces=app_namespaces
             )
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
+
+            if app_configs:
+                self.fields['application_configs'].widget = ApplicationConfigSelect(
+                    attrs={'id': 'application_configs'},
+                    app_configs=app_configs)
+
+                if self.data.get('application_urls', False) and self.data['application_urls'] in app_configs:
+                    self.fields['application_configs'].choices = [(config.pk, force_text(config)) for config in app_configs[self.data['application_urls']].get_configs()]
+
+                    apphook = self.data.get('application_urls', False)
+                    try:
+                        config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
+                        self.fields['application_configs'].initial = config.pk
+                    except ObjectDoesNotExist:
+                        # Provided apphook configuration doesn't exist (anymore),
+                        # just skip it
+                        # The user will choose another value anyway
+                        pass
+                else:
+                    # If app_config apphook is not selected, drop any value
+                    # for application_configs do avoid the field dato for
+                    # being validated by the field itself
+                    try:
+                        del self.data['application_configs']
+                    except KeyError:
+                        pass
 
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial
@@ -271,33 +307,45 @@ class AdvancedSettingsForm(forms.ModelForm):
         # The field 'application_namespace' is a misnomer. It should be
         # 'instance_namespace'.
         instance_namespace = cleaned_data.get('application_namespace', None)
+        application_config = cleaned_data.get('application_configs', None)
         if apphook:
-            # The attribute on the apps 'app_name' is a misnomer, it should be
-            # 'application_namespace'.
-            application_namespace = apphook_pool.get_apphook(apphook).app_name
-            if application_namespace and not instance_namespace:
-                if Page.objects.filter(
-                    publisher_is_draft=True,
-                    application_urls=apphook,
-                    application_namespace=application_namespace
-                ).exclude(pk=self.instance.pk).count():
-                    # Looks like there's already one with the default instance
-                    # namespace defined.
-                    self._errors['application_urls'] = ErrorList([
-                        _('''You selected an apphook with an "app_name".
-                            You must enter a unique instance name.''')
-                    ])
-                else:
-                    # OK, there are zero instances of THIS app that use the
-                    # default instance namespace, so, since the user didn't
-                    # provide one, we'll use the default. NOTE: The following
-                    # line is really setting the "instance namespace" of the
-                    # new app to the app’s "application namespace", which is
-                    # the default instance namespace.
-                    self.cleaned_data['application_namespace'] = application_namespace
+            # application_config wins over application_namespace
+            if application_config:
+                # the value of the application config namespace is saved in
+                # the 'usual' namespace field to be backward compatible
+                # with existing apphooks
+                config = apphook_pool.get_apphook(apphook).get_configs().get(pk=int(application_config))
+                self.cleaned_data['application_namespace'] = config.namespace
+            else:
+                # The attribute on the apps 'app_name' is a misnomer, it should be
+                # 'application_namespace'.
+                application_namespace = apphook_pool.get_apphook(apphook).app_name
+                if application_namespace and not instance_namespace:
+                    if Page.objects.filter(
+                        publisher_is_draft=True,
+                        application_urls=apphook,
+                        application_namespace=application_namespace
+                    ).exclude(pk=self.instance.pk).count():
+                        # Looks like there's already one with the default instance
+                        # namespace defined.
+                        self._errors['application_urls'] = ErrorList([
+                            _('''You selected an apphook with an "app_name".
+                                You must enter a unique instance name.''')
+                        ])
+                    else:
+                        # OK, there are zero instances of THIS app that use the
+                        # default instance namespace, so, since the user didn't
+                        # provide one, we'll use the default. NOTE: The following
+                        # line is really setting the "instance namespace" of the
+                        # new app to the app’s "application namespace", which is
+                        # the default instance namespace.
+                        self.cleaned_data['application_namespace'] = application_namespace
 
         if instance_namespace and not apphook:
             self.cleaned_data['application_namespace'] = None
+
+        if application_config and not apphook:
+            self.cleaned_data['application_configs'] = None
 
         return cleaned_data
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
 from cms.menu_bases import CMSAttachMenu
@@ -6,7 +7,7 @@ from cms.menu_bases import CMSAttachMenu
 
 class TestMenu(CMSAttachMenu):
     name = "test menu"
-    
+
     def get_nodes(self, request):
         nodes = []
         n = NavigationNode('sample root page', "/", 1)

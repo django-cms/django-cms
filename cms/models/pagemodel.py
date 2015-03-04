@@ -29,6 +29,7 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.helpers import reversion_register
 from menus.menu_pool import menu_pool
 
+
 @python_2_unicode_compatible
 class Page(with_metaclass(PageMetaClass, MPTTModel)):
     """
@@ -51,7 +52,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         (X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]   
+    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(_("created by"), max_length=70, editable=False)
     changed_by = models.CharField(_("changed by"), max_length=70, editable=False)
@@ -109,7 +110,6 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         choices=X_FRAME_OPTIONS_CHOICES,
         default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
     )
- 
 
     # Managers
     objects = PageManager()
@@ -530,7 +530,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
     def set_publisher_state(self, language, state, published=None):
         title = self.title_set.get(language=language)
         title.publisher_state = state
-        if not published is None:
+        if published is not None:
             title.published = published
         title._publisher_keep_state = True
         title.save()
@@ -812,7 +812,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             self.title_cache = {}
             for title in self.title_set.all():
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
+        if language not in self.title_cache or not validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
@@ -881,7 +881,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         if not hasattr(self, "title_cache") or force_reload:
             load = True
             self.title_cache = {}
-        elif not language in self.title_cache:
+        elif language not in self.title_cache:
             if fallback:
                 fallback_langs = i18n.get_fallback_languages(language)
                 for lang in fallback_langs:
@@ -1010,7 +1010,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             user = request.user
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + opts.get_delete_permission())
+        return (user.has_perm(opts.app_label + '.' +
+                opts.get_delete_permission())
                 and self.has_generic_permission(request, "delete"))
 
     def has_publish_permission(self, request, user=None):
@@ -1066,11 +1067,14 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
     def get_media_path(self, filename):
         """
-        Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
-        This allows multiple pages to contain files with identical names without namespace issues.
-        Plugins such as Picture can use this method to initialise the 'upload_to' parameter for
-        File-based fields. For example:
-            image = models.ImageField(_("image"), upload_to=CMSPlugin.get_media_path)
+        Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing
+        page-scope files. This allows multiple pages to contain files with
+        identical names without namespace issues. Plugins such as Picture can
+        use this method to initialise the 'upload_to' parameter for File-based
+        fields. For example:
+            image = models.ImageField(
+                _("image"), upload_to=CMSPlugin.get_media_path)
+
         where CMSPlugin.get_media_path calls self.page.get_media_path
 
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
@@ -1087,7 +1091,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         """Returns smart queryset depending on object type - draft / public
         """
         qs = self.__class__.objects
-        return self.publisher_is_draft and qs.drafts() or qs.public().published()
+        return (self.publisher_is_draft and
+            qs.drafts() or qs.public().published())
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?
@@ -1168,8 +1173,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         return sibling
 
     def _publisher_save_public(self, obj):
-        """Mptt specific stuff before the object can be saved, overrides original
-        publisher method.
+        """Mptt specific stuff before the object can be saved, overrides
+        original publisher method.
 
         Args:
             obj - public variant of `self` to be saved.
@@ -1182,7 +1187,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         else:
             filters['publisher_public__parent__isnull'] = True
         prev_sibling = self.get_previous_filtered_sibling(**filters)
-        public_prev_sib = prev_sibling.publisher_public if prev_sibling else None
+        public_prev_sib = (
+            prev_sibling.publisher_public if prev_sibling else None)
 
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
@@ -1190,16 +1196,18 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                 obj.insert_at(self, position='right', save=False)
             else:
                 if public_prev_sib:
-                    obj.insert_at(public_prev_sib, position='right', save=False)
+                    obj.insert_at(
+                        public_prev_sib, position='right', save=False)
                 else:
                     if public_parent:
-                        obj.insert_at(public_parent, position='first-child', save=False)
+                        obj.insert_at(
+                            public_parent, position='first-child', save=False)
         else:
             # check if object was moved / structural tree change
             prev_public_sibling = obj.get_previous_filtered_sibling()
-            if self.level != obj.level or \
-                            public_parent != obj.parent or \
-                            public_prev_sib != prev_public_sibling:
+            if (self.level != obj.level or
+                    public_parent != obj.parent or
+                    public_prev_sib != prev_public_sibling):
                 if public_prev_sib:
                     obj.move_to(public_prev_sib, position="right")
                 elif public_parent:
@@ -1209,7 +1217,8 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
                     # it is a move from the right side or just save
                     next_sibling = self.get_next_filtered_sibling(**filters)
                     if next_sibling and next_sibling.publisher_public_id:
-                        obj.move_to(next_sibling.publisher_public, position="left")
+                        obj.move_to(
+                            next_sibling.publisher_public, position="left")
 
         return obj
 
@@ -1226,21 +1235,22 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             if placeholder.slot in placeholders:
                 found[placeholder.slot] = placeholder
         for placeholder_name in placeholders:
-            if not placeholder_name in found:
+            if placeholder_name not in found:
                 placeholder = Placeholder.objects.create(slot=placeholder_name)
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
         return found
- 
+
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = cache.get('cms:xframe_options:%s' % self.pk)
         if xframe_options is None:
             ancestors = self.get_ancestors(ascending=True, include_self=True)
-            
+
             # Ignore those pages which just inherit their value
-            ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
-            
+            ancestors = ancestors.exclude(
+                xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+
             # Now just give me the clickjacking setting (not anything else)
             xframe_options = ancestors.values_list('xframe_options', flat=True)
 
@@ -1253,8 +1263,13 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
 
         return xframe_options
 
+
 def _reversion():
-    exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
+    exclude_fields = [
+        'publisher_is_draft',
+        'publisher_public',
+        'publisher_state',
+    ]
 
     reversion_register(
         Page,
