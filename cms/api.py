@@ -82,11 +82,6 @@ def _verify_apphook(apphook, namespace):
             raise
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
-        try:
-            assert apphook in apphook_pool.apps.values()
-        except AssertionError:
-            print(apphook_pool.apps.values())
-            raise
         return apphook.__name__
     elif isinstance(apphook, six.string_types):
         try:
