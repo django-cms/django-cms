@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-14 14:06-0500\n"
+"POT-Creation-Date: 2015-02-22 19:10+0100\n"
 "PO-Revision-Date: 2009-11-10 22:37+0100\n"
 "Last-Translator: Benjamin Wohlwend <piquadrat@gmail.com>\n"
 "Language-Team: divio.ch <developers@divio.ch>\n"
@@ -20,205 +20,13 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: apps.py:9 templates/cms/toolbar/items/logo.html:2
-msgid "django CMS"
+#: admin/dialog/forms.py:10
+msgid "Copy permissions"
 msgstr ""
 
-#: cms_plugins.py:18
-msgid "Placeholder"
-msgstr ""
-
-#: cms_plugins.py:31
-msgid "Alias"
-msgstr ""
-
-#: cms_plugins.py:54 cms_plugins.py:63
-msgid "Create Alias"
-msgstr ""
-
-#: cms_toolbar.py:90
-msgid "Structure"
-msgstr ""
-
-#: cms_toolbar.py:91
-msgid "Content"
-msgstr ""
-
-#: cms_toolbar.py:122
-msgid "Sites"
-msgstr ""
-
-#: cms_toolbar.py:123
-msgid "Admin Sites"
-msgstr ""
-
-#: cms_toolbar.py:130
-msgid "Administration"
-msgstr ""
-
-#: cms_toolbar.py:134
-msgid "User settings"
-msgstr ""
-
-#: cms_toolbar.py:148
-msgid "Users"
-msgstr ""
-
-#: cms_toolbar.py:167 tests/toolbar.py:412 tests/toolbar.py:427
-#: tests/toolbar.py:459
-#, python-format
-msgid "Logout %s"
-msgstr ""
-
-#: cms_toolbar.py:167
-msgid "Logout"
-msgstr ""
-
-#: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
+#: admin/forms.py:64 admin/forms.py:174 admin/forms.py:216 cms_toolbar.py:173
 #: models/settingmodels.py:12
 msgid "Language"
-msgstr ""
-
-#: cms_toolbar.py:302
-#, fuzzy
-msgid "Publish changes"
-msgstr "publish request"
-
-#: cms_toolbar.py:304
-#, fuzzy
-msgid "Publish page now"
-msgstr "publish request"
-
-#: cms_toolbar.py:346 cms_toolbar.py:431
-msgid "Page settings"
-msgstr ""
-
-#: cms_toolbar.py:366
-#, python-format
-msgid "Add %(language)s Translation"
-msgstr ""
-
-#: cms_toolbar.py:374
-#, python-format
-msgid "Delete %(language)s Translation"
-msgstr ""
-
-#: cms_toolbar.py:383
-#, python-format
-msgid "Copy all plugins from %s"
-msgstr ""
-
-#: cms_toolbar.py:384
-#, python-format
-msgid "Are you sure you want copy all plugins from %s?"
-msgstr ""
-
-#: cms_toolbar.py:398
-msgid "Pages"
-msgstr ""
-
-#: cms_toolbar.py:406 templates/admin/cms/page/permissions.html:5
-msgid "Page"
-msgstr ""
-
-#: cms_toolbar.py:409
-msgid "Add Page"
-msgstr ""
-
-#: cms_toolbar.py:412
-msgid "New Page"
-msgstr ""
-
-#: cms_toolbar.py:413
-msgid "New Sub Page"
-msgstr ""
-
-#: cms_toolbar.py:414
-msgid "Duplicate this Page"
-msgstr ""
-
-#: cms_toolbar.py:426
-msgid "Edit this Page"
-msgstr ""
-
-#: cms_toolbar.py:436
-msgid "Templates"
-msgstr ""
-
-#: cms_toolbar.py:452
-msgid "Advanced settings"
-msgstr ""
-
-#: cms_toolbar.py:458
-msgid "Permissions"
-msgstr ""
-
-#: cms_toolbar.py:462 admin/pageadmin.py:343
-#, fuzzy
-msgid "Publishing dates"
-msgstr "publish request"
-
-#: cms_toolbar.py:468
-msgid "Hide in navigation"
-msgstr ""
-
-#: cms_toolbar.py:468
-msgid "Display in navigation"
-msgstr ""
-
-#: cms_toolbar.py:475
-#, fuzzy
-msgid "Unpublish page"
-msgstr "unpublish request"
-
-#: cms_toolbar.py:478
-#, fuzzy
-msgid "Publish page"
-msgstr "publish request"
-
-#: cms_toolbar.py:489
-#, fuzzy
-msgid "Delete page"
-msgstr "deletion request"
-
-#: cms_toolbar.py:498
-msgid "Save as Page Type"
-msgstr ""
-
-#: cms_toolbar.py:503 templates/admin/cms/page/history/revision_header.html:10
-msgid "History"
-msgstr ""
-
-#: cms_toolbar.py:521
-msgid "Undo"
-msgstr ""
-
-#: cms_toolbar.py:522
-msgid "Redo"
-msgstr ""
-
-#: cms_toolbar.py:527
-msgid "Are you sure you want to revert to live?"
-msgstr ""
-
-#: cms_toolbar.py:528
-msgid "Revert to live"
-msgstr ""
-
-#: cms_toolbar.py:530
-msgid "View history"
-msgstr ""
-
-#: plugin_base.py:83
-msgid "Advanced options"
-msgstr ""
-
-#: plugin_base.py:100
-msgid "Generic"
-msgstr ""
-
-#: plugin_base.py:287
-msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
 #: admin/forms.py:65 admin/forms.py:175 admin/forms.py:217
@@ -358,8 +166,8 @@ msgid "Add"
 msgstr ""
 
 #: admin/forms.py:462 admin/forms.py:469 admin/forms.py:473
-#: templates/cms/toolbar/toolbar.html:36
 #: templates/cms/toolbar/items/live_draft.html:7
+#: templates/cms/toolbar/toolbar.html:36
 msgid "Change"
 msgstr ""
 
@@ -414,6 +222,11 @@ msgstr ""
 #: admin/pageadmin.py:340 templates/admin/cms/page/submit_row.html:9
 msgid "Advanced Settings"
 msgstr ""
+
+#: admin/pageadmin.py:343 cms_toolbar.py:462
+#, fuzzy
+msgid "Publishing dates"
+msgstr "publish request"
 
 #: admin/pageadmin.py:349
 msgid "Change Permissions"
@@ -653,8 +466,183 @@ msgstr ""
 msgid "placeholder"
 msgstr ""
 
-#: admin/dialog/forms.py:10
-msgid "Copy permissions"
+#: apps.py:9 templates/cms/toolbar/items/logo.html:2
+msgid "django CMS"
+msgstr ""
+
+#: cms_plugins.py:18
+msgid "Placeholder"
+msgstr ""
+
+#: cms_plugins.py:31
+msgid "Alias"
+msgstr ""
+
+#: cms_plugins.py:54 cms_plugins.py:63
+msgid "Create Alias"
+msgstr ""
+
+#: cms_toolbar.py:90
+msgid "Structure"
+msgstr ""
+
+#: cms_toolbar.py:91
+msgid "Content"
+msgstr ""
+
+#: cms_toolbar.py:122
+msgid "Sites"
+msgstr ""
+
+#: cms_toolbar.py:123
+msgid "Admin Sites"
+msgstr ""
+
+#: cms_toolbar.py:130
+msgid "Administration"
+msgstr ""
+
+#: cms_toolbar.py:134
+msgid "User settings"
+msgstr ""
+
+#: cms_toolbar.py:148
+msgid "Users"
+msgstr ""
+
+#: cms_toolbar.py:167 tests/toolbar.py:412 tests/toolbar.py:427
+#: tests/toolbar.py:459
+#, python-format
+msgid "Logout %s"
+msgstr ""
+
+#: cms_toolbar.py:167
+msgid "Logout"
+msgstr ""
+
+#: cms_toolbar.py:302
+#, fuzzy
+msgid "Publish changes"
+msgstr "publish request"
+
+#: cms_toolbar.py:304
+#, fuzzy
+msgid "Publish page now"
+msgstr "publish request"
+
+#: cms_toolbar.py:346 cms_toolbar.py:431
+msgid "Page settings"
+msgstr ""
+
+#: cms_toolbar.py:366
+#, python-format
+msgid "Add %(language)s Translation"
+msgstr ""
+
+#: cms_toolbar.py:374
+#, python-format
+msgid "Delete %(language)s Translation"
+msgstr ""
+
+#: cms_toolbar.py:383
+#, python-format
+msgid "Copy all plugins from %s"
+msgstr ""
+
+#: cms_toolbar.py:384
+#, python-format
+msgid "Are you sure you want copy all plugins from %s?"
+msgstr ""
+
+#: cms_toolbar.py:398
+msgid "Pages"
+msgstr ""
+
+#: cms_toolbar.py:406 templates/admin/cms/page/permissions.html:5
+msgid "Page"
+msgstr ""
+
+#: cms_toolbar.py:409
+msgid "Add Page"
+msgstr ""
+
+#: cms_toolbar.py:412
+msgid "New Page"
+msgstr ""
+
+#: cms_toolbar.py:413
+msgid "New Sub Page"
+msgstr ""
+
+#: cms_toolbar.py:414
+msgid "Duplicate this Page"
+msgstr ""
+
+#: cms_toolbar.py:426
+msgid "Edit this Page"
+msgstr ""
+
+#: cms_toolbar.py:436
+msgid "Templates"
+msgstr ""
+
+#: cms_toolbar.py:452
+msgid "Advanced settings"
+msgstr ""
+
+#: cms_toolbar.py:458
+msgid "Permissions"
+msgstr ""
+
+#: cms_toolbar.py:468
+msgid "Hide in navigation"
+msgstr ""
+
+#: cms_toolbar.py:468
+msgid "Display in navigation"
+msgstr ""
+
+#: cms_toolbar.py:475
+#, fuzzy
+msgid "Unpublish page"
+msgstr "unpublish request"
+
+#: cms_toolbar.py:478
+#, fuzzy
+msgid "Publish page"
+msgstr "publish request"
+
+#: cms_toolbar.py:489
+#, fuzzy
+msgid "Delete page"
+msgstr "deletion request"
+
+#: cms_toolbar.py:498
+msgid "Save as Page Type"
+msgstr ""
+
+#: cms_toolbar.py:503 templates/admin/cms/page/history/revision_header.html:10
+msgid "History"
+msgstr ""
+
+#: cms_toolbar.py:521
+msgid "Undo"
+msgstr ""
+
+#: cms_toolbar.py:522
+msgid "Redo"
+msgstr ""
+
+#: cms_toolbar.py:527
+msgid "Are you sure you want to revert to live?"
+msgstr ""
+
+#: cms_toolbar.py:528
+msgid "Revert to live"
+msgstr ""
+
+#: cms_toolbar.py:530
+msgid "View history"
 msgstr ""
 
 #: forms/fields.py:31
@@ -1035,6 +1023,18 @@ msgstr ""
 msgid "is published"
 msgstr ""
 
+#: plugin_base.py:83
+msgid "Advanced options"
+msgstr ""
+
+#: plugin_base.py:100
+msgid "Generic"
+msgstr ""
+
+#: plugin_base.py:287
+msgid "There are no further settings for this plugin. Please press save."
+msgstr ""
+
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
 #: templates/admin/cms/page/submit_row.html:4
@@ -1086,6 +1086,31 @@ msgstr ""
 #: templates/admin/cms/page/change_form.html:75
 #: templates/admin/cms/page/submit_row.html:14
 msgid "Save and continue editing"
+msgstr ""
+
+#: templates/admin/cms/page/history/recover_header.html:12
+#: templates/admin/cms/page/history/revision_header.html:6
+#: templates/admin/cms/page/tree/base.html:9
+#: templates/admin/cms/usersettings/change_form.html:14
+msgid "Home"
+msgstr ""
+
+#: templates/admin/cms/page/history/recover_header.html:15
+#, python-format
+msgid "Recover deleted %(verbose_name)s"
+msgstr ""
+
+#: templates/admin/cms/page/history/recover_header.html:21
+msgid "Press the save button below to recover this version of the object."
+msgstr ""
+
+#: templates/admin/cms/page/history/revision_header.html:11
+#, python-format
+msgid "Revert %(verbose_name)s"
+msgstr ""
+
+#: templates/admin/cms/page/history/revision_header.html:20
+msgid "Press the save button below to revert to this version of the object."
 msgstr ""
 
 #: templates/admin/cms/page/permissions.html:6
@@ -1141,6 +1166,10 @@ msgstr ""
 msgid "Page doesn't inherit any permissions."
 msgstr ""
 
+#: templates/admin/cms/page/plugin/error_form.html:4
+msgid "Edit model"
+msgstr ""
+
 #: templates/admin/cms/page/submit_row.html:8
 msgid "Basic Infos"
 msgstr ""
@@ -1151,35 +1180,6 @@ msgstr ""
 
 #: templates/admin/cms/page/submit_row.html:13
 msgid "Save and add another"
-msgstr ""
-
-#: templates/admin/cms/page/history/recover_header.html:12
-#: templates/admin/cms/page/history/revision_header.html:6
-#: templates/admin/cms/page/tree/base.html:9
-#: templates/admin/cms/usersettings/change_form.html:14
-msgid "Home"
-msgstr ""
-
-#: templates/admin/cms/page/history/recover_header.html:15
-#, python-format
-msgid "Recover deleted %(verbose_name)s"
-msgstr ""
-
-#: templates/admin/cms/page/history/recover_header.html:21
-msgid "Press the save button below to recover this version of the object."
-msgstr ""
-
-#: templates/admin/cms/page/history/revision_header.html:11
-#, python-format
-msgid "Revert %(verbose_name)s"
-msgstr ""
-
-#: templates/admin/cms/page/history/revision_header.html:20
-msgid "Press the save button below to revert to this version of the object."
-msgstr ""
-
-#: templates/admin/cms/page/plugin/error_form.html:4
-msgid "Edit model"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:4
@@ -1203,8 +1203,7 @@ msgid "An error occured. Please reload the page"
 msgstr "An error occurred. Please reload the page"
 
 #: templates/admin/cms/page/tree/base.html:57
-#, python-format
-msgid "Are you sure you want to %%s this page?"
+msgid "Are you sure you want to § this page?"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:73
@@ -1421,18 +1420,26 @@ msgstr ""
 msgid "Scroll for more"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:8
-msgid "Double-click to edit"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:33
 #: templates/cms/toolbar/items/live_draft.html:4
+#: templates/cms/toolbar/toolbar.html:33
 msgid "Live"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:34
 #: templates/cms/toolbar/items/live_draft.html:5
+#: templates/cms/toolbar/toolbar.html:34
 msgid "Draft"
+msgstr ""
+
+#: templates/cms/toolbar/items/login.html:5 toolbar/toolbar.py:23
+msgid "Username"
+msgstr ""
+
+#: templates/cms/toolbar/items/login.html:6
+msgid "Password"
+msgstr ""
+
+#: templates/cms/toolbar/toolbar.html:8
+msgid "Double-click to edit"
 msgstr ""
 
 #: templates/cms/toolbar/toolbar.html:41
@@ -1483,14 +1490,6 @@ msgstr ""
 
 #: templates/cms/toolbar/toolbar_javascript.html:65
 msgid "This page has unpublished changes."
-msgstr ""
-
-#: templates/cms/toolbar/items/login.html:5 toolbar/toolbar.py:23
-msgid "Username"
-msgstr ""
-
-#: templates/cms/toolbar/items/login.html:6
-msgid "Password"
 msgstr ""
 
 #: templatetags/cms_admin.py:68
