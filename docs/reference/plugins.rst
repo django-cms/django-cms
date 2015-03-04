@@ -272,7 +272,7 @@ By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
 The default implementation is as follows::
 
     def icon_alt(self, instance):
-        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+        return "%s - %s" % (force_text(self.name), force_text(instance))
 
 See also: `text_enabled`_, `icon_src`_
 
@@ -405,3 +405,43 @@ Example::
     # returns True
 
 See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
+
+add_url
+-------
+
+Returns the url to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_add_plugin`` view is used)
+
+edit_url
+--------
+
+Returns the url to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_edit_plugin`` view is used)
+
+move_url
+--------
+
+Returns the url to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_move_plugin`` view is used)
+
+delete_url
+----------
+
+Returns the url to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_delete_plugin`` view is used)
+
+copy_url
+--------
+
+Returns the url to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_copy_plugins`` view is used)

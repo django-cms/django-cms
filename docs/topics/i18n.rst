@@ -16,16 +16,16 @@ on the subject.
 Here's an example of `urls.py`::
 
     from django.conf import settings
-    from django.conf.urls import patterns, include, url
+    from django.conf.urls import include, url
     from django.contrib import admin
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     admin.autodiscover()
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
-    )
+    ]
 
     urlpatterns += staticfiles_urlpatterns()
 
@@ -137,5 +137,3 @@ Automated slug generation unicode characters
 If your site has languages which use non-ASCII character sets, you might want
 to enable :setting:`CMS_UNIHANDECODE_HOST` and :setting:`CMS_UNIHANDECODE_VERSION`
 to get automated slugs for those languages too.
-
-

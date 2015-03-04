@@ -59,6 +59,12 @@ class ToolbarMiddleware(object):
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         build = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        disable = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+
+        if disable in request.GET:
+            request.session['cms_toolbar_disabled'] = True
+        if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
+            request.session['cms_toolbar_disabled'] = False
 
         if request.user.is_staff or request.user.is_anonymous():
             if edit_on in request.GET and not request.session.get('cms_edit', False):
@@ -96,15 +102,11 @@ class ToolbarMiddleware(object):
     def process_response(self, request, response):
         from django.utils.cache import add_never_cache_headers
 
-        found = False
-        if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            found = True
-        for placeholder in getattr(request, 'placeholders', []):
-            if not placeholder.cache_placeholder:
-                found = True
-                break
-        if found:
+        if ((hasattr(request, 'toolbar') and request.toolbar.edit_mode) or
+            not all(ph.cache_placeholder
+                    for ph in getattr(request, 'placeholders', ()))):
             add_never_cache_headers(response)
+
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:
             try:
                 pk = LogEntry.objects.filter(

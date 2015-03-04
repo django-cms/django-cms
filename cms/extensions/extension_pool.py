@@ -125,4 +125,3 @@ class ExtensionPool(object):
         return extensions
 
 extension_pool = ExtensionPool()
-

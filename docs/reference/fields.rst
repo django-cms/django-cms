@@ -28,7 +28,7 @@ Form fields
     :class:`cms.models.pagemodel.Page` model, but displays itself as a split
     field with a select dropdown for the site and one for the page. It also
     indents the page names based on what level they're on, so that the page
-    select dropdown is easier to use. This takes the same arguments as 
+    select dropdown is easier to use. This takes the same arguments as
     :class:`django.forms.models.ModelChoiceField`.
 
 .. py:class:: cms.forms.fields.PageSmartLinkField

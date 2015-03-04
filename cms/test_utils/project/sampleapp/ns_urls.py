@@ -1,11 +1,9 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.utils.translation import ugettext_lazy as _
 
-"""
-Also used in cms.tests.ApphooksTestCase
-"""
+from . import views
 
-urlpatterns = patterns('cms.test_utils.project.sampleapp.views',
-    url(r'^current-app/$', 'current_app', name='current-app'),
-    url(_('page'), 'current_app', name='translated-url'),
-)
+urlpatterns = [
+    url(r'^current-app/$', views.current_app, name='current-app'),
+    url(_('page'), views.current_app, name='translated-url'),
+]

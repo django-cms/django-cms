@@ -5,6 +5,7 @@ import inspect
 from itertools import chain
 import os
 
+from django.db.models.loading import get_app_paths
 from django.conf import settings
 from django.template import Lexer, TOKEN_BLOCK
 from django.utils import six
@@ -15,7 +16,7 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths, is_installed
+from cms.utils.compat.dj import is_installed
 
 
 SUCCESS = 1
@@ -236,7 +237,7 @@ def check_plugin_instances(output):
                 section.error("%s has instances but is no longer installed" % plugin_type["type"] )
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")

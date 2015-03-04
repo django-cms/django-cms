@@ -292,7 +292,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added list of retired core developers
 - Added branch policy documentaion
 
-=== 3.0.8 (2015-01-11) ===
+==== 3.0.8 (2015-01-11) ===
 - Add require_parent option to CMS_PLACEHOLDER_CONF
 - Fix django-mptt version depenency to be PEP440 compatible
 - Fix some Django 1.4 compatibility issues
@@ -306,7 +306,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Documentation fixes
 - Minor code cleanups
 
-=== 3.0.9 (2015-01-11) ===
+==== 3.0.9 (2015-01-11) ===
 - Revert a change that caused a regression in toolbar login
 - Fix an error in a translated phrase
 - Fix error when moving items in the page tree
@@ -323,3 +323,10 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixed an issue that caused the uncached placeholder tag to display cached content
 - Fixed an issue where extra slashed would appear in apphooked URLs when APPEND_SLASH=False
 - Fixed issues relating to the logout function
+
+==== 3.1 (unreleased) ===
+- Remove django-mptt in favor of django-treebeard
+- Remove compatibility with Django 1.4 / 1.5
+- General code cleanup
+- Simplify loading of view restrictions in the menu
+- south is not marked as optional; to use south on Django 1.6 install django-cms[south]

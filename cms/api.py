@@ -8,6 +8,7 @@ calling these methods!
 """
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
@@ -15,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
+from django.utils.translation import activate
 
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
@@ -29,15 +31,14 @@ from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals
+from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
 
 #===============================================================================
-# Constants 
+# Constants
 #===============================================================================
 
 VISIBILITY_ALL = None
@@ -103,7 +104,7 @@ def _verify_plugin_type(plugin_type):
     (plugin_model, plugin_type)
     """
     if (hasattr(plugin_type, '__module__') and
-        issubclass(plugin_type, CMSPluginBase)):
+            issubclass(plugin_type, CMSPluginBase)):
         plugin_pool.set_plugin_meta()
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
@@ -119,8 +120,9 @@ def _verify_plugin_type(plugin_type):
         raise TypeError('plugin_type must be CMSPluginBase subclass or string')
     return plugin_model, plugin_type
 
+
 #===============================================================================
-# Public API 
+# Public API
 #===============================================================================
 
 def create_page(title, template, language, menu_title=None, slug=None,
@@ -133,7 +135,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # ugly permissions hack
@@ -186,6 +188,13 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
+    if parent:
+        if position in ('last-child', 'first-child'):
+            parent_id = parent.pk
+        else:
+            parent_id = parent.parent_id
+    else:
+        parent_id = None
     # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook, apphook_namespace)
@@ -199,7 +208,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     page = Page(
         created_by=created_by,
         changed_by=created_by,
-        parent=parent,
+        parent_id=parent_id,
         publication_date=publication_date,
         publication_end_date=publication_end_date,
         in_navigation=in_navigation,
@@ -212,10 +221,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
         site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
-        xframe_options=xframe_options,    
+        xframe_options=xframe_options,
     )
-    page.insert_at(parent, position)
-    page.save()
+    page = page.add_root(instance=page)
+
+    if parent:
+        page = page.move(target=parent, pos=position)
 
     create_title(
         language=language,
@@ -240,9 +251,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
                  parent=None, overwrite_url=None):
     """
     Create a title.
-    
+
     Parent is only used if slug=None.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate page
@@ -277,7 +288,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
     Add a plugin to a placeholder
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate placeholder
@@ -287,29 +298,58 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     plugin_model, plugin_type = _verify_plugin_type(plugin_type)
     if target:
         if position == 'last-child':
-            new_pos = CMSPlugin.objects.filter(language=language, parent=target, tree_id=target.tree_id).count()
+            if CMSPlugin.node_order_by:
+                position = 'sorted-child'
+            new_pos = CMSPlugin.objects.filter(parent=target).count()
+            parent_id = target.pk
         elif position == 'first-child':
             new_pos = 0
+            if CMSPlugin.node_order_by:
+                position = 'sorted-child'
+            parent_id = target.pk
         elif position == 'left':
             new_pos = target.position
+            if CMSPlugin.node_order_by:
+                position = 'sorted-sibling'
+            parent_id = target.parent_id
         elif position == 'right':
             new_pos = target.position + 1
+            if CMSPlugin.node_order_by:
+                position = 'sorted-sibling'
+            parent_id = target.parent_id
         else:
             raise Exception('position not supported: %s' % position)
-        for pl in CMSPlugin.objects.filter(language=language, parent=target.parent_id, tree_id=target.tree_id, position__gte=new_pos):
+        if position == 'last-child' or position == 'first-child':
+            qs = CMSPlugin.objects.filter(language=language, parent=target, position__gte=new_pos,
+                                          placeholder=placeholder)
+        else:
+            qs = CMSPlugin.objects.filter(language=language, parent=target.parent_id, position__gte=new_pos,
+                                          placeholder=placeholder)
+        for pl in qs:
             pl.position += 1
             pl.save()
     else:
-        new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
-
+        if position == 'last-child':
+            new_pos = CMSPlugin.objects.filter(language=language, parent__isnull=True, placeholder=placeholder).count()
+        else:
+            new_pos = 0
+            for pl in CMSPlugin.objects.filter(language=language, parent__isnull=True, position__gte=new_pos,
+                                               placeholder=placeholder):
+                pl.position += 1
+                pl.save()
+        parent_id = None
     plugin_base = CMSPlugin(
         plugin_type=plugin_type,
         placeholder=placeholder,
         position=new_pos,
-        language=language
+        language=language,
+        parent_id=parent_id,
     )
-    plugin_base.insert_at(target, position=position, save=False)
 
+    plugin_base = plugin_base.add_root(instance=plugin_base)
+
+    if target:
+        plugin_base = plugin_base.move(target, pos=position)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
@@ -326,7 +366,7 @@ def create_page_user(created_by, user,
                      can_delete_pagepermission=True, grant_all=False):
     """
     Creates a page user.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     if grant_all:
@@ -369,7 +409,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     grant_all = grant_all and not global_permission
@@ -399,7 +439,7 @@ def publish_page(page, user, language):
     """
     Publish a page. This sets `page.published` to `True` and calls publish()
     which does the actual publishing.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     page = page.reload()
@@ -411,8 +451,39 @@ def publish_page(page, user, language):
     request = FakeRequest(user)
     if not page.has_publish_permission(request):
         raise PermissionDenied()
-    page.publish(language)
+    # Set the current_user to have the page's changed_by
+    # attribute set correctly.
+    # 'user' is a user object, but current_user() just wants the username (a string).
+    with current_user(user.get_username()):
+        page.publish(language)
     return page.reload()
+
+
+def publish_pages(include_unpublished=False, language=None, site=None):
+    """
+    Create published public version of selected drafts.
+    """
+    qs = Page.objects.drafts()
+    if not include_unpublished:
+        qs = qs.filter(title_set__published=True).distinct()
+    if site:
+        qs = qs.filter(site=site)
+
+    output_language = None
+    for i, page in enumerate(qs):
+        add = True
+        titles = page.title_set
+        if not include_unpublished:
+            titles = titles.filter(published=True)
+        for lang in titles.values_list("language", flat=True):
+            if language is None or lang == language:
+                if not output_language:
+                    output_language = lang
+                if not page.publish(lang):
+                    add = False
+        # we may need to activate the first (main) language for proper page title rendering
+        activate(output_language)
+        yield (page, add)
 
 
 def get_page_draft(page):
@@ -456,13 +527,13 @@ def copy_plugins_to_language(page, source_language, target_language,
     :return int: number of copied plugins
     """
     copied = 0
-    placeholders = page.placeholders.all()
+    placeholders = page.get_placeholders()
     for placeholder in placeholders:
         # only_empty is True we check if the placeholder already has plugins and
         # we skip it if has some
         if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
             plugins = list(
-                placeholder.cmsplugin_set.filter(language=source_language).order_by('tree_id', 'level', 'position'))
+                placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied

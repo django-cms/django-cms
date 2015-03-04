@@ -247,7 +247,7 @@ class MenuPool(object):
         nodes = self._build_nodes(request, site_id)
         nodes = copy.deepcopy(nodes)
         nodes = self.apply_modifiers(nodes, request, namespace, root_id,
-            post_cut=False, breadcrumb=breadcrumb)
+                                     post_cut=False, breadcrumb=breadcrumb)
         return nodes
 
     def _mark_selected(self, request, nodes):
@@ -273,17 +273,11 @@ class MenuPool(object):
 
     def get_menus_by_attribute(self, name, value):
         self.discover_menus()
-        found = []
-        for menu in self.menus.items():
-            if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                found.append((menu[0], menu[1].name))
-        return found
+        return [(menu_class_name, menu.name)
+                for menu_class_name, menu in self.menus.items()
+                if getattr(menu, name, None) == value]
 
     def get_nodes_by_attribute(self, nodes, name, value):
-        found = []
-        for node in nodes:
-            if node.attr.get(name, None) == value:
-                found.append(node)
-        return found
+        return [node for node in nodes if node.attr.get(name, None) == value]
 
 menu_pool = MenuPool()
