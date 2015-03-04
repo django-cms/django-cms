@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.db.models import Q
 import re
+from cms.exceptions import NoHomeFound
 
 APPEND_TO_SLUG = "-copy"
 COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d+)*)?$')
@@ -10,7 +11,7 @@ COPY_SLUG_REGEX = re.compile(r'^.*-copy(?:-(\d+)*)?$')
 def is_valid_page_slug(page, parent, lang, slug, site, path=None):
     """Validates given slug depending on settings.
     """
-    from cms.models import Title
+    from cms.models import Page, Title
     # Since 3.0 this must take into account unpublished pages as it's necessary
     # to be able to open every page to edit content.
     # If page is newly created (i.e. page.pk is None) we skip filtering out
@@ -25,20 +26,29 @@ def is_valid_page_slug(page, parent, lang, slug, site, path=None):
 
     if parent:
         if parent.is_home:
+            # siblings on hoe and parentless
             qs = qs.filter(Q(page__parent=parent) |
                            Q(page__parent__isnull=True))
         else:
+            # siblings on the same parent page
             qs = qs.filter(page__parent=parent)
     else:
-        qs = qs.filter(page__parent__isnull=True)
+        try:
+            # siblings on home and parentless
+            home = Page.objects.get_home(site)
+            qs = qs.filter(Q(page__parent=home) |
+                           Q(page__parent__isnull=True))
+        except NoHomeFound:
+            # if no home is published, check among parentless siblings only
+            qs = qs.filter(page__parent__isnull=True)
 
     if page.pk:
         qs = qs.exclude(Q(language=lang) & Q(page=page))
         qs = qs.exclude(page__publisher_public=page)
-        # Check for slugs
+    # Check for slugs
     if qs.filter(slug=slug).count():
         return False
-        # Check for path
+    # Check for path
     if path and qs.filter(path=path).count():
         return False
     return True
