@@ -14,7 +14,7 @@ $(document).ready(function () {
 			'lang': {}
 		},
 
-		initialize: function (optio ns) {
+		initialize: function (options) {
 			this.options = $.extend(true, {}, this.options, options);
 
 			// load internal functions
