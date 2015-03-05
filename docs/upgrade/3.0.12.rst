@@ -11,4 +11,4 @@ What's new in 3.0.12
 Bug Fixes
 =========
 
-* Fixes a regression caused by extra whitespace in Javascript =(
+* Fixes a regression caused by extra whitespace in Javascript
