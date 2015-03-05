@@ -23,7 +23,7 @@ Bug Fixes
 * Fixes an issue where translations where broken when operating on a page
 * Fixes an edge-case SQLite issue under Django 1.7
 * Fixes an issue where a confirmation dialog shows only some of the plugins to
-  be deleted when usingthe "Empty All" context-menu item
+  be deleted when using the "Empty All" context-menu item
 * Fixes an issue where deprecated 'mimetype' was used instead of 'contenttype'
 * Fixes an issue where `cms check` erroneous displays warnings when a plugin
   uses class inheritance
