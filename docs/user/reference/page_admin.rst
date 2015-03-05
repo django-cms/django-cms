@@ -22,6 +22,8 @@ CMS.
 
 Takes you back to home page of your site.
 
+.. _site-menu:
+
 *Site menu*
 ===========
 
