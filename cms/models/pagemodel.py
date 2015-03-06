@@ -33,6 +33,7 @@ from treebeard.mp_tree import MP_Node
 
 logger = getLogger(__name__)
 
+
 @python_2_unicode_compatible
 class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     """
@@ -109,7 +110,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         choices=X_FRAME_OPTIONS_CHOICES,
         default=getattr(settings, 'CMS_DEFAULT_X_FRAME_OPTIONS', X_FRAME_OPTIONS_INHERIT)
     )
-
 
     # Managers
     objects = PageManager()
@@ -314,6 +314,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         Note for issue #1166: when copying pages there is no need to check for
         conflicting URLs as pages are copied unpublished.
         """
+        from cms.extensions import extension_pool
+
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable("copy page is not allowed for public pages")
         pages = list(self.get_descendants(True).order_by('path'))
@@ -331,6 +333,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if tree:
             tree[0].old_pk = tree[0].pk
         first = True
+        first_page = None
         # loop over all affected pages (self is included in descendants)
         for page in pages:
             titles = list(page.title_set.all())
@@ -356,6 +359,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 else:
                     page.parent = None
                 page.save()
+                first_page = page
                 if target:
                     page = page.move(target, pos=position)
                     page.old_pk = old_pk
@@ -411,8 +415,10 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     page.placeholders.add(ph)
                 if plugins:
                     copy_plugins_to(plugins, ph)
+            extension_pool.copy_extensions(Page.objects.get(pk=origin_id), page)
         # invalidate the menu for this site
         menu_pool.clear(site_id=site.pk)
+        return first_page
 
     def save(self, no_signals=False, commit=True, **kwargs):
         """
@@ -447,7 +453,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                     self.parent.add_child(instance=self)
                 else:
                     self.add_root(instance=self)
-                return #add_root and add_child save as well
+                return  #add_root and add_child save as well
             super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
@@ -515,7 +521,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     def set_publisher_state(self, language, state, published=None):
         title = self.title_set.get(language=language)
         title.publisher_state = state
-        if not published is None:
+        if published is not None:
             title.published = published
         title._publisher_keep_state = True
         title.save()
@@ -821,7 +827,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             self.title_cache = {}
             for title in self.title_set.all():
                 self.title_cache[title.language] = title
-        if not language in self.title_cache or not self._validate_title(self.title_cache.get(language, EmptyTitle(language))):
+        if language not in self.title_cache or not self._validate_title(self.title_cache.get(language, EmptyTitle(language))):
             fallback_langs = i18n.get_fallback_languages(language)
             found = False
             for lang in fallback_langs:
@@ -890,7 +896,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if not hasattr(self, "title_cache") or force_reload:
             load = True
             self.title_cache = {}
-        elif not language in self.title_cache:
+        elif language not in self.title_cache:
             if fallback:
                 fallback_langs = i18n.get_fallback_languages(language)
                 for lang in fallback_langs:
@@ -1057,11 +1063,14 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     def get_media_path(self, filename):
         """
-        Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing page-scope files.
-        This allows multiple pages to contain files with identical names without namespace issues.
-        Plugins such as Picture can use this method to initialise the 'upload_to' parameter for
-        File-based fields. For example:
-            image = models.ImageField(_("image"), upload_to=CMSPlugin.get_media_path)
+        Returns path (relative to MEDIA_ROOT/MEDIA_URL) to directory for storing
+        page-scope files. This allows multiple pages to contain files with
+        identical names without namespace issues. Plugins such as Picture can
+        use this method to initialise the 'upload_to' parameter for File-based
+        fields. For example:
+            image = models.ImageField(
+                _("image"), upload_to=CMSPlugin.get_media_path)
+
         where CMSPlugin.get_media_path calls self.page.get_media_path
 
         This location can be customised using the CMS_PAGE_MEDIA_PATH setting
@@ -1073,6 +1082,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         Reload a page from the database
         """
         return Page.objects.get(pk=self.pk)
+
+    def get_object_queryset(self):
+        """Returns smart queryset depending on object type - draft / public
+        """
+        qs = self.__class__.objects
+        return (self.publisher_is_draft and qs.drafts() or qs.public().published())
 
     def _publisher_can_publish(self):
         """Is parent of this object already published?
@@ -1109,8 +1124,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             return None
 
     def _publisher_save_public(self, obj):
-        """Mptt specific stuff before the object can be saved, overrides original
-        publisher method.
+        """Mptt specific stuff before the object can be saved, overrides
+        original publisher method.
 
         Args:
             obj - public variant of `self` to be saved.
@@ -1127,7 +1142,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         else:
             filters['publisher_public__parent__isnull'] = True
         prev_sibling = self.get_previous_filtered_sibling(**filters)
-        public_prev_sib = prev_sibling.publisher_public if prev_sibling else None
+        public_prev_sib = (prev_sibling.publisher_public if prev_sibling else None)
+
         if not self.publisher_public_id:  # first time published
             # is there anybody on left side?
             if not self.parent_id:
@@ -1185,7 +1201,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             if placeholder.slot in placeholders:
                 found[placeholder.slot] = placeholder
         for placeholder_name in placeholders:
-            if not placeholder_name in found:
+            if placeholder_name not in found:
                 placeholder = Placeholder.objects.create(slot=placeholder_name)
                 self.placeholders.add(placeholder)
                 found[placeholder_name] = placeholder
@@ -1318,7 +1334,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
 
 def _reversion():
-    exclude_fields = ['publisher_is_draft', 'publisher_public', 'publisher_state']
+    exclude_fields = [
+        'publisher_is_draft',
+        'publisher_public',
+        'publisher_state',
+    ]
 
     reversion_register(
         Page,

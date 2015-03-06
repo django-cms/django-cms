@@ -176,7 +176,7 @@ $(document).ready(function () {
 				e.preventDefault();
 
 				// cancel if not confirmed
-				if(!confirm(that.options.lang.publish.replace('%s', $(this).text().toLowerCase()))) return false;
+				if(!confirm(that.options.lang.publish.replace('§', $(this).text().toLowerCase()))) return false;
 
 				// publish page and update
 				window.location.href = $(this).attr('href');

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.template import Template
 from menus.menu_pool import menu_pool
 
+
 class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
 
     """
@@ -24,7 +25,13 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
-        menu_pool.menus = {'CMSMenu':self.old_menu['CMSMenu'], 'TestMenu':TestMenu()}
+        # NOTE: if we're going to directly manipulate this menu pool, we should
+        # at least be marking it as not _expanded.
+        menu_pool.menus = {
+            'CMSMenu': self.old_menu['CMSMenu'],
+            'TestMenu': TestMenu()
+        }
+        menu_pool._expanded = False
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
@@ -37,7 +44,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
 
     def test_menu_registration(self):
         self.assertEqual(len(menu_pool.menus), 2)
-        self.assertEqual(len(menu_pool.modifiers) >=4, True)
+        self.assertEqual(len(menu_pool.modifiers) >= 4, True)
 
     def test_extenders_on_root(self):
         self._update_page(1, navigation_extenders="TestMenu")
@@ -81,7 +88,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 4)
-        self.assertEqual(nodes[0].children[1].get_absolute_url(), "/" )
+        self.assertEqual(nodes[0].children[1].get_absolute_url(), "/")
 
     def test_incorrect_nav_extender_in_db(self):
         self._update_page(2, navigation_extenders="SomethingWrong")

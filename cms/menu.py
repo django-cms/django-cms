@@ -40,7 +40,10 @@ def get_visible_page_objects(request, pages, site=None):
 
     def has_global_perm():
         if has_global_perm.cache < 0:
-            has_global_perm.cache = 1 if request.user.has_perm('cms.view_page') else 0
+            if request.user.has_perm('cms.view_page'):
+                has_global_perm.cache = 1
+            else:
+                has_global_perm.cache = 0
         return bool(has_global_perm.cache)
     has_global_perm.cache = -1
 
@@ -78,7 +81,6 @@ def get_visible_page_objects(request, pages, site=None):
                 to_add = True
             elif has_global_perm():
                 to_add = True
-
         if to_add:
             visible_pages.append(page)
 
@@ -135,11 +137,19 @@ def page_to_node(page, home, cut):
         app_name = page.get_application_urls(fallback=False)
         if app_name:  # it means it is an apphook
             app = apphook_pool.get_apphook(app_name)
-            for menu in app.menus:
-                extenders.append(menu.__name__)
-
-    if extenders:
-        attr['navigation_extenders'] = extenders
+            extenders += app.menus
+    exts = []
+    for ext in extenders:
+        if hasattr(ext, "get_instances"):
+            # CMSAttachMenus are treated a bit differently to allow them to be
+            # able to be attached to multiple points in the navigation.
+            exts.append("{0}:{1}".format(ext.__name__, page.pk))
+        elif hasattr(ext, '__name__'):
+            exts.append(ext.__name__)
+        else:
+            exts.append(ext)
+    if exts:
+        attr['navigation_extenders'] = exts
 
     # Do we have a redirectURL?
     attr['redirect_url'] = page.get_redirect()  # save redirect URL if any
@@ -232,9 +242,10 @@ class NavExtender(Modifier):
                     if ext not in exts:
                         exts.append(ext)
                     for extnode in nodes:
-                        # if home has nav extenders but home is not visible
                         if extnode.namespace == ext and not extnode.parent_id:
-                            if node.attr.get("is_home", False) and not node.visible:
+                            # if home has nav extenders but home is not visible
+                            if (node.attr.get("is_home", False)
+                                    and not node.visible):
                                 extnode.parent_id = None
                                 extnode.parent_namespace = None
                                 extnode.parent = None
@@ -246,7 +257,8 @@ class NavExtender(Modifier):
         removed = []
         # find all not assigned nodes
         for menu in menu_pool.menus.items():
-            if hasattr(menu[1], 'cms_enabled') and menu[1].cms_enabled and not menu[0] in exts:
+            if (hasattr(menu[1], 'cms_enabled')
+                    and menu[1].cms_enabled and not menu[0] in exts):
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)
@@ -258,11 +270,10 @@ class NavExtender(Modifier):
                     home.selected = True
                 else:
                     home.selected = False
-                    # remove all nodes that are nav_extenders and not assigned
+        # remove all nodes that are nav_extenders and not assigned
         for node in removed:
             nodes.remove(node)
         return nodes
-
 
 menu_pool.register_modifier(NavExtender)
 

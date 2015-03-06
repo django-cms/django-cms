@@ -52,13 +52,14 @@ class SettingsAdmin(ModelAdmin):
         POST should have a settings parameter
         """
         if not request.user.is_staff:
-            return HttpResponse(json.dumps(""), mimetype="application/json")
+            return HttpResponse(json.dumps(""),
+                                content_type="application/json")
         if request.method == "POST":
             request.session['cms_settings'] = request.POST['settings']
             request.session.save()
         return HttpResponse(
             json.dumps(request.session.get('cms_settings', '')),
-            mimetype="application/json"
+            content_type="application/json"
         )
 
     def save_model(self, request, obj, form, change):

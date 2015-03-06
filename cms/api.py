@@ -75,12 +75,14 @@ def _verify_apphook(apphook, namespace):
     Verifies the apphook given is valid and returns the normalized form (name)
     """
     apphook_pool.discover_apps()
-    if hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
+    if isinstance(apphook, CMSApp):
         try:
-            assert apphook in apphook_pool.apps.values()
+            assert apphook.__class__ in [app.__class__ for app in apphook_pool.apps.values()]
         except AssertionError:
             print(apphook_pool.apps.values())
             raise
+        apphook_name = apphook.__class__.__name__
+    elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
     elif isinstance(apphook, six.string_types):
         try:

@@ -13,6 +13,7 @@ from django.template import RequestContext, Context
 from django.test import RequestFactory, TestCase
 from django.template.base import Template
 from django.utils.html import escape
+from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from cms.api import create_page, create_title, add_plugin
@@ -21,6 +22,7 @@ from cms.models.pagemodel import Page, Placeholder
 from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
                                        _show_placeholder_for_page,
                                        _get_placeholder, RenderPlugin)
+from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -69,6 +71,18 @@ class TemplatetagTests(TestCase):
         output = template.render(context)
         self.assertNotEqual(script, output)
         self.assertEqual(escape(script), output)
+
+    def test_json_encoder(self):
+        self.assertEqual(json_filter(True), 'true')
+        self.assertEqual(json_filter(False), 'false')
+        self.assertEqual(json_filter([1, 2, 3]), '[1, 2, 3]')
+        self.assertEqual(json_filter((1, 2, 3)), '[1, 2, 3]')
+        filtered_dict = json_filter({'item1': 1, 'item2': 2, 'item3': 3})
+        self.assertTrue('"item1": 1' in filtered_dict)
+        self.assertTrue('"item2": 2' in filtered_dict)
+        self.assertTrue('"item3": 3' in filtered_dict)
+        today = now().today()
+        self.assertEqual('"%s"' % today.isoformat()[:-3], json_filter(today))
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
@@ -400,7 +414,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request, {'category': Category()})
         with self.assertNumQueries(0):
             output = template.render(context)
-        expected = 'cms_plugin cms_plugin-sampleapp-category-add-None '
+        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
         'cms_render_model_add'
         self.assertIn(expected, output)
 
@@ -435,7 +449,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request, {'category': Category()})
         with self.assertNumQueries(0):
             output = template.render(context)
-        expected = 'cms_plugin cms_plugin-sampleapp-category-add-None '
+        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
         'cms_render_model_add'
         self.assertIn(expected, output)
 

@@ -39,6 +39,7 @@ from cms.test_utils.project.placeholderapp.models import (
     MultilingualExample1,
     TwoPlaceholderExample,
 )
+from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
@@ -305,6 +306,20 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
+
+    def test_placeholder_field_db_table(self):
+        """
+        Test for leaking Django 1.7 Model._meta.db_table monkeypatching
+        on sqlite See #3891
+        This test for a side-effect of the above which prevents placeholder
+        fields to return the 
+        """
+        example = Category.objects.create(
+            name='category',
+            parent=None, depth=1,
+        )
+        self.assertEqual(example.description._get_attached_fields()[0].model, Category)
+        self.assertEqual(len(example.description._get_attached_fields()), 1)
 
     def test_placeholder_field_valid_slotname(self):
         self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)

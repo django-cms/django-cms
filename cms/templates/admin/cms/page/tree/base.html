@@ -46,15 +46,15 @@ $(document).ready(function () {
 	// initialize tree
 	new CMS.TreeManager({
 		'settings': {
-			'permission': {{ CMS_PERMISSION|json }},
-			'debug': {{ DEBUG|json }},
-			'filtered': {% if cl.is_filtered %}true{% else %}false{% endif %}
+			'permission': {{ CMS_PERMISSION|bool }},
+			'debug': {{ DEBUG|bool }},
+			'filtered': {{ cl.is_filtered|bool }}
 		},
 		'lang': {
 			'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
 			'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
 			'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
-			'publish': '{% filter escapejs %}{% trans "Are you sure you want to %s this page?" %}{% endfilter %}'
+			'publish': '{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}'
 		}
 	});
 });
