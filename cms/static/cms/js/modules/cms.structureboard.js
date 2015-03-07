@@ -268,7 +268,7 @@ $(document).ready(function () {
 
 		// private methods
 		_showBoard: function () {
-			var that = this;g
+			var that = this;
 			var timer = function () {};
 
 			// show container

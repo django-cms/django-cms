@@ -301,8 +301,8 @@ $(document).ready(function () {
 				// update settings
 				that.settings.sideframe.position = e.clientX;
 
-                // trigger the resize event
-                $(window).trigger('resize.sideframe');
+				// trigger the resize event
+				$(window).trigger('resize.sideframe');
 
 				// save position
 				clearTimeout(timer);
