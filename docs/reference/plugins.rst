@@ -276,6 +276,31 @@ The default implementation is as follows::
 
 See also: `text_enabled`_, `icon_src`_
 
+text_editor_button_icon
+-----------------------
+
+When `text_enabled`_ is ``True``, this plugin can be added in a text editor and
+there might be an icon button for that purpose. This method allows to override
+this icon.
+
+By default, it returns ``None`` and each text editor plugin may have its own
+fallback icon.
+
+:meth:`text_editor_button_icon` takes 2 arguments:
+
+* ``editor_name``: The plugin name of the text editor
+* ``icon_context``: A dictionary containing information about the needed icon
+  like `width`, `height`, `theme`, etc
+
+Usually this method should return the icon url. But, it may depends on the text
+editor because what is needed may differ. Please consult the documentation of
+your text editor plugin.
+
+This requires support from the text plugin; support for this is currently planned
+for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+
+See also: `text_enabled`_
+
 .. _get_extra_placeholder_menu_items:
 
 get_extra_placeholder_menu_items
