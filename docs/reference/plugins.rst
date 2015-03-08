@@ -292,9 +292,12 @@ fallback icon.
 * ``icon_context``: A dictionary containing information about the needed icon
   like `width`, `height`, `theme`, etc
 
-Usualy this method should return the icon url. But, it may depends on the text
+Usually this method should return the icon url. But, it may depends on the text
 editor because what is needed may differ. Please consult the documentation of
 your text editor plugin.
+
+This requires support from the text plugin; support for this is currently planned
+for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
 
 See also: `text_enabled`_
 
