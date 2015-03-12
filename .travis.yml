@@ -12,8 +12,6 @@ env:
   global:
     - SAUCE_USERNAME=digi604
     - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
-    - AWS_ACCESS_KEY_ID_READONLY="AKIAIQ5HFADZDRR6K6OA"
-    - AWS_SECRET_ACCESS_KEY_READONLY="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"
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
@@ -34,13 +32,8 @@ before_script:
     -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
     fi"
     
-before_install:
-  - if [ -n "$AWS_ACCESS_KEY_ID_READWRITE" ]; then export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID_READWRITE"; else export AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID_READONLY"; fi
-  - if [ -n "$AWS_SECRET_ACCESS_KEY_READWRITE" ]; then export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY_READWRITE"; else export AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY_READONLY"; fi
-  - if [ -n "$AWS_SECRET_ACCESS_KEY_READWRITE" ]; then export PIP_ACCEL_S3_READONLY=""; else export PIP_ACCEL_S3_READONLY="true"; fi
-
 install:
-  - pip install 'pip-accel[s3]'
+  - pip install 'pip-accel'
   - pip-accel install -q -r "test_requirements/django-$DJANGO.txt"
   - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip-accel
     install -q psycopg2 ; fi
@@ -88,3 +81,7 @@ matrix:
       env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
 
   fast_finish: true
+
+cache:
+  directories:
+    .pip-accel
