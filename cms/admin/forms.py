@@ -213,7 +213,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         (None, {
             'fields': ('overwrite_url', 'redirect'),
         }),
-        ('Language independent options', {
+        (_('Language independent options'), {
             'fields': ('site', 'template', 'reverse_id', 'soft_root', 'navigation_extenders',
                        'application_urls', 'application_namespace', 'application_configs',
                        'xframe_options',)
