@@ -84,4 +84,4 @@ matrix:
 
 cache:
   directories:
-    .pip-accel
+    $HOME/.pip-accel
