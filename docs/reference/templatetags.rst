@@ -69,11 +69,11 @@ static_placeholder
 ==================
 .. versionadded:: 3.0
 
-The static_placeholder templatetag can be used anywhere in any template and is not bound to any page or model.
-It needs a name and it will create a placeholder that you can fill with plugins afterwards.
-The static_placeholder tag is normally used to display the same content on
-multiple locations or inside of apphooks or other 3rd party apps. Static_placeholder need to be published
-to show up on live pages.
+The static_placeholder templatetag can be used anywhere in any template and is not bound to any
+page or model. It needs a name and it will create a placeholder that you can fill with plugins
+afterwards. The static_placeholder tag is normally used to display the same content on multiple
+locations or inside of apphooks or other 3rd party apps. Static_placeholder need to be published to
+show up on live pages.
 
 Example::
 
@@ -86,7 +86,6 @@ Example::
 
     Static_placeholders are not included in the undo/redo and page history pages
 
-
 If you want additional content to be displayed in case the static placeholder is
 empty, use the ``or`` argument and an additional ``{% endstatic_placeholder %}``
 closing tag. Everything between ``{% static_placeholder "..." or %}`` and ``{%
@@ -97,18 +96,18 @@ Example::
 
     {% static_placeholder "footer" or %}There is no content.{% endstatic_placeholder %}
 
+By default, a static placeholder applies to *all* sites in a project.
 
-
-
-
-
-If you want to make your static placeholder site specific (``django.contrib.sites``) you can add
-``site`` to the templatetag to achieve this.
+If you want to make your static placeholder site-specific, so that different sites can have their
+own content in it, you can add the flag ``site`` to the templatetag to achieve this.
 
 Example::
 
     {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
 
+Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and ``SITE_ID``
+:ref:`*must* be set <configure-django-cms>` in ``settings.py`` for this (not to mention other
+aspects of django CMS) to work correctly.
 
 .. templatetag:: show_placeholder
 
