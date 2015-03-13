@@ -182,16 +182,6 @@ Can the plugin be inserted inside the text plugin?  If this is ``True`` then
 
 See also: `icon_src`_, `icon_alt`_
 
-.. _system_plugin:
-
-system
-------
-
-Default: ``False``
-
-Plugins with this attribute set to True can be dropped in any placeholder, overriding
-any placeholder configuration in :setting:`CMS_PLACEHOLDER_CONF`.
-
 
 Methods
 =======
