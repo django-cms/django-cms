@@ -20,6 +20,8 @@ def _base_detail(request, instance, template_name='detail.html',
     context['instance'] = instance
     context['instance_class'] = instance.__class__
     context['item_name'] = item_name
+    if hasattr(request, 'toolbar'):
+        request.toolbar.set_object(instance)
     if template_string:
         template = Template(template_string)
         return HttpResponse(template.render(context))

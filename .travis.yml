@@ -41,7 +41,7 @@ install:
 
 script: coverage run --rcfile=.coverage.rc develop.py test --migrate
 
-after_success: coveralls --config_file=.coverage.rc --coveralls_yaml=.coveralls.yml
+after_success: coveralls --config_file=.coverage.rc
 
 notifications:
   email:

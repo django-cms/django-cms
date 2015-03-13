@@ -1533,7 +1533,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(FuzzyInt(40, 60)):
+            with self.assertNumQueries(FuzzyInt(40, 72)):
                 output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
             self.assertIn('<b>Test</b>', output)
         with self.assertNumQueries(FuzzyInt(18, 45)):

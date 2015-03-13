@@ -18,6 +18,7 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns('',
     url(r'^detail/(?P<id>[0-9]+)/$', 'cms.test_utils.project.placeholderapp.views.detail_view', name="detail"),
+    url(r'^detail/(?P<pk>[0-9]+)/$', 'cms.test_utils.project.placeholderapp.views.detail_view', name="example_detail"),
     url(r'^detail_multi/(?P<id>[0-9]+)/$', 'cms.test_utils.project.placeholderapp.views.detail_view_multi', name="detail_multi"),
     url(r'^', include('cms.urls')),
 )

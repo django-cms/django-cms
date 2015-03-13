@@ -168,6 +168,62 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response,
                             '<div class="cms_submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
 
+    def test_markup_toolbar_url_page(self):
+        superuser = self.get_superuser()
+        page_1 = create_page("top-page", "col_two.html", "en", published=True)
+        page_2 = create_page("sec-page", "col_two.html", "en", published=True, parent=page_1)
+        page_3 = create_page("trd-page", "col_two.html", "en", published=False, parent=page_1)
+
+        # page with publish = draft
+        # check when in draft mode
+        with self.login_user_context(superuser):
+            response = self.client.get('%s?%s' % (
+                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        ))
+        # check when in live mode
+        with self.login_user_context(superuser):
+            response = self.client.get('%s?%s' % (
+                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            page_2.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.assertEqual(page_2.get_draft_url(), page_2.get_public_url())
+
+        # page with publish != draft
+        page_2.get_title_obj().slug = 'mod-page'
+        page_2.get_title_obj().save()
+        # check when in draft mode
+        with self.login_user_context(superuser):
+            response = self.client.get('%s?%s' % (
+                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        ))
+        # check when in live mode
+        with self.login_user_context(superuser):
+            response = self.client.get('%s?%s' % (
+                page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            page_2.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.assertNotEqual(page_2.get_draft_url(), page_2.get_public_url())
+
+        # not published page
+        # check when in draft mode
+        with self.login_user_context(superuser):
+            response = self.client.get('%s?%s' % (
+                page_3.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'cms_toolbar-item_switch')
+        self.assertEqual(page_3.get_public_url(), '')
+        self.assertNotEqual(page_3.get_draft_url(), page_3.get_public_url())
+
     def test_markup_plugin_template(self):
         page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
         plugin_1 = add_plugin(page.placeholders.get(slot='col_left'), language='en',
@@ -550,6 +606,29 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         Example1.objects.all().delete()
         MultilingualExample1.objects.all().delete()
         super(EditModelTemplateTagTest, self).tearDown()
+
+    def test_markup_toolbar_url_model(self):
+        superuser = self.get_superuser()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        # object
+        # check when in draft mode
+        request = self.get_page_request(page, superuser, edit=True)
+        response = detail_view(request, ex1.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            ex1.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        ))
+        # check when in live mode
+        request = self.get_page_request(page, superuser, edit=False)
+        response = detail_view(request, ex1.pk)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'href="%s?%s"' % (
+            ex1.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.assertNotEqual(ex1.get_draft_url(), ex1.get_public_url())
 
     def test_anon(self):
         user = self.get_anon()

@@ -6,11 +6,15 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
 from django.utils.translation import ugettext_lazy as _
 
+from .models import Example1
+
 SAMPLEAPP_BREAK = 'Example1 App Break'
 
 
 @toolbar_pool.register
 class Example1Toolbar(CMSToolbar):
+    watch_models = [Example1]
+
     def populate(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
         position = admin_menu.find_first(Break, identifier=ADMINISTRATION_BREAK)
