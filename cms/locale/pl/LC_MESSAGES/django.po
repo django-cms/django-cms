@@ -223,7 +223,7 @@ msgstr "Ogólne"
 
 #: plugin_base.py:287
 msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
+msgstr "Brak dodatkowych ustawień dla tego pluginu. Proszę wcisnąć zapisz."
 
 #: admin/forms.py:66 admin/forms.py:162 admin/forms.py:204
 msgid "The current language of the content fields."
@@ -272,7 +272,7 @@ msgstr "Opis w meta tagu"
 
 #: admin/forms.py:79
 msgid "A description of the page used by search engines."
-msgstr "Lista słów oddzielonych przecinkami używana czasem przez wyszukiwarki."
+msgstr "Opis strony wykorzystywany przez silniki wyszukiwarek."
 
 #: admin/forms.py:128
 msgid "Another page with this slug already exists"
