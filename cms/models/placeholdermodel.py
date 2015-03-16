@@ -106,7 +106,7 @@ class Placeholder(models.Model):
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
         """
-        if request.user.is_superuser:
+        if getattr(request, 'user', None) and request.user.is_superuser:
             return True
         if self.page:
             return self._get_object_permission(self.page, request, key)
@@ -114,6 +114,8 @@ class Placeholder(models.Model):
             return self._get_object_permission(obj, request, key)
 
     def _get_object_permission(self, obj, request, key):
+        if not getattr(request, 'user', None):
+            return False
         opts = obj._meta
         perm_accessor = getattr(opts, 'get_%s_permission' % key)
         perm_code = '%s.%s' % (opts.app_label, perm_accessor())
