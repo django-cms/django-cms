@@ -178,9 +178,9 @@ text_enabled
 Default: ``False``
 
 Can the plugin be inserted inside the text plugin?  If this is ``True`` then
-:meth:`icon_src` must be overridden.
+:meth:`in_text_editor_repr` should be overridden.
 
-See also: `icon_src`_, `icon_alt`_
+See also: `in_text_editor_tag`_, `in_text_editor_repr`_
 
 
 Methods
@@ -300,6 +300,44 @@ This requires support from the text plugin; support for this is currently planne
 for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
 
 See also: `text_enabled`_
+
+in_text_editor_repr
+-------------------
+
+When a plugin can be inserted as a child in a text plugin, this method provides
+the representation the text plugin must use.  For example, if
+`in_text_editor_tag`_ returns ``'span'``, parent plugins will encapsulate the
+plugin this way::
+
+    <span data-djangocms-plugin-id="the_plugin_id">whatever string returned by in_text_editor_repr</span>
+
+:meth:`in_text_editor_repr` takes 2 arguments:
+
+* ``instance``: The instance of the plugin model
+* ``editor_name``: The name of the parent plugin
+
+This method must return a string or ``None``. When it returns ``None``, parent
+plugins will fallback to the old way (`icon_alt`_ and `icon_src`_) which is
+deprecated since django cms 3.1 and will be removed in version 3.?.
+
+Default implementation returns ``None``.
+
+See also: `text_enabled`_, `in_text_editor_tag`_
+
+in_text_editor_tag
+------------------
+
+When a plugin can be inserted as a child in a text plugin, this method provides
+a way to choose the tag used to encapsulate the plugin representation.
+
+:meth:`in_text_editor_tag` takes 1 arguments:
+
+* ``instance``: The instance of the plugin model
+* ``editor_name``: The name of the parent plugin
+
+This method must return a string. Default implementation returns ``'div'``.
+
+See also: `text_enabled`_, `in_text_editor_repr`_
 
 .. _get_extra_placeholder_menu_items:
 
