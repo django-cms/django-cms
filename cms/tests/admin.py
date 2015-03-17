@@ -12,7 +12,8 @@ from django.contrib.admin.sites import site
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse, QueryDict)
+from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse,
+                         QueryDict, HttpResponseNotFound)
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import smart_str
 from django.utils import timezone
@@ -1032,6 +1033,22 @@ class PluginPermissionTests(AdminTestsBase):
         self._give_permission(normal_guy, Text, 'change')
         response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_plugin_edit_wrong_url(self):
+        """User tries to edit a plugin using a random url. 404 response returned"""
+        plugin = self._create_plugin()
+        _, normal_guy = self._get_guys()
+
+        if get_user_model().USERNAME_FIELD == 'email':
+            self.client.login(username='test@test.com', password='test@test.com')
+        else:
+            self.client.login(username='test', password='test')
+
+        self._give_permission(normal_guy, Text, 'change')
+        url = '%s/edit-plugin/%s/' % (admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
+        response = self.client.post(url, dict())
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertTrue("Plugin not found" in force_unicode(response))
 
     def test_plugin_remove_requires_permissions(self):
         """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
