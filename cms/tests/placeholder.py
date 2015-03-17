@@ -856,7 +856,7 @@ class PlaceholderModelTests(CMSTestCase):
 
         context_en = NoPushPopContext()
 
-        # no user, but: no placeholders but to error either
+        # no user: no placeholders but no error either
         factory = RequestFactory()
         context_en['request'] = factory.get(page_en.get_absolute_url())
         render_placeholder(ex.placeholder, context_en)
