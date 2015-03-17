@@ -130,6 +130,9 @@ on Django admin::
     from cms.admin.placeholderadmin import FrontendEditableAdminMixin
     from django.contrib import admin
 
+This mixin class enriches the context of the field's ``change_form.html`` with additional
+variables.
+
 
     class MyModelAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
         ...
