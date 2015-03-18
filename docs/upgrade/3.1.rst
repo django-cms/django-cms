@@ -4,6 +4,18 @@
 3.1 release notes
 #################
 
+django CMS 3.1 has been planned largely as a consolidation release, to build on the progress made
+in 3.0 and establish a safe, solid base for more ambitious work in the future.
+
+In this release we have tried to maintain maximum backwards-compatibility, particularly for
+third-party applications, and endeavoured to identify and tidy loose ends in the system wherever
+possible.
+
+.. warning:: Upgrading from previous versions
+
+    3.1 introduces some changes that **require** action if you are upgrading
+    from a previous version. PLease read this document with care.
+
 *****************
 What's new in 3.1
 *****************
@@ -11,57 +23,118 @@ What's new in 3.1
 Switch from MPTT to MP
 ======================
 
-Since django CMS 2.0 we relied on MPTT (Modified Preorder Tree Traversal) for efficiently handling tree structures in the DB.
-Over the years it proved that MPTT was not fast enough for big tree operations (>1000 pages) and regularly
-the tree got corrupted because of transactional errors.
+Since django CMS 2.0 we have relied on MPTT (Modified Preorder Tree Traversal) for efficiently
+handling tree structures in the database.
 
-In 3.1 we replaced MPTT for MP (Materialized Path). MP is more efficient and has more error resistance then MPTT.
-It should make the whole django CMS experience way better, faster and reliable.
+In 3.1, `Django MPTT <https://github.com/django-mptt/django-mptt>`_ has been replaced by
+`django-treebeard <https://github.com/tabo/django-treebeard>`_, to improve performance and
+reliability.
 
-Before upgrading
-----------------
+Over the years MPTT has proved not to be fast enough for big tree operations (>1000 pages); tree
+corruption, because of transactional errors, has also been a problem.
 
-Be sure to run ``manage.py cms fix-mptt`` before you upgrade.
+django-treebeard uses MP (Materialized Path). MP is more efficient and has more error resistance
+then MPTT. It should make working with and using django CMS better - faster and reliable.
 
+Other than this, end users should not notice any changes.
+
+Action required
+---------------
+
+Run ``manage.py cms fix-mptt`` before you upgrade.
+
+Developers who use django CMS will need to run the schema and data migrations that are part of this
+release. Developers of third-party applications that relied on the Django MPTT that shipped with
+django CMS are advised to update their own applications so that they install it independently.
 
 Dropped support for Django 1.4 and 1.5
 ======================================
 
-Starting from version 3.1 the supported Django versions are 1.6 and 1.7
+Starting from version 3.1, django CMS runs on Django 1.6 and 1.7.
 
+Action required
+---------------
+
+If you're still on an earlier version, you will need to install a newer one, and make sure that
+your third-party applications are also up-to-date with it before attempting to upgrade django CMS.
 
 South is now an optional dependency
 ===================================
 
 As south is now required for Django 1.6 only, it's marked as an optional dependency.
+
+Action required
+---------------
+
 To install south along with django CMS use ``pip install django-cms[south]``.
-
-
-********************
-Incompatible changes
-********************
 
 Migrations moved
 ================
 
-Migrations packages has been renamed to the standard layout:
+Migrations directories have been renamed to conform to the new standard layout:
 
- * Django 1.7 migrations are now into standard ``cms.migrations`` and ``menus.migrations`` packages
- * South migrations are now in ``cms.south_migrations`` and ``menus.south_migrations`` packages
+ * Django 1.7 migrations: in the default ``cms/migrations`` and ``menus/migrations`` directories
+ * South migrations: in the ``cms/south_migrations`` and ``menus/south_migrations`` directories
 
-South 1.0.2 is now required to correctly handle the above layout; if you are upgrading from Django 1.7 / django CMS 3.0.x,
-please remove the old migration path from ``MIGRATION_MODULES`` settings.
+Action required
+---------------
+
+South 1.0.2 or newer is required to handle the new layout correctly, so make sure you have that
+installed.
+
+If you are upgrading from django CMS 3.0.x running on Django 1.7 you need to remove the old
+migration path from ``MIGRATION_MODULES`` settings.
 
 Structure mode permission
 =========================
 
-The new "**Can use Structure mode**" permission has been added. Without this permission, a
-non-superuser cannot enter structure mode anymore: this allow more strict workflow which only
-enable content update for certain users.
-This change include data migration
-that adds the new permission to any staff user or group with
-`cms.change_page` permission; you can then later change this according to your permission
-model and workflow.
-Be aware that existing users cannot be migrated if running the django CMS
-migrations for the first time in the project, because permissions are not already in place;
-in this case users must be given the new permission manually.
+A new *Can use Structure mode* permission has been added.
+
+Without this permission, a non-superuser will no longer have access to structure mode. This makes
+possible a more strict workflow, in which certain users are abnle to edit content but not structure.
+
+This change includes a data migration that adds the new permission to any staff user or group with
+``cms.change_page`` permission.
+
+Action required
+---------------
+
+You may need to adjust these permissions once you have completed migrating your database.
+
+Note that if you have existing users in your database, but are installing django CMS and running
+its migrations for the first time, you will need to grant them these permissions - they will not
+acquire them automatically.
+
+
+Simplified loading of view restrictions in the menu
+===================================================
+
+The system that loads page view restrictions into the menu has been improved, simplifying the
+queries that are generated, in order to make it faster.
+
+Toolbar API extension
+=====================
+
+The toolbar API has been extended to permit more powerful use of it in future development, including the use of "clipboard-like" items.
+
+Per-namespace apphook configuration
+===================================
+
+New public API to define per-namespace apphook configuration. Core changes only defines the public API and changes to the Advanced settings form to add the UI for this.
+
+Some reversion refactoring
+==========================
+
+Internal code refactoring to allow integration with better reversion interface (developed externally). Only private API. Extensive reversion work is suggested in 3.2
+
+status : merged.
+
+backward incompatibility issues: None
+
+render_uncached_placeholder templatetag
+=======================================
+
+copy-site command
+=================
+
+Copies page from one site to another defined in the same project
