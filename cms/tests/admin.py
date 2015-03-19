@@ -1048,7 +1048,7 @@ class PluginPermissionTests(AdminTestsBase):
         url = '%s/edit-plugin/%s/' % (admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
         response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTrue("Plugin not found" in force_unicode(response))
+        self.assertTrue("Plugin not found" in force_unicode(response.content))
 
     def test_plugin_remove_requires_permissions(self):
         """User tries to remove a plugin but has no permissions. He can remove the plugin after he got the permissions"""
