@@ -217,7 +217,7 @@ plugins, as shown above with ``base.html content``.
 ``language_fallback``
     When ``True``, if the placeholder has no plugin for the current language
     it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
-    Defaults to ``False`` to maintain pre-3.0 behavior.
+    Defaults to ``True`` since version 3.1.
 
 .. _placeholder_default_plugins:
 
