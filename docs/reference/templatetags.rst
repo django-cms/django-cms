@@ -378,9 +378,8 @@ Example::
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
-.. templatetag:: render_model
 .. versionadded:: 3.0
-
+.. templatetag:: render_plugin_block
 
 render_plugin_block
 ===================
@@ -434,7 +433,8 @@ Example::
     </div>
     {% endblock %}
 
-
+.. templatetag:: render_model
+.. versionadded:: 3.0
 
 render_model
 ============
@@ -663,6 +663,8 @@ It will render to something like:
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
+.. templatetag:: render_model_add_block
+.. versionadded:: 3.1
 
 render_model_add_block
 ======================

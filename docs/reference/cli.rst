@@ -173,3 +173,15 @@ Example::
 
     This command publishes drafts. You should review drafts before using this
     command, because they will become public.
+
+**********************
+Maintenance and repair
+**********************
+
+.. _fix-mptt:
+
+``fix-mptt``
+============
+
+Occasionally, the MPTT tree can become corrupted (this is one of the reasons for :doc:`our move away from MPTT to MP in django CMS 3.1 </upgrade/3.1>`). Typical symptoms include problems when
+trying to copy or delete plugins or pages.

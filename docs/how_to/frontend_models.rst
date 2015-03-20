@@ -29,6 +29,8 @@ changeform.
     hvad-enabled object does not exists in the current language.
     As a workaround ``render_model_icon`` can be used instead.
 
+.. _render_model_templatetags:
+
 ************
 Templatetags
 ************
