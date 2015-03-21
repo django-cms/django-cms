@@ -48,7 +48,7 @@ class CMSAttachMenu(Menu):
         parent_apps = []
         for app in cls.get_apphooks():
             parent_apps.append(app.__class__.__name__)
-        return Page.objects.drafts().filter(
+        return Page.objects.filter(
             Q(application_urls__in=parent_apps)
             | Q(navigation_extenders=cls.__name__)
         )
