@@ -166,7 +166,7 @@ def _ensure_languages_settings(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, six.integer_types):
+        if site != hash(site):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -206,7 +206,7 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, six.integer_types):
+    if settings.SITE_ID != hash(settings.SITE_ID):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
