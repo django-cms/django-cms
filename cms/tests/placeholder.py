@@ -378,27 +378,28 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         context_de = NoPushPopContext()
         context_de['request'] = self.get_request(language="de", page=page_en)
 
-        # First test the default (non-fallback) behavior)
+        # First test the default (fallback) behavior)
         ## English page should have the text plugin
         content_en = render_placeholder(placeholder_en, context_en)
         self.assertRegexpMatches(content_en, "^en body$")
 
-        ## Deutsch page should have no text
+        ## Deutsch page have text due to fallback
         content_de = render_placeholder(placeholder_de, context_de)
-        self.assertNotRegex(content_de, "^en body$")
-        self.assertEqual(len(content_de), 0)
+        self.assertRegexpMatches(content_de, "^en body$")
+        self.assertEqual(len(content_de), 7)
 
         conf = {
             'col_left': {
-                'language_fallback': True,
+                'language_fallback': False,
             },
         }
+        # configure non fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "^en body$")
+            self.assertNotRegexpMatches(content_de, "^en body$")
             context_de2 = NoPushPopContext()
             request = self.get_request(language="de", page=page_en)
             request.user = self.get_superuser()
@@ -436,7 +437,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         context_de = NoPushPopContext()
         context_de['request'] = self.get_request(language="de", page=page_en)
 
-        # First test the default (non-fallback) behavior)
+        # First test the default (fallback) behavior)
         ## Deutsch page should have the text plugin
         content_de = render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
@@ -444,19 +445,20 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         cache.clear()
         ## English page should have no text
         content_en = render_placeholder(placeholder_en, context_en)
-        self.assertNotRegex(content_en, "^de body$")
-        self.assertEqual(len(content_en), 0)
+        self.assertRegexpMatches(content_en, "^de body$")
+        self.assertEqual(len(content_en), 7)
         del(placeholder_en._plugins_cache)
         cache.clear()
         conf = {
             'col_left': {
-                'language_fallback': True,
+                'language_fallback': False,
             },
         }
+        # configure non-fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## English page should have deutsch text
             content_en = render_placeholder(placeholder_en, context_en)
-            self.assertRegexpMatches(content_en, "^de body$")
+            self.assertNotRegexpMatches(content_en, "^de body$")
 
             # remove the cached plugins instances
             del(placeholder_en._plugins_cache)

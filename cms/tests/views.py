@@ -228,7 +228,7 @@ class ContextTests(CMSTestCase):
         # Number of queries when context processors is not enabled
         with self.settings(TEMPLATE_CONTEXT_PROCESSORS=new_context):
             # Baseline number of queries
-            with self.assertNumQueries(FuzzyInt(13, 17)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 19)) as context:
                 response = self.client.get("/en/page-2/")
                 num_queries_page = len(context.captured_queries)
         cache.clear()
