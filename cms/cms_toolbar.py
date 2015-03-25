@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from cms.api import get_page_draft
+from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
@@ -19,7 +19,7 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
-from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
+from cms.utils.permissions import get_user_sites_queryset
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
 
@@ -250,13 +250,7 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            # check global permissions if CMS_PERMISSIONS is active
-            global_permission = self.permissions_activated and has_page_change_permission(self.request)
-
-            # check if user has page edit permission
-            page_permission = self.page and self.page.has_change_permission(self.request)
-
-            self.page_change_permission = global_permission or page_permission
+            self.page_change_permission = can_change_page(self.request)
 
         return self.page_change_permission
 
