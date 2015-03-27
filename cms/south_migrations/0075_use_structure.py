@@ -2,6 +2,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
+from django.db import connection
+from django.db.transaction import set_autocommit
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
@@ -11,6 +13,8 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
+        if connection.vendor == 'sqlite':
+            set_autocommit(True)
         ph_model = orm['cms.Placeholder']
         page_model = orm['cms.Page']
         try:
