@@ -121,8 +121,8 @@ class MenuPool(object):
                 expanded_menus[menu_class_name] = menu_cls
             elif hasattr(menu_cls, "get_instances"):
                 # It quacks like a CMSAttachMenu, expand away!
-                # If a menu exists but has no instances, it's not included
-                # in the available menus
+                # If a menu exists but has no instances,
+                # it's included in the available menus as is
                 instances = menu_cls.get_instances()
                 if not instances:
                     expanded_menus[menu_class_name] = menu_cls()
@@ -134,7 +134,7 @@ class MenuPool(object):
                         menu_inst.instance = instance
                         expanded_menus[namespace] = menu_inst
             elif hasattr(menu_cls, "get_nodes"):
-                # This is another type of Menu, cannot be expended, but must be
+                # This is another type of Menu, cannot be expanded, but must be
                 # instantiated, none-the-less.
                 expanded_menus[menu_class_name] = menu_cls()
             else:
