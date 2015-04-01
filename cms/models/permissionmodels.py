@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -30,20 +29,6 @@ ACCESS_CHOICES = (
     (ACCESS_DESCENDANTS, _('Page descendants')),
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
 )
-
-
-def _get_user_model():
-    """
-    Returns the User model that is active in this project.
-    """
-    from django.db.models import get_model
-
-    try:
-        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
-    except ValueError:
-        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
-    user_model = get_model(app_label, model_name, only_installed=False)
-    return user_model
 
 
 class AbstractPagePermission(models.Model):
@@ -116,27 +101,5 @@ class PagePermission(AbstractPagePermission):
     def __str__(self):
         page = self.page_id and force_unicode(self.page) or "None"
         return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
-
-
-class PageUser(_get_user_model()):
-    """CMS specific user data, required for permission system"""
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="created_users")
-
-    class Meta:
-        verbose_name = _('User (page)')
-        verbose_name_plural = _('Users (page)')
-        app_label = 'cms'
-
-
-class PageUserGroup(Group):
-    """Cms specific group data, required for permission system
-    """
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="created_usergroups")
-
-    class Meta:
-        verbose_name = _('User group (page)')
-        verbose_name_plural = _('User groups (page)')
-        app_label = 'cms'
-
 
 reversion_register(PagePermission)
