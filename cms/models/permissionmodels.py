@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
+from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
-
+from django.utils.encoding import force_unicode, python_2_unicode_compatible
 from cms.models import Page
 from cms.models.managers import PagePermissionManager, GlobalPagePermissionManager
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible, user_model_label
 from cms.utils.helpers import reversion_register
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
@@ -32,11 +32,25 @@ ACCESS_CHOICES = (
 )
 
 
+def _get_user_model():
+    """
+    Returns the User model that is active in this project.
+    """
+    from django.db.models import get_model
+
+    try:
+        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    except ValueError:
+        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
+    user_model = get_model(app_label, model_name, only_installed=False)
+    return user_model
+
+
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
     """
     # who:
-    user = models.ForeignKey(user_model_label, verbose_name=_("user"), blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(Group, verbose_name=_("group"), blank=True, null=True)
 
     # what:
@@ -104,11 +118,9 @@ class PagePermission(AbstractPagePermission):
         return "%s :: %s has: %s" % (page, self.audience, force_unicode(dict(ACCESS_CHOICES)[self.grant_on]))
 
 
-class PageUser(models.Model):
-    """Cms specific user data, required for permission system
-    """
-    user_ptr = models.OneToOneField(settings.AUTH_USER_MODEL, primary_key=True, parent_link=True)
-    created_by = models.ForeignKey(user_model_label, related_name="created_users")
+class PageUser(_get_user_model()):
+    """CMS specific user data, required for permission system"""
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="created_users")
 
     class Meta:
         verbose_name = _('User (page)')
@@ -119,7 +131,7 @@ class PageUser(models.Model):
 class PageUserGroup(Group):
     """Cms specific group data, required for permission system
     """
-    created_by = models.ForeignKey(user_model_label, related_name="created_usergroups")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="created_usergroups")
 
     class Meta:
         verbose_name = _('User group (page)')
