@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from django import VERSION as DJANGO_VERSION
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
-from django.utils.encoding import force_unicode, python_2_unicode_compatible
+if DJANGO_VERSION[:2] >= (1, 6):
+    from django.utils.encoding import force_unicode, python_2_unicode_compatible
+else:
+    from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
 from cms.models import Page
 from cms.models.managers import PagePermissionManager, GlobalPagePermissionManager
 from cms.utils.helpers import reversion_register
