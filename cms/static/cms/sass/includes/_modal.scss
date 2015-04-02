@@ -8,7 +8,7 @@
 // #MODAL#
 .cms_modal {
 	display:none; position:fixed; left:50%; top:50%; z-index:999999; overflow:hidden;
-	@include border-radius(5px); @include box-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+	@include border-radius(5px); @include box-shadow(0 0 20px rgba(0, 0, 0, 0.5)); @include transform(translateZ(0));
 	background:white;
 
 	.cms_modal-body { position:relative; z-index:10; width:800px; height:400px;
