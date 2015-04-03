@@ -120,7 +120,7 @@ $(document).ready(function () {
 				that.copyPlugin(data);
 			});
 
-			// adds longclick events to content name
+			// adds longclick events to content area
 			this.container.bind('mousedown mouseup mousemove', function (e) {
 				if(e.type !== 'mousemove') e.stopPropagation();
 				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
