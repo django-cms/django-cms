@@ -120,6 +120,19 @@ $(document).ready(function () {
 				that.copyPlugin(data);
 			});
 
+			// adds longclick events to content name
+			this.container.bind('mousedown mouseup mousemove', function (e) {
+				if(e.type !== 'mousemove') e.stopPropagation();
+				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
+					// start countdown
+					timer = setTimeout(function () {
+						CMS.API.StructureBoard.setActive(that.options.plugin_id, true);
+					}, 500);
+				} else {
+					clearTimeout(timer);
+				}
+			});
+
 			// variables for dragitems
 			var draggable = $('.cms_draggable-' + this.options.plugin_id);
 			var dragitem = draggable.find('> .cms_dragitem');
