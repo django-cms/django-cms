@@ -225,25 +225,6 @@ $(document).ready(function () {
 
 			// ensure new settings are returned
 			return CMS.settings;
-		},
-
-		// prevents scrolling when another scrollbar is used (for better ux)
-		preventScroll: function (disable) {
-			// TODO: currently disabled
-/*
-			// cancel if scrollbar is not visible
-			if($(document).height() <= $(window).height()) return false;
-
-			var scrollTop = $(window).scrollTop();
-			var html = $('html');
-
-			if(disable) {
-				html.addClass('cms_toolbar-noscroll').css('top',-scrollTop).data('scroll', scrollTop);
-			} else {
-				html.removeClass('cms_toolbar-noscroll');
-				$(window).scrollTop(html.data('scroll'));
-			}
-*/
 		}
 
 	};
