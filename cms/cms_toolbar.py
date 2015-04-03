@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth import get_permission_codename
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
