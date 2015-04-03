@@ -165,25 +165,6 @@ $(document).ready(function () {
 				e.stopPropagation();
 				that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, that.options.plugin_breadcrumb);
 			});
-
-			// adds longclick events
-			dragitem.bind('mousedown mouseup mousemove', function (e) {
-				if(e.type === 'mousedown') {
-					// start countdown
-					timer = setTimeout(function () {
-						CMS.API.StructureBoard.setActive(that.options.plugin_id, false);
-						// prevent dragging
-						$(document).bind('mousemove.keypress', function () {
-							$(document).trigger('keyup.cms', [true]);
-							setTimeout(function () {
-								$(document).unbind('mousemove.keypress');
-							}, 1000);
-						});
-					}, 500);
-				} else {
-					clearTimeout(timer);
-				}
-			});
 		},
 
 		_setGeneric: function () {
@@ -458,8 +439,6 @@ $(document).ready(function () {
 
 		_setSubnav: function (nav) {
 			var that = this;
-
-			nav.bind('mousedown', function (e) { e.stopPropagation(); });  // avoid starting the longclick event when using the drag bar
 
 			nav.bind('mouseenter mouseleave tap.cms', function (e) {
 				e.preventDefault();
