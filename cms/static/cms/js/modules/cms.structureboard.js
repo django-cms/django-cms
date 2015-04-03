@@ -68,7 +68,7 @@ $(document).ready(function () {
 			// add drag & drop functionality
 			this._drag();
 			// prevent click events to detect double click
-			this.preventEvents(this.plugins);
+			// this.preventEvents(this.plugins);
 		},
 
 		_events: function () {
