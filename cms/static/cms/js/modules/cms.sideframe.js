@@ -250,9 +250,6 @@ $(document).ready(function () {
 			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
 			this.sideframe.find('.cms_sideframe-hide').show();
 
-			// hide scrollbar
-			this.preventScroll(false);
-
 			// reset to first state
 			if(!noPositionReset) {
 				this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
@@ -267,9 +264,6 @@ $(document).ready(function () {
 
 			this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
 			this.sideframe.find('.cms_sideframe-hide').hide();
-
-			// reset scrollbar
-			this.preventScroll(true);
 
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
 			// do custom animation
