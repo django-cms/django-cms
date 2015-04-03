@@ -323,11 +323,11 @@ $(document).ready(function () {
 				'type': 'POST',
 				'url': url,
 				'data': (post) ? JSON.parse(post) : {},
-				'success': function () {
+				'success': function (response) {
 					CMS.API.locked = false;
 
 					if(callback) {
-						callback(that);
+						callback(that, response);
 						that._loader(false);
 					} else if(onSuccess) {
 						CMS.API.Helpers.reloadBrowser(onSuccess, false, true);

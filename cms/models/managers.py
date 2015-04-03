@@ -9,7 +9,6 @@ from cms.exceptions import NoPermissionsException
 from cms.models.query import PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import user_related_query_name
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -181,10 +180,7 @@ class BasicPagePermissionManager(models.Manager):
         """Get all objects for given user, also takes look if user is in some
         group.
         """
-        query = dict()
-        query['group__' + user_related_query_name] = user
-
-        return self.filter(Q(user=user) | Q(**query))
+        return self.filter(Q(user=user) | Q(group__user=user))
 
     def with_can_change_permissions(self, user):
         """Set of objects on which user haves can_change_permissions. !But only
@@ -195,28 +191,28 @@ class BasicPagePermissionManager(models.Manager):
 
 
 class GlobalPagePermissionManager(BasicPagePermissionManager):
- 
+
     def user_has_permission(self, user, site_id, perm):
         """
         Provide a single point of entry for deciding whether any given global
         permission exists.
         """
         # if the user has add rights to this site explicitly
-        this_site = Q(**{perm: True, 'sites__in':[site_id]})
+        this_site = Q(**{perm: True, 'sites__in': [site_id]})
         # if the user can add to all sites
         all_sites = Q(**{perm: True, 'sites__isnull': True})
         return self.with_user(user).filter(this_site | all_sites)
- 
+
     def user_has_add_permission(self, user, site_id):
         return self.user_has_permission(user, site_id, 'can_add')
- 
+
     def user_has_change_permission(self, user, site_id):
         return self.user_has_permission(user, site_id, 'can_change')
- 
+
     def user_has_view_permission(self, user, site_id):
         return self.user_has_permission(user, site_id, 'can_view')
- 
-  
+
+
 class PagePermissionManager(BasicPagePermissionManager):
     """Page permission manager accessible under objects.
     """
@@ -277,7 +273,7 @@ class PagePermissionManager(BasicPagePermissionManager):
 
         if user.is_superuser or \
                 GlobalPagePermission.objects.with_can_change_permissions(user):
-        # everything for those guys
+            # everything for those guys
             return self.all()
 
         # get user level
@@ -396,9 +392,8 @@ class PagePermissionsPermissionManager(models.Manager):
             MASK_CHILDREN, MASK_DESCENDANTS, MASK_PAGE)
 
         global_permissions = GlobalPagePermission.objects.all()
-        if global_permissions.filter(**{
-            'can_view': True, 'sites__in': [site]
-        }).exists():
+        if global_permissions.filter(Q(sites__in=[site]) | Q(sites__isnull=True)
+                ).filter(can_view=True).exists():
             # user or his group are allowed to do `attr` action
             # !IMPORTANT: page permissions must not override global permissions
             from cms.models import Page
@@ -412,7 +407,7 @@ class PagePermissionsPermissionManager(models.Manager):
         page_id_allow_list = []
         for permission in qs:
             if permission.grant_on & MASK_PAGE:
-                page_id_allow_list.append(permission.page.id)
+                page_id_allow_list.append(permission.page_id)
             if permission.grant_on & MASK_CHILDREN:
                 page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
             elif permission.grant_on & MASK_DESCENDANTS:
@@ -453,7 +448,7 @@ class PagePermissionsPermissionManager(models.Manager):
             if getattr(permission, attr):
                 # can add is special - we are actually adding page under current page
                 if permission.grant_on & MASK_PAGE or attr is "can_add":
-                    page_id_allow_list.append(permission.page.id)
+                    page_id_allow_list.append(permission.page_id)
                 if permission.grant_on & MASK_CHILDREN and not attr is "can_add":
                     page_id_allow_list.extend(permission.page.get_children().values_list('id', flat=True))
                 elif permission.grant_on & MASK_DESCENDANTS:

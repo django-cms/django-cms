@@ -1,15 +1,15 @@
 ##########
 django CMS
 ##########
-.. image:: https://api.travis-ci.org/divio/django-cms.svg?branch=develop
+.. image:: https://travis-ci.org/divio/django-cms.svg?branch=support%2F3.0.x
     :target: http://travis-ci.org/divio/django-cms
-.. image:: https://pypip.in/v/django-cms/badge.svg
+.. image:: https://pypip.in/v/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://pypip.in/d/django-cms/badge.svg
+.. image:: https://pypip.in/d/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://pypip.in/wheel/django-cms/badge.svg
+.. image:: https://pypip.in/wheel/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://pypip.in/license/django-cms/badge.svg
+.. image:: https://pypip.in/license/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
 
 
@@ -18,7 +18,7 @@ Open source enterprise content management system based on the django framework.
 .. ATTENTION:: This is the **develop** branch. It's the branch for features that
    will go into django CMS 3.1. The **master** branch is the current stable release,
    the one released on PyPI.
-   
+
    **support/3.0.x** will be our *next stable release*, the most
    appropriate branch for fixes and patches that will go into the next **master**.
 

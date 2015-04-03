@@ -1,9 +1,11 @@
-from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import reverse
-from cms.utils import get_language_from_request
-from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
 from cms.models.fields import PlaceholderField
+from cms.utils import get_language_from_request
+from cms.utils.urlutils import admin_reverse
+
 from hvad.models import TranslatableModel, TranslatedFields
 
 
@@ -38,6 +40,12 @@ class Example1(models.Model):
     def get_absolute_url(self):
         return reverse("example_detail", args=(self.pk,))
 
+    def get_draft_url(self):
+        return self.get_absolute_url()
+
+    def get_public_url(self):
+        return '/public/view/'
+
     def set_static_url(self, request):
         language = get_language_from_request(request)
         if self.pk:
@@ -65,10 +73,14 @@ class DynamicPlaceholderSlotExample(models.Model):
     placeholder_2 = PlaceholderField(dynamic_placeholder_2, related_name='dynamic_pl_2')
 
 
+@python_2_unicode_compatible
 class CharPksExample(models.Model):
     char_1 = models.CharField(u'char_1', max_length=255)
     slug = models.SlugField(u'char_1', max_length=255, primary_key=True)
     placeholder_1 = PlaceholderField('placeholder_1', related_name='charpk_p1')
+
+    def __str__(self):
+        return "%s - %s" % (self.char_1, self.pk)
 
 
 @python_2_unicode_compatible

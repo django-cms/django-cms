@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from django.contrib.sites.models import Site
-from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
+from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.management.base import CommandError
 from django.core.management import call_command
@@ -11,16 +11,16 @@ from django.core.urlresolvers import reverse
 
 from cms.api import create_page, add_plugin, create_title
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-from cms.management.commands import publisher_publish
+from cms.management.commands.subcommands.publisher_publish import PublishCommand
 from cms.models import CMSPlugin, Title
 from cms.models.pagemodel import Page
 from cms.plugin_pool import plugin_pool
-from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
-from cms.test_utils.util.context_managers import StdoutOverride, SettingsOverride
+from cms.test_utils.testcases import CMSTestCase as TestCase
+from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
-from cms.utils.compat.dj import get_user_model
+from cms.utils.urlutils import admin_reverse
 
 
 class PublisherCommandTests(TestCase):
@@ -30,7 +30,7 @@ class PublisherCommandTests(TestCase):
 
     def test_command_line_should_raise_without_superuser(self):
         with self.assertRaises(CommandError):
-            com = publisher_publish.Command()
+            com = PublishCommand()
             com.handle_noargs()
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
@@ -42,7 +42,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish')
+            call_command('cms', 'publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -65,7 +65,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish')
+            call_command('cms', 'publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -90,7 +90,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish', include_unpublished=True)
+            call_command('cms', 'publisher_publish', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -121,7 +121,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish', language='de')
+            call_command('cms', 'publisher_publish', language='de')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -155,7 +155,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish', language='de', include_unpublished=True)
+            call_command('cms', 'publisher_publish', language='de', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -194,7 +194,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish')
+            call_command('cms', 'publisher_publish')
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEqual(not_drafts, 1)
@@ -224,7 +224,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish')
+            call_command('cms', 'publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -260,7 +260,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish')
+            call_command('cms', 'publisher_publish')
 
         public = Page.objects.public()[0]
         languages = sorted(public.title_set.values_list('language', flat=True))
@@ -282,7 +282,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish', site=siteB.id)
+            call_command('cms', 'publisher_publish', site=siteB.id)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -313,7 +313,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('publisher_publish')
+            call_command('cms', 'publisher_publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -390,10 +390,10 @@ class PublishingTests(TestCase):
     def test_publish_wrong_lang(self):
         page = self.create_page("test_admin", published=False)
         superuser = self.get_superuser()
-        with SettingsOverride(
-                LANGUAGES=(('de', 'de'), ('en', 'en')),
-                CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
-            ):
+        with self.settings(
+            LANGUAGES=(('de', 'de'), ('en', 'en')),
+            CMS_LANGUAGES={1: [{'code': 'en', 'name': 'en', 'fallbacks': ['fr', 'de'], 'public': True}]}
+        ):
             with self.login_user_context(superuser):
                 with force_language('de'):
                     response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
@@ -974,4 +974,3 @@ class PublishingTests(TestCase):
                 self.assertTrue(draft.parent in draft.get_ancestors())
                 self.assertTrue(draft in draft.parent.get_descendants())
                 self.assertTrue(draft in draft.parent.get_children())
-

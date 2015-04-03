@@ -2,186 +2,24 @@
 from collections import defaultdict
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
-import warnings
 
-from django.contrib.sites.models import Site, SITE_CACHE
 from django.shortcuts import get_object_or_404
-from django.template import NodeList, VariableNode, TemplateSyntaxError
-from django.template.loader import get_template
-from django.template.loader_tags import ExtendsNode, BlockNode
+from django.utils.encoding import force_text
 from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
-from sekizai.helpers import is_variable_extend_node
 
-try:
-    from django.template.loader_tags import ConstantIncludeNode as IncludeNode
-except ImportError:
-    from django.template.loader_tags import IncludeNode
-
-from cms.api import add_plugin
-from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
-from cms.models import Page
+from cms.exceptions import PluginLimitReached
+from cms.models import Page, CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
-from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
-from cms.utils.placeholder import (validate_placeholder_name,
-                                   get_placeholder_conf)
+from cms.utils.placeholder import (get_placeholder_conf, get_placeholders)
 
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
-
-
-def _extend_blocks(extend_node, blocks):
-    """
-    Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
-    """
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return
-    parent = extend_node.get_parent(None)
-    # Search for new blocks
-    for node in parent.nodelist.get_nodes_by_type(BlockNode):
-        if not node.name in blocks:
-            blocks[node.name] = node
-        else:
-            # set this node as the super node (for {{ block.super }})
-            block = blocks[node.name]
-            seen_supers = []
-            while hasattr(block.super, 'nodelist') and block.super not in seen_supers:
-                seen_supers.append(block.super)
-                block = block.super
-            block.super = node
-        # search for further ExtendsNodes
-    for node in parent.nodelist.get_nodes_by_type(ExtendsNode):
-        _extend_blocks(node, blocks)
-        break
-
-
-def _find_topmost_template(extend_node):
-    parent_template = extend_node.get_parent({})
-    for node in parent_template.nodelist.get_nodes_by_type(ExtendsNode):
-        # Their can only be one extend block in a template, otherwise django raises an exception
-        return _find_topmost_template(node)
-        # No ExtendsNode
-    return extend_node.get_parent({})
-
-
-def _extend_nodelist(extend_node):
-    """
-    Returns a list of placeholders found in the parent template(s) of this
-    ExtendsNode
-    """
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return []
-        # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
-    blocks = dict(extend_node.blocks)
-    _extend_blocks(extend_node, blocks)
-    placeholders = []
-
-    for block in blocks.values():
-        placeholders += _scan_placeholders(block.nodelist, block, blocks.keys())
-
-    # Scan topmost template for placeholder outside of blocks
-    parent_template = _find_topmost_template(extend_node)
-    placeholders += _scan_placeholders(parent_template.nodelist, None, blocks.keys())
-    return placeholders
-
-
-def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
-    from cms.templatetags.cms_tags import Placeholder
-    
-    placeholders = []
-    if ignore_blocks is None:
-        # List of BlockNode instances to ignore.
-        # This is important to avoid processing overriden block nodes.
-        ignore_blocks = []
-
-    for node in nodelist:
-        # check if this is a placeholder first
-        if isinstance(node, Placeholder):
-            placeholders.append(node.get_name())
-        elif isinstance(node, IncludeNode):
-            # if there's an error in the to-be-included template, node.template becomes None
-            if node.template:
-                # This is required for Django 1.7 but works on older version too
-                # Check if it quacks like a template object, if not
-                # presume is a template path and get the object out of it
-                if not callable(getattr(node.template, 'render', None)):
-                    template = get_template(node.template.var)
-                else:
-                    template = node.template
-                placeholders += _scan_placeholders(template.nodelist, current_block)
-        # handle {% extends ... %} tags
-        elif isinstance(node, ExtendsNode):
-            placeholders += _extend_nodelist(node)
-        # in block nodes we have to scan for super blocks
-        elif isinstance(node, VariableNode) and current_block:
-            if node.filter_expression.token == 'block.super':
-                if not hasattr(current_block.super, 'nodelist'):
-                    raise TemplateSyntaxError("Cannot render block.super for blocks without a parent.")
-                placeholders += _scan_placeholders(current_block.super.nodelist, current_block.super)
-        # ignore nested blocks which are already handled
-        elif isinstance(node, BlockNode) and node.name in ignore_blocks:
-            continue
-        # if the node has the newly introduced 'child_nodelists' attribute, scan
-        # those attributes for nodelists and recurse them
-        elif hasattr(node, 'child_nodelists'):
-            for nodelist_name in node.child_nodelists:
-                if hasattr(node, nodelist_name):
-                    subnodelist = getattr(node, nodelist_name)
-                    if isinstance(subnodelist, NodeList):
-                        if isinstance(node, BlockNode):
-                            current_block = node
-                        placeholders += _scan_placeholders(subnodelist, current_block, ignore_blocks)
-        # else just scan the node for nodelist instance attributes
-        else:
-            for attr in dir(node):
-                obj = getattr(node, attr)
-                if isinstance(obj, NodeList):
-                    if isinstance(node, BlockNode):
-                        current_block = node
-                    placeholders += _scan_placeholders(obj, current_block, ignore_blocks)
-    return placeholders
-
-
-def get_placeholders(template):
-    compiled_template = get_template(template)
-    placeholders = _scan_placeholders(compiled_template.nodelist)
-    clean_placeholders = []
-    for placeholder in placeholders:
-        if placeholder in clean_placeholders:
-            warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
-                          "in template {1}."
-                          .format(placeholder, template, placeholder),
-                          DuplicatePlaceholderWarning)
-        else:
-            validate_placeholder_name(placeholder)
-            clean_placeholders.append(placeholder)
-    return clean_placeholders
-
-
-SITE_VAR = "site__exact"
-
-
-def current_site(request):
-    if SITE_VAR in request.REQUEST:
-        site_pk = request.REQUEST[SITE_VAR]
-    else:
-        site_pk = request.session.get('cms_admin_site', None)
-    if site_pk:
-        try:
-            site = SITE_CACHE.get(site_pk) or Site.objects.get(pk=site_pk)
-            SITE_CACHE[site_pk] = site
-            return site
-        except Site.DoesNotExist:
-            return None
-    else:
-        return Site.objects.get_current()
 
 
 def get_plugins(request, placeholder, template, lang=None):
@@ -246,6 +84,8 @@ def create_default_plugins(request, placeholders, template, lang):
     a "default_plugins" configuration value in settings.
     return all plugins, children, grandchildren (etc.) created
     """
+    from cms.api import add_plugin
+
     def _create_default_plugins(placeholder, confs, parent=None):
         """
         Auxillary function that builds all of a placeholder's default plugins
@@ -328,6 +168,38 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
     return [plugin_lookup.get(plugin.pk, plugin) for plugin in queryset]
 
 
+def reorder_plugins(placeholder, parent_id, language, order):
+    """
+    Reorder the plugins according the order parameter
+
+    :param placeholder: placeholder instance which contains the given plugins
+    :param parent_id: parent of the given plugins
+    :param language: language
+    :param order: optional custom order (given as list of plugin primary keys)
+    """
+    plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder,
+                                       language=language).order_by('position')
+    x = 0
+    for level_plugin in plugins:
+        if order:
+            x = 0
+            found = False
+            for pk in order:
+                if level_plugin.pk == int(pk):
+                    level_plugin.position = x
+                    level_plugin.save()
+                    found = True
+                    break
+                x += 1
+            if not found:
+                return False
+        else:
+            level_plugin.position = x
+            level_plugin.save()
+            x += 1
+    return plugins
+
+
 def get_plugins_for_page(request, page, lang=None):
     if not page:
         return []
@@ -360,7 +232,7 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 plugin_type=plugin_type,
             ).count()
             if type_count >= type_limit:
-                plugin_name = force_unicode(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})

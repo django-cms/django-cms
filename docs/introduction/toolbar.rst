@@ -18,7 +18,7 @@ The other is to provide ``cms_toolbar.py`` files in your apps, which will be
 automatically loaded as long ``CMS_TOOLBARS`` is not set (or set to `None`).
 We'll work with this second method.
 
-Create a new ``cms_toolbar.py`` file in your Polls application (not: *not* in
+Create a new ``cms_toolbar.py`` file in your Polls application (NOTE: *not* in
 the Polls Plugin application we were working with in the previous tutorial)::
 
     from django.core.urlresolvers import reverse

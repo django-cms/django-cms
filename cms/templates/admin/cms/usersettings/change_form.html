@@ -1,5 +1,14 @@
 {% extends "admin/change_form.html" %}{% load i18n cms_tags %}
 
+{% block extrahead %}{{ block.super }}
+<script type="text/javascript">
+    if (history.pushState && location.href.indexOf('reload_window') > -1) {
+        history.pushState(null, null, location.href.replace(/[?&]reload_window/, ''));
+        window.top.location.reload()
+    }
+</script>
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 	<a href="{% cms_admin_url 'index' %}">{% trans 'Home' %}</a>

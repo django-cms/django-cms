@@ -5,9 +5,9 @@ import inspect
 from itertools import chain
 import os
 
+from django.db.models.loading import get_app_paths
 from django.conf import settings
 from django.template import Lexer, TOKEN_BLOCK
-from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
@@ -15,7 +15,7 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths, is_installed
+from cms.utils.compat.dj import is_installed
 
 
 SUCCESS = 1
@@ -198,7 +198,7 @@ def check_i18n(output):
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
                 section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        if isinstance(settings.SITE_ID, six.integer_types):
+        if settings.SITE_ID == hash(settings.SITE_ID):
             for site, items in get_cms_setting('LANGUAGES').items():
                 if type(site) == int:
                     for lang in items:
@@ -236,7 +236,7 @@ def check_plugin_instances(output):
                 section.error("%s has instances but is no longer installed" % plugin_type["type"] )
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
@@ -272,7 +272,7 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._meta.get_all_related_objects():
-                if rel.model != CMSPlugin and rel.model != AliasPluginModel:
+                if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),

@@ -1,20 +1,22 @@
 #!/usr/bin/env python
 from __future__ import print_function, with_statement
+
 import contextlib
 import multiprocessing
 import pkgutil
 import pyclbr
 import subprocess
-from django.core.exceptions import DjangoRuntimeWarning
 import os
 import sys
 import warnings
 
-from docopt import docopt
-from django import VERSION
+from django.core.exceptions import DjangoRuntimeWarning
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command, CommandError
 from django.utils import autoreload
 from django.utils.encoding import force_text
-from django.core.management import call_command, CommandError
+
+from docopt import docopt
 
 import cms
 from cms.test_utils.cli import configure
@@ -23,17 +25,20 @@ from cms.test_utils.tmpdir import temp_dir
 from cms.utils.compat import DJANGO_1_6
 import menus
 
-__doc__ = '''django CMS development helper script. 
+__doc__ = '''django CMS development helper script.
 
 To use a different database, set the DATABASE_URL environment variable to a
-dj-database-url compatible value.  The AUTH_USER_MODEL environment variable can be
-used to change the user model in the same manner as the --user option.
+dj-database-url compatible value.  The AUTH_USER_MODEL environment variable can
+be used to change the user model in the same manner as the --user option.
 
 Usage:
-    develop.py test [--parallel | --failfast] [--migrate] [--user=<user>] [<test-label>...] [--xvfb]
+    develop.py test [--parallel | --failfast] [--migrate] [--user=<user>]
+                    [<test-label>...] [--xvfb]
     develop.py timed test [test-label...] [--xvfb]
-    develop.py isolated test [<test-label>...] [--parallel] [--migrate] [--xvfb]
-    develop.py server [--port=<port>] [--bind=<bind>] [--migrate] [--user=<user>]
+    develop.py isolated test [<test-label>...] [--parallel] [--migrate]
+                             [--xvfb]
+    develop.py server [--port=<port>] [--bind=<bind>] [--migrate]
+                      [--user=<user>] [<application-name> <migration-number>]
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
@@ -43,32 +48,45 @@ Usage:
     develop.py authors
 
 Options:
-    -h --help                   Show this screen.
-    --version                   Show version.
-    --parallel                  Run tests in parallel.
-    --migrate                   Use south migrations in test or server command.
-    --merge                     Merge migrations
-    --failfast                  Stop tests on first failure (only if not --parallel).
-    --port=<port>               Port to listen on [default: 8000].
-    --bind=<bind>               Interface to bind to [default: 127.0.0.1].
-    --user=<user>               Specify which user model to run tests with (if other than auth.User).
-    --xvfb                      Use a virtual X framebuffer for frontend testing, requires xvfbwrapper to be installed.
+    -h --help             Show this screen.
+    --version             Show version.
+    --parallel            Run tests in parallel.
+    --migrate             Use south migrations in test or server command.
+    --merge               Merge migrations
+    --failfast            Stop tests on first failure (only if not --parallel).
+    --port=<port>         Port to listen on [default: 8000].
+    --bind=<bind>         Interface to bind to [default: 127.0.0.1].
+    --user=<user>         Specify which user model to run tests with (if other
+                          than auth.User).
+    --xvfb                Use a virtual X framebuffer for frontend testing,
+                          requires xvfbwrapper to be installed.
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False, app_name=None, migration=None):
     if os.environ.get("RUN_MAIN") != "true":
-        from cms.utils.compat.dj import get_user_model
+        from django.contrib.auth import get_user_model  # must be imported lazily
         if DJANGO_1_6:
             from south.management.commands import syncdb, migrate
             if migrate_cmd:
-                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default')
-                migrate.Command().handle(interactive=False, verbosity=1)
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1,
+                                               database='default')
+                if app_name:
+                    migrate.Command().handle(interactive=False, verbosity=1, app=app_name,
+                                             target=migration)
+                else:
+                    migrate.Command().handle(interactive=False, verbosity=1)
             else:
-                syncdb.Command().handle_noargs(interactive=False, verbosity=1, database='default', migrate=False, migrate_all=True)
-                migrate.Command().handle(interactive=False, verbosity=1, fake=True)
+                syncdb.Command().handle_noargs(interactive=False, verbosity=1,
+                                               database='default',
+                                               migrate=False, migrate_all=True)
+                migrate.Command().handle(interactive=False, verbosity=1,
+                                         fake=True)
         else:
-            call_command("migrate", database='default')
+            if app_name:
+                call_command("migrate", app_name, migration, database='default')
+            else:
+                call_command("migrate", database='default')
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
@@ -83,7 +101,8 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
             usr.is_active = True
             usr.save()
             print('')
-            print("A admin user (username: admin, password: admin) has been created.")
+            print("A admin user (username: admin, password: admin) "
+                  "has been created.")
             print('')
     from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()
@@ -110,7 +129,8 @@ def _split(itr, num):
 
 def _get_test_labels():
     test_labels = []
-    for module in [name for _, name, _ in pkgutil.iter_modules([os.path.join("cms","tests")])]:
+    for module in [name for _, name, _ in pkgutil.iter_modules(
+            [os.path.join("cms", "tests")])]:
         clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
         for clsname, cls in clsmembers.items():
             for method, _ in cls.methods.items():
@@ -120,7 +140,8 @@ def _get_test_labels():
     return test_labels
 
 
-def _test_run_worker(test_labels, failfast=False, test_runner='django.test.simple.DjangoTestSuiteRunner'):
+def _test_run_worker(test_labels, failfast=False,
+                     test_runner='django.test.simple.DjangoTestSuiteRunner'):
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
@@ -145,13 +166,20 @@ def isolated(test_labels, parallel=False):
         mapper = pool.map
     else:
         mapper = map
-    results = mapper(_test_in_subprocess, ([test_label] for test_label in test_labels))
-    failures = [test_label for test_label, return_code in zip(test_labels, results) if return_code != 0]
+    results = mapper(
+        _test_in_subprocess,
+        ([test_label] for test_label in test_labels)
+    )
+    failures = [test_label for test_label, return_code in zip(
+        test_labels, results) if return_code != 0]
     return failures
 
 
 def timed(test_labels):
-    return _test_run_worker(test_labels, test_runner='cms.test_utils.runners.TimedTestRunner')
+    return _test_run_worker(
+        test_labels,
+        test_runner='cms.test_utils.runners.TimedTestRunner'
+    )
 
 
 def test(test_labels, parallel=False, failfast=False):
@@ -185,26 +213,50 @@ def shell():
 
 
 def makemigrations(migrate_plugins=True, merge=False, squash=False):
-    from django.core.management import call_command
     applications = [
         # core applications
         'cms', 'menus',
         # testing applications
-        'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp', 'fakemlng', 'one_thing', 'extensionapp',
-        'objectpermissionsapp', 'bunch_of_plugins', 'emailuserapp'
+        'meta', 'manytomany_rel', 'fileapp', 'placeholderapp', 'sampleapp',
+        'fakemlng', 'one_thing', 'extensionapp', 'objectpermissionsapp',
+        'bunch_of_plugins', 'mti_pluginapp',
     ]
+    if os.environ.get("AUTH_USER_MODEL") == "emailuserapp.EmailUser":
+        applications.append('emailuserapp')
     if migrate_plugins:
         applications.extend([
             # official plugins
-            'djangocms_inherit', 'djangocms_googlemap', 'djangocms_column', 'djangocms_style', 'djangocms_link',
-            'djangocms_file', 'djangocms_text_ckeditor', 'djangocms_picture', 'djangocms_teaser', 'djangocms_file',
-            'djangocms_flash', 'djangocms_video',
+            'djangocms_inherit', 'djangocms_googlemap', 'djangocms_column',
+            'djangocms_style', 'djangocms_link', 'djangocms_file',
+            'djangocms_text_ckeditor', 'djangocms_picture', 'djangocms_teaser',
+            'djangocms_file', 'djangocms_flash', 'djangocms_video',
         ])
     if DJANGO_1_6:
+        from south.exceptions import NoMigrations
+        from south.migration import Migrations
+
         if merge:
-            raise DjangoRuntimeWarning(u'Option not implemented for Django 1.6')
+            raise DjangoRuntimeWarning(
+                u'Option not implemented for Django 1.6')
         for application in applications:
-            call_command('schemamigration', application, auto=True)
+            try:
+                Migrations(application)
+            except NoMigrations:
+                print('ATTENTION: No migrations found for {0}, creating '
+                      'initial migrations.'.format(application))
+                try:
+                    call_command('schemamigration', application, initial=True)
+                except SystemExit:
+                    pass
+            except ImproperlyConfigured:
+                print('WARNING: The app: {0} could not be found.'.format(
+                    application
+                ))
+            else:
+                try:
+                    call_command('schemamigration', application, auto=True)
+                except SystemExit:
+                    pass
     else:
         call_command('makemigrations', *applications, merge=merge)
 
@@ -221,7 +273,10 @@ def generate_authors():
 
     # Get our list of authors
     print("Collecting author names")
-    r = subprocess.Popen(["git", "log", "--use-mailmap", "--format=%aN"], stdout=subprocess.PIPE)
+    r = subprocess.Popen(
+        ["git", "log", "--use-mailmap", "--format=%aN"],
+        stdout=subprocess.PIPE
+    )
     seen_authors = []
     authors = []
     with open('AUTHORS', 'r') as f:
@@ -249,7 +304,7 @@ def main():
 
     if args['pyflakes']:
         return static_analysis.pyflakes((cms, menus))
-    
+
     if args['authors']:
         return generate_authors()
 
@@ -260,19 +315,20 @@ def main():
 
     default_name = ':memory:' if args['test'] else 'local.sqlite'
 
-    db_url = os.environ.get("DATABASE_URL", "sqlite://localhost/%s" % default_name)
+    db_url = os.environ.get(
+        "DATABASE_URL",
+        "sqlite://localhost/%s" % default_name
+    )
     migrate = args.get('--migrate', False)
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            use_tz = VERSION[:2] >= (1, 4)
-
             configs = {
                 'db_url': db_url,
                 'ROOT_URLCONF': 'cms.test_utils.project.urls',
                 'STATIC_ROOT': STATIC_ROOT,
                 'MEDIA_ROOT': MEDIA_ROOT,
-                'USE_TZ': use_tz,
+                'USE_TZ': True,
                 'SOUTH_TESTS_MIGRATE': migrate,
             }
 
@@ -286,12 +342,7 @@ def main():
                 auth_user_model = os.environ.get("AUTH_USER_MODEL", None)
 
             if auth_user_model:
-                if VERSION[:2] < (1, 5):
-                    print()
-                    print("Custom user models are not supported before Django 1.5")
-                    print()
-                else:
-                    configs['AUTH_USER_MODEL'] = auth_user_model
+                configs['AUTH_USER_MODEL'] = auth_user_model
 
             configure(**configs)
 
@@ -314,7 +365,9 @@ def main():
 
                 with context:
                     if args['isolated']:
-                        failures = isolated(args['<test-label>'], args['--parallel'])
+                        failures = isolated(
+                            args['<test-label>'], args['--parallel']
+                        )
                         print()
                         print("Failed tests")
                         print("============")
@@ -327,10 +380,20 @@ def main():
                     elif args['timed']:
                         num_failures = timed(args['<test-label>'])
                     else:
-                        num_failures = test(args['<test-label>'], args['--parallel'], args['--failfast'])
+                        num_failures = test(
+                            args['<test-label>'],
+                            args['--parallel'],
+                            args['--failfast']
+                        )
                     sys.exit(num_failures)
             elif args['server']:
-                server(args['--bind'], args['--port'], args.get('--migrate', True))
+                server(
+                    args['--bind'],
+                    args['--port'],
+                    args.get('--migrate', True),
+                    args.get('<application-name>', None),
+                    args.get('<migration-number>', None)
+                )
             elif args['shell']:
                 shell()
             elif args['compilemessages']:
@@ -340,7 +403,10 @@ def main():
             elif args['makemigrations']:
                 makemigrations(merge=args['--merge'])
             elif args['squashmigrations']:
-                squashmigrations(args['<applications-name>'], args['<migration-name>'])
+                squashmigrations(
+                    args['<applications-name>'],
+                    args['<migration-name>']
+                )
 
 
 if __name__ == '__main__':

@@ -64,7 +64,7 @@ $color-background-blue-hover: #e6f6fd;
 	ul.header li .col2 > div { font-size:10px; line-height:14px; border:none; background:none; }
 
 	// row
-	li .cont { display:block; border-top:1px solid $color-border !important; overflow: hidden; }
+	li .cont { display:block; border-top:1px solid $color-border !important; overflow: visible !important; }
 	li.open > .cont { border-bottom:1px solid $color-border !important; }
 	li.open ul .cont { border-top:none !important; border-bottom:1px solid $color-border !important; }
 	li.moveable > div { border-bottom:none !important; }

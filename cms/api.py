@@ -8,6 +8,7 @@ calling these methods!
 """
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
@@ -15,6 +16,8 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
+from django.utils.translation import activate
+
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -28,15 +31,14 @@ from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals
+from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
 
 #===============================================================================
-# Constants 
+# Constants
 #===============================================================================
 
 VISIBILITY_ALL = None
@@ -73,12 +75,14 @@ def _verify_apphook(apphook, namespace):
     Verifies the apphook given is valid and returns the normalized form (name)
     """
     apphook_pool.discover_apps()
-    if hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
+    if isinstance(apphook, CMSApp):
         try:
-            assert apphook in apphook_pool.apps.values()
+            assert apphook.__class__ in [app.__class__ for app in apphook_pool.apps.values()]
         except AssertionError:
             print(apphook_pool.apps.values())
             raise
+        apphook_name = apphook.__class__.__name__
+    elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
     elif isinstance(apphook, six.string_types):
         try:
@@ -118,7 +122,7 @@ def _verify_plugin_type(plugin_type):
 
 
 #===============================================================================
-# Public API 
+# Public API
 #===============================================================================
 
 def create_page(title, template, language, menu_title=None, slug=None,
@@ -131,7 +135,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # ugly permissions hack
@@ -219,12 +223,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-    page.add_root(instance=page)
-    page = page.reload()
+    page = page.add_root(instance=page)
 
     if parent:
-        page.move(target=parent, pos=position)
-        page = page.reload()
+        page = page.move(target=parent, pos=position)
 
     create_title(
         language=language,
@@ -249,9 +251,9 @@ def create_title(language, title, page, menu_title=None, slug=None,
                  parent=None, overwrite_url=None):
     """
     Create a title.
-    
+
     Parent is only used if slug=None.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate page
@@ -286,7 +288,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
     Add a plugin to a placeholder
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     # validate placeholder
@@ -344,11 +346,10 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         parent_id=parent_id,
     )
 
-    plugin_base.add_root(instance=plugin_base)
+    plugin_base = plugin_base.add_root(instance=plugin_base)
 
     if target:
-        plugin_base.move(target, pos=position)
-        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
+        plugin_base = plugin_base.move(target, pos=position)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
@@ -365,7 +366,7 @@ def create_page_user(created_by, user,
                      can_delete_pagepermission=True, grant_all=False):
     """
     Creates a page user.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     if grant_all:
@@ -408,7 +409,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     grant_all = grant_all and not global_permission
@@ -438,7 +439,7 @@ def publish_page(page, user, language):
     """
     Publish a page. This sets `page.published` to `True` and calls publish()
     which does the actual publishing.
-    
+
     See docs/extending_cms/api_reference.rst for more info
     """
     page = page.reload()
@@ -450,8 +451,39 @@ def publish_page(page, user, language):
     request = FakeRequest(user)
     if not page.has_publish_permission(request):
         raise PermissionDenied()
-    page.publish(language)
+    # Set the current_user to have the page's changed_by
+    # attribute set correctly.
+    # 'user' is a user object, but current_user() just wants the username (a string).
+    with current_user(user.get_username()):
+        page.publish(language)
     return page.reload()
+
+
+def publish_pages(include_unpublished=False, language=None, site=None):
+    """
+    Create published public version of selected drafts.
+    """
+    qs = Page.objects.drafts()
+    if not include_unpublished:
+        qs = qs.filter(title_set__published=True).distinct()
+    if site:
+        qs = qs.filter(site=site)
+
+    output_language = None
+    for i, page in enumerate(qs):
+        add = True
+        titles = page.title_set
+        if not include_unpublished:
+            titles = titles.filter(published=True)
+        for lang in titles.values_list("language", flat=True):
+            if language is None or lang == language:
+                if not output_language:
+                    output_language = lang
+                if not page.publish(lang):
+                    add = False
+        # we may need to activate the first (main) language for proper page title rendering
+        activate(output_language)
+        yield (page, add)
 
 
 def get_page_draft(page):

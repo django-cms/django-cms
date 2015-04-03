@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, NoReverseMatch, resolve, Resolver404
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import admin
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth import get_permission_codename
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-
-try:
-    from django.contrib.auth import get_user_model
-except ImportError:
-    get_user_model = lambda: User
 
 from cms.api import get_page_draft
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
@@ -18,7 +17,6 @@ from cms.models import Title, Page
 from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat import DJANGO_1_4
 from cms.utils.i18n import get_language_tuple, force_language
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
@@ -47,6 +45,7 @@ USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
+TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 
 
 @toolbar_pool.register
@@ -86,9 +85,12 @@ class PlaceholderToolbar(CMSToolbar):
         build_mode = self.toolbar.build_mode
         build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT, extra_classes=extra_classes)
-        switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
-        switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
+
+        if self.request.user.has_perm("cms.use_structure"):
+            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                    extra_classes=extra_classes)
+            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
+            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
 
 
 @toolbar_pool.register
@@ -96,15 +98,19 @@ class BasicToolbar(CMSToolbar):
     """
     Basic Toolbar for site and languages menu
     """
+    page = None
 
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
 
     def populate(self):
-        self.init_from_request()
+        if not self.page:
+            self.init_from_request()
 
-        self.add_admin_menu()
-        self.add_language_menu()
+            self.add_admin_menu()
+            self.add_language_menu()
+            user_settings = self.request.toolbar.get_user_settings()
+            self.clipboard = user_settings.clipboard
 
     def add_admin_menu(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
@@ -134,6 +140,10 @@ class BasicToolbar(CMSToolbar):
         admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
         admin_menu.add_break(USER_SETTINGS_BREAK)
 
+        # Disable toolbar
+        admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+        admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
+
         # logout
         self.add_logout_button(admin_menu)
 
@@ -143,7 +153,7 @@ class BasicToolbar(CMSToolbar):
         if User in admin.site._registry:
             opts = User._meta
 
-            if self.request.user.has_perm('%s.%s' % (opts.app_label, opts.get_change_permission())):
+            if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
                 user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
@@ -185,13 +195,23 @@ class BasicToolbar(CMSToolbar):
             name = user.get_full_name()
             if name:
                 return name
-            elif DJANGO_1_4:
-                return user.username
             else:
                 return user.get_username()
         except (AttributeError, NotImplementedError):
             return default
 
+    def get_clipboard_plugins(self):
+        self.populate()
+        if not hasattr(self, "clipboard"):
+            return []
+        return self.clipboard.get_plugins()
+
+    def render_addons(self, context):
+        context.push()
+        context['local_toolbar'] = self
+        clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
+        context.pop()
+        return [clipboard]
 
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
@@ -280,8 +300,8 @@ class PageToolbar(CMSToolbar):
     def post_template_populate(self):
         self.init_placeholders_from_request()
 
-        self.add_publish_button()
         self.add_draft_live()
+        self.add_publish_button()
 
     # Buttons
 
@@ -526,5 +546,6 @@ class PageToolbar(CMSToolbar):
             revert_action = admin_reverse('cms_page_revert_page', args=(self.page.pk, self.current_lang))
             revert_question = _('Are you sure you want to revert to live?')
             history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
-                                       disabled=not self.page.is_dirty(self.current_lang), on_success=refresh)
+                                       disabled=not self.page.is_dirty(self.current_lang),
+                                       on_success=refresh, extra_classes=('cms_toolbar-revert',))
             history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))

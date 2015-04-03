@@ -60,8 +60,16 @@ class PageSelectFormField(forms.MultiValueField):
         return None
 
     def _has_changed(self, initial, data):
+        is_empty = data and (len(data) >= 2 and data[1] in [None, ''])
+
         if isinstance(self.widget, RelatedFieldWidgetWrapper):
             self.widget.decompress = self.widget.widget.decompress
+
+        if is_empty and initial is None:
+            # when empty data will have [u'1', u'', u''] as value
+            # this will cause django to always return True because of the '1'
+            # so we simply follow django's default behavior when initial is None and data is "empty"
+            data = ['' for x in range(0, len(data))]
         return super(PageSelectFormField, self)._has_changed(initial, data)
 
 class PageSmartLinkField(forms.CharField):

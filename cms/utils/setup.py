@@ -10,7 +10,7 @@ def validate_dependencies():
     Check for installed apps, their versions and configuration options
     """
     if not app_is_installed('treebeard'):
-        raise ImproperlyConfigured('django CMS requires django-treebeard.')
+        raise ImproperlyConfigured('django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.')
 
     if app_is_installed('reversion'):
         from reversion.admin import VersionAdmin
@@ -36,7 +36,7 @@ def setup():
         # this in AppConfig and thus the patching is left for older version only
         from django.db.models import loading
         old_get_models = loading.AppCache.get_models
-        
+
         def get_models_patched(self, **kwargs):
             ret_value = old_get_models(self, **kwargs)
             from cms.plugin_pool import plugin_pool

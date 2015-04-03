@@ -41,7 +41,7 @@ class MenuUtilsTests(CMSTestCase):
         output = tag.get_context(fake_context, 'ja')
         url = output['content']
         self.assertEqual(url, '/ja/')
-        
+
     def test_language_changer_decorator(self):
         def lang_changer(lang):
             return "/%s/dummy/" % lang

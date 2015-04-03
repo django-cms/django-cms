@@ -110,6 +110,7 @@ In there, you place your plugins. For our example, include the following code::
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
         render_template = "hello_plugin.html"
+        cache = False
 
     plugin_pool.register_plugin(HelloPlugin)
 
@@ -142,6 +143,11 @@ There are two required attributes on those classes:
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
+* ``cache``: This is a property that tells the plugin rendering system in django
+  CMS whether to cache the plugin’s output to speed-up subsequent views of the
+  same plugin. By default, the cms caches. Since we want each visitor to see
+  output that is specific to him or her, we need to tell the cms to not cache
+  this plugin.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
 is ``True`` (the default):
@@ -217,6 +223,7 @@ Now we need to change our plugin definition to use this model, so our new
         model = Hello
         name = _("Hello Plugin")
         render_template = "hello_plugin.html"
+        cache = False
 
         def render(self, context, instance, placeholder):
             context['instance'] = instance
@@ -241,12 +248,6 @@ new configuration:
 The only thing we changed there is that we use the template variable ``{{
 instance.guest_name }}`` instead of the hardcoded ``Guest`` string in the else
 clause.
-
-.. warning::
-
-    :class:`cms.models.pluginmodel.CMSPlugin` subclasses cannot be further
-    subclassed at the moment. In order to make your plugin models reusable,
-    please use abstract base models.
 
 .. warning::
 
@@ -311,7 +312,7 @@ have two models, one for the plugin and one for those items::
         plugin = models.ForeignKey(
             ArticlePluginModel,
             related_name="associated_item"
-            )
+        )
 
 You'll then need the ``copy_relations()`` method on your plugin model to loop
 over the associated items and copy them, giving the copies foreign keys to the

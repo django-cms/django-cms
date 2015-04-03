@@ -2,13 +2,12 @@
 import bisect
 from cms.models import Title, Page, EmptyTitle
 from cms.utils import get_language_list
-from cms.utils.compat import DJANGO_1_5
 from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import get_user_sites_queryset, load_view_restrictions
 from django.contrib.admin.views.main import ChangeList, ALL_VAR, IS_POPUP_VAR, \
     ORDER_TYPE_VAR, ORDER_VAR, SEARCH_VAR
 from django.contrib.sites.models import Site
-import django
+
 
 COPY_VAR = "copy"
 
@@ -46,7 +45,8 @@ class CMSChangeList(ChangeList):
     real_queryset = False
 
     def __init__(self, request, *args, **kwargs):
-        from cms.utils.plugins import current_site
+        from cms.utils.helpers import current_site
+
         self._current_site = current_site(request)
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
@@ -59,32 +59,25 @@ class CMSChangeList(ChangeList):
             request.session['cms_admin_site'] = self._current_site.pk
         self.set_sites(request)
 
-    def get_queryset(self, request=None):
+    def get_queryset(self, request):
         if COPY_VAR in self.params:
             del self.params[COPY_VAR]
         if 'language' in self.params:
             del self.params['language']
         if 'page_id' in self.params:
             del self.params['page_id']
-        if django.VERSION[1] > 3:
-            qs = super(CMSChangeList, self).get_queryset(request).drafts()
-        else:
-            qs = super(CMSChangeList, self).get_queryset().drafts()
-        if request:
-            site = self.current_site()
-            permissions = Page.permissions.get_change_id_list(request.user, site)
-            if permissions != Page.permissions.GRANT_ALL:
-                qs = qs.filter(pk__in=permissions)
-                # root_query_set is a read-only property in Django 1.6
-                # and will be removed in Django 1.8.
-                queryset_attr = 'root_query_set' if DJANGO_1_5 else 'root_queryset'
-                setattr(self, queryset_attr, self.root_query_set.filter(pk__in=permissions))
-            self.real_queryset = True
-            qs = qs.filter(site=self._current_site)
+        qs = super(CMSChangeList, self).get_queryset(request).drafts()
+        site = self.current_site()
+        permissions = Page.permissions.get_change_id_list(request.user, site)
+        if permissions != Page.permissions.GRANT_ALL:
+            qs = qs.filter(pk__in=permissions)
+            self.root_queryset = self.root_queryset.filter(pk__in=permissions)
+        self.real_queryset = True
+        qs = qs.filter(site=self._current_site)
         return qs
 
     def is_filtered(self):
-        from cms.utils.plugins import SITE_VAR
+        from cms.utils.helpers import SITE_VAR
         lookup_params = self.params.copy() # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR, 'language', 'page_id'):
             if i in lookup_params:
@@ -97,9 +90,9 @@ class CMSChangeList(ChangeList):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
             if not self.is_filtered():
-                self.full_result_count = self.result_count = self.root_query_set.count()
+                self.full_result_count = self.result_count = self.root_queryset.count()
             else:
-                self.full_result_count = self.root_query_set.count()
+                self.full_result_count = self.root_queryset.count()
 
     def set_items(self, request):
         site = self.current_site()
@@ -118,6 +111,8 @@ class CMSChangeList(ChangeList):
                 pages = pages.filter(pk__in=perm_edit_ids)
 
         root_pages = []
+        # Cache view restrictions for the is_restricted template tag
+        load_view_restrictions(request, pages)
         pages = list(pages)
         all_pages = pages[:] # That is, basically, a copy.
         # Unfortunately we cannot use the MPTT builtin code for pre-caching

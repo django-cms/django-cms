@@ -34,7 +34,7 @@ $(document).ready(function () {
 			this.clipboard = $('.cms_clipboard');
 
 			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms';
+			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
 			this.timer = function () {};
 			this.interval = function () {};
 			this.state = false;
@@ -53,6 +53,9 @@ $(document).ready(function () {
 
 			// cancel if there are no dragareas
 			if(!this.dragareas.length) return false;
+
+			// cancel if there is no structure / content switcher
+			if(!this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 
 			// setup toolbar mode
 			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
@@ -95,9 +98,13 @@ $(document).ready(function () {
 				var fields = $('*:focus');
 				// 32 = space
 				if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
+					// cancel if there is no structure / content switcher
+					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.hide();
 				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+					// cancel if there is no structure / content switcher
+					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.show();
 				}
@@ -295,6 +302,8 @@ $(document).ready(function () {
 			this.interval = setInterval(function () {
 				$(window).trigger('resize.sideframe');
 			}, interval);
+
+			$(window).trigger('structureboard_shown.sideframe');
 		},
 
 		_hideBoard: function () {
@@ -309,6 +318,8 @@ $(document).ready(function () {
 
 			// clear interval
 			clearInterval(this.interval);
+
+			$(window).trigger('structureboard_hidden.sideframe');
 		},
 
 		_resizeBoard: function () {
@@ -316,6 +327,7 @@ $(document).ready(function () {
 			var id = null;
 			var area = null;
 			var min = null;
+			var areaParentOffset = null;
 
 			// start calculating
 			this.placeholders.each(function (index, item) {
@@ -327,9 +339,13 @@ $(document).ready(function () {
 				item.height(area.outerHeight(true));
 				// set min width
 				min = (item.width()) ? 0 : 150;
+				// as area is "css positioned" and jquery offset function is relative to the
+				// document (not the first relative/absolute parent) we need to substract
+				// first relative/absolute parent offset.
+				areaParentOffset = $(area).offsetParent().offset();
 				area.css({
-					'top': item.offset().top - 5,
-					'left': item.offset().left - min,
+					'top': item.offset().top - areaParentOffset.top - 5,
+					'left': item.offset().left - areaParentOffset.left - min,
 					'width': item.width() + min
 				});
 			});

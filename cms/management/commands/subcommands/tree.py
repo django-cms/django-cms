@@ -23,7 +23,7 @@ class FixTreeCommand(NoArgsCommand):
                 page.move(target=last, pos='right')
             elif first and first.pk != page.pk:
                 page.move(target=first, pos='left')
-            last = page
+            last = page.reload()
         for page in Page.objects.filter(publisher_is_draft=False, parent__isnull=True).order_by('publisher_public__path'):
             page = page.reload()
             public = page.publisher_public

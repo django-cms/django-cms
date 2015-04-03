@@ -38,3 +38,6 @@ class CMSToolbar(object):
             if app_name and local_app and app_name.startswith(local_app):
                 return True
         return False
+
+    def render_addons(self, context):
+        return []

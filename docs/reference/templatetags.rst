@@ -110,7 +110,7 @@ Example::
     {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
 
 
-.. templatetag:: show_placeholder
+.. templatetag:: render_placeholder
 
 render_placeholder
 ==================
@@ -124,6 +124,10 @@ The :ttag:`render_placeholder` tag takes the following parameters:
 * ``width`` parameter for context sensitive plugins (optional)
 * ``language`` keyword plus ``language-code`` string to render content in the
   specified language (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+* ``as`` keyword followed by ``varname`` (optional): the templatetag output can
+  be saved as a context variable for later use.
 
 
 The following example renders the my_placeholder field from the mymodel_instance and will render
@@ -147,7 +151,29 @@ only the english plugins:
     When used in this manner, the placeholder will not be displayed for
     editing when the CMS is in edit mode.
 
+.. templatetag:: render_uncached_placeholder
 
+render_uncached_placeholder
+===========================
+
+The same as :ttag:`render_placeholder`, but the placeholder contents will not be
+cached or taken from the cache.
+
+Arguments:
+
+* :class:`~cms.models.fields.PlaceholderField` instance
+* ``width`` parameter for context sensitive plugins (optional)
+* ``language`` keyword plus ``language-code`` string to render content in the
+  specified language (optional)
+* ``as`` keyword followed by ``varname`` (optional): the templatetag output can
+  be saved as a context variable for later use.
+
+Example::
+
+    {% render_uncached_placeholder mymodel_instance.my_placeholder language 'en' %}
+
+
+.. templatetag:: show_placeholder
 
 show_placeholder
 ================
@@ -168,6 +194,29 @@ Examples::
     {% show_placeholder "footer" "footer_container_page" %}
     {% show_placeholder "content" request.current_page.parent_id %}
     {% show_placeholder "teaser" request.current_page.get_root %}
+
+
+.. templatetag:: show_uncached_placeholder
+
+show_uncached_placeholder
+=========================
+
+The same as :ttag:`show_placeholder`, but the placeholder contents will not be
+cached or taken from the cache.
+
+Arguments:
+
+- ``placeholder_name``
+- ``page_lookup`` (see `page_lookup`_ for more information)
+- ``language`` (optional)
+- ``site`` (optional)
+
+Example::
+
+    {% show_uncached_placeholder "footer" "footer_container_page" %}
+
+
+.. templatetag:: page_lookup
 
 page_lookup
 ===========
@@ -208,25 +257,6 @@ inherit the content of its root-level ancestor::
         {% show_placeholder "teaser" request.current_page.get_root %}
     {% endplaceholder %}
 
-
-.. templatetag:: show_uncached_placeholder
-
-show_uncached_placeholder
-=========================
-
-The same as :ttag:`show_placeholder`, but the placeholder contents will not be
-cached.
-
-Arguments:
-
-- ``placeholder_name``
-- ``page_lookup`` (see `page_lookup`_ for more information)
-- ``language`` (optional)
-- ``site`` (optional)
-
-Example::
-
-    {% show_uncached_placeholder "footer" "footer_container_page" %}
 
 .. templatetag:: page_url
 
@@ -348,9 +378,8 @@ Example::
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
-.. templatetag:: render_model
 .. versionadded:: 3.0
-
+.. templatetag:: render_plugin_block
 
 render_plugin_block
 ===================
@@ -404,7 +433,8 @@ Example::
     </div>
     {% endblock %}
 
-
+.. templatetag:: render_model
+.. versionadded:: 3.0
 
 render_model
 ============
@@ -609,9 +639,65 @@ It will render to something like:
         Icon and position can be customized via CSS by setting a background
         to the ``.cms_render_model_add img`` selector.
 
+**Arguments:**
+
+* ``instance``: instance of your model, or model class to be added
+* ``edit_fields`` (optional): a comma separated list of fields editable in the
+  popup editor;
+* ``language`` (optional): the admin language tab to be linked. Useful only for
+  `django-hvad`_ enabled models.
+* ``view_url`` (optional): the name of a url that will be reversed using the
+  instance ``pk`` and the ``language`` as arguments;
+* ``view_method`` (optional): a method name that will return a URL to a view;
+  the method must accept ``request`` as first parameter.
+* ``varname`` (optional): the templatetag output can be saved as a context
+  variable for later use.
+
 ..warning::
 
-    You **must** pass an instance of your model as instance parameter.
+    If passing a class, instead of an instance, and using ``view_method``,
+    please bear in mind that the method will be called over an **empty instance**
+    of the class, so attributes are all empty, and the instance does not
+    exists on the database.
+
+
+.. _django-hvad: https://github.com/kristianoellegaard/django-hvad
+
+.. templatetag:: render_model_add_block
+.. versionadded:: 3.1
+
+render_model_add_block
+======================
+
+``render_model_add_block`` is similar to ``render_model_add`` but instead of
+emitting an icon that is linked to the add model form in a modal dialog, it
+wraps arbitrary markup with the same "link". This allows the developer to create
+front-end editing experiences better suited to the project.
+
+All arguments are identical to ``render_model_add``, but the templatetag is used
+in two parts to wrap the markup that should be wrapped.
+
+.. code-block:: html+django
+
+    {% render_model_add_block my_model_instance %}<div>New Object</div>{% endrender_model_add_block %}
+
+
+It will render to something like:
+
+.. code-block:: html+django
+
+    <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+      <div>New Object</div>
+    </div>
+
+
+.. warning::
+
+    You **must** pass an *instance* of your model as instance parameter. The
+    instance passed could be an existing models instance, or one newly created
+    in your view/plugin. It does not even have to be saved, it is introspected
+    by the templatetag to determine the desired model class.
+
 
 **Arguments:**
 
@@ -627,11 +713,8 @@ It will render to something like:
 * ``varname`` (optional): the templatetag output can be saved as a context
   variable for later use.
 
-
-
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
-    {% endblock %}
 
 .. templatetag:: page_language_url
 
