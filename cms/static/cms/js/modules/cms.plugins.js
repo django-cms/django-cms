@@ -465,7 +465,6 @@ $(document).ready(function () {
 
 				// show loader and make sure scroll doesn't jump
 				CMS.API.Toolbar._loader(true);
-				CMS.API.Helpers.preventScroll(false);
 
 				var el = $(this);
 
