@@ -15,7 +15,7 @@ from cms.utils import get_cms_setting
 from cms.utils.compat.dj import force_unicode
 from cms.utils.plugins import requires_reload, has_reached_plugin_limit
 from django.contrib.admin import ModelAdmin
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
@@ -355,7 +355,10 @@ class PlaceholderAdminMixin(object):
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
-        plugin_id = int(plugin_id)
+        try:
+            plugin_id = int(plugin_id)
+        except ValueError:
+            return HttpResponseNotFound(force_unicode(_("Plugin not found")))
         cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
         instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
