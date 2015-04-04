@@ -423,6 +423,23 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
         menu_pool.clear(site_id=site.pk)
         return first_page
 
+    def delete(self, *args, **kwargs):
+        """
+        Disconnects title-related signals prior to delete pages
+        """
+        from django.db.models import signals
+        from cms.models.titlemodels import Title
+        from cms.signals import pre_delete_title, post_delete_title
+
+        # title related signals are only meant to update attribute on the page
+        # given that the pages is going to be deleted, we don't need signal triggering
+        # this will avoid errors due to missing templates
+        signals.pre_delete.disconnect(pre_delete_title, sender=Title, dispatch_uid='cms_pre_delete_page')
+        signals.pre_delete.disconnect(post_delete_title, sender=Title, dispatch_uid='cms_post_delete_page')
+        super(Page, self).delete(*args, **kwargs)
+        signals.pre_delete.connect(pre_delete_title, sender=Title, dispatch_uid='cms_pre_delete_page')
+        signals.pre_delete.connect(post_delete_title, sender=Title, dispatch_uid='cms_post_delete_page')
+
     def save(self, no_signals=False, commit=True, **kwargs):
         """
         Args:
