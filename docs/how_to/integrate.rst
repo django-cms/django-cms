@@ -303,9 +303,8 @@ To make your life easier, add the following at the top of the file::
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
-Add the following apps to your :setting:`django:INSTALLED_APPS`.
-This includes django CMS itself as well as its dependenices and
-other highly recommended applications/libraries::
+Add the following apps to your :setting:`django:INSTALLED_APPS`. This includes django CMS itself as
+well as its dependencies and other highly recommended applications/libraries::
 
     'cms',  # django CMS itself
     'mptt',  # utilities for implementing a tree
@@ -315,8 +314,8 @@ other highly recommended applications/libraries::
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
 
-
-Also add any (or all) of the following plugins, depending on your needs::
+Also add any (or all) of the following plugins, depending on your needs (see the note in
+:ref:`installed_apps` about ordering)::
 
     'djangocms_file',
     'djangocms_flash',
@@ -327,7 +326,7 @@ Also add any (or all) of the following plugins, depending on your needs::
     'djangocms_video',
     'djangocms_link',
     'djangocms_snippet',
-    'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
+
 
 .. note::
 

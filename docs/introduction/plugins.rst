@@ -26,8 +26,8 @@ You should end up with a folder structure similar to this::
                     urls.py
                     views.py
 
-Let's add it this application to our project. Add ``'polls'`` to the end
-of `INSTALLED_APPS` in your project's `settings.py`.
+Let's add it this application to our project. Add ``'polls'`` to the end of ``INSTALLED_APPS`` in
+your project's `settings.py` (see the note on :ref:`installed_apps` about ordering ).
 
 Add the following line to ``urlpatterns`` in the project's ``urls.py``::
 

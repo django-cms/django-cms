@@ -7,6 +7,15 @@ Configuration
 django CMS has a number of settings to configure its behaviour. These should
 be available in your ``settings.py`` file.
 
+.. _installed_apps:
+
+******************************
+The ``INSTALLED_APPS`` setting
+******************************
+
+The ordering of items in ``INSTALLED_APPS`` matters. Entries for applications with plugins
+should come *after* ``cms``.
+
 ************************
 Custom User Requirements
 ************************
@@ -25,9 +34,12 @@ Additionally, the application in which the model is defined **must** be loaded b
 
 .. note::
 
-    In most cases, it is better to create a UserProfile model with a one to one relationship to auth.User rather than creating a custom user model.  Custom user models are only necessary if you intended to alter the default behavior of the User model, not simply extend it.
+    In most cases, it is better to create a UserProfile model with a one to one relationship to
+    auth.User rather than creating a custom user model. Custom user models are only necessary if
+    you intended to alter the default behavior of the User model, not simply extend it.
 
-    Additionally, if you do intend to use a custom user model, it is generally advisable to do so only at the beginning of a project, before the database is created.
+    Additionally, if you do intend to use a custom user model, it is generally advisable to do so
+    only at the beginning of a project, before the database is created.
 
 *****************
 Required Settings
