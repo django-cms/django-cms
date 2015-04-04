@@ -14,7 +14,7 @@ from django.http import HttpResponseForbidden, HttpResponse
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
@@ -855,6 +855,13 @@ class PlaceholderModelTests(CMSTestCase):
             pop = push
 
         context_en = NoPushPopContext()
+
+        # no user: no placeholders but no error either
+        factory = RequestFactory()
+        context_en['request'] = factory.get(page_en.get_absolute_url())
+        render_placeholder(ex.placeholder, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 0)
+        self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
 
         # request.placeholders is populated for superuser
         context_en['request'] = self.get_request(language="en", page=page_en)
