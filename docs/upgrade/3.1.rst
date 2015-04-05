@@ -14,7 +14,7 @@ possible.
 .. warning:: Upgrading from previous versions
 
     3.1 introduces some changes that **require** action if you are upgrading
-    from a previous version. PLease read this document with care.
+    from a previous version. Please read :ref:`upgrade-guide-3.1`.
 
 *****************
 What's new in 3.1
@@ -42,6 +42,14 @@ Other than this, end users should not notice any changes.
 
     We require as much feedback as possible about the performance of django-treebeard in this beta
     release. Please let us know your experiences with it, especially if you encounter any problems.
+
+.. note:: Backward incompatible change
+
+    While most of the low-level interface is very similar between ``django-mptt`` and
+    ``django-treebeard`` they are not exactly the same.
+    If any custom code interfaces with plugins and pages tree low level interface, please check
+    the ``django-treebeard`` documentation for the updated interface.
+
 
 Action required
 ---------------
@@ -160,3 +168,48 @@ just an image as previously).
 Some user interfaces have some plugins hidden from display in edit/preview mode.
 :ttag:`render_plugin_block` provides a way to expose them for editing, and also more generally
 provides an alternative means of triggering a plugin's change form.
+
+
+Drop deprecations
+=================
+
+* ``cms.context_processor.media`` has been removed in favor of
+  ``cms.context_processor.cms_settings``, update your settings accordingly;
+
+.. _upgrade-guide-3.1:
+
+***********************************
+Upgrading for django CMS 3.0 to 3.1
+***********************************
+
+The two major changes regarding 3.1 are the removal of django-mptt in favor of django-treebeard
+and the dropped support for Django prior 1.6.
+
+Preliminary steps
+=================
+
+Before upgrading, please make sure that you current database is consistent.
+
+To ensure this, run two commands:
+
+* ``python manage.py cms delete_orphaned_plugins``
+* ``python manage.py fix_mptt``
+
+Settings update
+===============
+
+* Change ``cms.context_processor.media`` in ``cms.context_processor.cms_settings`` in
+  ``TEMPLATE_CONTEXT_PROCESSORS``;
+* Add ``treebeard`` in ``INSTALLED_APPS`` and remove ``mptt`` if not required by other
+  applications;
+* If using Django 1.7 remove ``cms`` and ``menus`` from ``MIGRATION_MODULES`` to support
+  the new migration layout;
+* If migrating for Django 1.6 and below to Django 1.7, remove ``south`` from ``installed_apps``;
+
+Update the database
+===================
+
+The migration for mptt to treebeard is handled by the migrations, so just running them will
+update your database:
+
+* ``python manage.py migrate``
