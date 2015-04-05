@@ -170,11 +170,15 @@ Some user interfaces have some plugins hidden from display in edit/preview mode.
 provides an alternative means of triggering a plugin's change form.
 
 
-Drop deprecations
-=================
+Remove deprecations
+===================
 
 * ``cms.context_processor.media`` has been removed in favor of
   ``cms.context_processor.cms_settings``, update your settings accordingly;
+
+* Old-style plugin table names are no longer supported. Relevant code has been removed; any
+  plugin table name must be migrated to the standard table names layout;
+
 
 .. _upgrade-guide-3.1:
 
@@ -212,4 +216,6 @@ Update the database
 The migration for mptt to treebeard is handled by the migrations, so just running them will
 update your database:
 
-* ``python manage.py migrate``
+* Rename the plugin table names, either by applying relevant migrations or renaming the table
+  manually;
+* ``python manage.py migrate``;
