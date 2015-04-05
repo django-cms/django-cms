@@ -142,6 +142,12 @@ class CMSToolbar(ToolbarAPIMixin):
             addons.extend(toolbar.render_addons(context))
         return ''.join(addons)
 
+    def post_template_render_addons(self, context):
+        addons = []
+        for toolbar in self.toolbars.values():
+            addons.extend(toolbar.post_template_render_addons(context))
+        return ''.join(addons)
+
     @property
     def csrf_token(self):
         token = get_token(self.request)

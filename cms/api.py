@@ -33,7 +33,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals, current_user
+from cms.utils.permissions import _thread_locals, current_user, has_page_change_permission
 from menus.menu_pool import menu_pool
 
 
@@ -537,3 +537,18 @@ def copy_plugins_to_language(page, source_language, target_language,
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
+
+
+def can_change_page(request):
+    """
+    Check whether a user has the permission to change the page.
+
+    This will work across all permission-related setting, with a unified interface
+    to permission checking.
+    """
+    # check global permissions if CMS_PERMISSIONS is active
+    global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
+    # check if user has page edit permission
+    page_permission = request.current_page and request.current_page.has_change_permission(request)
+
+    return global_permission or page_permission

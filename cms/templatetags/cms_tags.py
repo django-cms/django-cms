@@ -680,9 +680,10 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
         request.toolbar.post_template_populate()
         with force_language(language):
-            content = render_to_string('cms/toolbar/toolbar.html', context)
+            addons = mark_safe(toolbar.post_template_render_addons(context))
+            toolbar = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
-        return '%s\n%s' % (content, rendered_contents)
+        return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
 
 register.tag(CMSToolbar)
 
