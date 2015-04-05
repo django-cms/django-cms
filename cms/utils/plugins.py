@@ -38,7 +38,7 @@ def requires_reload(action, plugins):
                for p in plugins)
 
 
-def assign_plugins(request, placeholders, template, lang=None, no_fallback=False):
+def assign_plugins(request, placeholders, template, lang=None, is_fallback=False):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -53,14 +53,14 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     plugins = list(qs.order_by('placeholder', 'path'))
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (not no_fallback and
+    if (not is_fallback and
         not (hasattr(request, 'toolbar') and request.toolbar.edit_mode)):
         disjoint_placeholders = (ph for ph in placeholders
                                  if all(ph.pk != p.placeholder_id for p in plugins))
         for placeholder in disjoint_placeholders:
             if get_placeholder_conf("language_fallback", placeholder.slot, template, False):
                 for fallback_language in get_fallback_languages(lang):
-                    assign_plugins(request, (placeholder,), template, fallback_language, no_fallback=True)
+                    assign_plugins(request, (placeholder,), template, fallback_language, is_fallback=True)
                     fallback_plugins = placeholder._plugins_cache
                     if fallback_plugins:
                         plugins += fallback_plugins
@@ -71,7 +71,7 @@ def assign_plugins(request, placeholders, template, lang=None, no_fallback=False
     plugins = downcast_plugins(plugins, placeholders)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
-    groups = dict((ph_id, build_plugin_tree(ph_plugins))
+    groups = dict((ph_id, build_plugin_tree(ph_plugins) if not is_fallback else ph_plugins)
                   for ph_id, ph_plugins
                   in groupby(plugins, attrgetter('placeholder_id')))
     for placeholder in placeholders:
