@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-05 00:12+0100\n"
+"POT-Creation-Date: 2015-04-07 14:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 msgid "Copy permissions"
 msgstr ""
 
-#: admin/forms.py:66 admin/forms.py:162 admin/forms.py:205 cms_toolbar.py:177
+#: admin/forms.py:66 admin/forms.py:162 admin/forms.py:205 cms_toolbar.py:182
 #: models/settingmodels.py:11
 msgid "Language"
 msgstr ""
@@ -162,18 +162,17 @@ msgstr ""
 
 #: admin/forms.py:500 admin/forms.py:507 admin/forms.py:511
 #: templates/admin/cms/usersettings/change_form.html:17
-#: templatetags/cms_tags.py:760
+#: templatetags/cms_tags.py:761
 msgid "Add"
 msgstr ""
 
 #: admin/forms.py:501 admin/forms.py:508 admin/forms.py:512
-#: templates/cms/toolbar/items/live_draft.html:7
-#: templates/cms/toolbar/toolbar.html:36
 msgid "Change"
 msgstr ""
 
 #: admin/forms.py:502 admin/forms.py:509 admin/forms.py:513
 #: templates/admin/cms/extensions/change_form.html:8
+#: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
 #: templates/admin/cms/page/tree/menu_item.html:66
 #: templates/cms/toolbar/dragitem.html:15
@@ -224,7 +223,7 @@ msgstr ""
 msgid "Advanced Settings"
 msgstr ""
 
-#: admin/pageadmin.py:344 cms_toolbar.py:464
+#: admin/pageadmin.py:344 cms_toolbar.py:475
 msgid "Publishing dates"
 msgstr ""
 
@@ -474,173 +473,173 @@ msgstr ""
 msgid "Placeholder"
 msgstr ""
 
-#: cms_plugins.py:30
+#: cms_plugins.py:31
 msgid "Alias"
 msgstr ""
 
-#: cms_plugins.py:54 cms_plugins.py:63
+#: cms_plugins.py:56 cms_plugins.py:65
 msgid "Create Alias"
 msgstr ""
 
-#: cms_toolbar.py:90
+#: cms_toolbar.py:91
 msgid "Structure"
 msgstr ""
 
-#: cms_toolbar.py:91
+#: cms_toolbar.py:92
 msgid "Content"
 msgstr ""
 
-#: cms_toolbar.py:122
+#: cms_toolbar.py:127
 msgid "Sites"
 msgstr ""
 
-#: cms_toolbar.py:123
+#: cms_toolbar.py:128
 msgid "Admin Sites"
 msgstr ""
 
-#: cms_toolbar.py:130
+#: cms_toolbar.py:135
 msgid "Administration"
 msgstr ""
 
-#: cms_toolbar.py:134
+#: cms_toolbar.py:139
 msgid "User settings"
 msgstr ""
 
-#: cms_toolbar.py:138
+#: cms_toolbar.py:143
 msgid "Disable toolbar"
 msgstr ""
 
-#: cms_toolbar.py:152
+#: cms_toolbar.py:157
 msgid "Users"
 msgstr ""
 
-#: cms_toolbar.py:171 tests/toolbar.py:473 tests/toolbar.py:488
-#: tests/toolbar.py:521
+#: cms_toolbar.py:176 tests/toolbar.py:529 tests/toolbar.py:544
+#: tests/toolbar.py:577
 #, python-format
 msgid "Logout %s"
 msgstr ""
 
-#: cms_toolbar.py:171
+#: cms_toolbar.py:176
 msgid "Logout"
 msgstr ""
 
-#: cms_toolbar.py:304
+#: cms_toolbar.py:315
 msgid "Publish changes"
 msgstr ""
 
-#: cms_toolbar.py:306
+#: cms_toolbar.py:317
 msgid "Publish page now"
 msgstr ""
 
-#: cms_toolbar.py:348 cms_toolbar.py:433
+#: cms_toolbar.py:359 cms_toolbar.py:444
 msgid "Page settings"
 msgstr ""
 
-#: cms_toolbar.py:368
+#: cms_toolbar.py:379
 #, python-format
 msgid "Add %(language)s Translation"
 msgstr ""
 
-#: cms_toolbar.py:376
+#: cms_toolbar.py:387
 #, python-format
 msgid "Delete %(language)s Translation"
 msgstr ""
 
-#: cms_toolbar.py:385
+#: cms_toolbar.py:396
 #, python-format
 msgid "Copy all plugins from %s"
 msgstr ""
 
-#: cms_toolbar.py:386
+#: cms_toolbar.py:397
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
 msgstr ""
 
-#: cms_toolbar.py:400
+#: cms_toolbar.py:411
 msgid "Pages"
 msgstr ""
 
-#: cms_toolbar.py:408 templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:419 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr ""
 
-#: cms_toolbar.py:411
+#: cms_toolbar.py:422
 msgid "Add Page"
 msgstr ""
 
-#: cms_toolbar.py:414
+#: cms_toolbar.py:425
 msgid "New Page"
 msgstr ""
 
-#: cms_toolbar.py:415
+#: cms_toolbar.py:426
 msgid "New Sub Page"
 msgstr ""
 
-#: cms_toolbar.py:416
+#: cms_toolbar.py:427
 msgid "Duplicate this Page"
 msgstr ""
 
-#: cms_toolbar.py:428
+#: cms_toolbar.py:439
 msgid "Edit this Page"
 msgstr ""
 
-#: cms_toolbar.py:438
+#: cms_toolbar.py:449
 msgid "Templates"
 msgstr ""
 
-#: cms_toolbar.py:454
+#: cms_toolbar.py:465
 msgid "Advanced settings"
 msgstr ""
 
-#: cms_toolbar.py:460
+#: cms_toolbar.py:471
 msgid "Permissions"
 msgstr ""
 
-#: cms_toolbar.py:470
+#: cms_toolbar.py:481
 msgid "Hide in navigation"
 msgstr ""
 
-#: cms_toolbar.py:470
+#: cms_toolbar.py:481
 msgid "Display in navigation"
 msgstr ""
 
-#: cms_toolbar.py:477
+#: cms_toolbar.py:488
 msgid "Unpublish page"
 msgstr ""
 
-#: cms_toolbar.py:480
+#: cms_toolbar.py:491
 msgid "Publish page"
 msgstr ""
 
-#: cms_toolbar.py:491
+#: cms_toolbar.py:502
 msgid "Delete page"
 msgstr ""
 
-#: cms_toolbar.py:500
+#: cms_toolbar.py:511
 msgid "Save as Page Type"
 msgstr ""
 
-#: cms_toolbar.py:505 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:516 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr ""
 
-#: cms_toolbar.py:523
+#: cms_toolbar.py:534
 msgid "Undo"
 msgstr ""
 
-#: cms_toolbar.py:524
+#: cms_toolbar.py:535
 msgid "Redo"
 msgstr ""
 
-#: cms_toolbar.py:529
+#: cms_toolbar.py:540
 msgid "Are you sure you want to revert to live?"
 msgstr ""
 
-#: cms_toolbar.py:530
+#: cms_toolbar.py:541
 msgid "Revert to live"
 msgstr ""
 
-#: cms_toolbar.py:533
+#: cms_toolbar.py:544
 msgid "View history"
 msgstr ""
 
@@ -862,11 +861,11 @@ msgstr ""
 msgid "pages"
 msgstr ""
 
-#: models/pagemodel.py:843
+#: models/pagemodel.py:863
 msgid "Empty"
 msgstr ""
 
-#: models/pagemodel.py:964
+#: models/pagemodel.py:984
 msgid "default"
 msgstr ""
 
@@ -1051,7 +1050,7 @@ msgstr ""
 msgid "Generic"
 msgstr ""
 
-#: plugin_base.py:284
+#: plugin_base.py:285
 msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
@@ -1068,6 +1067,7 @@ msgstr ""
 
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
+#: templates/admin/cms/page/plugin/submit_line.html:3
 #: templates/admin/cms/page/submit_row.html:4
 #: templates/admin/cms/page/tree/copy_premissions.html:19
 #: templates/admin/cms/usersettings/change_form.html:25
@@ -1115,6 +1115,7 @@ msgid "Loading..."
 msgstr ""
 
 #: templates/admin/cms/page/change_form.html:75
+#: templates/admin/cms/page/plugin/submit_line.html:9
 #: templates/admin/cms/page/submit_row.html:14
 msgid "Save and continue editing"
 msgstr ""
@@ -1201,16 +1202,18 @@ msgstr ""
 msgid "Edit model"
 msgstr ""
 
-#: templates/admin/cms/page/submit_row.html:8
-msgid "Basic Settings"
-msgstr ""
-
+#: templates/admin/cms/page/plugin/submit_line.html:7
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save as new"
 msgstr ""
 
+#: templates/admin/cms/page/plugin/submit_line.html:8
 #: templates/admin/cms/page/submit_row.html:13
 msgid "Save and add another"
+msgstr ""
+
+#: templates/admin/cms/page/submit_row.html:8
+msgid "Basic Settings"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base.html:4
@@ -1435,8 +1438,9 @@ msgstr ""
 msgid "Drop a plugin here"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:751
-#: templatetags/cms_tags.py:754
+#: templates/cms/toolbar/dragitem.html:14
+#: templates/cms/toolbar/items/live_draft.html:9 templatetags/cms_tags.py:752
+#: templatetags/cms_tags.py:755
 msgid "Edit"
 msgstr ""
 
@@ -1448,13 +1452,15 @@ msgstr ""
 msgid "Scroll for more"
 msgstr ""
 
-#: templates/cms/toolbar/items/live_draft.html:4
-#: templates/cms/toolbar/toolbar.html:33
+#: templates/cms/toolbar/items/live_draft.html:5
+msgid "Save and close"
+msgstr ""
+
+#: templates/cms/toolbar/items/live_draft.html:14
 msgid "Live"
 msgstr ""
 
-#: templates/cms/toolbar/items/live_draft.html:5
-#: templates/cms/toolbar/toolbar.html:34
+#: templates/cms/toolbar/items/live_draft.html:14
 msgid "Draft"
 msgstr ""
 
@@ -1470,19 +1476,19 @@ msgstr ""
 msgid "Double-click to edit"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:41
+#: templates/cms/toolbar/toolbar.html:32
 msgid "Toggle toolbar"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:83
+#: templates/cms/toolbar/toolbar.html:74
 msgid "Start"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:118
+#: templates/cms/toolbar/toolbar.html:109
 msgid "This page has no preview!"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar.html:119
+#: templates/cms/toolbar/toolbar.html:110
 msgid "It is being redirected to:"
 msgstr ""
 
@@ -1545,12 +1551,12 @@ msgstr ""
 msgid "<span>%(icon)s</span>"
 msgstr ""
 
-#: templatetags/cms_tags.py:110
+#: templatetags/cms_tags.py:111
 #, python-format
 msgid "Page not found on %(domain)s"
 msgstr ""
 
-#: templatetags/cms_tags.py:111
+#: templatetags/cms_tags.py:112
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `"
@@ -1678,11 +1684,11 @@ msgstr ""
 msgid "MultilingualExample1 App"
 msgstr ""
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:21
+#: test_utils/project/placeholderapp/cms_toolbar.py:25
 msgid "Example1"
 msgstr ""
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:22
+#: test_utils/project/placeholderapp/cms_toolbar.py:26
 msgid "Examples"
 msgstr ""
 
