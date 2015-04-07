@@ -122,7 +122,6 @@ $(document).ready(function () {
 
 			// adds longclick events
 			this.container.bind('mousedown mouseup mousemove', function (e) {
-				if(e.type !== 'mousemove') e.stopPropagation();
 				if(e.type === 'mousedown' && (e.which !== 3 || e.button !== 2)) {
 					// start countdown
 					timer = setTimeout(function () {
@@ -486,7 +485,6 @@ $(document).ready(function () {
 
 				// show loader and make sure scroll doesn't jump
 				CMS.API.Toolbar._loader(true);
-				CMS.API.Helpers.preventScroll(false);
 
 				var el = $(this);
 

@@ -68,7 +68,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 		}
 
 		// anchor hover
-		> a { color:white;
+		> a { color:white !important;
 			background:adjust-hue($color-blue, 15deg);
 			@include background-image($gradient-blue); }
 		> a span { background-position:right -300px !important; }

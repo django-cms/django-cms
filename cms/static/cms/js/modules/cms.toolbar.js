@@ -354,7 +354,9 @@ $(document).ready(function () {
 			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
 			// animate html
-			this.body.addClass('cms-toolbar-expanded').animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed);
+			this.body.animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed, function () {
+			    $(this).addClass('cms-toolbar-expanded')
+			});
 			// set messages top to toolbar height
 			this.messages.css('top', 31);
 			// set new settings

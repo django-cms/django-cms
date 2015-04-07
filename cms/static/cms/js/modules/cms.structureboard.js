@@ -68,7 +68,7 @@ $(document).ready(function () {
 			// add drag & drop functionality
 			this._drag();
 			// prevent click events to detect double click
-			this.preventEvents(this.plugins);
+			// this.preventEvents(this.plugins);
 		},
 
 		_events: function () {
@@ -191,7 +191,6 @@ $(document).ready(function () {
 			// resets
 			this.dragitems.removeClass('cms_draggable-selected');
 			this.plugins.removeClass('cms_plugin-active');
-			this.dragitems.unbind('mousedown.cms.longclick');
 
 			// only reset if no id is provided
 			if(id === false) return false;
@@ -213,12 +212,6 @@ $(document).ready(function () {
 
 				// show single placeholder
 				dragitem.closest('.cms_dragarea').show().css('opacity', 1);
-
-				// attach event to switch to fullmode when dragging
-				this.dragitems.bind('mousedown.cms.longclick', function () {
-					that.show();
-					that.setActive(false);
-				});
 
 			// otherwise hide and reset the board
 			} else {
