@@ -459,7 +459,8 @@ $(document).ready(function () {
 			} else {
 				row = iframe.contents().find('.save-box:eq(0)');
 			}
-			row.hide(); // hide submit-row
+			// hide all submit-rows
+			iframe.contents().find('.submit-row').hide();
 			var buttons = row.find('input, a, button');
 			var render = $('<span />'); // seriously jquery...
 

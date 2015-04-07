@@ -41,3 +41,6 @@ class CMSToolbar(object):
 
     def render_addons(self, context):
         return []
+
+    def post_template_render_addons(self, context):
+        return []
