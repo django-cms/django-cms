@@ -303,6 +303,7 @@ class Placeholder(Tag):
             if nodelist:
                 return nodelist.render(context)
             return ''
+        content = ''
         try:
             content = get_placeholder_content(context, request, page, name, inherit, nodelist)
         except PlaceholderNotFound:
