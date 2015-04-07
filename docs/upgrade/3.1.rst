@@ -176,8 +176,9 @@ Remove deprecations
 * ``cms.context_processor.media`` has been removed in favor of
   ``cms.context_processor.cms_settings``, update your settings accordingly;
 
-* Old-style plugin table names are no longer supported. Relevant code has been removed; any
-  plugin table name must be migrated to the standard table names layout;
+* Old-style plugin table names are no longer supported. For any custom plugin which has not
+  been ported to new-style plugin table names, any plugin table name must be migrated to
+  the standard table names layout;
 
 
 .. _upgrade-guide-3.1:
@@ -213,9 +214,9 @@ Settings update
 Update the database
 ===================
 
-The migration for mptt to treebeard is handled by the migrations, so just running them will
-update your database:
+* Rename the custom plugin table names, either by applying relevant migrations (if any) or
+  renaming the tables manually;
+* The migration for mptt to treebeard is handled by the django CMS migrations, thus apply
+  migrations to update your database::
 
-* Rename the plugin table names, either by applying relevant migrations or renaming the table
-  manually;
-* ``python manage.py migrate``;
+    python manage.py migrate
