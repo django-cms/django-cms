@@ -207,12 +207,11 @@ element of the page (which will otherwise simply use the *Title* field). If
 provided, it will be the *Page title* that appears in the browser's title bar
 and bookmarks, and in search engine results.
 
-*Description meta tag* is expected to be used to populate a `<meta>` tag in the
-document `<head>`. This is not displayed on the page, but is used for example
-by search engines for indexing and to show a summary of page content. It can
-also be used by other Django applications for similar purposes.
-Description is restricted by the number of characters the search engines
-actually use to show content.
+*Description meta tag* is expected to be used to populate a `<meta>` tag in the document `<head>`.
+This is not displayed on the page, but is used for example by search engines for indexing and to
+show a summary of page content. It can also be used by other Django applications for similar
+purposes. Description is restricted to 155 characters, the number of characters search engines
+typcially use to show content.
 
 =================
 Advanced settings

@@ -2,7 +2,8 @@
 Publish a page
 ##############
 
-Your page is a *draft* - only you can see it. To publish it so that ordinary web visitors can see, hit **Publish changes**.
+Your page is a *draft* - only you and other users with permission to edit the page can see it. To
+publish it so that ordinary web visitors can see, hit **Publish changes**.
 
 You'll notice that the toolbar indicates you're now seeing a *Live* view of
 your page. If you want to make further changes:
