@@ -1376,6 +1376,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     force_unicode(obj.get_absolute_url())
                 except:
                     obj = None
+            else:
+                obj = None
         if not obj:
             pk = request.REQUEST.get('pk')
             full_model = request.REQUEST.get('model')
