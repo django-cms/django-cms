@@ -399,7 +399,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertNotRegexpMatches(content_de, "^en body$")
+            self.assertNotRegex(content_de, "^en body$")
             context_de2 = NoPushPopContext()
             request = self.get_request(language="de", page=page_en)
             request.user = self.get_superuser()
@@ -458,7 +458,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## English page should have deutsch text
             content_en = render_placeholder(placeholder_en, context_en)
-            self.assertNotRegexpMatches(content_en, "^de body$")
+            self.assertNotRegex(content_en, "^de body$")
 
             # remove the cached plugins instances
             del(placeholder_en._plugins_cache)
