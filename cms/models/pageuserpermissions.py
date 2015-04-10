@@ -19,7 +19,7 @@ def _get_user_model():
             app_label, model_name = settings.AUTH_USER_MODEL.split('.')
         except ValueError:
             raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
-        user_model = get_model(app_label, model_name, only_installed=False)
+        user_model = get_model(app_label, model_name)
         if user_model is None:
             module = importlib.import_module(app_label)
             user_model = getattr(module, model_name)
