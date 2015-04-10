@@ -11,7 +11,25 @@ def _get_user_model():
     """
     Returns the User model that is active in this project.
     """
-    if DJANGO_VERSION[:2] >= (1, 6):
+    if DJANGO_VERSION[:2] >= (1, 7):
+        from django.apps import apps
+        from django.contrib.auth.models import User
+
+        if settings.AUTH_USER_MODEL == 'auth.User':
+            user_model = User
+        else:
+            # This is sort of a hack
+            # AppConfig is not ready yet, and we blindly check if the user model
+            # application has already been loaded
+            user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)
+            try:
+                user_model = apps.all_models[user_app_name][user_model_name.lower()]
+            except KeyError:
+                raise ImproperlyConfigured(
+                    "You have defined a custom user model %s, but the app %s is not "
+                    "in settings.INSTALLED_APPS" % (settings.AUTH_USER_MODEL, user_app_name)
+                )
+    elif DJANGO_VERSION[:2] == (1, 6):
         import importlib
         from django.db.models import get_model
 
