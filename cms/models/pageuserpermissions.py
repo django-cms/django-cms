@@ -23,28 +23,11 @@ def _get_user_model():
         if user_model is None:
             module = importlib.import_module(app_label)
             user_model = getattr(module, model_name)
-    else:  # Django-1.4, Django-1.5
-        from cms.utils.compat.dj import is_user_swapped, user_model_label
+    else:
         from django.contrib.auth.models import User
 
-        # To avoid circular dependencies, don't use cms.compat.get_user_model, and
-        # don't depend on the app registry, to get the custom user model if used
+        # In Django-1.4 and Django-1.5 AUTH_USER_MODEL can not be overridden
         user_model = User
-        if is_user_swapped:
-            user_app_name, user_model_name = user_model_label.rsplit('.', 1)
-            # This is sort of a hack
-            # AppConfig is not ready yet, and we blindly check if the user model
-            # application has already been loaded
-            from django.apps import apps
-            try:
-                user_model = apps.all_models[user_app_name][user_model_name.lower()]
-            except KeyError:
-                user_model = None
-            if user_model is None:
-                raise ImproperlyConfigured(
-                    "You have defined a custom user model %s, but the app %s is not "
-                    "in settings.INSTALLED_APPS" % (user_model_label, user_app_name)
-                )
     return user_model
 
 
