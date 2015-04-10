@@ -53,7 +53,7 @@ class PageUser(_get_user_model()):
     """
     CMS specific user data, required for permission system
     """
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="created_users")
+    created_by = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), related_name="created_users")
 
     class Meta:
         verbose_name = _('User (page)')
