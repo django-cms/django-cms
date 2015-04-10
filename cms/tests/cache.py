@@ -30,7 +30,7 @@ class CacheTestCase(CMSTestCase):
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
         rctx = RequestContext(request)
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(5):
             template.render(rctx)
         connection.queries = []
         request = self.get_request('/en/')
