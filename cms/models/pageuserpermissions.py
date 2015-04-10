@@ -25,9 +25,11 @@ def _get_user_model():
             user_model = getattr(module, model_name)
     else:  # Django-1.4, Django-1.5
         from cms.utils.compat.dj import is_user_swapped, user_model_label
+        from django.contrib.auth.models import User
 
         # To avoid circular dependencies, don't use cms.compat.get_user_model, and
         # don't depend on the app registry, to get the custom user model if used
+        user_model = User
         if is_user_swapped:
             user_app_name, user_model_name = user_model_label.rsplit('.', 1)
             # This is sort of a hack
