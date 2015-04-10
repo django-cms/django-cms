@@ -180,45 +180,7 @@ position:absolute; left:0; top:5px; z-index:9999999; width:100%;
 .cms_toolbar-loader a { background:#fcfcfc url('../img/loader.gif') no-repeat center center !important;
 	background-size:20px 20px !important; }
 
-// #TOOLBAR/elements/switch#
-.cms_toolbar-item_switch { position:relative; left:0; top:0; margin:4px 0 4px; @include border-radius(20px);
-	border-top:1px solid $color-grey-10; background:darken($color-grey-5, 5%);
-	@include box-shadow(inset $color-grey-10 0px 1px 0px);
-	&:hover, &:active, &:focus { background-color:$color-grey-10; }
-
-	a { float:left;	position:relative; z-index:100; font-size:11px; line-height:11px;
-		text-transform:uppercase; letter-spacing:1px; padding:6px 14px 4px 28px;
-		color:black; @include text-shadow(0 1px 0 white); }
-	.cms_toolbar-item_switch-knob {
-		float:left; position:absolute; left:2px; top:1px; z-index:99; width:16px; height:16px;
-		@include border-radius(16px); @include hide-text();
-
-		border:1px solid black; background:$color-grey-70;
-		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
-		@include background-image($gradient-dark);
-	}
-	.cms_toolbar-item_switch-on { display:none; position:relative; top:-1px; }
-	.cms_toolbar-item_switch-off { display:inline; position:relative; top:-1px; }
-}
-.cms_toolbar-item_switch-active {
-	a {	padding:6px 28px 4px 14px; color:$color-green; }
-	.cms_toolbar-item_switch-knob { left:auto; right:2px;
-		border:1px solid lighten($color-green, 10%); background:lighten($color-green, 10%);
-		@include box-shadow(inset 0 1px 0 lighten($color-green, 30%));
-		@include background-image($gradient-green); }
-	.cms_toolbar-item_switch-on { display:inline; }
-	.cms_toolbar-item_switch-off { display:none; }
-}
-// highlight
-.cms_toolbar-item_switch-highlight {
-	a {	color:$color-blue; }
-	.cms_toolbar-item_switch-knob {
-		border:1px solid darken($color-blue, 10%); background:lighten($color-blue, 10%);
-		@include box-shadow(inset 0 1px 0 lighten($color-blue, 20%));
-		@include background-image($gradient-blue);
-	}
-}
-
+// TODO Reimplement blinking if unpublished content is present
 //##################################################################################################################
 // #TOOLBAR/blocker#
 .cms_screenblock { color:white; text-align:center;

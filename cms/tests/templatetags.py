@@ -3,6 +3,7 @@ import copy
 import os
 from classytags.tests import DummyParser, DummyTokens
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core import mail
@@ -23,18 +24,16 @@ from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
                                        _get_placeholder, RenderPlugin)
 from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
-from cms.test_utils.testcases import SettingsOverrideTestCase, CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
+from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting, get_site_id
-from cms.utils.plugins import get_placeholders
-from cms.utils.compat.dj import get_user_model
+from cms.utils.placeholder import get_placeholders
 from sekizai.context import SekizaiContext
 
 
 class TemplatetagTests(TestCase):
     def test_get_site_id_from_nothing(self):
-        with SettingsOverride(SITE_ID=10):
+        with self.settings(SITE_ID=10):
             self.assertEqual(10, get_site_id(None))
 
     def test_get_site_id_from_int(self):
@@ -49,7 +48,7 @@ class TemplatetagTests(TestCase):
         self.assertEqual(10, get_site_id('10'))
 
     def test_get_site_id_from_str(self):
-        with SettingsOverride(SITE_ID=10):
+        with self.settings(SITE_ID=10):
             self.assertEqual(10, get_site_id("something"))
 
     def test_unicode_placeholder_name_fails_fast(self):
@@ -86,7 +85,7 @@ class TemplatetagTests(TestCase):
         self.assertEqual('"%s"' % today.isoformat()[:-3], json_filter(today))
 
 
-class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
+class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
     def _getfirst(self):
         return Page.objects.public().get(title_set__title='first')
 
@@ -131,7 +130,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         self.assertEqual(page, second)
 
     def test_get_page_by_untyped_arg_dict_fail_debug(self):
-        with SettingsOverride(DEBUG=True):
+        with self.settings(DEBUG=True):
             request = self.get_request('/')
             self.assertRaises(Page.DoesNotExist,
                               _get_page_by_untyped_arg, {'pk': 1003}, request, 1
@@ -139,7 +138,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             self.assertEqual(len(mail.outbox), 0)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_do_email(self):
-        with SettingsOverride(SEND_BROKEN_LINK_EMAILS=True, DEBUG=False,
+        with self.settings(SEND_BROKEN_LINK_EMAILS=True, DEBUG=False,
                               MANAGERS=[("Jenkins", "tests@django-cms.org")]):
             request = self.get_request('/')
             page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
@@ -147,7 +146,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             self.assertEqual(len(mail.outbox), 1)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
-        with SettingsOverride(SEND_BROKEN_LINK_EMAILS=False, DEBUG=False,
+        with self.settings(SEND_BROKEN_LINK_EMAILS=False, DEBUG=False,
                               MANAGERS=[("Jenkins", "tests@django-cms.org")]):
             request = self.get_request('/')
             page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
@@ -165,7 +164,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         """
         User = get_user_model()
 
-        with SettingsOverride(DEBUG=True):
+        with self.settings(DEBUG=True):
             request = HttpRequest()
             request.REQUEST = {}
             request.session = {}
@@ -175,7 +174,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
                               RequestContext(request),
                               'does_not_exist',
                               'myreverseid')
-        with SettingsOverride(DEBUG=False):
+        with self.settings(DEBUG=False):
             content = _show_placeholder_for_page(RequestContext(request),
                                                  'does_not_exist', 'myreverseid')
             self.assertEqual(content['content'], '')
@@ -203,7 +202,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][1]['hide_untranslated'] = False
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2
             res = tpl.render(context)
@@ -221,7 +220,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, SettingsOverrideTestCase):
             self.assertEqual(res, "/de/page-3/")
         lang_settings[1][1]['hide_untranslated'] = True
 
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
             context['request'].current_page = page_2.publisher_public
             res = tpl.render(context)
@@ -265,7 +264,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get('/')
         request.user = self.get_staff_user_with_no_permissions()
         request.current_page = page
-        with SettingsOverride(TEMPLATE_DIRS=[template_dir]):
+        with self.settings(TEMPLATE_DIRS=[template_dir]):
             template = Template(
                 "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
             context = RequestContext(request, {'page': page, 'slot': placeholder.slot})

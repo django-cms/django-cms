@@ -10,7 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils import get_cms_setting
 
 PATH_PREFIX = os.path.join('inner_dir', 'custom_templates')
@@ -76,7 +75,7 @@ class TemplatesConfig(CMSTestCase):
         for template in templates:
             if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                 self.assertTrue(template[0].find('%s/' % SITE_PATH[1]) >= -1)
-        with SettingsOverride(SITE_ID=2):
+        with self.settings(SITE_ID=2):
             templates = get_cms_setting('TEMPLATES')
             for template in templates:
                 if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:

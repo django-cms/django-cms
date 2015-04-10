@@ -111,4 +111,3 @@ def debug_server_restart(**kwargs):
         styles = color_style()
         msg = styles.NOTICE(msg)
         sys.stderr.write(msg)
-

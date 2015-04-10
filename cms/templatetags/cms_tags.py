@@ -2,6 +2,7 @@
 from copy import copy
 from datetime import datetime
 from itertools import chain
+from django.utils.six import string_types
 import re
 from classytags.values import StringValue
 from django.db.models import Model
@@ -220,7 +221,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
     # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
     # there for possible enhancements
     if inherit and not edit_mode:
-        pages = chain([current_page], current_page.get_cached_ancestors(ascending=True))
+        pages = chain([current_page], current_page.get_cached_ancestors())
     for page in pages:
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
@@ -274,8 +275,6 @@ class Placeholder(Tag):
 
     Keyword arguments:
     name -- the name of the placeholder
-    width -- additional width attribute (integer) which gets added to the plugin context
-    (deprecated, use `{% with 320 as width %}{% placeholder "foo"}{% endwith %}`)
     inherit -- optional argument which if given will result in inheriting
         the content of the placeholder with the same name on parent pages
     or -- optional argument which if given will make the template tag a block
@@ -292,36 +291,24 @@ class Placeholder(Tag):
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
         validate_placeholder_name(name)
-        width = None
         inherit = False
         for bit in extra_bits:
             if bit == 'inherit':
                 inherit = True
-            elif bit.isdigit():
-                width = int(bit)
-                import warnings
-
-                warnings.warn(
-                    "The width parameter for the placeholder tag is deprecated.",
-                    DeprecationWarning
-                )
         if not 'request' in context:
             return ''
         request = context['request']
-        if width:
-            context.update({'width': width})
-
         page = request.current_page
         if not page or page == 'dummy':
             if nodelist:
                 return nodelist.render(context)
             return ''
+        content = ''
         try:
             content = get_placeholder_content(context, request, page, name, inherit, nodelist)
         except PlaceholderNotFound:
             if nodelist:
                 return nodelist.render(context)
-            raise
         if not content:
             if nodelist:
                 return nodelist.render(context)
@@ -374,8 +361,34 @@ class RenderPlugin(InclusionTag):
             )
         }
 
-
 register.tag(RenderPlugin)
+
+
+class RenderPluginBlock(InclusionTag):
+    """
+    Acts like the CMS's templatetag 'render_model_block' but with a plugin
+    instead of a model. This is used to link from a block of markup to a
+    plugin's changeform.
+
+    This is useful for UIs that have some plugins hidden from display in
+    preview mode, but the CMS author needs to expose a way to edit them
+    anyway. It is also useful for just making duplicate or alternate means of
+    triggering the change form for a plugin.
+    """
+
+    name = 'render_plugin_block'
+    template = "cms/toolbar/render_plugin_block.html"
+    options = Options(
+        Argument('plugin'),
+        blocks=[('endrender_plugin_block', 'nodelist')],
+    )
+
+    def get_context(self, context, plugin, nodelist):
+        context['inner'] = nodelist.render(context)
+        context['plugin'] = plugin
+        return context
+
+register.tag(RenderPluginBlock)
 
 
 class PluginChildClasses(InclusionTag):
@@ -643,6 +656,7 @@ class CMSToolbar(RenderBlock):
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)
         if toolbar:
+            toolbar.init_toolbar(request)
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
@@ -652,10 +666,9 @@ class CMSToolbar(RenderBlock):
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
-                clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
+                context['addons'] = mark_safe(toolbar.render_addons(context))
         else:
             language = None
-            clipboard = ''
         # render everything below the tag
         rendered_contents = nodelist.render(context)
         # sanity checks
@@ -668,10 +681,10 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
         request.toolbar.post_template_populate()
         with force_language(language):
-            context['clipboard'] = clipboard
-            content = render_to_string('cms/toolbar/toolbar.html', context)
+            addons = mark_safe(toolbar.post_template_render_addons(context))
+            toolbar = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
-        return '%s\n%s' % (content, rendered_contents)
+        return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
 
 register.tag(CMSToolbar)
 
@@ -765,12 +778,12 @@ class CMSEditableObject(InclusionTag):
                 # current instance
                 if not editmode:
                     view_url = 'admin:%s_%s_add' % (
-                        instance._meta.app_label, instance._meta.module_name)
+                        instance._meta.app_label, instance._meta.model_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
                         view_url = 'admin:%s_%s_change' % (
-                            instance._meta.app_label, instance._meta.module_name)
+                            instance._meta.app_label, instance._meta.model_name)
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
@@ -778,7 +791,7 @@ class CMSEditableObject(InclusionTag):
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
-                            instance._meta.app_label, instance._meta.module_name)
+                            instance._meta.app_label, instance._meta.model_name)
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:
@@ -1150,11 +1163,13 @@ class RenderPlaceholder(AsTag):
         width = kwargs.get('width')
         nocache = kwargs.get('nocache', False)
         language = kwargs.get('language')
-
         if not request:
             return ''
         if not placeholder:
             return ''
+
+        if isinstance(placeholder, string_types):
+            placeholder = PlaceholderModel.objects.get(slot=placeholder)
         if not hasattr(request, 'placeholders'):
             request.placeholders = []
         if placeholder.has_change_permission(request):
@@ -1170,6 +1185,20 @@ class RenderPlaceholder(AsTag):
 
 register.tag(RenderPlaceholder)
 
+
+class RenderUncachedPlaceholder(RenderPlaceholder):
+    """
+    Uncached version of RenderPlaceholder
+    This templatetag will neither get the result from cache, nor will update
+    the cache value for the given placeholder
+    """
+    name = 'render_uncached_placeholder'
+
+    def _get_value(self, context, editable=True, **kwargs):
+        kwargs['nocache'] = True
+        return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
+
+register.tag(RenderUncachedPlaceholder)
 
 NULL = object()
 

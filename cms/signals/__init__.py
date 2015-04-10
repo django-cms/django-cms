@@ -92,4 +92,3 @@ if is_installed('reversion'):
     from reversion.models import post_revision_commit
 
     post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')
-

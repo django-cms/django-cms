@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
@@ -14,11 +15,11 @@ from django.utils.translation import ugettext_lazy as _, get_language
 from cms.apphook_pool import apphook_pool
 from cms.constants import PAGE_TYPES_ID
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title, EmptyTitle
-from cms.utils.compat.dj import get_user_model, force_unicode
+from cms.models import (Page, PagePermission, PageUser, ACCESS_PAGE, PageUserGroup, Title,
+                        EmptyTitle, GlobalPagePermission)
 from cms.utils.compat.forms import UserCreationForm
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, get_language_list
+from cms.utils.i18n import get_language_tuple
 from cms.utils.mail import mail_page_user_change
 from cms.utils.page import is_valid_page_slug
 from cms.utils.page_resolver import is_valid_url
@@ -30,7 +31,7 @@ from menus.menu_pool import menu_pool
 
 def get_permission_acessor(obj):
     User = get_user_model()
-    
+
     if isinstance(obj, (PageUser, User,)):
         rel_name = 'user_permissions'
     else:
@@ -113,22 +114,14 @@ class PageForm(forms.ModelForm):
     def clean(self):
         cleaned_data = self.cleaned_data
         slug = cleaned_data.get('slug', '')
-        
+
         page = self.instance
         lang = cleaned_data.get('language', None)
         # No language, can not go further, but validation failed already
         if not lang:
             return cleaned_data
-
-        if 'parent' not in cleaned_data:
-            cleaned_data['parent'] = None
         parent = cleaned_data.get('parent', None)
-
-        try:
-            site = self.cleaned_data.get('site', Site.objects.get_current())
-        except Site.DoesNotExist:
-            raise ValidationError("No site found for current settings.")
-
+        site = self.cleaned_data.get('site', Site.objects.get_current())
         if parent and parent.site != site:
             raise ValidationError("Site doesn't match the parent's page site")
 
@@ -154,7 +147,7 @@ class PageForm(forms.ModelForm):
                     if hasattr(exc, 'messages'):
                         errors = exc.messages
                     else:
-                        errors = [force_unicode(exc.message)]
+                        errors = [force_text(exc.message)]
                     self._errors['slug'] = ErrorList(errors)
         return cleaned_data
 
@@ -163,12 +156,6 @@ class PageForm(forms.ModelForm):
         if not slug:
             raise ValidationError(_("Slug must not be empty."))
         return slug
-
-    def clean_language(self):
-        language = self.cleaned_data['language']
-        if not language in get_language_list():
-            raise ValidationError("Given language does not match language settings.")
-        return language
 
 
 class PublicationDatesForm(forms.ModelForm):
@@ -389,10 +376,10 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
     """
     Page permission inline admin form used in inline admin. Required, because
     user and group queryset must be changed. User can see only users on the same
-    level or under him in choosen page tree, and users which were created by him, 
+    level or under him in choosen page tree, and users which were created by him,
     but aren't assigned to higher page level than current user.
     """
-    page = forms.ModelChoiceField(Page, label=_('user'), widget=HiddenInput(), required=True)
+    page = forms.ModelChoiceField(Page.objects.all(), label=_('user'), widget=HiddenInput(), required=True)
 
     def __init__(self, *args, **kwargs):
         super(PagePermissionInlineAdminForm, self).__init__(*args, **kwargs)
@@ -448,13 +435,12 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
                 continue
             name = field.name
             self.cleaned_data[name] = self.cleaned_data.get(name, False)
-
         can_add = self.cleaned_data['can_add']
         can_edit = self.cleaned_data['can_change']
         # check if access for childrens, or descendants is granted
         if can_add and self.cleaned_data['grant_on'] == ACCESS_PAGE:
             # this is a missconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to 
+            # page but after he does this, he will not have permissions to
             # access this page anymore, so avoid this
             raise forms.ValidationError(_("Add page permission requires also "
                                           "access to children, or descendants, otherwise added page "
@@ -484,6 +470,7 @@ class PagePermissionInlineAdminForm(forms.ModelForm):
         return instance
 
     class Meta:
+        fields = '__all__'
         model = PagePermission
 
 
@@ -492,7 +479,7 @@ class ViewRestrictionInlineAdminForm(PagePermissionInlineAdminForm):
 
     def clean_can_view(self):
         self.cleaned_data["can_view"] = True
-        return self.cleaned_data
+        return True
 
 
 class GlobalPagePermissionAdminForm(forms.ModelForm):
@@ -501,6 +488,10 @@ class GlobalPagePermissionAdminForm(forms.ModelForm):
         if not self.cleaned_data['user'] and not self.cleaned_data['group']:
             raise forms.ValidationError(_('Please select user or group first.'))
         return self.cleaned_data
+
+    class Meta:
+        fields = '__all__'
+        model = GlobalPagePermission
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
@@ -542,6 +533,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
                                          'Send email notification to user about username or password change. Requires user email.'))
 
     class Meta:
+        fields = '__all__'
         model = PageUser
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
@@ -596,7 +588,7 @@ class PageUserForm(UserCreationForm, GenericCmsPermissionForm):
         return cleaned_data
 
     def save(self, commit=True):
-        """Create user, assign him to staff users, and create permissions for 
+        """Create user, assign him to staff users, and create permissions for
         him if required. Also assigns creator to user.
         """
         Super = self._password_change and PageUserForm or UserCreationForm
@@ -634,15 +626,11 @@ class PageUserGroupForm(GenericCmsPermissionForm):
 
     def save(self, commit=True):
         group = super(GenericCmsPermissionForm, self).save(commit=False)
-
         created = not bool(group.pk)
         # assign creator to user
         if created:
             group.created_by = get_current_user()
-
         if commit:
             group.save()
-
         save_permissions(self.cleaned_data, group)
-
         return group

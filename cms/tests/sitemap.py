@@ -3,7 +3,6 @@ from cms.models import Title, Page
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
 from cms.api import create_page, create_title
-from cms.test_utils.util.context_managers import SettingsOverride
 
 
 class SitemapTestCase(CMSTestCase):
@@ -27,7 +26,7 @@ class SitemapTestCase(CMSTestCase):
             'template': 'nav_playground.html',
             'language': 'en',
         }
-        with SettingsOverride(CMS_PERMISSION=False):
+        with self.settings(CMS_PERMISSION=False):
             p1 = create_page('P1', published=True, in_navigation=True, **defaults)
             create_title(language='de', title="other title %s" % p1.get_title('en'), page=p1)
 

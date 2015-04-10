@@ -2,13 +2,13 @@
 from copy import deepcopy
 from django.contrib import admin
 from django.contrib.admin import site
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext as _
 
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
@@ -41,10 +41,10 @@ class PagePermissionInlineAdmin(TabularInline):
             return ['user']
         return []
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise can user see only permissions for 
+        all permissions. Otherwise can user see only permissions for
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to itself)
         """
@@ -77,7 +77,7 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_move_page')
         formset_cls = super(PagePermissionInlineAdmin, self
         ).get_formset(request, obj=None, exclude=exclude, **kwargs)
-        qs = self.queryset(request)
+        qs = self.get_queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)
         formset_cls._queryset = qs
@@ -102,13 +102,13 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         flag, he can't change assign can_publish permissions.
         """
         formset_cls = super(PagePermissionInlineAdmin, self).get_formset(request, obj, **kwargs)
-        qs = self.queryset(request)
+        qs = self.get_queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)
         formset_cls._queryset = qs
         return formset_cls
 
-    def queryset(self, request):
+    def get_queryset(self, request):
         """
         Returns a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.

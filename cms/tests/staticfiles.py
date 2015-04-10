@@ -3,7 +3,6 @@ from __future__ import with_statement
 from django.core import management
 from django.test import TestCase
 
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.context_managers import TemporaryDirectory
 
@@ -14,8 +13,7 @@ class StaticFilesTest(TestCase):
         # CachedStaticFilesStorage requires that the CSS files
         # don't contain any broken links.
         with TemporaryDirectory() as tmpdir:
-            with SettingsOverride(STATIC_ROOT=tmpdir,
+            with self.settings(STATIC_ROOT=tmpdir,
                 STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage'):
                 with StdoutOverride():
                     management.call_command('collectstatic', interactive=False)
-

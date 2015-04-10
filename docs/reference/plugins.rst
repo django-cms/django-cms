@@ -272,9 +272,34 @@ By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
 The default implementation is as follows::
 
     def icon_alt(self, instance):
-        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+        return "%s - %s" % (force_text(self.name), force_text(instance))
 
 See also: `text_enabled`_, `icon_src`_
+
+text_editor_button_icon
+-----------------------
+
+When `text_enabled`_ is ``True``, this plugin can be added in a text editor and
+there might be an icon button for that purpose. This method allows to override
+this icon.
+
+By default, it returns ``None`` and each text editor plugin may have its own
+fallback icon.
+
+:meth:`text_editor_button_icon` takes 2 arguments:
+
+* ``editor_name``: The plugin name of the text editor
+* ``icon_context``: A dictionary containing information about the needed icon
+  like `width`, `height`, `theme`, etc
+
+Usually this method should return the icon url. But, it may depends on the text
+editor because what is needed may differ. Please consult the documentation of
+your text editor plugin.
+
+This requires support from the text plugin; support for this is currently planned
+for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+
+See also: `text_enabled`_
 
 .. _get_extra_placeholder_menu_items:
 
@@ -405,3 +430,43 @@ Example::
     # returns True
 
 See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
+
+add_url
+-------
+
+Returns the url to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_add_plugin`` view is used)
+
+edit_url
+--------
+
+Returns the url to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_edit_plugin`` view is used)
+
+move_url
+--------
+
+Returns the url to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_move_plugin`` view is used)
+
+delete_url
+----------
+
+Returns the url to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_delete_plugin`` view is used)
+
+copy_url
+--------
+
+Returns the url to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view
+
+Default: None (``cms_page_copy_plugins`` view is used)

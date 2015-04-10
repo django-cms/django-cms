@@ -16,7 +16,7 @@ Requirements
 * `Django`_ 1.4.5, 1.5.x, 1.6.x or 1.7.x
 * `South`_ 1.0.1 or higher (Only required up to Django 1.6)
 * `django-classy-tags`_ 0.5 or higher
-* `django-mptt`_ (0.5.2, 0.6.0, 0.6.1)
+* `django-treebeard`_ 3.0
 * `django-sekizai`_ 0.7 or higher
 * `html5lib`_ 0.99 or higher
 * `djangocms-admin-style`_
@@ -30,10 +30,9 @@ Requirements
 .. _Django: https://www.djangoproject.com
 .. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
-.. _django-mptt: https://github.com/django-mptt/django-mptt
+.. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
 .. _html5lib: https://github.com/html5lib/html5lib-python
-.. _django-i18nurls: https://github.com/brocaar/django-i18nurls
 .. _djangocms-admin-style: https://github.com/divio/djangocms-admin-style
 
 Recommended
@@ -45,7 +44,7 @@ minimal additional configuration and are well-proven.
 Text Editors
 ------------
 
-* `Django CMS CKEditor`_ for a WYSIWYG editor 2.1.1 or higher
+* `Django CMS CKEditor`_ for a WYSIWYG editor 2.4.0 or higher
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
@@ -76,7 +75,9 @@ Revision management
 -------------------
 
 * `django-reversion`_ 1.8.X (with Django 1.6.X and Django 1.7.X) to support
-  versioning of your content.
+  versions of your content (If using a different Django version it is a good
+  idea to check the page `Compatible-Django-Versions`_ in the django-reversion
+  wiki in order to make sure that the package versions are compatible.)
 
   .. note::
 
@@ -138,7 +139,7 @@ its dependencies:
     Django>=1.7
 
     South==1.0.2 # Only needed for Django < 1.7
-    django-mptt==0.6.1
+    django-treebeard==3.0
     django-sekizai==0.7
     django-classy-tags==0.5
     djangocms-admin-style==0.2.2
@@ -147,9 +148,9 @@ its dependencies:
 
     # Optional, recommended packages
     Pillow>=2
-    django-filer==0.9.8
+    django-filer==0.9.9
     cmsplugin-filer==0.10.1
-    django-reversion==1.8
+    django-reversion==1.8.5
 
 .. note::
 
@@ -307,7 +308,7 @@ Add the following apps to your :setting:`django:INSTALLED_APPS`. This includes d
 well as its dependencies and other highly recommended applications/libraries::
 
     'cms',  # django CMS itself
-    'mptt',  # utilities for implementing a tree
+    'treebeard',  # utilities for implementing a tree
     'menus',  # helper for model independent hierarchical website navigation
     'south',  # Only needed for Django < 1.7
     'sekizai',  # for javascript and css management
@@ -372,8 +373,6 @@ and add it to :setting:`django:INSTALLED_APPS`:
 
 * ``'reversion'``
 
-.. _django-reversion: https://github.com/etianen/django-reversion
-
 You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_CLASSES`
 at the right position::
 
@@ -383,7 +382,6 @@ at the right position::
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.locale.LocaleMiddleware',
-        'django.middleware.doc.XViewMiddleware',
         'django.middleware.common.CommonMiddleware',
         'cms.middleware.user.CurrentUserMiddleware',
         'cms.middleware.page.CurrentPageMiddleware',
@@ -618,8 +616,6 @@ as the last thing before the closing ``</head>`` HTML tag and the
 HTML tag.
 
 
-.. _django-sekizai: https://github.com/ojii/django-sekizai
-
 Initial database setup
 ======================
 
@@ -690,5 +686,5 @@ For more information on using django CMS for managing web content, see
 To deploy your django CMS project on a production webserver, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
 
-.. _official documentation: http://docs.djangoproject.com/en/dev/topics/templates/
+.. _official documentation: http://docs.djangoproject.com/en/stable/topics/templates/
 .. _tutorial: https://github.com/divio/django-cms-tutorial
