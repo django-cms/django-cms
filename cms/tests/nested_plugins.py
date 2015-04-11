@@ -131,6 +131,105 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         # just in case the test method that called us wants it:
         return copied_placeholder
 
+    def test_plugin_fix_tree(self):
+        """
+        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the position
+        value to Null for all the plugins and then rebuild the tree.
+
+        The structure below isn't arbitrary, but has been designed to test
+        various conditions, including:
+
+        * nodes four levels deep
+        * siblings with and without children
+
+             1
+                 2
+                     4
+                          10
+                     8
+                 3
+                     9
+             5
+                 6
+                 7
+        """
+
+        placeholder = Placeholder(slot=u"some_slot")
+        placeholder.save()  # a good idea, if not strictly necessary
+
+        # plugin in placeholder
+        plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en", body=u"01")
+
+        # IMPORTANT: plugins must be reloaded, before they can be assigned
+        # as a parent. Otherwise, the Tree structure doesn't seem to rebuild
+        # properly.
+
+        # child of plugin_1
+        plugin_1 = self.reload(plugin_1)
+        plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"02", target=plugin_1,
+        )
+
+        # create a second child of plugin_1
+        plugin_1 = self.reload(plugin_1)
+        plugin_3 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"03", target=plugin_1
+        )
+
+        # child of plugin_2
+        plugin_2 = self.reload(plugin_2)
+        plugin_4 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"04", target=plugin_2
+        )
+
+
+        plugin_1 = self.reload(plugin_1)  # nopyflakes
+        # create a second root plugin
+        plugin_5 = add_plugin(placeholder, u"TextPlugin", u"en", body=u"05")
+        left = CMSPlugin.objects.filter(parent__isnull=True).order_by('path')[0]
+        plugin_5 = self.reload(plugin_5)
+        plugin_5 = plugin_5.move(left, pos='right')
+        self.reorder_positions(plugin_5)
+        self.reorder_positions(plugin_2)
+
+        # child of plugin_5
+        plugin_5 = self.reload(plugin_5)
+        plugin_6 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"06", target=plugin_5
+        )
+
+        # child of plugin_6
+        plugin_5 = self.reload(plugin_5)
+        plugin_7 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"07", target=plugin_5
+        )
+
+        # another child of plugin_2
+        plugin_2 = self.reload(plugin_2)
+        plugin_8 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"08", target=plugin_2
+        )
+
+        # child of plugin_3
+        plugin_3 = self.reload(plugin_3)
+        plugin_9 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                              body=u"09", target=plugin_3
+        )
+
+        # child of plugin_4
+        plugin_4 = self.reload(plugin_4)
+        plugin_10 = add_plugin(placeholder, u"TextPlugin", u"en",  # nopyflakes
+                               body=u"10", target=plugin_4
+        )
+
+        original_plugins = (placeholder.get_plugins().order_by('position', 'path'))
+
+        CMSPlugin.objects.update(position=None)
+        CMSPlugin.fix_tree()
+
+        new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
+        self.assertSequenceEqual(original_plugins, new_plugins)
+
     def test_plugin_deep_nesting_and_copying(self):
         """
         Create a deeply-nested plugin structure, tests its properties, and tests
@@ -159,11 +258,11 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                      8
                  3
                      9
-              5
+             5
                  6
                  7
                  13
-              14
+             14
 
         and then we move it all around.
         """
