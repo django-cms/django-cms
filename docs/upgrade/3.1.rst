@@ -153,6 +153,12 @@ Improvements to the toolbar user interface
 
 Some minor changes have been implemented to improve the toolbar user interface.
 
+Placeholder language fallback default to True
+=============================================
+
+``language_fallback`` in :setting:`CMS_PLACEHOLDER_CONF` is ``True`` by default.
+
+
 New templatetags
 ================
 
@@ -220,6 +226,8 @@ Settings update
 * If using Django 1.7 remove ``cms`` and ``menus`` from ``MIGRATION_MODULES`` to support
   the new migration layout.
 * If migrating from Django 1.6 and below to Django 1.7, remove ``south`` from ``installed_apps``.
+* Eventually set ``language_fallback`` to ``False`` in :setting:`CMS_PLACEHOLDER_CONF` if you do
+  not want language fallback behavior for placeholders.
 
 Update the database
 ===================
