@@ -14,7 +14,8 @@ possible.
 .. warning:: Upgrading from previous versions
 
     3.1 introduces some changes that **require** action if you are upgrading
-    from a previous version. PLease read this document with care.
+    from a previous version. Please read :ref:`upgrade-guide-3.1` for a step-by-step guide to the
+    process of upgrading from 3.0 to 3.1.
 
 *****************
 What's new in 3.1
@@ -42,6 +43,15 @@ Other than this, end users should not notice any changes.
 
     We require as much feedback as possible about the performance of django-treebeard in this beta
     release. Please let us know your experiences with it, especially if you encounter any problems.
+
+.. note:: Backward incompatible change
+
+    While most of the low-level interface is very similar between ``django-mptt`` and
+    ``django-treebeard`` they are not exactly the same. If any custom code needs to make use of the
+    low-level interfaces of the page or plugins tree, please see the `django-treebeard
+    documentation <https://django-treebeard.googlecode.com/svn/docs/index.html>`_ for information
+    on how to use equivalent calls in ``django-treebeard``.
+
 
 Action required
 ---------------
@@ -160,3 +170,63 @@ just an image as previously).
 Some user interfaces have some plugins hidden from display in edit/preview mode.
 :ttag:`render_plugin_block` provides a way to expose them for editing, and also more generally
 provides an alternative means of triggering a plugin's change form.
+
+Plugin table naming
+===================
+
+Old-style plugin table names (for example, ``cmsplugin_<plugin name>`` are no longer
+supported. Relevant code has been removed.
+
+Action required
+---------------
+
+Any plugin table name must be migrated to the standard (``<application name>_<table name>`` layout.
+
+``cms.context_processor.media`` replaced by ``cms.context_processor.cms_settings``
+==================================================================================
+
+Action required
+---------------
+
+Replace the ``cms.context_processor.media`` with ``cms.context_processor.cms_settings`` in
+``settings.py``.
+
+
+.. _upgrade-guide-3.1:
+
+*******************************
+Upgrading django CMS 3.0 to 3.1
+*******************************
+
+Preliminary steps
+=================
+
+Before upgrading, please make sure that your current database is consistent and in a healthy state.
+
+To ensure this, run two commands:
+
+* ``python manage.py cms delete_orphaned_plugins``
+* ``python manage.py fix_mptt``
+
+**Make a copy of the database before proceeding further.**
+
+Settings update
+===============
+
+* Change ``cms.context_processor.media`` to ``cms.context_processor.cms_settings`` in
+  ``TEMPLATE_CONTEXT_PROCESSORS``.
+* Add ``treebeard`` to ``INSTALLED_APPS``, and remove ``mptt`` if not required by other
+  applications.
+* If using Django 1.7 remove ``cms`` and ``menus`` from ``MIGRATION_MODULES`` to support
+  the new migration layout.
+* If migrating from Django 1.6 and below to Django 1.7, remove ``south`` from ``installed_apps``.
+
+Update the database
+===================
+
+* Rename the custom plugin table names, either by applying relevant migrations (if any) or
+  renaming the tables manually;
+* The migration for MPTT to ``django-treebeard`` is handled by the django CMS migrations,
+  thus apply migrations to update your database::
+
+    python manage.py migrate
