@@ -18,7 +18,7 @@ $(document).ready(function () {
 	appHooks.setupNamespaces = function() {
 		var opt = $(this).find('option:selected');
 
-		if(apphooks_configuration[opt.val()]){
+		if($(appCfgs).length > 0 && apphooks_configuration[opt.val()]){
 			for(var i=0; i < apphooks_configuration[opt.val()].length; i++) {
 				selectedCfgs = '';
 				if(apphooks_configuration[opt.val()][i][0] == apphooks_configuration_value) {

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-07 14:11+0200\n"
+"POT-Creation-Date: 2015-04-11 01:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,7 +162,7 @@ msgstr ""
 
 #: admin/forms.py:500 admin/forms.py:507 admin/forms.py:511
 #: templates/admin/cms/usersettings/change_form.html:17
-#: templatetags/cms_tags.py:761
+#: templatetags/cms_tags.py:762
 msgid "Add"
 msgstr ""
 
@@ -376,8 +376,8 @@ msgstr ""
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
 
-#: admin/pageadmin.py:1183 admin/placeholderadmin.py:481
-#: admin/placeholderadmin.py:520
+#: admin/pageadmin.py:1183 admin/placeholderadmin.py:484
+#: admin/placeholderadmin.py:523
 msgid "Are you sure?"
 msgstr ""
 
@@ -430,38 +430,42 @@ msgstr ""
 msgid "Parent plugin language must be same as language!"
 msgstr ""
 
-#: admin/placeholderadmin.py:337
+#: admin/placeholderadmin.py:335
+msgid "Plugin not found"
+msgstr ""
+
+#: admin/placeholderadmin.py:340
 msgid "You do not have permission to edit this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:420
+#: admin/placeholderadmin.py:423
 msgid "You have no permission to move this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:458 admin/placeholderadmin.py:469
+#: admin/placeholderadmin.py:461 admin/placeholderadmin.py:472
 msgid "You do not have permission to delete this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:473
+#: admin/placeholderadmin.py:476
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:479 admin/placeholderadmin.py:518
+#: admin/placeholderadmin.py:482 admin/placeholderadmin.py:521
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
+#: admin/placeholderadmin.py:502 admin/placeholderadmin.py:513
 msgid "You do not have permission to clear this placeholder"
 msgstr ""
 
-#: admin/placeholderadmin.py:513
+#: admin/placeholderadmin.py:516
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:523
+#: admin/placeholderadmin.py:526
 msgid "placeholder"
 msgstr ""
 
@@ -1439,8 +1443,8 @@ msgid "Drop a plugin here"
 msgstr ""
 
 #: templates/cms/toolbar/dragitem.html:14
-#: templates/cms/toolbar/items/live_draft.html:9 templatetags/cms_tags.py:752
-#: templatetags/cms_tags.py:755
+#: templates/cms/toolbar/items/live_draft.html:9 templatetags/cms_tags.py:753
+#: templatetags/cms_tags.py:756
 msgid "Edit"
 msgstr ""
 
@@ -1730,27 +1734,27 @@ msgstr ""
 msgid "Add Category"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:16
+#: test_utils/project/sampleapp/menu.py:17
 msgid "sample root page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:17
+#: test_utils/project/sampleapp/menu.py:18
 msgid "sample settings page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:18
+#: test_utils/project/sampleapp/menu.py:19
 msgid "sample account page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:19
+#: test_utils/project/sampleapp/menu.py:20
 msgid "sample my profile page"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:31
+#: test_utils/project/sampleapp/menu.py:33
 msgid "Static Menu"
 msgstr ""
 
-#: test_utils/project/sampleapp/menu.py:47
+#: test_utils/project/sampleapp/menu.py:51
 msgid "Static Menu2"
 msgstr ""
 

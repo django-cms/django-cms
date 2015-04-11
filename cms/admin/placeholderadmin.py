@@ -7,7 +7,7 @@ from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
-from django.http import (HttpResponse, HttpResponseBadRequest,
+from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseNotFound,
                          HttpResponseForbidden, HttpResponseRedirect)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -329,7 +329,10 @@ class PlaceholderAdminMixin(object):
 
     @xframe_options_sameorigin
     def edit_plugin(self, request, plugin_id):
-        plugin_id = int(plugin_id)
+        try:
+            plugin_id = int(plugin_id)
+        except ValueError:
+            return HttpResponseNotFound(force_text(_("Plugin not found")))
         cms_plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
 
         instance, plugin_admin = cms_plugin.get_plugin_instance(self.admin_site)
