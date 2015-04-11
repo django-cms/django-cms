@@ -546,7 +546,7 @@ def can_change_page(request):
     This will work across all permission-related setting, with a unified interface
     to permission checking.
     """
-    # check global permissions if CMS_PERMISSIONS is active
+    # check global permissions if CMS_PERMISSION is active
     global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
     # check if user has page edit permission
     page_permission = request.current_page and request.current_page.has_change_permission(request)
