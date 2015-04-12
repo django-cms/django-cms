@@ -264,15 +264,16 @@ class AdvancedSettingsForm(forms.ModelForm):
             )
             self.fields['application_urls'].choices = [('', "---------")] + apphook_pool.get_apphooks()
 
+            page_data = self.data if self.data else self.initial
             if app_configs:
                 self.fields['application_configs'].widget = ApplicationConfigSelect(
                     attrs={'id': 'application_configs'},
                     app_configs=app_configs)
 
-                if self.data.get('application_urls', False) and self.data['application_urls'] in app_configs:
-                    self.fields['application_configs'].choices = [(config.pk, force_text(config)) for config in app_configs[self.data['application_urls']].get_configs()]
+                if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
+                    self.fields['application_configs'].choices = [(config.pk, force_text(config)) for config in app_configs[page_data['application_urls']].get_configs()]
 
-                    apphook = self.data.get('application_urls', False)
+                    apphook = page_data.get('application_urls', False)
                     try:
                         config = apphook_pool.get_apphook(apphook).get_configs().get(namespace=self.initial['application_namespace'])
                         self.fields['application_configs'].initial = config.pk
@@ -283,7 +284,7 @@ class AdvancedSettingsForm(forms.ModelForm):
                         pass
                 else:
                     # If app_config apphook is not selected, drop any value
-                    # for application_configs do avoid the field dato for
+                    # for application_configs to avoid the field data from
                     # being validated by the field itself
                     try:
                         del self.data['application_configs']
