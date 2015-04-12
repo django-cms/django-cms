@@ -35,7 +35,7 @@ To support the current arrangement you need to add the following to your
 Extended Custom User Support
 ============================
 
-If you are using custom user models and use ``CMS_PERMISSIONS = True`` then be
+If you are using custom user models and use ``CMS_PERMISSION = True`` then be
 sure to check that ``PageUserAdmin`` and ``PageUserGroup`` is still in working
 order.
 

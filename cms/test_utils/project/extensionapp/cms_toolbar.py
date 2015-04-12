@@ -21,7 +21,7 @@ class MyTitleExtensionToolbar(CMSToolbar):
             # Nothing to do
             return
 
-        # check global permissions if CMS_PERMISSIONS is active
+        # check global permissions if CMS_PERMISSION is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
         else:
@@ -59,7 +59,7 @@ class MyPageExtensionToolbar(CMSToolbar):
             # Nothing to do
             return
 
-        # check global permissions if CMS_PERMISSIONS is active
+        # check global permissions if CMS_PERMISSION is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
         else:
