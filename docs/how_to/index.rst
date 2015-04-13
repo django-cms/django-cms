@@ -8,7 +8,7 @@ the same territory as the :doc:`/introduction/index`, but in more detail.
 .. toctree::
     :maxdepth: 2
 
-    integrate
+    install
     custom_plugins
     menus
     apphooks

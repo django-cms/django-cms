@@ -17,13 +17,14 @@ Once you're familiar with the basics presented in these tutorials, you'll find
 the more in-depth coverage of the same topics in the :doc:`How-to
 </how_to/index>` section.
 
-The tutorials follow a logical progession and build on each other, so it's
-recommended to work through them in the order presented here.
+The tutorials follow a logical progession, starting from installation of django CMS and the
+creation of a brand new project, and build on each other, so it's recommended to work through them
+in the order presented here.
 
 .. toctree::
     :maxdepth: 1
 
-    install_from_scratch
+    install
     templates_placeholders
     plugins
     apphooks
@@ -31,8 +32,9 @@ recommended to work through them in the order presented here.
     toolbar
     menu
 
-If you prefer, rather than installing django CMS from scratch, you can
-:doc:`/how_to/integrate` and then follow the rest of the tutorials.
+If you want to install django CMS into an existing project, or prefer to configure django CMS by
+hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the
+rest of the tutorials.
 
 Either way, you'll be able to find support and help from the numerous friendly
 members of the django CMS community, either on our `mailinglist`_ or IRC
