@@ -561,7 +561,8 @@ $(document).ready(function () {
 				});
 
 				// show scrollHint for FF on OSX
-				if(nav[0].scrollHeight > 230) scrollHint.show();
+				window.console.log(nav[0], nav[0].scrollHeight);
+				if(nav[0].scrollHeight > 245) scrollHint.show();
 
 			}, 100);
 
