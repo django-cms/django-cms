@@ -14,6 +14,7 @@ Reference for content editors
     :maxdepth: 2
 
     page_admin
+    frontend
 
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import sys
-from django.contrib.auth.models import Permission
 
+from django.contrib.admin.models import CHANGE
+from django.contrib.admin.models import LogEntry
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import clear_url_caches, reverse
 from django.utils import six
 from django.utils.timezone import now
@@ -12,7 +15,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.cms_toolbar import PlaceholderToolbar
-from cms.models import Title
+from cms.models import Title, Page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase, SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import SettingsOverride
@@ -21,6 +24,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
+from cms.utils.urlutils import admin_reverse
 from menus.utils import DefaultLanguageChanger
 
 
@@ -70,6 +74,19 @@ class ApphooksTestCase(CMSTestCase):
         for module in url_modules:
             if module in sys.modules:
                 del sys.modules[module]
+
+    def _fake_logentry(self, instance_id, user, text, model=Page):
+        LogEntry.objects.log_action(
+            user_id=user.id,
+            content_type_id=ContentType.objects.get_for_model(model).pk,
+            object_id=instance_id,
+            object_repr=text,
+            action_flag=CHANGE,
+        )
+        entry = LogEntry.objects.filter(user=user, action_flag__in=(CHANGE,))[0]
+        session = self.client.session
+        session['cms_log_latest'] = entry.pk
+        session.save()
 
     def create_base_structure(self, apphook, title_langs, namespace=None):
         apphook_pool.clear()
@@ -570,7 +587,7 @@ class ApphooksTestCase(CMSTestCase):
             self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbar.Example1Toolbar'].is_current_app)
 
     def test_toolbar_staff(self):
-        # Test that the toolbar contains edito mode switcher if placeholders are available
+        # Test that the toolbar contains edit mode switcher if placeholders are available
         apphooks = (
             'cms.test_utils.project.placeholderapp.cms_app.Example1App',
         )
@@ -593,7 +610,7 @@ class ApphooksTestCase(CMSTestCase):
             self.user = self._create_user('staff', True, False)
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            response.context['request'].user = self.user
+            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
             toolbar = CMSToolbar(response.context['request'])
             toolbar.populate()
             placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
@@ -605,7 +622,7 @@ class ApphooksTestCase(CMSTestCase):
             self.user.user_permissions.add(Permission.objects.get(codename='change_example1'))
             with self.login_user_context(self.user):
                 response = self.client.get(path+"?edit")
-            response.context['request'].user = self.user
+            response.context['request'].user = get_user_model().objects.get(pk=self.user.pk)
             toolbar = CMSToolbar(response.context['request'])
             toolbar.populate()
             placeholder_toolbar = PlaceholderToolbar(response.context['request'], toolbar, True, path)
@@ -615,6 +632,21 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEqual(len(placeholder_toolbar.toolbar.get_right_items()), 1)
 
             self.user = None
+
+    def test_page_edit_redirect_models(self):
+        apphooks = (
+            'cms.test_utils.project.placeholderapp.cms_app.Example1App',
+        )
+        ex1 = Example1.objects.create(char_1="char_1", char_2="char_2",
+                                      char_3="char_3", char_4="char_4")
+        with SettingsOverride(CMS_APPHOOKS=apphooks, ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
+            self.create_base_structure('Example1App', 'en')
+            url = admin_reverse('cms_page_resolve')
+            self.user = self._create_user('admin_staff', True, True)
+            with self.login_user_context(self.user):
+                # parameters - non page object
+                response = self.client.post(url, {'pk': ex1.pk, 'model': 'placeholderapp.example1'})
+                self.assertEqual(response.content.decode('utf-8'), ex1.get_absolute_url())
 
 
 class ApphooksPageLanguageUrlTestCase(SettingsOverrideTestCase):
