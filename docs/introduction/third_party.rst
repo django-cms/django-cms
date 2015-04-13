@@ -17,6 +17,7 @@ to you to check them::
 
     'aldryn_blog',
     'aldryn_common',
+    'aldryn_boilerplates',
     'django_select2',
     'djangocms_text_ckeditor',
     'easy_thumbnails',
@@ -41,6 +42,34 @@ Configure the image thumbnail processors in ``settings.py``::
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
+
+Configure the templates that will be used by Aldryn Blog (if you configured Django CMS to use bootstrap templates, choose `bootstrap3` instead)::
+
+    ALDRYN_BOILERPLATE_NAME='legacy'
+
+Add boilerplates finder to ``STATICFILES_FINDERS``::
+
+    STATICFILES_FINDERS = [
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        # important! place right before django.contrib.staticfiles.finders.AppDirectoriesFinder
+        'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    ]
+
+Add bolierplates loader to ``TEMPLATE_CONTEXT_PROCESSORS``::
+
+    TEMPLATE_CONTEXT_PROCESSORS = [
+        ....
+        'aldryn_boilerplates.context_processors.boilerplate',
+    ]
+
+Add boilerplates context processor to ``TEMPLATE_CONTEXT_PROCESSORS``::
+
+    TEMPLATE_CONTEXT_PROCESSORS = [
+        ...
+        'aldryn_boilerplates.context_processors.boilerplate',
+    ]
+
 
 Since we added a new app, we need to update our database::
 
