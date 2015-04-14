@@ -188,13 +188,13 @@ Action required
 
 Any plugin table name must be migrated to the standard (``<application name>_<table name>`` layout.
 
-``cms.context_processor.media`` replaced by ``cms.context_processor.cms_settings``
-==================================================================================
+``cms.context_processors.media`` replaced by ``cms.context_processors.cms_settings``
+====================================================================================
 
 Action required
 ---------------
 
-Replace the ``cms.context_processor.media`` with ``cms.context_processor.cms_settings`` in
+Replace the ``cms.context_processors.media`` with ``cms.context_processors.cms_settings`` in
 ``settings.py``.
 
 
@@ -219,7 +219,7 @@ To ensure this, run two commands:
 Settings update
 ===============
 
-* Change ``cms.context_processor.media`` to ``cms.context_processor.cms_settings`` in
+* Change ``cms.context_processors.media`` to ``cms.context_processors.cms_settings`` in
   ``TEMPLATE_CONTEXT_PROCESSORS``.
 * Add ``treebeard`` to ``INSTALLED_APPS``, and remove ``mptt`` if not required by other
   applications.
