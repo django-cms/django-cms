@@ -231,11 +231,10 @@ def _cache_page(response):
         return response
     request = response._request
     save_cache = True
-    if hasattr(request, 'placeholders'):
-        for placeholder in request.placeholders:
-            if not placeholder.cache_placeholder:
-                save_cache = False
-                break
+    for placeholder in getattr(request, 'placeholders', []):
+        if not placeholder.cache_placeholder:
+            save_cache = False
+            break
     if hasattr(request, 'toolbar'):
         if request.toolbar.edit_mode or request.toolbar.show_toolbar:
             save_cache = False
