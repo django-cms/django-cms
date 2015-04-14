@@ -23,7 +23,39 @@ class BaseExtension(models.Model):
         """
         pass
 
+    def copy(self, target, language):
+        """
+        This method copies this extension to an unrelated-target. If you intend
+        to "publish" this extension to the publisher counterpart of target, then
+        use copy_to_publish() instead.
+        """
+        clone = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
+        clone.pk = None
+        clone.public_extension = None
+        clone.extended_object = target  # set the new public object
+        clone.save(mark_page=False)
+
+        # If the target we're copying already has a publisher counterpart, then
+        # connect the dots.
+        target_prime = getattr(target, 'publisher_public')
+        if target_prime:
+            related_name = self.__class__.__name__.lower()
+            clone_prime = getattr(target_prime, related_name)
+            if clone_prime:
+                clone.public_extension = clone_prime
+            else:
+                clone.public_extension = None
+
+        clone.copy_relations(self, language)
+        clone.save(force_update=True, mark_page=False)
+        return clone
+
     def copy_to_public(self, public_object, language):
+        """
+        This method is used to "publish" this extension as part of the a larger
+        operation on the target. If you intend to copy this extension to an
+        unrelated object, use copy() instead.
+        """
         this = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
         public_extension = self.public_extension  # get the public version of this instance if any
 
