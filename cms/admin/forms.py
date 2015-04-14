@@ -294,10 +294,9 @@ class AdvancedSettingsForm(forms.ModelForm):
         if 'redirect' in self.fields:
             self.fields['redirect'].widget.language = self.fields['language'].initial
 
-    def _check_unique_namespace_instance(self, apphook, namespace):
+    def _check_unique_namespace_instance(self, namespace):
         return Page.objects.filter(
             publisher_is_draft=True,
-            application_urls=apphook,
             application_namespace=namespace
         ).exclude(pk=self.instance.pk).exists()
 
@@ -323,7 +322,7 @@ class AdvancedSettingsForm(forms.ModelForm):
                 # the 'usual' namespace field to be backward compatible
                 # with existing apphooks
                 config = apphook_pool.get_apphook(apphook).get_configs().get(pk=int(application_config))
-                if self._check_unique_namespace_instance(apphook, config.namespace):
+                if self._check_unique_namespace_instance(config.namespace):
                     # Looks like there's already one with the default instance
                     # namespace defined.
                     self._errors['application_configs'] = ErrorList([
@@ -332,24 +331,30 @@ class AdvancedSettingsForm(forms.ModelForm):
                 else:
                     self.cleaned_data['application_namespace'] = config.namespace
             else:
-                # The attribute on the apps 'app_name' is a misnomer, it should be
-                # 'application_namespace'.
-                application_namespace = apphook_pool.get_apphook(apphook).app_name
-                if application_namespace and not instance_namespace:
-                    if self._check_unique_namespace_instance(apphook, application_namespace):
-                        # Looks like there's already one with the default instance
-                        # namespace defined.
-                        self._errors['application_urls'] = ErrorList([
+                if instance_namespace:
+                    if self._check_unique_namespace_instance(instance_namespace):
+                        self._errors['application_namespace'] = ErrorList([
                             _('An application instance with this name already exists.')
                         ])
-                    else:
-                        # OK, there are zero instances of THIS app that use the
-                        # default instance namespace, so, since the user didn't
-                        # provide one, we'll use the default. NOTE: The following
-                        # line is really setting the "instance namespace" of the
-                        # new app to the app’s "application namespace", which is
-                        # the default instance namespace.
-                        self.cleaned_data['application_namespace'] = application_namespace
+                else:
+                    # The attribute on the apps 'app_name' is a misnomer, it should be
+                    # 'application_namespace'.
+                    application_namespace = apphook_pool.get_apphook(apphook).app_name
+                    if application_namespace and not instance_namespace:
+                        if self._check_unique_namespace_instance(application_namespace):
+                            # Looks like there's already one with the default instance
+                            # namespace defined.
+                            self._errors['application_namespace'] = ErrorList([
+                                _('An application instance with this name already exists.')
+                            ])
+                        else:
+                            # OK, there are zero instances of THIS app that use the
+                            # default instance namespace, so, since the user didn't
+                            # provide one, we'll use the default. NOTE: The following
+                            # line is really setting the "instance namespace" of the
+                            # new app to the app’s "application namespace", which is
+                            # the default instance namespace.
+                            self.cleaned_data['application_namespace'] = application_namespace
 
         if instance_namespace and not apphook:
             self.cleaned_data['application_namespace'] = None
@@ -359,16 +364,9 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         return self.cleaned_data
 
-    def clean_application_namespace(self):
-        namespace = self.cleaned_data['application_namespace']
-        if namespace and not self.cleaned_data.get('application_configs', False):
-            if Page.objects.filter(publisher_is_draft=True, application_namespace=namespace).exclude(pk=self.instance.pk).exists():
-                raise ValidationError(_('A instance name with this name already exists.'))
-        return namespace
-
     def clean_xframe_options(self):
         if 'xframe_options' not in self.fields:
-            return # nothing to do, field isn't present
+            return  # nothing to do, field isn't present
 
         xframe_options = self.cleaned_data['xframe_options']
         if xframe_options == '':
