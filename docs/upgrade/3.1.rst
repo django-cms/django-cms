@@ -188,7 +188,7 @@ Action required
 
 Any plugin table name must be migrated to the standard (``<application name>_<table name>`` layout.
 
-``cms.context_processor.media`` replaced by ``cms.context_processor.cms_settings``
+``cms.context_processors.media`` replaced by ``cms.context_processors.cms_settings``
 ==================================================================================
 
 Action required
