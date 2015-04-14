@@ -492,14 +492,16 @@ setting should look like::
     }
 
 
-Given django CMS's support for Django 1.6.x, Django 1.7 (or later) users have to
-specify where the migrations are situated using the ``MIGRATION_MODULES``
+django CMS, as well as its plugins, supports both Django 1.7 and Django 1.6 migrations.
+
+Since version 3.1 migrations are stored in modules compatibiles with Django 1.7 **and**
+South 1.0.2 without further configuration.
+
+django CMS are being ported to the same structure; in the meantime, on Django 1.7
+you may need to where the migrations are situated using the ``MIGRATION_MODULES``
 setting::
 
     MIGRATION_MODULES = {
-        'cms': 'cms.migrations_django',
-        'menus': 'menus.migrations_django',
-
         # Add also the following modules if you're using these plugins:
         'djangocms_file': 'djangocms_file.migrations_django',
         'djangocms_flash': 'djangocms_flash.migrations_django',
@@ -512,6 +514,8 @@ setting::
         'djangocms_video': 'djangocms_video.migrations_django',
         'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
     }
+
+Please check each plugin configuration option to see how to configure Django 1.7 support.
 
 URL configuration
 =================
