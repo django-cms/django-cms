@@ -6,6 +6,7 @@ from cms.utils.i18n import get_fallback_languages
 from django.conf import settings
 from django.test.utils import override_settings
 from django.utils.importlib import import_module
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
 @override_settings(
@@ -360,13 +361,13 @@ class TestLanguageFallbacks(CMSTestCase):
 
         #   ugly and long set of session
         session = self.client.session
-        session['django_language'] = 'fr'
+        session[LANGUAGE_SESSION_KEY] = 'fr'
         session.save()
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
         self.client.get('/en/')
-        self.assertEqual(self.client.session['django_language'], 'en')
+        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'en')
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')
