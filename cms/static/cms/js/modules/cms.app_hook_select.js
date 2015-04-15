@@ -19,6 +19,7 @@ $(document).ready(function () {
 		var opt = $(this).find('option:selected');
 
 		if($(appCfgs).length > 0 && apphooks_configuration[opt.val()]){
+			appCfgs.html('');
 			for(var i=0; i < apphooks_configuration[opt.val()].length; i++) {
 				selectedCfgs = '';
 				if(apphooks_configuration[opt.val()][i][0] == apphooks_configuration_value) {
