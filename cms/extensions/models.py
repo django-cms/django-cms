@@ -116,6 +116,3 @@ class TitleExtension(BaseExtension):
             Title.objects.filter(pk=self.extended_object.pk).update(
                 publisher_state=PUBLISHER_STATE_DIRTY) # mark title dirty
         return super(BaseExtension, self).delete(*args, **kwargs)
-
-
-

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
-from cms.utils.compat.dj import get_user_model
 
 from .models import EmailUser
 
@@ -43,7 +43,7 @@ class UserCreationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
 
         User = get_user_model()
-        
+
         try:
             User._default_manager.get(email=email)
         except User.DoesNotExist:
@@ -109,4 +109,3 @@ class UserChangeForm(forms.ModelForm):
         field does not have access to the inital value.
         """
         return self.initial["password"]
-

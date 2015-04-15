@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth import get_user_model
+
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_user_model
 
 
 PERMISSION_KEYS = [

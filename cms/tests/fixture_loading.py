@@ -10,11 +10,11 @@ except:
 from django.core.management import call_command
 
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
-from cms.test_utils.testcases import SettingsOverrideTestCase
+from cms.test_utils.testcases import CMSTestCase
 from cms.models import Page, Placeholder, CMSPlugin
 
 
-class FixtureTestCase(NavextendersFixture, SettingsOverrideTestCase):
+class FixtureTestCase(NavextendersFixture, CMSTestCase):
 
     def test_fixture_load(self):
         """

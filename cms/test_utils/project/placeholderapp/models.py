@@ -1,9 +1,11 @@
-from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import reverse
-from cms.utils import get_language_from_request
-from cms.utils.compat.dj import python_2_unicode_compatible
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
 from cms.models.fields import PlaceholderField
+from cms.utils import get_language_from_request
+from cms.utils.urlutils import admin_reverse
+
 from hvad.models import TranslatableModel, TranslatedFields
 
 
@@ -38,6 +40,12 @@ class Example1(models.Model):
 
     def get_absolute_url(self):
         return reverse("example_detail", args=(self.pk,))
+
+    def get_draft_url(self):
+        return self.get_absolute_url()
+
+    def get_public_url(self):
+        return '/public/view/'
 
     def set_static_url(self, request):
         language = get_language_from_request(request)

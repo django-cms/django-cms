@@ -2,21 +2,21 @@
 from __future__ import with_statement
 import copy
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.http import Http404, HttpResponseRedirect
+from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page, add_plugin
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.menu import CMSMenu
 from cms.models import Title, EmptyTitle
-from cms.test_utils.testcases import (SettingsOverrideTestCase,
+from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_languages
 
 
@@ -25,46 +25,49 @@ TEMPLATE_NAME = 'tests/rendering/base.html'
 def get_primary_lanaguage(current_site=None):
     """Fetch the first language of the current site settings."""
     current_site = current_site or Site.objects.get_current()
-    return get_languages()[current_site.id][0]['code']    
-    
+    return get_languages()[current_site.id][0]['code']
+
 def get_secondary_lanaguage(current_site=None):
     """Fetch the other language of the current site settings."""
     current_site = current_site or Site.objects.get_current()
-    return get_languages()[current_site.id][1]['code']    
+    return get_languages()[current_site.id][1]['code']
 
-class MultilingualTestCase(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_TEMPLATES': [(TEMPLATE_NAME, TEMPLATE_NAME), ('extra_context.html', 'extra_context.html'),
-                          ('nav_playground.html', 'nav_playground.html')],
-    }
 
+@override_settings(
+    CMS_TEMPLATES=[
+        (TEMPLATE_NAME, TEMPLATE_NAME),
+        ('extra_context.html', 'extra_context.html'),
+        ('nav_playground.html', 'nav_playground.html'),
+    ],
+)
+class MultilingualTestCase(CMSTestCase):
 
     def test_create_page(self):
         """
         Test that a page can be created
         and that a new language can be created afterwards in the admin pages
         """
-        
+
         # Create a new page
-        
+
         # Use the very first language in the list of languages
         # for the current site
         current_site = Site.objects.get_current()
         TESTLANG = get_primary_lanaguage(current_site=current_site)
         page_data = self.get_new_page_data_dbfields(
-            site=current_site, 
+            site=current_site,
             language=TESTLANG
         )
 
         page = create_page(**page_data)
         title = page.get_title_obj()
-        
+
         # A title is set?
         self.assertNotEqual(title, None)
-        
+
         # Publish and unpublish the page
         page.publish(TESTLANG)
-        
+
         page.unpublish(TESTLANG)
         page = page.reload()
 
@@ -72,19 +75,19 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(), page_data['slug'])
         self.assertEqual(page.placeholders.all().count(), 2)
-        
+
         # Were public instances created?
         title = Title.objects.drafts().get(slug=page_data['slug'])
-    
+
         # Test that it's the default language
         self.assertEqual(title.language, TESTLANG)
-            
+
         # Do stuff using admin pages
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            
+
             page_data = self.get_pagedata_from_dbfields(page_data)
-            
+
             # Publish page using the admin
             page_data['published'] = True
             self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG),
@@ -92,7 +95,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
             page = page.reload()
             self.assertTrue(page.is_published(TESTLANG))
-            
+
             # Create a different language using the edit admin page
             # This test case is bound in actual experience...
             # pull#1604
@@ -101,28 +104,28 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             page_data2['slug'] = 'ein-slug'
             TESTLANG2 = get_secondary_lanaguage(current_site=current_site)
             page_data2['language'] = TESTLANG2
-            
+
             # Ensure that the language version is not returned
             # since it does not exist
             self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyTitle))
-            
+
             # Now create it
             self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2),
                              page_data2)
-            
+
             page = page.reload()
-            
+
             # Test the new language version
             self.assertEqual(page.get_title(language=TESTLANG2), page_data2['title'])
             self.assertEqual(page.get_slug(language=TESTLANG2), page_data2['slug'])
-            
+
             # Test the default language version (TESTLANG)
             self.assertEqual(page.get_slug(language=TESTLANG, fallback=False), page_data['slug'])
             self.assertEqual(page.get_title(language=TESTLANG, fallback=False), page_data['title'])
             self.assertEqual(page.get_slug(fallback=False), page_data['slug'])
             self.assertEqual(page.get_title(fallback=False), page_data['title'])
-    
-    
+
+
     def test_multilingual_page(self):
         TESTLANG = get_primary_lanaguage()
         TESTLANG2 = get_secondary_lanaguage()
@@ -160,14 +163,14 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         request_2 = self.get_request('/%s/' % TESTLANG2, TESTLANG2)
 
         lang_settings[1][1]['hide_untranslated'] = False
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             list_1 = [node.id for node in menu.get_nodes(request_1)]
             list_2 = [node.id for node in menu.get_nodes(request_2)]
             self.assertEqual(list_1, list_2)
             self.assertEqual(len(list_1), 2)
 
         lang_settings[1][1]['hide_untranslated'] = True
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             list_1 = [node.id for node in menu.get_nodes(request_1)]
             list_2 = [node.id for node in menu.get_nodes(request_2)]
             self.assertNotEqual(list_1, list_2)
@@ -177,7 +180,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
     def test_frontend_lang(self):
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['public'] = False
-        with SettingsOverride(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="en"):
+        with self.settings(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="en"):
             page = create_page("page1", "nav_playground.html", "en")
             create_title("de", page.get_title(), page, slug=page.get_slug())
             page2 = create_page("page2", "nav_playground.html", "en")
@@ -219,7 +222,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         page.publish('en')
         page.publish('de')
 
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1:[
                     {'code':'x-klingon', 'name':'Klingon','public':True, 'fallbacks':[]},
@@ -258,7 +261,7 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         to English
         '''
         page = create_page("page1", "nav_playground.html", "en")
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1:[
                     {'code':'x-klingon', 'name':'Klingon', 'public':True, 'fallbacks':[]},
@@ -310,18 +313,18 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['fallbacks'] = []
         lang_settings[1][1]['fallbacks'] = []
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
             self.assertEqual(response.status_code, 404)
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['redirect_on_fallback'] = False
         lang_settings[1][1]['redirect_on_fallback'] = False
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
             self.assertEqual(response.status_code, 302)
 
     def test_no_english_defined(self):
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[],
+        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1:[
                     {'code': 'de', 'name': 'German', 'public':True, 'fallbacks': []},
@@ -345,4 +348,3 @@ class MultilingualTestCase(SettingsOverrideTestCase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             self.assertEqual(response.status_code, 200)
-

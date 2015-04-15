@@ -3,6 +3,7 @@
 from itertools import chain
 
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.forms.widgets import Select, MultiWidget, TextInput
@@ -13,7 +14,6 @@ from django.utils.translation import ugettext as _
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
-from cms.utils.compat.dj import force_unicode
 
 
 class PageSelectWidget(MultiWidget):
@@ -39,11 +39,11 @@ class PageSelectWidget(MultiWidget):
             return [site.pk, page.pk, page.pk]
         site = Site.objects.get_current()
         return [site.pk,None,None]
-    
+
     def _has_changed(self, initial, data):
         # THIS IS A COPY OF django.forms.widgets.Widget._has_changed()
         # (except for the first if statement)
-        
+
         """
         Return True if data differs from initial.
         """
@@ -58,14 +58,14 @@ class PageSelectWidget(MultiWidget):
             initial_value = u''
         else:
             initial_value = initial
-        if force_unicode(initial_value) != force_unicode(data_value):
+        if force_text(initial_value) != force_text(data_value):
             return True
         return False
-    
+
     def render(self, name, value, attrs=None):
         # THIS IS A COPY OF django.forms.widgets.MultiWidget.render()
         # (except for the last line)
-        
+
         # value is a list of values, each corresponding to a widget
         # in self.widgets.
 
@@ -122,7 +122,7 @@ class PageSelectWidget(MultiWidget):
 })(django.jQuery);
 </script>''' % {'name': name})
         return mark_safe(self.format_output(output))
-    
+
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
 
@@ -187,7 +187,7 @@ class PageSmartLinkWidget(TextInput):
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': force_unicode(self.ajax_url)
+            'ajax_url': force_text(self.ajax_url)
         }]
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
@@ -207,14 +207,14 @@ class UserSelectAdminWidget(Select):
     """Special widget used in page permission inlines, because we have to render
     an add user (plus) icon, but point it somewhere else - to special user creation
     view, which is accessible only if user haves "add user" permissions.
-    
-    Current user should be assigned to widget in form constructor as an user 
+
+    Current user should be assigned to widget in form constructor as an user
     attribute.
     """
     def render(self, name, value, attrs=None, choices=()):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]    
+        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, choices)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
-            self.user.has_perm(PageUser._meta.app_label + '.' + PageUser._meta.get_add_permission())):
+            self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
             add_url = '../../../cms/pageuser/add/'
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \

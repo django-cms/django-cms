@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.utils import importlib
 from django.db import models
 
-from .dj import is_user_swapped, user_model_label
-
 
 # overide with custom classes if they exist
-if is_user_swapped:
+if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
     # UserAdmin class
-    user_app_name = user_model_label.split('.')[0]
+    user_app_name = settings.AUTH_USER_MODEL.split('.')[0]
     app = models.get_app(user_app_name)
 
     try:

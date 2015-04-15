@@ -35,6 +35,9 @@ Several options in this menu open up administration controls in the side-frame:
 * *Administration ...* takes you to the site-wide administration panel
 * *User settings ...* allows you to switch the language of the admin interface
   and toolbar
+* *Disable toolbar* allows you to completely disable the toolbar and front-end
+  editing, regardless of login and staff status. To reactivate them, you need
+  to enter *edit mode* either manually or through the backend administration.
 
 You can also *Logout* from this menu.
 

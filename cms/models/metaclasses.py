@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from cms.publisher.manager import PublisherManager
-from mptt.models import MPTTModelBase
+from django.db.models.base import ModelBase
 
 
-class PageMetaClass(MPTTModelBase):
+class PageMetaClass(ModelBase):
     def __new__(cls, name, bases, attrs):
         super_new = super(PageMetaClass, cls).__new__
 
