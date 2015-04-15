@@ -621,9 +621,6 @@ $(document).ready(function () {
 				dropdown.css('top', offset);
 				dropdown.css('bottom', 'auto');
 			}
-
-			// enable scroll
-			this.preventScroll(true);
 		},
 
 		_hideSubnav: function (nav) {
@@ -644,9 +641,6 @@ $(document).ready(function () {
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
 			}, this.timeout);
-
-			// enable scroll
-			this.preventScroll(false);
 
 			// reset relativity
 			$('.cms_dragbar').css('position', '');
