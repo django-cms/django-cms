@@ -323,3 +323,24 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixed an issue that caused the uncached placeholder tag to display cached content
 - Fixed an issue where extra slashed would appear in apphooked URLs when APPEND_SLASH=False
 - Fixed issues relating to the logout function
+
+=== 3.0.11 (2015-03-05) ===
+
+- Core support for multiple instances of the same apphook'ed application
+- Fixed the template tag `render_model_add`
+- Fixed an issue with reverting to Live
+- Fixed a missing migration issue
+- Fixed an issue when using the PageField widget
+- Fixed an issue where duplicate page slugs is not prevented in some cases
+- Fixed an issue where copying a page didn't copy its extensions
+- Fixed an issue where translations where broken when operating on a page
+- Fixed an edge-case SQLite issue under Django 1.7
+- Fixed an issue with confirmation dialog
+- Fixed an issue with deprecated 'mimetype'
+- Fixed an issue where `cms check`
+- Documentation updates
+
+=== 3.0.12 (2015-03-06) ===
+
+- Fixed a typo in JavaScript which prevents page tree from working
+

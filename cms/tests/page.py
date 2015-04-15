@@ -2,7 +2,6 @@
 from __future__ import with_statement
 import datetime
 import os.path
-from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings
 from django.core.cache import cache
@@ -10,6 +9,7 @@ from django.contrib.sites.models import Site
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.db.models import signals
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.utils.timezone import now as tz_now, make_aware, get_current_timezone
 
@@ -21,6 +21,7 @@ from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
+from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
@@ -29,6 +30,7 @@ from cms.utils import get_cms_setting
 from cms.utils.compat.dj import installed_apps
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
+from cms.utils.urlutils import admin_reverse
 
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -111,6 +113,25 @@ class PagesTestCase(CMSTestCase):
 
         self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
         self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
+
+    def test_delete_page_no_template(self):
+        page_data = {
+            'title': 'root',
+            'slug': 'root',
+            'language': settings.LANGUAGES[0][0],
+            'template': 'nav_playground.html',
+
+        }
+        page = create_page(**page_data)
+        page.template = 'no_such_template.html'
+        signals.pre_save.disconnect(pre_save_page, sender=Page, dispatch_uid='cms_pre_save_page')
+        signals.post_save.disconnect(post_save_page, sender=Page, dispatch_uid='cms_post_save_page')
+        page.save(no_signals=True)
+        signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid='cms_pre_save_page')
+        signals.post_save.connect(post_save_page, sender=Page, dispatch_uid='cms_post_save_page')
+        page.delete()
+
+        self.assertEqual(Page.objects.count(), 0)
 
     def test_slug_collision(self):
         """

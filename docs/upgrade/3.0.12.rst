@@ -1,4 +1,4 @@
-.. _upgrade-to-3.0.10:
+.. _upgrade-to-3.0.12:
 
 ####################
 3.0.12 release notes

@@ -72,9 +72,15 @@ $(document).ready(function () {
 
 			// add timeout if provided
 			parent.setTimeout(function () {
-				if (url) { parent.location.href = url; }
-				// ensure page is always reloaded #3413
-				parent.location.reload()
+				if (url && url != parent.location.href) {
+					// location.reload() takes precedence over this, so we
+					// don't want to reload the page if we need a redirect
+					parent.location.href = url;
+				}
+				else {
+					// ensure page is always reloaded #3413
+					parent.location.reload()
+				}
 			}, timeout || 0);
 		},
 

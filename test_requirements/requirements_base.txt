@@ -6,7 +6,7 @@ sphinx
 Pillow==2.5.3
 django-classy-tags>=0.5
 html5lib>=0.90
-django-mptt>=0.6
+django-mptt>=0.6,<0.7
 django-sekizai>=0.7
 argparse
 dj-database-url

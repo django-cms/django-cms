@@ -2,12 +2,14 @@
 Apphooks
 #########
 
-An **Apphook** allows you to attach a Django application to a page. For example, you might have
-a news application that you'd like integrated with django CMS. In this case, you can create a
-normal django CMS page without any content of its own, and attach the news application to the page;
-the news application's content will be delivered at the page's URL.
+An **Apphook** allows you to attach a Django application to a page. For example,
+you might have a news application that you'd like integrated with django CMS. In
+this case, you can create a normal django CMS page without any content of its
+own, and attach the news application to the page; the news application's content
+will be delivered at the page's URL.
 
-To create an apphook place a ``cms_app.py`` in your application. And in it write the following::
+To create an apphook place a ``cms_app.py`` in your application. And in it write
+the following::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
@@ -19,24 +21,26 @@ To create an apphook place a ``cms_app.py`` in your application. And in it write
 
     apphook_pool.register(MyApphook)
 
-Replace ``myapp.urls`` with the path to your applications ``urls.py``.
-Now edit a page and open the advanced settings tab. Select your new apphook
-under "Application". Save the page.
+Replace ``myapp.urls`` with the path to your applications ``urls.py``. Now edit
+a page and open the advanced settings tab. Select your new apphook under
+"Application". Save the page.
 
 .. warning::
 
     Whenever you add or remove an apphook, change the slug of a page containing
-    an apphook or the slug if a page which has a descendant with an apphook,
-    you have to restart your server to re-load the URL caches.
+    an apphook or the slug if a page which has a descendant with an apphook, you
+    have to restart your server to re-load the URL caches.
+
+    An apphook won't appear until it is published. Take note that this also
+    means all parent pages must also be published.
 
 .. note::
 
-    If at some point you want to remove this apphook after deleting the cms_app.py
-    there is a cms management command called uninstall apphooks
-    that removes the specified apphook(s) from all pages by name.
-    eg. ``manage.py cms uninstall apphooks MyApphook``.
-    To find all names for uninstallable apphooks there is a command for this as well
-    ``manage.py cms list apphooks``.
+    If at some point you want to remove this apphook after deleting the
+    cms_app.py there is a cms management command called uninstall apphooks that
+    removes the specified apphook(s) from all pages by name. eg. ``manage.py cms
+    uninstall apphooks MyApphook``. To find all names for uninstallable apphooks
+    there is a command for this as well ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::

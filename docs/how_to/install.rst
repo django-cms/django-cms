@@ -1,6 +1,15 @@
-#############################################
-Integrate django CMS into an existing project
-#############################################
+#############################
+Installing django CMS by hand
+#############################
+
+This is how to install django CMS 'the hard way' (it's not really that hard, but there is an easier
+way).
+
+It's suitable if you want to dive in to integrating django CMS into an existing project, are already
+experienced at setting up Django projects or indeed like to do things the hard way.
+
+If you prefer an easier way using an automated configuration tool - definitely recommended for new
+users - see :doc:`/introduction/install`, which is part of a complete introductory tutorial.
 
 This document assumes you are familiar with Python and Django. After you've
 integrated django CMS into your project, you should be able to follow the
@@ -270,15 +279,15 @@ To use django CMS efficiently, we recommend:
 Configuration and setup
 ***********************
 
-
 Preparing the environment
 =========================
 
-The following assumes your Django project is in ``~/workspace/myproject``.
+The following steps assume your Django project will be - or already is - in
+``~/workspace/myproject``, and that you'll be using a virtualenv.
 
-After completing the OS-specific installation instructions above as well as a pip
-requirements.txt file, you should now be able to create a virtual environment for
-your project and install the requirements:
+If you already have a virtualenv with a project in it, activate it and move on to :ref:`configure-django-cms`.
+
+Otherwise:
 
 .. code-block:: bash
 
@@ -288,12 +297,22 @@ your project and install the requirements:
     pip install -r requirements.txt
 
 
+Create a new Django project
+===========================
+
+::
+
+    django-admin.py startproject myproject
+
+If this is new to you, you ought to read the `official Django tutorial
+<https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which covers starting a new project.
+
 .. _configure-django-cms:
 
-Installing and configuring django CMS in your Django project
-============================================================
+Configuring your project for django CMS
+=======================================
 
-Open the file ``~/workspace/myproject/myproject/settings.py``.
+Open the ``settings.py`` file in your project.
 
 To make your life easier, add the following at the top of the file::
 
@@ -303,9 +322,8 @@ To make your life easier, add the following at the top of the file::
     BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
-Add the following apps to your :setting:`django:INSTALLED_APPS`.
-This includes django CMS itself as well as its dependenices and
-other highly recommended applications/libraries::
+Add the following apps to your :setting:`django:INSTALLED_APPS`. This includes django CMS itself as
+well as its dependencies and other highly recommended applications/libraries::
 
     'cms',  # django CMS itself
     'mptt',  # utilities for implementing a tree
@@ -315,8 +333,8 @@ other highly recommended applications/libraries::
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
 
-
-Also add any (or all) of the following plugins, depending on your needs::
+Also add any (or all) of the following plugins, depending on your needs (see the note in
+:ref:`installed_apps` about ordering)::
 
     'djangocms_file',
     'djangocms_flash',
@@ -327,7 +345,7 @@ Also add any (or all) of the following plugins, depending on your needs::
     'djangocms_video',
     'djangocms_link',
     'djangocms_snippet',
-    'djangocms_text_ckeditor',  # note this needs to be above the 'cms' entry
+
 
 .. note::
 

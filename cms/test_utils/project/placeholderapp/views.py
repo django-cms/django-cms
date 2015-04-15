@@ -59,7 +59,10 @@ def list_view(request):
 
 def detail_view(request, pk, template_name='detail.html', item_name="char_1",
                 template_string='',):
-    instance = Example1.objects.get(pk=pk)
+    if request.user.is_staff and request.toolbar:
+        instance = Example1.objects.get(pk=pk)
+    else:
+        instance = Example1.objects.get(pk=pk, publish=True)
     return _base_detail(request, instance, template_name, item_name,
                         template_string)
 

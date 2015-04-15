@@ -82,7 +82,6 @@ Current core developers
 * Iacopo Spalletti http://github.com/yakky
 * Jonas Obrist http://github.com/ojii
 * Martin Koistinen http://github.com/mkoistinen
-* Øyvind Saltvik http://github.com/fivethreeo
 * Paulo Alvarado http://github.com/czpython
 * Patrick Lauber http://github.com/digi604
 * Stefan Foulis http://github.com/stefanfoulis
@@ -91,6 +90,7 @@ Retired core developers
 =======================
 
 * Chris Glass http://github.com/chrisglass
+* Øyvind Saltvik http://github.com/fivethreeo
 
 
 Election of new core developers
@@ -150,6 +150,5 @@ The current members of the technical board are:
 * Jonas Obrist
 * Martin Koistinen
 * Matteo Larghi
-* Patrick Lauber
 
 The board will co-opt new members as appropriate.

@@ -7,7 +7,7 @@ from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.utils.translation import activate
-from menus.base import NavigationNode
+from menus.base import NavigationNode, Menu
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
@@ -18,6 +18,7 @@ from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture, 
     SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.project.sampleapp.menu import StaticMenu, StaticMenu2
 from cms.test_utils.testcases import SettingsOverrideTestCase
 from cms.test_utils.util.context_managers import (SettingsOverride,
     LanguageOverride)
@@ -57,6 +58,77 @@ class BaseMenuTest(SettingsOverrideTestCase):
 
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
+
+
+class MenuDiscoveryTest(ExtendedMenusFixture, SettingsOverrideTestCase):
+
+    def setUp(self):
+        super(MenuDiscoveryTest, self).setUp()
+        menu_pool.discovered = False
+        self.old_menu = menu_pool.menus
+        menu_pool.menus = {}
+        menu_pool.discover_menus()
+        menu_pool.register_menu(StaticMenu)
+        menu_pool.register_menu(StaticMenu2)
+
+    def tearDown(self):
+        menu_pool.menus = self.old_menu
+        menu_pool._expanded = False
+        super(MenuDiscoveryTest, self).tearDown()
+
+    def test_menu_types_expansion_basic(self):
+        request = self.get_request('/')
+
+        menu_pool.discover_menus()
+        self.assertFalse(menu_pool._expanded)
+        for key, menu in menu_pool.menus.items():
+            self.assertTrue(issubclass(menu, Menu))
+        defined_menus = len(menu_pool.menus)
+
+        # Testing expansion after get_nodes
+        menu_pool.get_nodes(request)
+        self.assertTrue(menu_pool._expanded)
+        for key, menu in menu_pool.menus.items():
+            self.assertTrue(isinstance(menu, Menu))
+        self.assertEqual(defined_menus, len(menu_pool.menus))
+
+    def test_menu_expanded(self):
+        menu_pool.discovered = False
+        menu_pool.discover_menus()
+
+        with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            request = self.get_request('/')
+
+            page = create_page("apphooked-page", "nav_playground.html", "en",
+                               published=True, apphook="SampleApp",
+                               navigation_extenders='StaticMenu')
+
+            menu_pool._expanded = False
+            self.assertFalse(menu_pool._expanded)
+            self.assertTrue(menu_pool.discovered)
+            menu_pool.get_nodes(request)
+
+            self.assertTrue(menu_pool._expanded)
+            self.assertTrue(menu_pool.discovered)
+            menu_pool.get_nodes(request)
+
+            self.assertTrue(menu_pool._expanded)
+
+            # Counts the number of StaticMenu (which is expanded) and StaticMenu2
+            # (which is not) and checks the keyname for the StaticMenu instances
+            static_menus = 2
+            static_menus_2 = 1
+            for key, menu in menu_pool.menus.items():
+                if key.startswith('StaticMenu:'):
+                    static_menus -= 1
+                    self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
+
+                if key == 'StaticMenu2':
+                    static_menus_2 -= 1
+
+            self.assertEqual(static_menus, 0)
+            self.assertEqual(static_menus_2, 0)
+
 
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """
@@ -251,7 +323,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         for node in nodes:
             self.assertEqual(len(node.children), 0)
 
-
     def test_only_level_one(self):
         context = self.get_context()
         # test standard show_menu
@@ -261,7 +332,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), len(self.get_level(1)))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
-
 
     def test_only_level_one_active(self):
         context = self.get_context()
