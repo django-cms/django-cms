@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url, include
 from django.utils.translation import ugettext_lazy as _
 
+from cms.test_utils.project.sampleapp.views import ClassView, ClassBasedView
+
 """
 Also used in cms.tests.ApphooksTestCase
 """
@@ -15,5 +17,7 @@ urlpatterns = patterns('cms.test_utils.project.sampleapp.views',
     url(r'^category/(?P<id>[0-9]+)/$', 'category_view', name='category_view'),
     url(r'^notfound/$', 'notfound', name='notfound'),
     url(r'^extra_1/$', 'extra_view', {'message': 'test urlconf'}, name='extra_first'),
+    url(r'^class-view/$', ClassView(), name='sample-class-view'),
+    url(r'^class-based-view/$', ClassBasedView.as_view(), name='sample-class-based-view'),
     url(r'^', include('cms.test_utils.project.sampleapp.urls_extra'), {'opts': 'someopts'}),
 )

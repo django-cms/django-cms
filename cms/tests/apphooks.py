@@ -241,10 +241,17 @@ class ApphooksTestCase(CMSTestCase):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
             self.create_base_structure(APP_NAME, ['en', 'de'])
 
+            view_names = (
+                ('sample-settings', 'sample_view'),
+                ('sample-class-view', 'ClassView'),
+                ('sample-class-based-view', 'ClassBasedView'),
+            )
+
             with force_language("en"):
-                path = reverse('sample-settings')
-            match = resolve(path)
-            self.assertEqual(match.func.__name__, 'sample_view')
+                for url_name, view_name in view_names:
+                    path = reverse(url_name)
+                    match = resolve(path)
+                    self.assertEqual(match.func.__name__, view_name)
 
     def test_apphooks_with_excluded_permissions(self):
         with SettingsOverride(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests'):
