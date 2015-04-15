@@ -4,7 +4,7 @@ import sys
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import clear_url_caches, reverse
+from django.core.urlresolvers import clear_url_caches, reverse, resolve
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.timezone import now
@@ -213,6 +213,15 @@ class ApphooksTestCase(CMSTestCase):
         response = self.client.get(path)
         self.assertEqual(response.status_code, 302)
         apphook_pool.clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_permissions_preserves_view_name(self):
+        self.create_base_structure(APP_NAME, ['en', 'de'])
+
+        with force_language("en"):
+            path = reverse('sample-settings')
+        match = resolve(path)
+        self.assertEqual(match.func.__name__, 'sample_view')
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphooks_with_excluded_permissions(self):
