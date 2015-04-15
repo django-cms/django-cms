@@ -212,7 +212,7 @@ Before upgrading, please make sure that your current database is consistent and 
 To ensure this, run two commands:
 
 * ``python manage.py cms delete_orphaned_plugins``
-* ``python manage.py fix_mptt``
+* ``python manage.py cms fix-mptt``
 
 **Make a copy of the database before proceeding further.**
 
