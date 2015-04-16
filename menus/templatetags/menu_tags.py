@@ -281,13 +281,16 @@ class ShowBreadcrumb(InclusionTag):
             only_visible = bool(only_visible)
         ancestors = []
         nodes = menu_pool.get_nodes(request, breadcrumb=True)
-        selected = None
+
+        # Find home
         home = None
-        for node in nodes:
-            if node.selected:
-                selected = node
-            if node.get_absolute_url() == unquote(reverse("pages-root")):
-                home = node
+        root_url = unquote(reverse("pages-root"))
+        home = next((node for node in nodes if node.get_absolute_url() == root_url), None)
+
+        # Find selected
+        selected = None
+        selected = next((node for node in nodes if node.selected), None)
+
         if selected and selected != home:
             node = selected
             while node:
