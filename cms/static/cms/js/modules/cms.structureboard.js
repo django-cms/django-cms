@@ -262,7 +262,6 @@ $(document).ready(function () {
 		// private methods
 		_showBoard: function () {
 			var that = this;
-			var interval = 10;
 			var timer = function () {};
 
 			// show container
@@ -291,12 +290,6 @@ $(document).ready(function () {
 				that._resizeBoard();
 			}).trigger('resize.sideframe');
 
-			// setup an interval
-			this.interval = setInterval(function () {
-				$(window).trigger('resize.sideframe');
-			}, interval);
-
-			$(window).trigger('structureboard_shown.sideframe');
 		},
 
 		_hideBoard: function () {

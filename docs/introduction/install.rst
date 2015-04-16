@@ -1,6 +1,6 @@
-##################################
-Installing django CMS from scratch
-##################################
+#####################
+Installing django CMS
+#####################
 
 We'll get started by setting up our environment.
 
@@ -41,8 +41,7 @@ Create a new directory to work in, and cd into it::
     mkdir tutorial-project
     cd tutorial-project
 
-Run it to create a new
-Django project called ``mysite``::
+Run it to create a new Django project called ``mysite``::
 
     djangocms -p . mysite
 

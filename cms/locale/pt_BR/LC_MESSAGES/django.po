@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-11 19:49+0200\n"
-"PO-Revision-Date: 2015-04-11 17:50+0000\n"
+"POT-Creation-Date: 2015-04-15 19:20+0200\n"
+"PO-Revision-Date: 2015-04-15 17:21+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -136,55 +136,57 @@ msgstr "Comece a digitar..."
 msgid "Application configurations"
 msgstr "Configurações da aplicação"
 
-#: admin/forms.py:292
+#: admin/forms.py:216
+msgid "Language independent options"
+msgstr ""
+
+#: admin/forms.py:299
 msgid "A page with this reverse URL id exists already."
 msgstr "Já existe uma página com esta URL reversa."
 
-#: admin/forms.py:319
-msgid ""
-"You selected an apphook with an \"app_name\".\n"
-"                                You must enter a unique instance name."
-msgstr "Você selecionou uma aplicação com um \"app_name\".\nVocê deve inserir um nome único para a instância."
+#: admin/forms.py:316
+msgid "An application instance using this configuration already exists."
+msgstr ""
 
-#: admin/forms.py:342
-msgid "A instance name with this name already exists."
-msgstr "Um nome de instância com este nome já existe."
+#: admin/forms.py:324 admin/forms.py:335
+msgid "An application instance with this name already exists."
+msgstr ""
 
-#: admin/forms.py:382 migrations/0001_initial.py:72
+#: admin/forms.py:391 migrations/0001_initial.py:72
 #: migrations/0001_initial.py:135 models/permissionmodels.py:63
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "usuário"
 
-#: admin/forms.py:445
+#: admin/forms.py:454
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "A permissão para adicionar páginas requer também acesso aos filhos, ou descendentes, caso contrário, a página adicionada não poderá ser modificada pelo seu criador."
 
-#: admin/forms.py:450
+#: admin/forms.py:459
 msgid "Add page permission also requires edit page permission."
 msgstr "A permissão para adicionar páginas também requer permissão de edição de páginas."
 
-#: admin/forms.py:478
+#: admin/forms.py:487
 msgid "can_view"
 msgstr "can_view"
 
-#: admin/forms.py:489
+#: admin/forms.py:498
 msgid "Please select user or group first."
 msgstr "Por favor, selecione usuário ou grupo primeiro."
 
-#: admin/forms.py:500 admin/forms.py:507 admin/forms.py:511
+#: admin/forms.py:509 admin/forms.py:516 admin/forms.py:520
 #: templates/admin/cms/usersettings/change_form.html:17
 #: templatetags/cms_tags.py:762
 msgid "Add"
 msgstr "Adicionar"
 
-#: admin/forms.py:501 admin/forms.py:508 admin/forms.py:512
+#: admin/forms.py:510 admin/forms.py:517 admin/forms.py:521
 msgid "Change"
 msgstr "Modificar"
 
-#: admin/forms.py:502 admin/forms.py:509 admin/forms.py:513
+#: admin/forms.py:511 admin/forms.py:518 admin/forms.py:522
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
@@ -193,43 +195,43 @@ msgstr "Modificar"
 msgid "Delete"
 msgstr "Excluir"
 
-#: admin/forms.py:503
+#: admin/forms.py:512
 msgid "Recover (any) pages"
 msgstr "Recuperar (quaisquer) páginas"
 
-#: admin/forms.py:531
+#: admin/forms.py:540
 msgid "Notify user"
 msgstr "Notificar usuário"
 
-#: admin/forms.py:533
+#: admin/forms.py:542
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "Enviar notificação por e-mail ao usuário sobre modificação no seu nome de usuário ou senha. Requer o e-mail do usuário."
 
-#: admin/forms.py:554
+#: admin/forms.py:563
 msgid "New password"
 msgstr "Nova senha"
 
-#: admin/forms.py:556
+#: admin/forms.py:565
 msgid "New password confirmation"
 msgstr "Confirmação de nova senha"
 
-#: admin/forms.py:581
+#: admin/forms.py:590
 msgid "Email notification requires valid email address."
 msgstr "Notificações por e-mail requerem um endereço de e-mail válido."
 
-#: admin/forms.py:583
+#: admin/forms.py:592
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "A permissão para adicionar novas páginas requer a permissão para modificar páginas!"
 
-#: admin/forms.py:585
+#: admin/forms.py:594
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "A permissão para adicionar usuários requer a permissão para modificar usuários!"
 
-#: admin/forms.py:587
+#: admin/forms.py:596
 msgid "To add permissions you also need to edit them!"
 msgstr "Para adicionar permissões você também precisa editá-las!"
 
@@ -403,7 +405,7 @@ msgstr "Você não tem permissão para modificar o status de navegação desta p
 msgid "Page Types"
 msgstr "Tipos de Página"
 
-#: admin/pageadmin.py:1299
+#: admin/pageadmin.py:1325
 msgid "You do not have permission to edit this page"
 msgstr "Você não tem permissão para editar essa página"
 
@@ -531,8 +533,8 @@ msgstr "Desabilitar barra de ferramentas"
 msgid "Users"
 msgstr "Usuários"
 
-#: cms_toolbar.py:176 tests/toolbar.py:529 tests/toolbar.py:544
-#: tests/toolbar.py:577
+#: cms_toolbar.py:176 tests/toolbar.py:640 tests/toolbar.py:655
+#: tests/toolbar.py:688
 #, python-format
 msgid "Logout %s"
 msgstr "Sair %s"
@@ -1702,11 +1704,11 @@ msgstr "Aplicativo Exemplo1"
 msgid "MultilingualExample1 App"
 msgstr "Aplicativo MultilinguasExemplo1"
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:25
+#: test_utils/project/placeholderapp/cms_toolbar.py:26
 msgid "Example1"
 msgstr "Exemplo1"
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:26
+#: test_utils/project/placeholderapp/cms_toolbar.py:27
 msgid "Examples"
 msgstr "Exemplos"
 

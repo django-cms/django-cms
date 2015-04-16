@@ -19,7 +19,8 @@ Current and previous core designers:
 
 * Christian Bertschy
 
-Contributors (based on gitlog) (441):
+
+Contributors (based on gitlog) (445):
 
 * A. Bram Neijt
 * aaloy
@@ -34,6 +35,7 @@ Contributors (based on gitlog) (441):
 * Alberto Paro
 * Ales Kocjancic
 * Ales Zabala Alava (Shagi)
+* Alessandro Pasotti
 * Alessandro Ronchi
 * Alex Cucu
 * Alex Marandon
@@ -216,6 +218,8 @@ Contributors (based on gitlog) (441):
 * Jason Robinson
 * Jason Zylks
 * Javi Nievas
+* JensDiemer
+* Jeroen Noten
 * Jessica Tallon
 * Jimmy Lam
 * Johannes Bornhold
@@ -276,6 +280,7 @@ Contributors (based on gitlog) (441):
 * Martin Kosír
 * Martin Pajuste
 * martinkosir
+* Matas Dailyda
 * Mateusz Dereniowski
 * Mateusz Marzantowicz
 * mathijs

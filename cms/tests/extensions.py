@@ -141,6 +141,12 @@ class ExtensionsTestCase(TestCase):
             self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
                                 old_title_extension[index].pk)
 
+        # Test deleting original page for #3987
+        page.delete()
+        # asserting original extensions are gone, but copied ones should still exist
+        self.assertEqual(len(extension_pool.get_page_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+
     def test_publish_page_extension(self):
         page = create_page('Test Page Extension', "nav_playground.html", "en")
         page_extension = MyPageExtension(extended_object=page, extra='page extension 1')

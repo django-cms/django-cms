@@ -25,6 +25,7 @@ class Example1(models.Model):
     char_4 = models.CharField(u'char_4', max_length=255)
     date_field = models.DateField(null=True)
     placeholder = PlaceholderField('placeholder')
+    publish = models.BooleanField(default=True)
 
     static_admin_url = ''
 

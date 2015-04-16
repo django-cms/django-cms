@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-11 19:49+0200\n"
-"PO-Revision-Date: 2015-04-11 17:50+0000\n"
+"POT-Creation-Date: 2015-04-15 19:20+0200\n"
+"PO-Revision-Date: 2015-04-15 17:21+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django-cms/language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -126,55 +126,57 @@ msgstr "Pradėkite rašyti..."
 msgid "Application configurations"
 msgstr "Aplikacijų nustatymai"
 
-#: admin/forms.py:292
+#: admin/forms.py:216
+msgid "Language independent options"
+msgstr ""
+
+#: admin/forms.py:299
 msgid "A page with this reverse URL id exists already."
 msgstr "Puslapis su tokia nuoroda jau egzistuoja."
 
-#: admin/forms.py:319
-msgid ""
-"You selected an apphook with an \"app_name\".\n"
-"                                You must enter a unique instance name."
-msgstr "Jūs pasirinkote apphook'ą su \"app_name\".\nReikia įvesti unikalų pavadinimą."
+#: admin/forms.py:316
+msgid "An application instance using this configuration already exists."
+msgstr ""
 
-#: admin/forms.py:342
-msgid "A instance name with this name already exists."
-msgstr "Toks pavadinimas jau egzituoja."
+#: admin/forms.py:324 admin/forms.py:335
+msgid "An application instance with this name already exists."
+msgstr ""
 
-#: admin/forms.py:382 migrations/0001_initial.py:72
+#: admin/forms.py:391 migrations/0001_initial.py:72
 #: migrations/0001_initial.py:135 models/permissionmodels.py:63
 #: test_utils/project/customuserapp/models.py:60
 msgid "user"
 msgstr "vartotojas"
 
-#: admin/forms.py:445
+#: admin/forms.py:454
 msgid ""
 "Add page permission requires also access to children, or descendants, "
 "otherwise added page can't be changed by its creator."
 msgstr "Puslapio pridėjimo teisė taip pat reikalauja prieigos prie vidinių elementų, kitaip pridėto puslapio nebus galima redaguoti."
 
-#: admin/forms.py:450
+#: admin/forms.py:459
 msgid "Add page permission also requires edit page permission."
 msgstr "Puslapio teisių pridėjimas taip pat reikalauja puslapio redagavimo teisės"
 
-#: admin/forms.py:478
+#: admin/forms.py:487
 msgid "can_view"
 msgstr "gali peržiūrėti"
 
-#: admin/forms.py:489
+#: admin/forms.py:498
 msgid "Please select user or group first."
 msgstr "Visų pirma pasirinkte vartotoją arba grupę."
 
-#: admin/forms.py:500 admin/forms.py:507 admin/forms.py:511
+#: admin/forms.py:509 admin/forms.py:516 admin/forms.py:520
 #: templates/admin/cms/usersettings/change_form.html:17
 #: templatetags/cms_tags.py:762
 msgid "Add"
 msgstr "Pridėti"
 
-#: admin/forms.py:501 admin/forms.py:508 admin/forms.py:512
+#: admin/forms.py:510 admin/forms.py:517 admin/forms.py:521
 msgid "Change"
 msgstr "Pakeisti"
 
-#: admin/forms.py:502 admin/forms.py:509 admin/forms.py:513
+#: admin/forms.py:511 admin/forms.py:518 admin/forms.py:522
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
@@ -183,43 +185,43 @@ msgstr "Pakeisti"
 msgid "Delete"
 msgstr "Pašalinti"
 
-#: admin/forms.py:503
+#: admin/forms.py:512
 msgid "Recover (any) pages"
 msgstr "Atkurti (bet kokius) puslapius"
 
-#: admin/forms.py:531
+#: admin/forms.py:540
 msgid "Notify user"
 msgstr "Informuoti vartotoją"
 
-#: admin/forms.py:533
+#: admin/forms.py:542
 msgid ""
 "Send email notification to user about username or password change. Requires "
 "user email."
 msgstr "Siųsti vartotojui pranešimą elektroniniu paštu apie prisijungimo vardo arba slaptažodžio keitimą. Reikalingas vartotojo elektroninis paštas."
 
-#: admin/forms.py:554
+#: admin/forms.py:563
 msgid "New password"
 msgstr "Naujas slaptažodis"
 
-#: admin/forms.py:556
+#: admin/forms.py:565
 msgid "New password confirmation"
 msgstr "Naujo slaptažodžio patvirtinimas"
 
-#: admin/forms.py:581
+#: admin/forms.py:590
 msgid "Email notification requires valid email address."
 msgstr "Reikalingas validus el. pašto adresas."
 
-#: admin/forms.py:583
+#: admin/forms.py:592
 msgid ""
 "The permission to add new pages requires the permission to change pages!"
 msgstr "Teisė pridėti naują puslapį reikalauja teisės keisti puslapius!"
 
-#: admin/forms.py:585
+#: admin/forms.py:594
 msgid ""
 "The permission to add new users requires the permission to change users!"
 msgstr "Teisė pridėti naujus vartotojus reikalauja teisės keisti vartotojus!"
 
-#: admin/forms.py:587
+#: admin/forms.py:596
 msgid "To add permissions you also need to edit them!"
 msgstr "Norėdami pridėti teises taip pat turite jas redaguoti!"
 
@@ -393,7 +395,7 @@ msgstr "Jūs neturite teisės keisti šio puslapio atvaizdavimo navigacijoje sta
 msgid "Page Types"
 msgstr "Puslapio tipai"
 
-#: admin/pageadmin.py:1299
+#: admin/pageadmin.py:1325
 msgid "You do not have permission to edit this page"
 msgstr "Jūs neturite teisės redaguoti šio puslapio"
 
@@ -436,7 +438,7 @@ msgstr "Pradinio įskiepio kalba turi būti tokia pati!"
 
 #: admin/placeholderadmin.py:335
 msgid "Plugin not found"
-msgstr ""
+msgstr "Įskiepis nerastas"
 
 #: admin/placeholderadmin.py:340
 msgid "You do not have permission to edit this plugin"
@@ -521,8 +523,8 @@ msgstr "Išjungti įrankių juostą"
 msgid "Users"
 msgstr "Vartotojai"
 
-#: cms_toolbar.py:176 tests/toolbar.py:529 tests/toolbar.py:544
-#: tests/toolbar.py:577
+#: cms_toolbar.py:176 tests/toolbar.py:640 tests/toolbar.py:655
+#: tests/toolbar.py:688
 #, python-format
 msgid "Logout %s"
 msgstr "Atsijungti %s"
@@ -1693,11 +1695,11 @@ msgstr "Aplikacijos pavyzdys1"
 msgid "MultilingualExample1 App"
 msgstr "Aplikacijos daugiakalbis pavyzdys1"
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:25
+#: test_utils/project/placeholderapp/cms_toolbar.py:26
 msgid "Example1"
 msgstr "Pavyzdys1"
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:26
+#: test_utils/project/placeholderapp/cms_toolbar.py:27
 msgid "Examples"
 msgstr "Pavyzdžiai"
 
