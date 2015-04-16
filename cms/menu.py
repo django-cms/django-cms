@@ -302,23 +302,23 @@ class NavExtender(Modifier):
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
-        exts = []
         # rearrange the parent relations
-        home = None
+        # Find home
+        home = next((n for n in nodes if n.attr.get("is_home", False)), None)
+        # Find nodes with NavExtenders
+        exts = []
         for node in nodes:
-            if node.attr.get("is_home", False):
-                home = node
             extenders = node.attr.get("navigation_extenders", None)
             if extenders:
                 for ext in extenders:
                     if ext not in exts:
                         exts.append(ext)
+                    # Link the nodes
                     for extnode in nodes:
                         if extnode.namespace == ext and not extnode.parent_id:
                             # if home has nav extenders but home is not visible
-                            if (node.attr.get("is_home", False)
-                                    and not node.visible):
-                                extnode.parent_id = None
+                            if node == home and not node.visible:
+                                # extnode.parent_id = None
                                 extnode.parent_namespace = None
                                 extnode.parent = None
                             else:
