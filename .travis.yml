@@ -10,7 +10,6 @@ sudo: false
 
 env:
   global:
-    - SAUCE_USERNAME=digi604
     - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
   matrix:
     - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
@@ -44,11 +43,6 @@ script: coverage run --rcfile=.coverage.rc develop.py test --migrate
 after_success: coveralls --config_file=.coverage.rc
 
 notifications:
-  email:
-    recipients:
-      - digi@treepy.com
-    on_success: never
-    on_failure: always
   irc:
     - irc.freenode.org#django-cms
     - irc.freenode.org#django-cms-sprint
