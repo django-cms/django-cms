@@ -388,17 +388,17 @@ Since :class:`cms.plugin_base.CMSPluginBase` extends
 for your plugins just as you would customize your admin interfaces.
 
 The template that the plugin editing mechanism uses is
-``cms/templates/admin/cms/page/plugin_change_form.html``. You might need to
+``cms/templates/admin/cms/page/change_form.html``. You might need to
 change this.
 
 If you want to customise this the best way to do it is:
 
-* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html``
+* create a template of your own that extends ``cms/templates/admin/cms/page/change_form.html``
   to provide the functionality you require;
 * provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a
   ``change_form_template`` attribute pointing at your new template.
 
-Extending ``admin/cms/page/plugin_change_form.html`` ensures that you'll keep
+Extending ``admin/cms/page/change_form.html`` ensures that you'll keep
 a unified look and functionality across your plugins.
 
 There are various reasons *why* you might want to do this. For example, you
@@ -407,7 +407,7 @@ variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
 block.super }}`` to inherit the existing items that were in the parent
 template.
 
-Or: ``cms/templates/admin/cms/page/plugin_change_form.html`` extends Django's
+Or: ``cms/templates/admin/cms/page/change_form.html`` extends Django's
 own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
 and your plugin admin might require something newer. In this case, in your
 custom ``change_form_template`` you could do something like::
