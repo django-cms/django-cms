@@ -4,11 +4,11 @@ Permissions
 
 In django CMS you can set three types of permissions:
 
-1. View restrictions for restricting front-end view access to users
-2. Page permissions for allowing staff users to only have rights on certain sections of certain sites
-3. Mode permission which when left unset, restricts staff users to only editing, not adding new content
+#. View restrictions for restricting front-end view access to users
+#. Page permissions for allowing staff users to only have rights on certain sections of certain sites
+#. Mode permission which when left unset, restricts staff users to only editing, not adding new content
 
-To enable features 1. and 2., ``settings.py`` requires:
+To enable features 1. and 2., ``settings.py`` requires::
 
     CMS_PERMISSION = True
 
