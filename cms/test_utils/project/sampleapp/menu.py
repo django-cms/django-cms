@@ -7,7 +7,7 @@ from menus.menu_pool import menu_pool
 
 
 class SampleAppMenu(Menu):
-    
+
     def get_nodes(self, request):
         nodes = []
         for cat in Category.objects.all():
@@ -25,7 +25,7 @@ class SampleAppMenu(Menu):
         except NoReverseMatch:
             pass
         return nodes
-    
+
 menu_pool.register_menu(SampleAppMenu)
 
 

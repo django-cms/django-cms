@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cms import api
-from cms.models import Placeholder
+from cms.cms_plugins import AliasPlugin
+from cms.models import Placeholder, AliasPluginModel
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 from django.template import Template, Context
@@ -17,6 +18,20 @@ class AliasTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(admin_reverse('cms_create_alias'), data={'placeholder_id': ph_en.pk})
             self.assertEqual(response.status_code, 200)
+            response = self.client.post(admin_reverse('cms_create_alias'))
+            self.assertEqual(response.status_code, 400)
+            response = self.client.post(admin_reverse('cms_create_alias'), data={'plugin_id': 20000})
+            self.assertEqual(response.status_code, 400)
+            response = self.client.post(admin_reverse('cms_create_alias'), data={'placeholder_id': 20000})
+            self.assertEqual(response.status_code, 400)
+        response = self.client.post(admin_reverse('cms_create_alias'), data={'plugin_id': text_plugin_1.pk})
+        self.assertEqual(response.status_code, 403)
+        instance = AliasPluginModel.objects.all()[0]
+        admin = AliasPlugin()
+        request = self.get_request("/")
+        context = Context({'request': request})
+        admin.render(context, instance, ph_en)
+        self.assertEqual(context['content'], "I'm the first")
 
     def test_move_and_delete_plugin_alias(self):
         '''

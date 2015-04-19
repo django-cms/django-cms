@@ -18,13 +18,13 @@ test version of ``urls.py`` and tell your tests to use that.
 So you could create ``myapp/tests/urls.py`` with the following code::
 
     from django.contrib import admin
-    from django.conf.urls import url, patterns, include
+    from django.conf.urls import url, include
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^admin/', include(admin.site.urls)),
         url(r'^myapp/', include('myapp.urls')),
         url(r'', include('cms.urls')),
-    )
+    ]
 
 And then in your tests you can plug this in with the
 :func:`~django.test.utils.override_settings` decorator::

@@ -28,6 +28,8 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
     hvad-enabled object does not exists in the current language.
     As a workaround ``render_model_icon`` can be used instead.
 
+.. _render_model_templatetags:
+
 ************
 Templatetags
 ************
@@ -102,9 +104,9 @@ Will render to:
             <li><a href="/another">another</a></li>
             [...]
     </div>
-    
+
 .. warning:
-    
+
     Be aware that depending on the layout of your menu templates, clickable
     area of the menu may completely overlap with the active area of the
     frontend editor thus preventing editing. In this case you may use
@@ -220,13 +222,13 @@ Example ``view_url``::
 
 
 Example ``view_method``::
-    
+
     class MyModel(models.Model):
         char = models.CharField(max_length=10)
-        
+
         def some_method(self, request):
             return "/some/url"
-    
+
 
     {% load cms_tags %}
 

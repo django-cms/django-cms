@@ -55,11 +55,8 @@ class ToolbarPool(object):
         return self.toolbars
 
     def get_watch_models(self):
-        models = []
-        for toolbar in self.toolbars.values():
-            if hasattr(toolbar, 'watch_models'):
-                models += toolbar.watch_models
-        return models
+        return sum((getattr(tb, 'watch_models', [])
+                    for tb in self.toolbars.values()), [])
 
 
 toolbar_pool = ToolbarPool()

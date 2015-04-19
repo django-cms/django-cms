@@ -220,9 +220,6 @@ $(document).ready(function () {
 				CMS.API.locked = false;
 			});
 
-			// prevent scrolling
-			this.preventScroll(true);
-
 			// add esc close event
 			$(document).bind('keydown.cms', function (e) {
 				if(e.keyCode === 27) that.close();
@@ -236,8 +233,6 @@ $(document).ready(function () {
 			this.modal.fadeOut(speed);
 			this.modal.find('.cms_modal-frame iframe').remove();
 			this.modal.find('.cms_modal-body').removeClass('cms_loader');
-			// prevent scrolling
-			this.preventScroll(false);
 		},
 
 		_minimize: function () {
@@ -464,7 +459,8 @@ $(document).ready(function () {
 			} else {
 				row = iframe.contents().find('.save-box:eq(0)');
 			}
-			row.hide(); // hide submit-row
+			// hide all submit-rows
+			iframe.contents().find('.submit-row').hide();
 			var buttons = row.find('input, a, button');
 			var render = $('<span />'); // seriously jquery...
 

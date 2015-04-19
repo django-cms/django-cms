@@ -1,34 +1,30 @@
 # -*- coding: utf-8 -*-
-
-import json
 from functools import update_wrapper
+import json
 
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
+from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import override
 
 from cms.models import UserSettings
-from cms.utils.compat import DJANGO_1_4
-from cms.utils.transaction import wrap_transaction
 from cms.utils.urlutils import admin_reverse
 
 
 class SettingsAdmin(ModelAdmin):
     def get_urls(self):
-        from django.conf.urls import patterns, url
-
         def wrap(view):
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
 
             return update_wrapper(wrapper, view)
 
-        info = self.model._meta.app_label, self.model._meta.module_name
+        info = self.model._meta.app_label, self.model._meta.model_name
 
-        urlpatterns = patterns(
-            '',
+        return [
             url(r'^session_store/$',
                 self.session_store,
                 name='%s_%s_session_store' % info),
@@ -38,11 +34,10 @@ class SettingsAdmin(ModelAdmin):
             url(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-        )
-        return urlpatterns
+        ]
 
     @csrf_protect_m
-    @wrap_transaction
+    @transaction.atomic
     def change_view(self, request, id=None):
         model = self.model
         try:
@@ -57,25 +52,15 @@ class SettingsAdmin(ModelAdmin):
         POST should have a settings parameter
         """
         if not request.user.is_staff:
-            if DJANGO_1_4:
-                return HttpResponse(json.dumps(""),
-                    mimetype="application/json")
-            else:
-                return HttpResponse(json.dumps(""),
-                    content_type="application/json")
+            return HttpResponse(json.dumps(""),
+                                content_type="application/json")
         if request.method == "POST":
             request.session['cms_settings'] = request.POST['settings']
             request.session.save()
-        if DJANGO_1_4:
-            return HttpResponse(
-                json.dumps(request.session.get('cms_settings', '')),
-                mimetype="application/json"
-            )
-        else:
-            return HttpResponse(
-                json.dumps(request.session.get('cms_settings', '')),
-                content_type="application/json"
-            )
+        return HttpResponse(
+            json.dumps(request.session.get('cms_settings', '')),
+            content_type="application/json"
+        )
 
     def save_model(self, request, obj, form, change):
         obj.user = request.user

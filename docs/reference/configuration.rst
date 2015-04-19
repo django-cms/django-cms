@@ -229,7 +229,7 @@ plugins, as shown above with ``base.html content``.
 ``language_fallback``
     When ``True``, if the placeholder has no plugin for the current language
     it falls back to the fallback languages as specified in :setting:`CMS_LANGUAGES`.
-    Defaults to ``False`` to maintain pre-3.0 behavior.
+    Defaults to ``True`` since version 3.1.
 
 .. _placeholder_default_plugins:
 
@@ -514,10 +514,10 @@ will redirect to the URL of the same page in the fallback language. If
 ``False``, the content will be displayed in the fallback language, but there
 will be no redirect.
 
-Note that this applies to the fallback behaviour of *pages*. Within pages, *placeholders* will
-**not** by default adopt the same behaviour. If you want a placeholder to follow a page's fallback
-behaviour, you must set its ``language_fallback`` to ``True`` in :setting:`CMS_PLACEHOLDER_CONF`,
-above.
+Note that this applies to the fallback behaviour of *pages*. Starting for 3.1 *placeholders*
+**will** default to the same behaviour. If you do not want a placeholder to follow a page's
+fallback behaviour, you must set its ``language_fallback`` to ``False``
+in :setting:`CMS_PLACEHOLDER_CONF`, above.
 
 type
     Boolean
