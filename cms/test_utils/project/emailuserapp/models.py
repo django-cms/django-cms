@@ -49,6 +49,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(
         'email address',
+        max_length=300,
         blank=True,
         unique=True,
         help_text = "Required.  Standard format email address."
