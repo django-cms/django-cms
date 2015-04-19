@@ -15,12 +15,15 @@ django CMS
 
 Open source enterprise content management system based on the django framework.
 
-.. ATTENTION:: This is the **develop** branch. It's the branch for features that
-   will go into django CMS 3.1. The **master** branch is the current stable release,
-   the one released on PyPI.
+.. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
+   It's the branch for features that will go into the next django CMS feature relese.
 
-   **support/3.0.x** will be our *next stable release*, the most
-   appropriate branch for fixes and patches that will go into the next **master**.
+   For fixes for 3.0.x releases, please work on **support/3.0.x** which contains
+   the next patch release for 3.0.x series.
+
+   The **master** branch is the current stable release, the one released on PyPI.
+   Changes based on **master** will not be accepted.
+
 
 ********
 Features
@@ -73,8 +76,10 @@ You can use the `django CMS installer <https://github.com/nephila/djangocms-inst
     $ virtualenv env
     $ source env/bin/activate
     (env) $ pip install djangocms-installer
+    (env) $ mkdir myproject && cd myproject
     (env) $ djangocms -p . my_demo
-    (env) $ cd my_demo
+    (env) $ python manage.py
+
 
 ************
 Getting Help
