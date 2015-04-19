@@ -53,7 +53,7 @@ class ToolbarTestBase(CMSTestCase):
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)
-        if hasattr(request,'toolbar'):
+        if hasattr(request, 'toolbar'):
             request.toolbar.populate()
         return request
 
@@ -93,29 +93,29 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
 
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
     def test_no_app_setted_show_toolbar_in_cms_urls(self):
-        page = create_page('foo','col_two.html','en',published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_APP_NAME='cms')
     def test_app_setted_hide_toolbar_in_non_cms_urls_toolbar_hide_unsetted(self):
         request = self.get_page_request(None, self.get_anon(), '/')
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_APP_NAME='cms')
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_hide_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
-        self.assertFalse(hasattr(request,'toolbar'))
+        self.assertFalse(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_APP_NAME='cms')
     def test_app_setted_show_toolbar_in_cms_urls(self):
-        page = create_page('foo','col_two.html','en',published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
 
 @override_settings(CMS_PERMISSION=False)
