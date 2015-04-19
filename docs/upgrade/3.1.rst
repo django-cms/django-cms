@@ -152,6 +152,9 @@ Improvements to the toolbar user interface
 ==========================================
 
 Some minor changes have been implemented to improve the toolbar user interface.
+The old *Draft/Live* switch has been replaced to achieve a more clear
+distinction between page states: *Edit* and *Save and close* buttons are now
+available in the toolbar to control the page editing workflow.
 
 Placeholder language fallback default to True
 =============================================
