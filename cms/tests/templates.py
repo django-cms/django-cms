@@ -11,6 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 
 PATH_PREFIX = os.path.join('inner_dir', 'custom_templates')
 GOOD_PATH = os.path.join(settings.PROJECT_PATH, 'project', 'templates', PATH_PREFIX)
@@ -60,11 +61,16 @@ class TemplatesConfig(CMSTestCase):
         Checking that templates can be loaded by the template loader
         """
         templates = get_cms_setting('TEMPLATES')
-        files = [template[0] for template in templates]
         for template in templates:
             if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                 tpl = loader.get_template(template[0])
-                self.assertTrue(tpl.name in files)
+
+                if DJANGO_1_7:
+                    tpl_name = tpl.name
+                else:
+                    tpl_name = tpl.template.name
+
+                self.assertEqual(tpl_name, template[0])
 
     @override_settings(CMS_TEMPLATES_DIR=SITE_PATH)
     def test_multisite(self):
