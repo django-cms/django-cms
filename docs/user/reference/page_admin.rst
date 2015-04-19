@@ -83,17 +83,25 @@ draft only).
 =======================
 
 The *Publishing controller* manages the publishing state of your page - options
-are *Publish page now* |publish-page-now|, for hitherto unpublished pages, and
-a control to switch to *Draft* |draft| and *Live* |live| views.
+are:
+
+* *Publish page now* |publish-page-now|, to publish the current page
+* *Publish changes* |publish-changes| for publishing pending changes of an
+  existing page
+* *Edit* |edit| button to open the page in edit mode
+* *Save and close* |save-and-close| to update the page and exit the edit mode.
 
 .. |publish-page-now| image:: /images/publish-page-now.png
    :width: 119
 
-.. |draft| image:: /images/draft.png
-   :width: 91
+.. |publish-changes| image:: /images/publish-changes.png
+   :width: 107
 
-.. |live| image:: /images/live.png
-   :width: 79
+.. |edit| image:: /images/edit.png
+   :width: 45
+
+.. |save-and-close| image:: /images/save-and-close.png
+   :width: 101
 
 The *disclosure triangle*
 =========================
