@@ -37,7 +37,7 @@ from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_6
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 
 class AdminTestsBase(CMSTestCase):
@@ -1650,7 +1650,12 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 # expect that the pagesize gets influenced by the useramount of the system
                 self.assertTrue(page_size_grown, "Page size has not grown after user creation")
                 # usernames are only 2 times in content
-                text = smart_str(response.content, response._charset)
+                if DJANGO_1_7:
+                    charset = response._charset
+                else:
+                    charset = response.charset
+
+                text = smart_str(response.content, charset)
 
                 foundcount = text.count(USER_NAME)
                 # 2 forms contain usernames as options
