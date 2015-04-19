@@ -104,7 +104,7 @@ migration path from `MIGRATION_MODULES
 Structure mode permission
 =========================
 
-A new :doc:`*Can use Structure mode* permission </topics/permissions>` has been added.
+A new :doc:`Can use Structure mode* permission </topics/permissions>` has been added.
 
 Without this permission, a non-superuser will no longer have access to structure mode. This makes
 possible a more strict workflow, in which certain users are abnle to edit content but not structure.
@@ -152,6 +152,9 @@ Improvements to the toolbar user interface
 ==========================================
 
 Some minor changes have been implemented to improve the toolbar user interface.
+The old **Draft/Live** switch has been replaced to achieve a more clear
+distinction between page states, and **Edit** and **Save and close** buttons are now
+available in the toolbar to control the page editing workflow.
 
 Placeholder language fallback default to True
 =============================================

@@ -2,21 +2,36 @@
 Publish a page
 ##############
 
-Your page is a *draft* - only you and other users with permission to edit the page can see it. To
-publish it so that ordinary web visitors can see, hit **Publish changes**.
+The page you were working on in the previous step - :doc:`/user/tutorial/create_page_content` - of this tutorial is not
+yet published. It's currently in *Draft* mode, and only you and other users with permission to edit the page can see it.
 
-You'll notice that the toolbar indicates you're now seeing a *Live* view of
-your page. If you want to make further changes:
+To publish it so that ordinary web visitors will be able to see it, hit **Publish page now** |publish-page-now| (a
+window alert will ask you for confirmation).
 
-* switch back to *Draft* mode, by using the :ref:`Draft/live switch
-  <publishing-controller>`
-* make further changes in *Structure* or *Content* mode using the
-  :ref:`Structure/Content button <structure-content-button>`
-* **Publish changes** when you're ready, using *Page > Publish page* from the
-  toolbar, or the *language version* control in the :ref:`page-list`
+Using the toolbar you can make further changes to the page: just select the **Edit** |edit| button to activate *Edit
+mode*. Notice how the ``?edit`` and ``?edit_off`` parameters are appended to the URL in your browser as you switch in
+and out of *Edit* mode.
 
-Until you publish your changes, you can continue working on the draft without
-affecting the published page.
+While your page remains in draft mode, you can continue working on it without affecting the published page.
+
+Once you have finished editing, you can exit editing mode and save the page
+using the **Save and close** |save-and-close| button.
 
 You have now worked through the complete cycle of content publishing in django
 CMS.
+
+.. |publish-page-now| image:: /images/publish-page-now.png
+.. |edit| image:: /images/edit.png
+.. |save-and-close| image:: /images/save-and-close.png
+
+Publishing status in the *Page list*
+====================================
+
+A page's status is also indicated in the *Page list* (if it's not already visible, select the *Pages...* menu item from
+the *Site menu*).
+
+In the example below, the *Home* page is page is published (in English) but the *About* page is still only in *Draft* mode.
+
+|unpublished-page|
+
+.. |unpublished-page| image:: /images/unpublished-page.png
