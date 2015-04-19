@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from cms.utils.compat import DJANGO_1_7
 
 from django.conf import settings
 from django.conf.urls import url
@@ -464,9 +465,13 @@ class PlaceholderAdminMixin(object):
         opts = plugin_class._meta
         using = router.db_for_write(plugin_class)
         app_label = opts.app_label
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
-            [plugin], opts, request.user, self.admin_site, using)
-
+        if DJANGO_1_7:
+            deleted_objects, perms_needed, protected = get_deleted_objects(
+                [plugin], opts, request.user, self.admin_site, using)
+        else:
+            deleted_objects, __, perms_needed, protected = get_deleted_objects(
+                [plugin], opts, request.user, self.admin_site, using)
+            
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied(_("You do not have permission to delete this plugin"))
@@ -505,8 +510,13 @@ class PlaceholderAdminMixin(object):
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
-            plugins, opts, request.user, self.admin_site, using)
+        if DJANGO_1_7:
+            deleted_objects, perms_needed, protected = get_deleted_objects(
+                plugins, opts, request.user, self.admin_site, using)
+        else:
+            deleted_objects, __, perms_needed, protected = get_deleted_objects(
+                plugins, opts, request.user, self.admin_site, using)
+
         obj_display = force_text(placeholder)
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
