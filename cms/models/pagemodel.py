@@ -40,8 +40,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     A simple hierarchical page model
     """
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
-        (1, _('for logged in users only')),
-        (2, _('for anonymous users only')),
+        (constants.VISIBILITY_USERS, _('for logged in users only')),
+        (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
     )
     TEMPLATE_DEFAULT = TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 

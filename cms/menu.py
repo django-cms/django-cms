@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import get_language
 
+from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.utils.permissions import load_view_restrictions, has_global_page_permission
 from cms.utils import get_language_from_request
@@ -117,12 +118,12 @@ def page_to_node(page, home, cut):
     # if parent_id and not page.parent.get_calculated_status():
     #    parent_id = None # ????
 
-    if page.limit_visibility_in_menu is None:
+    if page.limit_visibility_in_menu is constants.VISIBILITY_ALL:
         attr['visible_for_authenticated'] = True
         attr['visible_for_anonymous'] = True
     else:
-        attr['visible_for_authenticated'] = page.limit_visibility_in_menu == 1
-        attr['visible_for_anonymous'] = page.limit_visibility_in_menu == 2
+        attr['visible_for_authenticated'] = page.limit_visibility_in_menu == constants.VISIBILITY_USERS
+        attr['visible_for_anonymous'] = page.limit_visibility_in_menu == constants.VISIBILITY_ANONYMOUS
     attr['is_home'] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []

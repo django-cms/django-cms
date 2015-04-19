@@ -18,6 +18,7 @@ from django.template.loader import get_template
 from django.utils import six
 from django.utils.translation import activate
 
+from cms import constants
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -36,14 +37,6 @@ from cms.utils.i18n import get_language_list
 from cms.utils.permissions import _thread_locals, current_user, has_page_change_permission
 from menus.menu_pool import menu_pool
 
-
-#===============================================================================
-# Constants
-#===============================================================================
-
-VISIBILITY_ALL = None
-VISIBILITY_USERS = 1
-VISIBILITY_STAFF = 2
 
 #===============================================================================
 # Helpers/Internals
@@ -131,7 +124,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
-                login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
+                login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
@@ -183,7 +176,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert navigation_extenders in menus
 
     # validate menu visibility
-    accepted_limitations = (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
+    accepted_limitations = (constants.VISIBILITY_ALL, constants.VISIBILITY_USERS, constants.VISIBILITY_ANONYMOUS)
     assert limit_visibility_in_menu in accepted_limitations
 
     # validate position

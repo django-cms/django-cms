@@ -55,10 +55,10 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to authenticated users.
 
 
-.. data:: VISIBILITY_STAFF
+.. data:: VISIBILITY_ANONYMOUS
 
     Used for the ``limit_menu_visibility`` keyword argument to
-    :func:`create_page`. Limits menu visibility to staff users.
+    :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
 .. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
@@ -92,7 +92,7 @@ Functions and constants
     :type site: :class:`django.contrib.sites.models.Site` instance
     :param bool login_required: Whether users must be logged in or not to view this page
     :param limit_menu_visibility: Limits visibility of this page in the menu
-    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_STAFF`
+    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
 
