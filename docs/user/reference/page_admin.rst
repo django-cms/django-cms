@@ -85,11 +85,11 @@ draft only).
 The *Publishing controller* manages the publishing state of your page - options
 are:
 
-* *Publish page now* |publish-page-now|, to publish the current page
-* *Publish changes* |publish-changes| for publishing pending changes of an
+* **Publish page now** |publish-page-now| to publish an unpublished
+* **Publish changes** |publish-changes| to publish changes made to an
   existing page
-* *Edit* |edit| button to open the page in edit mode
-* *Save and close* |save-and-close| to update the page and exit the edit mode.
+* **Edit** |edit| to open the page for editing
+* **Save and close** |save-and-close| to update the page and exit editing mode
 
 .. |publish-page-now| image:: /images/publish-page-now.png
    :width: 119
