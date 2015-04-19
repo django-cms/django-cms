@@ -10,6 +10,7 @@ from menus.menu_pool import menu_pool
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from cms.utils.placeholder import get_toolbar_plugin_struct
+from django.core.urlresolvers import resolve
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
@@ -50,11 +51,29 @@ class ToolbarMiddleware(object):
     Middleware to set up CMS Toolbar.
     """
 
+    def is_cms_request(self,request):
+        cms_app_name = get_cms_setting('APP_NAME')
+        toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
+
+        if not toolbar_hide or not cms_app_name:
+            return True
+
+        try:
+            match = resolve(request.path_info)
+        except:
+            return False
+
+        return match.app_name == cms_app_name
+
+
     def process_request(self, request):
         """
         If we should show the toolbar for this request, put it on
         request.toolbar. Then call the request_hook on the toolbar.
         """
+
+        if not self.is_cms_request(request):
+            return
 
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
@@ -95,11 +114,17 @@ class ToolbarMiddleware(object):
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):
+        if not self.is_cms_request(request):
+            return
+
         response = request.toolbar.request_hook()
         if isinstance(response, HttpResponse):
             return response
 
     def process_response(self, request, response):
+        if not self.is_cms_request(request):
+            return response
+
         from django.utils.cache import add_never_cache_headers
 
         if ((hasattr(request, 'toolbar') and request.toolbar.edit_mode) or
