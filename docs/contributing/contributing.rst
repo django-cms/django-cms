@@ -197,23 +197,24 @@ We use Python documentation conventions for section marking:
 
 * ``#`` with overline, for parts
 * ``*`` with overline, for chapters
-* ``=``, for sections
-* ``-``, for subsections
-* ``^``, for subsubsections
-* ``"``, for paragraphs
+* ``=`` for sections
+* ``-`` for subsections
+* ``^`` for subsubsections
+* ``"`` for paragraphs
 
 Inline markup
 -------------
 
-* use backticks - ````settings.py```` - for:
-    * literals
-    * filenames
-    * names of fields and other items in the Admin interface:
-* use emphasis - ``*Home*`` around:
-    * the names of available options in the Admin
-    * values in or of fields
-* use strong emphasis - ``**Add page**`` around:
-    * buttons that perform an action
+* use backticks - `````` - for:
+    * literals - ````cms.models.pagemodel````
+    * filenames - ``edit ``settings.py````
+    * names of fields and other specific items in the Admin interface - ``edit ``Redirect````
+* use emphasis - ``*Home*`` - around:
+    * the names of available options in or parts of the Admin - ``the *Toolbar*``
+    * the names of important modes or states - ``switch to *Edit mode*``
+    * values in or of fields - ``enter *Home*``
+* use strong emphasis - ``**`` - around:
+    * buttons that perform an action - ``hit **Save and close**``
 
 Rules for using technical words
 -------------------------------
