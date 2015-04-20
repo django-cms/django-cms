@@ -101,6 +101,17 @@ If you are upgrading from django CMS 3.0.x running on Django 1.7 you need to rem
 migration path from `MIGRATION_MODULES
 <https://docs.djangoproject.com/en/1.7/ref/settings/#migration-modules>`_ settings.
 
+Plugins migrations moving process
+=================================
+
+Core plugins are being changeed to follow the new convention for the migration modules, starting
+with **djangocms_text_ckeditor** 2.5 released together with django CMS 3.1.
+
+Action required
+---------------
+
+Check the readme file of each plugin when upgrading to know the actions required.
+
 Structure mode permission
 =========================
 
