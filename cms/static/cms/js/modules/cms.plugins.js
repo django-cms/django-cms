@@ -687,9 +687,24 @@ $(document).ready(function () {
 				if(el.hasClass('cms_dragitem-expanded')) {
 					settings.states.splice($.inArray(id, settings.states), 1);
 					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
+					if ($(document).data('expandmode')) {
+						var items = draggable.find('.cms_draggable').find('.cms_dragitem-collapsable');
+						if(!items.length) return false;
+						items.each(function () {
+							if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+						});
+					}
+
 				} else {
 					settings.states.push(id);
 					el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
+					if ($(document).data('expandmode')) {
+						var items = draggable.find('.cms_draggable').find('.cms_dragitem-collapsable');
+						if(!items.length) return false;
+						items.each(function () {
+							if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+						});
+					}
 				}
 
 				// save settings
