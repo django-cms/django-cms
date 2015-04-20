@@ -344,3 +344,19 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - Fixed a typo in JavaScript which prevents page tree from working
 
+=== 3.0.13 (2015-04-15) ===
+
+- Numerous documentation including installation and tutorial updates
+- Numerous improvements to translations
+- Improves reliability of apphooks
+- Improves reliabiliy of Advanced Settings on page when using apphooks
+- Allow page deletion after template removal
+- Improves upstream caching accuracy
+- Improves CMSAttachMenu registration
+- Improves handling of mistyped URLs
+- Improves redirection as a result of changes to page slugs, etc.
+- Improves performance of "watched models"
+- Improves frontend performance relating to resizing the sideframe
+- Corrects an issue where items might not be visible in structue mode menus
+- Limits version of django-mptt used in CMS for 3.0.x
+- Prevent accidental upgrades to Django 1.8, which is not yet supported
