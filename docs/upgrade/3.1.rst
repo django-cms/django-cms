@@ -41,7 +41,7 @@ Other than this, end users should not notice any changes.
 
 .. note:: User feedback required
 
-    We require as much feedback as possible about the performance of django-treebeard in this beta
+    We require as much feedback as possible about the performance of django-treebeard in this 
     release. Please let us know your experiences with it, especially if you encounter any problems.
 
 .. note:: Backward incompatible change
@@ -49,7 +49,7 @@ Other than this, end users should not notice any changes.
     While most of the low-level interface is very similar between ``django-mptt`` and
     ``django-treebeard`` they are not exactly the same. If any custom code needs to make use of the
     low-level interfaces of the page or plugins tree, please see the `django-treebeard
-    documentation <https://django-treebeard.googlecode.com/svn/docs/index.html>`_ for information
+    documentation <https://tabo.pe/projects/django-treebeard/docs/2.0/>`_ for information
     on how to use equivalent calls in ``django-treebeard``.
 
 
@@ -118,7 +118,7 @@ Structure mode permission
 A new :doc:`Can use Structure mode* permission </topics/permissions>` has been added.
 
 Without this permission, a non-superuser will no longer have access to structure mode. This makes
-possible a more strict workflow, in which certain users are abnle to edit content but not structure.
+possible a more strict workflow, in which certain users are able to edit content but not structure.
 
 This change includes a data migration that adds the new permission to any staff user or group with
 ``cms.change_page`` permission.
@@ -140,7 +140,7 @@ queries that are generated, in order to make it faster.
 
 .. note:: User feedback required
 
-    We require as much feedback as possible about the performance of this feature in this beta
+    We require as much feedback as possible about the performance of this feature in this 
     release. Please let us know your experiences with it, especially if you encounter any problems.
 
 Toolbar API extension
@@ -149,14 +149,16 @@ Toolbar API extension
 The toolbar API has been extended to permit more powerful use of it in future development,
 including the use of "clipboard-like" items.
 
-For an example of how this can be used, see the new Blueprint application.
+For an example of how this can be used, see the new
+`Aldryn Blueprint <https://github.com/aldryn/aldryn-blueprint/>`_ application.
 
 Per-namespace apphook configuration
 ===================================
 
 django CMS provides a new API to define namespaced :doc:`Apphook </how_to/apphooks>` configurations.
 
-Aldryn Apphook Config has been created and released as a standard implementation to take advantage
+`Aldryn Apphooks Config <https://github.com/aldryn/aldryn-apphooks-config>`_ has
+been created and released as a standard implementation to take advantage
 of this, but other implementations can be developed.
 
 Improvements to the toolbar user interface
