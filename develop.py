@@ -129,28 +129,43 @@ def _split(itr, num):
 
 def _get_test_labels():
     test_labels = []
-    for module in [name for _, name, _ in pkgutil.iter_modules(
-            [os.path.join("cms", "tests")])]:
-        clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
-        for clsname, cls in clsmembers.items():
-            for method, _ in cls.methods.items():
-                if method.startswith('test_'):
-                    test_labels.append('cms.%s.%s' % (clsname, method))
+    if DJANGO_1_6:
+        for module in [name for _, name, _ in pkgutil.iter_modules(
+                [os.path.join("cms", "tests")])]:
+            clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+            for clsname, cls in clsmembers.items():
+                for method, _ in cls.methods.items():
+                    if method.startswith('test_'):
+                        test_labels.append('cms.%s.%s' % (clsname, method))
+    else:
+        for module in [name for _, name, _ in pkgutil.iter_modules(
+                [os.path.join("cms", "tests")])]:
+            clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+            for clsname, cls in clsmembers.items():
+                for method, _ in cls.methods.items():
+                    if method.startswith('test_'):
+                        test_labels.append('cms.tests.%s.%s' % (clsname, method))
     test_labels = sorted(test_labels)
     return test_labels
 
 
-def _test_run_worker(test_labels, failfast=False,
-                     test_runner='django.test.simple.DjangoTestSuiteRunner'):
+def _test_run_worker(test_labels, failfast=False, test_runner=None):
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
     from django.conf import settings
-    settings.TEST_RUNNER = test_runner
     from django.test.utils import get_runner
+    if not test_runner:
+        if DJANGO_1_6:
+            test_runner = 'django.test.simple.DjangoTestSuiteRunner'
+        else:
+            test_runner = 'django.test.runner.DiscoverRunner'
+    if not test_labels:
+        test_labels = _get_test_labels()
+    settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
-
-    test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
+    test_runner = TestRunner(verbosity=1, pattern="*.py", top_level='cms',
+                             interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 

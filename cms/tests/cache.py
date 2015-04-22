@@ -152,7 +152,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 20)):
+            with self.assertNumQueries(FuzzyInt(1, 21)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 

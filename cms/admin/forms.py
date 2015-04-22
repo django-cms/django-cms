@@ -6,7 +6,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models.fields import BooleanField
-from django.forms.util import ErrorList
+try:
+    from django.forms.utils import ErrorList
+except ImportError:
+    from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text

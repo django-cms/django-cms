@@ -1,0 +1,6 @@
+https://github.com/ojii/django-sekizai/archive/master.zip
+-r requirements_base.txt
+django>=1.8,<1.9
+django-reversion>=1.8,<1.9
+https://github.com/KristianOellegaard/django-hvad/archive/master.zip
+

@@ -7,7 +7,7 @@ import os
 
 from django.db.models.loading import get_app_paths
 from django.conf import settings
-from django.template import Lexer, TOKEN_BLOCK
+from django.template.base import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
