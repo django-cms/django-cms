@@ -1,5 +1,6 @@
+from cms.utils.compat import DJANGO_1_7
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.template.base import Template
 from django.template.context import RequestContext
 from django.views.generic import DetailView
@@ -17,16 +18,20 @@ def example_view(request):
 def _base_detail(request, instance, template_name='detail.html',
                  item_name="char_1", template_string='',):
     context = RequestContext(request)
-    context['instance'] = instance
-    context['instance_class'] = instance.__class__
-    context['item_name'] = item_name
+    context.update({
+        'instance': instance,
+        'instance_class': instance.__class__(),
+        'item_name': item_name
+    })
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(instance)
     if template_string:
         template = Template(template_string)
         return HttpResponse(template.render(context))
     else:
-        return render_to_response(template_name, context)
+        if DJANGO_1_7:
+            return render_to_response(template_name, context)
+        return render(request, template_name, context)
 
 
 def list_view_multi(request):
