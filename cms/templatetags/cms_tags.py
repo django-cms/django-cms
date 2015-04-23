@@ -2,6 +2,7 @@
 from copy import copy
 from datetime import datetime
 from itertools import chain
+from cms.utils.compat import DJANGO_1_7
 from django.utils.six import string_types
 import re
 from classytags.values import StringValue
@@ -563,7 +564,11 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     from django.core.cache import cache
     validate_placeholder_name(placeholder_name)
 
-    request = context.get('request', False)
+    if DJANGO_1_7:
+        request = context.get('request', False)
+    else:
+        request = context.request
+
     site_id = get_site_id(site)
 
     if not request:

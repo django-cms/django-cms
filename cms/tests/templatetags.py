@@ -169,6 +169,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             request.REQUEST = {}
             request.session = {}
             request.user = User()
+
             self.assertRaises(Placeholder.DoesNotExist,
                               _show_placeholder_for_page,
                               RequestContext(request),

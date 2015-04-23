@@ -6,7 +6,7 @@ import dj_database_url
 import django
 from django.utils import six
 
-from cms.utils.compat import DJANGO_1_6
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 
 gettext = lambda s: s
@@ -267,6 +267,10 @@ def configure(db_url, **extra):
         ALLOWED_HOSTS=['localhost'],
     )
     from django.utils.functional import empty
+    #
+    # if not DJANGO_1_7:
+    #     defaults['TEMPLATE_CONTEXT_PROCESSORS'].append(
+    #         'django.core.context_processors.request')
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
