@@ -103,19 +103,12 @@ options you can change this.
 
 You must provide two arguments:
 
-* ``from_language``: the language to copy the content from;
-* ``to_language``: the language to copy the content to.
-
-It accepts the following options
-
-* ``force-copy``: set to copy content even if a placeholder already has content;
-  if set, copied content will be appended to the original one;
-* ``site``: specifiy a SITE_ID to operate on sites different from the current one;
-* ``verbose``: set for more verbose output.
+* ``from_site``: the site to copy the content from;
+* ``to_site``: the site to copy the content to.
 
 Example::
 
-    cms copy-lang en de force-copy site=2 verbose
+    cms copy-site 1 2 verbose
 
 *******************
 Moderation commands
