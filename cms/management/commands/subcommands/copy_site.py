@@ -1,5 +1,4 @@
-from optparse import make_option
-
+# -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.sites.models import Site
 from django.db import transaction
@@ -28,7 +27,7 @@ class CopySiteCommand(BaseCommand):
 
         with transaction.atomic():
             for page in pages:
-                page.copy_page(page, to_site)
+                page.copy_page(None, to_site)
             self.stdout.write("Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n".format(from_site_id, to_site_id))
 
     def get_site(self, site_id):
