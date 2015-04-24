@@ -330,6 +330,63 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(stack_text_en.plugin_type, stack_text_de.plugin_type)
         self.assertEqual(stack_text_en.body, stack_text_de.body)
 
+    def test_copy_sites(self):
+        """
+        Various checks here:
+
+         * plugins are exactly doubled, half per site with no orphaned plugin
+         * the bottom-most plugins in the nesting chain maintain the same position and the same content
+         * the top-most plugin are of the same type
+        """
+        site_1 = 1
+        site_2 = 2
+        Site.objects.create(name='site 2')
+        phs = []
+        for page in Page.objects.on_site(site_1).drafts():
+            phs.extend(page.placeholders.values_list('pk', flat=True))
+        number_start_plugins = CMSPlugin.objects.filter(placeholder__in=phs).count()
+
+        out = StringIO()
+        command = cms.Command()
+        command.stdout = out
+        command.handle("copy-site", site_1, site_2)
+        for page in Page.objects.on_site(site_1).drafts():
+            page.publish('en')
+        for page in Page.objects.on_site(site_2).drafts():
+            page.publish('en')
+        pages_1 = list(Page.objects.on_site(site_1).drafts())
+        pages_2 = list(Page.objects.on_site(site_2).drafts())
+        for index, page in enumerate(pages_1):
+            self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
+            self.assertEqual(page.depth, pages_2[index].depth)
+
+        phs_1 = []
+        phs_2 = []
+        for page in Page.objects.on_site(site_1).drafts():
+            phs_1.extend(page.placeholders.values_list('pk', flat=True))
+        for page in Page.objects.on_site(site_2).drafts():
+            phs_2.extend(page.placeholders.values_list('pk', flat=True))
+
+        # These asserts that no orphaned plugin exists
+        self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
+        self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
+
+        root_page_1 = Page.objects.on_site(site_1).get_home(site_1)
+        root_page_2 = Page.objects.on_site(site_2).get_home(site_2)
+        root_plugins_1 = CMSPlugin.objects.filter(placeholder=root_page_1.placeholders.get(slot="body"))
+        root_plugins_2 = CMSPlugin.objects.filter(placeholder=root_page_2.placeholders.get(slot="body"))
+
+        first_plugin_1, _ = root_plugins_1.get(language='en', parent=None).get_plugin_instance()
+        first_plugin_2, _ = root_plugins_2.get(language='en', parent=None).get_plugin_instance()
+
+        self.assertEqual(first_plugin_1.plugin_type, first_plugin_2.plugin_type)
+
+        link_1, _ = root_plugins_1.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
+        link_2, _ = root_plugins_2.get(language='en', plugin_type='LinkPlugin').get_plugin_instance()
+
+        self.assertEqual(link_1.url, link_2.url)
+        self.assertEqual(link_1.get_position_in_placeholder(), link_2.get_position_in_placeholder())
+
     def test_copy_existing_title(self):
         """
         Even if a title already exists the copy is successfull, the original
