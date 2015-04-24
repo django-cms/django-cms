@@ -23,3 +23,8 @@ except ImportError:  # Django 1.6
 
     def installed_apps():
         return settings.INSTALLED_APPS
+
+try:
+    from django.utils.translation import LANGUAGE_SESSION_KEY
+except ImportError:
+    LANGUAGE_SESSION_KEY = 'django_language'

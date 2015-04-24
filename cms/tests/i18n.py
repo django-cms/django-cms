@@ -1,13 +1,11 @@
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import i18n
-from cms.utils.i18n import get_fallback_languages
 
 from django.conf import settings
 from django.test.utils import override_settings
 from django.utils.importlib import import_module
-from django.utils.translation import LANGUAGE_SESSION_KEY
-
+from cms.utils.compat.dj import LANGUAGE_SESSION_KEY
 
 @override_settings(
     LANGUAGE_CODE='en',
@@ -298,7 +296,7 @@ class TestLanguageCodesEnGB(CMSTestCase):
 class TestLanguagesNotInCMSLanguages(CMSTestCase):
 
     def test_get_fallback_languages(self):
-        languages = get_fallback_languages('en', 1)
+        languages = i18n.get_fallback_languages('en', 1)
         self.assertEqual(languages, ['de', 'fr'])
 
 

@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from django.utils.translation import (get_language, LANGUAGE_SESSION_KEY)
+from django.utils.translation import get_language
 from django.conf import settings
+
+from cms.utils.compat.dj import LANGUAGE_SESSION_KEY
 
 
 class LanguageCookieMiddleware(object):
