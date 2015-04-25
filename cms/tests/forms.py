@@ -190,9 +190,8 @@ class PermissionFormTestCase(CMSTestCase):
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertFalse(form.is_valid())
-            self.assertEqual(str(form.errors),
-                             '<ul class="errorlist"><li>__all__<ul class="errorlist"><li>Add page permission also '
-                             'requires edit page permission.</li></ul></li></ul>')
+            self.assertTrue('<li>Add page permission also requires edit page '
+                            'permission.</li>' in str(form.errors))
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
@@ -201,10 +200,9 @@ class PermissionFormTestCase(CMSTestCase):
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertFalse(form.is_valid())
-            self.assertEqual(str(form.errors),
-                             '<ul class="errorlist"><li>__all__<ul class="errorlist"><li>Add page permission requires '
-                             'also access to children, or descendants, otherwise added page can&#39;t be changed by '
-                             'its creator.</li></ul></li></ul>')
+            self.assertTrue('<li>Add page permission requires also access to children, or '
+                            'descendants, otherwise added page can&#39;t be changed by its '
+                            'creator.</li>' in str(form.errors))
 
     def test_inlines(self):
         user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)

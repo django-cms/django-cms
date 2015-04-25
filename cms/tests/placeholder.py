@@ -1284,10 +1284,10 @@ class PlaceholderI18NTest(CMSTestCase):
         return u
 
     def test_hvad_tabs(self):
-        ex = MultilingualExample1(
-            char_1='one',
-            char_2='two',
-        )
+        ex = MultilingualExample1()
+        ex.translate("en")
+        ex.char_1 = 'one'
+        ex.char_2 = 'two'
         ex.save()
         self._testuser()
         self.client.login(username='test', password='test')

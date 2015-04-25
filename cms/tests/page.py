@@ -1049,9 +1049,6 @@ class PagesTestCase(CMSTestCase):
                 for j in range(5):
                     add_plugin(placeholder, TextPlugin, 'en', body='text-%d-%d' % (i, j))
                     add_plugin(placeholder, LinkPlugin, 'en', name='link-%d-%d' % (i, j))
-            from django.db import connection
-
-            connection.queries = []
 
             # trigger the apphook query so that it doesn't get in our way
             reverse('pages-root')

@@ -73,7 +73,6 @@ def configure(db_url, **extra):
             os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
         ],
         MIDDLEWARE_CLASSES=[
-            #'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
@@ -267,10 +266,6 @@ def configure(db_url, **extra):
         ALLOWED_HOSTS=['localhost'],
     )
     from django.utils.functional import empty
-    #
-    # if not DJANGO_1_7:
-    #     defaults['TEMPLATE_CONTEXT_PROCESSORS'].append(
-    #         'django.core.context_processors.request')
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
@@ -304,8 +299,6 @@ def configure(db_url, **extra):
         }
     else:
         defaults['MIGRATION_MODULES'] = {
-            'cms': 'cms.migrations',
-            'menus': 'menus.migrations',
             'djangocms_column': 'djangocms_column.migrations_django',
             'djangocms_file': 'djangocms_file.migrations_django',
             'djangocms_flash': 'djangocms_flash.migrations_django',
