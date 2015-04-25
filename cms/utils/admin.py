@@ -44,13 +44,11 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
 
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
-    #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
     if get_cms_setting('PERMISSION'):
         # jstree metadata generator
         md = []
 
-        #if not has_add_page_permission:
         if not has_move_page_permission:
             md.append(('valid_children', False))
             md.append(('draggable', False))
@@ -74,7 +72,6 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site_id)
-        #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
     context = {
         'page': page,
         'site': site,
