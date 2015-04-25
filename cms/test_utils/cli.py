@@ -6,7 +6,7 @@ import dj_database_url
 import django
 from django.utils import six
 
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_6
 
 
 gettext = lambda s: s
