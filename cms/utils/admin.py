@@ -4,8 +4,7 @@ import json
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import render
 from django.utils.encoding import smart_str
 
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
@@ -106,12 +105,10 @@ def render_admin_menu_item(request, page, template=None, language=None):
     # languages
     from cms.utils import permissions
     languages = get_language_list(page.site_id)
-    context = RequestContext(request, {
+    context = {
         'has_add_permission': permissions.has_page_add_permission(request),
         'site_languages': languages,
-    })
-
+    }
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered, language))
-    # add mimetype to help out IE
-    return render_to_response(template, context, content_type="text/html; charset=utf-8")
+    return render(request, template, context)

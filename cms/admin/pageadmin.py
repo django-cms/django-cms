@@ -19,8 +19,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, Validat
 from django.db import router, transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.template.defaultfilters import escape
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import unquote
@@ -677,7 +676,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # the 'invalid=1' parameter was already in the query string, something
             # is screwed up with the database, so display an error page.
             if ERROR_FLAG in request.GET.keys():
-                return render_to_response('admin/invalid_setup.html', {'title': _('Database error')})
+                return render(request, 'admin/invalid_setup.html', {'title': _('Database error')})
             return HttpResponseRedirect(request.path_info + '?' + ERROR_FLAG + '=1')
         cl.set_items(request)
 
@@ -720,11 +719,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             context['has_recover_permission'] = self.has_recover_permission(request)
             context['has_change_permission'] = self.has_change_permission(request)
         context.update(extra_context or {})
-        return render_to_response(self.change_list_template or [
+        return render(request, self.change_list_template or [
             'admin/%s/%s/change_list.html' % (app_label, opts.object_name.lower()),
             'admin/%s/change_list.html' % app_label,
             'admin/change_list.html'
-        ], context, context_instance=RequestContext(request))
+        ], context)
 
     def recoverlist_view(self, request, extra_context=None):
         if not self.has_recover_permission(request):
@@ -883,7 +882,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             'page': page,
             'permission_set': permission_set,
         }
-        return render_to_response('admin/cms/page/permissions.html', context)
+        return render(request, 'admin/cms/page/permissions.html', context)
 
     @require_POST
     @transaction.atomic
@@ -1204,12 +1203,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             "app_label": app_label,
         }
         context.update(extra_context or {})
-        context_instance = RequestContext(request, current_app=self.admin_site.name)
-        return render_to_response(self.delete_confirmation_template or [
+        request.current_app = self.admin_site.name
+        return render(request, self.delete_confirmation_template or [
             "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
-        ], context, context_instance=context_instance)
+        ], context)
 
     def preview_page(self, request, object_id, language):
         """Redirecting preview function based on draft_id
@@ -1376,10 +1375,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             context.update({
                 'cancel': True,
             })
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
-        return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
+        return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
     def get_published_pagelist(self, *args, **kwargs):
         """
