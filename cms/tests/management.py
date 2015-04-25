@@ -338,41 +338,41 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
          * the bottom-most plugins in the nesting chain maintain the same position and the same content
          * the top-most plugin are of the same type
         """
-        site_1 = 1
-        site_2 = 2
-        Site.objects.create(name='site 2')
+        site_1_pk = 1
+        site_2 = Site.objects.create(name='site 2')
+        site_2_pk = site_2.pk
         phs = []
-        for page in Page.objects.on_site(site_1).drafts():
+        for page in Page.objects.on_site(site_1_pk).drafts():
             phs.extend(page.placeholders.values_list('pk', flat=True))
         number_start_plugins = CMSPlugin.objects.filter(placeholder__in=phs).count()
 
         out = StringIO()
         command = cms.Command()
         command.stdout = out
-        command.handle("copy-site", site_1, site_2)
-        for page in Page.objects.on_site(site_1).drafts():
+        command.handle("copy-site", site_1_pk, site_2_pk)
+        for page in Page.objects.on_site(site_1_pk).drafts():
             page.publish('en')
-        for page in Page.objects.on_site(site_2).drafts():
+        for page in Page.objects.on_site(site_2_pk).drafts():
             page.publish('en')
-        pages_1 = list(Page.objects.on_site(site_1).drafts())
-        pages_2 = list(Page.objects.on_site(site_2).drafts())
+        pages_1 = list(Page.objects.on_site(site_1_pk).drafts())
+        pages_2 = list(Page.objects.on_site(site_2_pk).drafts())
         for index, page in enumerate(pages_1):
             self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
             self.assertEqual(page.depth, pages_2[index].depth)
 
         phs_1 = []
         phs_2 = []
-        for page in Page.objects.on_site(site_1).drafts():
+        for page in Page.objects.on_site(site_1_pk).drafts():
             phs_1.extend(page.placeholders.values_list('pk', flat=True))
-        for page in Page.objects.on_site(site_2).drafts():
+        for page in Page.objects.on_site(site_2_pk).drafts():
             phs_2.extend(page.placeholders.values_list('pk', flat=True))
 
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
 
-        root_page_1 = Page.objects.on_site(site_1).get_home(site_1)
-        root_page_2 = Page.objects.on_site(site_2).get_home(site_2)
+        root_page_1 = Page.objects.on_site(site_1_pk).get_home(site_1_pk)
+        root_page_2 = Page.objects.on_site(site_2_pk).get_home(site_2_pk)
         root_plugins_1 = CMSPlugin.objects.filter(placeholder=root_page_1.placeholders.get(slot="body"))
         root_plugins_2 = CMSPlugin.objects.filter(placeholder=root_page_2.placeholders.get(slot="body"))
 
