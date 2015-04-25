@@ -69,7 +69,7 @@ class ExtensionsTestCase(TestCase):
             from django.apps import apps
             del apps.all_models['cms']['testpageextension']
             del apps.all_models['cms']['testtitleextension']
-        except ImportError:  # Django 1.6
+        except (ImportError, KeyError):  # Django 1.6
             pass
 
     def get_page_extension_class(self):
@@ -78,6 +78,9 @@ class ExtensionsTestCase(TestCase):
         class TestPageExtension(PageExtension):
             content = models.CharField('Content', max_length=50)
 
+            class Meta:
+                abstract = True
+
         return TestPageExtension
 
     def get_title_extension_class(self):
@@ -85,6 +88,9 @@ class ExtensionsTestCase(TestCase):
 
         class TestTitleExtension(TitleExtension):
             content = models.CharField('Content', max_length=50)
+
+            class Meta:
+                abstract = True
 
         return TestTitleExtension
 
