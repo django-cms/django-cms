@@ -125,6 +125,12 @@ dj-database-url compatible value.
 Runs the test suite. Optionally takes test labels as arguments to limit the tests which should be run.
 Test labels should be in the same format as used in ``manage.py test``.
 
+.. option:: --xvfb
+
+    Use a virtual X framebuffer for frontend testing, requires `xvfbwrapper <https://github.com/cgoldberg/xvfbwrapper>`_ to be installed.
+
+    With this option you won't need a physical display.
+
 .. option:: --parallel
 
     Runs tests in parallel, using one worker process per available CPU core.
