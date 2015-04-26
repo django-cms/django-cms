@@ -880,35 +880,36 @@ class PlaceholderModelTests(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         template = '{% load cms_tags %}{% render_placeholder ex1.placeholder %}'
-
         context = RequestContext(self.get_request(language="en", page=page_en), {'ex1': ex1})
 
         # request.placeholders is populated for superuser
-        context['request'] = self.get_request(language="en", page=page_en)
-        context['request'].user = self.get_superuser()
+        request = self.get_request(language="en", page=page_en)
+        request.user = self.get_superuser()
+        context.update({'request': request})
         template_obj = Template(template)
         template_obj.render(context)
-        print(context)
-        self.assertEqual(len(context['request'].placeholders), 2)
-        self.assertIn(ex1.placeholder, context['request'].placeholders)
+        self.assertEqual(len(request.placeholders), 2)
+        self.assertIn(ex1.placeholder, request.placeholders)
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
-        context['request'] = self.get_request(language="en", page=page_en)
-        context['request'].user = user
+        request = self.get_request(language="en", page=page_en)
+        request.user = user
+        context.update({'request': request})
         template_obj = Template(template)
         template_obj.render(context)
-        self.assertEqual(len(context['request'].placeholders), 0)
-        self.assertNotIn(ex1.placeholder, context['request'].placeholders)
+        self.assertEqual(len(request.placeholders), 0)
+        self.assertNotIn(ex1.placeholder, request.placeholders)
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename='change_example1'))
-        context['request'] = self.get_request(language="en", page=page_en)
-        context['request'].user = get_user_model().objects.get(pk=user.pk)
+        request = self.get_request(language="en", page=page_en)
+        request.user = get_user_model().objects.get(pk=user.pk)
+        context.update({'request': request})
         template_obj = Template(template)
         template_obj.render(context)
-        self.assertEqual(len(context['request'].placeholders), 2)
-        self.assertIn(ex1.placeholder, context['request'].placeholders)
+        self.assertEqual(len(request.placeholders), 2)
+        self.assertIn(ex1.placeholder, request.placeholders)
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)

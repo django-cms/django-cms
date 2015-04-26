@@ -3,7 +3,6 @@ from copy import copy
 from datetime import datetime
 from itertools import chain
 from cms.utils.compat import DJANGO_1_7
-from django.template import RequestContext
 from django.utils.six import string_types
 import re
 from classytags.values import StringValue
@@ -737,7 +736,6 @@ class CMSEditableObject(InclusionTag):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
-        data = RequestContext(context['request'], data)
         output = render_to_string(template, data).strip()
         context.pop()
         if kwargs.get('varname'):
@@ -1024,7 +1022,6 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
-        data = RequestContext(context['request'], data)
         output = render_to_string(template, data)
         context.pop()
         if kwargs.get('varname'):
@@ -1077,7 +1074,6 @@ class CMSEditableObjectBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
-        data = RequestContext(context['request'], data)
         output = render_to_string(template, data)
         context.pop()
         if kwargs.get('varname'):
