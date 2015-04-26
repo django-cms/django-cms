@@ -139,7 +139,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_do_email(self):
         with self.settings(SEND_BROKEN_LINK_EMAILS=True, DEBUG=False,
-                              MANAGERS=[("Jenkins", "tests@django-cms.org")]):
+                           MANAGERS=[("Jenkins", "tests@django-cms.org")]):
             request = self.get_request('/')
             page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
             self.assertEqual(page, None)

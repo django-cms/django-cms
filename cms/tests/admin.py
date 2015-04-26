@@ -9,7 +9,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
-from django.contrib.admin.sites import site
+from django.contrib.admin.sites import site, AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
@@ -1240,7 +1240,7 @@ class PluginPermissionTests(AdminTestsBase):
         page_permission = PagePermission.objects.create(
             can_change_permissions=True, user=user, page=page)
         request = self._get_change_page_request(user, page)
-        page_admin = PageAdmin(Page, None)
+        page_admin = PageAdmin(Page, AdminSite())
         page_admin._current_page = page
         # user has can_change_permission
         # => must see the PagePermissionInline
@@ -1253,7 +1253,7 @@ class PluginPermissionTests(AdminTestsBase):
         page_permission.can_change_permissions = False
         page_permission.save()
         request = self._get_change_page_request(user, page)
-        page_admin = PageAdmin(Page, None)
+        page_admin = PageAdmin(Page, AdminSite())
         page_admin._current_page = page
         # => PagePermissionInline is no longer visible
         self.assertFalse(

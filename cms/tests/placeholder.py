@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import itertools
-from cms.utils.compat import DJANGO_1_7
 
 from django.conf import settings
 from django.contrib import admin
@@ -287,18 +286,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
 
     def test_placeholder_context_leaking(self):
-        TEST_CONF = {'test': {'extra_context': {'width': 10}}}
+        TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
         ph = Placeholder.objects.create(slot='test')
 
         context = SekizaiContext()
         context['request'] = self.get_request()
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             render_placeholder(ph, context)
-            self.assertTrue('width' in context)
-            self.assertEqual(context['width'], 10)
+            self.assertFalse('extra_width' in context)
             ph.render(context, None)
-            self.assertTrue('width' in context)
-            self.assertEqual(context['width'], 10)
+            self.assertFalse('extra_width' in context)
 
     def test_placeholder_scanning_nested_super(self):
         placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
@@ -314,13 +311,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         This test for a side-effect of the above which prevents placeholder
         fields to return the 
         """
-        if DJANGO_1_7:
-            example = Category.objects.create(
-                name='category',
-                parent=None, depth=1,
-            )
-            self.assertEqual(example.description._get_attached_fields()[0].model, Category)
-            self.assertEqual(len(example.description._get_attached_fields()), 1)
+        example = Category.objects.create(
+            name='category',
+            parent=None, depth=1,
+        )
+        self.assertEqual(example.description._get_attached_fields()[0].model, Category)
+        self.assertEqual(len(example.description._get_attached_fields()), 1)
 
     def test_placeholder_field_valid_slotname(self):
         self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
@@ -880,14 +876,12 @@ class PlaceholderModelTests(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         template = '{% load cms_tags %}{% render_placeholder ex1.placeholder %}'
-        context = RequestContext(self.get_request(language="en", page=page_en), {'ex1': ex1})
+        context = {'ex1': ex1}
 
         # request.placeholders is populated for superuser
         request = self.get_request(language="en", page=page_en)
         request.user = self.get_superuser()
-        context.update({'request': request})
-        template_obj = Template(template)
-        template_obj.render(context)
+        self.render_template_obj(template, context, request)
         self.assertEqual(len(request.placeholders), 2)
         self.assertIn(ex1.placeholder, request.placeholders)
 
@@ -895,9 +889,7 @@ class PlaceholderModelTests(CMSTestCase):
         user = self.get_staff_user_with_no_permissions()
         request = self.get_request(language="en", page=page_en)
         request.user = user
-        context.update({'request': request})
-        template_obj = Template(template)
-        template_obj.render(context)
+        self.render_template_obj(template, context, request)
         self.assertEqual(len(request.placeholders), 0)
         self.assertNotIn(ex1.placeholder, request.placeholders)
 
@@ -905,9 +897,7 @@ class PlaceholderModelTests(CMSTestCase):
         user.user_permissions.add(Permission.objects.get(codename='change_example1'))
         request = self.get_request(language="en", page=page_en)
         request.user = get_user_model().objects.get(pk=user.pk)
-        context.update({'request': request})
-        template_obj = Template(template)
-        template_obj.render(context)
+        self.render_template_obj(template, context, request)
         self.assertEqual(len(request.placeholders), 2)
         self.assertIn(ex1.placeholder, request.placeholders)
 

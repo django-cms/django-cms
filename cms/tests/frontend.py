@@ -36,13 +36,14 @@ else:
 
 
 class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
+    driver = None
     @classmethod
     def setUpClass(cls):
-        super(CMSLiveTests, cls).setUpClass()
-        cache.clear()
         if os.environ.get('SELENIUM', '') != '':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
+        super(CMSLiveTests, cls).setUpClass()
+        cache.clear()
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
             capabilities = webdriver.DesiredCapabilities.CHROME
             capabilities['version'] = '31'
@@ -63,7 +64,8 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.quit()
+        if cls.driver:
+            cls.driver.quit()
         super(CMSLiveTests, cls).tearDownClass()
 
     def tearDown(self):

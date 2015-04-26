@@ -80,6 +80,7 @@ def configure(db_url, **extra):
             'django.contrib.messages.middleware.MessageMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.BrokenLinkEmailsMiddleware',
             'django.middleware.common.CommonMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
@@ -236,7 +237,7 @@ def configure(db_url, **extra):
             },
             'extra_context': {
                 "plugins": ('TextPlugin',),
-                "extra_context": {"width": 250},
+                "extra_context": {"extra_width": 250},
                 "name": "extra context"
             },
         },

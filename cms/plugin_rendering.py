@@ -106,7 +106,7 @@ def render_placeholder(placeholder, context_to_copy,
     if not placeholder:
         return
     from cms.utils.plugins import get_plugins
-    context = context_to_copy
+    context = context_to_copy.new(context_to_copy)
     context.push()
     request = context['request']
     if not hasattr(request, 'placeholders'):
@@ -153,12 +153,10 @@ def render_placeholder(placeholder, context_to_copy,
     # TODO this should actually happen as a plugin context processor, but these currently overwrite
     # existing context -- maybe change this order?
     slot = getattr(placeholder, 'slot', None)
-    extra_context = {}
     if slot:
         for key, value in get_placeholder_conf("extra_context", slot, template, {}).items():
             if key not in context:
-                extra_context[key] = value
-        context.update(extra_context)
+                context[key] = value
     content = []
     watcher = Watcher(context)
     content.extend(render_plugins(plugins, context, placeholder, processors))
@@ -177,11 +175,9 @@ def render_placeholder(placeholder, context_to_copy,
         content = mark_safe(default.render(context_to_copy))
     else:
         content = ''
-    context.update({
-        'content': content,
-        'placeholder': toolbar_content,
-        'edit': edit
-    })
+    context['content'] = content
+    context['placeholder'] = toolbar_content
+    context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
     changes = watcher.get_changes()
     if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
@@ -208,12 +204,10 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
     context.push()
 
     # to restrict child-only plugins from draggables..
-    context.update({
-        'allowed_plugins': [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)] + plugin_pool.get_system_plugins(),
-        'placeholder': placeholder,
-        'language': save_language,
-        'page': page
-    })
+    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)] + plugin_pool.get_system_plugins()
+    context['placeholder'] = placeholder
+    context['language'] = save_language
+    context['page'] = page
     toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return toolbar

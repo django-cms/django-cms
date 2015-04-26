@@ -142,7 +142,7 @@ class Placeholder(models.Model):
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
-            context.update({'width': width})
+            context['width'] = width
         return render_placeholder(self, context, lang=lang, editable=editable,
                                   use_cache=use_cache)
 
