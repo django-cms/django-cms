@@ -33,8 +33,11 @@ class PluginContext(Context):
     using the "processors" keyword argument.
     """
 
-    def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
-        super(PluginContext, self).__init__(dict, current_app=current_app)
+    def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
+        if current_app:
+            super(PluginContext, self).__init__(dict_)
+        else:
+            super(PluginContext, self).__init__(dict_, current_app=current_app)
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
@@ -50,10 +53,12 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     Renders a single plugin and applies the post processors to it's rendered
     content.
     """
+    if current_app:
+        context['request'].current_app = current_app
     if not processors:
         processors = []
     if isinstance(template, six.string_types):
-        content = render_to_string(template, context_instance=context)
+        content = render_to_string(template, context)
     elif isinstance(template, Template):
         content = template.render(context)
     else:
@@ -150,11 +155,10 @@ def render_placeholder(placeholder, context_to_copy,
     slot = getattr(placeholder, 'slot', None)
     extra_context = {}
     if slot:
-        extra_context = get_placeholder_conf("extra_context", slot, template, {})
-    for key, value in extra_context.items():
-        if key not in context:
-            context[key] = value
-
+        for key, value in get_placeholder_conf("extra_context", slot, template, {}).items():
+            if key not in context:
+                extra_context[key] = value
+        context.update(extra_context)
     content = []
     watcher = Watcher(context)
     content.extend(render_plugins(plugins, context, placeholder, processors))
@@ -173,9 +177,11 @@ def render_placeholder(placeholder, context_to_copy,
         content = mark_safe(default.render(context_to_copy))
     else:
         content = ''
-    context['content'] = content
-    context['placeholder'] = toolbar_content
-    context['edit'] = edit
+    context.update({
+        'content': content,
+        'placeholder': toolbar_content,
+        'edit': edit
+    })
     result = render_to_string("cms/toolbar/content.html", context)
     changes = watcher.get_changes()
     if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
@@ -202,10 +208,12 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
     context.push()
 
     # to restrict child-only plugins from draggables..
-    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)] + plugin_pool.get_system_plugins()
-    context['placeholder'] = placeholder
-    context['language'] = save_language
-    context['page'] = page
+    context.update({
+        'allowed_plugins': [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)] + plugin_pool.get_system_plugins(),
+        'placeholder': placeholder,
+        'language': save_language,
+        'page': page
+    })
     toolbar = render_to_string("cms/toolbar/placeholder.html", context)
     context.pop()
     return toolbar

@@ -3,6 +3,7 @@ from copy import copy
 from datetime import datetime
 from itertools import chain
 from cms.utils.compat import DJANGO_1_7
+from django.template import RequestContext
 from django.utils.six import string_types
 import re
 from classytags.values import StringValue
@@ -385,8 +386,10 @@ class RenderPluginBlock(InclusionTag):
     )
 
     def get_context(self, context, plugin, nodelist):
-        context['inner'] = nodelist.render(context)
-        context['plugin'] = plugin
+        context.update({
+            'inner': nodelist.render(context),
+            'plugin': plugin
+        })
         return context
 
 register.tag(RenderPluginBlock)
@@ -664,14 +667,14 @@ class CMSToolbar(RenderBlock):
             toolbar.init_toolbar(request)
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
-            context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
-        context['cms_version'] = __version__
+            context.update({'cms_toolbar_login_error': request.GET['cms-toolbar-login-error'] == '1'})
+        context.update({'cms_version': __version__})
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
-                context['addons'] = mark_safe(toolbar.render_addons(context))
+                context.update({'addons': mark_safe(toolbar.render_addons(context))})
         else:
             language = None
         # render everything below the tag
@@ -734,10 +737,11 @@ class CMSEditableObject(InclusionTag):
         context.push()
         template = self.get_template(context, **kwargs)
         data = self.get_context(context, **kwargs)
+        data = RequestContext(context['request'], data)
         output = render_to_string(template, data).strip()
         context.pop()
         if kwargs.get('varname'):
-            context[kwargs['varname']] = output
+            context.update({kwargs['varname']: output})
             return ''
         else:
             return output
@@ -1020,10 +1024,11 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
+        data = RequestContext(context['request'], data)
         output = render_to_string(template, data)
         context.pop()
         if kwargs.get('varname'):
-            context[kwargs['varname']] = output
+            context.update({kwargs['varname']: output})
             return ''
         else:
             return output
@@ -1072,10 +1077,11 @@ class CMSEditableObjectBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
+        data = RequestContext(context['request'], data)
         output = render_to_string(template, data)
         context.pop()
         if kwargs.get('varname'):
-            context[kwargs['varname']] = output
+            context.update({kwargs['varname']: output})
             return ''
         else:
             return output
