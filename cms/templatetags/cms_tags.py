@@ -1184,7 +1184,7 @@ class RenderPlaceholder(AsTag):
         if not hasattr(request, 'placeholders'):
             request.placeholders = []
         if placeholder.has_change_permission(request):
-            request.placeholders.append(placeholder)
+            context['request'].placeholders.append(placeholder)
         return safe(placeholder.render(context, width, lang=language,
                                        editable=editable, use_cache=not nocache))
 

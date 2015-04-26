@@ -5,7 +5,7 @@ from cms.utils.compat import DJANGO_1_7
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
@@ -802,13 +802,12 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_request_placeholders_permission_check_model(self):
         # Setup instance
-        ex = Example1(
+        ex = Example1.objects.create(
             char_1='one',
             char_2='two',
             char_3='tree',
             char_4='four'
         )
-        ex.save()
         page_en = create_page('page_en', 'col_two.html', 'en')
 
         context_en = SekizaiContext()
@@ -816,14 +815,14 @@ class PlaceholderModelTests(CMSTestCase):
         # no user: no placeholders but no error either
         factory = RequestFactory()
         context_en['request'] = factory.get(page_en.get_absolute_url())
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 0)
         self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
 
         # request.placeholders is populated for superuser
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = self.get_superuser()
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 1)
         self.assertIn(ex.placeholder, context_en['request'].placeholders)
 
@@ -831,15 +830,15 @@ class PlaceholderModelTests(CMSTestCase):
         user = self.get_staff_user_with_no_permissions()
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = user
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 0)
         self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
 
         # request.placeholders is populated for staff user with permission on the model
-        user.user_permissions.add(Permission.objects.get(codename='change_example1'))
+        user.user_permissions.add(Permission.objects.get(codename=get_permission_codename('change', ex._meta)))
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = get_user_model().objects.get(pk=user.pk)
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 1)
         self.assertIn(ex.placeholder, context_en['request'].placeholders)
 
@@ -889,6 +888,7 @@ class PlaceholderModelTests(CMSTestCase):
         context['request'].user = self.get_superuser()
         template_obj = Template(template)
         template_obj.render(context)
+        print(context)
         self.assertEqual(len(context['request'].placeholders), 2)
         self.assertIn(ex1.placeholder, context['request'].placeholders)
 
