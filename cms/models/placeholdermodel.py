@@ -122,11 +122,16 @@ class Placeholder(models.Model):
             raise Exception("%s is not a valid perm key. '\
                 'Only 'add', 'change' and 'delete' are allowed" % key)
         objects = [self.page] if self.page else self._get_attached_objects()
+        obj_perm = None
         for obj in objects:
+            obj_perm = False
             for key in perm_keys[key]:
                 if self._get_object_permission(obj, request, key):
-                    return True
-            return False
+                    obj_perm = True
+                    break
+            if not obj_perm:
+                return False
+        return obj_perm
 
     def _get_object_permission(self, obj, request, key):
         if not getattr(request, 'user', None):
