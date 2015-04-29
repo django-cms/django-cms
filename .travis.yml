@@ -46,6 +46,8 @@ notifications:
   irc:
     - irc.freenode.org#django-cms
     - irc.freenode.org#django-cms-sprint
+  webhooks:
+    - http://addons.us-iad-rs.aldryn.io/en/travis-endpoint/
 
 matrix:
   exclude:
