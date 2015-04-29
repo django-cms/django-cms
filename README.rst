@@ -11,7 +11,9 @@ django CMS
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://pypip.in/license/django-cms/badge.svg?style=flat
     :target: https://pypi.python.org/pypi/django-cms/
-
+.. image:: https://codeclimate.com/github/divio/django-cms/badges/gpa.svg
+   :target: https://codeclimate.com/github/divio/django-cms
+   :alt: Code Climate
 
 Open source enterprise content management system based on the django framework.
 
