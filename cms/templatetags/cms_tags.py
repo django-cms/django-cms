@@ -883,7 +883,8 @@ class CMSEditableObject(InclusionTag):
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
-            view_url = 'admin:cms_page_changelist'
+            view_url = 'admin:%s_%s_changelist' % (
+                instance._meta.app_label, instance._meta.module_name)
         querystring = {'language': language}
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
