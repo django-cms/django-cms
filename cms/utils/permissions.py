@@ -357,7 +357,7 @@ def load_view_restrictions(request, pages):
             page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
             pages_by_id[page_id] = page
             cache[page_id] = []
-        page_permissions = PagePermission.objects.filter(page__in=pages_by_id).select_related('group__users')
+        page_permissions = PagePermission.objects.filter(page__in=pages_by_id, can_view=True).select_related('group__users')
         for perm in page_permissions:
             perm_page = pages_by_id[perm.page_id]
             # add the page itself
