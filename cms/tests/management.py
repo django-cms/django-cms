@@ -37,6 +37,8 @@ TEST_INSTALLED_APPS = [
 ]
 if settings.AUTH_USER_MODEL == "emailuserapp.EmailUser":
     TEST_INSTALLED_APPS.append("cms.test_utils.project.emailuserapp")
+if settings.AUTH_USER_MODEL == "customuserapp.User":
+    TEST_INSTALLED_APPS.append("cms.test_utils.project.customuserapp")
 
 
 class ManagementTestCase(CMSTestCase):
