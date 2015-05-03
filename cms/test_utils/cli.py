@@ -267,6 +267,8 @@ def configure(db_url, **extra):
         ALLOWED_HOSTS=['localhost'],
     )
     from django.utils.functional import empty
+    settings._wrapped = empty
+    defaults.update(extra)
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
@@ -298,6 +300,7 @@ def configure(db_url, **extra):
             'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.south_migrations',
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.south_migrations',
         }
+        defaults['SOUTH_TESTS_MIGRATE'] = defaults.get('TESTS_MIGRATE', False)
     else:
         defaults['MIGRATION_MODULES'] = {
             'djangocms_column': 'djangocms_column.migrations_django',
@@ -324,13 +327,22 @@ def configure(db_url, **extra):
             'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
         }
+        if not defaults.get('TESTS_MIGRATE', False):
+            # Disable migrations for Django 1.7+
+            class DisableMigrations(object):
+
+                def __contains__(self, item):
+                    return True
+
+                def __getitem__(self, item):
+                    return "notmigrations"
+
+            defaults['MIGRATION_MODULES'] = DisableMigrations()
 
     if 'AUTH_USER_MODEL' in extra:
         custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
         defaults['INSTALLED_APPS'].insert(defaults['INSTALLED_APPS'].index('cms'), custom_user_app)
 
-    settings._wrapped = empty
-    defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
 

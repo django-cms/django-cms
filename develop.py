@@ -344,7 +344,7 @@ def main():
                 'STATIC_ROOT': STATIC_ROOT,
                 'MEDIA_ROOT': MEDIA_ROOT,
                 'USE_TZ': True,
-                'SOUTH_TESTS_MIGRATE': migrate,
+                'TESTS_MIGRATE': migrate,
             }
 
             if args['test']:
