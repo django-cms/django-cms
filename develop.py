@@ -238,6 +238,8 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
     ]
     if os.environ.get("AUTH_USER_MODEL") == "emailuserapp.EmailUser":
         applications.append('emailuserapp')
+    if os.environ.get("AUTH_USER_MODEL") == "customuserapp.User":
+        applications.append('customuserapp')
     if migrate_plugins:
         applications.extend([
             # official plugins
@@ -334,7 +336,9 @@ def main():
         "DATABASE_URL",
         "sqlite://localhost/%s" % default_name
     )
-    migrate = args.get('--migrate', False)
+    migrate = (args.get('--migrate', False) or
+               args.get('makemigrations', False) or
+               args.get('squashmigrations', False))
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
