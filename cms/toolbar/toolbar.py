@@ -16,7 +16,11 @@ from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
-from django.utils.datastructures import SortedDict
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -86,7 +90,7 @@ class CMSToolbar(ToolbarAPIMixin):
                 break
             parts.pop()
 
-        self.toolbars = SortedDict()
+        self.toolbars = OrderedDict()
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, toolbars[key].check_current_app(key, self.app_name), self.app_name)
             self.toolbars[key] = toolbar

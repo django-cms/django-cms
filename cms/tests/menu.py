@@ -1006,6 +1006,8 @@ class ViewPermissionMenuTests(CMSTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'POST': {},
+            'GET': {},
             'session': {},
         }
         return type('Request', (object,), attrs)
@@ -1154,6 +1156,8 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         attrs = {
             'user': self.user,
             'REQUEST': {},
+            'POST': {},
+            'GET': {},
             'session': {},
         }
         self.request = type('Request', (object,), attrs)

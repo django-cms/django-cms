@@ -260,6 +260,7 @@ class ViewPermissionTests(CMSTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'POST': {},
             'GET': {},
             'path': path,
             'session': {},

@@ -828,6 +828,8 @@ class ViewPermissionBaseTests(CMSTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'POST': {},
+            'GET': {},
             'session': {},
         }
         return type('Request', (object,), attrs)
