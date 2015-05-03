@@ -13,6 +13,7 @@ from django.core.urlresolvers import reverse
 from django.template.context import Context, RequestContext
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.utils.timezone import now
 from django.utils.translation import activate
 from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
@@ -114,7 +115,7 @@ class BaseCMSTestCase(object):
         """
         User = get_user_model()
 
-        fields = dict(email=username + '@django-cms.org',
+        fields = dict(email=username + '@django-cms.org', last_login=now(),
                       is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
         )
 

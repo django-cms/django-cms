@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.create_table(u'emailuserapp_emailuser', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('password', self.gf('django.db.models.fields.CharField')(max_length=128)),
-            ('last_login', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('last_login', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now, null=True)),
             ('is_superuser', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('email', self.gf('django.db.models.fields.EmailField')(unique=True, max_length=75, blank=True)),
             ('first_name', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
