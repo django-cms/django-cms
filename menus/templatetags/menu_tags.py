@@ -146,13 +146,13 @@ class ShowMenu(InclusionTag):
             children = menu_pool.apply_modifiers(children, request, namespace, root_id, post_cut=True)
 
         try:
-            context.update({'children': children,
-                'template': template,
-                'from_level': from_level,
-                'to_level': to_level,
-                'extra_inactive': extra_inactive,
-                'extra_active': extra_active,
-                'namespace': namespace})
+            context['children'] = children
+            context['template'] = template
+            context['from_level'] = from_level
+            context['to_level'] = to_level
+            context['extra_inactive'] = extra_inactive
+            context['extra_active'] = extra_active
+            context['namespace'] = namespace
         except:
             context = {"template": template}
         return context
@@ -235,14 +235,12 @@ class ShowSubMenu(InclusionTag):
                     children = menu_pool.apply_modifiers([node], request, post_cut=True)
                 else:
                     children = menu_pool.apply_modifiers(children, request, post_cut=True)
-        context.update({
-            'children': children,
-            'template': template,
-            'from_level': 0,
-            'to_level': 0,
-            'extra_inactive': 0,
-            'extra_active': 0
-        })
+        context['children'] = children
+        context['template'] = template
+        context['from_level'] = 0
+        context['to_level'] = 0
+        context['extra_inactive'] = 0
+        context['extra_active'] = 0
         return context
 
 
@@ -301,8 +299,8 @@ class ShowBreadcrumb(InclusionTag):
             ancestors = ancestors[start_level:]
         else:
             ancestors = []
-        context.update({'ancestors': ancestors,
-            'template': template})
+        context['ancestors'] = ancestors
+        context['template'] = template
         return context
 
 
@@ -369,11 +367,9 @@ class LanguageChooser(InclusionTag):
         for lang in get_language_objects(site.pk):
             if lang.get('public', True):
                 languages.append((lang['code'], marker(lang['name'], lang['code'])))
-        context.update({
-            'languages': languages,
-            'current_language': current_lang,
-            'template': template,
-        })
+        context['languages'] = languages
+        context['current_language'] = current_lang
+        context['template'] = template
         return context
 
 
