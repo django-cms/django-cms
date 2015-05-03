@@ -292,6 +292,7 @@ def configure(db_url, **extra):
             'placeholderapp': 'cms.test_utils.project.placeholderapp.south_migrations',
             'sampleapp': 'cms.test_utils.project.sampleapp.south_migrations',
             'emailuserapp': 'cms.test_utils.project.emailuserapp.south_migrations',
+            'customuserapp': 'cms.test_utils.project.customuserapp.south_migrations',
             'fakemlng': 'cms.test_utils.project.fakemlng.south_migrations',
             'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.south_migrations',
             'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.south_migrations',
