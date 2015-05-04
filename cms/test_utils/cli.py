@@ -282,7 +282,6 @@ def configure(db_url, **extra):
             'djangocms_picture': 'djangocms_picture.migrations_django',
             'djangocms_style': 'djangocms_style.migrations_django',
             'djangocms_teaser': 'djangocms_teaser.migrations_django',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
             'djangocms_video': 'djangocms_video.migrations_django',
             'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations_django',
             'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations_django',
