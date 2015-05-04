@@ -516,6 +516,18 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self.assertViewAllowed(urls["/en/page_d/"], user)
         self.assertViewAllowed(urls["/en/page_d/page_d_a/"], user)
 
+    def test_non_view_permission_doesnt_hide(self):
+        """
+        PagePermissions with can_view=False shouldn't hide pages in the menu.
+        """
+        self._setup_user_groups()
+        all_pages = self._setup_tree_pages()
+        page = Page.objects.drafts().get(title_set__title="page_b")
+        group = Group.objects.get(name=self.GROUPNAME_1)
+        PagePermission.objects.create(can_view=False, group=group, page=page)
+        urls = self.get_url_dict(all_pages)
+        self.assertInMenu(urls["/en/page_b/"], AnonymousUser())
+
 
 @override_settings(
     CMS_PERMISSION=True,
