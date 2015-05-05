@@ -360,3 +360,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Corrects an issue where items might not be visible in structue mode menus
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
+
+=== 3.0.14 (XXXX-XX-XX) ===
+
+- Fixed an issue related to "Empty all" Placeholder feature
