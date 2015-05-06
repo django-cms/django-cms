@@ -72,10 +72,17 @@ $(document).ready(function () {
 			// register the subnav on the placeholder
 			this._setSubnav(dragbar.find('.cms_submenu'));
 
+			var settings = CMS.settings;
+			settings.dragbars = settings.dragbars || [];
+
 			// enable expanding/collapsing globally within the placeholder
 			dragbar.find(title).bind(this.click, function () {
 				($(this).hasClass(expanded)) ? that._collapseAll($(this)) : that._expandAll($(this));
 			});
+
+			if ($.inArray(this.options.placeholder_id, settings.dragbars) != -1) {
+				dragbar.find(title).addClass(expanded);
+			}
 		},
 
 		_setPlugin: function () {
@@ -737,6 +744,11 @@ $(document).ready(function () {
 			});
 
 			el.addClass('cms_dragbar-title-expanded');
+
+			var settings = CMS.settings;
+			settings.dragbars = settings.dragbars || [];
+			settings.dragbars.push(this.options.placeholder_id);
+			CMS.API.Toolbar.setSettings(settings);
 		},
 
 		_collapseAll: function (el) {
@@ -746,6 +758,11 @@ $(document).ready(function () {
 			});
 
 			el.removeClass('cms_dragbar-title-expanded');
+
+			var settings = CMS.settings;
+			settings.dragbars = settings.dragbars || [];
+			settings.dragbars.splice($.inArray(this.options.placeholder_id, settings.states), 1);
+			CMS.API.Toolbar.setSettings(settings);
 		},
 
 		_getId: function (el) {
