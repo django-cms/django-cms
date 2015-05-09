@@ -106,8 +106,13 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, app_name=None, migrat
             print('')
     from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()
-    rs.stdout = sys.stdout
-    rs.stderr = sys.stderr
+    try:
+        from django.core.management.base import OutputWrapper
+        rs.stdout = OutputWrapper(sys.stdout)
+        rs.stderr = OutputWrapper(sys.stderr)
+    except ImportError:
+        rs.stdout = sys.stdout
+        rs.stderr = sys.stderr
     rs.use_ipv6 = False
     rs._raw_ipv6 = False
     rs.addr = bind
