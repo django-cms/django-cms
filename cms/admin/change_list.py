@@ -97,9 +97,9 @@ class CMSChangeList(ChangeList):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
             if not self.is_filtered():
-                self.full_result_count = self.result_count = self.root_query_set.count()
+                self.full_result_count = self.result_count = self.root_query_set.drafts().count()
             else:
-                self.full_result_count = self.root_query_set.count()
+                self.full_result_count = self.root_query_set.drafts().count()
 
     def set_items(self, request):
         site = self.current_site()
