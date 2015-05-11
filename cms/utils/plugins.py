@@ -309,7 +309,7 @@ def build_plugin_tree(plugin_list):
         else:
             parent = cache[plugin.parent_id]
             parent.child_plugin_instances.append(plugin)
-    root.sort(key=lambda x: x.position)
+    root.sort(key=lambda x: (x.position is None, x.position))
     for plugin in plugin_list:
         if plugin.child_plugin_instances and len(plugin.child_plugin_instances) > 1:
             plugin.child_plugin_instances.sort(key=lambda x: x.position)
