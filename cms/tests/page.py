@@ -80,13 +80,14 @@ class PagesTestCase(CMSTestCase):
         create_title("fr", "french inner", page_2)
         publish_page(page_2, user, "fr")
 
-        self.assertEqual(page_2.get_absolute_url(), '/en/inner/')
-        self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
-        self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+        with force_language('en'):
+            self.assertEqual(page_2.get_absolute_url(), '/en/inner/')
+            self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
+            self.assertEqual(page_2.get_absolute_url(language='fr'), '/en/french-inner/')
 
         with force_language('fr'):
             self.assertEqual(page_2.get_absolute_url(), '/fr/french-inner/')
-            self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
+            self.assertEqual(page_2.get_absolute_url(language='en'), '/fr/inner/')
             self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
 
     def test_create_page_admin(self):
