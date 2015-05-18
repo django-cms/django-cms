@@ -135,8 +135,9 @@ def build_plugin_tree(plugins):
                 in groupby(nonroots, by_parent_id))
     for parent, children in families:
         parent.child_plugin_instances = children
+    by_position = attrgetter('position')
     return sorted(filterfalse(by_parent_id, cache.values()),
-                  key=attrgetter('position'))
+                  key=(lambda x: (by_position(x) is None, by_position(x))))
 
 
 def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
