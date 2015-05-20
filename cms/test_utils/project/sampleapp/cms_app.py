@@ -41,3 +41,17 @@ class NamespacedApp(CMSApp):
     app_name = 'namespaced_app_ns'
 
 apphook_pool.register(NamespacedApp)
+
+
+class ParentApp(CMSApp):
+    name = _("Parent app")
+    urls = ["cms.test_utils.project.sampleapp.urls_parentapp"]
+
+apphook_pool.register(ParentApp)
+
+
+class ChildApp(CMSApp):
+    name = _("Child app")
+    urls = ["cms.test_utils.project.sampleapp.urls_childapp"]
+
+apphook_pool.register(ChildApp)

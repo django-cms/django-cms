@@ -56,3 +56,13 @@ def plain_view(request):
 
 def notfound(request):
     raise Http404
+
+
+def parentapp_view(request, path):
+    context = RequestContext(request, {'content': 'parent app content'})
+    return render_to_response("sampleapp/plain.html", context)
+
+
+def childapp_view(request, path):
+    context = RequestContext(request, {'content': 'child app content'})
+    return render_to_response("sampleapp/plain.html", context)
