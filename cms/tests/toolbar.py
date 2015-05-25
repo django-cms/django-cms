@@ -31,6 +31,7 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
 from cms.views import details
 
@@ -411,6 +412,24 @@ class ToolbarTests(ToolbarTestBase):
         de_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
         self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
+
+    def test_double_menus(self):
+        """
+        Tests that even called multiple times, admin and language buttons are not duplicated
+        """
+        user = self.get_staff()
+        en_request = self.get_page_request(None, user, edit=True, path='/')
+        toolbar = CMSToolbar(en_request)
+        toolbar.populated = False
+        toolbar.populate()
+        toolbar.populated = False
+        toolbar.populate()
+        toolbar.populated = False
+        toolbar.post_template_populate()
+        admin = toolbar.get_left_items()[0]
+        lang = toolbar.get_left_items()[1]
+        self.assertEqual(len(admin.get_items()), 9)
+        self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
     def test_placeholder_name(self):

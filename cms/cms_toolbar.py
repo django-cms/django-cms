@@ -98,6 +98,8 @@ class BasicToolbar(CMSToolbar):
     Basic Toolbar for site and languages menu
     """
     page = None
+    _language_menu = None
+    _admin_menu = None
 
     def init_from_request(self):
         self.page = get_page_draft(self.request.current_page)
@@ -112,39 +114,39 @@ class BasicToolbar(CMSToolbar):
             self.clipboard = user_settings.clipboard
 
     def add_admin_menu(self):
-        admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
+        if not self._admin_menu:
+            self._admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, self.current_site.name)
+            # Users button
+            self.add_users_button(self._admin_menu)
 
-        # Users button
-        self.add_users_button(admin_menu)
+            # sites menu
+            if get_cms_setting('PERMISSION'):
+                sites_queryset = get_user_sites_queryset(self.request.user)
+            else:
+                sites_queryset = Site.objects.all()
 
-        # sites menu
-        if get_cms_setting('PERMISSION'):
-            sites_queryset = get_user_sites_queryset(self.request.user)
-        else:
-            sites_queryset = Site.objects.all()
+            if len(sites_queryset) > 1:
+                sites_menu = self._admin_menu.get_or_create_menu('sites', _('Sites'))
+                sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
+                sites_menu.add_break(ADMIN_SITES_BREAK)
+                for site in sites_queryset:
+                    sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
+                                             active=site.pk == self.current_site.pk)
 
-        if len(sites_queryset) > 1:
-            sites_menu = admin_menu.get_or_create_menu('sites', _('Sites'))
-            sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
-            sites_menu.add_break(ADMIN_SITES_BREAK)
-            for site in sites_queryset:
-                sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
-                                         active=site.pk == self.current_site.pk)
+            # admin
+            self._admin_menu.add_sideframe_item(_('Administration'), url=admin_reverse('index'))
+            self._admin_menu.add_break(ADMINISTRATION_BREAK)
 
-        # admin
-        admin_menu.add_sideframe_item(_('Administration'), url=admin_reverse('index'))
-        admin_menu.add_break(ADMINISTRATION_BREAK)
+            # cms users
+            self._admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
+            self._admin_menu.add_break(USER_SETTINGS_BREAK)
 
-        # cms users
-        admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
-        admin_menu.add_break(USER_SETTINGS_BREAK)
+            # Disable toolbar
+            self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+            self._admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
 
-        # Disable toolbar
-        admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
-        admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
-
-        # logout
-        self.add_logout_button(admin_menu)
+            # logout
+            self.add_logout_button(self._admin_menu)
 
     def add_users_button(self, parent):
         User = get_user_model()
@@ -178,15 +180,15 @@ class BasicToolbar(CMSToolbar):
         parent.add_ajax_item(logout_menu_text, action=admin_reverse('logout'), active=True, on_success=on_success)
 
     def add_language_menu(self):
-        if settings.USE_I18N:
-            language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
+        if settings.USE_I18N and not self._language_menu:
+            self._language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'))
             language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
             for code, name in get_language_tuple(self.current_site.pk):
                 try:
                     url = language_changer(code)
                 except NoReverseMatch:
                     url = DefaultLanguageChanger(self.request)(code)
-                language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+                self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
