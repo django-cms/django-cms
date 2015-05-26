@@ -291,10 +291,10 @@ class MenuPool(object):
         classes = []
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                menu_class = menu[1].__class__.__name__
-                if menu_class not in classes:
-                    classes.append(menu_class)
+                if menu[1].__name__ not in classes:
+                    classes.append(menu[1].__name__)
                     found.append((menu[0], menu[1].name))
+        print(classes, found)
         return found
 
     def get_nodes_by_attribute(self, nodes, name, value):
