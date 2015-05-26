@@ -231,8 +231,9 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                 self.parent.add_child(instance=self)
             else:
                 if not self.position and not self.position == 0:
-                    self.position == CMSPlugin.objects.filter(parent__isnull=True,
-                                                              placeholder_id=self.placeholder_id).count()
+                    self.position = CMSPlugin.objects.filter(parent__isnull=True,
+                                                             language=self.language,
+                                                             placeholder_id=self.placeholder_id).count()
                 self.add_root(instance=self)
             return
         super(CMSPlugin, self).save()
@@ -242,6 +243,16 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def move(self, target, pos=None):
         super(CMSPlugin, self).move(target, pos)
+        self = self.reload()
+        try:
+            new_pos = max(CMSPlugin.objects.filter(parent_id=self.parent_id,
+                                                   placeholder_id=self.placeholder_id,
+                                                   language=self.language).exclude(pk=self.pk).order_by('depth', 'path').values_list('position', flat=True)) + 1
+        except ValueError:
+            # This is the first plugin in the set
+            new_pos = 0
+        self.position = new_pos
+        self.save()
         return self.reload()
 
     def set_base_attr(self, plugin):
