@@ -89,7 +89,7 @@ are:
 * **Publish changes** |publish-changes| to publish changes made to an
   existing page
 * **Edit** |edit| to open the page for editing
-* **Save and close** |save-and-close| to update the page and exit editing mode
+* **Save as draft** |save-as-draft| to update the page and exit editing mode
 
 .. |publish-page-now| image:: /images/publish-page-now.png
    :width: 119
@@ -100,7 +100,7 @@ are:
 .. |edit| image:: /images/edit.png
    :width: 45
 
-.. |save-and-close| image:: /images/save-and-close.png
+.. |save-as-draft| image:: /images/save-as-draft.png
    :width: 101
 
 The *disclosure triangle*

@@ -214,7 +214,7 @@ Inline markup
     * the names of important modes or states - ``switch to *Edit mode*``
     * values in or of fields - ``enter *Home*``
 * use strong emphasis - ``**`` - around:
-    * buttons that perform an action - ``hit **Save and close**``
+    * buttons that perform an action - ``hit **Save as draft**``
 
 Rules for using technical words
 -------------------------------
