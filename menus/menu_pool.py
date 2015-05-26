@@ -284,15 +284,18 @@ class MenuPool(object):
         """
         # Note that we are limiting the output to only single instances of any
         # specific menu class. This is to address issue (#4041) which has
-        # cropped-up in 3.0.13/3.0.0 relating to how CMSAttachMenus can now have
-        # multiple instances rather than classes.
+        # cropped-up in 3.0.13/3.0.0.
         self.discover_menus()
         found = []
         classes = []
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                if menu[1].__name__ not in classes:
-                    classes.append(menu[1].__name__)
+                if isinstance(menu[1], type):  # Its a class
+                    menu_class = menu[1]
+                else:
+                    menu_class = menu[1].__class__
+                if menu_class not in classes:
+                    classes.append(menu_class)
                     found.append((menu[0], menu[1].name))
         return found
 

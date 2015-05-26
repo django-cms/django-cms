@@ -98,23 +98,3 @@ class NavExtenderTestCase(NavextendersFixture, SettingsOverrideTestCase):
         tpl.render(context)
         nodes = context['children']
         self.assertEqual(len(nodes), 2)
-
-    def test_draft_published_mode(self):
-        """
-        Test to ensure that the menu are the same in draft and published mode.
-        """
-        self._update_page(2, navigation_extenders="TestMenu")
-        menu_pool.clear(settings.SITE_ID)
-        context = self.get_context()
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context)
-        nodes_published = context['children']
-
-        self._update_page(2, publisher_is_draft=True)
-        menu_pool.clear(settings.SITE_ID)
-        context = self.get_context()
-        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
-        tpl.render(context)
-        nodes_draft = context['children']
-
-        self.assertEqual(len(nodes_published), len(nodes_draft))
