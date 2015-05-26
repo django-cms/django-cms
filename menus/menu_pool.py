@@ -278,25 +278,21 @@ class MenuPool(object):
             node.selected = (node in sel)
         return nodes
 
-    def get_menus_by_attribute(self, name, value, distinct=False):
+    def get_menus_by_attribute(self, name, value):
         """
         Returns the list of menus that match the name/value criteria provided.
-
-        Since 3.0.14/3.1.1, the distinct flag is added to return only a single
-        instance of the same menu class. This is now required to prevent
-        multiple menus from appearing in, say, the advanced settings form for a
-        CMS page.
-
-        This flag is set to False to maintain backward compatibility, but for
-        most cases, this should be set to True.
         """
+        # Note that we are limiting the output to only single instances of any
+        # specific menu class. This is to address issue (#4041) which has
+        # cropped-up in 3.0.13/3.0.0 relating to how CMSAttachMenus can now have
+        # multiple instances rather than classes.
         self.discover_menus()
         found = []
         classes = []
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
                 menu_class = menu[1].__class__.__name__
-                if not distinct or menu_class not in classes:
+                if menu_class not in classes:
                     classes.append(menu_class)
                     found.append((menu[0], menu[1].name))
         return found
