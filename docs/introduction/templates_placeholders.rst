@@ -58,7 +58,9 @@ static placeholders from a template, you can reuse them later.
 
 So let's add a footer to all our pages. Since we want our footer on every
 single page, we should add it to our base template
-(``mysite/templates/base.html``). Place it at the bottom of the HTML body::
+(``mysite/templates/base.html``). Place it at the bottom of the HTML body:
+
+.. code-block:: html+django
 
     <footer>
       {% static_placeholder 'footer' %}
@@ -75,14 +77,18 @@ Rendering Menus
 
 In order to render the CMS's menu in your template you can use the :doc:`show_menu </reference/navigation>` tag.
 
-The example we use in ``mysite/templates/base.html``  is::
+The example we use in ``mysite/templates/base.html``  is:
+
+.. code-block:: html+django
 
     <ul class="nav navbar-nav">
         {% show_menu 0 1 100 100 "menu.html" %}
     </ul>
 
 Any template that uses ``show_menu`` must load the CMS's ``menu_tags`` library
-first::
+first:
+
+.. code-block:: html+django
 
     {% load menu_tags %}
 
