@@ -1,14 +1,16 @@
-.. _cms-models:
+.. _custom-models:
 
-##########
-CMS Models
-##########
+#############
+Custom Models
+#############
 
 We often need other editable contents than pages. Django allows you to create
 as many models as you need. Most of the time, those models have common
 behaviours: list view, detail view, permissions checking, cms toolbar integration,
 etc. Django CMS provides some abstract classes and factory functions to simplify all 
 of this and allows you to focus only on specific behaviours and rules.
+Before reading this documentation's part, be sure you understood concepts 
+exposed in :doc:`frontend_models`
 
 .. _cms-models-class:
 
@@ -103,14 +105,14 @@ If ``True``, the detail view will be created using django ``cms.views.CMSModelDe
 If ``str`` or view class, the detail view will not be created and the provided one will be used.
 If ``False``, the detail view is neither created nor handled by django-cms.
 
-Default is ``True``.
+Default is ``False``.
 
 ``cms_detail_view_url_name``:
 *****************************
 
 Configure the name of the detail view URL. 
 
-Default is '%(app_label)s_%(model_name)s_detail'.
+Default is `None`.
 
 .. _cms_create_app:
 
@@ -120,14 +122,14 @@ Default is '%(app_label)s_%(model_name)s_detail'.
 If ``True``, a cms app will be created.
 If ``False``, no cms app is created.
 
-Default is ``True``.
+Default is ``False``.
 
 ``cms_slug_field_name``:
 ************************
 
 Specify the field used to build url.
 
-Default is the first SlugField (or subclass) found in your model.
+Default is the first SlugField (or subclass) found in your model or `'pk'`.
 
 .. _cms-models-list:
 
@@ -137,10 +139,11 @@ CMSPublisherModelBase
 
 This base Class inherit from CMSModelBase_ and will allow you to have a model that has the 
 same publishing workflow than pages:
- * a "draft" and "published" version
- * having "publish" and "modify" button in the toolbar when an instance's detail of your model
-   is displayed
- * allow users to undo/redo their modifications
+
+* a "draft" and "published" version
+* having "publish" and "modify" button in the toolbar when an instance's detail of your model 
+  is displayed
+* allow users to undo/redo their modifications
 
 Model fields
 ------------
@@ -308,7 +311,8 @@ Available settings
     * ``search``: Allow to configure a search form.
       
       The plugin form only permit to enable or disable search form.
-  
+      __FIXME__: do we really need it in Plugin ?
+    
       Options:
   
       * ``static``: Default is True.
@@ -316,7 +320,8 @@ Available settings
       * ``search_fields``: A list of field to search into. If empty or
         None, all compatible model fields will be used.
   
-    * ``sort``: Allow to configure sorting.
+    * ``sort``: Allow to configure sorting. 
+      __FIXME__: do we really need it in Plugin ?
      
       Options:
   
@@ -335,7 +340,7 @@ Available settings
         which queryset can be either a queryset or a collable returning a
         queryset.
       * ``queryset``: a key of available_querysets dictionary, or a queryset
-        or a collable returning a queryset. If None, self.get_queryset is used.
+        or a collable returning a queryset. If None, super self.get_queryset is used.
     
 * ``new_link``
     If ``True``, add a creation link when plugin is rendered.
@@ -473,13 +478,14 @@ admin's frame.
 
 Usage Ex::
 
+    # -*- coding: utf-8 -*-
+
     from django.contrib import admin
-    from .models import Author, Book, Publisher
+    from .models import Author, Book, PublicBookProxy, Publisher
     from cms.utils.generic import modeladmin_cls_factory, modeladmin_bool_field_link_factory
 
     """Exemple of using the full GenericModelAdmin class generated"""
-    PublisherAdmin = modeladmin_cls_factory(model=Author)
-    admin.site.register(Publisher, PublisherAdmin)
+    PublisherAdmin = modeladmin_cls_factory(model=Publisher, auto_register=True)
 
     """Exemple of changing some GenericModelAdmin class properties"""
     AuthorAdmin = modeladmin_cls_factory(model=Author)
@@ -493,25 +499,25 @@ Usage Ex::
     """Exemple of extending some GenericModelAdmin class"""
     BookModelAdminBase =  modeladmin_cls_factory(model=Book)
 
+    class BookModelAdmin(BookModelAdminBase):
+        pass
 
-    class PublicBookModelAdmin(BookModelAdmin):
-        list_display = list(set(BookModelAdmin.list_display) - set(('public_domain',)))
+    admin.site.register(Book, BookModelAdmin)
+
+
+    class PublicBookModelAdmin(BookModelAdminBase):
+        list_display = list(set(BookModelAdminBase.list_display) - set(('public_domain',)))
 
         def queryset(self, request):
             queryset = super(PublicBookModelAdmin, self).queryset(request)
             return qs.filter(public_domain=True)
 
-    admin.site.register(Book, PublicBookModelAdmin)
+    admin.site.register(PublicBookProxy, PublicBookModelAdmin)
 
-
-    class NonPublicBookModelAdmin(BookModelAdmin):
-        list_display = list(set(BookModelAdmin.list_display) - set(('public_domain',)))
-
-        def queryset(self, request):
-            queryset = super(NonPublicBookModelAdmin, self).queryset(request)
-            return qs.filter(public_domain=False)
-
-    admin.site.register(Book, NonPublicBookModelAdmin)
+    """
+    We do not need to create or register a DVDModelAdmin because we set it to be fully aut-configured 
+    via the cms_meta options.
+    """
 
 *******
 Helpers
@@ -527,11 +533,11 @@ needed instead of redo the wheel.
 cmsapp_cls_factory(model, app_name=None, auto_register=False)
 =============================================================
 
-Builds the "best" default ModelApp for the current model and auto register it via 
-`` if wanted.
+Builds the "best" default ``AppHook`` subclass for the current model and auto register it via 
+``apphook_pool.register`` if wanted.
 
-Returned class will be named `Generic{AppLabel}{ModelName}App`. e.g for a model `Book` from 
-`library.models.py`, the generated app name will be `GenericLibraryBookApp`.
+Returned class will be named ``Generic{AppLabel}{ModelName}App``. e.g for a model ``Book`` from 
+``library.models.py``, the generated app name will be ``GenericLibraryBookApp``.
 
 
 .. _cmsplugin_cls_factory:
@@ -539,30 +545,55 @@ Returned class will be named `Generic{AppLabel}{ModelName}App`. e.g for a model 
 cmsplugin_cls_factory(model, auto_register=False)
 =================================================
 
-Builds the "best" default CMSPlugin subclass for the given CMSModel to display a list of 
-its instances and auto register it via `apphook_pool.register` if wanted.
+Builds the "best" default ``CMSPlugin`` subclass for the given CMSModel to display a list of 
+its instances and auto register it via ``apphook_pool.register`` if wanted.
 
-Returned class will be named `Generic{AppLabel}{ModelName}ListPlugin`. e.g for a model `Book` 
-from `library.models.py`, the generated app name will be `GenericLibraryBookListPlugin`.
+Returned class will be named ``Generic{AppLabel}{ModelName}ListPlugin``. e.g for a model ``Book`` 
+from ``library.models.py``, the generated app name will be ``GenericLibraryBookListPlugin``.
+
+
+.. _cmsattachmenu_cls_factory:
+
+cmsattachmenu_cls_factory(model, auto_register=False)
+=====================================================
+
+Builds the "best" default ``CMSAttachMenu`` subclass for the given CMSModel to have a 
+submenu with all instances detail link and auto register it via ``menu_pool.register_menu`` 
+if wanted.
+
+Returned class will be named ``Generic{AppLabel}{ModelName}Menu``. e.g for a model ``Book`` 
+from ``library.models.py``, the generated app name will be ``GenericLibraryBookMenu``.
 
 .. _modeladmin_cls_factory:
 
 modeladmin_cls_factory(model, auto_register=False)
 ==================================================
 
-Builds the "best" default AdminModel to manage the given CMSModel and auto register it 
-if wanted.
+Builds the "best" default ``ModelAdmin`` to manage the given CMSModel and auto register it 
+if wanted via ``admin.site.register``.
     
-Returned class will be named `Generic{AppLabel}{ModelName}Admin`. e.g for a model `Book` from 
-`library.models.py`, the generated app name will be `GenericLibraryBookAdmin`.
+Returned class will be named ``Generic{AppLabel}{ModelName}Admin``. e.g for a model ``Book`` from 
+``library.models.py``, the generated app name will be ``GenericLibraryBookAdmin``.
 
 
-.. _modeladmin_change_bool_field_func_factory:
+.. _modeladmin_switch_bool_field_func_factory:
 
-modeladmin_change_bool_field_func_factory(field_name)
+modeladmin_switch_bool_field_func_factory(field_name)
 =====================================================
 
-Creates and returns a ModelAdmin view function to switch the value of a boolean field.
-Throws a 404 if object is not found, else update the field from False to True or True to False and 
-redirects on the list if request was not ajax (else return a json serialization of 
-``{'new_status': new_value}``).
+Creates and returns a ModelAdmin view method to switch the value of a boolean field.
+Returned method view raises a 404 if object is not found, else it swiches the value of the related 
+field, then redirect to the list (related url path MUST looks like `^([0-9]+)/whatever/$`) or,
+if ajax, returns a dict with keys `obj_title` and `new_value`.
+e.g: with `field_name` = 'published', returned method will be equivalent to::
+
+    def switch_published(self, request, obj_id):
+        """switches the "published" boolean field from True to False or vice versa"""
+        obj = get_object_or_404(self.model, pk=obj_id)
+        new_value = not obj.published
+        obj.published = new_value
+        obj.save()
+        if request.is_ajax():
+            return json.dumps({'obj_title': '%s' % obj, 'new_value': new_value,})
+        else:
+            return HttpResponseRedirect('../../')

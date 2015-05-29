@@ -102,16 +102,17 @@ class CMSModelToolbar(CMSToolbar):
     """
 
     def populate(self):
+        app_labels = sorted(CMSModelsRegistry.items.keys())
+        if not app_labels:
+            return
+
         admin_menu = self.toolbar.get_or_create_menu(
             ADMIN_MENU_IDENTIFIER, 
             _('Site'))
-
         position = admin_menu.find_first(
             Break,
             identifier=ADMINISTRATION_BREAK)
 
-        app_labels = sorted(CMSModelsRegistry.items.keys())
-        
         for app_label in app_labels:
             if len(app_labels) == 1:
                 #If we only have one application, we add model's action to

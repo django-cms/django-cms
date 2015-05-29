@@ -1,5 +1,4 @@
-
-from cms.utils.generic import modeladmin_cls_factory, cmsplugin_cls_factory, cmsapp_cls_factory
+# -*- coding: utf-8 -*-
 
 class CMSModelsRegistry:
     items = {}
@@ -10,30 +9,23 @@ class CMSModelsRegistry:
             for item in configs:
                 model = item['model']
                 if model._cms_meta['create_admin_model']:
+                    from cms.utils.generic import modeladmin_cls_factory
                     modeladmin_cls_factory(model, auto_register=True)
-                if model._cms_meta['cmsplugin_cls_factory']:
+                if model._cms_meta['create_plugin']:
+                    from cms.utils.generic import cmsplugin_cls_factory
                     cmsplugin_cls_factory(model, auto_register=True)
                 if model._cms_meta['create_app']:
+                    from cms.utils.generic import cmsapp_cls_factory
                     cmsapp_cls_factory(model, auto_register=True)
 
     @staticmethod
     def add_item(model):
-        """
-        Adds a custom model to the list of CMS Model's
-        """
-        
-        #can not use issubclass because of resursive import : 
-        #1/ we need to use CMSModelsRegistry in CMSModelMetaClass
-        #2/ in CMSModelsRegistry, we need to check CMSModelBase
-        #3/ CMSModelBase need to import CMSModelMetaClass -> back to 1/
-        is_cmsmodel_subclass = len([
-            b.__name__ 
-            for b in model.__bases__ 
-            if b.__name__ == 'CMSModelBase'])
-        if not is_cmsmodel_subclass:
-            raise ValueError(
-                "Model %s is not subclassing CMSModelBase." % (model.__name__,)
-            )
+        """Adds a custom model to the list of CMS Model's"""
+
+        from cms.models import CMSModelBase
+        if not issubclass(model, CMSModelBase):
+            raise ValueError("Model %s is not subclassing CMSModelBase." % (model.__name__,))
+
         app_label = model._meta.app_label
         if not app_label in CMSModelsRegistry.items:
             CMSModelsRegistry.items[app_label] = []

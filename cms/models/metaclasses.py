@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 from cms.publisher.manager import PublisherManager
-from mptt.models import MPTTModelBase
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models import SlugField
 from django.db.models.base import ModelBase
 from cms.models._registry import CMSModelsRegistry
+
+
+def _get_slug_field_name(attrs, bases):
+    for field_name in attrs:
+        if isinstance(attrs[field_name], SlugField):
+            return field_name
+    for base in bases:
+        if not hasattr(base, '_meta') or not hasattr(base._meta, 'fields'):
+            continue
+        for field in base._meta.fields:
+            if isinstance(field, SlugField):
+                return field.name
+    return 'pk'
 
 def _default_get_absolute_url(self, *args, **kwargs):
     """
@@ -11,10 +24,21 @@ def _default_get_absolute_url(self, *args, **kwargs):
     Default behaviour is to build an url with "url_name_detail" and the 
     slug field of the instance if exists, else with the pk.
     """
-    return reverse(self._cms_meta['detail_view_url_name'], 
-                   args=(self.get_slug(),))
+    try:
+        return reverse(self._cms_meta['detail_view_url_name'], 
+                       args=(self.get_slug(),))
+    except NoReverseMatch as e:
+        if self._cms_meta['detail_view'] and self._cms_meta['create_app']:
+            msg = ('%s\n'
+                   'Your "%s" CMSModel seems to have an AppHook managing detail views.'
+                   'Did you attach this App to an existing page ?')
+            raise NoReverseMatch(msg % (e, self.__class__.__name__))
+        raise e
+_default_get_absolute_url.__name__ = 'get_absolute_url'
+
 
 class CMSModelMetaClass(ModelBase):
+    #TODO : checks that CMSModelMetaClass is coherent with the CMSModelBase documentation.
     def __new__(cls, name, bases, attrs):
         super_new = super(CMSModelMetaClass, cls).__new__
 
@@ -32,30 +56,26 @@ class CMSModelMetaClass(ModelBase):
 
         attr_meta = attrs.get('Meta', None)
         abstract = getattr(attr_meta, 'abstract', False)
-        cms_opts = {}
         
-        cms_opts_default_values = {
-            'create_admin_model': True,
-            'create_plugin': True,
-            'create_app': True,
+        cms_opts = {
+            'create_admin_model': False,
+            'create_plugin': False,
+            'create_app': False,
             'add_to_cms_toolbar': False,
-            'detail_view': True,
-            'list_view': True,
+            'detail_view': False,
+            'list_view': False,
             'detail_view_url_name': None,
             'list_view_url_name': None,
             'slug_field_name': None,
         }
 
-        for opt in cms_opts_default_values:
+        for opt in cms_opts.keys():
             cms_opt = 'cms_' + opt
             if hasattr(attr_meta, cms_opt):
                 cms_opts[opt] = getattr(attr_meta, cms_opt)
                 delattr(attr_meta, cms_opt)
 
         if not abstract:
-            for opt in cms_opts_default_values:
-                if not opt in cms_opts:
-                    cms_opts[opt] = cms_opts_default_values[opt]
             app_label = getattr(attr_meta, 'app_label', attrs['__module__'])
             app_label = app_label.split('.')[0].lower()
 
@@ -88,15 +108,7 @@ class CMSModelMetaClass(ModelBase):
             #Find the SlugField to use for this model. If there is no SlugField,
             #pk is used instead.
             if not cms_opts['slug_field_name']:
-                if 'slug' in attrs and isinstance(attrs['slug'], SlugField):
-                    cms_opts['slug_field_name'] = 'slug'
-                else:
-                    for field_name in attrs:
-                        if isinstance(attrs[field_name], SlugField):
-                            cms_opts['slug_field_name'] = field_name
-                            break
-                    if not cms_opts['slug_field_name']:
-                        cms_opts['slug_field_name'] = 'pk'
+                cms_opts['slug_field_name'] = _get_slug_field_name(attrs, bases)
 
         attrs['_cms_meta'] = cms_opts
         model = super_new(cls, name, bases, attrs)

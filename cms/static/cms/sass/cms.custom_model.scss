@@ -1,0 +1,22 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//######################################################################################################################
+// #IMPORT SETTINGS#
+@import "settings/default";
+.cms-custom_models.change-list .cms_actions{
+	// icons
+	a { vertical-align: middle; }
+	a.edit, a.deletelink {
+	    span { display:none ; }
+	}
+	a.edit, {
+		display: inline-block; width: 18px; height: 18px; margin-top:0;
+		background: url('../img/pagetree/sprite.png') no-repeat 0 0; 
+		background-position:-40px -20px; }
+	a.deletelink { 
+		display: inline-block; width: 10px; height: 10px; margin-left:4px; padding:0;
+		background-position: 0px 0px; }
+}

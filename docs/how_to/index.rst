@@ -20,4 +20,5 @@ the same territory as the :doc:`/introduction/index`, but in more detail.
     placeholders
     caching
     frontend_models
+    custom_models
     sitemap

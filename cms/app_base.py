@@ -32,27 +32,3 @@ class CMSApp(object):
 
     def get_config_add_url(self):
         raise NotImplemented('Configurable AppHooks must implement this method')
-
-
-class GenericCMSModelAppMetaClass(CMSApp):
-    def __new__(cls, name, bases, attrs):
-        import pdb
-        pdb.set_trace()
-        super_new = super(GenericCMSModelAppMetaClass, cls).__new__
-
-        # attrs will never be empty for classes declared in the standard way
-        # (ie. with the `class` keyword). This is quite robust.
-        if name == 'NewBase' and attrs == {}:
-            return super_new(cls, name, bases, attrs)
-
-        # Also ensure initialization is only performed for subclasses of 
-        # CMSModelMetaClass (excluding CMSModelMetaClass class itself).
-        parents = [b for b in bases if isinstance(b, GenericCMSModelAppMetaClass) and
-                   not (b.__name__ == 'NewBase' and b.__mro__ == (b, object))]
-        if not parents:
-            return super_new(cls, name, bases, attrs)
-        
-        if 'model' in attrs:
-            import pdb
-            pdb.set_trace()
-            pass

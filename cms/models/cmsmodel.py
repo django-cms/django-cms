@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from django.core.urlresolvers import reverse
 from django.utils import six
 from django.db import models
 from .metaclasses import CMSModelMetaClass
 
 
 class CMSModelBase(six.with_metaclass(CMSModelMetaClass, models.Model)):
+    #TODO : checks that CMSModelBase is coherent with the documented one.
 
     def _has_perm(self, perm_key, request):
         perm = '{0}.{1}_{2}'.format(
