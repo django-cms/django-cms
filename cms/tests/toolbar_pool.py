@@ -60,3 +60,7 @@ class ToolbarPoolTests(CMSTestCase):
                 response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 self.assertEqual(response.status_code, 200)
         toolbar_pool.toolbars = toolbars
+
+    def test_watch_models(self):
+        toolbar_pool.discover_toolbars()
+        self.assertEqual(type(toolbar_pool.get_watch_models()), list)
