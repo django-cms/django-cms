@@ -22,23 +22,22 @@ def validate_settings():
     """
     Check project settings file for required options
     """
-    def raise_missing_processor():
-        raise ImproperlyConfigured('django CMS requires django.core.context_processors.request in settings.TEMPLATE_CONTEXT_PROCESSORS to work correctly.')
-
     if DJANGO_1_7:
         if 'django.core.context_processors.request' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
-            raise_missing_processor()
+            raise ImproperlyConfigured('django CMS requires django.core.context_processors.request in settings.TEMPLATE_CONTEXT_PROCESSORS to work correctly.')
     else:
         try:
             django_backend = [x for x in settings.TEMPLATES
                               if x['BACKEND'] == 'django.template.backends.django.DjangoTemplates'][0]
         except IndexError:
-            raise_missing_processor()
+            raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
+                                       "'django.template.backends.django.DjangoTemplates' context processors.")
 
         context_processors = django_backend.get('OPTIONS', {}).get('context_processors', [])
         if ('django.core.context_processors.request' not in context_processors and
                 'django.template.context_processors.request' not in context_processors):
-            raise_missing_processor()
+            raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
+                                       "'django.template.backends.django.DjangoTemplates' context processors.")
 
 
 def setup():
