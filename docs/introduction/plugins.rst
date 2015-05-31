@@ -29,18 +29,22 @@ You should end up with a folder structure similar to this::
 Let's add it this application to our project. Add ``'polls'`` to the end of ``INSTALLED_APPS`` in
 your project's `settings.py` (see the note on :ref:`installed_apps` about ordering ).
 
-Add the following line to ``urlpatterns`` in the project's ``urls.py``::
+Add the following line to ``urlpatterns`` in the project's ``urls.py``:
+
+.. code-block:: python
 
     url(r'^polls/', include('polls.urls', namespace='polls')),
 
-Make sure this line is included **before** the line for the django-cms urls::
+Make sure this line is included **before** the line for the django-cms urls:
+
+.. code-block:: python
 
     url(r'^', include('cms.urls')),
 
 django CMS's URL pattern needs to be last, because it "swallows up" anything
 that hasn't already been matched by a previous pattern.
 
-Now run the application's migrations using ``south``::
+Now run the application's migrations::
 
     python manage.py migrate polls
 
@@ -51,8 +55,9 @@ However, in pages of the polls application we only have minimal templates, and
 no navigation or styling. Let's improve this by overriding the polls
 application's base template.
 
-add ``my_site/templates/polls/base.html``::
+add ``my_site/templates/polls/base.html``:
 
+.. code-block:: html+django
 
     {% extends 'base.html' %}
 
@@ -104,7 +109,9 @@ So our workspace looks like this::
 The Plugin Model
 ================
 
-In your poll application’s ``models.py`` add the following::
+In your poll application’s ``models.py`` add the following:
+
+.. code-block:: python
 
     from django.db import models
     from cms.models import CMSPlugin
@@ -129,7 +136,9 @@ Now create a file ``cms_plugins.py`` in the same folder your models.py is in.
 The plugin class is responsible for providing django CMS with the necessary
 information to render your plugin.
 
-For our poll plugin, we're going to write the following plugin class::
+For our poll plugin, we're going to write the following plugin class:
+
+.. code-block:: python
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
@@ -170,23 +179,32 @@ the plugin which :attr:`render_template
 
 In this case the template needs to be at
 ``polls_plugin/templates/djangocms_polls/poll_plugin.html`` and should look
-something like this::
+something like this:
+
+.. code-block:: html+django
 
     <h1>{{ instance.poll.question }}</h1>
 
     <form action="{% url 'polls:vote' instance.poll.id %}" method="post">
         {% csrf_token %}
-        {% for choice in instance.poll.choice_set.all %}
-            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
-        {% endfor %}
+        <div class="form-group">
+            {% for choice in instance.poll.choice_set.all %}
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="choice" value="{{ choice.id }}">
+                        {{ choice.choice_text }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
         <input type="submit" value="Vote" />
     </form>
 
-Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
-to add the plugin table (using South)::
 
-    python manage.py schemamigration polls_plugin --init
+Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
+to add the plugin table::
+
+    python manage.py makemigrations polls
     python manage.py migrate polls_plugin
 
 Finally, start the runserver and visit http://localhost:8000/.

@@ -9,16 +9,20 @@ is still only determined by django CMS Pages.
 We can hook into the django CMS menu system to add our own nodes to that
 navigation menu.
 
-For this we need a file called ``menu.py`` in the Polls application::
+For this we need a file called ``menu.py`` in our application. Add
+``polls_plugin/menu.py``:
+
+.. code-block:: python
 
     from django.core.urlresolvers import reverse
     from django.utils.translation import ugettext_lazy as _
 
     from cms.menu_bases import CMSAttachMenu
-    from menus.base import Menu, NavigationNode
+    from menus.base import NavigationNode
     from menus.menu_pool import menu_pool
 
-    from .models import Poll
+    from polls.models import Poll
+
 
     class PollsMenu(CMSAttachMenu):
         name = _("Polls Menu")  # give the menu a name this is required.
@@ -29,24 +33,21 @@ For this we need a file called ``menu.py`` in the Polls application::
             """
             nodes = []
             for poll in Poll.objects.all():
-                # the menu tree consists of NavigationNode instances
-                # Each NavigationNode takes a label as its first argument, a URL as
-                # its second argument and a (for this tree) unique id as its third
-                # argument.
                 node = NavigationNode(
-                    poll.question,
-                    reverse('polls:detail', args=(poll.pk,)),
-                    poll.pk
+                    title=poll.question,
+                    url=reverse('polls:detail', args=(poll.pk,)),
+                    id=poll.pk,  # unique id for this node within the menu
                 )
                 nodes.append(node)
             return nodes
 
-    menu_pool.register_menu(PollsMenu) # register the menu.
+    menu_pool.register_menu(PollsMenu)
+
 
 What's happening here:
 
 * we define a ``PollsMenu`` class, and register it
-* we give the class a ``name`` attribute
+* we give the class a ``name`` attribute (will be displayed in admin)
 * in its ``get_nodes()`` method, we build and return a list of nodes, where:
 * first we get all the ``Poll`` objects
 * ... and then create a ``NavigationNode`` object from each one
@@ -59,5 +60,5 @@ So open your ``cms_app.py`` and add::
 
 to the ``PollsApp`` class.
 
-Now, any page that is attached to the ``Polls`` application have, below its
-own node in the navigation menu, a node for each of the Polls in the database.
+Any page that is attached to the ``Polls`` application will now have submenu
+items for each of the Polls in the database.
