@@ -44,7 +44,9 @@ Make sure this line is included **before** the line for the django-cms urls:
 django CMS's URL pattern needs to be last, because it "swallows up" anything
 that hasn't already been matched by a previous pattern.
 
-Now run the application's migrations::
+Now run the application's migrations:
+
+.. code-block:: bash
 
     python manage.py migrate polls
 
@@ -204,7 +206,7 @@ something like this:
 Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
 to add the plugin table::
 
-    python manage.py makemigrations polls
+    python manage.py makemigrations polls_plugin
     python manage.py migrate polls_plugin
 
 Finally, start the runserver and visit http://localhost:8000/.

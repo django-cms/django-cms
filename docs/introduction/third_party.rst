@@ -64,6 +64,9 @@ Add boilerplates finder to ``STATICFILES_FINDERS``:
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
 
+If ``STATICFILES_FINDERS`` is not defined in your ``settings.py`` just copy and paste the above
+code.
+
 Add the boilerplate template loader to ``TEMPLATE_LOADERS``:
 
 .. code-block:: python
