@@ -4,14 +4,18 @@ from datetime import datetime
 from itertools import chain
 import re
 from classytags.values import StringValue
-from django.db.models import Model
-from cms.utils.urlutils import admin_reverse
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
+from django.db.models import Model
 from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
 from django.utils import six
@@ -20,8 +24,8 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _, get_language
-from classytags.arguments import Argument, MultiValueArgument, \
-    MultiKeywordArgument
+from classytags.arguments import (Argument, MultiValueArgument,
+                                  MultiKeywordArgument)
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
@@ -40,6 +44,7 @@ from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.urlutils import admin_reverse
 
 
 register = template.Library()
@@ -885,7 +890,7 @@ class CMSEditableObject(InclusionTag):
         if edit_fields == 'changelist':
             view_url = 'admin:%s_%s_changelist' % (
                 instance._meta.app_label, instance._meta.module_name)
-        querystring = {'language': language}
+        querystring = OrderedDict((('language', language),))
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it

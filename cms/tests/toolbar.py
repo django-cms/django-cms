@@ -1042,7 +1042,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(
             response,
-            "'edit_plugin': '%s?edit_fields=changelist&amp;language=%s'" % (admin_reverse('placeholderapp_example1_changelist'), 'en'))
+            "'edit_plugin': '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('placeholderapp_example1_changelist'), 'en'))
 
     def test_invalid_attribute(self):
         user = self.get_staff()
@@ -1429,7 +1429,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<div class="cms_plugin cms_plugin-cms-page-changelist-%s cms_render_model cms_render_model_block"><h3>Menu</h3></div>' % page.pk)
         self.assertContains(
             response,
-            "'edit_plugin': '%s?edit_fields=changelist&amp;language=%s'" % (admin_reverse('cms_page_changelist'), language))
+            "'edit_plugin': '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('cms_page_changelist'), language))
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
 
