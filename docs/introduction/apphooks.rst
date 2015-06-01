@@ -1,6 +1,6 @@
-#########
+########
 Apphooks
-#########
+########
 
 Right now, our django Polls app is statically hooked into the project's
 ``urls.py``. This is all right, but we can do more, by attaching applications to
@@ -24,6 +24,7 @@ This is the most basic example for a django CMS app:
     class PollsApp(CMSApp):
         name = _("Poll App")  # give your app a name, this is required
         urls = ["polls.urls"]  # link your app to url configuration(s)
+        app_name = "polls"
 
     apphook_pool.register(PollsApp)  # register your app
 
