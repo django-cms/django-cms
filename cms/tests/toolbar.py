@@ -310,6 +310,13 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'cms_form-login')
 
+    @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
+    def test_hide_toolbar_login_anonymous_setting(self):
+        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'cms_form-login')
+
     def test_hide_toolbar_login_nonstaff(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         with self.login_user_context(self.get_nonstaff()):
