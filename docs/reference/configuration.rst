@@ -904,6 +904,18 @@ Example::
 .. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
+
+CMS_TOOLBAR_ANONYMOUS_ON
+========================
+
+default
+    ``True``
+
+This setting controls if anonymous users can see the CMS toolbar with
+a login form when ``?edit`` is appended to a URL. The default behaviour
+is to show the toolbar to anonymous users.
+
+
 CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
 
