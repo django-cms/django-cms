@@ -30,12 +30,13 @@ before_script:
   - sh -c "if [ '$DATABASE_URL' = 'mysql://root@127.0.0.1/djangocms_test' ]; then mysql
     -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
     fi"
-
+    
 install:
-  - pip install -q -r "test_requirements/django-$DJANGO.txt"
-  - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip
+  - pip install 'pip-accel'
+  - pip-accel install -q -r "test_requirements/django-$DJANGO.txt"
+  - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip-accel
     install -q psycopg2 ; fi
-  - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install
+  - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip-accel install
     -q mysql-python ; fi
 
 script: coverage run --rcfile=.coverage.rc develop.py test --migrate
@@ -76,3 +77,7 @@ matrix:
       env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
 
   fast_finish: true
+
+cache:
+  directories:
+    $HOME/.pip-accel
