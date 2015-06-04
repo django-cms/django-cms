@@ -56,6 +56,10 @@ What's happening here:
 This menu class is not active until attached to the apphook we created earlier.
 So open your ``cms_app.py`` and add::
 
+    from polls_plugin.menu import PollsMenu
+
+for importing ``PollsMenu`` and
+    
     menus = [PollsMenu]
 
 to the ``PollsApp`` class.
