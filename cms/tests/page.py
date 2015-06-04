@@ -13,7 +13,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import signals
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
-from django.test.utils import modify_settings, override_settings
+from django.test.utils import override_settings
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now, make_aware, get_current_timezone
 
@@ -1145,9 +1145,9 @@ class PagesTestCase(CMSTestCase):
         resp = self.client.get(page.get_absolute_url('en'))
         self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
 
-    @modify_settings(MIDDLEWARE_CLASSES={
-        'append': 'django.middleware.clickjacking.XFrameOptionsMiddleware'
-    })
+    @override_settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES +
+        ['django.middleware.clickjacking.XFrameOptionsMiddleware']
+    )
     def test_top_level_page_inherited_xframe_options_are_applied(self):
         page = create_page('test page 1', 'nav_playground.html', 'en',
                            published=True)
