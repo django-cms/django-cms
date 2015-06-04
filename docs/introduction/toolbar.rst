@@ -27,6 +27,7 @@ the Polls Plugin application we were working with in the previous tutorial):
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar_base import CMSToolbar
     from cms.utils.urlutils import admin_reverse
+    from poll.models import Poll
 
 
     @toolbar_pool.register
@@ -35,6 +36,7 @@ the Polls Plugin application we were working with in the previous tutorial):
             'polls',
             'polls_plugin',
         )
+        watch_models = [Poll,]
 
         def populate(self):
             if not self.is_current_app:
@@ -80,12 +82,15 @@ as a decorator.
   by the same app as the function is in (use ``supported_apps`` to add more
   apps that should be considered the "active app")
 * ``app_path`` the name of the app used for the current request
+* ``watch_models`` which allow the frontend editor to redirect the user to the model instance
+  ``get_absolute_url`` whenever an instance is created or saved through the frontend editor
+  (see :ref:`url_changes` for details)
 
 ``CMSToolbar`` subclasses must implement a ``populate`` method. The ``populate``
 method will only be called if the current user is a staff user.
 ``supported_apps`` is a list of app names that should be considered as
 ``is_current_app``. Usually you don't need to set ``supported_apps``, but in
-our case we need it so ``is_currnet_app`` can be detected properly (because the
+our case we need it so ``is_current_app`` can be detected properly (because the
 views for the poll app are in ``polls`` and our ``cms_toolbar.py`` is in the
 ``polls_plugin`` app).
 
