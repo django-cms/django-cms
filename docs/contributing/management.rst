@@ -1,3 +1,5 @@
+.. _management:
+
 ###########################
 Code and project management
 ###########################

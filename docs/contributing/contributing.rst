@@ -1,12 +1,11 @@
+..  _contributing:
+
 ##########################
 Contributing to django CMS
 ##########################
 
 Like every open-source project, django CMS is always looking for motivated
 individuals to contribute to its source code.
-
-There's more guidance on `how to contribute in our documentation
-<http://docs.django-cms.org/en/latest/introduction>`_.
 
 
 Key points:
@@ -52,6 +51,8 @@ only for the stuff we host on GitHub:
    push your changes to it.
 #. When you feel your code is good enough for inclusion, "send us a `pull
    request`_", by using the nice GitHub web interface.
+
+.. _contributing-code:
 
 *****************
 Contributing Code
@@ -124,6 +125,8 @@ that the fix works.
 
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
+
+.. _contributing-documentation:
 
 **************************
 Contributing Documentation
@@ -237,6 +240,8 @@ References
 Use absolute links to other documentation pages - ``:doc:`/how_to/toolbar``` -
 rather than relative links - ``:doc:`/../toolbar```. This makes it easier to
 run search-and-replaces when items are moved in the structure.
+
+.. _contributing-translations:
 
 ************
 Translations

@@ -32,6 +32,7 @@ in the order presented here.
     toolbar
     menu
     namespaced_apphooks
+    contributing
 
 If you want to install django CMS into an existing project, or prefer to configure django CMS by
 hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the
