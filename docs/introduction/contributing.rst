@@ -1,4 +1,4 @@
-..  _tutorial_contributing:_
+..  _tutorial_contributing:
 
 ============
 Contributing
@@ -25,7 +25,7 @@ will make much easier for the core developers to validate and accept your contri
 
 The basic step to contribute are:
 
-#. fork :ref:`django CMS project <https://github.com/divio/django-cms>` repostory on github
+#. fork `django CMS project <https://github.com/divio/django-cms>`_  repostory on github
 #. clone your fork on your local computer::
 
     git clone git@github.com:YOUR_USERNAME/django-cms.git
@@ -54,6 +54,8 @@ The basic step to contribute are:
     git push origin my_fix
 
 #. open a pull request on github
+
+.. _target-branches:
 
 Target branches
 ===============
@@ -146,6 +148,10 @@ Write a real test:
     class SimplePluginTestCase(CMSTestCase):
 
         def test_render_method(self):
+            """
+            Tests the CMSPluginBase.render method by checking that the appropriate variables
+            are set in the returned context
+            """
             from cms.api import create_page
             my_page = create_page('home', language='en', template='col_two.html')
             placeholder = my_page.placeholders.get(slot='col_left')
@@ -173,7 +179,8 @@ this test is actually doing something.
 Let's quickly check the test code.
 
 To test ``CMSPluginBase.render`` method we need a RequestContext instance and a placeholder. As
-``CMSPluginBase`` does not have any :ref:`configuration model`, the instance argument can be ``None``.
+``CMSPluginBase`` does not have any :ref:`configuration model <storing configuration>`,
+the instance argument can be ``None``.
 
 #. Create a page instance to get the placeholder
 #. Get the placeholder by filtering the placeholders of the page instance on the expected
@@ -183,8 +190,57 @@ To test ``CMSPluginBase.render`` method we need a RequestContext instance and a 
    ``render`` of a bare instance of the ``CMSPluginBase`` class, which helps in tests
 #. Assert a few things the method must provide on the returned context instance
 
-As you see, even a simple test like this, assumes and uses many feature of the test utils provided
+As you see, even a simple test like this assumes and uses many feature of the test utils provided
 by django CMS. Before attempting to write a test, take your time to explore the content of
 ``cms.test_utils`` package and check the shipped templates, example applications and, most of all,
 the base testcases defined in ``cms.test_utils.testscases`` which provide *a lot* of useful
 methods to prepare the environment for our tests or to create useful test data.
+
+********************
+Submitting your code
+********************
+
+After the code and the tests are ready and packed in commits, you must submit it for review and
+merge in the django CMS github project.
+
+As stated above, always create a feature branch for your code, being it a fix or a new feature;
+then you can create a Pull Request from your branch to the :ref:`target branch<target-branches>`
+on django CMS.
+
+
+Acceptance criteria
+===================
+
+Matching this criteria from the very beginning will help the core developers to be able
+to review your submission more quickly and efficiently and will greatly help your code
+to be merged in.
+
+Features
+--------
+
+To be accepted, proposed features should have *at least*:
+
+ * natural language documentation in the ``docs`` folder describing the feature, its usage and
+   potentially backward incompatibilities.
+ * inline documentation (comments and docstrings) in the critical areas of the code explaining
+   the behavior
+ * appropriate test coverage
+ * Python 2/3 compatibility
+ * South and Django migrations (where applicable)
+
+The pull request description must briefly describe the feature and the intended goal and benefits.
+
+Bugs
+----
+
+To be accepted, proposed bug fixes should have *at least*:
+
+ * inline documentation (comments and docstrings) in the critical areas of the code explaining
+   the behavior
+ * at least 1 regression test that demonstrates the issue and the fix
+ * Python 2/3 compatibility
+ * South and Django migrations (where applicable)
+
+The pull request description must briefly describe the bug and the steps for its solution; in case
+the bug has been opened elsewhere, it must be linked in the Pull Request description, describing
+the fix.
