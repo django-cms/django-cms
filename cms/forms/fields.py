@@ -49,6 +49,7 @@ class PageSelectFormField(forms.MultiValueField):
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
+        kwargs['widget'] = self.widget(site_choices, page_choices)
         super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):

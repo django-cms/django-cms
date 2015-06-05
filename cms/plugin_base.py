@@ -361,6 +361,15 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         )
 
 
+class CMSPagePluginBase(CMSPluginBase):
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        from cms.models import fields
+        if isinstance(db_field, fields.PageField):
+            kwargs['language'] = self.cms_plugin_instance.language
+
+        return super(CMSPagePluginBase, self).formfield_for_dbfield(db_field, **kwargs)
+
+
 class PluginMenuItem(object):
     def __init__(self, name, url, data, question=None, action='ajax'):
         """

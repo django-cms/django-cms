@@ -1,8 +1,10 @@
-from cms.models.fields import PlaceholderField
+from cms.models.fields import PageField, PlaceholderField
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from treebeard.mp_tree import MP_Node
+
+from cms.models.pluginmodel import CMSPlugin
 
 
 @python_2_unicode_compatible
@@ -24,3 +26,7 @@ class Category(MP_Node):
 class Picture(models.Model):
     image = models.ImageField(upload_to="pictures")
     category = models.ForeignKey(Category)
+
+
+class LinkModel(CMSPlugin):
+    link = PageField(related_name='plugin_link_link')

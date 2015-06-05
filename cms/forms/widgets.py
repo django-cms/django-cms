@@ -11,7 +11,6 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
-from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
@@ -25,7 +24,8 @@ class PageSelectWidget(MultiWidget):
             self.attrs = attrs.copy()
         else:
             self.attrs = {}
-        self.choices = []
+        self.site_choices = site_choices or []
+        self.choices = page_choices or []
         super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
 
     def decompress(self, value):
@@ -69,11 +69,7 @@ class PageSelectWidget(MultiWidget):
         # value is a list of values, each corresponding to a widget
         # in self.widgets.
 
-        site_choices = get_site_choices()
-        page_choices = get_page_choices()
-        self.site_choices = site_choices
-        self.choices = page_choices
-        self.widgets = (Select(choices=site_choices ),
+        self.widgets = (Select(choices=self.site_choices ),
                    Select(choices=[('', '----')]),
                    Select(choices=self.choices, attrs={'style': "display:none;"} ),
         )
