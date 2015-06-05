@@ -29,7 +29,9 @@ $(document).ready(function () {
 				initTree();
 			} else {
 				// when filtered is active, prevent tree actions
+				this.setupFunctions();
 				this.setupUIHacks();
+				$.syncCols();
 			}
 		},
 
