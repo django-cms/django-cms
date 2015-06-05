@@ -7,7 +7,7 @@ Contributing
 .. note:: The topics of this chapter is covered in more details into the :ref:`contributing` and
           :ref:`testing` sections of the documentation
 
-django CMS is an open source and open projects which welcomes anyone who want to provide its
+django CMS is an open source and open project which welcomes anyone who want to provide its
 contribution at any level of knowledge.
 
 You can contribute code, :ref:`documentation <contributing-documentation>` and
