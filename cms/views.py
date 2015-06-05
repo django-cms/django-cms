@@ -12,6 +12,7 @@ from django.utils.cache import add_never_cache_headers
 from django.utils.encoding import iri_to_uri, force_text
 from django.utils.http import urlquote
 from django.utils.timezone import get_current_timezone_name
+from django.views.generic import DetailView, ListView
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
@@ -334,3 +335,49 @@ def invalidate_cms_page_cache():
     #
     version = _get_cache_version()
     _set_cache_version(version + 1)
+
+
+class CustomModelDetailView(DetailView):
+    model = None
+    context_object_name = 'object'
+
+    def __init__(self, model, **kwargs):
+        if 'slug_field' not in kwargs:
+            kwargs['slug_field'] = model._cms_meta['slug_field_name']
+        if 'slug_url_kwarg' not in kwargs:
+            kwargs['slug_url_kwarg'] = model._cms_meta['slug_field_name']
+        super(CustomModelDetailView, self).__init__(model=model, **kwargs)
+    
+    def get_queryset(self):
+        queryset = super(CustomModelDetailView, self).get_queryset()
+        if hasattr(queryset, 'all_can_view'):
+            queryset = queryset.all_can_view()
+        return queryset
+
+    def get_template_names(self):
+        template_names = super(CustomModelDetailView, self).get_template_names()
+        #TODO : rajouter un setting CMS_GENERIC_DETAIL_TEMPLATE
+        template_names.append('cms/generic/detail.html')
+        return template_names
+
+
+class CustomModelListView(ListView):
+    model = None
+    context_object_name = 'object_list'
+    paginate_by = 10
+    paginate_orphans = 2
+
+    def __init__(self, model, **kwargs):
+        super(CustomModelDetailView, self).__init__(model=model, **kwargs)
+    
+    def get_queryset(self):
+        queryset = super(CustomModelDetailView, self).get_queryset()
+        if hasattr(queryset, 'all_can_view'):
+            queryset = queryset.all_can_view()
+        return queryset
+
+    def get_template_names(self):
+        template_names = super(CustomModelDetailView, self).get_template_names()
+        #TODO : rajouter un setting CMS_GENERIC_LIST_TEMPLATE
+        template_names.append('cms/generic/list.html')
+        return template_names

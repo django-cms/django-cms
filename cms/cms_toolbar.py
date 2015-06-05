@@ -13,7 +13,8 @@ from django.utils.translation import ugettext_lazy as _
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.models import Title, Page
-from cms.toolbar.items import TemplateItem
+from cms.models._registry import CMSModelsRegistry
+from cms.toolbar.items import TemplateItem, Break
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language
@@ -22,7 +23,6 @@ from cms.utils import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
-
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
@@ -90,6 +90,61 @@ class PlaceholderToolbar(CMSToolbar):
                                                     extra_classes=extra_classes)
             switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
             switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
+
+
+@toolbar_pool.register
+class CMSModelToolbar(CMSToolbar):
+    """
+    Adds change_list access buttons links for all CMSModel
+    subclasses with cms_add_to_cms_toolbar set to True.
+    When on detail view for this model, add edit button and suppress the page
+    menu to not confused the user.
+    """
+
+    def populate(self):
+        app_labels = sorted(CMSModelsRegistry.items.keys())
+        if not app_labels:
+            return
+
+        admin_menu = self.toolbar.get_or_create_menu(
+            ADMIN_MENU_IDENTIFIER, 
+            _('Site'))
+        position = admin_menu.find_first(
+            Break,
+            identifier=ADMINISTRATION_BREAK)
+
+        for app_label in app_labels:
+            if len(app_labels) == 1:
+                #If we only have one application, we add model's action to
+                #admin_menu ; else, we build a sub menu per app.
+                app_menu = admin_menu
+                subpos = position
+            else:
+                position+=1
+                app_menu = admin_menu.get_or_create_menu(
+                    '%s-menu' % app_label,
+                    _(app_label.title()),
+                    position=position)
+                subpos=0
+            
+            app_items = sorted(
+                CMSModelsRegistry.items[app_label], 
+                key=lambda k: k['title']) 
+            
+            for item in app_items:
+                subpos+=1
+            
+                url = reverse('admin:%s_%s_changelist' % (
+                    item['model']._meta.app_label, 
+                    item['model']._meta.model_name))
+
+                app_menu.add_sideframe_item(
+                    item['title'], 
+                    url=url, 
+                    position=subpos)
+        if len(app_labels) == 1:
+            position = subpos
+        admin_menu.add_break('custommodel-break', position=position+1)
 
 
 @toolbar_pool.register

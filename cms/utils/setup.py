@@ -30,6 +30,7 @@ def setup():
     """
     Gather all checks and validations
     """
+    from cms.models._registry import CMSModelsRegistry
     if DJANGO_1_6:
         # While setup is called both in all the Django versions only 1.6-
         # requires paching the AppCache. 1.7 provides a cleaner way to handle
@@ -46,3 +47,4 @@ def setup():
         loading.AppCache.get_models = get_models_patched
     validate_dependencies()
     validate_settings()
+    CMSModelsRegistry._auto_build()
