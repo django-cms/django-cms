@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from operator import attrgetter
 import re
 
 from django.contrib import admin
@@ -15,7 +16,7 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
 
 from cms.api import create_page, create_title, add_plugin
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, LANGUAGE_MENU_IDENTIFIER
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -480,6 +481,46 @@ class ToolbarTests(ToolbarTestBase):
             # parameters - non existing id - no redirection
             response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
+
+    def test_remove_language(self):
+        item_name = attrgetter('name')
+
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        create_title(title="de page", language="de", page=page)
+        create_title(title="fr page", language="fr", page=page)
+
+        request = self.get_page_request(page, self.get_staff(), '/', edit=True)
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        meu = toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
+        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete German')]))
+        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete English')]))
+        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete French')]))
+
+        reduced_langs = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': 'English',
+                    'fallbacks': ['fr', 'de'],
+                    'public': True,
+                },
+                {
+                    'code': 'fr',
+                    'name': 'French',
+                    'public': True,
+                },
+            ]
+        }
+
+        with SettingsOverride(CMS_LANGUAGES=reduced_langs):
+            toolbar = CMSToolbar(request)
+            toolbar.populate()
+            meu = toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
+            self.assertFalse(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete German')]))
+            self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete English')]))
+            self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete French')]))
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
