@@ -118,8 +118,8 @@ class MenuPool(object):
                 # A Menu **instance** was registered, this is non-standard, but
                 # acceptable. However, it cannot be "expanded", so, just add it
                 # as-is to the list of expanded_menus.
-                expanded_menus[menu_class_name] = menu_cls
-            elif hasattr(menu_cls, "get_instances"):
+                menu_cls = menu_cls.__class__
+            if hasattr(menu_cls, "get_instances"):
                 # It quacks like a CMSAttachMenu, expand away!
                 # If a menu exists but has no instances,
                 # it's included in the available menus as is
@@ -286,18 +286,12 @@ class MenuPool(object):
         # specific menu class. This is to address issue (#4041) which has
         # cropped-up in 3.0.13/3.0.0.
         self.discover_menus()
-        found = []
-        classes = []
+        self._expand_menus()
+        found = set()
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                if isinstance(menu[1], type):  # Its a class
-                    menu_class = menu[1]
-                else:
-                    menu_class = menu[1].__class__
-                if menu_class not in classes:
-                    classes.append(menu_class)
-                    found.append((menu[0], menu[1].name))
-        return found
+                found.add((menu[1].__class__.__name__, menu[1].name))
+        return sorted(list(found))
 
     def get_nodes_by_attribute(self, nodes, name, value):
         found = []
