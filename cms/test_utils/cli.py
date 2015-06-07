@@ -291,11 +291,10 @@ def configure(db_url, **extra):
                         "cms.context_processors.cms_settings",
                         "sekizai.context_processors.sekizai",
                         "django.template.context_processors.static",
-                    ]
+                    ],
                 }
             }
         ]
-
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')

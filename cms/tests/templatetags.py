@@ -1,8 +1,9 @@
 from __future__ import with_statement
-import copy
+from copy import deepcopy
 import os
 from classytags.tests import DummyParser, DummyTokens
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
@@ -27,6 +28,7 @@ from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting, get_site_id
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.placeholder import get_placeholders
 from sekizai.context import SekizaiContext
 
@@ -201,7 +203,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         page_3 = create_page('Page 3', 'nav_playground.html', 'en', page_2, published=True,
                              in_navigation=True, reverse_id='page3')
         tpl = Template("{% load menu_tags %}{% page_language_url 'de' %}")
-        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        lang_settings = deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][1]['hide_untranslated'] = False
         with self.settings(CMS_LANGUAGES=lang_settings):
             context = self.get_context(page_2.get_absolute_url())
@@ -265,7 +267,12 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get('/')
         request.user = self.get_staff_user_with_no_permissions()
         request.current_page = page
-        with self.settings(TEMPLATE_DIRS=[template_dir]):
+        if DJANGO_1_7:
+            override = {'TEMPLATE_DIRS': [template_dir], 'CMS_TEMPLATES': []}
+        else:
+            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+            override['TEMPLATES'][0]['DIRS'] = [template_dir]
+        with self.settings(**override):
             template = Template(
                 "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
             context = RequestContext(request, {'page': page, 'slot': placeholder.slot})

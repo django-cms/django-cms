@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from copy import deepcopy
 import os
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, base
 from django.test import SimpleTestCase, TestCase
@@ -90,7 +92,12 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             apps.unset_available_apps()
 
     def test_no_sekizai_template_context_processor(self):
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[]):
+        if DJANGO_1_7:
+            override = {'TEMPLATE_CONTEXT_PROCESSORS': []}
+        else:
+            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+            override['TEMPLATES'][0]['OPTIONS']['context_processors'] = []
+        with self.settings(**override):
             self.assertCheck(False, errors=2)
 
     def test_old_style_i18n_settings(self):
@@ -146,8 +153,14 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             'project',
             'alt_templates'
         )
-        with self.settings(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
-            self.assertCheck(True, warnings=1, errors=0)
+        if DJANGO_1_7:
+            with self.settings(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
+                self.assertCheck(True, warnings=1, errors=0)
+        else:
+            NEWTEMPLATES = deepcopy(settings.TEMPLATES)
+            NEWTEMPLATES[0]['DIRS'] = [alt_dir]
+            with self.settings(TEMPLATES=NEWTEMPLATES, CMS_TEMPLATES=[]):
+                self.assertCheck(True, warnings=1, errors=0)
 
     def test_non_numeric_site_id(self):
         self.assertCheck(True, warnings=0, errors=0)
@@ -166,7 +179,7 @@ class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                       name="A Link", url="https://www.django-cms.org")
 
             # create a CMSPlugin with an unsaved instance
             instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")

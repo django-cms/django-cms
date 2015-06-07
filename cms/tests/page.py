@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
-from django.contrib.auth import get_user_model
-from django.db import transaction
-from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
-from cms.test_utils.compat import skipIf
-from cms.utils.i18n import force_language
 import os.path
 
 from django.conf import settings
 from django.core.cache import cache
-from django.contrib.sites.models import Site
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.db.models import signals
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.test.utils import override_settings
@@ -24,6 +21,7 @@ from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin
+from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title, EmptyTitle
 from cms.models.placeholdermodel import Placeholder
@@ -31,11 +29,13 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
+from cms.test_utils.compat import skipIf
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import installed_apps
+from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
 from cms.utils.page import is_valid_page_slug, get_available_slug
 from cms.utils.urlutils import admin_reverse
@@ -663,7 +663,10 @@ class PagesTestCase(CMSTestCase):
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
+        try:
+            path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
+        except IndexError:
+            path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
         with open(path, 'r') as fobj:
             old = fobj.read()
         try:

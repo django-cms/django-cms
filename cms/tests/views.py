@@ -1,6 +1,5 @@
 from __future__ import with_statement
-
-from copy import copy
+from copy import deepcopy
 import re
 import sys
 
@@ -17,6 +16,7 @@ from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.views import _handle_no_page, details
 from menus.menu_pool import menu_pool
@@ -182,9 +182,13 @@ class ContextTests(CMSTestCase):
         from django.template import context
 
         page_template = "nav_playground.html"
-        original_context = settings.TEMPLATE_CONTEXT_PROCESSORS
-        new_context = copy(original_context)
-        new_context.remove("cms.context_processors.cms_settings")
+        if DJANGO_1_7:
+            original_context = {'TEMPLATE_CONTEXT_PROCESSORS': settings.TEMPLATE_CONTEXT_PROCESSORS}
+            override = {'TEMPLATE_CONTEXT_PROCESSORS': list(settings.TEMPLATE_CONTEXT_PROCESSORS).remove("cms.context_processors.cms_settings")}
+        else:
+            original_context = {'TEMPLATES': settings.TEMPLATES}
+            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+            override['TEMPLATES'][0]['OPTIONS']['context_processors'].remove("cms.context_processors.cms_settings")
         page = create_page("page", page_template, "en", published=True)
         page_2 = create_page("page-2", page_template, "en", published=True,
                              parent=page)
@@ -200,7 +204,7 @@ class ContextTests(CMSTestCase):
         menu_pool.clear()
         context._standard_context_processors = None
         # Number of queries when context processors is not enabled
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=new_context):
+        with self.settings(**override):
             with self.assertNumQueries(FuzzyInt(0, 12)) as context:
                 response = self.client.get("/en/plain_view/")
                 num_queries = len(context.captured_queries)
@@ -208,7 +212,7 @@ class ContextTests(CMSTestCase):
         cache.clear()
         menu_pool.clear()
         # Number of queries when context processor is enabled
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=original_context):
+        with self.settings(**original_context):
             # no extra query is run when accessing urls managed by standard
             # django applications
             with self.assertNumQueries(FuzzyInt(0, num_queries)):
@@ -226,7 +230,7 @@ class ContextTests(CMSTestCase):
         menu_pool.clear()
 
         # Number of queries when context processors is not enabled
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=new_context):
+        with self.settings(**override):
             # Baseline number of queries
             with self.assertNumQueries(FuzzyInt(13, 19)) as context:
                 response = self.client.get("/en/page-2/")
@@ -235,7 +239,7 @@ class ContextTests(CMSTestCase):
         menu_pool.clear()
 
         # Number of queries when context processors is enabled
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=original_context):
+        with self.settings(**original_context):
             # Exactly the same number of queries are executed with and without
             # the context_processor
             with self.assertNumQueries(num_queries_page):
@@ -247,7 +251,7 @@ class ContextTests(CMSTestCase):
         page_2.template = 'INHERIT'
         page_2.save()
         page_2.publish('en')
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=original_context):
+        with self.settings(**original_context):
             # One query more triggered as page inherits template from ancestor
             with self.assertNumQueries(num_queries_page + 1):
                 response = self.client.get("/en/page-2/")

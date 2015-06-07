@@ -170,10 +170,17 @@ def check_sekizai(output):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
-        if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
-            section.success("Sekizai template context processor is installed")
+        if DJANGO_1_7:
+            if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
+                section.success("Sekizai template context processor is installed")
+            else:
+                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
         else:
-            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+            processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+            if 'sekizai.context_processors.sekizai' in processors:
+                section.success("Sekizai template context processor is installed")
+            else:
+                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -328,7 +335,10 @@ def _load_all_templates(directory):
 @define_check
 def deprecations(output):
     # deprecated placeholder_tags scan (1 in 3.1)
-    templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
+    if DJANGO_1_7:
+        templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
+    else:
+        templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
     templates_dirs.extend(
         [os.path.join(path, 'templates') for path in get_app_paths()]
     )

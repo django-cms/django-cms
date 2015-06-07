@@ -114,7 +114,13 @@ def get_templates():
         # app_directories template loaders do
         prefix = ''
         # Relative to TEMPLATE_DIRS for filesystem loader
-        for basedir in settings.TEMPLATE_DIRS:
+
+        try:
+            path = settings.TEMPLATE_DIRS
+        except IndexError:
+            path = [template['DIRS'][0] for template in settings.TEMPLATES]
+
+        for basedir in path:
             if tpldir.find(basedir) == 0:
                 prefix = tpldir.replace(basedir + os.sep, '')
                 break
