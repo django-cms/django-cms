@@ -82,7 +82,9 @@ def get_visible_pages(request, pages, site=None):
 
     # authenticated user and global permission
     if is_auth_user:
-        global_view_perms = GlobalPagePermission.objects.user_has_view_permission(request.user, site.pk).exists()
+        perms = GlobalPagePermission.objects
+        global_view_perms = perms.user_has_view_permission(
+            request.user, site.pk).exists()
 
         # no page perms edge case - all visible
         if ((is_setting_public_all or (
@@ -272,9 +274,11 @@ class CMSMenu(Menu):
                 home = page
             if first and page.pk != home.pk:
                 home_cut = True
-            if (page.parent_id == home.pk or page.parent_id in home_children) and home_cut:
+            if (home_cut and (page.parent_id == home.pk or 
+                    page.parent_id in home_children)):
                 home_children.append(page.pk)
-            if (page.pk == home.pk and home.in_navigation) or page.pk != home.pk:
+            if ((page.pk == home.pk and home.in_navigation)
+                    or page.pk != home.pk):
                 first = False
             ids[page.id] = page
             actual_pages.append(page)
@@ -284,7 +288,8 @@ class CMSMenu(Menu):
         if not hide_untranslated(lang):
             langs.extend(get_fallback_languages(lang))
 
-        titles = list(get_title_queryset(request).filter(page__in=ids, language__in=langs))
+        titles = list(get_title_queryset(request).filter(
+            page__in=ids, language__in=langs))
         for title in titles:  # add the title and slugs and some meta data
             page = ids[title.page_id]
             page.title_cache[title.language] = title
@@ -302,23 +307,23 @@ class NavExtender(Modifier):
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
-        exts = []
         # rearrange the parent relations
-        home = None
+        # Find home
+        home = next((n for n in nodes if n.attr.get("is_home", False)), None)
+        # Find nodes with NavExtenders
+        exts = []
         for node in nodes:
-            if node.attr.get("is_home", False):
-                home = node
             extenders = node.attr.get("navigation_extenders", None)
             if extenders:
                 for ext in extenders:
                     if ext not in exts:
                         exts.append(ext)
+                    # Link the nodes
                     for extnode in nodes:
                         if extnode.namespace == ext and not extnode.parent_id:
                             # if home has nav extenders but home is not visible
-                            if (node.attr.get("is_home", False)
-                                    and not node.visible):
-                                extnode.parent_id = None
+                            if node == home and not node.visible:
+                                # extnode.parent_id = None
                                 extnode.parent_namespace = None
                                 extnode.parent = None
                             else:
@@ -468,7 +473,8 @@ class SoftRootCutter(Modifier):
                 node.parent.parent = None
                 nodes = [node.parent] + nodes
             else:
-                nodes = self.find_ancestors_and_remove_children(node.parent, nodes)
+                nodes = self.find_ancestors_and_remove_children(
+                    node.parent, nodes)
         else:
             for newnode in nodes:
                 if newnode != node and not newnode.parent:

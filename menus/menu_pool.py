@@ -220,8 +220,8 @@ class MenuPool(object):
                         _('Menu %s cannot be loaded. Please, make sure all '
                           'its urls exist and can be resolved.') %
                         menu_class_name)
-                    logger.error("Menu %s could not be loaded." %
-                        menu_class_name, exc_info=True)
+                logger.error("Menu %s could not be loaded." %
+                    menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(
                 nodes, menu_class_name)
@@ -257,32 +257,46 @@ class MenuPool(object):
         return nodes
 
     def _mark_selected(self, request, nodes):
-        sel = None
+        # There /may/ be two nodes that get marked with selected. A published
+        # and a draft version of the node. We'll mark both, later, the unused
+        # one will be removed anyway.
+        sel = []
         for node in nodes:
             node.sibling = False
             node.ancestor = False
             node.descendant = False
-            node.selected = False
-            if node.get_absolute_url() == request.path[
-                    :len(node.get_absolute_url())]:
+            node_abs_url = node.get_absolute_url()
+            if node_abs_url == request.path[:len(node_abs_url)]:
                 if sel:
-                    if len(node.get_absolute_url()) > len(
-                            sel.get_absolute_url()):
-                        sel = node
+                    if len(node_abs_url) > len(sel[0].get_absolute_url()):
+                        sel = [node]
+                    elif len(node_abs_url) == len(sel[0].get_absolute_url()):
+                        sel.append(node)
                 else:
-                    sel = node
-            else:
-                node.selected = False
-        if sel:
-            sel.selected = True
+                    sel = [node]
+        for node in nodes:
+            node.selected = (node in sel)
         return nodes
 
     def get_menus_by_attribute(self, name, value):
+        """
+        Returns the list of menus that match the name/value criteria provided.
+        """
+        # Note that we are limiting the output to only single instances of any
+        # specific menu class. This is to address issue (#4041) which has
+        # cropped-up in 3.0.13/3.0.0.
         self.discover_menus()
         found = []
+        classes = []
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                found.append((menu[0], menu[1].name))
+                if isinstance(menu[1], type):  # Its a class
+                    menu_class = menu[1]
+                else:
+                    menu_class = menu[1].__class__
+                if menu_class not in classes:
+                    classes.append(menu_class)
+                    found.append((menu[0], menu[1].name))
         return found
 
     def get_nodes_by_attribute(self, nodes, name, value):
