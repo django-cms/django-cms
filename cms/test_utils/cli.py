@@ -6,8 +6,7 @@ import dj_database_url
 import django
 from django.utils import six
 
-from cms.utils.compat import DJANGO_1_6
-
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 gettext = lambda s: s
 
@@ -52,26 +51,6 @@ def configure(db_url, **extra):
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
         SECRET_KEY='key',
-        TEMPLATE_LOADERS=(
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
-            'django.template.loaders.eggs.Loader',
-        ),
-        TEMPLATE_CONTEXT_PROCESSORS=[
-            "django.contrib.auth.context_processors.auth",
-            'django.contrib.messages.context_processors.messages',
-            "django.core.context_processors.i18n",
-            "django.core.context_processors.debug",
-            "django.core.context_processors.request",
-            "django.core.context_processors.media",
-            'django.core.context_processors.csrf',
-            "cms.context_processors.cms_settings",
-            "sekizai.context_processors.sekizai",
-            "django.core.context_processors.static",
-        ],
-        TEMPLATE_DIRS=[
-            os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
-        ],
         MIDDLEWARE_CLASSES=[
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
@@ -269,6 +248,54 @@ def configure(db_url, **extra):
     from django.utils.functional import empty
     settings._wrapped = empty
     defaults.update(extra)
+
+    if DJANGO_1_7:
+        defaults.update(dict(
+            TEMPLATE_CONTEXT_PROCESSORS=[
+                "django.contrib.auth.context_processors.auth",
+                'django.contrib.messages.context_processors.messages',
+                "django.core.context_processors.i18n",
+                "django.core.context_processors.debug",
+                "django.core.context_processors.request",
+                "django.core.context_processors.media",
+                'django.core.context_processors.csrf',
+                "cms.context_processors.cms_settings",
+                "sekizai.context_processors.sekizai",
+                "django.core.context_processors.static",
+            ],
+            TEMPLATE_LOADERS=(
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.eggs.Loader',
+            ),
+            TEMPLATE_DIRS=[
+                os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
+            ],
+        ))
+    else:
+        defaults['TEMPLATES'] = [
+            {
+                'NAME': 'django',
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+                'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
+                'OPTIONS': {
+                    'context_processors': [
+                        "django.contrib.auth.context_processors.auth",
+                        'django.contrib.messages.context_processors.messages',
+                        "django.template.context_processors.i18n",
+                        "django.template.context_processors.debug",
+                        "django.template.context_processors.request",
+                        "django.template.context_processors.media",
+                        'django.template.context_processors.csrf',
+                        "cms.context_processors.cms_settings",
+                        "sekizai.context_processors.sekizai",
+                        "django.template.context_processors.static",
+                    ]
+                }
+            }
+        ]
+
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
