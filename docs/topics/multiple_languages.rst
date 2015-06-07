@@ -18,7 +18,7 @@ django CMS determines the user's language the same way Django does it.
 
 * the language code prefix in the URL
 * the language set in the session
-* the language in the `django_language` cookie
+* the language in the language cookie
 * the language that the browser says its user prefers
 
 It uses the django built in capabilities for this.
@@ -41,4 +41,3 @@ What django CMS shows in your menus
 
 If :setting:`hide_untranslated` is ``True`` (the default) then pages that
 aren't translated into the desired language will not appear in the menu.
-
