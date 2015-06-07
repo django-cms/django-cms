@@ -372,18 +372,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
         model = self.placeholder._get_attached_model() or Page
         breadcrumb = []
-        if not self.parent_id:
-            try:
-                url = force_text(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
-                                  args=[self.pk]))
-            except NoReverseMatch:
-                url = force_text(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
-                                  args=[self.pk]))
-            breadcrumb.append({'title': force_text(self.get_plugin_name()), 'url': url})
-            return breadcrumb
-        for parent in self.get_ancestors().reverse():
+        for parent in self.get_ancestors():
             try:
                 url = force_text(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
@@ -393,6 +382,15 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                                   args=[parent.pk]))
             breadcrumb.append({'title': force_text(parent.get_plugin_name()), 'url': url})
+        try:
+            url = force_text(
+                admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                              args=[self.pk]))
+        except NoReverseMatch:
+            url = force_text(
+                admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                              args=[self.pk]))
+        breadcrumb.append({'title': force_text(self.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):
