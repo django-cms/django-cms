@@ -48,7 +48,7 @@ from cms.utils.compat.dj import force_unicode, get_user_model
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
-from cms.utils.plugins import get_placeholders, assign_plugins
+from cms.utils.plugins import get_placeholders, assign_plugins, _scan_placeholders
 from cms.utils.urlutils import admin_reverse
 
 
@@ -115,6 +115,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def test_placeholder_scanning_sekizai_extend_outside_block_nested(self):
         placeholders = get_placeholders('placeholder_tests/outside_nested_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+
+    def test_placeholder_scanning_var(self):
+        t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
+        phs = _scan_placeholders(t.nodelist)
+        self.assertListEqual(phs, [u'a_placeholder'])
+
+        t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
+        phs = _scan_placeholders(t.nodelist)
+        self.assertListEqual(phs, [u'two', u'new_one', u'base_outside'])
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
