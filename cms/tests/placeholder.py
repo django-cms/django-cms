@@ -394,10 +394,10 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             },
         }
         with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
-            ## Deutsch page should have no text
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
+            ## Deutsch page should inherit english content
             self.assertRegexpMatches(content_de, "^en body$")
             context_de2 = NoPushPopContext()
             request = self.get_request(language="de", page=page_en)
@@ -416,6 +416,55 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^de body$")
+
+    def test_nested_plugins_language_fallback(self):
+        """ Tests language_fallback placeholder configuration for nested plugins"""
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        title_de = create_title("de", "page_de", page_en)
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        link_en = add_plugin(placeholder_en, LinkPlugin, 'en', name='en name', url='http://example.com/en')
+        add_plugin(placeholder_en, TextPlugin, 'en',  target=link_en, body='en body')
+
+        class NoPushPopContext(SekizaiContext):
+            def push(self):
+                pass
+
+            pop = push
+
+        context_en = NoPushPopContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_de = NoPushPopContext()
+        context_de['request'] = self.get_request(language="de", page=page_en)
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\">")
+            self.assertRegexpMatches(content_de, "en body")
+            context_de2 = NoPushPopContext()
+            request = self.get_request(language="de", page=page_en)
+            request.user = self.get_superuser()
+            request.toolbar = CMSToolbar(request)
+            request.toolbar.edit_mode = True
+            context_de2['request'] = request
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            content_de2 = render_placeholder(placeholder_de, context_de2)
+            self.assertFalse("en body" in content_de2)
+            # remove the cached plugins instances
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            # Then we add a plugin to check for proper rendering
+            link_de = add_plugin(placeholder_en, LinkPlugin, 'de', name='de name', url='http://example.com/de')
+            add_plugin(placeholder_en, TextPlugin, 'de',  target=link_de, body='de body')
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\">")
+            self.assertRegexpMatches(content_de, "de body")
 
     def test_plugins_non_default_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
