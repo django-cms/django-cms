@@ -952,14 +952,12 @@ class PagesTestCase(CMSTestCase):
         resp = self.client.get(page.get_absolute_url('en'))
         self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
 
-    @override_settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES +
-        ['django.middleware.clickjacking.XFrameOptionsMiddleware']
-    )
     def test_top_level_page_inherited_xframe_options_are_applied(self):
-        page = create_page('test page 1', 'nav_playground.html', 'en',
-                           published=True)
-        resp = self.client.get(page.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
+        with SettingsOverride(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + ['django.middleware.clickjacking.XFrameOptionsMiddleware']):
+            page = create_page('test page 1', 'nav_playground.html', 'en',
+                               published=True)
+            resp = self.client.get(page.get_absolute_url('en'))
+            self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
 
 class PageAdminTestBase(CMSTestCase):
     """
