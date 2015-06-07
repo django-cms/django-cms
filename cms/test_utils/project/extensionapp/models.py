@@ -8,7 +8,7 @@ from cms.extensions.extension_pool import  extension_pool
 
 class MyPageExtension(PageExtension):
     extra = models.CharField(blank=True, default='', max_length=255)
-    favorite_users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, null=True)
+    favorite_users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
 
     def copy_relations(self, other, language):
         for favorite_user in other.favorite_users.all():
