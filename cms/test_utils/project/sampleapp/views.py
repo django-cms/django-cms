@@ -69,3 +69,13 @@ class ClassView(object):
 
 class ClassBasedView(TemplateView):
     template_name = 'sampleapp/plain.html'
+
+
+def parentapp_view(request, path):
+    context = RequestContext(request, {'content': 'parent app content'})
+    return render_to_response("sampleapp/plain.html", context)
+
+
+def childapp_view(request, path):
+    context = RequestContext(request, {'content': 'child app content'})
+    return render_to_response("sampleapp/plain.html", context)
