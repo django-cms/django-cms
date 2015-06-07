@@ -184,7 +184,8 @@ class ContextTests(CMSTestCase):
         page_template = "nav_playground.html"
         if DJANGO_1_7:
             original_context = {'TEMPLATE_CONTEXT_PROCESSORS': settings.TEMPLATE_CONTEXT_PROCESSORS}
-            override = {'TEMPLATE_CONTEXT_PROCESSORS': list(settings.TEMPLATE_CONTEXT_PROCESSORS).remove("cms.context_processors.cms_settings")}
+            override = {'TEMPLATE_CONTEXT_PROCESSORS': list(settings.TEMPLATE_CONTEXT_PROCESSORS)}
+            override['TEMPLATE_CONTEXT_PROCESSORS'].remove("cms.context_processors.cms_settings")
         else:
             original_context = {'TEMPLATES': settings.TEMPLATES}
             override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
