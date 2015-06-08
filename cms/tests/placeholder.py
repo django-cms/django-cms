@@ -119,11 +119,11 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def test_placeholder_scanning_var(self):
         t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
         phs = _scan_placeholders(t.nodelist)
-        self.assertListEqual(phs, [u'a_placeholder'])
+        self.assertListEqual(sorted(phs), sorted([u'a_placeholder']))
 
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
         phs = _scan_placeholders(t.nodelist)
-        self.assertListEqual(phs, [u'two', u'new_one', u'base_outside'])
+        self.assertListEqual(sorted(phs), sorted([u'two', u'new_one', u'base_outside']))
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
