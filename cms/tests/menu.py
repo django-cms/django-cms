@@ -95,8 +95,6 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         menu_pool.discover_menus()
 
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
-            request = self.get_request('/')
-
             page = create_page("apphooked-page", "nav_playground.html", "en",
                                published=True, apphook="SampleApp",
                                navigation_extenders='StaticMenu')
@@ -104,14 +102,10 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             menu_pool._expanded = False
             self.assertFalse(menu_pool._expanded)
             self.assertTrue(menu_pool.discovered)
-            menu_pool.get_nodes(request)
+            menu_pool._expand_menus()
 
             self.assertTrue(menu_pool._expanded)
             self.assertTrue(menu_pool.discovered)
-            menu_pool.get_nodes(request)
-
-            self.assertTrue(menu_pool._expanded)
-
             # Counts the number of StaticMenu (which is expanded) and StaticMenu2
             # (which is not) and checks the keyname for the StaticMenu instances
             static_menus = 2
@@ -127,6 +121,20 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             self.assertEqual(static_menus, 0)
             self.assertEqual(static_menus_2, 0)
 
+    def test_multiple_menus(self):
+        with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True, apphook="SampleApp2")
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True,
+                        navigation_extenders='StaticMenu')
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True, apphook="NamespacedApp", apphook_namespace='whatever',
+                        navigation_extenders='StaticMenu')
+            menu_pool._expanded = False
+            menu_pool._expand_menus()
+
+            self.assertEqual(len(menu_pool.get_menus_by_attribute("cms_enabled", True)), 2)
 
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """

@@ -42,7 +42,7 @@ There's more than one way to do this, but here's one to help you get started::
 
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
-    pip install -Ur django-cms/test_requirements/django-1.6.txt
+    pip install -r django-cms/test_requirements/django-1.6.txt
 
     # run the test suite
     # note that you must be in the django-cms directory when you do this,

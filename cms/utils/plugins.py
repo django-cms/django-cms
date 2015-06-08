@@ -8,6 +8,7 @@ from django.utils.encoding import force_text
 from django.utils.six.moves import filter, filterfalse
 from django.utils.translation import ugettext as _
 
+
 from cms.exceptions import PluginLimitReached
 from cms.models import Page, CMSPlugin
 from cms.plugin_pool import plugin_pool
@@ -51,6 +52,7 @@ def assign_plugins(request, placeholders, template, lang=None, is_fallback=False
     qs = get_cmsplugin_queryset(request)
     qs = qs.filter(placeholder__in=placeholders, language=lang)
     plugins = list(qs.order_by('placeholder', 'path'))
+    fallbacks = defaultdict(list)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
     if (not is_fallback and
@@ -63,17 +65,21 @@ def assign_plugins(request, placeholders, template, lang=None, is_fallback=False
                     assign_plugins(request, (placeholder,), template, fallback_language, is_fallback=True)
                     fallback_plugins = placeholder._plugins_cache
                     if fallback_plugins:
-                        plugins += fallback_plugins
+                        fallbacks[placeholder.pk] += fallback_plugins
                         break
-    # If no plugin is present, create default plugins if enabled)
+    # These placeholders have no fallback
+    non_fallback_phs = [ph for ph in placeholders if ph.pk not in fallbacks]
+    # If no plugin is present in non fallback placeholders, create default plugins if enabled)
     if not plugins:
-        plugins = create_default_plugins(request, placeholders, template, lang)
-    plugins = downcast_plugins(plugins, placeholders)
+        plugins = create_default_plugins(request, non_fallback_phs, template, lang)
+    plugins = downcast_plugins(plugins, non_fallback_phs)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
-    groups = dict((ph_id, build_plugin_tree(ph_plugins))
-                  for ph_id, ph_plugins
-                  in groupby(plugins, attrgetter('placeholder_id')))
+    plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
+    for group in plugin_groups:
+        plugin_groups[group] = build_plugin_tree(plugin_groups[group])
+    groups = fallbacks.copy()
+    groups.update(plugin_groups)
     for placeholder in placeholders:
         setattr(placeholder, '_plugins_cache', groups.get(placeholder.pk, []))
 

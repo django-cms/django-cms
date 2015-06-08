@@ -47,7 +47,8 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
-                                   get_placeholder_conf, get_placeholders, _get_nodelist)
+                                   get_placeholder_conf, get_placeholders, _get_nodelist,
+                                   _scan_placeholders)
 from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
@@ -115,6 +116,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def test_placeholder_scanning_sekizai_extend_outside_block_nested(self):
         placeholders = get_placeholders('placeholder_tests/outside_nested_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+
+    def test_placeholder_scanning_var(self):
+        t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
+        phs = _scan_placeholders(t.nodelist)
+        self.assertListEqual(sorted(phs), sorted([u'a_placeholder']))
+
+        t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
+        phs = _scan_placeholders(t.nodelist)
+        self.assertListEqual(sorted(phs), sorted([u'two', u'new_one', u'base_outside']))
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
@@ -390,6 +400,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
+            ## Deutsch page should inherit english content
             self.assertNotRegex(content_de, "^en body$")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
@@ -408,6 +419,49 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^de body$")
+
+    def test_nested_plugins_language_fallback(self):
+        """ Tests language_fallback placeholder configuration for nested plugins"""
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        title_de = create_title("de", "page_de", page_en)
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        link_en = add_plugin(placeholder_en, LinkPlugin, 'en', name='en name', url='http://example.com/en')
+        add_plugin(placeholder_en, TextPlugin, 'en',  target=link_en, body='en body')
+
+        context_en = SekizaiContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_de = SekizaiContext()
+        context_de['request'] = self.get_request(language="de", page=page_en)
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\">")
+            self.assertRegexpMatches(content_de, "en body")
+            context_de2 = SekizaiContext()
+            request = self.get_request(language="de", page=page_en)
+            request.user = self.get_superuser()
+            request.toolbar = CMSToolbar(request)
+            request.toolbar.edit_mode = True
+            context_de2['request'] = request
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            content_de2 = render_placeholder(placeholder_de, context_de2)
+            self.assertFalse("en body" in content_de2)
+            # remove the cached plugins instances
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            # Then we add a plugin to check for proper rendering
+            link_de = add_plugin(placeholder_en, LinkPlugin, 'de', name='de name', url='http://example.com/de')
+            add_plugin(placeholder_en, TextPlugin, 'de',  target=link_de, body='de body')
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\">")
+            self.assertRegexpMatches(content_de, "de body")
 
     def test_plugins_non_default_language_fallback(self):
         """ Tests language_fallback placeholder configuration """

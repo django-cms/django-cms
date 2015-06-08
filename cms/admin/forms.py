@@ -235,7 +235,8 @@ class AdvancedSettingsForm(forms.ModelForm):
             self.fields['language'].initial = get_language()
         if 'navigation_extenders' in self.fields:
             self.fields['navigation_extenders'].widget = forms.Select(
-                {}, [('', "---------")] + menu_pool.get_menus_by_attribute("cms_enabled", True))
+                {}, [('', "---------")] + menu_pool.get_menus_by_attribute(
+                    "cms_enabled", True))
         if 'application_urls' in self.fields:
             # Prepare a dict mapping the apps by class name ('PollApp') to
             # their app_name attribute ('polls'), if any.
