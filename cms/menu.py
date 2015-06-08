@@ -199,8 +199,11 @@ def page_to_node(page, home, cut):
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
-        extenders.append(page.navigation_extenders)
-        # Is this page an apphook? If so, we need to handle the apphooks's nodes
+        if page.navigation_extenders in menu_pool.menus:
+            extenders.append(page.navigation_extenders)
+        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in menu_pool.menus:
+            extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
+    # Is this page an apphook? If so, we need to handle the apphooks's nodes
     lang = get_language()
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
