@@ -4,7 +4,7 @@ import itertools
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
@@ -47,7 +47,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
-                                   get_placeholder_conf, get_placeholders)
+                                   get_placeholder_conf, get_placeholders, _get_nodelist)
 from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
@@ -212,7 +212,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         template = Template("{% load cms_tags %}{% render_placeholder placeholder %}")
         ctx = Context()
         self.assertEqual(template.render(ctx), "")
-        request = self.get_request('/')
+        request = self.get_request('/', language=settings.LANGUAGES[0][0])
         rctx = RequestContext(request)
         self.assertEqual(template.render(rctx), "")
         placeholder = Placeholder.objects.create(slot="test")
@@ -223,7 +223,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(placeholder.cmsplugin_set.count(), 1)
         rctx = RequestContext(request)
         placeholder = self.reload(placeholder)
-        rctx['placeholder'] = placeholder
+        rctx.update({'placeholder': placeholder})
         self.assertEqual(template.render(rctx).strip(), "test")
 
     def test_placeholder_tag_language(self):
@@ -233,11 +233,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
         request = self.get_request('/')
         rctx = RequestContext(request)
-        rctx['placeholder'] = placeholder
-        rctx['language'] = 'en'
+        rctx.update({
+            'placeholder': placeholder,
+            'language': 'en'
+        })
         self.assertEqual(template.render(rctx).strip(), "English")
         del placeholder._plugins_cache
-        rctx['language'] = 'de'
+        rctx.update({
+            'placeholder': placeholder,
+            'language': 'de'
+        })
         self.assertEqual(template.render(rctx).strip(), "Deutsch")
 
     def test_get_placeholder_conf(self):
@@ -281,24 +286,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
 
     def test_placeholder_context_leaking(self):
-        TEST_CONF = {'test': {'extra_context': {'width': 10}}}
+        TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
         ph = Placeholder.objects.create(slot='test')
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
-        context = NoPushPopContext()
+        context = SekizaiContext()
         context['request'] = self.get_request()
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             render_placeholder(ph, context)
-            self.assertTrue('width' in context)
-            self.assertEqual(context['width'], 10)
+            self.assertFalse('extra_width' in context)
             ph.render(context, None)
-            self.assertTrue('width' in context)
-            self.assertEqual(context['width'], 10)
+            self.assertFalse('extra_width' in context)
 
     def test_placeholder_scanning_nested_super(self):
         placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
@@ -367,15 +364,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_de = title_de.page.placeholders.get(slot='col_left')
         add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
 
-        class NoPushPopContext(SekizaiContext):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = NoPushPopContext()
+        context_de = SekizaiContext()
         context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (fallback) behavior)
@@ -400,7 +391,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertNotRegex(content_de, "^en body$")
-            context_de2 = NoPushPopContext()
+            context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
@@ -426,15 +417,9 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_de = page_en.placeholders.get(slot='col_left')
         add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = NoPushPopContext()
+        context_de = SekizaiContext()
         context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (fallback) behavior)
@@ -479,13 +464,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_en = page_en.placeholders.get(slot='col_left')
         add_plugin(placeholder_sidebar_en, TextPlugin, 'en', body='en body')
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
 
         conf = {
@@ -509,12 +488,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def test_plugins_prepopulate(self):
         """ Tests prepopulate placeholder configuration """
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
         conf = {
             'col_left': {
                 'default_plugins' : [
@@ -532,7 +505,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
-            context = NoPushPopContext()
+            context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             # Our page should have "en default body 1" AND "en default body 2"
             content = render_placeholder(placeholder, context)
@@ -543,12 +516,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         """
         Validate a default textplugin with a nested default link plugin
         """
-
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
 
         conf = {
             'col_left': {
@@ -582,7 +549,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
-            context = NoPushPopContext()
+            context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             render_placeholder(placeholder, context)
             plugins = placeholder.get_plugins_list()
@@ -684,15 +651,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         renders of that template will render the super block twice.
         """
 
+        nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
         self.assertNotIn('one',
-            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
             "but _2.html does not.")
 
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
+        nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
         self.assertNotIn('one',
-            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            nodelist[0].blocks.keys(),
             "test_super_extends_1.html still should not contain a block "
             "called 'one' after rescanning placeholders.")
 
@@ -829,34 +798,27 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_request_placeholders_permission_check_model(self):
         # Setup instance
-        ex = Example1(
+        ex = Example1.objects.create(
             char_1='one',
             char_2='two',
             char_3='tree',
             char_4='four'
         )
-        ex.save()
         page_en = create_page('page_en', 'col_two.html', 'en')
 
-        class NoPushPopContext(SekizaiContext):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
 
         # no user: no placeholders but no error either
         factory = RequestFactory()
         context_en['request'] = factory.get(page_en.get_absolute_url())
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 0)
         self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
 
         # request.placeholders is populated for superuser
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = self.get_superuser()
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 1)
         self.assertIn(ex.placeholder, context_en['request'].placeholders)
 
@@ -864,15 +826,15 @@ class PlaceholderModelTests(CMSTestCase):
         user = self.get_staff_user_with_no_permissions()
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = user
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 0)
         self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
 
         # request.placeholders is populated for staff user with permission on the model
-        user.user_permissions.add(Permission.objects.get(codename='change_example1'))
+        user.user_permissions.add(Permission.objects.get(codename=get_permission_codename('change', ex._meta)))
         context_en['request'] = self.get_request(language="en", page=page_en)
         context_en['request'].user = get_user_model().objects.get(pk=user.pk)
-        render_placeholder(ex.placeholder, context_en)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
         self.assertEqual(len(context_en['request'].placeholders), 1)
         self.assertIn(ex.placeholder, context_en['request'].placeholders)
 
@@ -880,13 +842,7 @@ class PlaceholderModelTests(CMSTestCase):
         page_en = create_page('page_en', 'col_two.html', 'en')
         placeholder_en = page_en.placeholders.get(slot='col_left')
 
-        class NoPushPopContext(SekizaiContext):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
 
         # request.placeholders is populated for superuser
         context_en['request'] = self.get_request(language="en", page=page_en)
@@ -920,34 +876,30 @@ class PlaceholderModelTests(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         template = '{% load cms_tags %}{% render_placeholder ex1.placeholder %}'
-
-        context = RequestContext(self.get_request(language="en", page=page_en), {'ex1': ex1})
+        context = {'ex1': ex1}
 
         # request.placeholders is populated for superuser
-        context['request'] = self.get_request(language="en", page=page_en)
-        context['request'].user = self.get_superuser()
-        template_obj = Template(template)
-        template_obj.render(context)
-        self.assertEqual(len(context['request'].placeholders), 2)
-        self.assertIn(ex1.placeholder, context['request'].placeholders)
+        request = self.get_request(language="en", page=page_en)
+        request.user = self.get_superuser()
+        self.render_template_obj(template, context, request)
+        self.assertEqual(len(request.placeholders), 2)
+        self.assertIn(ex1.placeholder, request.placeholders)
 
         # request.placeholders is not populated for staff user with no permission
         user = self.get_staff_user_with_no_permissions()
-        context['request'] = self.get_request(language="en", page=page_en)
-        context['request'].user = user
-        template_obj = Template(template)
-        template_obj.render(context)
-        self.assertEqual(len(context['request'].placeholders), 0)
-        self.assertNotIn(ex1.placeholder, context['request'].placeholders)
+        request = self.get_request(language="en", page=page_en)
+        request.user = user
+        self.render_template_obj(template, context, request)
+        self.assertEqual(len(request.placeholders), 0)
+        self.assertNotIn(ex1.placeholder, request.placeholders)
 
         # request.placeholders is populated for staff user with permission on the model
         user.user_permissions.add(Permission.objects.get(codename='change_example1'))
-        context['request'] = self.get_request(language="en", page=page_en)
-        context['request'].user = get_user_model().objects.get(pk=user.pk)
-        template_obj = Template(template)
-        template_obj.render(context)
-        self.assertEqual(len(context['request'].placeholders), 2)
-        self.assertIn(ex1.placeholder, context['request'].placeholders)
+        request = self.get_request(language="en", page=page_en)
+        request.user = get_user_model().objects.get(pk=user.pk)
+        self.render_template_obj(template, context, request)
+        self.assertEqual(len(request.placeholders), 2)
+        self.assertIn(ex1.placeholder, request.placeholders)
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
@@ -1284,11 +1236,7 @@ class PlaceholderI18NTest(CMSTestCase):
         return u
 
     def test_hvad_tabs(self):
-        ex = MultilingualExample1(
-            char_1='one',
-            char_2='two',
-        )
-        ex.save()
+        ex = MultilingualExample1.objects.language('en').create(char_1='one', char_2='two')
         self._testuser()
         self.client.login(username='test', password='test')
 
@@ -1296,13 +1244,12 @@ class PlaceholderI18NTest(CMSTestCase):
         self.assertContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_no_tabs(self):
-        ex = Example1(
+        ex = Example1.objects.create(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
         )
-        ex.save()
         self._testuser()
         self.client.login(username='test', password='test')
 
@@ -1310,13 +1257,12 @@ class PlaceholderI18NTest(CMSTestCase):
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
-        ex = TwoPlaceholderExample(
+        ex = TwoPlaceholderExample.objects.create(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
         )
-        ex.save()
         self._testuser()
         self.client.login(username='test', password='test')
 

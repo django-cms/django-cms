@@ -8,7 +8,6 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting
 from django.core.cache import cache
-from django.db import connection
 from django.template import Template, RequestContext
 from django.conf import settings
 from cms.views import _get_cache_version
@@ -32,7 +31,6 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(5):
             template.render(rctx)
-        connection.queries = []
         request = self.get_request('/en/')
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
@@ -152,7 +150,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 20)):
+            with self.assertNumQueries(FuzzyInt(1, 21)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 

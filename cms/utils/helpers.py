@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+import re
+
 from django.contrib.sites.models import SITE_CACHE, Site
-from cms.utils.compat.dj import is_installed
+from .compat.dj import is_installed
 
 SITE_VAR = "site__exact"
 
@@ -128,9 +130,8 @@ class classproperty(object):
 
 
 def current_site(request):
-    if SITE_VAR in request.REQUEST:
-        site_pk = request.REQUEST[SITE_VAR]
-    else:
+    site_pk = request.GET.get(SITE_VAR, None) if request.GET.get(SITE_VAR, None) else request.POST.get(SITE_VAR, None)
+    if not site_pk:
         site_pk = request.session.get('cms_admin_site', None)
     if site_pk:
         try:
@@ -141,3 +142,18 @@ def current_site(request):
             return None
     else:
         return Site.objects.get_current()
+
+
+def normalize_name(name):
+    """
+    Converts camel-case style names into underscore seperated words. Example::
+
+        >>> normalize_name('oneTwoThree')
+        'one_two_three'
+        >>> normalize_name('FourFiveSix')
+        'four_five_six'
+
+    taken from django.contrib.formtools
+    """
+    new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
+    return new.lower().strip('_')

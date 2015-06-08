@@ -53,13 +53,14 @@ def _generate_valid_slug(source, parent, language):
         qs = Title.objects.filter(language=language, page__parent=parent)
     else:
         qs = Title.objects.filter(language=language, page__parent__isnull=True)
-    used = qs.values_list('slug', flat=True)
+    used = list(qs.values_list('slug', flat=True))
     baseslug = slugify(source)
     slug = baseslug
     i = 1
-    while slug in used:
-        slug = '%s-%s' % (baseslug, i)
-        i += 1
+    if used:
+        while slug in used:
+            slug = '%s-%s' % (baseslug, i)
+            i += 1
     return slug
 
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from cms.utils.compat import DJANGO_1_7
 
 from django.conf import settings
 from django.conf.urls import url
@@ -9,8 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseNotFound,
                          HttpResponseForbidden, HttpResponseRedirect)
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.template.defaultfilters import force_escape, escapejs
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
@@ -66,14 +66,14 @@ class FrontendEditableAdminMixin(object):
                 'opts': opts,
                 'message': force_text(_("Field %s not found")) % raw_fields
             }
-            return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/error_form.html', context)
         if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
                                                              self.model._meta.model_name)):
             context = {
                 'opts': opts,
                 'message': force_text(_("You do not have permission to edit this item"))
             }
-            return render_to_response('admin/cms/page/plugin/error_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/error_form.html', context)
             # Dinamically creates the form class with only `field_name` field
         # enabled
         form_class = self.get_form(request, obj, fields=fields)
@@ -107,10 +107,10 @@ class FrontendEditableAdminMixin(object):
             context.update({
                 'cancel': True,
             })
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
-        return render_to_response('admin/cms/page/plugin/change_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
+        return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
 class PlaceholderAdminMixin(object):
@@ -369,7 +369,7 @@ class PlaceholderAdminMixin(object):
                     "deleted": True,
                     'name': force_text(cms_plugin),
                 })
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
 
         if not instance:
             # instance doesn't exist, call add view
@@ -393,7 +393,7 @@ class PlaceholderAdminMixin(object):
                 'icon': force_escape(saved_object.get_instance_icon_src()),
                 'alt': force_escape(saved_object.get_instance_icon_alt()),
             }
-            return render_to_response('admin/cms/page/plugin/confirm_form.html', context, RequestContext(request))
+            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return response
 
     @method_decorator(require_POST)
@@ -464,9 +464,13 @@ class PlaceholderAdminMixin(object):
         opts = plugin_class._meta
         using = router.db_for_write(plugin_class)
         app_label = opts.app_label
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
-            [plugin], opts, request.user, self.admin_site, using)
-
+        if DJANGO_1_7:
+            deleted_objects, perms_needed, protected = get_deleted_objects(
+                [plugin], opts, request.user, self.admin_site, using)
+        else:
+            deleted_objects, __, perms_needed, protected = get_deleted_objects(
+                [plugin], opts, request.user, self.admin_site, using)
+            
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied(_("You do not have permission to delete this plugin"))
@@ -505,8 +509,13 @@ class PlaceholderAdminMixin(object):
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
-        (deleted_objects, perms_needed, protected) = get_deleted_objects(
-            plugins, opts, request.user, self.admin_site, using)
+        if DJANGO_1_7:
+            deleted_objects, perms_needed, protected = get_deleted_objects(
+                plugins, opts, request.user, self.admin_site, using)
+        else:
+            deleted_objects, __, perms_needed, protected = get_deleted_objects(
+                plugins, opts, request.user, self.admin_site, using)
+
         obj_display = force_text(placeholder)
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:

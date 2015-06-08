@@ -6,8 +6,8 @@ import os.path
 from django.conf import settings
 from django.core.cache import cache
 from django.contrib import admin
-from django.contrib.sites.models import Site
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -33,6 +33,7 @@ from cms.test_utils.compat import skipIf
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import installed_apps
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
@@ -51,8 +52,10 @@ class PageMigrationTestCase(CMSTestCase):
         Test correct content type is set for Page object
         """
         from django.contrib.contenttypes.models import ContentType
-        self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
-        self.assertTrue(ContentType.objects.filter(model='page', name='page', app_label='cms').exists())
+        if DJANGO_1_7:
+            # obsolete test for an old bug, can be dropped at any time
+            self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
+        self.assertEqual(ContentType.objects.filter(model='page', app_label='cms').count(), 1)
 
 
 def has_no_custom_user():
@@ -677,7 +680,10 @@ class PagesTestCase(CMSTestCase):
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
+        try:
+            path = os.path.join(settings.TEMPLATE_DIRS[0], 'add_placeholder.html')
+        except IndexError:
+            path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
         with open(path, 'r') as fobj:
             old = fobj.read()
         try:
@@ -1063,9 +1069,6 @@ class PagesTestCase(CMSTestCase):
                 for j in range(5):
                     add_plugin(placeholder, TextPlugin, 'en', body='text-%d-%d' % (i, j))
                     add_plugin(placeholder, LinkPlugin, 'en', name='link-%d-%d' % (i, j))
-            from django.db import connection
-
-            connection.queries = []
 
             # trigger the apphook query so that it doesn't get in our way
             reverse('pages-root')

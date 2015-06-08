@@ -33,8 +33,11 @@ class PluginContext(Context):
     using the "processors" keyword argument.
     """
 
-    def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
-        super(PluginContext, self).__init__(dict, current_app=current_app)
+    def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
+        if current_app:
+            super(PluginContext, self).__init__(dict_)
+        else:
+            super(PluginContext, self).__init__(dict_, current_app=current_app)
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
@@ -50,10 +53,12 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     Renders a single plugin and applies the post processors to it's rendered
     content.
     """
+    if current_app:
+        context['request'].current_app = current_app
     if not processors:
         processors = []
     if isinstance(template, six.string_types):
-        content = render_to_string(template, context_instance=context)
+        content = render_to_string(template, context)
     elif isinstance(template, Template):
         content = template.render(context)
     else:
@@ -101,7 +106,7 @@ def render_placeholder(placeholder, context_to_copy,
     if not placeholder:
         return
     from cms.utils.plugins import get_plugins
-    context = context_to_copy
+    context = context_to_copy.new(context_to_copy)
     context.push()
     request = context['request']
     if not hasattr(request, 'placeholders'):
@@ -148,13 +153,10 @@ def render_placeholder(placeholder, context_to_copy,
     # TODO this should actually happen as a plugin context processor, but these currently overwrite
     # existing context -- maybe change this order?
     slot = getattr(placeholder, 'slot', None)
-    extra_context = {}
     if slot:
-        extra_context = get_placeholder_conf("extra_context", slot, template, {})
-    for key, value in extra_context.items():
-        if key not in context:
-            context[key] = value
-
+        for key, value in get_placeholder_conf("extra_context", slot, template, {}).items():
+            if key not in context:
+                context[key] = value
     content = []
     watcher = Watcher(context)
     content.extend(render_plugins(plugins, context, placeholder, processors))

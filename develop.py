@@ -106,8 +106,13 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False, app_name=None, migrat
             print('')
     from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()
-    rs.stdout = sys.stdout
-    rs.stderr = sys.stderr
+    try:
+        from django.core.management.base import OutputWrapper
+        rs.stdout = OutputWrapper(sys.stdout)
+        rs.stderr = OutputWrapper(sys.stderr)
+    except ImportError:
+        rs.stdout = sys.stdout
+        rs.stderr = sys.stderr
     rs.use_ipv6 = False
     rs._raw_ipv6 = False
     rs.addr = bind
@@ -129,28 +134,43 @@ def _split(itr, num):
 
 def _get_test_labels():
     test_labels = []
-    for module in [name for _, name, _ in pkgutil.iter_modules(
-            [os.path.join("cms", "tests")])]:
-        clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
-        for clsname, cls in clsmembers.items():
-            for method, _ in cls.methods.items():
-                if method.startswith('test_'):
-                    test_labels.append('cms.%s.%s' % (clsname, method))
+    if DJANGO_1_6:
+        for module in [name for _, name, _ in pkgutil.iter_modules(
+                [os.path.join("cms", "tests")])]:
+            clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+            for clsname, cls in clsmembers.items():
+                for method, _ in cls.methods.items():
+                    if method.startswith('test_'):
+                        test_labels.append('cms.%s.%s' % (clsname, method))
+    else:
+        for module in [name for _, name, _ in pkgutil.iter_modules(
+                [os.path.join("cms", "tests")])]:
+            clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+            for clsname, cls in clsmembers.items():
+                for method, _ in cls.methods.items():
+                    if method.startswith('test_'):
+                        test_labels.append('cms.tests.%s.%s' % (clsname, method))
     test_labels = sorted(test_labels)
     return test_labels
 
 
-def _test_run_worker(test_labels, failfast=False,
-                     test_runner='django.test.simple.DjangoTestSuiteRunner'):
+def _test_run_worker(test_labels, failfast=False, test_runner=None):
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
     from django.conf import settings
-    settings.TEST_RUNNER = test_runner
     from django.test.utils import get_runner
+    if not test_runner:
+        if DJANGO_1_6:
+            test_runner = 'django.test.simple.DjangoTestSuiteRunner'
+        else:
+            test_runner = 'django.test.runner.DiscoverRunner'
+    if not test_labels:
+        test_labels = _get_test_labels()
+    settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
-
-    test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
+    test_runner = TestRunner(verbosity=1, pattern="*.py", top_level='cms',
+                             interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 
@@ -223,6 +243,8 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
     ]
     if os.environ.get("AUTH_USER_MODEL") == "emailuserapp.EmailUser":
         applications.append('emailuserapp')
+    if os.environ.get("AUTH_USER_MODEL") == "customuserapp.User":
+        applications.append('customuserapp')
     if migrate_plugins:
         applications.extend([
             # official plugins
@@ -319,7 +341,9 @@ def main():
         "DATABASE_URL",
         "sqlite://localhost/%s" % default_name
     )
-    migrate = args.get('--migrate', False)
+    migrate = (args.get('--migrate', False) or
+               args.get('makemigrations', False) or
+               args.get('squashmigrations', False))
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
@@ -329,7 +353,7 @@ def main():
                 'STATIC_ROOT': STATIC_ROOT,
                 'MEDIA_ROOT': MEDIA_ROOT,
                 'USE_TZ': True,
-                'SOUTH_TESTS_MIGRATE': migrate,
+                'TESTS_MIGRATE': migrate,
             }
 
             if args['test']:

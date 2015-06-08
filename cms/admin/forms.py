@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from django import forms
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db.models.fields import BooleanField
-from django.forms.util import ErrorList
+try:
+    from django.forms.utils import ErrorList
+except ImportError:
+    from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
@@ -29,7 +32,7 @@ from cms.utils.permissions import (get_current_user, get_subordinate_users,
 from menus.menu_pool import menu_pool
 
 
-def get_permission_acessor(obj):
+def get_permission_accessor(obj):
     User = get_user_model()
 
     if isinstance(obj, (PageUser, User,)):
@@ -49,17 +52,17 @@ def save_permissions(data, obj):
     if not obj.pk:
         # save obj, otherwise we can't assign permissions to him
         obj.save()
-    permission_acessor = get_permission_acessor(obj)
+    permission_accessor = get_permission_accessor(obj)
     for model, name in models:
         content_type = ContentType.objects.get_for_model(model)
-        for t in ('add', 'change', 'delete'):
-            # add permission `t` to model `model`
-            codename = getattr(model._meta, 'get_%s_permission' % t)()
+        for key in ('add', 'change', 'delete'):
+            # add permission `key` for model `model`
+            codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
-            if data.get('can_%s_%s' % (t, name), None):
-                permission_acessor.add(permission)
+            if data.get('can_%s_%s' % (key, name), None):
+                permission_accessor.add(permission)
             else:
-                permission_acessor.remove(permission)
+                permission_accessor.remove(permission)
 
 
 class PageForm(forms.ModelForm):
@@ -525,14 +528,14 @@ class GenericCmsPermissionForm(forms.ModelForm):
         """Read out permissions from permission system.
         """
         initials = {}
-        permission_acessor = get_permission_acessor(obj)
+        permission_accessor = get_permission_accessor(obj)
         for model in (Page, PageUser, PagePermission):
             name = model.__name__.lower()
             content_type = ContentType.objects.get_for_model(model)
-            permissions = permission_acessor.filter(content_type=content_type).values_list('codename', flat=True)
-            for t in ('add', 'change', 'delete'):
-                codename = getattr(model._meta, 'get_%s_permission' % t)()
-                initials['can_%s_%s' % (t, name)] = codename in permissions
+            permissions = permission_accessor.filter(content_type=content_type).values_list('codename', flat=True)
+            for key in ('add', 'change', 'delete'):
+                codename = get_permission_codename(key, model._meta)
+                initials['can_%s_%s' % (key, name)] = codename in permissions
         return initials
 
 

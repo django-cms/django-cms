@@ -2,7 +2,7 @@
 from copy import deepcopy
 from django.contrib import admin
 from django.contrib.admin import site
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext as _
 
@@ -153,10 +153,10 @@ class GenericCmsPermissionAdmin(object):
             model, title = perm_model
             opts, fields = model._meta, []
             name = model.__name__.lower()
-            for t in ('add', 'change', 'delete'):
-                fn = getattr(opts, 'get_%s_permission' % t)
-                if request.user.has_perm(opts.app_label + '.' + fn()):
-                    fields.append('can_%s_%s' % (t, name))
+            for key in ('add', 'change', 'delete'):
+                perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
+                if request.user.has_perm(perm_code):
+                    fields.append('can_%s_%s' % (key, name))
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
         return fieldsets

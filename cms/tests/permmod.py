@@ -473,7 +473,7 @@ class PermissionModeratorTests(CMSTestCase):
         self.assertTrue('_auth_user_id' in self.client.session)
         login_user_id = self.client.session.get('_auth_user_id')
         user = get_user_model().objects.get(pk=self.user_staff.pk)
-        self.assertEqual(login_user_id, user.id)
+        self.assertEqual(str(login_user_id), str(user.id))
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -828,6 +828,8 @@ class ViewPermissionBaseTests(CMSTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'POST': {},
+            'GET': {},
             'session': {},
         }
         return type('Request', (object,), attrs)

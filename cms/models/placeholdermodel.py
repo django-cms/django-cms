@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from cms.utils.compat import DJANGO_1_7
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -119,8 +121,7 @@ class Placeholder(models.Model):
         if not getattr(request, 'user', None):
             return False
         opts = obj._meta
-        perm_accessor = getattr(opts, 'get_%s_permission' % key)
-        perm_code = '%s.%s' % (opts.app_label, perm_accessor())
+        perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
         return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
 
     def has_change_permission(self, request):
@@ -141,7 +142,7 @@ class Placeholder(models.Model):
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
-            context.update({'width': width})
+            context['width'] = width
         return render_placeholder(self, context, lang=lang, editable=editable,
                                   use_cache=use_cache)
 
@@ -156,7 +157,11 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
+                if DJANGO_1_7:
+                    parent = rel.model
+                else:
+                    parent = rel.related_model
+                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.count():
@@ -172,13 +177,21 @@ class Placeholder(models.Model):
             relations = self._meta.get_all_related_objects()
 
             for rel in relations:
-                if rel.model == Page or rel.model == StaticPlaceholder:
+                if DJANGO_1_7:
+                    parent = rel.model
+                else:
+                    parent = rel.related_model
+                if parent == Page or parent == StaticPlaceholder:
                     relations.insert(0, relations.pop(relations.index(rel)))
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
+                if DJANGO_1_7:
+                    parent = rel.model
+                else:
+                    parent = rel.related_model
+                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.count():

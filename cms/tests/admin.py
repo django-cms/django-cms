@@ -9,7 +9,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
-from django.contrib.admin.sites import site
+from django.contrib.admin.sites import site, AdminSite
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission, AnonymousUser
 from django.contrib.sites.models import Site
@@ -37,7 +37,7 @@ from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_6
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 
 class AdminTestsBase(CMSTestCase):
@@ -1240,7 +1240,7 @@ class PluginPermissionTests(AdminTestsBase):
         page_permission = PagePermission.objects.create(
             can_change_permissions=True, user=user, page=page)
         request = self._get_change_page_request(user, page)
-        page_admin = PageAdmin(Page, None)
+        page_admin = PageAdmin(Page, AdminSite())
         page_admin._current_page = page
         # user has can_change_permission
         # => must see the PagePermissionInline
@@ -1253,7 +1253,7 @@ class PluginPermissionTests(AdminTestsBase):
         page_permission.can_change_permissions = False
         page_permission.save()
         request = self._get_change_page_request(user, page)
-        page_admin = PageAdmin(Page, None)
+        page_admin = PageAdmin(Page, AdminSite())
         page_admin._current_page = page
         # => PagePermissionInline is no longer visible
         self.assertFalse(
@@ -1650,7 +1650,12 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 # expect that the pagesize gets influenced by the useramount of the system
                 self.assertTrue(page_size_grown, "Page size has not grown after user creation")
                 # usernames are only 2 times in content
-                text = smart_str(response.content, response._charset)
+                if DJANGO_1_7:
+                    charset = response._charset
+                else:
+                    charset = response.charset
+
+                text = smart_str(response.content, charset)
 
                 foundcount = text.count(USER_NAME)
                 # 2 forms contain usernames as options

@@ -16,11 +16,16 @@ env:
     - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
     - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
     - DJANGO=1.7 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
     - DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
     - DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
+    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
 
 before_script:
   - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ];
@@ -31,16 +36,20 @@ before_script:
     -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
     fi"
 
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
-  - pip install -q -r "test_requirements/django-$DJANGO.txt"
+  - pip install -q -r "test_requirements/django-$DJANGO.txt" xvfbwrapper
   - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip
     install -q psycopg2 ; fi
   - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install
-    -q mysql-python ; fi
+    -q mysqlclient ; fi
 
-script: coverage run --rcfile=.coverage.rc develop.py test --migrate
+script: coverage run --rcfile=.coverage.rc develop.py test --migrate --xvfb
 
-after_success: coveralls --config_file=.coverage.rc
+after_success: coverallscustomuserapp.User --config_file=.coverage.rc
 
 notifications:
   irc:
@@ -61,18 +70,35 @@ matrix:
     - python: 2.6
       env: DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
 
-    - python: 3.3
-      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - python: 3.3
-      env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-
-    - python: 3.4
-      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - python: 3.4
-      env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 2.6
+      env: DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
+    - python: 2.6
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 2.6
+      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 2.6
+      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 2.6
+      env: DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
 
   allow_failures:
     - python: 2.7
       env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 2.7
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+
+    - python: 3.3
+      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 3.3
+      env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 3.3
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+
+    - python: 3.4
+      env: DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 3.4
+      env: DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    - python: 3.4
+      env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
 
   fast_finish: true

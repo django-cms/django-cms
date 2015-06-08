@@ -14,9 +14,9 @@ template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0001_initial'),
+        ('auth', '__first__'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('sites', '0001_initial'),
+        ('sites', '__first__'),
     ]
 
     operations = [

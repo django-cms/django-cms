@@ -494,7 +494,9 @@ class RenderingTestCase(CMSTestCase):
     def test_extra_context_isolation(self):
         with ChangeModel(self.test_page, template='extra_context.html'):
             response = self.client.get(self.test_page.get_absolute_url())
-            self.assertTrue('width' not in response.context)
+            # only test the swallower context, other items in response.context are throwaway
+            # contexts used for rendering templates fragments and templatetags
+            self.assertFalse('extra_width' in response.context[0])
 
     def test_render_placeholder_toolbar(self):
         placeholder = Placeholder()

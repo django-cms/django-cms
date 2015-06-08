@@ -2,30 +2,31 @@
 from copy import copy
 from datetime import datetime
 from itertools import chain
-from django.utils.six import string_types
 import re
-from classytags.values import StringValue
-from django.db.models import Model
-from cms.utils.urlutils import admin_reverse
 
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
+from django.db.models import Model
+from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
 from django.utils import six
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.utils.six import string_types
 from django.utils.translation import ugettext_lazy as _, get_language
-from classytags.arguments import Argument, MultiValueArgument, \
-    MultiKeywordArgument
+
+from classytags.arguments import (Argument, MultiValueArgument,
+                                  MultiKeywordArgument)
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from classytags.values import StringValue
 from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
@@ -36,11 +37,13 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_site_id
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.urlutils import admin_reverse
 
 
 register = template.Library()
@@ -115,8 +118,15 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            if settings.SEND_BROKEN_LINK_EMAILS:
+            if getattr(settings, 'SEND_BROKEN_LINK_EMAILS', False):
                 mail_managers(subject, body, fail_silently=True)
+            elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in settings.MIDDLEWARE_CLASSES:
+                middle = BrokenLinkEmailsMiddleware()
+                domain = request.get_host()
+                path = request.get_full_path()
+                referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+                if not middle.is_ignorable_request(request, path, domain, referer):
+                    mail_managers(subject, body, fail_silently=True)
             return None
 
 class PageUrl(AsTag):
@@ -563,7 +573,11 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     from django.core.cache import cache
     validate_placeholder_name(placeholder_name)
 
-    request = context.get('request', False)
+    if DJANGO_1_7:
+        request = context.get('request', False)
+    else:
+        request = context.request
+
     site_id = get_site_id(site)
 
     if not request:
@@ -660,13 +674,13 @@ class CMSToolbar(RenderBlock):
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
-        context['cms_version'] = __version__
+        context['cms_version'] =  __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
-                context['addons'] = mark_safe(toolbar.render_addons(context))
+                context['addons'] =  mark_safe(toolbar.render_addons(context))
         else:
             language = None
         # render everything below the tag
@@ -1174,6 +1188,7 @@ class RenderPlaceholder(AsTag):
             request.placeholders = []
         if placeholder.has_change_permission(request):
             request.placeholders.append(placeholder)
+        context = context.new(context)
         return safe(placeholder.render(context, width, lang=language,
                                        editable=editable, use_cache=not nocache))
 
