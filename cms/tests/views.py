@@ -11,9 +11,9 @@ from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
 
-from cms.api import create_page
+from cms.api import create_page, create_title, publish_page
 from cms.apphook_pool import apphook_pool
-from cms.models import PagePermission
+from cms.models import PagePermission, UserSettings, Placeholder
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.compat import DJANGO_1_7
@@ -169,6 +169,25 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(user):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertContains(response, "cms_toolbar-item_switch_save-edit", 1, 200)
+
+
+    def test_toolbar_switch_urls(self):
+        user = self.get_superuser()
+        user_settings = UserSettings(language="en", user=user)
+        placeholder = Placeholder(slot="clipboard")
+        placeholder.save()
+        user_settings.clipboard = placeholder
+        user_settings.save()
+
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        create_title("fr", "french home", page)
+        publish_page(page, user, "fr")
+
+        with self.login_user_context(user):
+            response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            self.assertContains(response, "/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'), 1, 200)
+            response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+            self.assertContains(response, "/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'), 1, 200)
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')

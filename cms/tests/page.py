@@ -20,7 +20,7 @@ from django.utils.timezone import now as tz_now, make_aware, get_current_timezon
 from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
-from cms.api import create_page, add_plugin
+from cms.api import create_page, add_plugin, create_title, publish_page
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import Page, Title, EmptyTitle
@@ -74,6 +74,23 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.get(URL_CMS_PAGE_ADD)
             self.assertEqual(response.status_code, 200)
+
+    def test_absolute_url(self):
+        user = self.get_superuser()
+        page = create_page("page", "nav_playground.html", "en", published=True)
+        create_title("fr", "french home", page)
+        page_2 = create_page("inner", "nav_playground.html", "en", published=True, parent=page)
+        create_title("fr", "french inner", page_2)
+        publish_page(page_2, user, "fr")
+
+        self.assertEqual(page_2.get_absolute_url(), '/en/inner/')
+        self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
+        self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
+        with force_language('fr'):
+            self.assertEqual(page_2.get_absolute_url(), '/fr/french-inner/')
+            self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
+            self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
 
     def test_create_page_admin(self):
         """

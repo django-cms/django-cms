@@ -59,7 +59,7 @@ class ToolbarPool(object):
         return self.toolbars
 
     def get_watch_models(self):
-        return sum((getattr(tb, 'watch_models', [])
+        return sum((list(getattr(tb, 'watch_models', []))
                     for tb in self.toolbars.values()), [])
 
 

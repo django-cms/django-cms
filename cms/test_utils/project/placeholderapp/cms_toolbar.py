@@ -12,7 +12,7 @@ SAMPLEAPP_BREAK = 'Example1 App Break'
 
 @toolbar_pool.register
 class Example1Toolbar(CMSToolbar):
-    watch_models = [Example1, CharPksExample]
+    watch_models = (Example1, CharPksExample)
 
     def populate(self):
         admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)

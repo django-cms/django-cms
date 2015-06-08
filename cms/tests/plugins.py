@@ -244,6 +244,28 @@ class PluginsTestCase(PluginsTestBaseCase):
             rendered_live_placeholder = live_placeholder.render(self.get_context(live_page.get_absolute_url(), page=live_page), None)
             self.assertEqual(rendered_live_placeholder, "I'm the firstI'm the secondI'm the third")
 
+    def test_plugin_breadcrumbs(self):
+        """
+        Test the plugin breadcrumbs order
+        """
+        draft_page = api.create_page("home", "col_two.html", "en",
+                                     slug="page1", published=False, in_navigation=True)
+        placeholder = draft_page.placeholders.get(slot="col_left")
+
+        columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
+        column = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')
+        text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column, body="I'm the second")
+        text_breadcrumbs = text_plugin.get_breadcrumb()
+        self.assertEqual(len(columns.get_breadcrumb()), 1)
+        self.assertEqual(len(column.get_breadcrumb()), 2)
+        self.assertEqual(len(text_breadcrumbs), 3)
+        self.assertTrue(text_breadcrumbs[0]['title'], columns.get_plugin_class().name)
+        self.assertTrue(text_breadcrumbs[1]['title'], column.get_plugin_class().name)
+        self.assertTrue(text_breadcrumbs[2]['title'], text_plugin.get_plugin_class().name)
+        self.assertTrue('/edit-plugin/%s/'% columns.pk in text_breadcrumbs[0]['url'])
+        self.assertTrue('/edit-plugin/%s/'% column.pk, text_breadcrumbs[1]['url'])
+        self.assertTrue('/edit-plugin/%s/'% text_plugin.pk, text_breadcrumbs[2]['url'])
+
     def test_add_cancel_plugin(self):
         """
         Test that you can cancel a new plugin before editing and

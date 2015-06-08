@@ -117,6 +117,27 @@ Example::
 
     cms copy-lang en de force-copy site=2 verbose
 
+.. _cms-copy-site-command:
+
+``cms copy-site``
+=================
+
+The ``copy-site`` subcommand can be used to copy content (pages and plugins)
+from one site to another.
+The subcommand copy content from the ``from_site`` to ``to_site``; please note
+that static placehoders are copied as they are shared across sites.
+The whole source tree is copied, in the root of the target website.
+Existing pages on the target website are not modified.
+
+You must provide two arguments:
+
+* ``from_site``: the site to copy the content from;
+* ``to_site``: the site to copy the content to.
+
+Example::
+
+    cms copy-site 1 2
+
 *******************
 Moderation commands
 *******************

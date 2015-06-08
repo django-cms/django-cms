@@ -228,21 +228,23 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def get_object_public_url(self):
         if self.obj:
-            try:
-                return self.obj.get_public_url()
-            except:
-                pass
+            with force_language(self.request.LANGUAGE_CODE):
+                try:
+                    return self.obj.get_public_url()
+                except:
+                    pass
         return ''
 
     def get_object_draft_url(self):
         if self.obj:
-            try:
-                return self.obj.get_draft_url()
-            except:
+            with force_language(self.request.LANGUAGE_CODE):
                 try:
-                    return self.obj.get_absolute_url()
+                    return self.obj.get_draft_url()
                 except:
-                    pass
+                    try:
+                        return self.obj.get_absolute_url()
+                    except:
+                        pass
         return ''
 
     # Internal API

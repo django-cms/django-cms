@@ -60,13 +60,14 @@ class ToolbarMiddleware(object):
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         build = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         disable = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+        anonymous_on = get_cms_setting('TOOLBAR_ANONYMOUS_ON')
 
         if disable in request.GET:
             request.session['cms_toolbar_disabled'] = True
         if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
             request.session['cms_toolbar_disabled'] = False
 
-        if request.user.is_staff or request.user.is_anonymous():
+        if request.user.is_staff or (anonymous_on and request.user.is_anonymous()):
             if edit_on in request.GET and not request.session.get('cms_edit', False):
                 if not request.session.get('cms_edit', False):
                     menu_pool.clear()

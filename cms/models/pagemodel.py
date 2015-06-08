@@ -156,10 +156,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
             language = get_language()
-        if self.is_home:
-            return reverse('pages-root')
-        path = self.get_path(language, fallback) or self.get_slug(language, fallback)
-        return reverse('pages-details-by-slug', kwargs={"slug": path})
+        with i18n.force_language(language):
+            if self.is_home:
+                return reverse('pages-root')
+            path = self.get_path(language, fallback) or self.get_slug(language, fallback)
+            return reverse('pages-details-by-slug', kwargs={"slug": path})
 
     def get_public_url(self, language=None, fallback=True):
         """
