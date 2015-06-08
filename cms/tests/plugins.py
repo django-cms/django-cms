@@ -445,6 +445,29 @@ class PluginsTestCase(PluginsTestBaseCase):
                 self.assertTrue('link.png' in new_plugins[idx].body)
                 self.assertTrue('plugin_obj_%s' % new_plugins[idx].get_children()[0].pk in new_plugins[idx].body)
 
+    def test_plugin_position(self):
+        page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
+        placeholder = page_en.placeholders.get(slot="body")
+        placeholder_right = page_en.placeholders.get(slot="right-column")
+        columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
+        column_1 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')
+        column_2 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='30%')
+        api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the first")
+        text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the second")
+
+        returned_1 = copy_plugins_to([text_plugin], placeholder, 'en', column_1.pk)
+        returned_2 = copy_plugins_to([text_plugin], placeholder_right, 'en')
+        returned_3 = copy_plugins_to([text_plugin], placeholder, 'en', column_2.pk)
+
+        # Second plugin in the plugin branch
+        self.assertEqual(text_plugin.position, 1)
+        # Added as third plugin in the same branch as the above
+        self.assertEqual(returned_1[0][0].position, 2)
+        # First plugin in a placeholder
+        self.assertEqual(returned_2[0][0].position, 0)
+        # First plugin nested in a plugin
+        self.assertEqual(returned_3[0][0].position, 0)
+
     def test_copy_plugins(self):
         """
         Test that copying plugins works as expected.
@@ -461,7 +484,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         # add a *nested* link plugin
         link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=text_plugin_en,
-                                    name="A Link", url="https://www.django-cms.org")
+                                        name="A Link", url="https://www.django-cms.org")
 
         # the call above to add a child makes a plugin reload required here.
         text_plugin_en = self.reload(text_plugin_en)
