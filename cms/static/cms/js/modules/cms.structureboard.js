@@ -353,7 +353,7 @@ $(document).ready(function () {
 				'dropOnEmpty': true,
 				'forcePlaceholderSize': true,
 				'helper': 'clone',
-				'appendTo': 'body',
+				'appendTo': '.cms_structure-content',
 				'cursor': 'move',
 				'opacity': 0.4,
 				'zIndex': 9999999,
@@ -381,6 +381,11 @@ $(document).ready(function () {
 						if($(this).children().length === 0) {
 							$(this).show();
 						}
+					});
+					// add overflow hidden to body
+					$('.cms_structure-content').css({
+						'height': $(document).height(),
+						'overflow': 'hidden'
 					});
 				},
 
@@ -415,6 +420,12 @@ $(document).ready(function () {
 						if($(this).children().length === 0) {
 							$(this).hide();
 						}
+					});
+
+					// add overflow hidden to body
+					$('.cms_structure-content').css({
+						'height': '',
+						'overflow': ''
 					});
 				},
 				'isAllowed': function(placeholder, placeholderParent, originalItem) {
