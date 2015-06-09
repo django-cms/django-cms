@@ -94,7 +94,8 @@ to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 Commercial support
 ************
 
-Django CMS is sponsored by `Divio <https://divio.ch>`_. If you need help implementing or hosting Django CMS, please contact us: sales@divio.ch
+Django CMS is sponsored by `Divio <https://divio.ch>`_. If you need help
+implementing or hosting Django CMS, please contact us: sales@divio.ch
 
 *******
 Credits
