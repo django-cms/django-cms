@@ -699,6 +699,9 @@ $(document).ready(function () {
 					el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
 				}
 
+				// make sure structurboard gets updated after expanding
+				$(window).trigger('resize.sideframe');
+
 				// save settings
 				CMS.API.Toolbar.setSettings(settings);
 			});
@@ -784,6 +787,8 @@ $(document).ready(function () {
 			tpl.fadeOut(function () {
 				$(this).remove()
 			});
+			// make sure structurboard gets updated after success
+			$(window).trigger('resize.sideframe');
 		}
 
 	});
