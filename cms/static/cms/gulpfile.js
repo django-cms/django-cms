@@ -37,7 +37,7 @@ gulp.task('sass', function () {
         .pipe(sass())
         .on('error', gutil.log.bind(console))
         .pipe(autoprefixer({
-            browsers: ['last 2 versions'],
+            browsers: ['last 3 versions'],
             cascade: false
         }))
         .pipe(minifyCss())
