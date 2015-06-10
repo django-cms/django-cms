@@ -28,10 +28,10 @@
 
 		.cms_sideframe-close { background-position:-80px -90px; }
 		.cms_sideframe-close:hover { background-position:-100px -90px; }
-		.cms_sideframe-hide { background-position:-101px -150px; }
-		.cms_sideframe-hide:hover { background-position:-121px -150px; }
-		.cms_sideframe-hidden { background-position:-60px -150px; }
-		.cms_sideframe-hidden:hover { background-position:-80px -150px; }
+		.cms_sideframe-hide { height: 30px; border: none !important; background-position:-101px -144px; }
+		.cms_sideframe-hide:hover { background-position:-121px -144px; }
+		.cms_sideframe-hidden { background-position:-60px -144px; }
+		.cms_sideframe-hidden:hover { background-position:-80px -144px; }
 		.cms_sideframe-maximize { background-position:-40px -91px; }
 		.cms_sideframe-maximize:hover { background-position:-60px -91px; }
 		.cms_sideframe-minimize { background-position:-61px -111px; }
