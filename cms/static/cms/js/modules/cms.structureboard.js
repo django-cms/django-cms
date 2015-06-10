@@ -309,6 +309,14 @@ $(document).ready(function () {
 		},
 
 		_resizeBoard: function () {
+			if (CMS.config.simpleStructureBoard) {
+				$('.cms_dragarea').css('position', 'static');
+				$('.cms_structure-content').css('padding', '5%');
+				$('.cms_clipboard-containers').css('position', 'absolute');
+				// cancel further requests
+				return false;
+			}
+
 			// calculate placeholder position
 			var id = null;
 			var area = null;
