@@ -1,0 +1,68 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+//##################################################################################################################
+// #MIXINS#
+@mixin transition($transition) {
+	-webkit-transition: $transition;
+	-moz-transition: $transition;
+	-ms-transition: $transition;
+	-o-transition: $transition;
+	transition: $transition;
+}
+
+@mixin background-image($images...) {
+	@include image-property(background-image, $images...) {
+		@if $current-prefix == -svg {
+			background-size: 100%;
+		}
+	}
+}
+
+// autoprefixer will take care of appending the right prefix
+@mixin background-image($gradient) {
+	background: linear-gradient($gradient);
+}
+
+@mixin box-shadow($value) {
+	box-shadow: $value;
+}
+
+@mixin inline-block() {
+	display: inline-block;
+}
+
+@mixin single-transition($transition) {
+	transition: $transition;
+}
+
+@mixin transform($transform) {
+	transform: $transform;
+}
+
+@mixin box-sizing($value) {
+	box-sizing: $value;
+}
+
+@mixin text-shadow($shadow) {
+	text-shadow: $shadow;
+}
+
+// https://github.com/Compass/compass/blob/stable/core/stylesheets/compass/typography/text/_replacement.scss
+@mixin hide-text($direction: left) {
+    $approximate-em-value: 12px / 1em;
+    $wider-than-any-screen: -9999em;
+    text-indent: $wider-than-any-screen * $approximate-em-value;
+    overflow: hidden;
+    text-align: left;
+}
+
+// https://github.com/Compass/compass/blob/stable/core/stylesheets/compass/css3/_opacity.scss
+@mixin opacity($opacity) {
+	filter: unquote("progid:DXImageTransform.Microsoft.Alpha(enabled=false)");
+	opacity: $opacity;
+}
+
+// end of mixins

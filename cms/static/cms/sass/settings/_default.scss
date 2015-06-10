@@ -1,10 +1,6 @@
 //##################################################
 // #SETTINGS#
 
-// #IMPORTS#
-@import "compass/css3";
-@import "compass/utilities";
-
 // #COLORS#
 $color-white: #fff;
 $color-black: #000;
@@ -23,10 +19,12 @@ $color-grey-20: lighten($color-grey, 25%); // 454545
 $color-grey-70: darken($color-grey, 13%); // 454545
 $color-grey-90: darken($color-grey, 20%); // 333333
 
-$gradient-toolbar: linear-gradient(top, rgba(lighten($color-grey, 58%), 0.97) 0%, rgba(lighten($color-grey, 59%), 0.97) 50%, rgba(lighten($color-grey, 58%), 0.95) 100%);
-$gradient-dark: linear-gradient(top, $color-grey, darken($color-grey, 20%));
-$gradient-blue: linear-gradient(top, adjust-hue($color-blue, 5deg), adjust-hue($color-blue, 15deg));
-$gradient-green: linear-gradient(top, lighten($color-green, 10%) 0%, saturate($color-green, 20%) 50%, saturate($color-green, 30%) 100%);
-$gradient-orange: linear-gradient(top, lighten($color-orange, 5%), $color-orange);
-$gradient-red: linear-gradient(top, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg));
-$gradient-light: linear-gradient(top, lighten($color-grey-10, 5%), $color-grey-10);
+$gradient-toolbar: to bottom, rgba(lighten($color-grey, 58%), 0.97) 0%, rgba(lighten($color-grey, 59%), 0.97) 50%, rgba(lighten($color-grey, 58%), 0.95) 100%;
+$gradient-dark: to bottom, $color-grey, darken($color-grey, 20%);
+$gradient-blue: to bottom, adjust-hue($color-blue, 5deg), adjust-hue($color-blue, 15deg);
+$gradient-green: to bottom, lighten($color-green, 10%) 0%, saturate($color-green, 20%) 50%, saturate($color-green, 30%) 100%;
+$gradient-orange: to bottom, lighten($color-orange, 5%), $color-orange;
+$gradient-red: to bottom, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg);
+$gradient-light: to bottom, lighten($color-grey-10, 5%), $color-grey-10;
+
+@import "mixins";

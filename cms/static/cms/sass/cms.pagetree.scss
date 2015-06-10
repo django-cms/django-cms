@@ -127,7 +127,7 @@ $color-background-blue-hover: #e6f6fd;
 	.info-details { cursor:default;
 		position:absolute; right:-6px; top:-6px; z-index:100;
 		text-align:left; line-height:18px; padding:5px 10px;
-		background:white; border:1px solid #ccc; @include border-radius(3px 0 3px 3px);
+		background:white; border:1px solid #ccc; border-radius:3px 0 3px 3px;
 		mark { font-weight:bold; background:none; font-style:normal;
 			@include inline-block(); min-width:100px; }
 		span { display:inline !important; }
@@ -166,7 +166,7 @@ $color-background-blue-hover: #e6f6fd;
 		border: 1px solid transparent;
 		width:12px !important; height:12px !important; margin:-3px 0 0 !important;
 		@include inline-block();
-		@include border-radius(7px);
+		border-radius: 7px;
 		color: transparent;
 		// colors used within the tree
 		&.dirty { background-color:#6ba6ff;
@@ -187,7 +187,7 @@ $color-background-blue-hover: #e6f6fd;
 .language-tooltip { display:none; position:absolute; right:20px; top:4px; z-index:9999;
 	line-height:1; padding:4px 6px; font-size:11px; color:#ccc;
 	background-color:black; background:rgba(black, 0.8); border:none;
-	@include border-radius(3px);
+	border-radius:3px;
 	a { color:#ddd; }
 	a:hover { color:white; text-decoration:none; }
 	&:before { display:block; width:0; height:0;

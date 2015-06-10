@@ -10,7 +10,7 @@
 	background:url('../img/toolbar/sprite_toolbar.png') no-repeat 3px -152px; }
 
 .cms_submenu-lang { padding:0 5px; position:absolute; top:3px; right:3px;
-	border:1px solid $color-grey-10; background:white; @include border-radius(3px); }
+	border:1px solid $color-grey-10; background:white; border-radius:3px; }
 
 .cms_submenu-dropdown {
 	display:none; zoom:1; position:absolute; right:0; top:20px; z-index:999;
@@ -38,7 +38,7 @@
 }
 
 .cms_submenu-quicksearch { display:none; position:absolute; right:-5px; top:-5px; z-index:1000;
-	cursor:default; text-align:right; height:25px; @include border-radius(4px);
+	cursor:default; text-align:right; height:25px; border-radius:4px;
 	background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat right -326px; }
 .cms_submenu-quicksearch label { cursor:pointer; }
 .cms_submenu-quicksearch input { display:block; font-size:12px; color:white; text-align:right; -webkit-appearance:none;
