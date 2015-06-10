@@ -6,7 +6,7 @@ import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList
+from django.template import TemplateSyntaxError, NodeList, Variable
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import ExtendsNode, BlockNode
@@ -188,7 +188,12 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                 # Check if it quacks like a template object, if not
                 # presume is a template path and get the object out of it
                 if not callable(getattr(node.template, 'render', None)):
-                    template = get_template(node.template.var)
+                    # If it's a variable there is no way to expand it at this stage so we
+                    # need to skip it
+                    if isinstance(node.template.var, Variable):
+                        continue
+                    else:
+                        template = get_template(node.template.var)
                 else:
                     template = node.template
                 placeholders += _scan_placeholders(_get_nodelist(template), current_block)

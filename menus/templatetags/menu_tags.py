@@ -18,7 +18,8 @@ from menus.utils import DefaultLanguageChanger
 register = template.Library()
 
 
-class NOT_PROVIDED: pass
+class NOT_PROVIDED:
+    pass
 
 
 def cut_after(node, levels, removed):
@@ -130,7 +131,7 @@ class ShowMenu(InclusionTag):
         else:
             # new menu... get all the data so we can save a lot of queries
             nodes = menu_pool.get_nodes(request, namespace, root_id)
-            if root_id: # find the root id and cut the nodes
+            if root_id:  # find the root id and cut the nodes
                 id_nodes = menu_pool.get_nodes_by_attribute(nodes, "reverse_id", root_id)
                 if id_nodes:
                     node = id_nodes[0]
@@ -279,13 +280,16 @@ class ShowBreadcrumb(InclusionTag):
             only_visible = bool(only_visible)
         ancestors = []
         nodes = menu_pool.get_nodes(request, breadcrumb=True)
-        selected = None
+
+        # Find home
         home = None
-        for node in nodes:
-            if node.selected:
-                selected = node
-            if node.get_absolute_url() == unquote(reverse("pages-root")):
-                home = node
+        root_url = unquote(reverse("pages-root"))
+        home = next((node for node in nodes if node.get_absolute_url() == root_url), None)
+
+        # Find selected
+        selected = None
+        selected = next((node for node in nodes if node.selected), None)
+
         if selected and selected != home:
             node = selected
             while node:

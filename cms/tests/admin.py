@@ -494,6 +494,64 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(root_page.get_children()[1], second_level_page_bottom)
         self.assertEqual(root_page.get_children()[0].get_children()[0], third_level_page)
 
+    def test_changelist_get_results(self):
+        admin_user = self.get_superuser()
+        first_level_page = create_page('level1', 'nav_playground.html', 'en', published=True)
+        second_level_page_top = create_page('level21', "nav_playground.html", "en",
+                                            created_by=admin_user, published=True,
+                                            parent=first_level_page)
+        second_level_page_bottom = create_page('level22', "nav_playground.html", "en", # nopyflakes
+                                               created_by=admin_user, published=True,
+                                               parent=self.reload(first_level_page))
+        third_level_page = create_page('level3', "nav_playground.html", "en", # nopyflakes
+                                       created_by=admin_user, published=True,
+                                       parent=second_level_page_top)
+        fourth_level_page = create_page('level23', "nav_playground.html", "en", # nopyflakes
+                                        created_by=admin_user,
+                                        parent=self.reload(first_level_page))
+        self.assertEqual(Page.objects.all().count(), 9)
+
+        url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
+
+        request = self.get_request(url)
+        request.session = {}
+        request.user = admin_user
+
+        page_admin = site._registry[Page]
+
+        # full blown page list. only draft pages are taken into account
+        cl_params = [request, page_admin.model, page_admin.list_display,
+            page_admin.list_display_links, page_admin.list_filter,
+            page_admin.date_hierarchy, page_admin.search_fields,
+            page_admin.list_select_related, page_admin.list_per_page]
+        if hasattr(page_admin, 'list_max_show_all'):  # django 1.4
+            cl_params.append(page_admin.list_max_show_all)
+        cl_params.extend([page_admin.list_editable, page_admin])
+        cl = CMSChangeList(*tuple(cl_params))
+        cl.get_results(request)
+        self.assertEqual(cl.full_result_count, 5)
+        self.assertEqual(cl.result_count, 5)
+
+        # only one unpublished page is returned
+        request = self.get_request(url+'?q=level23')
+        request.session = {}
+        request.user = admin_user
+        cl_params[0] = request
+        cl = CMSChangeList(*tuple(cl_params))
+        cl.get_results(request)
+        self.assertEqual(cl.full_result_count, 5)
+        self.assertEqual(cl.result_count, 1)
+
+        # a number of pages matches the query
+        request = self.get_request(url+'?q=level2')
+        request.session = {}
+        request.user = admin_user
+        cl_params[0] = request
+        cl = CMSChangeList(*tuple(cl_params))
+        cl.get_results(request)
+        self.assertEqual(cl.full_result_count, 5)
+        self.assertEqual(cl.result_count, 3)
+
     def test_changelist_tree(self):
         """ This test checks for proper jstree cookie unquoting.
 

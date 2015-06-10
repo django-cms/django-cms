@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import datetime
+from operator import attrgetter
 import re
 
 from django.contrib import admin
@@ -16,7 +17,8 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
 
 from cms.api import create_page, create_title, add_plugin
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model
+from cms.cms_toolbar import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
+                             LANGUAGE_MENU_IDENTIFIER)
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -626,6 +628,46 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
 
+    def test_remove_language(self):
+        item_name = attrgetter('name')
+
+        page = create_page("toolbar-page", "nav_playground.html", "en",
+                           published=True)
+        create_title(title="de page", language="de", page=page)
+        create_title(title="fr page", language="fr", page=page)
+
+        request = self.get_page_request(page, self.get_staff(), '/', edit=True)
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        meu = toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
+        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete German')]))
+        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete English')]))
+        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete French')]))
+
+        reduced_langs = {
+            1: [
+                {
+                    'code': 'en',
+                    'name': 'English',
+                    'fallbacks': ['fr', 'de'],
+                    'public': True,
+                },
+                {
+                    'code': 'fr',
+                    'name': 'French',
+                    'public': True,
+                },
+            ]
+        }
+
+        with self.settings(CMS_LANGUAGES=reduced_langs):
+            toolbar = CMSToolbar(request)
+            toolbar.populate()
+            meu = toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
+            self.assertFalse(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete German')]))
+            self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete English')]))
+            self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete French')]))
+
     def get_username(self, user=None, default=''):
         user = user or self.request.user
         try:
@@ -1207,6 +1249,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<div class="cms_plugin cms_plugin-%s-%s-changelist-%s cms_render_model cms_render_model_block">' % (
                 'placeholderapp', 'example1', ex1.pk))
+        self.assertContains(
+            response,
+            "'edit_plugin': '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('placeholderapp_example1_changelist'), 'en'))
 
     def test_invalid_attribute(self):
         user = self.get_staff()
@@ -1591,7 +1636,9 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<div class="cms_plugin cms_plugin-cms-page-changelist-%s cms_render_model cms_render_model_block"><h3>Menu</h3></div>' % page.pk)
-
+        self.assertContains(
+            response,
+            "'edit_plugin': '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('cms_page_changelist'), language))
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
 
