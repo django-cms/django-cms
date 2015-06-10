@@ -166,7 +166,7 @@ $color-background-blue-hover: #e6f6fd;
 		border: 1px solid transparent;
 		width:12px !important; height:12px !important; margin:-3px 0 0 !important;
 		@include inline-block();
-		border-radius: 7px;
+		border-radius:7px;
 		color: transparent;
 		// colors used within the tree
 		&.dirty { background-color:#6ba6ff;
