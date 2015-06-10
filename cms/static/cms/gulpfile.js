@@ -27,7 +27,6 @@ var PROJECT_PATTERNS = {
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
     ]
 };
-console.log(PROJECT_PATTERNS);
 
 // #####################################################################################################################
 // #TASKS#
