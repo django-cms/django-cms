@@ -209,6 +209,8 @@ class MenuPool(object):
         for menu_class_name in self.menus:
             menu = self.menus[menu_class_name]
             try:
+                if isinstance(menu, type):
+                    menu = menu()
                 nodes = menu.get_nodes(request)
             except NoReverseMatch:
                 # Apps might raise NoReverseMatch if an apphook does not yet
