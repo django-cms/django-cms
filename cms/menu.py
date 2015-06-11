@@ -105,7 +105,8 @@ def page_to_node(page, home, cut):
     """
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
-    attr = {'soft_root': page.soft_root,
+    attr = {'page': page,
+            'soft_root': page.soft_root,
             'auth_required': page.login_required,
             'reverse_id': page.reverse_id, }
 
