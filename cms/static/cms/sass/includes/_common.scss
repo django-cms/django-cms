@@ -10,7 +10,7 @@
 
 //##################################################################################################################
 // #BUTTONS#
-.cms_btn { color:$color-grey; @include border-radius(3px);
+.cms_btn { color:$color-grey; border-radius:3px;
 	border:1px solid $color-grey-10;
 	background:$color-grey-10; @include background-image($gradient-light);
 	@include box-shadow(inset lighten($color-grey-10, 5%) 0px 1px 0px);
@@ -52,11 +52,11 @@
 
 //######################################################################################################################
 // #TOOLTIP#
-.cms_tooltip { visibility:hidden; position:absolute; left:0; top:0; @include border-radius(3px);
+.cms_tooltip { visibility:hidden; position:absolute; left:0; top:0; border-radius:3px;
 	font-size:11px; line-height:11px; font-weight:bold; white-space:nowrap; padding:5px 7px 7px 24px; margin:0;
 	color:$color-grey-10;
 	background:$color-grey-70 url('../img/toolbar/sprite_toolbar.png') no-repeat -78px -169px;
-	span { float:right; position:absolute; right:0; top:20px; @include border-radius(3px 0 3px 3px);
+	span { float:right; position:absolute; right:0; top:20px; border-radius:3px 0 3px 3px;
 		color:white; font-weight:normal; padding:5px 7px; background:$color-grey-70; }
 }
 

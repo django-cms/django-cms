@@ -19,7 +19,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 // #DRAGAREA#
 .cms_dragarea {
 	position:absolute; padding:5px 5px 4px; margin:0 0 5px;
-	@include border-radius(3px); background:$color-grey-70;
+	border-radius:3px; background:$color-grey-70;
 	@include box-sizing(border-box);
 }
 .cms_dragarea-static { background:$color-grey-70 url('../img/toolbar/pattern.png'); }
@@ -29,7 +29,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 .cms_dragbar {
 	font-size:13px; line-height:20px;
 	position:relative; left:0; top:0; z-index:9999;
-	@include border-radius(3px);
+	border-radius:3px;
 
 	.cms_dragbar-title { font-size:12px; line-height:17px; text-transform:uppercase;
 		font-weight:500; padding:0 0 0 15px; height:16px; cursor:pointer;
@@ -68,7 +68,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 
 // #DRAGGABLES/general#
 .cms_draggable, .cms_droppable { list-style-type:none;
-	position:relative; left:0; top:0; z-index:99; @include border-radius(3px);
+	position:relative; left:0; top:0; z-index:99; border-radius:3px;
 	padding:4px 5px 3px 5px; margin:5px 0 0; margin-left:0 !important;
 
 	// levels
@@ -86,7 +86,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 	// menu overwrites
 	.cms_submenu { display:none; margin-top:2px; }
 	.cms_submenu-dropdown { right:-6px; top:22px; }
-	.cms_submenu-quicksearch { right:-5px; top:-6px; @include border-radius(0); height:28px; border-left:1px dotted $color-grey-10;
+	.cms_submenu-quicksearch { right:-5px; top:-6px; border-radius:0; height:28px; border-left:1px dotted $color-grey-10;
 		background:$color-grey-5 url('../img/toolbar/sprite_toolbar.png') no-repeat right -415px; }
 	.cms_submenu-quicksearch input { color:black; margin-top:1px; }
 
@@ -97,19 +97,19 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch,
 	.cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_draggable .cms_submenu-quicksearch { background-color:$color-grey-5; }
 
-	.cms_dragitem-text { @include inline-block(); width:90%; height:21px; overflow:hidden; }
+	.cms_dragitem-text { @include inline-block(); width:90%; height:15px; overflow:visible; }
 }
 
 // #DRAGGABLES/specific#
 .cms_draggable { z-index:100; color:black; border:1px solid $color-grey-5; background:$color-grey-5;
 	&:hover { @include box-shadow(inset 0px 0px 3px $color-grey-10); } }
-.cms_droppable { @include border-radius(3px); color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
+.cms_droppable { border-radius:3px; color:darken($color-grey-10, 15%); border:1px dashed darken($color-grey-10, 15%); }
 
 .cms_dragitem { cursor:move; }
 .cms_dragitem-collapsable, .cms_dragitem-expanded { cursor:pointer; padding-left:15px; }
 .cms_dragitem-collapsable { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 1px -359px; }
 .cms_dragitem-expanded { background:url('../img/toolbar/sprite_toolbar.png') no-repeat 0 -389px; }
-.cms_dragitem-success { position:absolute; left:-1px; top:-1px; @include border-radius(3px);
+.cms_dragitem-success { position:absolute; left:-1px; top:-1px; border-radius:3px;
 	width:100%; height:100%;
 	@include opacity(0.6); }
 
@@ -140,7 +140,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 
 // dragging state
 body > .cms_draggable { list-style-type:none; white-space:nowrap;
-	@include border-radius(3px); padding:4px 5px 3px 5px; margin:0;
+	border-radius:3px; padding:4px 5px 3px 5px; margin:0;
 	border-color:$color-grey-10; background:white; }
 
 // hide elements when dragging
