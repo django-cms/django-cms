@@ -107,13 +107,13 @@ $(document).ready(function () {
 					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.show();
-				} else if(e.keyCode === 18) {
+				} else if(e.keyCode === 16) {
 					$(this).data('expandmode', true);
 				}
 			});
 
 			$(document).bind('keyup', function (e) {
-				if(e.keyCode === 18) {
+				if(e.keyCode === 16) {
 					$(this).data('expandmode', false);
 				}
 			});
