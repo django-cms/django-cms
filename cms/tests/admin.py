@@ -355,6 +355,16 @@ class AdminTestCase(AdminTestsBase):
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
 
+    def test_pagetree_filtered(self):
+        superuser = self.get_superuser()
+        create_page("root-page", "nav_playground.html", "en",
+                    created_by=superuser, published=True)
+        with self.login_user_context(superuser):
+            url = admin_reverse('cms_page_changelist')
+            response = self.client.get('%s?template__exact=nav_playground.html' % url)
+            errmsg = response.content
+            self.assertEqual(response.status_code, 200, errmsg)
+
     def test_delete_translation(self):
         admin_user = self.get_superuser()
         page = create_page("delete-page-translation", "nav_playground.html", "en",
