@@ -2,15 +2,16 @@
 """
 Edit Toolbar middleware
 """
-from cms.utils.conf import get_cms_setting
-from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.i18n import force_language
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
-from menus.menu_pool import menu_pool
+from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+
+from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import force_language
 from cms.utils.placeholder import get_toolbar_plugin_struct
-from django.core.urlresolvers import resolve
+from menus.menu_pool import menu_pool
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
