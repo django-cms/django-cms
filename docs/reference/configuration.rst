@@ -916,6 +916,23 @@ a login form when ``?edit`` is appended to a URL. The default behaviour
 is to show the toolbar to anonymous users.
 
 
+CMS_TOOLBAR_HIDE
+================
+
+default
+    ``False``
+
+If True, the toolbar is hidden in the pages out django CMS.
+To determine the internal url of django cms, you need to assign CMS_APP_NAME to use when you include ``'cms.urls'``
+
+Example::
+
+    urlpatterns += i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^content/', include('cms.urls', app_name=settings.CMS_APP_NAME)),
+    )
+
+
 CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
 
