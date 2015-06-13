@@ -409,3 +409,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix Scanning for placeholders fails on include tags with a variable as an argument
 - Fix handling of plugin position attribute
 - Fix for some structureboard issues
+- Add setting to hide toolbar when a URL is not handled by django CMS

@@ -12,6 +12,7 @@ What's new in 3.1.1
 * Tutorial updates and improvements
 * Add copy_site command
 * Add setting to disable toolbar for anonymous users
+* Add setting to hide toolbar when a URL is not handled by django CMS
 
 Bug Fixes
 =========
@@ -57,6 +58,6 @@ Thanks
 Many thanks community members who have submitted issue reports and especially to
 these GitHub users who have also submitted pull requests: astagi, dirtycoder, doctormo,
 douwevandermeij, driesdesmet, furiousdave, ldgarcia, maqnouch, nikolas, northben,
-olarcheveque, peterfarrell, sam-m888, sephii, stefanw, timgraham, vstoykov,
+olarcheveque, pa0lin082, peterfarrell, sam-m888, sephii, stefanw, timgraham, vstoykov.
 
 A special thank you to vad and nostalgiaz for their support on Django 1.8 support
