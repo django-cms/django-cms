@@ -1,0 +1,15 @@
+{% extends "tests/dolly/one.html" %}
+{% load menu_tags %}
+{% block main %}
+    {% with template='Magic Pony is the best !' %}
+        <h2>{{ template }}</h2>
+        {% block sidebar %}
+            <aside>
+                But Dolly could be a problem !
+                {% show_sub_menu 1 %}
+                <h3>{{ template }}</h3>
+            </aside>
+        {% endblock %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
