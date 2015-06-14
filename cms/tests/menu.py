@@ -4,9 +4,9 @@ import copy
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.shortcuts import render_to_response
 from django.template import Template, TemplateSyntaxError
 from django.test.utils import override_settings
-from django.shotcuts import render_to_response
 from django.utils.translation import activate
 from menus.base import NavigationNode, Menu
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
