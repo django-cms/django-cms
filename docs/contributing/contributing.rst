@@ -97,9 +97,9 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
 HTML, CSS and JavaScript
 ------------------------
 
-As of django CMS 3.1, we will use spaces within frontend code, not tabs as previously. In the
+As of django CMS 3.2, we will use spaces within frontend code, not tabs as previously. In the
 meantime, please continue using tabs - all tabs will be converted to spaces in a single commit
-for 3.1.
+for 3.2.
 
 Frontend code should be formatted for readability. If in doubt, follow existing examples, or ask.
 
