@@ -27,7 +27,6 @@
     }
 
     .cms_submenu-dropdown {
-        @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.1));
         display: none;
         position: absolute;
         top: 20px;
@@ -39,6 +38,7 @@
         max-height: 230px;
         border: 1px solid $color-grey-10;
         background: white;
+        box-shadow: 0 1px 1px rgba(black, 0.1);
 
         // force scrollbars on subnav menu
         // not yet working on firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=77790
@@ -49,9 +49,9 @@
             -webkit-appearance: none;
         }
         &::-webkit-scrollbar-thumb {
-            @include box-shadow(0 0 1px rgba(white,0.5));
             border-left: 1px solid $color-grey-10;
             background-color: $color-grey-70;
+            box-shadow: 0 0 1px rgba(white, 0.5);
         }
 
         .cms_submenu-item {
@@ -69,9 +69,10 @@
         .cms_submenu-item a {
             color: black;
             &:hover,
-            &:focus {@include background-image($gradient-blue);
+            &:focus {
                 color: white;
                 background: adjust-hue($color-blue, 15deg);
+                background: linear-gradient($gradient-blue);
             }
             &:first-child {
                 border-top: none;
