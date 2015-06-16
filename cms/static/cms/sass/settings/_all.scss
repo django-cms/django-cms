@@ -26,5 +26,3 @@ $gradient-green: to bottom, lighten($color-green, 10%) 0%, saturate($color-green
 $gradient-orange: to bottom, lighten($color-orange, 5%), $color-orange;
 $gradient-red: to bottom, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg);
 $gradient-light: to bottom, lighten($color-grey-10, 5%), $color-grey-10;
-
-@import "mixins";

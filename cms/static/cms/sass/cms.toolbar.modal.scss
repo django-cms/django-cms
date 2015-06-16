@@ -5,23 +5,40 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "settings/default";
+@import "settings/all";
+@import "mixins/all";
 
 //##################################################
 // #MODAL#
-#content > h2:first-child { display:none; }
-#content { margin:10px 10px 0; }
-#content .module { padding:10px; }
-
-#container { padding-top:0; }
-
-#footer { display:none; }
-
-#cke_id_body {
-	border:1px solid $color-grey-10 !important;
-
-	.cke_top, .cke_bottom { background:$color-grey-5 !important; border-color:$color-grey-10 !important;
-		@include box-shadow(none !important); }
+#content > h2:first-child {
+    display: none;
+}
+#content {
+    margin: 10px 10px 0;
+}
+#content .module {
+    padding: 10px;
 }
 
-.errornote { margin:0 !important; }
+#container {
+    padding-top: 0;
+}
+
+#footer {
+    display: none;
+}
+
+#cke_id_body {
+    border: 1px solid $color-grey-10 !important;
+
+    .cke_top,
+    .cke_bottom {
+        border-color: $color-grey-10 !important;
+        background: $color-grey-5 !important;
+        box-shadow: none !important;
+    }
+}
+
+.errornote {
+    margin: 0 !important;
+}

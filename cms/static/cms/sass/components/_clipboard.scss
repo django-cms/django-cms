@@ -1,0 +1,122 @@
+@charset "utf-8";
+/*!
+ * @copyright:	https://github.com/divio/django-cms
+ */
+
+#cms_toolbar {
+    //##################################################################################################################
+    // #CLIPBOARD#
+    .cms_clipboard {
+        display: none;
+        position: fixed;
+        top: 130px;
+        left: 0;
+        z-index: 99999;
+        padding: 3px 3px 3px 0;
+        border-radius: 0 3px 3px 0;
+        background: rgba(255,255,255,0.6);
+
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .cms_clipboard-numbers {
+            margin: 0 0 2px;
+        }
+        .cms_clipboard-numbers a {
+            @include hide-text();
+            @include box-sizing(border-box);
+            display: block;
+            overflow: hidden;
+            width: 20px;
+            height: 30px;
+            border: 5px solid $color-grey-70;
+            border-right: none;
+            border-left: none;
+            border-radius: 0 3px 3px 0;
+            background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat left -130px;
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: $color-grey-90;
+                background-position: -20px -130px;
+            }
+        }
+        .cms_clipboard-numbers .cms_clipboard-numbers {
+            display: none !important;
+        }
+
+        .cms_clipboard-empty a {
+            @include hide-text();
+            display: block;
+            width: 20px;
+            height: 20px;
+            border-radius: 0 3px 3px 0;
+            cursor: pointer;
+            background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat left -110px;
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: $color-grey-90;
+                background-position: -20px -110px;
+            }
+        }
+
+        // placeholders
+        .cms_clipboard-triggers {
+            position: relative;
+            z-index: 999;
+        }
+        .cms_clipboard-triggers .cms_clipboard-numbers:nth-child(n+6) {
+            display: none;
+        }
+
+        .cms_clipboard-containers {
+            position: absolute;
+            top: 0;
+            left: -1px;
+            z-index: 99;
+            width: 0;
+        }
+        .cms_clipboard-containers .cms_draggable {
+            width: 190px;
+            margin-left: -220px;
+        }
+
+        // custom style for draggable item
+        .cms_dragarea {
+            padding-top: 3px;
+        }
+        .cms_draggable {
+            position: relative;
+            top: 0;
+            left: 0;
+            z-index: 99;
+            margin: 0 0 2px;
+            padding: 4px 5px 3px 5px;
+            border: 1px solid $color-grey-70;
+            border-radius: 3px;
+            cursor: move;
+            background: $color-grey-5;
+        }
+        .cms_draggable .cms_dragitem {
+            padding-left: 20px;
+        }
+        .cms_draggable .cms_dragitem .cms_submenu {
+            display: none !important;
+        }
+        .cms_draggable .cms_dragitem-text {
+            @include inline-block();
+            overflow: hidden;
+            width: 140px;
+            height: 15px;
+        }
+
+        .cms_plugins {
+            display: none;
+        }
+    }
+
+    // end of toolbar
+}
