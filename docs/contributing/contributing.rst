@@ -97,11 +97,11 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
 HTML, CSS and JavaScript
 ------------------------
 
-As of django CMS 3.1, we will use spaces within frontend code, not tabs as previously. In the
-meantime, please continue using tabs - all tabs will be converted to spaces in a single commit
-for 3.1.
+As of django CMS 3.2, we are using the same guidelines as described in `Aldryn
+Boilerplate`_
 
-Frontend code should be formatted for readability. If in doubt, follow existing examples, or ask.
+Frontend code should be formatted for readability.  If in doubt, follow existing
+examples, or ask.
 
 Process
 =======
@@ -263,19 +263,35 @@ contribute. All changes there will be automatically sent to the project.
 Frontend
 ********
 
+We are using `SASS <http://sass-lang.com/>`_ for our styles. The files
+are located within ``cms/static/cms/sass`` and can be compiled using the `libsass
+<http://libsass.org/>`_ implementation of Sass compiler through `Gulp
+<http://gulpjs.com/>`_.
 
-We are using `SASS/Compass <compass-style.org>`_ for our styles. The files
-are located within ``cms/static/cms/sass`` and can be compiled using the compass
-command ``compass watch cms/static/cms/`` from within the django-cms root.
+In order to compile the stylesheets you need to run this command from the repo
+root::
 
-This will invoke the **config.rb** within ``cms/static/cms/`` using the predefined
-settings.
+	cd cms/static/cms && gulp sass
+
+While developing it is also possible to run a watcher that compiles sass files
+on change::
+
+	cd cms/static/cms && gulp
+
+In order to be able to run ``gulp sass`` you need to have all the dependencies
+installed:
+
+	1. `Node <https://nodejs.org/>`_ (will install npm as well).
+	2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
+	3. Local dependencies ``cd cms/static/cms && npm install``
+
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
 .. _fork: http://github.com/divio/django-cms
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
+.. _Aldryn Boilerplate : http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _GitHub : http://www.github.com
 .. _GitHub help : http://help.github.com
