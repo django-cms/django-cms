@@ -5,6 +5,7 @@
 var autoprefixer = require('gulp-autoprefixer');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var iconfont = require('gulp-iconfont');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
@@ -14,12 +15,16 @@ var minifyCss = require('gulp-minify-css');
 var PROJECT_ROOT = '.';
 var PROJECT_PATH = {
     'sass': PROJECT_ROOT + '/sass',
-    'css': PROJECT_ROOT + '/css'
+    'css': PROJECT_ROOT + '/css',
+    'icons': PROJECT_ROOT + '/fonts'
 };
 
 var PROJECT_PATTERNS = {
     'sass': [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
+    ],
+    'icons': [
+        PROJECT_PATH.icons + '/src/*.svg'
     ]
 };
 
@@ -37,6 +42,18 @@ gulp.task('sass', function () {
         .pipe(minifyCss())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(PROJECT_PATH.css));
+});
+
+gulp.task('icons', function () {
+    gulp.src(PROJECT_PATTERNS.icons)
+    .pipe(iconfont({
+        fontName: 'django-cms-icons',
+        startUnicode: true
+    }))
+    .on('glyphs', function(glyphs, options) {
+        gutil.log.bind(glyphs, options);
+    })
+    .pipe(gulp.dest(PROJECT_PATH.icons));
 });
 
 gulp.task('watch', function () {
