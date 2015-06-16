@@ -4,196 +4,448 @@
  */
 
 #cms_toolbar {
-position:absolute; left:0; top:5px; z-index:9999999; width:100%;
-//######################################################################################################################
-// #TOOLBAR#
-.cms_toolbar { display:none; position:fixed; left:0; top:0; z-index:999999; width:100%; min-width:320px; height:30px;
-	border-bottom:1px solid $color-grey !important; background-color:white; background:rgba($color-grey-5, 0);
-	@include background-image($gradient-toolbar); @include box-shadow(0 0 5px rgba(0, 0, 0, 0.2));
-	/* hack for ie9 */ background/**/:#fcfcfc;
+    position: absolute;
+    top: 5px;
+    left: 0;
+    z-index: 9999999;
+    width: 100%;
+    //######################################################################################################################
+    // #TOOLBAR#
+    .cms_toolbar {
+        @include background-image($gradient-toolbar);
+        @include box-shadow(0 0 5px rgba(0, 0, 0, 0.2));
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999999;
+        width: 100%;
+        min-width: 320px;
+        height: 30px;
+        border-bottom: 1px solid $color-grey !important;
+        background: rgba($color-grey-5, 0);
+        /* hack for ie9 */ background/**/: #fcfcfc;
+        background-color: white;
 
-	.cms_toolbar-left { float:left; padding-left:10px; position:relative; z-index:10; }
-	.cms_toolbar-right { float:right; padding-right:32px; position:relative; z-index:10; }
+        .cms_toolbar-left {
+            position: relative;
+            float: left;
+            z-index: 10;
+            padding-left: 10px;
+        }
+        .cms_toolbar-right {
+            position: relative;
+            float: right;
+            z-index: 10;
+            padding-right: 32px;
+        }
 
-	.cms_toolbar-left .cms_toolbar-item { margin-left:10px; }
-	.cms_toolbar-right .cms_toolbar-item { margin-right:20px; }
+        .cms_toolbar-left .cms_toolbar-item {
+            margin-left: 10px;
+        }
+        .cms_toolbar-right .cms_toolbar-item {
+            margin-right: 20px;
+        }
 
-	// items
-	.cms_toolbar-item { float:left; }
-	.cms_toolbar-item-buttons a { border-bottom:none !important; }
-}
+        // items
+        .cms_toolbar-item {
+            float: left;
+        }
+        .cms_toolbar-item-buttons a {
+            border-bottom: none !important;
+        }
+    }
 
-// do some responsive magic
-@media only screen and (max-width: 800px) {
-	.cms_toolbar-right { display:none; }
-}
+    // do some responsive magic
+    @media only screen and (max-width: 800px) {
+        .cms_toolbar-right {
+            display: none;
+        }
+    }
 
-//######################################################################################################################
-// #TOOLBAR/debug#
-&.cms_toolbar-debug {
-	.cms_toolbar { top:5px !important; }
-	.cms_toolbar-trigger { top:5px !important; }
+    //######################################################################################################################
+    // #TOOLBAR/debug#
+    &.cms_toolbar-debug {
+        .cms_toolbar {
+            top: 5px !important;
+        }
+        .cms_toolbar-trigger {
+            top: 5px !important;
+        }
 
-	.cms_debug-bar { position:fixed; left:0; top:0; z-index:99999999; width:100%; height:4px;
-		border-bottom:1px solid #ddd; background:#fdffc8 url('../img/toolbar/sprite_toolbar.png') repeat-x left -444px; }
-}
-&.cms_toolbar-debug #container { padding-top:35px !important; }
+        .cms_debug-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 99999999;
+            width: 100%;
+            height: 4px;
+            border-bottom: 1px solid #ddd;
+            background: #fdffc8 url("../img/toolbar/sprite_toolbar.png") repeat-x left -444px;
+        }
+    }
+    &.cms_toolbar-debug #container {
+        padding-top: 35px !important;
+    }
 
-//##################################################################################################################
-// #TOOLBAR/navigation#
-.cms_toolbar-item-navigation {
-	li { float:left; position:relative; zoom:1; }
-	li a { float:left; padding:5px 10px; zoom:1; cursor:default; }
-	li ul { display:none; }
-	> li:first-child > a span { font-weight:800; line-height:12px; }
+    //##################################################################################################################
+    // #TOOLBAR/navigation#
+    .cms_toolbar-item-navigation {
+        li {
+            position: relative;
+            float: left;
+            zoom: 1;
+        }
+        li a {
+            float: left;
+            zoom: 1;
+            padding: 5px 10px;
+            cursor: default;
+        }
+        li ul {
+            display: none;
+        }
+        > li:first-child > a span {
+            font-weight: 800;
+            line-height: 12px;
+        }
 
-	// hover effect
-	.cms_toolbar-item-navigation-hover {
-		ul { position:absolute; left:0; top:30px;
-			display:block; min-width:180px; padding:4px 0;
-			border-radius:0 0 4px 4px;
-			border:1px solid white; border-top:none;
-			background-color:white; background:rgba(white, 0.97);
-			@include box-shadow(0 1px 1px rgba(0, 0, 0, 0.4)); }
-		ul li { float:none; zoom:1; }
-		ul li a { float:none; display:block; zoom:1; cursor:pointer; white-space:nowrap;
-			padding:2px 10px 2px 15px; }
-		ul ul { border-radius:0 4px 4px 0; border-top:1px solid #f5f5f5; }
+        // hover effect
+        .cms_toolbar-item-navigation-hover {
+            ul {
+                @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+                display: block;
+                position: absolute;
+                top: 30px;
+                left: 0;
+                min-width: 180px;
+                padding: 4px 0;
+                border: 1px solid white;
+                border-top: none;
+                border-radius: 0 0 4px 4px;
+                background: rgba(white, 0.97);
+                background-color: white;
+            }
+            ul li {
+                float: none;
+                zoom: 1;
+            }
+            ul li a {
+                display: block;
+                float: none;
+                zoom: 1;
+                white-space: nowrap;
+                padding: 2px 10px 2px 15px;
+                cursor: pointer;
+            }
+            ul ul {
+                border-top: 1px solid #f5f5f5;
+                border-radius: 0 4px 4px 0;
+            }
 
-		// second level
-		.cms_toolbar-item-navigation-children {
-			ul { display:none; left:100%; top:-5px; }
-			> a { cursor:default; }
-			> a span { display:block; background:url('../img/toolbar/sprite_toolbar.png') no-repeat right -270px; }
-		}
+            // second level
+            .cms_toolbar-item-navigation-children {
+                ul {
+                    display: none;
+                    top: -5px;
+                    left: 100%;
+                }
+                > a {
+                    cursor: default;
+                }
+                > a span {
+                    display: block;
+                    background: url("../img/toolbar/sprite_toolbar.png") no-repeat right -270px;
+                }
+            }
 
-		// anchor hover
-		> a { color:white !important;
-			background:adjust-hue($color-blue, 15deg);
-			@include background-image($gradient-blue); }
-		> a span { background-position:right -300px !important; }
+            // anchor hover
+            > a {
+                @include background-image($gradient-blue);
+                color: white !important;
+                background: adjust-hue($color-blue, 15deg);
+            }
+            > a span {
+                background-position: right -300px !important;
+            }
 
-		// add active style
-		.cms_toolbar-item-navigation-active > a { font-weight:800; }
-	}
+            // add active style
+            .cms_toolbar-item-navigation-active > a {
+                font-weight: 800;
+            }
+        }
 
-	.cms_toolbar-item-navigation-break { height:1px; margin:0 0 4px; padding:0 0 3px; @include hide-text();
-		border-bottom:1px solid $color-grey-10; }
+        .cms_toolbar-item-navigation-break {@include hide-text();
+            height: 1px;
+            margin: 0 0 4px;
+            padding: 0 0 3px;
+            border-bottom: 1px solid $color-grey-10;
+        }
 
-	.cms_toolbar-item-navigation-disabled {
-		a { cursor:default !important; @include opacity(0.2);
-			&:hover, &:active, &:focus { @include box-shadow(none); background:none !important;
-				color:black !important; } }
-		ul { display:none !important; }
-	}
-}
-.cms_toolbar-item-cms-mode-switcher { display:none; }
+        .cms_toolbar-item-navigation-disabled {
+            a {
+                @include opacity(0.2);
+                cursor: default !important;
+                &:hover,
+                &:active,
+                &:focus {
+                    @include box-shadow(none);
+                    color: black !important;
+                    background: none !important;
+                }
+            }
+            ul {
+                display: none !important;
+            }
+        }
+    }
+    .cms_toolbar-item-cms-mode-switcher {
+        display: none;
+    }
 
-//##################################################################################################################
-// #TOOLBAR/dialog#
-.cms_messages { display:none; position:fixed; z-index:999999; top:30px;
-	width:300px; min-height:14px; margin:0; padding:6px 10px 8px; background:rgba(black, 0.74);
-	border-radius:0 0 3px 3px;
-	color:white; font-size:12px; line-height:16px; font-weight:200;
-	* { color:white; font-size:12px; line-height:16px; font-weight:200; }
+    //##################################################################################################################
+    // #TOOLBAR/dialog#
+    .cms_messages {
+        display: none;
+        position: fixed;
+        top: 30px;
+        z-index: 999999;
+        color: white;
+        font-size: 12px;
+        font-weight: 200;
+        line-height: 16px;
+        width: 300px;
+        min-height: 14px;
+        margin: 0;
+        padding: 6px 10px 8px;
+        border-radius: 0 0 3px 3px;
+        background: rgba(black, 0.74);
+        * {
+            color: white;
+            font-size: 12px;
+            font-weight: 200;
+            line-height: 16px;
+        }
 
-	a { color:$color-blue; }
-	a:hover { text-decoration:underline; }
-	strong { color:lighten($color-blue, 10%); font-weight:200; }
-	ul { display:inline; color:white; }
-	ul li { display:inline; color:white; font-weight:200; }
+        a {
+            color: $color-blue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        strong {
+            color: lighten($color-blue, 10%);
+            font-weight: 200;
+        }
+        ul {
+            display: inline;
+            color: white;
+        }
+        ul li {
+            display: inline;
+            color: white;
+            font-weight: 200;
+        }
 
-	.cms_messages-close { display:none; float:right; cursor:pointer;
-		width:20px; height:14px; margin-left:10px; position:relative; top:-2px; left:3px;
-		background:url('../img/toolbar/sprite_toolbar.png') no-repeat -100px -90px; }
-	.cms_messages-close:hover { background-position:-120px -90px; }
-}
-.cms_messages-error strong { color:$color-red; }
+        .cms_messages-close {
+            display: none;
+            position: relative;
+            top: -2px;
+            left: 3px;
+            float: right;
+            width: 20px;
+            height: 14px;
+            margin-left: 10px;
+            cursor: pointer;
+            background: url("../img/toolbar/sprite_toolbar.png") no-repeat -100px -90px;
+        }
+        .cms_messages-close:hover {
+            background-position: -120px -90px;
+        }
+    }
+    .cms_messages-error strong {
+        color: $color-red;
+    }
 
-//##################################################################################################################
-// #TOOLBAR/elements#
-// #TOOLBAR/elements/logo#
-.cms_toolbar-item-logo {
-	margin:0 !important;
+    //##################################################################################################################
+    // #TOOLBAR/elements#
+    // #TOOLBAR/elements/logo#
+    .cms_toolbar-item-logo {
+        margin: 0 !important;
 
-	a { display:block; width:92px; height:20px; margin:5px 0; @include hide-text();
-		background:url('../img/toolbar/sprite_toolbar.png') no-repeat left top;
-		&:hover, &:active, &:focus { background-position:left -20px; } }
-}
+        a {@include hide-text();
+            display: block;
+            width: 92px;
+            height: 20px;
+            margin: 5px 0;
+            background: url("../img/toolbar/sprite_toolbar.png") no-repeat left top;
+            &:hover,
+            &:active,
+            &:focus {
+                background-position: left -20px;
+            }
+        }
+    }
 
-// #TOOLBAR/elements/form#
-.cms_form-login {
-	padding:3px 0 0 0;
+    // #TOOLBAR/elements/form#
+    .cms_form-login {
+        padding: 3px 0 0 0;
 
-	label { float:left; cursor:pointer; padding-left:10px; }
-	label span { padding-top:1px; @include inline-block(); }
-	input[type="text"], input[type="password"] { font-size:13px; line-height:13px; width:100px;
-		padding:3px 5px; margin:0; border-radius:3px;
-		color:$color-grey; border:1px solid lighten($color-grey, 45%);
-		@include box-shadow(0px 1px 0px white);
+        label {
+            float: left;
+            padding-left: 10px;
+            cursor: pointer;
+        }
+        label span {@include inline-block();
+            padding-top: 1px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            @include box-shadow(0px 1px 0px white);
+            color: $color-grey;
+            font-size: 13px;
+            line-height: 13px;
+            width: 100px;
+            margin: 0;
+            padding: 3px 5px;
+            border: 1px solid lighten($color-grey, 45%);
+            border-radius: 3px;
 
-		&:focus { border-color:$color-blue;
-			@include box-shadow(inset 0px 0px 2px $color-grey-10);
-			@include single-transition(outline 0.2s);
-		}
-	}
-	input[type="submit"] { display:block; color:white; font-size:12px; text-transform:uppercase; cursor:pointer;
-		height:23px; padding:1px 15px 0; border-radius:3px;
-		border:1px solid darken($color-grey, 20%);
-		background-color:$color-grey;
-		@include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
-		@include background-image($gradient-dark);
+            &:focus {
+                @include box-shadow(inset 0px 0px 2px $color-grey-10);
+                @include single-transition(outline 0.2s);
+                border-color: $color-blue;
+            }
+        }
+        input[type="submit"] {
+            @include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
+            @include background-image($gradient-dark);
+            display: block;
+            color: white;
+            font-size: 12px;
+            text-transform: uppercase;
+            height: 23px;
+            padding: 1px 15px 0;
+            border: 1px solid darken($color-grey, 20%);
+            border-radius: 3px;
+            cursor: pointer;
+            background-color: $color-grey;
 
-		&:hover, &:active, &:focus { background:$color-grey-70; @include box-shadow(none); }
-		&:active, &:focus { background:darken($color-grey-70, 50%); }
-	}
+            &:hover,
+            &:active,
+            &:focus {
+                @include box-shadow(none);
+                background: $color-grey-70;
+            }
+            &:active,
+            &:focus {
+                background: darken($color-grey-70, 50%);
+            }
+        }
 
-	.cms_error { color:$color-red; }
-	.cms_error input { border:1px solid $color-red; }
-}
+        .cms_error {
+            color: $color-red;
+        }
+        .cms_error input {
+            border: 1px solid $color-red;
+        }
+    }
 
-// #TOOLBAR/elements/buttongroups#
-.cms_toolbar-item-buttons {
-	margin:4px 0 4px;
+    // #TOOLBAR/elements/buttongroups#
+    .cms_toolbar-item-buttons {
+        margin: 4px 0 4px;
 
-	a { float:left; font-size:11px; line-height:1; padding:5px 12px; }
-	a:first-child { border-radius:3px 0 0 3px; }
-	a:last-child { border-radius:0 3px 3px 0; }
-	a:only-child { border-radius:3px; }
-}
+        a {
+            float: left;
+            font-size: 11px;
+            line-height: 1;
+            padding: 5px 12px;
+        }
+        a:first-child {
+            border-radius: 3px 0 0 3px;
+        }
+        a:last-child {
+            border-radius: 0 3px 3px 0;
+        }
+        a:only-child {
+            border-radius: 3px;
+        }
+    }
 
-// #TOOLBAR/elements/toggler#
-.cms_toolbar-trigger { position:fixed; right:0; top:0; z-index:999999;
-	border-left:1px solid $color-grey; border-bottom:1px solid $color-grey;
+    // #TOOLBAR/elements/toggler#
+    .cms_toolbar-trigger {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 999999;
+        border-bottom: 1px solid $color-grey;
+        border-left: 1px solid $color-grey;
 
-	a { display:block; width:30px; height:29px; @include hide-text();
-		color:$color-grey-70;
-		border-left:1px solid white; border-top:1px solid white;
-		background:$color-grey-5 url('../img/toolbar/sprite_toolbar.png') no-repeat -60px -40px;
-		&:hover, &:active, &:focus { background-position:-90px -40px; background-color:white; }
-	}
- }
-// #TOOLBAR/elements/loader#
-.cms_toolbar-trigger-expanded a { background-position:0 -40px;
-	&:hover, &:active, &:focus { background-position:-30px -40px; }
-}
-.cms_toolbar-loader a { background:#fcfcfc url('../img/loader.gif') no-repeat center center !important;
-	background-size:20px 20px !important; }
+        a {
+            @include hide-text();
+            display: block;
+            color: $color-grey-70;
+            width: 30px;
+            height: 29px;
+            border-top: 1px solid white;
+            border-left: 1px solid white;
+            background: $color-grey-5 url("../img/toolbar/sprite_toolbar.png") no-repeat -60px -40px;
+            &:hover,
+            &:active,
+            &:focus {
+                background-color: white;
+                background-position: -90px -40px;
+            }
+        }
+    }
+    // #TOOLBAR/elements/loader#
+    .cms_toolbar-trigger-expanded a {
+        background-position: 0 -40px;
+        &:hover,
+        &:active,
+        &:focus {
+            background-position: -30px -40px;
+        }
+    }
+    .cms_toolbar-loader a {
+        background: #fcfcfc url("../img/loader.gif") no-repeat center center !important;
+        background-size: 20px 20px !important;
+    }
 
-// TODO Reimplement blinking if unpublished content is present
-//##################################################################################################################
-// #TOOLBAR/blocker#
-.cms_screenblock { color:white; text-align:center;
-	position:fixed; right:0; top:0; z-index:100;
-	width:100%; height:100%;
-	background-color:black; background:rgba(black, 0.9); }
+    // TODO Reimplement blinking if unpublished content is present
+    //##################################################################################################################
+    // #TOOLBAR/blocker#
+    .cms_screenblock {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 100;
+        color: white;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        background: rgba(black, 0.9);
+        background-color: black;
+    }
 
-.cms_screenblock .cms_screenblock-inner { margin-top:300px;
-	h1 { font-size:28px; line-height:30px; }
-	h1, p { color:$color-grey-20; text-align:center; }
-	a { color:white; }
-	a:hover { text-decoration:underline; }
-}
+    .cms_screenblock .cms_screenblock-inner {
+        margin-top: 300px;
+        h1 {
+            font-size: 28px;
+            line-height: 30px;
+        }
+        h1,
+        p {
+            color: $color-grey-20;
+            text-align: center;
+        }
+        a {
+            color: white;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    }
 
-// end of toolbar
+    // end of toolbar
 }
