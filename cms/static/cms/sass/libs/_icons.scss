@@ -32,8 +32,7 @@
 // #ICONS:start#
 // use unicode characters for accessibility reasons and use aria-hidden="true" for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
-<% _.each(glyphs, function(glyph) { %>
-    .cms-<%= glyph.fileName %>:before {
-        content: '\<%= glyph.codePoint %>';
-    }
+<% _.each(glyphs, function(glyph) { %>.cms-<%= glyph.fileName %>:before {
+    content: '\<%= glyph.codePoint %>';
+}
 <% }); %>
