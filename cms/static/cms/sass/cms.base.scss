@@ -5,7 +5,8 @@
 
 //##################################################
 // #IMPORT SETTINGS#
-@import "settings/default";
+@import "settings/all";
+@import "mixins/all";
 
 //##################################################
 // #RESET#
@@ -56,12 +57,12 @@
 
 //##################################################
 // #TOOLBAR#
-@import "includes/common";
-@import "includes/content";
-@import "includes/toolbar";
-@import "includes/modal";
-@import "includes/sideframe";
-@import "includes/clipboard";
-@import "includes/structureboard";
-@import "includes/subnav";
-@import "includes/retina";
+@import "components/common";
+@import "components/content";
+@import "components/toolbar";
+@import "components/modal";
+@import "components/sideframe";
+@import "components/clipboard";
+@import "components/structureboard";
+@import "components/subnav";
+@import "components/retina";
