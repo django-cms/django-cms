@@ -25,10 +25,10 @@
             margin: 0 0 2px;
         }
         .cms_clipboard-numbers a {
-            @include hide-text();
-            @include box-sizing(border-box);
+            @include hide-content();
             display: block;
             overflow: hidden;
+            box-sizing: border-box;
             width: 20px;
             height: 30px;
             border: 5px solid $color-grey-70;
@@ -48,7 +48,7 @@
         }
 
         .cms_clipboard-empty a {
-            @include hide-text();
+            @include hide-content();
             display: block;
             width: 20px;
             height: 20px;
@@ -107,7 +107,7 @@
             display: none !important;
         }
         .cms_draggable .cms_dragitem-text {
-            @include inline-block();
+            display: inline-block;
             overflow: hidden;
             width: 140px;
             height: 15px;

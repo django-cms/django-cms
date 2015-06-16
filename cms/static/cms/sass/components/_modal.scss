@@ -7,8 +7,6 @@
     //##################################################################################################################
     // #MODAL#
     .cms_modal {
-        @include box-shadow(0 0 20px rgba(0, 0, 0, 0.5));
-        @include transform(translateZ(0));
         display: none;
         position: fixed;
         top: 50%;
@@ -17,6 +15,8 @@
         z-index: 999999;
         border-radius: 5px;
         background: white;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        transform: translateZ(0);
 
         .cms_modal-body {
             position: relative;
@@ -69,7 +69,7 @@
         .cms_modal-collapse,
         .cms_modal-close,
         .cms_modal-maximize {
-            @include hide-text();
+            @include hide-content();
             display: block;
             position: absolute;
             top: 3px;
@@ -211,7 +211,7 @@
                 color: $color-grey;
             }
             .cms_modal-breadcrumb-title {
-                @include hide-text();
+                @include hide-content();
                 padding: 10px 20px 10px 15px;
                 border-right: 1px solid $color-grey-10;
                 border-radius: 0 0 0 5px;

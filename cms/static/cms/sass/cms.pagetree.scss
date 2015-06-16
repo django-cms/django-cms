@@ -6,7 +6,6 @@
 //######################################################################################################################
 // #IMPORT SETTINGS#
 @import "settings/all";
-@import "mixins/all";
 
 //######################################################################################################################
 // #PAGETREE#
@@ -338,7 +337,7 @@ $color-background-blue-hover: #e6f6fd;
         cursor: default;
         background: white;
         mark {
-            @include inline-block();
+            display: inline-block;
             font-weight: bold;
             font-style: normal;
             min-width: 100px;
@@ -414,7 +413,7 @@ $color-background-blue-hover: #e6f6fd;
         background: url("../img/pagetree/sprite.png") -40px -80px no-repeat !important;
     }
     li .col-language span {
-        @include inline-block();
+        display: inline-block;
         color: transparent;
         width: 12px !important;
         height: 12px !important;

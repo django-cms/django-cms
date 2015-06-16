@@ -24,7 +24,6 @@
     label,
     input,
     textarea {
-        @include transition(none);
         color: #222;
         font: normal 13px/20px Helvetica,Arial,sans-serif;
         text-align: left;
@@ -36,6 +35,7 @@
         outline: none;
         list-style-type: none;
         background: none;
+        transition: none;
     }
 }
 
@@ -85,7 +85,7 @@
     background: white;
 
     h1 {
-        margin: 0 0 15px; 
+        margin: 0 0 15px;
         padding: 0;
     }
     form {
