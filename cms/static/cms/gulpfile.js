@@ -6,6 +6,7 @@ var autoprefixer = require('gulp-autoprefixer');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var iconfont = require('gulp-iconfont');
+var iconfontCss = require('gulp-iconfont-css');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
@@ -46,9 +47,14 @@ gulp.task('sass', function () {
 
 gulp.task('icons', function () {
     gulp.src(PROJECT_PATTERNS.icons)
+    .pipe(iconfontCss({
+        fontName: 'django-cms-iconfont',
+        fontPath: '../fonts/',
+        path: PROJECT_PATH.sass + '/libs/_icons.scss',
+        targetPath: '../sass/components/_iconography.scss'
+    }))
     .pipe(iconfont({
-        fontName: 'django-cms-icons',
-        startUnicode: true
+        fontName: 'django-cms-iconfont'
     }))
     .on('glyphs', function(glyphs, options) {
         gutil.log.bind(glyphs, options);
