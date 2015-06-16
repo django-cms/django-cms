@@ -12,8 +12,6 @@
     //######################################################################################################################
     // #TOOLBAR#
     .cms_toolbar {
-        @include background-image($gradient-toolbar);
-        @include box-shadow(0 0 5px rgba(0, 0, 0, 0.2));
         display: none;
         position: fixed;
         top: 0;
@@ -24,8 +22,10 @@
         height: 30px;
         border-bottom: 1px solid $color-grey !important;
         background: rgba($color-grey-5, 0);
+        background: linear-gradient($gradient-toolbar);
         /* hack for ie9 */ background/**/: #fcfcfc;
         background-color: white;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 
         .cms_toolbar-left {
             position: relative;
@@ -113,7 +113,6 @@
         // hover effect
         .cms_toolbar-item-navigation-hover {
             ul {
-                @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
                 display: block;
                 position: absolute;
                 top: 30px;
@@ -123,8 +122,9 @@
                 border: 1px solid white;
                 border-top: none;
                 border-radius: 0 0 4px 4px;
-                background: rgba(white, 0.97);
                 background-color: white;
+                background: rgba(white, 0.97);
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
             }
             ul li {
                 float: none;
@@ -161,9 +161,9 @@
 
             // anchor hover
             > a {
-                @include background-image($gradient-blue);
                 color: white !important;
                 background: adjust-hue($color-blue, 15deg);
+                background: linear-gradient($gradient-blue);
             }
             > a span {
                 background-position: right -300px !important;
@@ -175,7 +175,8 @@
             }
         }
 
-        .cms_toolbar-item-navigation-break {@include hide-text();
+        .cms_toolbar-item-navigation-break {
+            @include hide-content();
             height: 1px;
             margin: 0 0 4px;
             padding: 0 0 3px;
@@ -184,14 +185,14 @@
 
         .cms_toolbar-item-navigation-disabled {
             a {
-                @include opacity(0.2);
                 cursor: default !important;
+                opacity: 0.2;
                 &:hover,
                 &:active,
                 &:focus {
-                    @include box-shadow(none);
                     color: black !important;
                     background: none !important;
+                    box-shadow: none;
                 }
             }
             ul {
@@ -273,7 +274,8 @@
     .cms_toolbar-item-logo {
         margin: 0 !important;
 
-        a {@include hide-text();
+        a {
+            @include hide-content();
             display: block;
             width: 92px;
             height: 20px;
@@ -296,12 +298,12 @@
             padding-left: 10px;
             cursor: pointer;
         }
-        label span {@include inline-block();
+        label span {
+            display: inline-block;
             padding-top: 1px;
         }
         input[type="text"],
         input[type="password"] {
-            @include box-shadow(0px 1px 0px white);
             color: $color-grey;
             font-size: 13px;
             line-height: 13px;
@@ -310,16 +312,15 @@
             padding: 3px 5px;
             border: 1px solid lighten($color-grey, 45%);
             border-radius: 3px;
+            box-shadow: 0px 1px 0px white;
 
             &:focus {
-                @include box-shadow(inset 0px 0px 2px $color-grey-10);
-                @include single-transition(outline 0.2s);
+                transition: outline 0.2s;
                 border-color: $color-blue;
+                box-shadow: inset 0px 0px 2px $color-grey-10;
             }
         }
         input[type="submit"] {
-            @include box-shadow(inset 0 1px 0 lighten($color-grey, 20%));
-            @include background-image($gradient-dark);
             display: block;
             color: white;
             font-size: 12px;
@@ -329,13 +330,15 @@
             border: 1px solid darken($color-grey, 20%);
             border-radius: 3px;
             cursor: pointer;
+            background: linear-gradient($gradient-dark);
             background-color: $color-grey;
+            box-shadow: inset 0 1px 0 lighten($color-grey, 20%);
 
             &:hover,
             &:active,
             &:focus {
-                @include box-shadow(none);
                 background: $color-grey-70;
+                box-shadow: none;
             }
             &:active,
             &:focus {
@@ -382,7 +385,7 @@
         border-left: 1px solid $color-grey;
 
         a {
-            @include hide-text();
+            @include hide-content();
             display: block;
             color: $color-grey-70;
             width: 30px;
