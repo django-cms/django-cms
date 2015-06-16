@@ -3,10 +3,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="-273 365 64 64" style="enable-background:new -273 365 64 64;" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#FFFFFF;}
-</style>
-<polygon class="st0" points="-268,424 -265,416 -260.1,421 "/>
-<path d="M-233,381v-16h-28l-12,12v36h24v16h40v-48H-233z M-261,370.7v6.3h-6.3L-261,370.7z M-269,409v-28h12v-12h20v12l-12,12v16
-	H-269z M-237,386.7v6.3h-6.3L-237,386.7z M-213,425h-32v-28h12v-12h20V425z"/>
+<path d="M-262.6,385.2v39.3c0,2.2,1.8,3.9,3.9,3.9h35.4c2.2,0,3.9-1.8,3.9-3.9v-39.3H-262.6z M-250.8,420.6h-3.9v-27.5h3.9V420.6z
+	 M-243,420.6h-3.9v-27.5h3.9V420.6z M-235.1,420.6h-3.9v-27.5h3.9V420.6z M-227.2,420.6h-3.9v-27.5h3.9V420.6z"/>
+<path d="M-218.4,373.4h-12.8v-4.9c0-1.6-1.4-2.9-2.9-2.9h-13.8c-1.7,0-2.9,1.4-2.9,2.9v4.9h-12.8c-1.6,0-2.9,1.4-2.9,2.9v4.9h51.1
+	v-4.9C-215.4,374.8-216.8,373.4-218.4,373.4z M-235.1,373.4h-11.8v-3.9h11.8V373.4z"/>
 </svg>
