@@ -30,7 +30,7 @@
 	{% for lang_code, lang_name in language_tabs %}
 		<input type="button" onclick="CMS.API.changeLanguage('./?language={{lang_code}}');"
 			class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
-			id="debutton" name="{{lang_code}}" value="{{lang_name}}" />
+			id="{{lang_code}}button" name="{{lang_code}}" value="{{lang_name}}" />
 	{% endfor %}
 	<div class="lang_tabs_line"></div>
 </div>

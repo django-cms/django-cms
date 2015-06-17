@@ -25,7 +25,7 @@
 
 	{% if plugin.get_plugin_class.allow_children %}<div class="cms_draggables">{% endif %}
 	{% if plugin.get_plugin_class.allow_children and plugin.num_children == 0 %}
-		{# <div class="cms_reset cms_draggable cms_draggable-empty"><div class="cms_dragitem">{% trans "Drop a plugin here" %}</div></div> #}
+		{# <div class="cms-reset cms_draggable cms_draggable-empty"><div class="cms_dragitem">{% trans "Drop a plugin here" %}</div></div> #}
 	{% endif %}
 	{% if plugin.child_plugin_instances %}
 		{% for child in plugin.child_plugin_instances %}
