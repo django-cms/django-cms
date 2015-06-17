@@ -202,6 +202,9 @@
             .cms_modal-breadcrumb-last {
                 cursor: default;
                 color: $color-blue;
+                &:hover {
+                    color: $color-blue;
+                }
             }
         }
 
