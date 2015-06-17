@@ -35,7 +35,9 @@ gulp.task('sass', function () {
     gulp.src(PROJECT_PATTERNS.sass)
         .pipe(sourcemaps.init())
         .pipe(sass())
-        .on('error', gutil.log.bind(console))
+        .on('error', function (error) {
+            gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
+        })
         .pipe(autoprefixer({
             browsers: ['last 3 versions'],
             cascade: false
