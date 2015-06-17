@@ -1,3 +1,5 @@
 <li class="{% if active %}cms_toolbar-item-navigation-active{% endif %}{% if disabled %} cms_toolbar-item-navigation-disabled{% endif %} {{ extra_classes|join:' ' }}">
-	<a href="{{ url }}" data-rel="modal"{% if on_close %} data-on-close="{{ on_close }}"{% endif %}><span>{{ name }}</span></a>
+	<a href="{{ url }}" data-rel="modal"{% if on_close %} data-on-close="{{ on_close }}"{% endif %}>
+	    <span>{{ name }}<span class="cms-icon cms-icon-arrow"></span></span>
+    </a>
 </li>

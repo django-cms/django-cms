@@ -120,6 +120,14 @@
             font-weight: 800;
             line-height: 12px;
         }
+        .cms-icon {
+            display: none;
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            font-size: 10px;
+            transform: rotate(180deg);
+        }
 
         // hover effect
         .cms_toolbar-item-navigation-hover {
@@ -129,7 +137,7 @@
                 top: 30px;
                 left: 0;
                 min-width: 180px;
-                padding: 4px 0;
+                padding: 3px 0;
                 border: 1px solid white;
                 border-top: none;
                 border-radius: 0 0 4px 4px;
@@ -158,7 +166,7 @@
             .cms_toolbar-item-navigation-children {
                 ul {
                     display: none;
-                    top: -5px;
+                    top: -4px;
                     left: 100%;
                 }
                 > a {
@@ -166,7 +174,9 @@
                 }
                 > a span {
                     display: block;
-                    background: url("../img/toolbar/sprite_toolbar.png") no-repeat right -270px;
+                    .cms-icon {
+                        display: block;
+                    }
                 }
             }
 
