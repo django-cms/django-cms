@@ -288,8 +288,6 @@ on change::
 
     cd cms/static/cms && gulp
 
-
-
 Icons
 -----
 
