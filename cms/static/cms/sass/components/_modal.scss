@@ -196,11 +196,18 @@
                 color: $color-grey;
             }
             .cms_modal-breadcrumb-title {
-                font-size: 20px;
+                font-size: 15px;
                 color: $color-grey-20;
-                padding: 10px 20px 10px 15px;
+                text-align: center;
+                width: 36px;
+                height: 32px;
                 border-right: 1px solid $color-grey-10;
                 border-radius: 0 0 0 5px;
+                background: white;
+                &:before {
+                    position: relative;
+                    top: 8px;
+                }
             }
 
             a:hover {
