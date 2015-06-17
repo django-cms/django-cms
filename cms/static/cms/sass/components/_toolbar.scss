@@ -296,16 +296,23 @@
         margin: 0 !important;
 
         a {
-            @include hide-content();
-            display: block;
-            width: 92px;
+            @extend .cms-icon;
+            @extend .cms-icon-logo;
+            font-size: 21px;
+            line-height: 21px;
+            width: 90px;
             height: 20px;
-            margin: 5px 0;
-            background: url("../img/toolbar/sprite_toolbar.png") no-repeat left top;
+            margin: 4px 0;
+            transition: color $base-speed;
+
+            span {
+                display: none;
+            }
+
             &:hover,
             &:active,
             &:focus {
-                background-position: left -20px;
+                color: $color-blue;
             }
         }
     }
