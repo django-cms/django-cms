@@ -567,8 +567,8 @@ $(document).ready(function () {
 					}
 				}
 
-				// bind arrow up keys
-				if(e.keyCode === 38) {
+				// bind arrow up and shift+tab keys
+				if(e.keyCode === 38 || (e.keyCode === 9 && e.shiftKey)) {
 					e.preventDefault();
 					if(anchors.is(':focus')) {
 						anchors.eq(index - 1).focus();
