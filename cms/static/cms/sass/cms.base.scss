@@ -38,33 +38,6 @@
         transition: none;
     }
 }
-
-//##################################################
-// #DIALOG#
-// used in: /cms/admin/page/tree/copy_premissions
-.cms_dialog {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 99999;
-    width: 500px;
-    height: 200px;
-    margin: -100px 0 0 -275px;
-    padding: 25px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: white;
-
-    h1 {
-        margin: 0 0 15px;
-        padding: 0;
-    }
-    form {
-        margin: 15px 0;
-        padding: 15px 0;
-        border-top: 1px solid #f3f3f3;
-    }
-}
 // removed as of: //github.com/divio/django-cms/issues/2476
 // #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
 
@@ -75,6 +48,7 @@
 @import "components/content";
 @import "components/toolbar";
 @import "components/modal";
+@import "components/dialog";
 @import "components/sideframe";
 @import "components/clipboard";
 @import "components/structureboard";
