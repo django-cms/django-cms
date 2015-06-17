@@ -79,9 +79,20 @@
             left: 0;
             z-index: 99999999;
             width: 100%;
-            height: 4px;
+            height: 5px;
             border-bottom: 1px solid #ddd;
-            background: #fdffc8 url("../img/toolbar/sprite_toolbar.png") repeat-x left -444px;
+            background-color: #fcd200;
+            background-image: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, .8) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, .8) 50%,
+                rgba(255, 255, 255, .8) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 10px 10px;
         }
     }
     &.cms_toolbar-debug #container {
