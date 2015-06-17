@@ -263,7 +263,7 @@ contribute. All changes there will be automatically sent to the project.
 Frontend
 ********
 
-We are using `SASS <http://sass-lang.com/>`_ for our styles. The files
+We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
 are located within ``cms/static/cms/sass`` and can be compiled using the `libsass
 <http://libsass.org/>`_ implementation of Sass compiler through `Gulp
 <http://gulpjs.com/>`_.
@@ -273,7 +273,7 @@ root::
 
 	cd cms/static/cms && gulp sass
 
-While developing it is also possible to run a watcher that compiles sass files
+While developing it is also possible to run a watcher that compiles Sass files
 on change::
 
 	cd cms/static/cms && gulp
