@@ -9,40 +9,8 @@
 @import "mixins/all";
 
 //##################################################
-// #RESET#
-.cms-reset {
-    div,
-    p,
-    a,
-    a:hover,
-    a:active,
-    a:focus,
-    ul,
-    li,
-    form,
-    fieldset,
-    label,
-    input,
-    textarea {
-        color: #222;
-        font: normal 13px/20px Helvetica,Arial,sans-serif;
-        text-align: left;
-        text-decoration: none;
-        height: auto;
-        margin: 0;
-        padding: 0;
-        border: none;
-        outline: none;
-        list-style-type: none;
-        background: none;
-        transition: none;
-    }
-}
-// removed as of: //github.com/divio/django-cms/issues/2476
-// #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
-
-//##################################################
-// #TOOLBAR#
+// #IMPORT COMPONENTS#
+@import "components/reset";
 @import "components/iconography";
 @import "components/common";
 @import "components/content";
@@ -54,3 +22,8 @@
 @import "components/structureboard";
 @import "components/subnav";
 @import "components/retina";
+
+//##################################################
+// DJANGO DEBUG TOOLBAR FIX
+// removed as of: //github.com/divio/django-cms/issues/2476
+// #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
