@@ -73,7 +73,7 @@
         .cms_sideframe-maximize {
             cursor: pointer;
             font-size: 8px;
-            color: $color-grey-20;
+            color: $color-grey-10;
             text-align: center;
             width: 20px;
             height: 20px;
@@ -102,12 +102,12 @@
         }
 
         .cms_sideframe-hidden span {
-            color: white;
+            color: $color-blue;
             transform: rotate(180deg);
         }
 
         .cms_sideframe-minimize span {
-            color: white;
+            color: $color-blue;
         }
     }
 
