@@ -1,6 +1,6 @@
 @charset "utf-8";
 /*!
- * @copyright:	https://github.com/divio/django-cms
+ * @copyright: https://github.com/divio/django-cms
  */
 
 #cms_toolbar {
@@ -68,57 +68,46 @@
             right: -20px;
             z-index: 40;
         }
-        .cms_sideframe-btn {
-            div {
-                width: 20px;
-                height: 20px;
-                margin-bottom: 2px;
-                border-radius: 0 3px 3px 0;
-                cursor: pointer;
-                background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat;
-            }
-            div:hover {
+        .cms_sideframe-close,
+        .cms_sideframe-hide,
+        .cms_sideframe-maximize {
+            cursor: pointer;
+            font-size: 8px;
+            color: $color-grey-10;
+            text-align: center;
+            width: 20px;
+            height: 20px;
+            margin-bottom: 2px;
+            border-radius: 0 3px 3px 0;
+            background: $color-grey-70;
+
+            &:hover {
+                color: white;
                 background-color: $color-grey-90;
             }
 
-            .cms_sideframe-close {
-                background-position: -80px -90px;
+            span {
+                position: relative;
+                top: 2px;
             }
-            .cms_sideframe-close:hover {
-                background-position: -100px -90px;
-            }
-            .cms_sideframe-hide {
-                height: 30px;
-                border: none !important;
-                background-position: -101px -144px;
-            }
-            .cms_sideframe-hide:hover {
-                background-position: -121px -144px;
-            }
-            .cms_sideframe-hidden {
-                background-position: -60px -144px;
-            }
-            .cms_sideframe-hidden:hover {
-                background-position: -80px -144px;
-            }
-            .cms_sideframe-maximize {
-                background-position: -40px -91px;
-            }
-            .cms_sideframe-maximize:hover {
-                background-position: -60px -91px;
-            }
-            .cms_sideframe-minimize {
-                background-position: -61px -111px;
-            }
-            .cms_sideframe-minimize:hover {
-                background-position: -61px -91px;
-            }
+        }
 
-            .cms_sideframe-hide {
-                border: 5px solid $color-grey-70;
-                border-right: none;
-                border-left: none;
+        .cms_sideframe-hide {
+            font-size: 10px;
+            height: 30px;
+            border: none;
+            span {
+                top: 6px;
             }
+        }
+
+        .cms_sideframe-hidden span {
+            color: $color-blue;
+            transform: rotate(180deg);
+        }
+
+        .cms_sideframe-minimize span {
+            color: $color-blue;
         }
     }
 
