@@ -196,11 +196,11 @@
                 color: $color-grey;
             }
             .cms_modal-breadcrumb-title {
-                @include hide-content();
+                font-size: 20px;
+                color: $color-grey-20;
                 padding: 10px 20px 10px 15px;
                 border-right: 1px solid $color-grey-10;
                 border-radius: 0 0 0 5px;
-                background: white url("../img/toolbar/sprite_toolbar.png") no-repeat -133px -84px;
             }
 
             a:hover {
@@ -213,7 +213,8 @@
             }
 
             .cms_modal-breadcrumb-last {
-                cursor: default; span {
+                cursor: default;
+                span {
                     color: $color-blue;
                 }
             }
