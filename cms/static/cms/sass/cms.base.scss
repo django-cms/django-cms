@@ -94,14 +94,6 @@
         border-top: 1px solid #f3f3f3;
     }
 }
-
-//##################################################
-// #GLOBALS#
-.cms_toolbar-noscroll {
-    position: fixed;
-    overflow-y: scroll;
-    width: 100%;
-}
 // removed as of: //github.com/divio/django-cms/issues/2476
 // #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
 
