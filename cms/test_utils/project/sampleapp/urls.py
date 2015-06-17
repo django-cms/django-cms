@@ -3,6 +3,9 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import views
 
+"""
+Also used in cms.tests.ApphooksTestCase
+"""
 urlpatterns = [
     url(r'^$', views.sample_view, {'message': 'sample root page',}, name='sample-root'),
     url(r'^exempt/$', views.exempt_view, {'message': 'sample root page',}, name='sample-exempt'),
@@ -13,5 +16,7 @@ urlpatterns = [
     url(r'^category/(?P<id>[0-9]+)/$', views.category_view, name='category_view'),
     url(r'^notfound/$', views.notfound, name='notfound'),
     url(r'^extra_1/$', views.extra_view, {'message': 'test urlconf'}, name='extra_first'),
+    url(r'^class-view/$', views.ClassView(), name='sample-class-view'),
+    url(r'^class-based-view/$', views.ClassBasedView.as_view(), name='sample-class-based-view'),
     url(r'^', include('cms.test_utils.project.sampleapp.urls_extra'), {'opts': 'someopts'}),
 ]

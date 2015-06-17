@@ -361,7 +361,11 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
-==== 3.1 (unreleased) ===
+=== 3.0.14 (XXXX-XX-XX) ===
+
+- Fixed an issue related to "Empty all" Placeholder feature
+
+=== 3.1 (2015-04-20) ===
 
 - Remove django-mptt in favor of django-treebeard
 - Remove compatibility with Django 1.4 / 1.5
@@ -375,3 +379,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Add templatetag render_plugin_block
 - Add templatetag render_model_add_block
 - Add "Structure mode" permission
+
+=== 3.1.1 (XXXX-XX-XX) ===
+
+- Add Django 1.8 support

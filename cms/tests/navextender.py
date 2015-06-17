@@ -29,7 +29,7 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         # at least be marking it as not _expanded.
         menu_pool.menus = {
             'CMSMenu': self.old_menu['CMSMenu'],
-            'TestMenu': TestMenu()
+            'TestMenu': TestMenu
         }
         menu_pool._expanded = False
 

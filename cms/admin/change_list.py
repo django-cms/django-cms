@@ -51,7 +51,7 @@ class CMSChangeList(ChangeList):
         super(CMSChangeList, self).__init__(request, *args, **kwargs)
         try:
             self.queryset = self.get_queryset(request)
-        except:
+        except:  # pragma: no cover
             raise
         self.get_results(request)
 
@@ -78,7 +78,7 @@ class CMSChangeList(ChangeList):
 
     def is_filtered(self):
         from cms.utils.helpers import SITE_VAR
-        lookup_params = self.params.copy() # a dictionary of the query string
+        lookup_params = self.params.copy()  # a dictionary of the query string
         for i in (ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, SITE_VAR, 'language', 'page_id'):
             if i in lookup_params:
                 del lookup_params[i]
@@ -90,9 +90,9 @@ class CMSChangeList(ChangeList):
         if self.real_queryset:
             super(CMSChangeList, self).get_results(request)
             if not self.is_filtered():
-                self.full_result_count = self.result_count = self.root_queryset.count()
+                self.full_result_count = self.result_count = self.root_queryset.drafts().count()
             else:
-                self.full_result_count = self.root_queryset.count()
+                self.full_result_count = self.root_queryset.drafts().count()
 
     def set_items(self, request):
         site = self.current_site()

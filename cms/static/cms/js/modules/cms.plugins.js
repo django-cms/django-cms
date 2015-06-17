@@ -546,7 +546,6 @@ $(document).ready(function () {
 				});
 
 				// show scrollHint for FF on OSX
-				window.console.log(nav[0], nav[0].scrollHeight);
 				if(nav[0].scrollHeight > 245) scrollHint.show();
 
 			}, 100);
@@ -568,8 +567,8 @@ $(document).ready(function () {
 					}
 				}
 
-				// bind arrow up keys
-				if(e.keyCode === 38) {
+				// bind arrow up and shift+tab keys
+				if(e.keyCode === 38 || (e.keyCode === 9 && e.shiftKey)) {
 					e.preventDefault();
 					if(anchors.is(':focus')) {
 						anchors.eq(index - 1).focus();
@@ -694,9 +693,24 @@ $(document).ready(function () {
 				if(el.hasClass('cms_dragitem-expanded')) {
 					settings.states.splice($.inArray(id, settings.states), 1);
 					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
+					if ($(document).data('expandmode')) {
+						var items = draggable.find('.cms_draggable').find('.cms_dragitem-collapsable');
+						if(!items.length) return false;
+						items.each(function () {
+							if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+						});
+					}
+
 				} else {
 					settings.states.push(id);
 					el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
+					if ($(document).data('expandmode')) {
+						var items = draggable.find('.cms_draggable').find('.cms_dragitem-collapsable');
+						if(!items.length) return false;
+						items.each(function () {
+							if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+						});
+					}
 				}
 
 				// make sure structurboard gets updated after expanding

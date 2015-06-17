@@ -6,7 +6,7 @@ from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import clear_url_caches, reverse
+from django.core.urlresolvers import clear_url_caches, reverse, resolve
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.timezone import now
@@ -139,12 +139,11 @@ class ApphooksTestCase(CMSTestCase):
         apphook_pool.clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
-        self.assertEqual(len(hooks), 4)
+        self.assertEqual(len(hooks), 6)
         self.assertIn(NS_APP_NAME, app_names)
         self.assertIn(APP_NAME, app_names)
         apphook_pool.clear()
 
-    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
     def test_apphook_on_root(self):
         apphook_pool.clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
@@ -231,6 +230,21 @@ class ApphooksTestCase(CMSTestCase):
         apphook_pool.clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
+    def test_apphook_permissions_preserves_view_name(self):
+            self.create_base_structure(APP_NAME, ['en', 'de'])
+
+            view_names = (
+                ('sample-settings', 'sample_view'),
+                ('sample-class-view', 'ClassView'),
+                ('sample-class-based-view', 'ClassBasedView'),
+            )
+
+            with force_language("en"):
+                for url_name, view_name in view_names:
+                    path = reverse(url_name)
+                    match = resolve(path)
+                    self.assertEqual(match.func.__name__, view_name)
+
     def test_apphooks_with_excluded_permissions(self):
         en_title = self.create_base_structure('SampleAppWithExcludedPermissions', 'en')
 
@@ -648,6 +662,34 @@ class ApphooksTestCase(CMSTestCase):
                 # parameters - non page object
                 response = self.client.post(url, {'pk': ex1.pk, 'model': 'placeholderapp.example1'})
                 self.assertEqual(response.content.decode('utf-8'), ex1.get_absolute_url())
+
+    def test_nested_apphooks_urls(self):
+        # make sure that urlparams actually reach the apphook views
+        with self.settings(ROOT_URLCONF='cms.test_utils.project.urls'):
+            apphook_pool.clear()
+
+            superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+            create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
+            parent_page = create_page("parent-apphook-page", "nav_playground.html", "en",
+                                      created_by=superuser, published=True, apphook="ParentApp")
+            create_page("child-apphook-page", "nav_playground.html", "en", parent=parent_page,
+                        created_by=superuser, published=True, apphook="ChildApp")
+
+            parent_app_path = reverse('parentapp_view', kwargs={'path': 'parent/path/'})
+            child_app_path = reverse('childapp_view', kwargs={'path': 'child-path/'})
+
+            # Ensure the page structure is ok before getting responses
+            self.assertEqual(parent_app_path, '/en/parent-apphook-page/parent/path/')
+            self.assertEqual(child_app_path, '/en/parent-apphook-page/child-apphook-page/child-path/')
+
+            # Get responses for both paths and ensure that the right view will answer
+            response = self.client.get(parent_app_path)
+            self.assertContains(response, 'parent app content', status_code=200)
+
+            response = self.client.get(child_app_path)
+            self.assertContains(response, 'child app content', status_code=200)
+
+            apphook_pool.clear()
 
 
 class ApphooksPageLanguageUrlTestCase(CMSTestCase):

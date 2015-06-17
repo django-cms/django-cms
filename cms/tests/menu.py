@@ -95,8 +95,6 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         menu_pool.discover_menus()
 
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
-            request = self.get_request('/')
-
             page = create_page("apphooked-page", "nav_playground.html", "en",
                                published=True, apphook="SampleApp",
                                navigation_extenders='StaticMenu')
@@ -104,14 +102,10 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             menu_pool._expanded = False
             self.assertFalse(menu_pool._expanded)
             self.assertTrue(menu_pool.discovered)
-            menu_pool.get_nodes(request)
+            menu_pool._expand_menus()
 
             self.assertTrue(menu_pool._expanded)
             self.assertTrue(menu_pool.discovered)
-            menu_pool.get_nodes(request)
-
-            self.assertTrue(menu_pool._expanded)
-
             # Counts the number of StaticMenu (which is expanded) and StaticMenu2
             # (which is not) and checks the keyname for the StaticMenu instances
             static_menus = 2
@@ -127,6 +121,20 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             self.assertEqual(static_menus, 0)
             self.assertEqual(static_menus_2, 0)
 
+    def test_multiple_menus(self):
+        with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True, apphook="SampleApp2")
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True,
+                        navigation_extenders='StaticMenu')
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True, apphook="NamespacedApp", apphook_namespace='whatever',
+                        navigation_extenders='StaticMenu')
+            menu_pool._expanded = False
+            menu_pool._expand_menus()
+
+            self.assertEqual(len(menu_pool.get_menus_by_attribute("cms_enabled", True)), 2)
 
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """
@@ -913,6 +921,107 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         self.assertEqual(len(children), 1, repr(children))
         child = children[0]
         self.assertEqual(child.id, c.publisher_public.id)
+
+    def test_menu_beyond_soft_root(self):
+        """
+        Test for issue 4107
+
+        Build the following tree:
+
+            A
+            |-B (soft_root)
+              |-C
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        a = create_page('A', reverse_id='a', **stdkwargs)
+        b = create_page('B', parent=a, soft_root=True, **stdkwargs)
+        c = create_page('C', parent=b, **stdkwargs)
+
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        a_node = nodes[0]
+        self.assertEqual(a_node.id, a.publisher_public.pk)  # On A, show from A
+        self.assertEqual(len(a_node.children), 1)
+        b_node = a_node.children[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(b.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On B, show from B
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(c.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On C, show from B
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On A, show from B (since below A)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(b.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On B, show from B (since below A)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(c.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On C, show from B (since below A)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
 
     def test_not_in_navigation_num_queries(self):
         """
