@@ -100,7 +100,7 @@ HTML, CSS and JavaScript
 As of django CMS 3.2, we are using the same guidelines as described in `Aldryn
 Boilerplate`_
 
-Frontend code should be formatted for readability.  If in doubt, follow existing
+Frontend code should be formatted for readability. If in doubt, follow existing
 examples, or ask.
 
 Process
@@ -263,27 +263,48 @@ contribute. All changes there will be automatically sent to the project.
 Frontend
 ********
 
+In order to be able to work with the frontend tooling contributing to the
+django CMS you need to have the following dependencies installed:
+
+    1. `Node <https://nodejs.org/>`_ (will install npm as well).
+    2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
+    3. Local dependencies ``cd cms/static/cms && npm install``
+
+Styles
+------
+
 We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
-are located within ``cms/static/cms/sass`` and can be compiled using the `libsass
-<http://libsass.org/>`_ implementation of Sass compiler through `Gulp
-<http://gulpjs.com/>`_.
+are located within ``cms/static/cms/sass`` and can be compiled using the
+`libsass <http://libsass.org/>`_ implementation of Sass compiler through
+`Gulp <http://gulpjs.com/>`_.
 
 In order to compile the stylesheets you need to run this command from the repo
 root::
 
-	cd cms/static/cms && gulp sass
+    cd cms/static/cms && gulp sass
 
 While developing it is also possible to run a watcher that compiles Sass files
 on change::
 
-	cd cms/static/cms && gulp
+    cd cms/static/cms && gulp
 
-In order to be able to run ``gulp sass`` you need to have all the dependencies
-installed:
 
-	1. `Node <https://nodejs.org/>`_ (will install npm as well).
-	2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
-	3. Local dependencies ``cd cms/static/cms && npm install``
+
+Icons
+-----
+
+We are using `gulp-iconfont <https://github.com/backflip/gulp-iconfont>`_ to
+generate icon webfonts into ``cms/static/cms/fonts/``. This generates
+``_iconography.scss`` within ``cms/static/cms/sass/components`` which ultimately
+compiles to css.
+
+In order to compile the webfont you need to run::
+
+    cd cms/static/cms && gulp icons
+
+This simply takes all SVG's within ``cms/static/cms/fonts/src`` and embeds them
+into the webfont. All classes will be automatically added to
+``_iconography.scss``.
 
 
 
