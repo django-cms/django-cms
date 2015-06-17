@@ -40,35 +40,6 @@
 }
 
 //##################################################
-// #TABS#
-// used in: /cms/admin/page/change_form
-#page_form_lang_tabs {
-    position: relative;
-
-    input.language_button {
-        background: #ccc;
-    }
-    input.selected {
-        color: black;
-        text-shadow: none;
-        background: white;
-    }
-    input.notfilled {
-        color: #bbb;
-        background: none;
-    }
-
-    .lang_tabs_line {
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        width: 100%;
-        height: 5px;
-        background: white;
-    }
-}
-
-//##################################################
 // #DOALOG#
 // used in: /cms/admin/page/tree/copy_premissions
 .cms_dialog {
