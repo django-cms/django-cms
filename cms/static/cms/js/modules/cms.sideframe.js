@@ -114,7 +114,7 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
 				// remove loader
-				that.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
+				that.sideframe.find('.cms_sideframe-frame').removeClass('cms-loader');
 				// than show
 				iframe.show();
 
@@ -161,7 +161,7 @@ $(document).ready(function () {
 
 			function insertHolder(iframe) {
 				// show iframe after animation
-				that.sideframe.find('.cms_sideframe-frame').addClass('cms_loader');
+				that.sideframe.find('.cms_sideframe-frame').addClass('cms-loader');
 				holder.html(iframe);
 			}
 		},
@@ -192,7 +192,7 @@ $(document).ready(function () {
 		_show: function (width, animate) {
 			// add class
 			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
-			
+
 			// make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
 			this.sideframe.show();
 
@@ -238,7 +238,7 @@ $(document).ready(function () {
 				if(close) $(this).hide();
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
-			this.sideframe.find('.cms_sideframe-frame').removeClass('cms_loader');
+			this.sideframe.find('.cms_sideframe-frame').removeClass('cms-loader');
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {

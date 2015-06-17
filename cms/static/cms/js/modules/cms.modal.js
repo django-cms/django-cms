@@ -142,7 +142,7 @@ $(document).ready(function () {
 				'width': width,
 				'height': height
 			});
-			this.modal.find('.cms_modal-body').removeClass('cms_loader');
+			this.modal.find('.cms_modal-body').removeClass('cms-loader');
 			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
 			this.maximized = false;
 			// in case, the window is larger than the windows height, we trigger fullscreen mode
@@ -232,7 +232,7 @@ $(document).ready(function () {
 		_hide: function (speed) {
 			this.modal.fadeOut(speed);
 			this.modal.find('.cms_modal-frame iframe').remove();
-			this.modal.find('.cms_modal-body').removeClass('cms_loader');
+			this.modal.find('.cms_modal-body').removeClass('cms-loader');
 		},
 
 		_minimize: function () {
@@ -613,7 +613,7 @@ $(document).ready(function () {
 
 			// inject
 			setTimeout(function () {
-				that.modal.find('.cms_modal-body').addClass('cms_loader');
+				that.modal.find('.cms_modal-body').addClass('cms-loader');
 				holder.html(iframe);
 			}, this.options.modalDuration);
 		},
