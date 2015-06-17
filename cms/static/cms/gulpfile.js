@@ -50,7 +50,7 @@ gulp.task('icons', function () {
     .pipe(iconfontCss({
         fontName: 'django-cms-iconfont',
         fontPath: '../fonts/',
-        path: PROJECT_PATH.sass + '/libs/_icons.scss',
+        path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
         targetPath: '../sass/components/_iconography.scss'
     }))
     .pipe(iconfont({

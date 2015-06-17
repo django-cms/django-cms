@@ -385,30 +385,32 @@
         border-left: 1px solid $color-grey;
 
         a {
-            @include hide-content();
             display: block;
-            color: $color-grey-70;
             width: 30px;
             height: 29px;
+            text-align: center;
             border-top: 1px solid white;
             border-left: 1px solid white;
-            background: $color-grey-5 url("../img/toolbar/sprite_toolbar.png") no-repeat -60px -40px;
-            &:hover,
-            &:active,
-            &:focus {
+            background: $color-grey-5;
+            &:hover span,
+            &:active span,
+            &:focus span {
+                color: $color-grey-90;
                 background-color: white;
-                background-position: -90px -40px;
+            }
+            span {
+                font-size: 10px;
+                color: $color-grey-70;
+                margin: 8px 0 0 -2px;
+                transition: all $base-speed;
+                transform: rotate(270deg);
             }
         }
     }
     // #TOOLBAR/elements/loader#
-    .cms_toolbar-trigger-expanded a {
-        background-position: 0 -40px;
-        &:hover,
-        &:active,
-        &:focus {
-            background-position: -30px -40px;
-        }
+    .cms_toolbar-trigger-expanded a span {
+        margin-top: 9px;
+        transform: rotate(90deg);
     }
     .cms_toolbar-loader a {
         background: #fcfcfc url("../img/loader.gif") no-repeat center center !important;
