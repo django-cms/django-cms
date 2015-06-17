@@ -486,11 +486,11 @@ $(document).ready(function () {
 
 				// create helper variables
 				var title = item.attr('value') || item.text();
-				var cls = 'cms_btn';
+				var cls = 'cms-btn';
 
 				// set additional special css classes
-				if(item.hasClass('default')) cls = 'cms_btn cms_btn-action';
-				if(item.hasClass('deletelink')) cls = 'cms_btn cms_btn-caution';
+				if(item.hasClass('default')) cls = 'cms-btn cms-btn-action';
+				if(item.hasClass('deletelink')) cls = 'cms-btn cms-btn-caution';
 
 				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
@@ -515,7 +515,7 @@ $(document).ready(function () {
 			});
 
 			// manually add cancel button at the end
-			var cancel = $('<div class="cms_btn">'+that.config.lang.cancel+'</div>');
+			var cancel = $('<div class="cms-btn">'+that.config.lang.cancel+'</div>');
 				cancel.bind(that.click, function () {
 					that.options.onClose = false;
 					that.close();

@@ -127,7 +127,7 @@ $(document).ready(function () {
 
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
-				modes.removeClass('cms_btn-active').eq(0).addClass('cms_btn-active');
+				modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
 
 			// show clipboard
 			this.clipboard.css('opacity', 1).fadeIn(this.options.speed);
@@ -149,7 +149,7 @@ $(document).ready(function () {
 
 			// set active item
 			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
-				modes.removeClass('cms_btn-active').eq(1).addClass('cms_btn-active');
+				modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
 
 			// hide clipboard if in edit mode
 			this.container.find('.cms_clipboard').hide();
