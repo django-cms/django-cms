@@ -1,4 +1,4 @@
-@media print, (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 1.25dppx) {
+@include print-and-retina() {
     //######################################################################################################################
     // #RETINA#
 
@@ -21,12 +21,6 @@
         background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
         background-size: 190px !important;
     }
-
-    #cms_toolbar .cms-loader {
-        background-image: url("../img/loader@2x.gif") !important;
-        background-size: 32px !important;
-    }
-
 
     // #RETINA PLACEHOLDER#
     .cms_submenu,
