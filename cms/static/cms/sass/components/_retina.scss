@@ -1,7 +1,6 @@
+//######################################################################################################################
+// #RETINA#
 @include print-and-retina() {
-    //######################################################################################################################
-    // #RETINA#
-
     // #RETINA TOOLBAR#
     .cms_toolbar-item-navigation-children > a span,
     .cms_sideframe-btn div,
@@ -15,7 +14,6 @@
     .cms_modal-breadcrumb a,
     .cms_modal-breadcrumb-title,
     .cms_toolbar-item-logo a,
-    .cms_tooltip,
     .cms_placeholders-menu,
     .cms_toolbar-debug .cms_debug-bar {
         background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
