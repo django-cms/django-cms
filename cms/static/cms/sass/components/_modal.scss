@@ -69,54 +69,38 @@
         .cms_modal-collapse,
         .cms_modal-close,
         .cms_modal-maximize {
-            @include hide-content();
             display: block;
             position: absolute;
+            font-size: 8px;
             top: 3px;
             right: 3px;
+            color: $color-grey-20;
+            text-align: center;
             width: 20px;
             height: 20px;
             cursor: pointer;
-            background: url("../img/toolbar/sprite_toolbar.png") no-repeat left top;
+            &:before {
+                position: relative;
+                top: 7px;
+            }
+            &:hover,
+            &:active,
+            &:focus {
+                color: $color-blue;
+            }
         }
         .cms_modal-collapse {
             right: 40px;
-            background-position: 0 -70px;
         }
-        .cms_modal-collapse:hover,
-        .cms_modal-collapse:active,
-        .cms_modal-collapse:focus {
-            background-position: -20px -70px;
+        .cms_modal-maximize {
+            right: 21px;
         }
         .cms_modal-collapsed {
-            background-position: -100px -70px;
-        }
-        .cms_modal-collapsed:hover,
-        .cms_modal-collapsed:active,
-        .cms_modal-collapsed:focus {
-            background-position: -100px -70px;
-        }
-
-        .cms_modal-maximize {
-            right: 22px;
-            background-position: 0 -90px;
-        }
-        .cms_modal-maximize:hover,
-        .cms_modal-maximize:active,
-        .cms_modal-maximize:focus {
-            background-position: -20px -90px;
+            @extend .cms-icon-plus;
+            color: $color-blue;
         }
         .cms_modal-maximize-active {
-            background-position: -20px -90px !important;
-        }
-
-        .cms_modal-close {
-            background-position: -40px -70px;
-        }
-        .cms_modal-close:hover,
-        .cms_modal-close:active,
-        .cms_modal-close:focus {
-            background-position: -60px -70px;
+            color: $color-blue;
         }
 
         .cms_modal-resize {
@@ -124,12 +108,13 @@
             right: 0;
             bottom: 0;
             z-index: 102;
+            font-size: 10px;
+            color: $color-grey-20;
             width: 20px;
             height: 20px;
             cursor: nw-resize;
-            background: url("../img/toolbar/sprite_toolbar.png") no-repeat -117px -67px;
-            &:hover {
-                background-position: -137px -67px;
+            span {
+                margin: 6px 0 0 6px;
             }
         }
 
