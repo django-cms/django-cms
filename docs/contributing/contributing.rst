@@ -294,17 +294,17 @@ Icons
 -----
 
 We are using `gulp-iconfont <https://github.com/backflip/gulp-iconfont>`_ to
-generate icon webfonts into ``cms/static/cms/fonts/``. This generates
-``_iconography.scss`` within ``cms/static/cms/sass/components`` which ultimately
-compiles to css.
+generate icon webfonts into ``cms/static/cms/fonts/``. This also creates
+``_iconography.scss`` within ``cms/static/cms/sass/components`` which adds all
+the icon classes and ultimately compiles to css.
 
 In order to compile the webfont you need to run::
 
     cd cms/static/cms && gulp icons
 
-This simply takes all SVG's within ``cms/static/cms/fonts/src`` and embeds them
+This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
 into the webfont. All classes will be automatically added to
-``_iconography.scss``.
+``_iconography.scss`` as previously mentioned.
 
 
 
