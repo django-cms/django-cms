@@ -1,12 +1,7 @@
-@charset "utf-8";
-/*!
- * @copyright: https://github.com/divio/django-cms
- */
-
 #cms_toolbar {
     //##################################################################################################################
     // #MODAL#
-    .cms_modal {
+    .cms-modal {
         display: none;
         position: fixed;
         top: 50%;
@@ -18,7 +13,7 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         transform: translateZ(0);
 
-        .cms_modal-body {
+        .cms-modal-body {
             position: relative;
             z-index: 10;
             width: 800px;
@@ -26,7 +21,7 @@
             border-top: 1px solid $color-grey-10;
             border-bottom: 1px solid $color-grey-10;
         }
-        .cms_modal-foot {
+        .cms-modal-foot {
             position: relative;
             clear: both;
             overflow: hidden;
@@ -34,7 +29,7 @@
             border-radius: 0 0 5px 5px;
             background: $color-grey-5;
         }
-        .cms_modal-shim {
+        .cms-modal-shim {
             display: none;
             position: absolute;
             top: 0;
@@ -43,18 +38,18 @@
             width: 100%;
             height: 100%;
         }
-        .cms_modal-frame {
+        .cms-modal-frame {
             position: relative;
             z-index: 10;
             width: 100%;
             height: 100%;
         }
-        .cms_modal-frame iframe {
+        .cms-modal-frame iframe {
             width: 100%;
             height: 100%;
         }
 
-        .cms_modal-title {
+        .cms-modal-title {
             display: block;
             color: $color-grey-70;
             font-size: 13px;
@@ -66,9 +61,9 @@
             background: $color-grey-5;
         }
 
-        .cms_modal-collapse,
-        .cms_modal-close,
-        .cms_modal-maximize {
+        .cms-modal-collapse,
+        .cms-modal-close,
+        .cms-modal-maximize {
             display: block;
             position: absolute;
             font-size: 8px;
@@ -89,21 +84,21 @@
                 color: $color-blue;
             }
         }
-        .cms_modal-collapse {
+        .cms-modal-collapse {
             right: 40px;
         }
-        .cms_modal-maximize {
+        .cms-modal-maximize {
             right: 21px;
         }
-        .cms_modal-collapsed {
+        .cms-modal-collapsed {
             @extend .cms-icon-plus;
             color: $color-blue;
         }
-        .cms_modal-maximize-active {
+        .cms-modal-maximize-active {
             color: $color-blue;
         }
 
-        .cms_modal-resize {
+        .cms-modal-resize {
             position: absolute;
             right: 0;
             bottom: 0;
@@ -118,7 +113,7 @@
             }
         }
 
-        .cms_modal-breadcrumb {
+        .cms-modal-breadcrumb {
             display: none;
             position: relative;
             float: left;
@@ -130,7 +125,7 @@
             min-width: 225px;
             height: 32px;
 
-            .cms_modal-breadcrumb-items {
+            .cms-modal-breadcrumb-items {
                 position: absolute;
                 top: 0;
                 left: 35px;
@@ -173,7 +168,7 @@
             }
 
             // home icon
-            .cms_modal-breadcrumb-title {
+            .cms-modal-breadcrumb-title {
                 position: relative;
                 z-index: 3;
                 color: $color-grey-10;
@@ -199,7 +194,7 @@
             }
 
             // last entry highlight
-            .cms_modal-breadcrumb-last {
+            .cms-modal-breadcrumb-last {
                 cursor: default;
                 color: $color-blue;
                 &:hover {
@@ -209,7 +204,7 @@
         }
 
         // buttons
-        .cms_modal-buttons {
+        .cms-modal-buttons {
             position: absolute;
             top: 0;
             right: 0;

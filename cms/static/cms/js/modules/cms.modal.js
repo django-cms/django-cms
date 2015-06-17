@@ -28,7 +28,7 @@ $(document).ready(function () {
 
 			// elements
 			this.body = $('html');
-			this.modal = $('.cms_modal');
+			this.modal = $('.cms-modal');
 			this.toolbar = $('.cms_toolbar');
 
 			// states
@@ -50,30 +50,30 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach events to window
-			this.modal.find('.cms_modal-collapse').bind(this.click, function (e) {
+			this.modal.find('.cms-modal-collapse').bind(this.click, function (e) {
 				e.preventDefault();
 				that._minimize();
 			});
-			this.modal.find('.cms_modal-title').bind('mousedown.cms', function (e) {
+			this.modal.find('.cms-modal-title').bind('mousedown.cms', function (e) {
 				e.preventDefault();
 				that._startMove(e);
 			});
-			this.modal.find('.cms_modal-title').bind('dblclick.cms', function () {
+			this.modal.find('.cms-modal-title').bind('dblclick.cms', function () {
 				that._maximize();
 			});
-			this.modal.find('.cms_modal-resize').bind('mousedown.cms', function (e) {
+			this.modal.find('.cms-modal-resize').bind('mousedown.cms', function (e) {
 				e.preventDefault();
 				that._startResize(e);
 			});
-			this.modal.find('.cms_modal-maximize').bind(this.click, function (e) {
+			this.modal.find('.cms-modal-maximize').bind(this.click, function (e) {
 				e.preventDefault();
 				that._maximize();
 			});
-			this.modal.find('.cms_modal-breadcrumb-items').on(this.click, 'a', function (e) {
+			this.modal.find('.cms-modal-breadcrumb-items').on(this.click, 'a', function (e) {
 				e.preventDefault();
 				that._changeContent($(this));
 			});
-			this.modal.find('.cms_modal-close, .cms_modal-cancel').bind(this.click, function (e) {
+			this.modal.find('.cms-modal-close, .cms-modal-cancel').bind(this.click, function (e) {
 				that.options.onClose = null;
 				e.preventDefault();
 				that.close();
@@ -97,7 +97,7 @@ $(document).ready(function () {
 			}
 
 			// because a new instance is called, we have to ensure minimized state is removed #3620
-			if(this.modal.is(':visible') && this.modal.find('.cms_modal-collapsed').length) {
+			if(this.modal.is(':visible') && this.modal.find('.cms-modal-collapsed').length) {
 				this.minimized = true;
 				this._minimize();
 			}
@@ -109,19 +109,19 @@ $(document).ready(function () {
 			this.hideTooltip();
 
 			// reset breadcrumb
-			this.modal.find('.cms_modal-breadcrumb').hide();
-			this.modal.find('.cms_modal-breadcrumb-items').html('');
+			this.modal.find('.cms-modal-breadcrumb').hide();
+			this.modal.find('.cms-modal-breadcrumb-items').html('');
 
 			// empty buttons
-			this.modal.find('.cms_modal-buttons').html('');
+			this.modal.find('.cms-modal-buttons').html('');
 
-			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
+			var contents = this.modal.find('.cms-modal-body, .cms-modal-foot');
 				contents.show();
 
 			this._loadContent(url, name);
 
 			// insure modal is not maximized
-			if(this.modal.find('.cms_modal-collapsed').length) this._minimize();
+			if(this.modal.find('.cms-modal-collapsed').length) this._minimize();
 
 			// reset styles
 			this.modal.css({
@@ -138,12 +138,12 @@ $(document).ready(function () {
 
 			var width = (screenWidth >= this.options.minWidth + widthOffset) ? screenWidth - widthOffset : this.options.minWidth;
 			var height = (screenHeight >= this.options.minHeight + heightOffset) ? screenHeight - heightOffset : this.options.minHeight;
-			this.modal.find('.cms_modal-body').css({
+			this.modal.find('.cms-modal-body').css({
 				'width': width,
 				'height': height
 			});
-			this.modal.find('.cms_modal-body').removeClass('cms-loader');
-			this.modal.find('.cms_modal-maximize').removeClass('cms_modal-maximize-active');
+			this.modal.find('.cms-modal-body').removeClass('cms-loader');
+			this.modal.find('.cms-modal-maximize').removeClass('cms-modal-maximize-active');
 			this.maximized = false;
 			// in case, the window is larger than the windows height, we trigger fullscreen mode
 			if(height >= screenHeight) this.triggerMaximized = true;
@@ -231,15 +231,15 @@ $(document).ready(function () {
 
 		_hide: function (speed) {
 			this.modal.fadeOut(speed);
-			this.modal.find('.cms_modal-frame iframe').remove();
-			this.modal.find('.cms_modal-body').removeClass('cms-loader');
+			this.modal.find('.cms-modal-frame iframe').remove();
+			this.modal.find('.cms-modal-body').removeClass('cms-loader');
 		},
 
 		_minimize: function () {
-			var trigger = this.modal.find('.cms_modal-collapse');
-			var maximize = this.modal.find('.cms_modal-maximize');
-			var contents = this.modal.find('.cms_modal-body, .cms_modal-foot');
-			var title = this.modal.find('.cms_modal-title');
+			var trigger = this.modal.find('.cms-modal-collapse');
+			var maximize = this.modal.find('.cms-modal-maximize');
+			var contents = this.modal.find('.cms-modal-body, .cms-modal-foot');
+			var title = this.modal.find('.cms-modal-title');
 
 			// cancel action if maximized
 			if(this.maximized) return false;
@@ -249,7 +249,7 @@ $(document).ready(function () {
 				CMS.API.Toolbar.toggleToolbar(true);
 
 				// minimize
-				trigger.addClass('cms_modal-collapsed');
+				trigger.addClass('cms-modal-collapsed');
 				contents.hide();
 
 				// save initial state
@@ -276,7 +276,7 @@ $(document).ready(function () {
 				this.minimized = true;
 			} else {
 				// minimize
-				trigger.removeClass('cms_modal-collapsed');
+				trigger.removeClass('cms-modal-collapsed');
 				contents.show();
 
 				// reattach css
@@ -296,10 +296,10 @@ $(document).ready(function () {
 
 		_maximize: function () {
 			var debug = (this.config.debug) ? 5 : 0;
-			var container = this.modal.find('.cms_modal-body');
-			var minimize = this.modal.find('.cms_modal-collapse');
-			var trigger = this.modal.find('.cms_modal-maximize');
-			var title = this.modal.find('.cms_modal-title');
+			var container = this.modal.find('.cms-modal-body');
+			var minimize = this.modal.find('.cms-modal-collapse');
+			var trigger = this.modal.find('.cms-modal-maximize');
+			var title = this.modal.find('.cms-modal-title');
 
 			// cancel action when minimized
 			if(this.minimized) return false;
@@ -307,7 +307,7 @@ $(document).ready(function () {
 			if(this.maximized === false) {
 				// maximize
 				this.maximized = true;
-				trigger.addClass('cms_modal-maximize-active');
+				trigger.addClass('cms-modal-maximize-active');
 
 				this.modal.data('css', {
 					'left': this.modal.css('left'),
@@ -342,7 +342,7 @@ $(document).ready(function () {
 			} else {
 				// minimize
 				this.maximized = false;
-				trigger.removeClass('cms_modal-maximize-active');
+				trigger.removeClass('cms-modal-maximize-active');
 
 				$(window).unbind('resize.cms.modal');
 
@@ -366,7 +366,7 @@ $(document).ready(function () {
 			var that = this;
 			var position = that.modal.position();
 
-			this.modal.find('.cms_modal-shim').show();
+			this.modal.find('.cms-modal-shim').show();
 
 			$(document).bind('mousemove.cms', function (e) {
 				var left = position.left - (initial.pageX - e.pageX);
@@ -380,7 +380,7 @@ $(document).ready(function () {
 		},
 
 		_endMove: function () {
-			this.modal.find('.cms_modal-shim').hide();
+			this.modal.find('.cms-modal-shim').hide();
 
 			$(document).unbind('mousemove.cms');
 		},
@@ -390,13 +390,13 @@ $(document).ready(function () {
 			if(this.maximized) return false;
 			// continue
 			var that = this;
-			var container = this.modal.find('.cms_modal-body');
+			var container = this.modal.find('.cms-modal-body');
 			var width = container.width();
 			var height = container.height();
 			var modalLeft = this.modal.position().left;
 			var modalTop = this.modal.position().top;
 
-			this.modal.find('.cms_modal-shim').show();
+			this.modal.find('.cms-modal-shim').show();
 
 			$(document).bind('mousemove.cms', function (e) {
 				var mvX = initial.pageX - e.pageX;
@@ -422,13 +422,13 @@ $(document).ready(function () {
 		},
 
 		_endResize: function () {
-			this.modal.find('.cms_modal-shim').hide();
+			this.modal.find('.cms-modal-shim').hide();
 
 			$(document).unbind('mousemove.cms');
 		},
 
 		_setBreadcrumb: function (breadcrumb) {
-			var bread = this.modal.find('.cms_modal-breadcrumb');
+			var bread = this.modal.find('.cms-modal-breadcrumb');
 			var crumb = '';
 
 			// cancel if there is no breadcrumb)
@@ -438,13 +438,13 @@ $(document).ready(function () {
 			// load breadcrumb
 			$.each(breadcrumb, function (index, item) {
 				// check if the item is the last one
-				var last = (index >= breadcrumb.length - 1) ? 'cms_modal-breadcrumb-last' : '';
+				var last = (index >= breadcrumb.length - 1) ? 'cms-modal-breadcrumb-last' : '';
 				// render breadcrumb
 				crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
 			});
 
 			// attach elements
-			bread.find('.cms_modal-breadcrumb-items').html(crumb);
+			bread.find('.cms-modal-breadcrumb-items').html(crumb);
 
 			// show breadcrumb
 			bread.show();
@@ -504,7 +504,7 @@ $(document).ready(function () {
  							// reset onClose when delete is triggered
 							if(item.hasClass('deletelink')) that.options.onClose = null;
 							// hide iframe
-							that.modal.find('.cms_modal-frame iframe').hide();
+							that.modal.find('.cms-modal-frame iframe').hide();
 							// page has been saved or deleted, run checkup
 							that.saved = true;
 						}
@@ -523,7 +523,7 @@ $(document).ready(function () {
 			render.append(cancel);
 
 			// render buttons
-			this.modal.find('.cms_modal-buttons').html(render);
+			this.modal.find('.cms-modal-buttons').html(render);
 		},
 
 		_loadContent: function (url, name) {
@@ -535,10 +535,10 @@ $(document).ready(function () {
 			// now refresh the content
 			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
 				iframe.css('visibility', 'hidden');
-			var holder = this.modal.find('.cms_modal-frame');
+			var holder = this.modal.find('.cms-modal-frame');
 
 			// set correct title
-			var title = this.modal.find('.cms_modal-title');
+			var title = this.modal.find('.cms-modal-title');
 				title.html(name || '&nbsp;');
 
 			// ensure previous iframe is hidden
@@ -602,7 +602,7 @@ $(document).ready(function () {
 					contents.find('body').bind('keydown.cms', function (e) {
 						if(e.keyCode === 27) that.close();
 					});
-					contents.find('body').addClass('cms_modal-window');
+					contents.find('body').addClass('cms-modal-window');
 
 					// figure out if .object-tools is available
 					if(contents.find('.object-tools').length) {
@@ -613,23 +613,23 @@ $(document).ready(function () {
 
 			// inject
 			setTimeout(function () {
-				that.modal.find('.cms_modal-body').addClass('cms-loader');
+				that.modal.find('.cms-modal-body').addClass('cms-loader');
 				holder.html(iframe);
 			}, this.options.modalDuration);
 		},
 
 		_changeContent: function (el) {
-			if(el.hasClass('cms_modal-breadcrumb-last')) return false;
+			if(el.hasClass('cms-modal-breadcrumb-last')) return false;
 
 			var parents = el.parent().find('a');
-				parents.removeClass('cms_modal-breadcrumb-last');
+				parents.removeClass('cms-modal-breadcrumb-last');
 
-			el.addClass('cms_modal-breadcrumb-last');
+			el.addClass('cms-modal-breadcrumb-last');
 
 			this._loadContent(el.attr('href'));
 
 			// update title
-			this.modal.find('.cms_modal-title').text(el.text());
+			this.modal.find('.cms-modal-title').text(el.text());
 		}
 
 	});
