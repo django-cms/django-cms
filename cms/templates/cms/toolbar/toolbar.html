@@ -29,7 +29,7 @@
 			{% endfor %}
 		</div>
 	</div>
-	<div class="cms_toolbar-trigger"><a href="#" title="{% trans "Toggle toolbar" %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
+	<div class="cms_toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
 	{# end: toolbar #}
 
 	{# start: messages #}
@@ -45,9 +45,9 @@
 		<div class="cms_sideframe-frame"></div>
 		<div class="cms_sideframe-shim"></div>
 		<div class="cms_sideframe-btn">
-			<div class="cms_sideframe-close"></div>
-			<div class="cms_sideframe-hide"></div>
-			<div class="cms_sideframe-maximize"></div>
+			<div class="cms_sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
+			<div class="cms_sideframe-hide"><span class="cms-icon cms-icon-arrow"></span></div>
+			<div class="cms_sideframe-maximize"><span class="cms-icon cms-icon-window"></span></div>
 		</div>
 		<div class="cms_sideframe-copy"></div>
 	</div>
@@ -61,9 +61,9 @@
 	<div class="cms_modal">
 		<div class="cms_modal-head">
 			<span class="cms_modal-title">&nbsp;</span>
-			<span class="cms_modal-collapse">-</span>
-			<span class="cms_modal-maximize">+</span>
-			<span class="cms_modal-close">x</span>
+			<span class="cms_modal-collapse cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
+			<span class="cms_modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
+			<span class="cms_modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
 		</div>
 		<div class="cms_modal-body">
 			<div class="cms_modal-shim"></div>
@@ -71,11 +71,11 @@
 		</div>
 		<div class="cms_modal-foot">
 			<div class="cms_modal-breadcrumb">
-				<span class="cms_modal-breadcrumb-title">{% trans "Start" %}</span>
+				<span class="cms_modal-breadcrumb-title cms-icon cms-icon-home" title="{% trans 'Start' %}"></span>
 				<span class="cms_modal-breadcrumb-items">&nbsp;</span>
 			</div>
 			<div class="cms_modal-buttons"></div>
-			<div class="cms_modal-resize"></div>
+			<div class="cms_modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
 		</div>
 	</div>
 	{# end: modal #}
