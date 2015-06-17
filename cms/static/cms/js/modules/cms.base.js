@@ -109,7 +109,7 @@ $(document).ready(function () {
 
 		// handles the tooltip for the plugins
 		showTooltip: function (name, id) {
-			var tooltip = $('.cms_tooltip');
+			var tooltip = $('.cms-tooltip');
 
 			// change css and attributes
 			tooltip.css('visibility', 'visible')
@@ -140,7 +140,7 @@ $(document).ready(function () {
 		},
 
 		hideTooltip: function () {
-			var tooltip = $('.cms_tooltip');
+			var tooltip = $('.cms-tooltip');
 
 			// change css
 			tooltip.css('visibility', 'hidden').hide();

@@ -1,18 +1,7 @@
-@charset "utf-8";
-/*!
- * @copyright:	https://github.com/divio/django-cms
- */
-
+//##################################################################################################################
+// #BUTTONS#
 #cms_toolbar {
-    //##################################################################################################################
-    // #COMMON#
-    .cms_loader {
-        background: $color-window url("../img/loader.gif") no-repeat center center !important;
-    }
-
-    //##################################################################################################################
-    // #BUTTONS#
-    .cms_btn {
+    .cms-btn {
         color: $color-grey;
         border: 1px solid $color-grey-10;
         border-radius: 3px;
@@ -33,7 +22,7 @@
         }
     }
 
-    .cms_btn-disabled {
+    .cms-btn-disabled {
         border-top: 1px solid darken($color-grey-10, 10%);
         border-right: 1px solid darken($color-grey-10, 10%);
         background: darken($color-grey-5, 5%);
@@ -45,7 +34,7 @@
         }
     }
 
-    .cms_btn-active {
+    .cms-btn-active {
         color: white;
         border: 1px solid darken($color-grey, 20%) !important;
         border-bottom: none !important;
@@ -64,7 +53,7 @@
         }
     }
 
-    .cms_btn-action {
+    .cms-btn-action {
         color: white;
         border: 1px solid adjust-hue($color-blue, 15deg) !important;
         background: $color-blue;
@@ -81,7 +70,7 @@
             background: darken(adjust-hue($color-blue, 15deg), 10%);
         }
     }
-    .cms_btn-caution {
+    .cms-btn-caution {
         color: white;
         border: 1px solid adjust-hue($color-red, 15deg) !important;
         background: $color-red;
@@ -98,41 +87,10 @@
             background: darken(adjust-hue($color-red, 15deg), 10%);
         }
     }
-    .cms_btn-publish {
+    .cms-btn-publish {
         display: none;
     }
-    .cms_btn-publish-active {
+    .cms-btn-publish-active {
         display: block;
     }
-
-    //######################################################################################################################
-    // #TOOLTIP#
-    .cms_tooltip {
-        visibility: hidden;
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: $color-grey-10;
-        font-size: 11px;
-        font-weight: bold;
-        line-height: 11px;
-        white-space: nowrap;
-        margin: 0;
-        padding: 5px 7px 7px 24px;
-        border-radius: 3px;
-        background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat -78px -169px;
-        span {
-            position: absolute;
-            top: 20px;
-            right: 0;
-            float: right;
-            color: white;
-            font-weight: normal;
-            padding: 5px 7px;
-            border-radius: 3px 0 3px 3px;
-            background: $color-grey-70;
-        }
-    }
-
-    // end of toolbar
 }
