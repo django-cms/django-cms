@@ -290,7 +290,7 @@
     }
 
     // #TOOLBAR/elements/form#
-    .cms_form-login {
+    .cms-form-login {
         padding: 3px 0 0 0;
 
         label {
@@ -346,10 +346,10 @@
             }
         }
 
-        .cms_error {
+        .cms-error {
             color: $color-red;
         }
-        .cms_error input {
+        .cms-error input {
             border: 1px solid $color-red;
         }
     }

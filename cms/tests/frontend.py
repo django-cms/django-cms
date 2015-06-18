@@ -206,7 +206,7 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.send_keys("what")
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
     def test_toolbar_login_cbv(self):
         User = get_user_model()
@@ -230,7 +230,7 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.send_keys("what")
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
     @override_settings(DEBUG=True)
     def test_basic_add_pages(self):
