@@ -75,6 +75,8 @@
         border-radius: 3px;
 
         .cms-dragbar-title {
+            @extend .cms-icon-arrow-wide;
+            cursor: pointer;
             color: white;
             font-size: 12px;
             font-weight: 500;
@@ -83,8 +85,6 @@
             text-shadow: 0 1px 0 black;
             height: 16px;
             padding: 0 0 0 15px;
-            cursor: pointer;
-            @extend .cms-icon-arrow-wide;
 
             &:before {
                 @extend .cms-icon;
