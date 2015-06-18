@@ -82,6 +82,10 @@
             height: 4px;
             border-bottom: 1px solid #ddd;
             background: #fdffc8 url("../img/toolbar/sprite_toolbar.png") repeat-x left -444px;
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
         }
     }
     &.cms-toolbar-debug #container {
@@ -156,6 +160,11 @@
                 > a span {
                     display: block;
                     background: url("../img/toolbar/sprite_toolbar.png") no-repeat right -270px;
+
+                    @include print-and-retina() {
+                        background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                        background-size: 190px !important;
+                    }
                 }
             }
 
@@ -259,6 +268,11 @@
             margin-left: 10px;
             cursor: pointer;
             background: url("../img/toolbar/sprite_toolbar.png") no-repeat -100px -90px;
+
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
         }
         .cms-messages-close:hover {
             background-position: -120px -90px;
@@ -281,6 +295,10 @@
             height: 20px;
             margin: 5px 0;
             background: url("../img/toolbar/sprite_toolbar.png") no-repeat left top;
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
             &:hover,
             &:active,
             &:focus {
