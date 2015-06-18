@@ -14,7 +14,7 @@
         z-index: 99999;
         padding: 3px 3px 3px 0;
         border-radius: 0 3px 3px 0;
-        background: rgba(255,255,255,0.6);
+        background: rgba(white, 0.6);
 
         p {
             margin: 0;
@@ -26,6 +26,10 @@
         }
         .cms-clipboard-numbers a {
             @include hide-content();
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
             display: block;
             overflow: hidden;
             box-sizing: border-box;
@@ -39,6 +43,7 @@
             &:hover,
             &:active,
             &:focus {
+                border-color: $color-grey-90;
                 background-color: $color-grey-90;
                 background-position: -20px -130px;
             }
@@ -49,6 +54,10 @@
 
         .cms-clipboard-empty a {
             @include hide-content();
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
             display: block;
             width: 20px;
             height: 20px;
