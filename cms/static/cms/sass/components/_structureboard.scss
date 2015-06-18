@@ -49,7 +49,18 @@
         background: $color-grey-70;
     }
     .cms-dragarea-static {
-        background: $color-grey-70 url("../img/toolbar/pattern.png");
+        background-color: $color-grey-70;
+        background-image: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, .1) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .1) 50%,
+            rgba(255, 255, 255, .1) 75%,
+            transparent 75%,
+            transparent
+        );
+        background-size: 10px 10px;
     }
 
     //######################################################################################################################
@@ -64,6 +75,8 @@
         border-radius: 3px;
 
         .cms-dragbar-title {
+            @extend .cms-icon-arrow-wide;
+            cursor: pointer;
             color: white;
             font-size: 12px;
             font-weight: 500;
@@ -72,32 +85,25 @@
             text-shadow: 0 1px 0 black;
             height: 16px;
             padding: 0 0 0 15px;
-            cursor: pointer;
 
             &:before {
-                content: " ";
+                @extend .cms-icon;
                 position: absolute;
-                top: 0;
-                left: 0;
+                top: -4px;
+                left: -5px;
+                font-size: 9px;
+                color: $color-grey-20;
                 width: 16px;
-                height: 15px;
-                background: url("../img/toolbar/sprite_toolbar.png") no-repeat -85px -113px;
+                height: 16px;
+                transform: rotate(180deg);
             }
-            &:hover {
-                &:before {
-                    background-position: -105px -113px;
-                }
+            &:hover:before {
+                color: #fff;
             }
         }
-        .cms-dragbar-title-expanded {
-            &:before {
-                background-position: -124px -114px;
-            }
-            &:hover {
-                &:before {
-                    background-position: -144px -114px !important;
-                }
-            }
+        .cms-dragbar-title-expanded:before {
+            transform: rotate(-90deg);
+            left: 2px;
         }
     }
 
@@ -176,6 +182,11 @@
         .cms-submenu {
             display: none;
             margin-top: 2px;
+            &:before {
+                color: $color-grey-70;
+                left: 2px;
+                top: -1px;
+            }
         }
         .cms-submenu-dropdown {
             top: 22px;
@@ -187,7 +198,10 @@
             height: 28px;
             border-left: 1px dotted $color-grey-10;
             border-radius: 0;
-            background: $color-grey-5 url("../img/toolbar/sprite_toolbar.png") no-repeat right -415px;
+            background: $color-grey-5;
+            &:before {
+                color: $color-grey-70;
+            }
         }
         .cms-submenu-quicksearch input {
             color: black;
@@ -238,18 +252,22 @@
         cursor: pointer;
     }
     .cms-dragitem-collapsable {
-        background: url("../img/toolbar/sprite_toolbar.png") no-repeat 1px -359px;
-        @include print-and-retina() {
-            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-            background-size: 190px !important;
+        @extend .cms-icon-arrow-wide;
+        &:before {
+            @extend .cms-icon;
+            position: absolute;
+            left: 5px;
+            top: 8px;
+            font-size: 10px;
+            color: $color-grey-70;
+            transform: rotate(180deg);
+        }
+        &:hover:before {
+            color: #000;
         }
     }
-    .cms-dragitem-expanded {
-        background: url("../img/toolbar/sprite_toolbar.png") no-repeat 0 -389px;
-        @include print-and-retina() {
-            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-            background-size: 190px !important;
-        }
+    .cms-dragitem-expanded:before {
+        transform: rotate(-90deg);
     }
     .cms-dragitem-success {
         position: absolute;
