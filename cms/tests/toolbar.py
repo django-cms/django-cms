@@ -194,7 +194,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Generic</span>')
+        self.assertContains(response, '<div class="cms-submenu-item cms-submenu-item-title"><span>Generic</span>')
 
     def test_markup_flash_custom_module(self):
         superuser = self.get_superuser()
@@ -204,7 +204,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response,
-                            '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
+                            '<div class="cms-submenu-item cms-submenu-item-title"><span>Different Grouper</span>')
 
     def test_markup_menu_items(self):
         superuser = self.get_superuser()
@@ -213,9 +213,9 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,
-                            '<div class="cms_submenu-item"><a href="/some/url/" data-rel="ajax"')
+                            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"')
         self.assertContains(response,
-                            '<div class="cms_submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
+                            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
 
     def test_markup_toolbar_url_page(self):
         superuser = self.get_superuser()

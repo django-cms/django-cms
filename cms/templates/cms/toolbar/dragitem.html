@@ -5,20 +5,20 @@
 	<div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
 		{% language request.toolbar.toolbar_language %}
 		<div class="cms_switcher"></div>
-		<div class="cms_submenu">
-			<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
-			<div class="cms_submenu-dropdown">
-				<div class="cms_submenu-item cms_submenu-item-title"><span>{% trans "Settings" %}</span></div>
-				<div class="cms_submenu-item"><a data-rel="copy" href="#">{% trans "Copy" %}</a></div>
-				<div class="cms_submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
-				<div class="cms_submenu-item"><a data-rel="edit" href="#">{% trans "Edit" %}</a></div>
-				<div class="cms_submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
+		<div class="cms-submenu">
+			<div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
+			<div class="cms-submenu-dropdown">
+				<div class="cms-submenu-item cms-submenu-item-title"><span>{% trans "Settings" %}</span></div>
+				<div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy" %}</a></div>
+				<div class="cms-submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
+				<div class="cms-submenu-item"><a data-rel="edit" href="#">{% trans "Edit" %}</a></div>
+				<div class="cms-submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
                 {% extra_menu_items plugin %}
 				{% plugin_child_classes plugin %}
 			</div>
 		</div>
 
-		{% if show_language %}<span class="cms_submenu-lang">{{ plugin.language }}</span>{% endif %}
+		{% if show_language %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
 		<span class="cms-dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
 
 	</div>

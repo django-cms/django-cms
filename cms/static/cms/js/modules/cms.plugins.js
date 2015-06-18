@@ -70,7 +70,7 @@ $(document).ready(function () {
 			var dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
 
 			// register the subnav on the placeholder
-			this._setSubnav(dragbar.find('.cms_submenu'));
+			this._setSubnav(dragbar.find('.cms-submenu'));
 
 			var settings = CMS.settings;
 			settings.dragbars = settings.dragbars || [];
@@ -130,11 +130,11 @@ $(document).ready(function () {
 			// variables for dragitems
 			var draggable = $('.cms-draggable-' + this.options.plugin_id);
 			var dragitem = draggable.find('> .cms-dragitem');
-			var submenu = draggable.find('.cms_submenu:eq(0)');
-			var submenus = $('.cms-draggables').find('.cms_submenu');
+			var submenu = draggable.find('.cms-submenu:eq(0)');
+			var submenus = $('.cms-draggables').find('.cms-submenu');
 
 			// attach event to the plugin menu
-			this._setSubnav(draggable.find('> .cms-dragitem .cms_submenu'));
+			this._setSubnav(draggable.find('> .cms-dragitem .cms-submenu'));
 
 			// adds event for hiding the subnav
 			draggable.bind('mouseenter mouseleave mouseover', function (e) {
@@ -152,7 +152,7 @@ $(document).ready(function () {
 				// add timeout to determine if we should hide the element
 				setTimeout(function () {
 					if(!$(e.currentTarget).data('active')) {
-						$(e.currentTarget).find('.cms_submenu:eq(0)').hide();
+						$(e.currentTarget).find('.cms-submenu:eq(0)').hide();
 					}
 				}, 100);
 			});
@@ -507,7 +507,7 @@ $(document).ready(function () {
 			});
 
 			// set data attributes for original top positioning
-			nav.find('.cms_submenu-dropdown').each(function () {
+			nav.find('.cms-submenu-dropdown').each(function () {
 				$(this).data('top', $(this).css('top'))
 			});
 
@@ -519,7 +519,7 @@ $(document).ready(function () {
 
 		_showSubnav: function (nav) {
 			var that = this;
-			var dropdown = nav.find('.cms_submenu-dropdown');
+			var dropdown = nav.find('.cms-submenu-dropdown');
 			var offset = parseInt(dropdown.data('top'));
 
 			// clearing
@@ -528,8 +528,8 @@ $(document).ready(function () {
 			// add small delay before showing submenu
 			this.timer = setTimeout(function () {
 				// reset z indexes
-				var reset = $('.cms_submenu').parentsUntil('.cms-dragarea');
-				var scrollHint = nav.find('.cms_submenu-scroll-hint');
+				var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
+				var scrollHint = nav.find('.cms-submenu-scroll-hint');
 
 				reset.css('z-index', 0);
 
@@ -537,10 +537,10 @@ $(document).ready(function () {
 					parents.css('z-index', 999);
 
 				// show subnav
-				nav.find('.cms_submenu-quicksearch').show();
+				nav.find('.cms-submenu-quicksearch').show();
 
 				// set visible states
-				nav.find('> .cms_submenu-dropdown').show().on('scroll', function () {
+				nav.find('> .cms-submenu-dropdown').show().on('scroll', function () {
 					scrollHint.fadeOut(100);
 					$(this).off('scroll');
 				});
@@ -553,7 +553,7 @@ $(document).ready(function () {
 			// add key events
 			$(document).unbind('keydown.cms');
 			$(document).bind('keydown.cms', function (e) {
-				var anchors = nav.find('.cms_submenu-item:visible a');
+				var anchors = nav.find('.cms-submenu-item:visible a');
 				var index = anchors.index(anchors.filter(':focus'));
 
 				// bind arrow down and tab keys
@@ -609,8 +609,8 @@ $(document).ready(function () {
 
 			this.timer = setTimeout(function () {
 				// set visible states
-				nav.find('> .cms_submenu-dropdown').hide();
-				nav.find('.cms_submenu-quicksearch').hide();
+				nav.find('> .cms-submenu-dropdown').hide();
+				nav.find('.cms-submenu-quicksearch').hide();
 				// reset search
 				nav.find('input').val('');
 				that._searchSubnav(nav, '');
@@ -621,8 +621,8 @@ $(document).ready(function () {
 		},
 
 		_searchSubnav: function (nav, value) {
-			var items = nav.find('.cms_submenu-item');
-			var titles = nav.find('.cms_submenu-item-title');
+			var items = nav.find('.cms-submenu-item');
+			var titles = nav.find('.cms-submenu-item-title');
 
 			// cancel if value is zero
 			if(value === '') {
@@ -642,26 +642,26 @@ $(document).ready(function () {
 			// check if a title is matching
 			titles.filter(':visible').each(function (index, item) {
 				titles.hide();
-				$(item).nextUntil('.cms_submenu-item-title').show();
+				$(item).nextUntil('.cms-submenu-item-title').show();
 			});
 
 			// always display title of a category
 			items.filter(':visible').each(function (index, item) {
-				if($(item).prev().hasClass('cms_submenu-item-title')) {
+				if($(item).prev().hasClass('cms-submenu-item-title')) {
 					$(item).prev().show();
 				} else {
-					$(item).prevUntil('.cms_submenu-item-title').last().prev().show();
+					$(item).prevUntil('.cms-submenu-item-title').last().prev().show();
 				}
 			});
 
 			// if there is no element visible, show only first categoriy
-			nav.find('.cms_submenu-dropdown').show();
+			nav.find('.cms-submenu-dropdown').show();
 			if(items.add(titles).filter(':visible').length <= 0) {
-				nav.find('.cms_submenu-dropdown').hide();
+				nav.find('.cms-submenu-dropdown').hide();
 			}
 
 			// hide scrollHint
-			nav.find('.cms_submenu-scroll-hint').hide();
+			nav.find('.cms-submenu-scroll-hint').hide();
 		},
 
 		_collapsables: function () {
