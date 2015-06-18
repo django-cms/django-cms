@@ -366,7 +366,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         output = tag.render(context)
         self.assertEqual(
             output,
-            '<div class="cms_plugin cms_plugin-{0}">Test</div>'.format(
+            '<div class="cms-plugin cms-plugin-{0}">Test</div>'.format(
                 plugin.pk
             )
         )

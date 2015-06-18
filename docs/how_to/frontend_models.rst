@@ -97,7 +97,7 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-cms-page-changelist-1">
+    <div class="cms-plugin cms-plugin-cms-page-changelist-1">
         <h3>Menu</h3>
         <ul>
             <li><a href="/">Home</a></li>
@@ -251,7 +251,7 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-myapp-mymodel-changelist-1">
+    <div class="cms-plugin cms-plugin-myapp-mymodel-changelist-1">
         My Model Instance Name
     </div>
 

@@ -135,7 +135,7 @@ $(document).ready(function () {
 
 			// attach tooltip event for touch devices
 			tooltip.bind('touchstart.cms', function () {
-				$('.cms_plugin-' + $(this).data('plugin_id')).trigger('dblclick');
+				$('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
 			});
 		},
 

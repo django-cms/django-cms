@@ -340,7 +340,7 @@ $(document).ready(function () {
 			// set correct options
 			options = options || this.options;
 
-			var plugin = $('.cms_plugin-' + options.plugin_id);
+			var plugin = $('.cms-plugin-' + options.plugin_id);
 			var dragitem = $('.cms-draggable-' + options.plugin_id);
 
 			// SETTING POSITION
@@ -388,7 +388,7 @@ $(document).ready(function () {
 			});
 
 			// show publish button
-			$('.cms_btn-publish').addClass('cms_btn-publish-active').parent().show();
+			$('.cms-btn-publish').addClass('cms-btn-publish-active').parent().show();
 
 			// enable revert to live
 			$('.cms-toolbar-revert').removeClass('cms-toolbar-item-navigation-disabled');
@@ -410,14 +410,14 @@ $(document).ready(function () {
 			var prevItem = dragitem.prev('.cms-draggable');
 			var nextItem = dragitem.next('.cms-draggable');
 			var parent = dragitem.parent().closest('.cms-draggable');
-			var child = $('.cms_plugin-' + this._getId(parent));
+			var child = $('.cms-plugin-' + this._getId(parent));
 			var placeholder = dragitem.closest('.cms-dragarea');
 
 			// determine if there are other plugins within the same level, this makes the move easier
 			if(prevItem.length) {
-				plugin.insertAfter($('.cms_plugin-' + this._getId(prevItem)));
+				plugin.insertAfter($('.cms-plugin-' + this._getId(prevItem)));
 			} else if(nextItem.length) {
-				plugin.insertBefore($('.cms_plugin-' + this._getId(nextItem)));
+				plugin.insertBefore($('.cms-plugin-' + this._getId(nextItem)));
 			} else if(parent.length) {
 				// if we can't find a plugin on the same level, we need to travel higher
 				// for this we need to find the deepest child
@@ -427,7 +427,7 @@ $(document).ready(function () {
 				child.append(plugin);
 			} else if(placeholder.length) {
 				// we also need to cover the case if we move the plugin to an empty placeholder
-				plugin.append($('.cms_plugin-' + this._getId(placeholder)));
+				plugin.append($('.cms-plugin-' + this._getId(placeholder)));
 			} else {
 				// if we did not found a match, reload
 				CMS.API.Helpers.reloadBrowser();
@@ -722,7 +722,7 @@ $(document).ready(function () {
 			// adds double click event
 			draggable.bind('dblclick', function (e) {
 				e.stopPropagation();
-				$('.cms_plugin-' + that._getId($(this))).trigger('dblclick');
+				$('.cms-plugin-' + that._getId($(this))).trigger('dblclick');
 			});
 
 			// only needs to be excecuted once
