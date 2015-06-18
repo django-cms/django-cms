@@ -65,9 +65,9 @@ $(document).ready(function () {
 		// initial methods
 		_setPlaceholder: function () {
 			var that = this;
-			var title = '.cms_dragbar-title';
-			var expanded = 'cms_dragbar-title-expanded';
-			var dragbar = $('.cms_dragbar-' + this.options.placeholder_id);
+			var title = '.cms-dragbar-title';
+			var expanded = 'cms-dragbar-title-expanded';
+			var dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
 
 			// register the subnav on the placeholder
 			this._setSubnav(dragbar.find('.cms_submenu'));
@@ -114,27 +114,27 @@ $(document).ready(function () {
 				e.stopPropagation();
 
 				var el = $(e.delegateTarget);
-				var dragitem = $('.cms_draggable-' + el.data('settings').plugin_id);
-				var placeholder_id = that._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
+				var dragitem = $('.cms-draggable-' + el.data('settings').plugin_id);
+				var placeholder_id = that._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
 
 				// if placeholder_id is empty, cancel
 				if(!placeholder_id) return false;
 
 				var data = el.data('settings');
 					data.target = placeholder_id;
-					data.parent= that._getId(dragitem.parent().closest('.cms_draggable'));
+					data.parent= that._getId(dragitem.parent().closest('.cms-draggable'));
 
 				that.copyPlugin(data);
 			});
 
 			// variables for dragitems
-			var draggable = $('.cms_draggable-' + this.options.plugin_id);
-			var dragitem = draggable.find('> .cms_dragitem');
+			var draggable = $('.cms-draggable-' + this.options.plugin_id);
+			var dragitem = draggable.find('> .cms-dragitem');
 			var submenu = draggable.find('.cms_submenu:eq(0)');
-			var submenus = $('.cms_draggables').find('.cms_submenu');
+			var submenus = $('.cms-draggables').find('.cms_submenu');
 
 			// attach event to the plugin menu
-			this._setSubnav(draggable.find('> .cms_dragitem .cms_submenu'));
+			this._setSubnav(draggable.find('> .cms-dragitem .cms_submenu'));
 
 			// adds event for hiding the subnav
 			draggable.bind('mouseenter mouseleave mouseover', function (e) {
@@ -341,15 +341,15 @@ $(document).ready(function () {
 			options = options || this.options;
 
 			var plugin = $('.cms_plugin-' + options.plugin_id);
-			var dragitem = $('.cms_draggable-' + options.plugin_id);
+			var dragitem = $('.cms-draggable-' + options.plugin_id);
 
 			// SETTING POSITION
 			this._setPosition(options.plugin_id, plugin, dragitem);
 
 			// SAVING POSITION
-			var placeholder_id = this._getId(dragitem.parents('.cms_draggables').last().prevAll('.cms_dragbar').first());
-			var plugin_parent = this._getId(dragitem.parent().closest('.cms_draggable'));
-			var plugin_order = this._getIds(dragitem.siblings('.cms_draggable').andSelf());
+			var placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
+			var plugin_parent = this._getId(dragitem.parent().closest('.cms-draggable'));
+			var plugin_order = this._getIds(dragitem.siblings('.cms-draggable').andSelf());
 
 			// cancel here if we have no placeholder id
 			if(placeholder_id === false) return false;
@@ -407,11 +407,11 @@ $(document).ready(function () {
 		// private methods
 		_setPosition: function (id, plugin, dragitem) {
 			// after we insert the plugin onto its new place, we need to figure out where to position it
-			var prevItem = dragitem.prev('.cms_draggable');
-			var nextItem = dragitem.next('.cms_draggable');
-			var parent = dragitem.parent().closest('.cms_draggable');
+			var prevItem = dragitem.prev('.cms-draggable');
+			var nextItem = dragitem.next('.cms-draggable');
+			var parent = dragitem.parent().closest('.cms-draggable');
 			var child = $('.cms_plugin-' + this._getId(parent));
-			var placeholder = dragitem.closest('.cms_dragarea');
+			var placeholder = dragitem.closest('.cms-dragarea');
 
 			// determine if there are other plugins within the same level, this makes the move easier
 			if(prevItem.length) {
@@ -465,7 +465,7 @@ $(document).ready(function () {
 				// set switch for subnav entries
 				switch(el.attr('data-rel')) {
 					case 'add':
-						that.addPlugin(el.attr('href').replace('#', ''), el.text(), that._getId(el.closest('.cms_draggable')));
+						that.addPlugin(el.attr('href').replace('#', ''), el.text(), that._getId(el.closest('.cms-draggable')));
 						break;
 					case 'ajax_add':
 						CMS.API.Toolbar.openAjax(el.attr('href'), JSON.stringify(el.data('post')), el.data('text'), that.editPluginPostAjax(that), el.data('on-success'));
@@ -528,12 +528,12 @@ $(document).ready(function () {
 			// add small delay before showing submenu
 			this.timer = setTimeout(function () {
 				// reset z indexes
-				var reset = $('.cms_submenu').parentsUntil('.cms_dragarea');
+				var reset = $('.cms_submenu').parentsUntil('.cms-dragarea');
 				var scrollHint = nav.find('.cms_submenu-scroll-hint');
 
 				reset.css('z-index', 0);
 
-				var parents = nav.parentsUntil('.cms_dragarea');
+				var parents = nav.parentsUntil('.cms-dragarea');
 					parents.css('z-index', 999);
 
 				// show subnav
@@ -590,7 +590,7 @@ $(document).ready(function () {
 				dropdown.css('top', 'auto');
 				dropdown.css('bottom', offset);
 				// if parent is within a plugin, add additional offset
-				if(dropdown.closest('.cms_draggable').length) dropdown.css('bottom', offset - 1);
+				if(dropdown.closest('.cms-draggable').length) dropdown.css('bottom', offset - 1);
 			} else {
 				dropdown.css('top', offset);
 				dropdown.css('bottom', 'auto');
@@ -605,7 +605,7 @@ $(document).ready(function () {
 			if(this.focused) return false;
 
 			// set correct active state
-			nav.closest('.cms_draggable').data('active', false);
+			nav.closest('.cms-draggable').data('active', false);
 
 			this.timer = setTimeout(function () {
 				// set visible states
@@ -617,7 +617,7 @@ $(document).ready(function () {
 			}, this.timeout);
 
 			// reset relativity
-			$('.cms_dragbar').css('position', '');
+			$('.cms-dragbar').css('position', '');
 		},
 
 		_searchSubnav: function (nav, value) {
@@ -668,21 +668,21 @@ $(document).ready(function () {
 			// one time setup
 			var that = this;
 			var settings = CMS.settings;
-			var draggable = $('.cms_draggable-' + this.options.plugin_id);
+			var draggable = $('.cms-draggable-' + this.options.plugin_id);
 
 			// check which button should be shown for collapsemenu
 			this.container.each(function (index, item) {
-				var els = $(item).find('.cms_dragitem-collapsable');
-				var open = els.filter('.cms_dragitem-expanded');
+				var els = $(item).find('.cms-dragitem-collapsable');
+				var open = els.filter('.cms-dragitem-expanded');
 				if(els.length === open.length && (els.length + open.length !== 0)) {
-					$(item).find('.cms_dragbar-title').addClass('cms_dragbar-title-expanded');
+					$(item).find('.cms-dragbar-title').addClass('cms-dragbar-title-expanded');
 				}
 			});
 			// cancel here if its not a draggable
 			if(!draggable.length) return false;
 
 			// attach events to draggable
-			draggable.find('> .cms_dragitem-collapsable').bind(this.click, function () {
+			draggable.find('> .cms-dragitem-collapsable').bind(this.click, function () {
 				var el = $(this);
 				var id = that._getId($(this).parent());
 
@@ -690,25 +690,25 @@ $(document).ready(function () {
 					settings.states = settings.states || [];
 
 				// collapsable function and save states
-				if(el.hasClass('cms_dragitem-expanded')) {
+				if(el.hasClass('cms-dragitem-expanded')) {
 					settings.states.splice($.inArray(id, settings.states), 1);
-					el.removeClass('cms_dragitem-expanded').parent().find('> .cms_draggables').hide();
+					el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
 					if ($(document).data('expandmode')) {
-						var items = draggable.find('.cms_draggable').find('.cms_dragitem-collapsable');
+						var items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
 						if(!items.length) return false;
 						items.each(function () {
-							if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+							if($(this).hasClass('cms-dragitem-expanded')) $(this).trigger('click.cms');
 						});
 					}
 
 				} else {
 					settings.states.push(id);
-					el.addClass('cms_dragitem-expanded').parent().find('> .cms_draggables').show();
+					el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
 					if ($(document).data('expandmode')) {
-						var items = draggable.find('.cms_draggable').find('.cms_dragitem-collapsable');
+						var items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
 						if(!items.length) return false;
 						items.each(function () {
-							if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+							if(!$(this).hasClass('cms-dragitem-expanded')) $(this).trigger('click.cms');
 						});
 					}
 				}
@@ -740,11 +740,11 @@ $(document).ready(function () {
 
 			// loop through the items
 			$.each(CMS.settings.states, function (index, id) {
-				var el = $('.cms_draggable-' + id);
+				var el = $('.cms-draggable-' + id);
 				// only add this class to elements which have a draggable area
-				if(el.find('.cms_draggables').length) {
-					el.find('> .cms_draggables').show();
-					el.find('> .cms_dragitem').addClass('cms_dragitem-expanded');
+				if(el.find('.cms-draggables').length) {
+					el.find('> .cms-draggables').show();
+					el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
 				}
 			});
 
@@ -753,14 +753,14 @@ $(document).ready(function () {
 		},
 
 		_expandAll: function (el) {
-			var items = el.closest('.cms_dragarea').find('.cms_dragitem-collapsable');
+			var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
 			// cancel if there are no items
 			if(!items.length) return false;
 			items.each(function () {
-				if(!$(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+				if(!$(this).hasClass('cms-dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
-			el.addClass('cms_dragbar-title-expanded');
+			el.addClass('cms-dragbar-title-expanded');
 
 			var settings = CMS.settings;
 			settings.dragbars = settings.dragbars || [];
@@ -769,12 +769,12 @@ $(document).ready(function () {
 		},
 
 		_collapseAll: function (el) {
-			var items = el.closest('.cms_dragarea').find('.cms_dragitem-collapsable');
+			var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
 			items.each(function () {
-				if($(this).hasClass('cms_dragitem-expanded')) $(this).trigger('click.cms');
+				if($(this).hasClass('cms-dragitem-expanded')) $(this).trigger('click.cms');
 			});
 
-			el.removeClass('cms_dragbar-title-expanded');
+			el.removeClass('cms-dragbar-title-expanded');
 
 			var settings = CMS.settings;
 			settings.dragbars = settings.dragbars || [];
@@ -795,7 +795,7 @@ $(document).ready(function () {
 		},
 
 		_showSuccess: function (el) {
-			var tpl = $('<div class="cms_dragitem-success"></div>');
+			var tpl = $('<div class="cms-dragitem-success"></div>');
 			el.append(tpl);
 			// start animation
 			tpl.fadeOut(function () {

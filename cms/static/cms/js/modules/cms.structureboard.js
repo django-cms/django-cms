@@ -16,21 +16,21 @@ $(document).ready(function () {
 		},
 
 		initialize: function (options) {
-			this.container = $('.cms_structure');
+			this.container = $('.cms-structure');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
 			this.settings = CMS.settings;
 
 			// elements
 			this.toolbar = $('#cms_toolbar');
-			this.sortables = $('.cms_draggables'); // use global scope
+			this.sortables = $('.cms-draggables'); // use global scope
 			this.plugins = $('.cms_plugin');
 			this.render_model = $('.cms_render_model');
 			this.placeholders = $('.cms_placeholder');
-			this.dragitems = $('.cms_draggable');
-			this.dragareas = $('.cms_dragarea');
-			this.dropareas = $('.cms_droppable');
-			this.dimmer = this.container.find('.cms_structure-dimmer');
+			this.dragitems = $('.cms-draggable');
+			this.dragareas = $('.cms-dragarea');
+			this.dropareas = $('.cms-droppable');
+			this.dimmer = this.container.find('.cms-structure-dimmer');
 			this.clipboard = $('.cms-clipboard');
 
 			// states
@@ -173,14 +173,14 @@ $(document).ready(function () {
 
 			if(el.hasClass('cms_plugin')) {
 				id = cls.replace('cms_plugin-', '');
-			} else if(el.hasClass('cms_draggable')) {
-				id = cls.replace('cms_draggable-', '');
+			} else if(el.hasClass('cms-draggable')) {
+				id = cls.replace('cms-draggable-', '');
 			} else if(el.hasClass('cms_placeholder')) {
 				id = cls.replace('cms_placeholder-', '');
-			} else if(el.hasClass('cms_dragbar')) {
-				id = cls.replace('cms_dragbar-', '');
-			} else if(el.hasClass('cms_dragarea')) {
-				id = cls.replace('cms_dragarea-', '');
+			} else if(el.hasClass('cms-dragbar')) {
+				id = cls.replace('cms-dragbar-', '');
+			} else if(el.hasClass('cms-dragarea')) {
+				id = cls.replace('cms-dragarea-', '');
 			}
 
 			return id;
@@ -198,14 +198,14 @@ $(document).ready(function () {
 		setActive: function (id, state) {
 			var that = this;
 			// resets
-			this.dragitems.removeClass('cms_draggable-selected');
+			this.dragitems.removeClass('cms-draggable-selected');
 			this.plugins.removeClass('cms_plugin-active');
 
 			// only reset if no id is provided
 			if(id === false) return false;
 
 			// attach active class to current element
-			var dragitem = $('.cms_draggable-' + id);
+			var dragitem = $('.cms-draggable-' + id);
 			var plugin = $('.cms_plugin-' + id);
 
 			// if we switch from content to edit, show only a single plcaeholder
@@ -220,7 +220,7 @@ $(document).ready(function () {
 				this.dragareas.css('opacity', 0.2);
 
 				// show single placeholder
-				dragitem.closest('.cms_dragarea').show().css('opacity', 1);
+				dragitem.closest('.cms-dragarea').show().css('opacity', 1);
 
 			// otherwise hide and reset the board
 			} else {
@@ -228,11 +228,11 @@ $(document).ready(function () {
 			}
 
 			// collapse all previous elements
-			var collapsed = dragitem.parentsUntil('.cms_dragarea').siblings().not('.cms_dragitem-expanded');
+			var collapsed = dragitem.parentsUntil('.cms-dragarea').siblings().not('.cms-dragitem-expanded');
 				collapsed.trigger(this.click);
 
 			// set new classes
-			dragitem.addClass('cms_draggable-selected');
+			dragitem.addClass('cms-draggable-selected');
 			plugin.addClass('cms_plugin-active');
 		},
 
@@ -328,7 +328,7 @@ $(document).ready(function () {
 			this.placeholders.each(function (index, item) {
 				item = $(item);
 				id = item.data('settings').placeholder_id;
-				area = $('.cms_dragarea-' + id);
+				area = $('.cms-dragarea-' + id);
 				// to calculate the correct offset, we need to set the
 				// placeholders correct heights and than set the according position
 				item.height(area.outerHeight(true));
@@ -353,46 +353,46 @@ $(document).ready(function () {
 			var dropzone = null;
 
 			this.sortables.nestedSortable({
-				'items': '.cms_draggable',
-				'handle': '.cms_dragitem',
-				'placeholder': 'cms_droppable',
+				'items': '.cms-draggable',
+				'handle': '.cms-dragitem',
+				'placeholder': 'cms-droppable',
 				'connectWith': this.sortables,
 				'tolerance': 'pointer',
 				'toleranceElement': '> div',
 				'dropOnEmpty': true,
 				'forcePlaceholderSize': true,
 				'helper': 'clone',
-				'appendTo': '.cms_structure-content',
+				'appendTo': '.cms-structure-content',
 				'cursor': 'move',
 				'opacity': 0.4,
 				'zIndex': 9999999,
 				'delay': 100,
 				'refreshPositions': true,
 				// nestedSortable
-				'listType': 'div.cms_draggables',
+				'listType': 'div.cms-draggables',
 				'doNotClear': true,
-				//'disableNestingClass': 'cms_draggable-disabled',
-				//'errorClass': 'cms_draggable-disallowed',
-				//'hoveringClass': 'cms_draggable-hover',
+				//'disableNestingClass': 'cms-draggable-disabled',
+				//'errorClass': 'cms-draggable-disallowed',
+				//'hoveringClass': 'cms-draggable-hover',
 				// methods
 				'start': function (e, ui) {
 					that.dragging = true;
 					// show empty
-					$('.cms_dragbar-empty-wrapper').show();
+					$('.cms-dragbar-empty-wrapper').show();
 					// ensure all menus are closed
-					$('.cms_dragitem .cms_submenu').hide();
+					$('.cms-dragitem .cms_submenu').hide();
 					// remove classes from empty dropzones
-					$('.cms_dragbar-empty').removeClass('cms_draggable-disallowed');
+					$('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
 					// fixes placeholder height
 					ui.placeholder.height(ui.item.height());
 					// show placeholder without entries
-					$('.cms_draggables').each(function () {
+					$('.cms-draggables').each(function () {
 						if($(this).children().length === 0) {
 							$(this).show();
 						}
 					});
 					// add overflow hidden to body
-					$('.cms_structure-content').css({
+					$('.cms-structure-content').css({
 						'height': $(document).height(),
 						'overflow': 'hidden'
 					});
@@ -401,7 +401,7 @@ $(document).ready(function () {
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
-					$('.cms_dragbar-empty-wrapper').hide();
+					$('.cms-dragbar-empty-wrapper').hide();
 
 					// cancel if isAllowed returns false
 					if(!that.state) return false;
@@ -413,7 +413,7 @@ $(document).ready(function () {
 					}
 
 					// we pass the id to the updater which checks within the backend the correct place
-					//var id = ui.item.attr('class').replace('cms_draggable cms_draggable-', '');
+					//var id = ui.item.attr('class').replace('cms-draggable cms-draggable-', '');
 					var id = that.getId(ui.item);
 					var plugin = $('.cms_plugin-' + id);
 
@@ -425,14 +425,14 @@ $(document).ready(function () {
 					}
 
 					// reset placeholder without entries
-					$('.cms_draggables').each(function () {
+					$('.cms-draggables').each(function () {
 						if($(this).children().length === 0) {
 							$(this).hide();
 						}
 					});
 
 					// add overflow hidden to body
-					$('.cms_structure-content').css({
+					$('.cms-structure-content').css({
 						'height': '',
 						'overflow': ''
 					});
@@ -448,9 +448,9 @@ $(document).ready(function () {
 					if(original.length === 0 || original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
-					var holderId = that.getId(placeholder.closest('.cms_dragarea'));
+					var holderId = that.getId(placeholder.closest('.cms-dragarea'));
 					var holder = $('.cms_placeholder-' + holderId);
-					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms_draggable')));
+					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms-draggable')));
 
 					// now set the correct bounds
 					if(holder.length) bounds = holder.data('settings').plugin_restriction;
@@ -458,7 +458,7 @@ $(document).ready(function () {
 					if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
 
 					// if parent has class disabled, dissalow drop
-					if(placeholder.parent().hasClass('cms_draggable-disabled')) return false;
+					if(placeholder.parent().hasClass('cms-draggable-disabled')) return false;
 
 					// if restrictions is still empty, proceed
 					that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;
@@ -478,30 +478,30 @@ $(document).ready(function () {
 			// define droppable helpers
 			this.dropareas.droppable({
 				'greedy': true,
-				'accept': '.cms_draggable',
+				'accept': '.cms-draggable',
 				'tolerance': 'pointer',
-				'activeClass': 'cms_draggable-allowed',
-				'hoverClass': 'cms_draggable-hover-allowed',
+				'activeClass': 'cms-draggable-allowed',
+				'hoverClass': 'cms-draggable-hover-allowed',
 				'over': function (event) {
 					dropzone = $('.cms_placeholder-' + that.getId($(event.target).parent().prev()));
 					timer = setInterval(function () {
 						// reset other empty placeholders
-						$('.cms_dragbar-empty').removeClass('cms_draggable-disallowed');
+						$('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
 						if(that.state) {
-							$(event.target).removeClass('cms_draggable-disallowed');
+							$(event.target).removeClass('cms-draggable-disallowed');
 						} else {
-							$(event.target).addClass('cms_draggable-disallowed');
+							$(event.target).addClass('cms-draggable-disallowed');
 						}
 					}, 10);
 				},
 				'out': function (event) {
 					dropzone = null;
-					$(event.target).removeClass('cms_draggable-disallowed');
+					$(event.target).removeClass('cms-draggable-disallowed');
 					clearInterval(timer);
 				},
 				'drop': function (event) {
 					dropped = true;
-					droparea = $(event.target).parent().nextAll('.cms_draggables').first();
+					droparea = $(event.target).parent().nextAll('.cms-draggables').first();
 					clearInterval(timer);
 				}
 			});

@@ -1,8 +1,8 @@
 {% load i18n l10n cms_tags %}
 {% load url from future %}
 
-<div class="cms_draggable cms_draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms_draggable-disabled{% endif %}">
-	<div class="cms_dragitem cms_dragitem-handler{% if plugin.child_plugin_instances %} cms_dragitem-collapsable{% endif %}">
+<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}">
+	<div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
 		{% language request.toolbar.toolbar_language %}
 		<div class="cms_switcher"></div>
 		<div class="cms_submenu">
@@ -19,13 +19,13 @@
 		</div>
 
 		{% if show_language %}<span class="cms_submenu-lang">{{ plugin.language }}</span>{% endif %}
-		<span class="cms_dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
+		<span class="cms-dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
 
 	</div>
 
-	{% if plugin.get_plugin_class.allow_children %}<div class="cms_draggables">{% endif %}
+	{% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables">{% endif %}
 	{% if plugin.get_plugin_class.allow_children and plugin.num_children == 0 %}
-		{# <div class="cms-reset cms_draggable cms_draggable-empty"><div class="cms_dragitem">{% trans "Drop a plugin here" %}</div></div> #}
+		{# <div class="cms-reset cms-draggable cms-draggable-empty"><div class="cms-dragitem">{% trans "Drop a plugin here" %}</div></div> #}
 	{% endif %}
 	{% if plugin.child_plugin_instances %}
 		{% for child in plugin.child_plugin_instances %}
