@@ -473,7 +473,7 @@ $(document).ready(function () {
 			var timer = function () {};
 
 			// bind message event
-			var debug = this.container.find('.cms_debug-bar');
+			var debug = this.container.find('.cms-debug-bar');
 				debug.bind('mouseenter mouseleave', function (e) {
 					clearTimeout(timer);
 
