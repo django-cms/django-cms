@@ -14,6 +14,10 @@
         height: 15px;
         cursor: pointer;
         background: url("../img/toolbar/sprite_toolbar.png") no-repeat 3px -152px;
+        @include print-and-retina() {
+            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+            background-size: 190px !important;
+        }
     }
 
     .cms-submenu-lang {
@@ -101,6 +105,10 @@
         border-radius: 4px;
         cursor: default;
         background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat right -326px;
+        @include print-and-retina() {
+            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+            background-size: 190px !important;
+        }
     }
     .cms-submenu-quicksearch label {
         cursor: pointer;
