@@ -1,7 +1,7 @@
 {% load i18n l10n cms_tags %}
 {% load url from future %}
 
-<div class="cms_dragbar cms_dragbar-{{ placeholder.pk|unlocalize }}">
+<div class="cms-dragbar cms-dragbar-{{ placeholder.pk|unlocalize }}">
 	{% language request.toolbar.toolbar_language %}
 	<div class="cms_submenu">
 		<div class="cms_submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
@@ -18,9 +18,9 @@
 	</div>
 	{% endlanguage %}
 
-	<div class="cms_dragbar-title">{{ placeholder.get_label }}</div>
+	<div class="cms-dragbar-title">{{ placeholder.get_label }}</div>
 </div>
 
-<div class="cms_dragbar-empty-wrapper">
-	<div class="cms_droppable cms_dragbar-empty">{% trans "Drop a plugin here" %}</div>
+<div class="cms-dragbar-empty-wrapper">
+	<div class="cms-droppable cms-dragbar-empty">{% trans "Drop a plugin here" %}</div>
 </div>

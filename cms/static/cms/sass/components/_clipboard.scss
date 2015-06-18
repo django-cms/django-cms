@@ -94,7 +94,7 @@
         }
 
         // custom style for draggable item
-        .cms_dragarea {
+        .cms-dragarea {
             padding-top: 3px;
         }
         .cms-draggable {
@@ -109,13 +109,13 @@
             cursor: move;
             background: $color-grey-5;
         }
-        .cms-draggable .cms_dragitem {
+        .cms-draggable .cms-dragitem {
             padding-left: 20px;
         }
-        .cms-draggable .cms_dragitem .cms_submenu {
+        .cms-draggable .cms-dragitem .cms_submenu {
             display: none !important;
         }
-        .cms-draggable .cms_dragitem-text {
+        .cms-draggable .cms-dragitem-text {
             display: inline-block;
             overflow: hidden;
             width: 140px;

@@ -317,7 +317,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms_dragbar .cms_submenu')
+        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms_submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
@@ -381,7 +381,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         time.sleep(0.1)
 
         drag = ActionChains(self.driver).move_to_element(
-            self.driver.find_element_by_css_selector('.cms_dragarea-1')
+            self.driver.find_element_by_css_selector('.cms-dragarea-1')
         )
         drag.perform()
 

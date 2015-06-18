@@ -28,8 +28,8 @@ $(document).ready(function () {
 			this.render_model = $('.cms_render_model');
 			this.placeholders = $('.cms_placeholder');
 			this.dragitems = $('.cms-draggable');
-			this.dragareas = $('.cms_dragarea');
-			this.dropareas = $('.cms_droppable');
+			this.dragareas = $('.cms-dragarea');
+			this.dropareas = $('.cms-droppable');
 			this.dimmer = this.container.find('.cms-structure-dimmer');
 			this.clipboard = $('.cms-clipboard');
 
@@ -177,10 +177,10 @@ $(document).ready(function () {
 				id = cls.replace('cms-draggable-', '');
 			} else if(el.hasClass('cms_placeholder')) {
 				id = cls.replace('cms_placeholder-', '');
-			} else if(el.hasClass('cms_dragbar')) {
-				id = cls.replace('cms_dragbar-', '');
-			} else if(el.hasClass('cms_dragarea')) {
-				id = cls.replace('cms_dragarea-', '');
+			} else if(el.hasClass('cms-dragbar')) {
+				id = cls.replace('cms-dragbar-', '');
+			} else if(el.hasClass('cms-dragarea')) {
+				id = cls.replace('cms-dragarea-', '');
 			}
 
 			return id;
@@ -220,7 +220,7 @@ $(document).ready(function () {
 				this.dragareas.css('opacity', 0.2);
 
 				// show single placeholder
-				dragitem.closest('.cms_dragarea').show().css('opacity', 1);
+				dragitem.closest('.cms-dragarea').show().css('opacity', 1);
 
 			// otherwise hide and reset the board
 			} else {
@@ -228,7 +228,7 @@ $(document).ready(function () {
 			}
 
 			// collapse all previous elements
-			var collapsed = dragitem.parentsUntil('.cms_dragarea').siblings().not('.cms_dragitem-expanded');
+			var collapsed = dragitem.parentsUntil('.cms-dragarea').siblings().not('.cms-dragitem-expanded');
 				collapsed.trigger(this.click);
 
 			// set new classes
@@ -328,7 +328,7 @@ $(document).ready(function () {
 			this.placeholders.each(function (index, item) {
 				item = $(item);
 				id = item.data('settings').placeholder_id;
-				area = $('.cms_dragarea-' + id);
+				area = $('.cms-dragarea-' + id);
 				// to calculate the correct offset, we need to set the
 				// placeholders correct heights and than set the according position
 				item.height(area.outerHeight(true));
@@ -354,8 +354,8 @@ $(document).ready(function () {
 
 			this.sortables.nestedSortable({
 				'items': '.cms-draggable',
-				'handle': '.cms_dragitem',
-				'placeholder': 'cms_droppable',
+				'handle': '.cms-dragitem',
+				'placeholder': 'cms-droppable',
 				'connectWith': this.sortables,
 				'tolerance': 'pointer',
 				'toleranceElement': '> div',
@@ -378,11 +378,11 @@ $(document).ready(function () {
 				'start': function (e, ui) {
 					that.dragging = true;
 					// show empty
-					$('.cms_dragbar-empty-wrapper').show();
+					$('.cms-dragbar-empty-wrapper').show();
 					// ensure all menus are closed
-					$('.cms_dragitem .cms_submenu').hide();
+					$('.cms-dragitem .cms_submenu').hide();
 					// remove classes from empty dropzones
-					$('.cms_dragbar-empty').removeClass('cms-draggable-disallowed');
+					$('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
 					// fixes placeholder height
 					ui.placeholder.height(ui.item.height());
 					// show placeholder without entries
@@ -401,7 +401,7 @@ $(document).ready(function () {
 				'stop': function (event, ui) {
 					that.dragging = false;
 					// hide empty
-					$('.cms_dragbar-empty-wrapper').hide();
+					$('.cms-dragbar-empty-wrapper').hide();
 
 					// cancel if isAllowed returns false
 					if(!that.state) return false;
@@ -448,7 +448,7 @@ $(document).ready(function () {
 					if(original.length === 0 || original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
-					var holderId = that.getId(placeholder.closest('.cms_dragarea'));
+					var holderId = that.getId(placeholder.closest('.cms-dragarea'));
 					var holder = $('.cms_placeholder-' + holderId);
 					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms-draggable')));
 
@@ -486,7 +486,7 @@ $(document).ready(function () {
 					dropzone = $('.cms_placeholder-' + that.getId($(event.target).parent().prev()));
 					timer = setInterval(function () {
 						// reset other empty placeholders
-						$('.cms_dragbar-empty').removeClass('cms-draggable-disallowed');
+						$('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
 						if(that.state) {
 							$(event.target).removeClass('cms-draggable-disallowed');
 						} else {

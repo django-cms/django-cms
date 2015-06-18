@@ -16,7 +16,7 @@
 	{% for plugin in local_toolbar.get_clipboard_plugins %}
 	<div class="cms_plugins">{% include "cms/toolbar/plugin.html" with instance=plugin %}</div>
 	{% endfor %}
-	<div class="cms-clipboard-containers cms_dragarea cms-draggables">
+	<div class="cms-clipboard-containers cms-dragarea cms-draggables">
 		{% for plugin in local_toolbar.get_clipboard_plugins %}
 			{% with show_language="true" %}{% include "cms/toolbar/dragitem.html" with plugin=plugin %}{% endwith %}
 		{% endfor %}
