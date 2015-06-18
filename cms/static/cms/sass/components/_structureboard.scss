@@ -84,31 +84,26 @@
             height: 16px;
             padding: 0 0 0 15px;
             cursor: pointer;
+            @extend .cms-icon-arrow-wide;
 
             &:before {
-                content: " ";
+                @extend .cms-icon;
                 position: absolute;
-                top: 0;
-                left: 0;
+                top: -4px;
+                left: -5px;
+                font-size: 9px;
+                color: $color-grey-20;
                 width: 16px;
-                height: 15px;
-                background: url("../img/toolbar/sprite_toolbar.png") no-repeat -85px -113px;
+                height: 16px;
+                transform: rotate(180deg);
             }
-            &:hover {
-                &:before {
-                    background-position: -105px -113px;
-                }
+            &:hover:before {
+                color: #fff;
             }
         }
-        .cms-dragbar-title-expanded {
-            &:before {
-                background-position: -124px -114px;
-            }
-            &:hover {
-                &:before {
-                    background-position: -144px -114px !important;
-                }
-            }
+        .cms-dragbar-title-expanded:before {
+            transform: rotate(-90deg);
+            left: 2px;
         }
     }
 
