@@ -1,0 +1,39 @@
+//######################################################################################################################
+// #TOOLTIP#
+// used when hover over plugins in edit mode
+#cms_toolbar {
+    .cms-tooltip {
+        visibility: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: $color-grey-10;
+        font-size: 11px;
+        font-weight: bold;
+        line-height: 11px;
+        white-space: nowrap;
+        margin: 0;
+        padding: 5px 7px 7px 24px;
+        border-radius: 3px;
+        background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat -78px -169px;
+
+        @include print-and-retina() {
+            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+            background-size: 190px !important;
+        }
+
+        span {
+            position: absolute;
+            top: 20px;
+            right: 0;
+            float: right;
+            color: white;
+            font-weight: normal;
+            padding: 5px 7px;
+            border-radius: 3px 0 3px 3px;
+            background: $color-grey-70;
+        }
+    }
+
+    // end of toolbar
+}

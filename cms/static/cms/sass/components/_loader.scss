@@ -1,0 +1,11 @@
+//##################################################################################################################
+// #LOADER#
+#cms_toolbar {
+    .cms-loader {
+        background: $color-window url("../img/loader.gif") no-repeat center center !important;
+        @include print-and-retina() {
+            background-image: url("../img/loader@2x.gif") !important;
+            background-size: 32px !important;
+        }
+    }
+}

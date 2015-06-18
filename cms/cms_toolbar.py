@@ -300,7 +300,7 @@ class PageToolbar(CMSToolbar):
 
     # Buttons
 
-    def add_publish_button(self, classes=('cms_btn-action', 'cms_btn-publish',)):
+    def add_publish_button(self, classes=('cms-btn-action', 'cms-btn-publish',)):
         # only do dirty lookups if publish permission is granted else button isn't added anyway
         if self.toolbar.edit_mode and self.has_publish_permission():
             classes = list(classes or [])
@@ -311,7 +311,7 @@ class PageToolbar(CMSToolbar):
                                      self.page_is_pending(self.page, self.current_lang))))
 
             if dirty:
-                classes.append('cms_btn-publish-active')
+                classes.append('cms-btn-publish-active')
 
             if self.dirty_statics or (self.page and self.page.is_published(self.current_lang)):
                 title = _('Publish changes')
@@ -356,7 +356,7 @@ class PageToolbar(CMSToolbar):
         pos = len(self.toolbar.right_items)
         self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
 
-    def add_page_settings_button(self, extra_classes=('cms_btn-action',)):
+    def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
         url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.language)
         self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 

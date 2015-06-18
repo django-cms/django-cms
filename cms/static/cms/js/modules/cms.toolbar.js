@@ -51,9 +51,9 @@ $(document).ready(function () {
 			(this.settings.toolbar === 'expanded') ? this._showToolbar(0, true) : this._hideToolbar(0, true);
 
 			// hide publish button
-			var publishBtn = $('.cms_btn-publish').parent();
+			var publishBtn = $('.cms-btn-publish').parent();
 				publishBtn.hide();
-			if($('.cms_btn-publish-active').length) publishBtn.show();
+			if($('.cms-btn-publish-active').length) publishBtn.show();
 
 			// check if debug is true
 			if(CMS.config.debug) this._debug();
@@ -488,7 +488,7 @@ $(document).ready(function () {
 		_screenBlock: function () {
 			var interval = 20;
 			var blocker = this.screenBlock;
-			var sideframe = $('.cms_sideframe');
+			var sideframe = $('.cms-sideframe');
 
 			// automatically resize screenblock window according to given attributes
 			$(window).on('resize.cms.screenblock', function () {

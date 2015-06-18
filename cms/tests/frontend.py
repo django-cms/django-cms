@@ -317,19 +317,19 @@ class PlaceholderBasicTests(CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms_dragbar .cms_submenu')
+        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
 
-        submenu_link_selector = '.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
         copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
         copy_from_english.click()
 
         # Done, check if the text plugin was copied and it is only one
 
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)
@@ -345,12 +345,12 @@ class PlaceholderBasicTests(CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms_submenu')
+        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
@@ -359,7 +359,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         copy.click()
 
         time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms_clipboard')
+        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
 
         WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
 
@@ -373,7 +373,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
         drag = ActionChains(self.driver).click_and_hold(
-            clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+            clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
         )
 
         drag.perform()
@@ -381,7 +381,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         time.sleep(0.1)
 
         drag = ActionChains(self.driver).move_to_element(
-            self.driver.find_element_by_css_selector('.cms_dragarea-1')
+            self.driver.find_element_by_css_selector('.cms-dragarea-1')
         )
         drag.perform()
 
