@@ -80,7 +80,7 @@ class PlaceholderToolbar(CMSToolbar):
             if sp.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
-    def add_structure_mode_item(self, extra_classes=('cms_toolbar-item-cms-mode-switcher',)):
+    def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         build_mode = self.toolbar.build_mode
         build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
@@ -540,5 +540,5 @@ class PageToolbar(CMSToolbar):
             revert_question = _('Are you sure you want to revert to live?')
             history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
                                        disabled=not self.page.is_dirty(self.current_lang),
-                                       on_success=refresh, extra_classes=('cms_toolbar-revert',))
+                                       on_success=refresh, extra_classes=('cms-toolbar-revert',))
             history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))

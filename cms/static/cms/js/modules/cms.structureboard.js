@@ -22,7 +22,7 @@ $(document).ready(function () {
 			this.settings = CMS.settings;
 
 			// elements
-			this.toolbar = $('#cms_toolbar');
+			this.toolbar = $('#cms-toolbar');
 			this.sortables = $('.cms-draggables'); // use global scope
 			this.plugins = $('.cms_plugin');
 			this.render_model = $('.cms_render_model');
@@ -55,14 +55,14 @@ $(document).ready(function () {
 			if(!this.dragareas.length) return false;
 
 			// cancel if there is no structure / content switcher
-			if(!this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
+			if(!this.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) return false;
 
 			// setup toolbar mode
 			if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
 
 			// check if modes should be visible
 			if(this.placeholders.length) {
-				this.toolbar.find('.cms_toolbar-item-cms-mode-switcher').show();
+				this.toolbar.find('.cms-toolbar-item-cms-mode-switcher').show();
 			}
 
 			// add drag & drop functionality
@@ -73,7 +73,7 @@ $(document).ready(function () {
 
 		_events: function () {
 			var that = this;
-			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+			var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
 
 			// show edit mode
 			modes.eq(1).bind(this.click, function (e) {
@@ -99,12 +99,12 @@ $(document).ready(function () {
 				// 32 = space
 				if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
 					// cancel if there is no structure / content switcher
-					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
+					if(!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.hide();
 				} else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
 					// cancel if there is no structure / content switcher
-					if(!that.toolbar.find('.cms_toolbar-item-cms-mode-switcher').length) return false;
+					if(!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) return false;
 					e.preventDefault();
 					that.show();
 				} else if(e.keyCode === 16) {
@@ -126,7 +126,7 @@ $(document).ready(function () {
 			if(CMS.config.mode === 'live') return false;
 
 			// set active item
-			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+			var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
 				modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
 
 			// show clipboard
@@ -148,7 +148,7 @@ $(document).ready(function () {
 			if(CMS.config.mode === 'live') return false;
 
 			// set active item
-			var modes = this.toolbar.find('.cms_toolbar-item-cms-mode-switcher a');
+			var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
 				modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
 
 			// hide clipboard if in edit mode

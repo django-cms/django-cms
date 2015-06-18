@@ -269,7 +269,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('%s?%s' % (
                 page_3.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms_toolbar-item_switch')
+        self.assertNotContains(response, 'cms-toolbar-item-switch')
         self.assertEqual(page_3.get_public_url(), '')
         self.assertNotEqual(page_3.get_draft_url(), page_3.get_public_url())
 

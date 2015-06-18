@@ -1,21 +1,21 @@
 {% load i18n l10n %}
 
 {% language request.toolbar.toolbar_language %}
-<div id="cms_toolbar" class="cms-reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}{% if debug %} cms_toolbar-debug{% endif %}" dir="ltr">
+<div id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr">
 
 	{# debug, tooltip #}
 	<div class="cms_debug-bar"></div>
 	<div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
 
 	{# start: toolbar #}
-	<div class="cms_toolbar">
-		<div class="cms_toolbar-left">
+	<div class="cms-toolbar">
+		<div class="cms-toolbar-left">
 			{% include "cms/toolbar/items/logo.html" %}
 
 			{% if not user.is_authenticated %}
 			{% include "cms/toolbar/items/login.html" %}
 			{% else %}
-			<ul class="cms_toolbar-item cms_toolbar-item-navigation">
+			<ul class="cms-toolbar-item cms-toolbar-item-navigation">
 				{% for item in request.toolbar.get_left_items %}
 					{{ item.render }}
 				{% endfor %}
@@ -23,13 +23,13 @@
 			{% endif %}
 		</div>
 
-		<div class="cms_toolbar-right">
+		<div class="cms-toolbar-right">
 			{% for item in request.toolbar.get_right_items %}
 				{{ item.render }}
 			{% endfor %}
 		</div>
 	</div>
-	<div class="cms_toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
+	<div class="cms-toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
 	{# end: toolbar #}
 
 	{# start: messages #}

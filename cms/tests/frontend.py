@@ -173,14 +173,14 @@ class ToolbarBasicTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
         password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
     def test_toolbar_login_view(self):
         User = get_user_model()
@@ -295,7 +295,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
 
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -303,7 +303,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
     def test_copy_from_language(self):
         self._login()
@@ -314,7 +314,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 0)
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
         submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms_submenu')
@@ -342,7 +342,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
         cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
@@ -428,7 +428,7 @@ class StaticPlaceholderPermissionTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
 
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -436,7 +436,7 @@ class StaticPlaceholderPermissionTests(CMSLiveTests):
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
         pk = Placeholder.objects.filter(slot='logo').order_by('id')[0].pk
         placeholder_name = 'cms_placeholder-%s' % pk

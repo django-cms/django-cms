@@ -18,18 +18,18 @@ $(document).ready(function () {
 		},
 
 		initialize: function (options) {
-			this.container = $('#cms_toolbar');
+			this.container = $('#cms-toolbar');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
 			this.settings = CMS.settings;
 
 			// elements
 			this.body = $('html');
-			this.toolbar = this.container.find('.cms_toolbar').hide();
-			this.toolbarTrigger = this.container.find('.cms_toolbar-trigger');
-			this.navigations = this.container.find('.cms_toolbar-item-navigation');
-			this.buttons = this.container.find('.cms_toolbar-item-buttons');
-			this.switcher = this.container.find('.cms_toolbar-item_switch');
+			this.toolbar = this.container.find('.cms-toolbar').hide();
+			this.toolbarTrigger = this.container.find('.cms-toolbar-trigger');
+			this.navigations = this.container.find('.cms-toolbar-item-navigation');
+			this.buttons = this.container.find('.cms-toolbar-item-buttons');
+			this.switcher = this.container.find('.cms-toolbar-item-switch');
 			this.messages = this.container.find('.cms_messages');
 			this.screenBlock = this.container.find('.cms_screenblock');
 
@@ -74,7 +74,7 @@ $(document).ready(function () {
 			if(CMS.config.publisher) {
 				this.openMessage(CMS.config.publisher, 'right');
 				setInterval(function () {
-					CMS.$('.cms_toolbar-item_switch').toggleClass('cms_toolbar-item_switch-highlight');
+					CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
 				}, this.options.messageDelay);
 			}
 
@@ -105,10 +105,10 @@ $(document).ready(function () {
 			this.navigations.each(function () {
 				var item = $(this);
 				var lists = item.find('li');
-				var root = 'cms_toolbar-item-navigation';
-				var hover = 'cms_toolbar-item-navigation-hover';
-				var disabled = 'cms_toolbar-item-navigation-disabled';
-				var children = 'cms_toolbar-item-navigation-children';
+				var root = 'cms-toolbar-item-navigation';
+				var hover = 'cms-toolbar-item-navigation-hover';
+				var disabled = 'cms-toolbar-item-navigation-disabled';
+				var children = 'cms-toolbar-item-navigation-children';
 
 				// remove events from first level
 				item.find('a').bind(that.click, function (e) {
@@ -151,7 +151,7 @@ $(document).ready(function () {
 				// attach hover
 				lists.find('li').bind('mouseenter mouseleave', function () {
 					var el = $(this);
-					var parent = el.closest('.cms_toolbar-item-navigation-children').add(el.parents('.cms_toolbar-item-navigation-children'));
+					var parent = el.closest('.cms-toolbar-item-navigation-children').add(el.parents('.cms-toolbar-item-navigation-children'));
 					var hasChildren = el.hasClass(children) || parent.length;
 
 					// do not attach hover effect if disabled
@@ -351,7 +351,7 @@ $(document).ready(function () {
 
 		// private methods
 		_showToolbar: function (speed, init) {
-			this.toolbarTrigger.addClass('cms_toolbar-trigger-expanded');
+			this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
 			this.toolbar.slideDown(speed);
 			// animate html
 			this.body.animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed, function () {
@@ -368,7 +368,7 @@ $(document).ready(function () {
 			// cancel if sideframe is active
 			if(this.lockToolbar) return false;
 
-			this.toolbarTrigger.removeClass('cms_toolbar-trigger-expanded');
+			this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
 			this.toolbar.slideUp(speed);
 			// animate html
 			this.body.removeClass('cms-toolbar-expanded').animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
@@ -381,9 +381,9 @@ $(document).ready(function () {
 
 		_setSwitcher: function (el) {
 			// save local vars
-			var active = el.hasClass('cms_toolbar-item_switch-active');
+			var active = el.hasClass('cms-toolbar-item-switch-active');
 			var anchor = el.find('a');
-			var knob = el.find('.cms_toolbar-item_switch-knob');
+			var knob = el.find('.cms-toolbar-item-switch-knob');
 			var duration = 300;
 
 			// prevent if switchopstion is passed
@@ -461,9 +461,9 @@ $(document).ready(function () {
 
 		_loader: function (loader) {
 			if(loader) {
-				this.toolbarTrigger.addClass('cms_toolbar-loader');
+				this.toolbarTrigger.addClass('cms-toolbar-loader');
 			} else {
-				this.toolbarTrigger.removeClass('cms_toolbar-loader');
+				this.toolbarTrigger.removeClass('cms-toolbar-loader');
 			}
 		},
 
