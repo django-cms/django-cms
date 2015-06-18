@@ -317,12 +317,12 @@ class PlaceholderBasicTests(CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms_submenu')
+        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
 
-        submenu_link_selector = '.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
         copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
         copy_from_english.click()
@@ -350,7 +350,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms_submenu')
+        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()

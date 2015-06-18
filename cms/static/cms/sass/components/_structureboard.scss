@@ -173,15 +173,15 @@
         }
 
         // menu overwrites
-        .cms_submenu {
+        .cms-submenu {
             display: none;
             margin-top: 2px;
         }
-        .cms_submenu-dropdown {
+        .cms-submenu-dropdown {
             top: 22px;
             right: -6px;
         }
-        .cms_submenu-quicksearch {
+        .cms-submenu-quicksearch {
             top: -6px;
             right: -5px;
             height: 28px;
@@ -189,19 +189,19 @@
             border-radius: 0;
             background: $color-grey-5 url("../img/toolbar/sprite_toolbar.png") no-repeat right -415px;
         }
-        .cms_submenu-quicksearch input {
+        .cms-submenu-quicksearch input {
             color: black;
             margin-top: 1px;
         }
 
-        .cms-draggable .cms_submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms_submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms_submenu-quicksearch {
+        .cms-draggable .cms-submenu-quicksearch,
+        .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
+        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
             background-color: white;
         }
-        .cms-draggable .cms-draggable .cms_submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms_submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms_submenu-quicksearch {
+        .cms-draggable .cms-draggable .cms-submenu-quicksearch,
+        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
+        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
             background-color: $color-grey-5;
         }
 
@@ -324,7 +324,7 @@ body > .cms-draggable {
 body > .cms-draggable .cms_switcher {
     display: none !important;
 }
-body > .cms-draggable .cms_submenu {
+body > .cms-draggable .cms-submenu {
     display: none !important;
 }
 body > .cms-draggable .cms-draggables {

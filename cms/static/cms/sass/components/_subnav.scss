@@ -6,7 +6,7 @@
 #cms_toolbar {
     //######################################################################################################################
     // #SUBNAV#
-    .cms_submenu {
+    .cms-submenu {
         display: block;
         position: absolute;
         right: 5px;
@@ -16,7 +16,7 @@
         background: url("../img/toolbar/sprite_toolbar.png") no-repeat 3px -152px;
     }
 
-    .cms_submenu-lang {
+    .cms-submenu-lang {
         position: absolute;
         top: 3px;
         right: 3px;
@@ -26,7 +26,7 @@
         background: white;
     }
 
-    .cms_submenu-dropdown {
+    .cms-submenu-dropdown {
         display: none;
         position: absolute;
         top: 20px;
@@ -54,10 +54,10 @@
             box-shadow: 0 0 1px rgba(white, 0.5);
         }
 
-        .cms_submenu-item {
+        .cms-submenu-item {
             zoom: 1;
         }
-        .cms_submenu-item a,
+        .cms-submenu-item a,
         span {
             display: block;
             font-size: 12px;
@@ -66,7 +66,7 @@
             padding: 4px 8px 3px 8px;
         }
 
-        .cms_submenu-item a {
+        .cms-submenu-item a {
             color: black;
             &:hover,
             &:focus {
@@ -78,19 +78,19 @@
                 border-top: none;
             }
         }
-        .cms_submenu-item span {
+        .cms-submenu-item span {
             color: black;
             font-weight: bold;
             border-top: 1px solid $color-grey-20;
             border-bottom: 1px solid $color-grey-10;
             cursor: default;
         }
-        .cms_submenu-item:first-child span {
+        .cms-submenu-item:first-child span {
             border-top: none;
         }
     }
 
-    .cms_submenu-quicksearch {
+    .cms-submenu-quicksearch {
         display: none;
         position: absolute;
         top: -5px;
@@ -102,10 +102,10 @@
         cursor: default;
         background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat right -326px;
     }
-    .cms_submenu-quicksearch label {
+    .cms-submenu-quicksearch label {
         cursor: pointer;
     }
-    .cms_submenu-quicksearch input {
+    .cms-submenu-quicksearch input {
         display: block;
         color: white;
         font-size: 12px;
@@ -121,7 +121,7 @@
     }
 
     // scrollhint
-    .cms_submenu-scroll-hint {
+    .cms-submenu-scroll-hint {
         display: none;
         position: absolute;
         bottom: 0;
