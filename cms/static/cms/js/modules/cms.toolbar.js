@@ -488,7 +488,7 @@ $(document).ready(function () {
 		_screenBlock: function () {
 			var interval = 20;
 			var blocker = this.screenBlock;
-			var sideframe = $('.cms_sideframe');
+			var sideframe = $('.cms-sideframe');
 
 			// automatically resize screenblock window according to given attributes
 			$(window).on('resize.cms.screenblock', function () {
