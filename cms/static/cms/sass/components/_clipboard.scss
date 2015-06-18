@@ -88,7 +88,7 @@
             z-index: 99;
             width: 0;
         }
-        .cms-clipboard-containers .cms_draggable {
+        .cms-clipboard-containers .cms-draggable {
             width: 190px;
             margin-left: -220px;
         }
@@ -97,7 +97,7 @@
         .cms_dragarea {
             padding-top: 3px;
         }
-        .cms_draggable {
+        .cms-draggable {
             position: relative;
             top: 0;
             left: 0;
@@ -109,13 +109,13 @@
             cursor: move;
             background: $color-grey-5;
         }
-        .cms_draggable .cms_dragitem {
+        .cms-draggable .cms_dragitem {
             padding-left: 20px;
         }
-        .cms_draggable .cms_dragitem .cms_submenu {
+        .cms-draggable .cms_dragitem .cms_submenu {
             display: none !important;
         }
-        .cms_draggable .cms_dragitem-text {
+        .cms-draggable .cms_dragitem-text {
             display: inline-block;
             overflow: hidden;
             width: 140px;

@@ -25,7 +25,7 @@ $(document).ready(function () {
 			this.settings = CMS.settings;
 
 			// elements
-			this.containers = this.clipboard.find('.cms-clipboard-containers > .cms_draggable');
+			this.containers = this.clipboard.find('.cms-clipboard-containers > .cms-draggable');
 			this.triggers = this.clipboard.find('.cms-clipboard-triggers a');
 			this.triggerRemove = this.clipboard.find('.cms-clipboard-empty a');
 

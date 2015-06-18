@@ -81,14 +81,14 @@
 	{# end: modal #}
 
 	{# start: structure #}
-	<div class="cms_structure">
-		<div class="cms_structure-content">
+	<div class="cms-structure">
+		<div class="cms-structure-content">
 			{% for placeholder in request.toolbar.placeholders.values %}
 			<div class="cms_dragarea cms_dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms_dragarea-static{% endif %}">
 				{% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
 				{# <div class="cms_dragitem cms_dragitem-1888"> #}
-				<div class="cms_draggables">
+				<div class="cms-draggables">
 				{% with placeholder.slot as slot %}
 				{% for plugin in placeholder.get_cached_plugins %}
 					{% include "cms/toolbar/dragitem.html" with plugin=plugin %}
@@ -99,7 +99,7 @@
 			</div>
 			{% endfor %}
 		</div>
-		<div class="cms_structure-dimmer"></div>
+		<div class="cms-structure-dimmer"></div>
 	</div>
 	{# end: structure #}
 

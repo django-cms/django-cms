@@ -329,7 +329,7 @@ class PlaceholderBasicTests(CMSLiveTests):
 
         # Done, check if the text plugin was copied and it is only one
 
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)
@@ -345,7 +345,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
@@ -373,7 +373,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
         drag = ActionChains(self.driver).click_and_hold(
-            clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+            clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
         )
 
         drag.perform()
