@@ -282,9 +282,9 @@
             span {
                 font-size: 10px;
             }
-        }
-        .cms_messages-close:hover span {
-            color: $color-blue;
+            &:hover span {
+                color: $color-blue;
+            }
         }
     }
     .cms_messages-error strong {
