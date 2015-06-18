@@ -16,14 +16,16 @@
         width: 0;
         height: 100%;
 
-        .cms-sideframe-frame {
-            position: relative;
-            overflow: hidden;
-            z-index: 10;
-            width: 100%;
-            height: 100%;
-            background: white;
-        }
+    }
+
+    .cms-sideframe-frame {
+        position: relative;
+        overflow: hidden;
+        z-index: 10;
+        width: 100%;
+        height: 100%;
+        background: white;
+
         iframe {
             overflow: auto;
             width: 100%;
@@ -31,84 +33,84 @@
             border: none;
             background: white;
         }
+    }
 
-        .cms-sideframe-resize {
-            position: absolute;
-            top: 0;
-            right: -2px;
-            z-index: 30;
-            width: 2px;
-            height: 100%;
-            cursor: col-resize;
-            background: $color-grey-70;
-        }
-        .cms-sideframe-shim {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-        }
-        .cms-sideframe-knob {
-            position: absolute;
-            top: 50%;
-            right: -2px;
-            width: 6px;
-            height: 50px;
-            margin-top: -15px;
-            border-radius: 3px;
-            background: $color-grey-70;
-        }
+    .cms-sideframe-resize {
+        position: absolute;
+        top: 0;
+        right: -2px;
+        z-index: 30;
+        width: 2px;
+        height: 100%;
+        cursor: col-resize;
+        background: $color-grey-70;
+    }
+    .cms-sideframe-shim {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+    }
+    .cms-sideframe-knob {
+        position: absolute;
+        top: 50%;
+        right: -2px;
+        width: 6px;
+        height: 50px;
+        margin-top: -15px;
+        border-radius: 3px;
+        background: $color-grey-70;
+    }
 
-        .cms-sideframe-btn {
-            position: absolute;
-            top: 50px;
-            right: -20px;
-            z-index: 40;
-        }
-        .cms-sideframe-close,
-        .cms-sideframe-hide,
-        .cms-sideframe-maximize {
-            cursor: pointer;
-            font-size: 8px;
-            color: $color-grey-10;
-            text-align: center;
-            width: 20px;
-            height: 20px;
-            margin-bottom: 2px;
-            border-radius: 0 3px 3px 0;
-            background: $color-grey-70;
+    .cms-sideframe-btn {
+        position: absolute;
+        top: 50px;
+        right: -20px;
+        z-index: 40;
+    }
+    .cms-sideframe-close,
+    .cms-sideframe-hide,
+    .cms-sideframe-maximize {
+        cursor: pointer;
+        font-size: 8px;
+        color: $color-grey-10;
+        text-align: center;
+        width: 20px;
+        height: 20px;
+        margin-bottom: 2px;
+        border-radius: 0 3px 3px 0;
+        background: $color-grey-70;
 
-            &:hover {
-                color: white;
-                background-color: $color-grey-90;
-            }
-
-            span {
-                position: relative;
-                top: 2px;
-            }
+        &:hover {
+            color: white;
+            background-color: $color-grey-90;
         }
 
-        .cms-sideframe-hide {
-            font-size: 10px;
-            height: 30px;
-            border: none;
-            span {
-                top: 6px;
-            }
+        span {
+            position: relative;
+            top: 2px;
         }
+    }
 
-        .cms-sideframe-hidden span {
-            color: $color-blue;
-            transform: rotate(180deg);
+    .cms-sideframe-hide {
+        font-size: 10px;
+        height: 30px;
+        border: none;
+        span {
+            top: 6px;
         }
+    }
 
-        .cms-sideframe-minimize span {
-            color: $color-blue;
-        }
+    .cms-sideframe-hidden span {
+        color: $color-blue;
+        transform: rotate(180deg);
+    }
+
+    .cms-sideframe-minimize span {
+        color: $color-blue;
     }
 
     // end of toolbar
