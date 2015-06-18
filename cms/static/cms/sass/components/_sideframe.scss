@@ -6,7 +6,7 @@
 #cms_toolbar {
     //##################################################################################################################
     // #SIDEFRAME#
-    .cms_sideframe {
+    .cms-sideframe {
         display: none;
         position: fixed;
         top: 0;
@@ -16,7 +16,7 @@
         width: 0;
         height: 100%;
 
-        .cms_sideframe-frame {
+        .cms-sideframe-frame {
             position: relative;
             overflow: hidden;
             z-index: 10;
@@ -32,7 +32,7 @@
             background: white;
         }
 
-        .cms_sideframe-resize {
+        .cms-sideframe-resize {
             position: absolute;
             top: 0;
             right: -2px;
@@ -42,7 +42,7 @@
             cursor: col-resize;
             background: $color-grey-70;
         }
-        .cms_sideframe-shim {
+        .cms-sideframe-shim {
             position: absolute;
             top: 0;
             left: 0;
@@ -51,7 +51,7 @@
             height: 100%;
             background: transparent;
         }
-        .cms_sideframe-knob {
+        .cms-sideframe-knob {
             position: absolute;
             top: 50%;
             right: -2px;
@@ -62,15 +62,15 @@
             background: $color-grey-70;
         }
 
-        .cms_sideframe-btn {
+        .cms-sideframe-btn {
             position: absolute;
             top: 50px;
             right: -20px;
             z-index: 40;
         }
-        .cms_sideframe-close,
-        .cms_sideframe-hide,
-        .cms_sideframe-maximize {
+        .cms-sideframe-close,
+        .cms-sideframe-hide,
+        .cms-sideframe-maximize {
             cursor: pointer;
             font-size: 8px;
             color: $color-grey-10;
@@ -92,7 +92,7 @@
             }
         }
 
-        .cms_sideframe-hide {
+        .cms-sideframe-hide {
             font-size: 10px;
             height: 30px;
             border: none;
@@ -101,12 +101,12 @@
             }
         }
 
-        .cms_sideframe-hidden span {
+        .cms-sideframe-hidden span {
             color: $color-blue;
             transform: rotate(180deg);
         }
 
-        .cms_sideframe-minimize span {
+        .cms-sideframe-minimize span {
             color: $color-blue;
         }
     }
