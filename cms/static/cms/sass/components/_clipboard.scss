@@ -6,7 +6,7 @@
 #cms_toolbar {
     //##################################################################################################################
     // #CLIPBOARD#
-    .cms_clipboard {
+    .cms-clipboard {
         display: none;
         position: fixed;
         top: 130px;
@@ -21,10 +21,10 @@
             padding: 0;
         }
 
-        .cms_clipboard-numbers {
+        .cms-clipboard-numbers {
             margin: 0 0 2px;
         }
-        .cms_clipboard-numbers a {
+        .cms-clipboard-numbers a {
             @include hide-content();
             display: block;
             overflow: hidden;
@@ -43,11 +43,11 @@
                 background-position: -20px -130px;
             }
         }
-        .cms_clipboard-numbers .cms_clipboard-numbers {
+        .cms-clipboard-numbers .cms-clipboard-numbers {
             display: none !important;
         }
 
-        .cms_clipboard-empty a {
+        .cms-clipboard-empty a {
             @include hide-content();
             display: block;
             width: 20px;
@@ -64,22 +64,22 @@
         }
 
         // placeholders
-        .cms_clipboard-triggers {
+        .cms-clipboard-triggers {
             position: relative;
             z-index: 999;
         }
-        .cms_clipboard-triggers .cms_clipboard-numbers:nth-child(n+6) {
+        .cms-clipboard-triggers .cms-clipboard-numbers:nth-child(n+6) {
             display: none;
         }
 
-        .cms_clipboard-containers {
+        .cms-clipboard-containers {
             position: absolute;
             top: 0;
             left: -1px;
             z-index: 99;
             width: 0;
         }
-        .cms_clipboard-containers .cms_draggable {
+        .cms-clipboard-containers .cms_draggable {
             width: 190px;
             margin-left: -220px;
         }

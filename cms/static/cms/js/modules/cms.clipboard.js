@@ -19,15 +19,15 @@ $(document).ready(function () {
 		},
 
 		initialize: function (options) {
-			this.clipboard = $('.cms_clipboard');
+			this.clipboard = $('.cms-clipboard');
 			this.options = $.extend(true, {}, this.options, options);
 			this.config = CMS.config;
 			this.settings = CMS.settings;
 
 			// elements
-			this.containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
-			this.triggers = this.clipboard.find('.cms_clipboard-triggers a');
-			this.triggerRemove = this.clipboard.find('.cms_clipboard-empty a');
+			this.containers = this.clipboard.find('.cms-clipboard-containers > .cms_draggable');
+			this.triggers = this.clipboard.find('.cms-clipboard-triggers a');
+			this.triggerRemove = this.clipboard.find('.cms-clipboard-empty a');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
@@ -52,7 +52,7 @@ $(document).ready(function () {
 
 				if(e.type === 'mouseleave' && !that.containers.has(e.toElement).length) hide();
 
-				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
+				var index = that.clipboard.find('.cms-clipboard-triggers a').index(this);
 				var el = that.containers.eq(index);
 				// cancel if element is already open
 				if(el.data('open') === true) return false;
