@@ -193,7 +193,10 @@
             height: 28px;
             border-left: 1px dotted $color-grey-10;
             border-radius: 0;
-            background: $color-grey-5 url("../img/toolbar/sprite_toolbar.png") no-repeat right -415px;
+            background: $color-grey-5;
+            &:before {
+                color: $color-grey-70;
+            }
         }
         .cms-submenu-quicksearch input {
             color: black;

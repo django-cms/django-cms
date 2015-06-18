@@ -95,6 +95,8 @@
     }
 
     .cms-submenu-quicksearch {
+        @extend .cms-icon-search;
+        cursor: default;
         display: none;
         position: absolute;
         top: -5px;
@@ -103,11 +105,15 @@
         text-align: right;
         height: 25px;
         border-radius: 4px;
-        cursor: default;
-        background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat right -326px;
-        @include print-and-retina() {
-            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-            background-size: 190px !important;
+        background: $color-grey-70;
+
+        &:before {
+            @extend .cms-icon;
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            font-size: 13px;
+            color: white;
         }
     }
     .cms-submenu-quicksearch label {
@@ -117,9 +123,10 @@
         display: block;
         color: white;
         font-size: 12px;
+        line-height: 12px;
         text-align: right;
         width: 109px;
-        height: 20px;
+        height: 24px;
         margin-right: 25px;
         padding: 3px 1px 1px 5px;
         border: none;
