@@ -380,7 +380,7 @@ $(document).ready(function () {
 					// show empty
 					$('.cms-dragbar-empty-wrapper').show();
 					// ensure all menus are closed
-					$('.cms-dragitem .cms_submenu').hide();
+					$('.cms-dragitem .cms-submenu').hide();
 					// remove classes from empty dropzones
 					$('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
 					// fixes placeholder height
