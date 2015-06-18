@@ -56,7 +56,8 @@ gulp.task('icons', function () {
         targetPath: '../sass/components/_iconography.scss'
     }))
     .pipe(iconfont({
-        fontName: 'django-cms-iconfont'
+        fontName: 'django-cms-iconfont',
+        normalize: true
     }))
     .on('glyphs', function(glyphs, options) {
         gutil.log.bind(glyphs, options);
