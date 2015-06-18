@@ -31,7 +31,7 @@ $(document).ready(function () {
 			this.dragareas = $('.cms_dragarea');
 			this.dropareas = $('.cms_droppable');
 			this.dimmer = this.container.find('.cms_structure-dimmer');
-			this.clipboard = $('.cms_clipboard');
+			this.clipboard = $('.cms-clipboard');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
@@ -152,7 +152,7 @@ $(document).ready(function () {
 				modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
 
 			// hide clipboard if in edit mode
-			this.container.find('.cms_clipboard').hide();
+			this.container.find('.cms-clipboard').hide();
 
 			// hide clipboard
 			this.clipboard.hide();
@@ -418,7 +418,7 @@ $(document).ready(function () {
 					var plugin = $('.cms_plugin-' + id);
 
 					// check if we copy/paste a plugin or not
-					if(plugin.closest('.cms_clipboard').length) {
+					if(plugin.closest('.cms-clipboard').length) {
 						plugin.trigger('cms.plugin.update');
 					} else {
 						plugin.trigger('cms.plugins.update');

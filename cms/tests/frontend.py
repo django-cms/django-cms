@@ -359,7 +359,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         copy.click()
 
         time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms_clipboard')
+        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
 
         WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
 
