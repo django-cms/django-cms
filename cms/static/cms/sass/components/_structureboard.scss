@@ -182,6 +182,11 @@
         .cms-submenu {
             display: none;
             margin-top: 2px;
+            &:before {
+                color: $color-grey-70;
+                left: 2px;
+                top: -1px;
+            }
         }
         .cms-submenu-dropdown {
             top: 22px;

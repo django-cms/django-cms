@@ -13,10 +13,13 @@
         width: 20px;
         height: 15px;
         cursor: pointer;
-        background: url("../img/toolbar/sprite_toolbar.png") no-repeat 3px -152px;
-        @include print-and-retina() {
-            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-            background-size: 190px !important;
+        @extend .cms-icon-menu;
+        &:before {
+            @extend .cms-icon;
+            position: relative;
+            left: 4px;
+            font-size: 16px;
+            color: #fff;
         }
     }
 
