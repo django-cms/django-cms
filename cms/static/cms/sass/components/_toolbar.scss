@@ -420,7 +420,7 @@
     // TODO Reimplement blinking if unpublished content is present
     //##################################################################################################################
     // #TOOLBAR/blocker#
-    .cms_screenblock {
+    .cms-screenblock {
         position: fixed;
         top: 0;
         right: 0;
@@ -433,7 +433,7 @@
         background-color: black;
     }
 
-    .cms_screenblock .cms_screenblock-inner {
+    .cms-screenblock-inner {
         margin-top: 300px;
         h1 {
             font-size: 28px;

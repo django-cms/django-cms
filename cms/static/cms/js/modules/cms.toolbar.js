@@ -31,7 +31,7 @@ $(document).ready(function () {
 			this.buttons = this.container.find('.cms-toolbar-item-buttons');
 			this.switcher = this.container.find('.cms-toolbar-item-switch');
 			this.messages = this.container.find('.cms-messages');
-			this.screenBlock = this.container.find('.cms_screenblock');
+			this.screenBlock = this.container.find('.cms-screenblock');
 
 			// states
 			this.click = 'click.cms';
