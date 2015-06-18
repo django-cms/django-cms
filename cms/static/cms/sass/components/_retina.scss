@@ -2,8 +2,7 @@
 // #RETINA#
 @include print-and-retina() {
     // #RETINA TOOLBAR#
-    .cms_placeholders-menu,
-    .cms_toolbar-debug .cms_debug-bar {
+    .cms_placeholders-menu {
         background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
         background-size: 190px !important;
     }

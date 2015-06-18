@@ -29,7 +29,7 @@ $(document).ready(function () {
 			// elements
 			this.body = $('html');
 			this.modal = $('.cms-modal');
-			this.toolbar = $('.cms_toolbar');
+			this.toolbar = $('.cms-toolbar');
 
 			// states
 			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
@@ -260,7 +260,7 @@ $(document).ready(function () {
 				});
 
 				this.modal.css({
-					'left': this.toolbar.find('.cms_toolbar-left').outerWidth(true) + 50,
+					'left': this.toolbar.find('.cms-toolbar-left').outerWidth(true) + 50,
 					'top': (this.config.debug) ? 6 : 1,
 					'margin': 0
 				});
