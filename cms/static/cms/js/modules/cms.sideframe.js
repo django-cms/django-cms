@@ -26,7 +26,7 @@ $(document).ready(function () {
 			this.settings = CMS.settings;
 
 			// elements
-			this.sideframe = $('.cms_sideframe');
+			this.sideframe = $('.cms-sideframe');
 			this.body = $('html');
 
 			// states
@@ -45,13 +45,13 @@ $(document).ready(function () {
 			var that = this;
 
 			// attach close event
-			this.sideframe.find('.cms_sideframe-close').bind(this.click, function () {
+			this.sideframe.find('.cms-sideframe-close').bind(this.click, function () {
 				that.close(true);
 			});
 
 			// attach hide event
-			this.sideframe.find('.cms_sideframe-hide').bind(this.click, function () {
-				if($(this).hasClass('cms_sideframe-hidden')) {
+			this.sideframe.find('.cms-sideframe-hide').bind(this.click, function () {
+				if($(this).hasClass('cms-sideframe-hidden')) {
 					that.settings.sideframe.hidden = false;
 					that._show(that.settings.sideframe.position || that.options.sideframeWidth, true);
 				} else {
@@ -62,8 +62,8 @@ $(document).ready(function () {
 			});
 
 			// attach maximize event
-			this.sideframe.find('.cms_sideframe-maximize').bind(this.click, function () {
-				if($(this).hasClass('cms_sideframe-minimize')) {
+			this.sideframe.find('.cms-sideframe-maximize').bind(this.click, function () {
+				if($(this).hasClass('cms-sideframe-minimize')) {
 					that.settings.sideframe.maximized = false;
 					that._minimize();
 				} else {
@@ -74,7 +74,7 @@ $(document).ready(function () {
 				that.settings = that.setSettings(that.settings);
 			});
 
-			this.sideframe.find('.cms_sideframe-resize').bind('mousedown', function (e) {
+			this.sideframe.find('.cms-sideframe-resize').bind('mousedown', function (e) {
 				e.preventDefault();
 				that._startResize();
 			});
@@ -91,7 +91,7 @@ $(document).ready(function () {
 			var that = this;
 			var language = 'language=' + CMS.config.request.language;
 			var page_id = 'page_id=' + CMS.config.request.page_id;
-			var holder = this.sideframe.find('.cms_sideframe-frame');
+			var holder = this.sideframe.find('.cms-sideframe-frame');
 			var initialized = false;
 
 			// push required params if defined
@@ -114,7 +114,7 @@ $(document).ready(function () {
 				// after iframe is loaded append css
 				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
 				// remove loader
-				that.sideframe.find('.cms_sideframe-frame').removeClass('cms-loader');
+				that.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
 				// than show
 				iframe.show();
 
@@ -161,7 +161,7 @@ $(document).ready(function () {
 
 			function insertHolder(iframe) {
 				// show iframe after animation
-				that.sideframe.find('.cms_sideframe-frame').addClass('cms-loader');
+				that.sideframe.find('.cms-sideframe-frame').addClass('cms-loader');
 				holder.html(iframe);
 			}
 		},
@@ -178,8 +178,8 @@ $(document).ready(function () {
 			};
 
 			// resets
-			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').show();
+			this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
+			this.sideframe.find('.cms-sideframe-hide').show();
 
 			// update settings
 			this.settings = this.setSettings(this.settings);
@@ -191,7 +191,7 @@ $(document).ready(function () {
 		// private methods
 		_show: function (width, animate) {
 			// add class
-			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden');
+			this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden');
 
 			// make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
 			this.sideframe.show();
@@ -216,7 +216,7 @@ $(document).ready(function () {
 						this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
 					}
 				}
-				this.sideframe.find('.cms_sideframe-btn').css('right', -20);
+				this.sideframe.find('.cms-sideframe-btn').css('right', -20);
 			}
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
@@ -228,7 +228,7 @@ $(document).ready(function () {
 
 		_hide: function (close) {
 			// add class
-			this.sideframe.find('.cms_sideframe-hide').addClass('cms_sideframe-hidden');
+			this.sideframe.find('.cms-sideframe-hide').addClass('cms-sideframe-hidden');
 
 			var duration = this.options.sideframeDuration;
 			// remove the iframe
@@ -238,7 +238,7 @@ $(document).ready(function () {
 				if(close) $(this).hide();
 			});
 			this.body.animate({ 'margin-left': 0 }, duration);
-			this.sideframe.find('.cms_sideframe-frame').removeClass('cms-loader');
+			this.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
 
 			// lock toolbar, set timeout to make sure CMS.API is ready
 			setTimeout(function () {
@@ -247,8 +247,8 @@ $(document).ready(function () {
 		},
 
 		_minimize: function (noPositionReset) {
-			this.sideframe.find('.cms_sideframe-maximize').removeClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').show();
+			this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
+			this.sideframe.find('.cms-sideframe-hide').show();
 
 			// reset to first state
 			if(!noPositionReset) {
@@ -262,15 +262,15 @@ $(document).ready(function () {
 		_maximize: function () {
 			var that = this;
 
-			this.sideframe.find('.cms_sideframe-maximize').addClass('cms_sideframe-minimize');
-			this.sideframe.find('.cms_sideframe-hide').hide();
+			this.sideframe.find('.cms-sideframe-maximize').addClass('cms-sideframe-minimize');
+			this.sideframe.find('.cms-sideframe-hide').hide();
 
-			this.sideframe.find('.cms_sideframe-hide').removeClass('cms_sideframe-hidden').hide();
+			this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden').hide();
 			// do custom animation
 			this.sideframe.animate({ 'width': $(window).width() }, 0);
 			this.body.animate({ 'margin-left': 0 }, 0);
 			// invert icon position
-			this.sideframe.find('.cms_sideframe-btn').css('right', -2);
+			this.sideframe.find('.cms-sideframe-btn').css('right', -2);
 			// attach resize event
 			$(window).bind('resize.cms.sideframe', function () {
 				that.sideframe.css('width', $(window).width());
@@ -282,7 +282,7 @@ $(document).ready(function () {
 			var outerOffset = 20;
 			var timer = function () {};
 			// this prevents the iframe from being focusable
-			this.sideframe.find('.cms_sideframe-shim').css('z-index', 20);
+			this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
 			this._minimize(true);
 
 			$(document).bind('mousemove.cms', function (e) {
@@ -307,7 +307,7 @@ $(document).ready(function () {
 		},
 
 		_stopResize: function () {
-			this.sideframe.find('.cms_sideframe-shim').css('z-index', 1);
+			this.sideframe.find('.cms-sideframe-shim').css('z-index', 1);
 
 			$(document).unbind('mousemove.cms');
 		},
