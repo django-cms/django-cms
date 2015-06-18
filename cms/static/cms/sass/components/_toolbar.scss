@@ -206,7 +206,7 @@
 
     //##################################################################################################################
     // #TOOLBAR/dialog#
-    .cms_messages {
+    .cms-messages {
         display: none;
         position: fixed;
         top: 30px;
@@ -248,7 +248,7 @@
             font-weight: 200;
         }
 
-        .cms_messages-close {
+        .cms-messages-close {
             display: none;
             position: relative;
             top: -2px;
@@ -260,11 +260,11 @@
             cursor: pointer;
             background: url("../img/toolbar/sprite_toolbar.png") no-repeat -100px -90px;
         }
-        .cms_messages-close:hover {
+        .cms-messages-close:hover {
             background-position: -120px -90px;
         }
     }
-    .cms_messages-error strong {
+    .cms-messages-error strong {
         color: $color-red;
     }
 

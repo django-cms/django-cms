@@ -30,7 +30,7 @@ $(document).ready(function () {
 			this.navigations = this.container.find('.cms-toolbar-item-navigation');
 			this.buttons = this.container.find('.cms-toolbar-item-buttons');
 			this.switcher = this.container.find('.cms-toolbar-item-switch');
-			this.messages = this.container.find('.cms_messages');
+			this.messages = this.container.find('.cms-messages');
 			this.screenBlock = this.container.find('.cms_screenblock');
 
 			// states
@@ -231,7 +231,7 @@ $(document).ready(function () {
 			this._lock(true);
 
 			// add content to element
-			this.messages.find('.cms_messages-inner').html(msg);
+			this.messages.find('.cms-messages-inner').html(msg);
 
 			// clear timeout
 			clearTimeout(this.timer);
@@ -241,7 +241,7 @@ $(document).ready(function () {
 			var width = 320;
 			var height = this.messages.outerHeight(true);
 			var top = this.toolbar.outerHeight(true);
-			var close = this.messages.find('.cms_messages-close');
+			var close = this.messages.find('.cms-messages-close');
 				close.hide();
 				close.bind(this.click, function () {
 					that.closeMessage();
@@ -257,8 +257,8 @@ $(document).ready(function () {
 			this.messages.css('top', -height).show();
 
 			// error handling
-			this.messages.removeClass('cms_messages-error');
-			if(error) this.messages.addClass('cms_messages-error');
+			this.messages.removeClass('cms-messages-error');
+			if(error) this.messages.addClass('cms-messages-error');
 
 			// dir should be left, center, right
 			dir = dir || 'center';

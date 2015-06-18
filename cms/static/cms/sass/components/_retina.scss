@@ -3,7 +3,7 @@
 @include print-and-retina() {
     // #RETINA TOOLBAR#
     .cms-toolbar-item-navigation-children > a span,
-    .cms_messages .cms_messages-close,
+    .cms-messages .cms-messages-close,
     .cms-toolbar-item-logo a,
     .cms_placeholders-menu,
     .cms-toolbar-debug .cms-debug-bar {
