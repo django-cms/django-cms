@@ -239,9 +239,17 @@
     }
     .cms-dragitem-collapsable {
         background: url("../img/toolbar/sprite_toolbar.png") no-repeat 1px -359px;
+        @include print-and-retina() {
+            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+            background-size: 190px !important;
+        }
     }
     .cms-dragitem-expanded {
         background: url("../img/toolbar/sprite_toolbar.png") no-repeat 0 -389px;
+        @include print-and-retina() {
+            background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+            background-size: 190px !important;
+        }
     }
     .cms-dragitem-success {
         position: absolute;
