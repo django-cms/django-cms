@@ -86,7 +86,7 @@ $(document).ready(function () {
 
 		// disable multiple form submissions
 		preventSubmit: function () {
-			var forms = $('#cms_toolbar').find('form');
+			var forms = $('#cms-toolbar').find('form');
 				forms.submit(function () {
 					// show loader
 					CMS.API.Toolbar._loader(true);

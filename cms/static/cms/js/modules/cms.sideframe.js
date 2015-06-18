@@ -119,7 +119,7 @@ $(document).ready(function () {
 				iframe.show();
 
 				// add debug infos
-				if(that.config.debug) iframe.contents().find('body').addClass('cms_debug');
+				if(that.config.debug) iframe.contents().find('body').addClass('cms-debug');
 
 				// save url in settings
 				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;

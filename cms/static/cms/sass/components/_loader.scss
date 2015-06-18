@@ -1,6 +1,6 @@
 //##################################################################################################################
 // #LOADER#
-#cms_toolbar {
+#cms-toolbar {
     .cms-loader {
         background: $color-window url("../img/loader.gif") no-repeat center center !important;
         @include print-and-retina() {

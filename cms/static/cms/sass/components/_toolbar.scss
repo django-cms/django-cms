@@ -3,7 +3,7 @@
  * @copyright:	https://github.com/divio/django-cms
  */
 
-#cms_toolbar {
+#cms-toolbar {
     position: absolute;
     top: 5px;
     left: 0;
@@ -11,7 +11,7 @@
     width: 100%;
     //######################################################################################################################
     // #TOOLBAR#
-    .cms_toolbar {
+    .cms-toolbar {
         display: none;
         position: fixed;
         top: 0;
@@ -27,53 +27,53 @@
         background-color: white;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 
-        .cms_toolbar-left {
+        .cms-toolbar-left {
             position: relative;
             float: left;
             z-index: 10;
             padding-left: 10px;
         }
-        .cms_toolbar-right {
+        .cms-toolbar-right {
             position: relative;
             float: right;
             z-index: 10;
             padding-right: 32px;
         }
 
-        .cms_toolbar-left .cms_toolbar-item {
+        .cms-toolbar-left .cms-toolbar-item {
             margin-left: 10px;
         }
-        .cms_toolbar-right .cms_toolbar-item {
+        .cms-toolbar-right .cms-toolbar-item {
             margin-right: 20px;
         }
 
         // items
-        .cms_toolbar-item {
+        .cms-toolbar-item {
             float: left;
         }
-        .cms_toolbar-item-buttons a {
+        .cms-toolbar-item-buttons a {
             border-bottom: none !important;
         }
     }
 
     // do some responsive magic
     @media only screen and (max-width: 800px) {
-        .cms_toolbar-right {
+        .cms-toolbar-right {
             display: none;
         }
     }
 
     //######################################################################################################################
     // #TOOLBAR/debug#
-    &.cms_toolbar-debug {
-        .cms_toolbar {
+    &.cms-toolbar-debug {
+        .cms-toolbar {
             top: 5px !important;
         }
-        .cms_toolbar-trigger {
+        .cms-toolbar-trigger {
             top: 5px !important;
         }
 
-        .cms_debug-bar {
+        .cms-debug-bar {
             position: fixed;
             top: 0;
             left: 0;
@@ -82,15 +82,19 @@
             height: 4px;
             border-bottom: 1px solid #ddd;
             background: #fdffc8 url("../img/toolbar/sprite_toolbar.png") repeat-x left -444px;
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
         }
     }
-    &.cms_toolbar-debug #container {
+    &.cms-toolbar-debug #container {
         padding-top: 35px !important;
     }
 
     //##################################################################################################################
     // #TOOLBAR/navigation#
-    .cms_toolbar-item-navigation {
+    .cms-toolbar-item-navigation {
         li {
             position: relative;
             float: left;
@@ -111,7 +115,7 @@
         }
 
         // hover effect
-        .cms_toolbar-item-navigation-hover {
+        .cms-toolbar-item-navigation-hover {
             ul {
                 display: block;
                 position: absolute;
@@ -144,7 +148,7 @@
             }
 
             // second level
-            .cms_toolbar-item-navigation-children {
+            .cms-toolbar-item-navigation-children {
                 ul {
                     display: none;
                     top: -5px;
@@ -156,6 +160,11 @@
                 > a span {
                     display: block;
                     background: url("../img/toolbar/sprite_toolbar.png") no-repeat right -270px;
+
+                    @include print-and-retina() {
+                        background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                        background-size: 190px !important;
+                    }
                 }
             }
 
@@ -170,12 +179,12 @@
             }
 
             // add active style
-            .cms_toolbar-item-navigation-active > a {
+            .cms-toolbar-item-navigation-active > a {
                 font-weight: 800;
             }
         }
 
-        .cms_toolbar-item-navigation-break {
+        .cms-toolbar-item-navigation-break {
             @include hide-content();
             height: 1px;
             margin: 0 0 4px;
@@ -183,7 +192,7 @@
             border-bottom: 1px solid $color-grey-10;
         }
 
-        .cms_toolbar-item-navigation-disabled {
+        .cms-toolbar-item-navigation-disabled {
             a {
                 cursor: default !important;
                 opacity: 0.2;
@@ -200,13 +209,13 @@
             }
         }
     }
-    .cms_toolbar-item-cms-mode-switcher {
+    .cms-toolbar-item-cms-mode-switcher {
         display: none;
     }
 
     //##################################################################################################################
     // #TOOLBAR/dialog#
-    .cms_messages {
+    .cms-messages {
         display: none;
         position: fixed;
         top: 30px;
@@ -248,7 +257,7 @@
             font-weight: 200;
         }
 
-        .cms_messages-close {
+        .cms-messages-close {
             display: none;
             position: relative;
             top: -2px;
@@ -259,19 +268,24 @@
             margin-left: 10px;
             cursor: pointer;
             background: url("../img/toolbar/sprite_toolbar.png") no-repeat -100px -90px;
+
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
         }
-        .cms_messages-close:hover {
+        .cms-messages-close:hover {
             background-position: -120px -90px;
         }
     }
-    .cms_messages-error strong {
+    .cms-messages-error strong {
         color: $color-red;
     }
 
     //##################################################################################################################
     // #TOOLBAR/elements#
     // #TOOLBAR/elements/logo#
-    .cms_toolbar-item-logo {
+    .cms-toolbar-item-logo {
         margin: 0 !important;
 
         a {
@@ -281,6 +295,10 @@
             height: 20px;
             margin: 5px 0;
             background: url("../img/toolbar/sprite_toolbar.png") no-repeat left top;
+            @include print-and-retina() {
+                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
+                background-size: 190px !important;
+            }
             &:hover,
             &:active,
             &:focus {
@@ -290,7 +308,7 @@
     }
 
     // #TOOLBAR/elements/form#
-    .cms_form-login {
+    .cms-form-login {
         padding: 3px 0 0 0;
 
         label {
@@ -346,16 +364,16 @@
             }
         }
 
-        .cms_error {
+        .cms-error {
             color: $color-red;
         }
-        .cms_error input {
+        .cms-error input {
             border: 1px solid $color-red;
         }
     }
 
     // #TOOLBAR/elements/buttongroups#
-    .cms_toolbar-item-buttons {
+    .cms-toolbar-item-buttons {
         margin: 4px 0 4px;
 
         a {
@@ -376,7 +394,7 @@
     }
 
     // #TOOLBAR/elements/toggler#
-    .cms_toolbar-trigger {
+    .cms-toolbar-trigger {
         position: fixed;
         top: 0;
         right: 0;
@@ -408,11 +426,11 @@
         }
     }
     // #TOOLBAR/elements/loader#
-    .cms_toolbar-trigger-expanded a span {
+    .cms-toolbar-trigger-expanded a span {
         margin-top: 9px;
         transform: rotate(90deg);
     }
-    .cms_toolbar-loader a {
+    .cms-toolbar-loader a {
         background: #fcfcfc url("../img/loader.gif") no-repeat center center !important;
         background-size: 20px 20px !important;
     }
@@ -420,7 +438,7 @@
     // TODO Reimplement blinking if unpublished content is present
     //##################################################################################################################
     // #TOOLBAR/blocker#
-    .cms_screenblock {
+    .cms-screenblock {
         position: fixed;
         top: 0;
         right: 0;
@@ -433,7 +451,7 @@
         background-color: black;
     }
 
-    .cms_screenblock .cms_screenblock-inner {
+    .cms-screenblock-inner {
         margin-top: 300px;
         h1 {
             font-size: 28px;
@@ -459,7 +477,7 @@
 // #GLOBALS#
 // looks like this particular helper is not used anywhere in the core
 // TODO remove
-.cms_toolbar-noscroll {
+.cms-toolbar-noscroll {
     position: fixed;
     overflow-y: scroll;
     width: 100%;
