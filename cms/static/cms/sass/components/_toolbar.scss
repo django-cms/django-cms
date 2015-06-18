@@ -482,13 +482,3 @@
 
     // end of toolbar
 }
-
-//##################################################
-// #GLOBALS#
-// looks like this particular helper is not used anywhere in the core
-// TODO remove
-.cms_toolbar-noscroll {
-    position: fixed;
-    overflow-y: scroll;
-    width: 100%;
-}
