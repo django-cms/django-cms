@@ -271,7 +271,7 @@ django CMS you need to have the following dependencies installed:
     3. Local dependencies ``cd cms/static/cms && npm install``
 
 Styles
-------
+======
 
 We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
 are located within ``cms/static/cms/sass`` and can be compiled using the
@@ -288,8 +288,13 @@ on change::
 
     cd cms/static/cms && gulp
 
+By default, sourcemaps are not included in the compiled files. In order to turn
+them on while developing just add the ``--debug`` option::
+
+	cd cms/static/cms && gulp --debug
+
 Icons
------
+=====
 
 We are using `gulp-iconfont <https://github.com/backflip/gulp-iconfont>`_ to
 generate icon webfonts into ``cms/static/cms/fonts/``. This also creates

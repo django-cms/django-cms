@@ -5,14 +5,20 @@
 var autoprefixer = require('gulp-autoprefixer');
 var gulp = require('gulp');
 var gutil = require('gulp-util');
+var gulpif = require('gulp-if');
 var iconfont = require('gulp-iconfont');
 var iconfontCss = require('gulp-iconfont-css');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
 
+var argv = require('minimist')(process.argv.slice(2));
+
 // #####################################################################################################################
 // #SETTINGS#
+var options = {
+	debug: argv.debug
+};
 var PROJECT_ROOT = '.';
 var PROJECT_PATH = {
     'sass': PROJECT_ROOT + '/sass',
@@ -33,7 +39,7 @@ var PROJECT_PATTERNS = {
 // #TASKS#
 gulp.task('sass', function () {
     gulp.src(PROJECT_PATTERNS.sass)
-        .pipe(sourcemaps.init())
+        .pipe(gulpif(options.debug, sourcemaps.init()))
         .pipe(sass())
         .on('error', function (error) {
             gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
@@ -43,7 +49,7 @@ gulp.task('sass', function () {
             cascade: false
         }))
         .pipe(minifyCss())
-        .pipe(sourcemaps.write())
+        .pipe(gulpif(options.debug, sourcemaps.write()))
         .pipe(gulp.dest(PROJECT_PATH.css));
 });
 
