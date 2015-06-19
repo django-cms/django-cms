@@ -313,7 +313,7 @@
         background: rgba(255, 0, 0, 0.1);
     }
 
-    //.cms_placeholder .cms-draggables .cms-draggable { margin-left:0 !important; }
+    //.cms-placeholder .cms-draggables .cms-draggable { margin-left:0 !important; }
 
     // hide arrow when adding plugin-in-plugin within disabled item
     .cms-draggable-disabled > .cms-dragitem-collapsable {
@@ -339,7 +339,7 @@ body > .cms-draggable {
 }
 
 // hide elements when dragging
-body > .cms-draggable .cms_switcher {
+body > .cms-draggable .cms-switcher {
     display: none !important;
 }
 body > .cms-draggable .cms-submenu {

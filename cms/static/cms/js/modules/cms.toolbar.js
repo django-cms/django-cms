@@ -212,7 +212,7 @@ $(document).ready(function () {
 				}
 
 				// in case of the publish button
-				btn.find('.cms_publish-page').bind(that.click, function (e) {
+				btn.find('.cms-publish-page').bind(that.click, function (e) {
 					if(!confirm(that.config.lang.publish)) e.preventDefault();
 				});
 			});

@@ -439,7 +439,7 @@ class StaticPlaceholderPermissionTests(CMSLiveTests):
         self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
         pk = Placeholder.objects.filter(slot='logo').order_by('id')[0].pk
-        placeholder_name = 'cms_placeholder-%s' % pk
+        placeholder_name = 'cms-placeholder-%s' % pk
 
         # test static placeholder permission (content of static placeholders is NOT editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))

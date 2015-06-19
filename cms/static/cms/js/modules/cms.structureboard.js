@@ -24,9 +24,9 @@ $(document).ready(function () {
 			// elements
 			this.toolbar = $('#cms-toolbar');
 			this.sortables = $('.cms-draggables'); // use global scope
-			this.plugins = $('.cms_plugin');
-			this.render_model = $('.cms_render_model');
-			this.placeholders = $('.cms_placeholder');
+			this.plugins = $('.cms-plugin');
+			this.render_model = $('.cms-render-model');
+			this.placeholders = $('.cms-placeholder');
 			this.dragitems = $('.cms-draggable');
 			this.dragareas = $('.cms-dragarea');
 			this.dropareas = $('.cms-droppable');
@@ -171,12 +171,12 @@ $(document).ready(function () {
 			var id = null;
 			var cls = el.attr('class').split(' ')[1];
 
-			if(el.hasClass('cms_plugin')) {
-				id = cls.replace('cms_plugin-', '');
+			if(el.hasClass('cms-plugin')) {
+				id = cls.replace('cms-plugin-', '');
 			} else if(el.hasClass('cms-draggable')) {
 				id = cls.replace('cms-draggable-', '');
-			} else if(el.hasClass('cms_placeholder')) {
-				id = cls.replace('cms_placeholder-', '');
+			} else if(el.hasClass('cms-placeholder')) {
+				id = cls.replace('cms-placeholder-', '');
 			} else if(el.hasClass('cms-dragbar')) {
 				id = cls.replace('cms-dragbar-', '');
 			} else if(el.hasClass('cms-dragarea')) {
@@ -199,14 +199,14 @@ $(document).ready(function () {
 			var that = this;
 			// resets
 			this.dragitems.removeClass('cms-draggable-selected');
-			this.plugins.removeClass('cms_plugin-active');
+			this.plugins.removeClass('cms-plugin-active');
 
 			// only reset if no id is provided
 			if(id === false) return false;
 
 			// attach active class to current element
 			var dragitem = $('.cms-draggable-' + id);
-			var plugin = $('.cms_plugin-' + id);
+			var plugin = $('.cms-plugin-' + id);
 
 			// if we switch from content to edit, show only a single plcaeholder
 			if(state) {
@@ -233,7 +233,7 @@ $(document).ready(function () {
 
 			// set new classes
 			dragitem.addClass('cms-draggable-selected');
-			plugin.addClass('cms_plugin-active');
+			plugin.addClass('cms-plugin-active');
 		},
 
 		preventEvents: function (elements) {
@@ -415,7 +415,7 @@ $(document).ready(function () {
 					// we pass the id to the updater which checks within the backend the correct place
 					//var id = ui.item.attr('class').replace('cms-draggable cms-draggable-', '');
 					var id = that.getId(ui.item);
-					var plugin = $('.cms_plugin-' + id);
+					var plugin = $('.cms-plugin-' + id);
 
 					// check if we copy/paste a plugin or not
 					if(plugin.closest('.cms-clipboard').length) {
@@ -443,14 +443,14 @@ $(document).ready(function () {
 					// getting restriction array
 					var bounds = [];
 					// save original state events
-					var original = $('.cms_plugin-' + that.getId(originalItem));
+					var original = $('.cms-plugin-' + that.getId(originalItem));
 					// cancel if item has no settings
 					if(original.length === 0 || original.data('settings') === null) return false;
 					var type = original.data('settings').plugin_type;
 					// prepare variables for bound
 					var holderId = that.getId(placeholder.closest('.cms-dragarea'));
-					var holder = $('.cms_placeholder-' + holderId);
-					var plugin = $('.cms_plugin-' + that.getId(placeholder.closest('.cms-draggable')));
+					var holder = $('.cms-placeholder-' + holderId);
+					var plugin = $('.cms-plugin-' + that.getId(placeholder.closest('.cms-draggable')));
 
 					// now set the correct bounds
 					if(holder.length) bounds = holder.data('settings').plugin_restriction;
@@ -483,7 +483,7 @@ $(document).ready(function () {
 				'activeClass': 'cms-draggable-allowed',
 				'hoverClass': 'cms-draggable-hover-allowed',
 				'over': function (event) {
-					dropzone = $('.cms_placeholder-' + that.getId($(event.target).parent().prev()));
+					dropzone = $('.cms-placeholder-' + that.getId($(event.target).parent().prev()));
 					timer = setInterval(function () {
 						// reset other empty placeholders
 						$('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');

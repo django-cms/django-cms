@@ -513,8 +513,8 @@ class RenderingTestCase(CMSTestCase):
             method='GET',
         )
         classes = [
-            "cms_placeholder-%s" % placeholder.pk,
-            'cms_placeholder',
+            "cms-placeholder-%s" % placeholder.pk,
+            'cms-placeholder',
         ]
         output = render_placeholder_toolbar(placeholder, context, 'test', 'en')
         for cls in classes:

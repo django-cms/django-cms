@@ -2,14 +2,14 @@
 {% load i18n l10n sekizai_tags %}
 {% load url from future %}
 
-<div class="cms_placeholder cms_placeholder-{{ placeholder.pk|unlocalize }}"></div>
+<div class="cms-placeholder cms-placeholder-{{ placeholder.pk|unlocalize }}"></div>
 
 {% endspaceless %}{% addtoblock "js" %}
 <script>
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	new CMS.Plugin('cms_placeholder-{{ placeholder.pk|unlocalize }}', {
+	new CMS.Plugin('cms-placeholder-{{ placeholder.pk|unlocalize }}', {
 		'type': 'placeholder',
 		'page_language': '{{ LANGUAGE_CODE }}',
 		'placeholder_id': '{{ placeholder.pk|unlocalize }}',

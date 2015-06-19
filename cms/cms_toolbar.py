@@ -317,7 +317,7 @@ class PageToolbar(CMSToolbar):
                 title = _('Publish changes')
             else:
                 title = _('Publish page now')
-                classes.append('cms_publish-page')
+                classes.append('cms-publish-page')
 
             params = {}
 
