@@ -304,6 +304,12 @@ This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
 into the webfont. All classes will be automatically added to
 ``_iconography.scss`` as previously mentioned.
 
+Additionally we created an SVG template within
+``cms/static/cms/font/src/_template.svgz`` that you should use when converting
+or creating additional icons. It is named *svgz* so it doesn't get compiled
+into the font. When using *Adobe Illustrator* please mind the
+`following settings <images/svg_settings.png>`_.
+
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
