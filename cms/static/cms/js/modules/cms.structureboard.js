@@ -25,7 +25,7 @@ $(document).ready(function () {
 			this.toolbar = $('#cms-toolbar');
 			this.sortables = $('.cms-draggables'); // use global scope
 			this.plugins = $('.cms-plugin');
-			this.render_model = $('.cms_render_model');
+			this.render_model = $('.cms-render-model');
 			this.placeholders = $('.cms-placeholder');
 			this.dragitems = $('.cms-draggable');
 			this.dragareas = $('.cms-dragarea');

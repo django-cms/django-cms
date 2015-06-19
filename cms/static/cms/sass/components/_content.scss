@@ -1,8 +1,3 @@
-@charset "utf-8";
-/*!
- * @copyright:	https://github.com/divio/django-cms
- */
-
 //######################################################################################################################
 // #PLUGIN
 .cms-plugin {
@@ -15,7 +10,7 @@
     height: 0;
 }
 
-.cms_render_model_icon {
+.cms-render-model-icon {
     display: inline-block;
     width: 18px;
     height: 18px;
@@ -31,7 +26,7 @@
     }
 }
 
-.cms_render_model_add {
+.cms-render-model-add {
     display: inline-block;
     width: 18px;
     height: 18px;
