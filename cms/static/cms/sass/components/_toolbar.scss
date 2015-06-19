@@ -187,9 +187,6 @@
                 background: adjust-hue($color-blue, 15deg);
                 background: linear-gradient($gradient-blue);
             }
-            > a span {
-                background-position: right -300px !important;
-            }
 
             // add active style
             .cms-toolbar-item-navigation-active > a {

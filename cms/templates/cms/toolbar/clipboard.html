@@ -21,7 +21,7 @@
 			{% with show_language="true" %}{% include "cms/toolbar/dragitem.html" with plugin=plugin %}{% endwith %}
 		{% endfor %}
 	</div>
-	<p class="cms-clipboard-empty"><a href="#">{% trans "Empty Clipboard" %}</a></p>
+	<p class="cms-clipboard-empty"><a href="#" title="{% trans 'Empty Clipboard' %}"></a></p>
 </div>
 {% endwith %}
 {% endif %}
