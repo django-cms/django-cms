@@ -79,13 +79,20 @@
             left: 0;
             z-index: 99999999;
             width: 100%;
-            height: 4px;
+            height: 5px;
             border-bottom: 1px solid #ddd;
-            background: #fdffc8 url("../img/toolbar/sprite_toolbar.png") repeat-x left -444px;
-            @include print-and-retina() {
-                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-                background-size: 190px !important;
-            }
+            background-color: #fcd200;
+            background-image: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, .8) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, .8) 50%,
+                rgba(255, 255, 255, .8) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 10px 10px;
         }
     }
     &.cms-toolbar-debug #container {
@@ -113,6 +120,14 @@
             font-weight: 800;
             line-height: 12px;
         }
+        .cms-icon {
+            display: none;
+            position: absolute;
+            top: 7px;
+            right: 7px;
+            font-size: 10px;
+            transform: rotate(180deg);
+        }
 
         // hover effect
         .cms-toolbar-item-navigation-hover {
@@ -122,7 +137,7 @@
                 top: 30px;
                 left: 0;
                 min-width: 180px;
-                padding: 4px 0;
+                padding: 3px 0;
                 border: 1px solid white;
                 border-top: none;
                 border-radius: 0 0 4px 4px;
@@ -151,7 +166,7 @@
             .cms-toolbar-item-navigation-children {
                 ul {
                     display: none;
-                    top: -5px;
+                    top: -4px;
                     left: 100%;
                 }
                 > a {
@@ -159,12 +174,10 @@
                 }
                 > a span {
                     display: block;
-                    background: url("../img/toolbar/sprite_toolbar.png") no-repeat right -270px;
-
-                    @include print-and-retina() {
-                        background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-                        background-size: 190px !important;
+                    .cms-icon {
+                        display: block;
                     }
+
                 }
             }
 
@@ -173,9 +186,6 @@
                 color: white !important;
                 background: adjust-hue($color-blue, 15deg);
                 background: linear-gradient($gradient-blue);
-            }
-            > a span {
-                background-position: right -300px !important;
             }
 
             // add active style
@@ -258,24 +268,21 @@
         }
 
         .cms-messages-close {
+            cursor: pointer;
             display: none;
-            position: relative;
-            top: -2px;
-            left: 3px;
             float: right;
+            position: relative;
+            top: 0;
+            left: 8px;
             width: 20px;
             height: 14px;
             margin-left: 10px;
-            cursor: pointer;
-            background: url("../img/toolbar/sprite_toolbar.png") no-repeat -100px -90px;
-
-            @include print-and-retina() {
-                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-                background-size: 190px !important;
+            span {
+                font-size: 10px;
             }
-        }
-        .cms-messages-close:hover {
-            background-position: -120px -90px;
+            &:hover span {
+                color: $color-blue;
+            }
         }
     }
     .cms-messages-error strong {
@@ -289,20 +296,23 @@
         margin: 0 !important;
 
         a {
-            @include hide-content();
-            display: block;
-            width: 92px;
+            @extend .cms-icon;
+            @extend .cms-icon-logo;
+            font-size: 21px;
+            line-height: 21px;
+            width: 90px;
             height: 20px;
-            margin: 5px 0;
-            background: url("../img/toolbar/sprite_toolbar.png") no-repeat left top;
-            @include print-and-retina() {
-                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-                background-size: 190px !important;
+            margin: 4px 0;
+            transition: color $base-speed;
+
+            span {
+                display: none;
             }
+
             &:hover,
             &:active,
             &:focus {
-                background-position: left -20px;
+                color: $color-blue;
             }
         }
     }
@@ -420,7 +430,7 @@
                 font-size: 10px;
                 color: $color-grey-70;
                 margin: 8px 0 0 -2px;
-                transition: all $base-speed;
+                transition: transform $base-speed;
                 transform: rotate(270deg);
             }
         }
@@ -430,9 +440,15 @@
         margin-top: 9px;
         transform: rotate(90deg);
     }
-    .cms-toolbar-loader a {
-        background: #fcfcfc url("../img/loader.gif") no-repeat center center !important;
-        background-size: 20px 20px !important;
+    .cms-toolbar-loader a span {
+        @extend .cms-icon-loader;
+        position: relative;
+        top: -5px;
+        font-size: 20px;
+        line-height: 20px;
+        color: $color-blue;
+        background: transparent;
+        animation: cms-spin 2s infinite linear;
     }
 
     // TODO Reimplement blinking if unpublished content is present
@@ -473,12 +489,3 @@
     // end of toolbar
 }
 
-//##################################################
-// #GLOBALS#
-// looks like this particular helper is not used anywhere in the core
-// TODO remove
-.cms-toolbar-noscroll {
-    position: fixed;
-    overflow-y: scroll;
-    width: 100%;
-}

@@ -25,27 +25,31 @@
             margin: 0 0 2px;
         }
         .cms-clipboard-numbers a {
-            @include hide-content();
-            @include print-and-retina() {
-                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-                background-size: 190px !important;
-            }
+            @extend .cms-icon;
+            @extend .cms-icon-copy;
+            box-sizing: border-box;
             display: block;
             overflow: hidden;
-            box-sizing: border-box;
+            color: $color-grey-10;
+            font-size: 12px;
             width: 20px;
             height: 30px;
             border: 5px solid $color-grey-70;
             border-right: none;
             border-left: none;
             border-radius: 0 3px 3px 0;
-            background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat left -130px;
+            background: $color-grey-70;
+            &:before {
+                position: relative;
+                left: 3px;
+                top: 4px;
+            }
             &:hover,
             &:active,
             &:focus {
+                color: #fff;
                 border-color: $color-grey-90;
                 background-color: $color-grey-90;
-                background-position: -20px -130px;
             }
         }
         .cms-clipboard-numbers .cms-clipboard-numbers {
@@ -53,22 +57,26 @@
         }
 
         .cms-clipboard-empty a {
-            @include hide-content();
-            @include print-and-retina() {
-                background-image: url("../img/toolbar/sprite_toolbar@2x.png") !important;
-                background-size: 190px !important;
-            }
+            @extend .cms-icon;
+            @extend .cms-icon-bin;
             display: block;
+            cursor: pointer;
+            font-size: 11px;
+            color: $color-grey-10;
             width: 20px;
             height: 20px;
             border-radius: 0 3px 3px 0;
-            cursor: pointer;
-            background: $color-grey-70 url("../img/toolbar/sprite_toolbar.png") no-repeat left -110px;
+            background: $color-grey-70;
+            &:before {
+                position: relative;
+                left: 3px;
+                top: 4px;
+            }
             &:hover,
             &:active,
             &:focus {
+                color: #fff;
                 background-color: $color-grey-90;
-                background-position: -20px -110px;
             }
         }
 
