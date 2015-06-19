@@ -940,7 +940,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
+            '<h1><div class="cms-placeholder cms-placeholder-{0}"></div>\n'
             '<div class="cms-plugin cms-plugin-{1}">{2}</div></h1>'.format(ex1.placeholder.pk,
                                                                            plugin.pk, render_placeholder_body)
             )
@@ -966,7 +966,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         self.assertContains(
             response,
-            'CMS.Plugin(\'cms_placeholder-{0}\''.format(ex1.placeholder.pk)
+            'CMS.Plugin(\'cms-placeholder-{0}\''.format(ex1.placeholder.pk)
         )
 
     def test_filters(self):
