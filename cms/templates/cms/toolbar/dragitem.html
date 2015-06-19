@@ -4,7 +4,7 @@
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}">
 	<div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
 		{% language request.toolbar.toolbar_language %}
-		<div class="cms_switcher"></div>
+		<div class="cms-switcher"></div>
 		<div class="cms-submenu">
 			<div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
 			<div class="cms-submenu-dropdown">
