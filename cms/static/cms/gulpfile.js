@@ -17,7 +17,7 @@ var argv = require('minimist')(process.argv.slice(2));
 // #####################################################################################################################
 // #SETTINGS#
 var options = {
-	debug: argv.debug
+    debug: argv.debug
 };
 var PROJECT_ROOT = '.';
 var PROJECT_PATH = {
