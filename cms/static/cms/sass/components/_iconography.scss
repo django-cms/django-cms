@@ -5,73 +5,153 @@
 @font-face {
     font-family: "django-cms-iconfont";
     src: url("../fonts/django-cms-iconfont.eot?v=3.2.0");
-    src: url("../fonts/django-cms-iconfont.eot?#iefix&v=3.2.0") format("embedded-opentype"),
-         url("../fonts/django-cms-iconfont.woff?v=3.2.0") format("woff"),
-         url("../fonts/django-cms-iconfont.ttf?v=3.2.0") format("truetype"),
-         url("../fonts/django-cms-iconfont.svg?v=3.2.0#fontawesomeregular") format("svg");
+    src: url("../fonts/django-cms-iconfont.eot?v=3.2.0#iefix") format("eot"),
+        url("../fonts/django-cms-iconfont.woff?v=3.2.0") format("woff"),
+        url("../fonts/django-cms-iconfont.ttf?v=3.2.0") format("truetype"),
+        url("../fonts/django-cms-iconfont.svg?v=3.2.0#django-cms-iconfont") format("svg");
     font-weight: normal;
     font-style: normal;
 }
 
-.cms-icon {
+%icon {
     display: inline-block;
     font: normal normal normal 14px/1 django-cms-iconfont;
     font-size: inherit;
     text-rendering: auto;
+    transform: translate(0, 0);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
+}
+
+@function icon-char($filename) {
+    $char: "";
+
+    @if $filename == arrow-wide {
+        $char: "E001";
+    }
+    @if $filename == arrow {
+        $char: "E002";
+    }
+    @if $filename == bin {
+        $char: "E003";
+    }
+    @if $filename == close {
+        $char: "E004";
+    }
+    @if $filename == copy {
+        $char: "E005";
+    }
+    @if $filename == handler {
+        $char: "E006";
+    }
+    @if $filename == home {
+        $char: "E007";
+    }
+    @if $filename == loader {
+        $char: "E008";
+    }
+    @if $filename == logo {
+        $char: "E009";
+    }
+    @if $filename == menu {
+        $char: "E00A";
+    }
+    @if $filename == minus {
+        $char: "E00B";
+    }
+    @if $filename == pencil {
+        $char: "E00C";
+    }
+    @if $filename == plus {
+        $char: "E00D";
+    }
+    @if $filename == scissors {
+        $char: "E00E";
+    }
+    @if $filename == search {
+        $char: "E00F";
+    }
+    @if $filename == window {
+        $char: "E010";
+    }
+
+    @return $char;
+}
+
+.cms-icon {
+    @extend %icon;
+}
+@mixin icon($filename, $insert: before) {
+    &:#{$insert} {
+        content: #{"\"\\"}#{icon-char($filename) + "\""};
+    }
 }
 
 // #####################################################################################################################
 // #ICONS:start#
 // use unicode characters for accessibility reasons and use aria-hidden="true" for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
-.cms-icon-arrow-wide:before {
-    content: '\E001';
+
+.cms-icon-arrow-wide {
+    @include icon(arrow-wide);
 }
-.cms-icon-arrow:before {
-    content: '\E002';
+
+.cms-icon-arrow {
+    @include icon(arrow);
 }
-.cms-icon-bin:before {
-    content: '\E003';
+
+.cms-icon-bin {
+    @include icon(bin);
 }
-.cms-icon-close:before {
-    content: '\E004';
+
+.cms-icon-close {
+    @include icon(close);
 }
-.cms-icon-copy:before {
-    content: '\E005';
+
+.cms-icon-copy {
+    @include icon(copy);
 }
-.cms-icon-handler:before {
-    content: '\E006';
+
+.cms-icon-handler {
+    @include icon(handler);
 }
-.cms-icon-home:before {
-    content: '\E007';
+
+.cms-icon-home {
+    @include icon(home);
 }
-.cms-icon-loader:before {
-    content: '\E008';
+
+.cms-icon-loader {
+    @include icon(loader);
 }
-.cms-icon-logo:before {
-    content: '\E009';
+
+.cms-icon-logo {
+    @include icon(logo);
 }
-.cms-icon-menu:before {
-    content: '\E00A';
+
+.cms-icon-menu {
+    @include icon(menu);
 }
-.cms-icon-minus:before {
-    content: '\E00B';
+
+.cms-icon-minus {
+    @include icon(minus);
 }
-.cms-icon-pencil:before {
-    content: '\E00C';
+
+.cms-icon-pencil {
+    @include icon(pencil);
 }
-.cms-icon-plus:before {
-    content: '\E00D';
+
+.cms-icon-plus {
+    @include icon(plus);
 }
-.cms-icon-scissors:before {
-    content: '\E00E';
+
+.cms-icon-scissors {
+    @include icon(scissors);
 }
-.cms-icon-search:before {
-    content: '\E00F';
+
+.cms-icon-search {
+    @include icon(search);
 }
-.cms-icon-window:before {
-    content: '\E010';
+
+.cms-icon-window {
+    @include icon(window);
 }
