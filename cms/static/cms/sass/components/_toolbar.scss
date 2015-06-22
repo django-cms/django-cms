@@ -420,11 +420,13 @@
             border-top: 1px solid white;
             border-left: 1px solid white;
             background: $color-grey-5;
+            &:hover {
+                background: #fff;
+            }
             &:hover span,
             &:active span,
             &:focus span {
                 color: $color-grey-90;
-                background-color: white;
             }
             span {
                 font-size: 10px;
@@ -432,6 +434,7 @@
                 margin: 8px 0 0 -2px;
                 transition: transform $speed-base;
                 transform: rotate(270deg);
+                background: none;
             }
         }
     }
