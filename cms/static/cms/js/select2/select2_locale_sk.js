@@ -46,5 +46,5 @@
         formatSearching: function () { return "Vyhľadávanie…"; }
     };
 
-	$.extend($.fn.select2.defaults, $.fn.select2.locales['sk']);
+    $.extend($.fn.select2.defaults, $.fn.select2.locales['sk']);
 })(jQuery);
