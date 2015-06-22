@@ -1,11 +1,6 @@
-@charset "utf-8";
-/*!
- * @copyright:	https://github.com/divio/django-cms
- */
-
+//######################################################################################################################
+// #SUBNAV#
 #cms-toolbar {
-    //######################################################################################################################
-    // #SUBNAV#
     .cms-submenu {
         @extend .cms-icon-menu;
         display: block;
@@ -152,6 +147,4 @@
         padding: 5px 0 4px;
         background-color: $color-grey-10;
     }
-
-    // end of toolbar
 }

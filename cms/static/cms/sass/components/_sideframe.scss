@@ -1,11 +1,6 @@
-@charset "utf-8";
-/*!
- * @copyright: https://github.com/divio/django-cms
- */
-
+//######################################################################################################################
+// #SIDEFRAME#
 #cms-toolbar {
-    //##################################################################################################################
-    // #SIDEFRAME#
     .cms-sideframe {
         display: none;
         position: fixed;
@@ -112,6 +107,4 @@
     .cms-sideframe-minimize span {
         color: $color-blue;
     }
-
-    // end of toolbar
 }
