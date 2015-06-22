@@ -465,9 +465,9 @@ $(document).ready(function () {
 				row = iframe.contents().find('.save-box:eq(0)');
 			}
 			row.hide(); // hide submit-row
-			form = iframe.contents().find('form');
+			var form = iframe.contents().find('form');
 			//avoids conflict between the browser's form validation and Django's validation
-			form.submit(function(e){
+			form.submit(function () {
 				if (that.hideFrame) { //submit button was clicked
 					that.modal.find('.cms_modal-frame iframe').hide();
 					//page has been saved, run checkup
@@ -513,8 +513,8 @@ $(document).ready(function () {
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
- 							that.options.newPlugin = null;
-							if (! item.hasClass('default')) {// hide iframe when using buttons other than submit
+							that.options.newPlugin = null;
+							if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
 								that.modal.find('.cms_modal-frame iframe').hide();
 								// page has been saved or deleted, run checkup
 								that.saved = true;
