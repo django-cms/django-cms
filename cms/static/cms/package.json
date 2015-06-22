@@ -4,7 +4,7 @@
     "devDependencies": {
         "gulp": "3.9.0",
         "gulp-autoprefixer": "2.3.1",
-        "gulp-iconfont": "2.0.0",
+        "gulp-iconfont": "3.0.1",
         "gulp-iconfont-css": "0.0.9",
         "gulp-if": "1.2.5",
         "gulp-minify-css": "1.1.6",
