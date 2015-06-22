@@ -47,5 +47,5 @@
         formatSearching: function () { return "Vyhledávání…"; }
     };
 
-	$.extend($.fn.select2.defaults, $.fn.select2.locales['cs']);
+    $.extend($.fn.select2.defaults, $.fn.select2.locales['cs']);
 })(jQuery);

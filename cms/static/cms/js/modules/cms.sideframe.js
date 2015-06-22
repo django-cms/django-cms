@@ -1,366 +1,367 @@
-/*##################################################|*/
-/* #CMS# */
+//##################################################################################################################
+// #SIDEFRAME#
+
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	/*!
-	 * Sideframe
-	 * Controls a cms specific sideframe
-	 */
-	CMS.Sideframe = new CMS.Class({
+    /*!
+     * Sideframe
+     * Controls a cms specific sideframe
+     */
+    CMS.Sideframe = new CMS.Class({
 
-		implement: [CMS.API.Helpers],
+        implement: [CMS.API.Helpers],
 
-		options: {
-			'onClose': false,
-			'sideframeDuration': 300,
-			'sideframeWidth': 320,
-			'urls': {
-				'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
-			}
-		},
+        options: {
+            'onClose': false,
+            'sideframeDuration': 300,
+            'sideframeWidth': 320,
+            'urls': {
+                'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
+            }
+        },
 
-		initialize: function (options) {
-			this.options = $.extend(true, {}, this.options, options);
-			this.config = CMS.config;
-			this.settings = CMS.settings;
+        initialize: function (options) {
+            this.options = $.extend(true, {}, this.options, options);
+            this.config = CMS.config;
+            this.settings = CMS.settings;
 
-			// elements
-			this.sideframe = $('.cms-sideframe');
-			this.body = $('html');
+            // elements
+            this.sideframe = $('.cms-sideframe');
+            this.body = $('html');
 
-			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
-			this.enforceReload = false;
+            // states
+            this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
+            this.enforceReload = false;
 
-			// if the modal is initialized the first time, set the events
-			if(!this.sideframe.data('ready')) this._events();
+            // if the modal is initialized the first time, set the events
+            if(!this.sideframe.data('ready')) this._events();
 
-			// ready sideframe
-			this.sideframe.data('ready', true);
-		},
+            // ready sideframe
+            this.sideframe.data('ready', true);
+        },
 
-		// initial methods
-		_events: function () {
-			var that = this;
+        // initial methods
+        _events: function () {
+            var that = this;
 
-			// attach close event
-			this.sideframe.find('.cms-sideframe-close').bind(this.click, function () {
-				that.close(true);
-			});
+            // attach close event
+            this.sideframe.find('.cms-sideframe-close').bind(this.click, function () {
+                that.close(true);
+            });
 
-			// attach hide event
-			this.sideframe.find('.cms-sideframe-hide').bind(this.click, function () {
-				if($(this).hasClass('cms-sideframe-hidden')) {
-					that.settings.sideframe.hidden = false;
-					that._show(that.settings.sideframe.position || that.options.sideframeWidth, true);
-				} else {
-					that.settings.sideframe.hidden = true;
-					that._hide();
-				}
-				that.settings = that.setSettings(that.settings);
-			});
+            // attach hide event
+            this.sideframe.find('.cms-sideframe-hide').bind(this.click, function () {
+                if($(this).hasClass('cms-sideframe-hidden')) {
+                    that.settings.sideframe.hidden = false;
+                    that._show(that.settings.sideframe.position || that.options.sideframeWidth, true);
+                } else {
+                    that.settings.sideframe.hidden = true;
+                    that._hide();
+                }
+                that.settings = that.setSettings(that.settings);
+            });
 
-			// attach maximize event
-			this.sideframe.find('.cms-sideframe-maximize').bind(this.click, function () {
-				if($(this).hasClass('cms-sideframe-minimize')) {
-					that.settings.sideframe.maximized = false;
-					that._minimize();
-				} else {
-					that.settings.sideframe.maximized = true;
-					that.settings.sideframe.hidden = false;
-					that._maximize();
-				}
-				that.settings = that.setSettings(that.settings);
-			});
+            // attach maximize event
+            this.sideframe.find('.cms-sideframe-maximize').bind(this.click, function () {
+                if($(this).hasClass('cms-sideframe-minimize')) {
+                    that.settings.sideframe.maximized = false;
+                    that._minimize();
+                } else {
+                    that.settings.sideframe.maximized = true;
+                    that.settings.sideframe.hidden = false;
+                    that._maximize();
+                }
+                that.settings = that.setSettings(that.settings);
+            });
 
-			this.sideframe.find('.cms-sideframe-resize').bind('mousedown', function (e) {
-				e.preventDefault();
-				that._startResize();
-			});
+            this.sideframe.find('.cms-sideframe-resize').bind('mousedown', function (e) {
+                e.preventDefault();
+                that._startResize();
+            });
 
-			// stopper events
-			$(document).bind('mouseup.cms', function () {
-				that._stopResize();
-			});
-		},
+            // stopper events
+            $(document).bind('mouseup.cms', function () {
+                that._stopResize();
+            });
+        },
 
-		// public methods
-		open: function (url, animate) {
-			// prepare iframe
-			var that = this;
-			var language = 'language=' + CMS.config.request.language;
-			var page_id = 'page_id=' + CMS.config.request.page_id;
-			var holder = this.sideframe.find('.cms-sideframe-frame');
-			var initialized = false;
+        // public methods
+        open: function (url, animate) {
+            // prepare iframe
+            var that = this;
+            var language = 'language=' + CMS.config.request.language;
+            var page_id = 'page_id=' + CMS.config.request.page_id;
+            var holder = this.sideframe.find('.cms-sideframe-frame');
+            var initialized = false;
 
-			// push required params if defined
-			// only apply params on tree view
-			if(url.indexOf(CMS.config.request.tree) >= 0) {
-				var params = [];
-				if(CMS.config.request.language) params.push(language);
-				if(CMS.config.request.page_id) params.push(page_id);
-				url = this._url(url, params);
-			}
+            // push required params if defined
+            // only apply params on tree view
+            if(url.indexOf(CMS.config.request.tree) >= 0) {
+                var params = [];
+                if(CMS.config.request.language) params.push(language);
+                if(CMS.config.request.page_id) params.push(page_id);
+                url = this._url(url, params);
+            }
 
-			var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
-				iframe.hide();
-			var width = this.settings.sideframe.position || this.options.sideframeWidth;
+            var iframe = $('<iframe src="'+url+'" class="" frameborder="0" />');
+                iframe.hide();
+            var width = this.settings.sideframe.position || this.options.sideframeWidth;
 
-			// attach load event to iframe
-			iframe.bind('load', function () {
-				var contents = iframe.contents();
+            // attach load event to iframe
+            iframe.bind('load', function () {
+                var contents = iframe.contents();
 
-				// after iframe is loaded append css
-				contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
-				// remove loader
-				that.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
-				// than show
-				iframe.show();
+                // after iframe is loaded append css
+                contents.find('head').append($('<link rel="stylesheet" type="text/css" href="' + that.config.urls.static + that.options.urls.css_sideframe + '" />'));
+                // remove loader
+                that.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
+                // than show
+                iframe.show();
 
-				// add debug infos
-				if(that.config.debug) iframe.contents().find('body').addClass('cms-debug');
+                // add debug infos
+                if(that.config.debug) iframe.contents().find('body').addClass('cms-debug');
 
-				// save url in settings
-				that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
-				that.settings = that.setSettings(that.settings);
+                // save url in settings
+                that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
+                that.settings = that.setSettings(that.settings);
 
-				// bind extra events
-				contents.find('body').bind(that.click, function () {
-					$(document).trigger(that.click);
-				});
+                // bind extra events
+                contents.find('body').bind(that.click, function () {
+                    $(document).trigger(that.click);
+                });
 
-				// attach reload event
-				if(initialized) that.reloadBrowser(false, false, true);
-				initialized = true;
+                // attach reload event
+                if(initialized) that.reloadBrowser(false, false, true);
+                initialized = true;
 
-				// adding django hacks
-				contents.find('.viewsitelink').attr('target', '_top');
-			});
+                // adding django hacks
+                contents.find('.viewsitelink').attr('target', '_top');
+            });
 
-			// cancel animation if sideframe is already shown
-			if(this.sideframe.is(':visible')) {
-				// sideframe is already open
-				insertHolder(iframe);
-				// reanimate the frame
-				if(this.sideframe.outerWidth() < width) {
-					// The user has performed an action that requires the
-					// sideframe to be shown, this intent outweighs any
-					// previous intent to minimize the frame.
-					this.settings.sideframe.hidden = false;
-					this._show(width, animate);
-				}
-			} else {
-				// load iframe after frame animation is done
-				setTimeout(function () {
-					insertHolder(iframe);
-				}, this.options.sideframeDuration);
-				// display the frame
-				this._show(width, animate);
-			}
+            // cancel animation if sideframe is already shown
+            if(this.sideframe.is(':visible')) {
+                // sideframe is already open
+                insertHolder(iframe);
+                // reanimate the frame
+                if(this.sideframe.outerWidth() < width) {
+                    // The user has performed an action that requires the
+                    // sideframe to be shown, this intent outweighs any
+                    // previous intent to minimize the frame.
+                    this.settings.sideframe.hidden = false;
+                    this._show(width, animate);
+                }
+            } else {
+                // load iframe after frame animation is done
+                setTimeout(function () {
+                    insertHolder(iframe);
+                }, this.options.sideframeDuration);
+                // display the frame
+                this._show(width, animate);
+            }
 
-			function insertHolder(iframe) {
-				// show iframe after animation
-				that.sideframe.find('.cms-sideframe-frame').addClass('cms-loader');
-				holder.html(iframe);
-			}
-		},
+            function insertHolder(iframe) {
+                // show iframe after animation
+                that.sideframe.find('.cms-sideframe-frame').addClass('cms-loader');
+                holder.html(iframe);
+            }
+        },
 
-		close: function () {
-			this._hide(true);
+        close: function () {
+            this._hide(true);
 
-			// remove url in settings
-			this.settings.sideframe = {
-				'url': null,
-				'hidden': false,
-				'maximized': false,
-				'width': this.options.sideframeWidth
-			};
+            // remove url in settings
+            this.settings.sideframe = {
+                'url': null,
+                'hidden': false,
+                'maximized': false,
+                'width': this.options.sideframeWidth
+            };
 
-			// resets
-			this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
-			this.sideframe.find('.cms-sideframe-hide').show();
+            // resets
+            this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
+            this.sideframe.find('.cms-sideframe-hide').show();
 
-			// update settings
-			this.settings = this.setSettings(this.settings);
+            // update settings
+            this.settings = this.setSettings(this.settings);
 
-			// handle refresh option
-			this.reloadBrowser(this.options.onClose, false, true);
-		},
+            // handle refresh option
+            this.reloadBrowser(this.options.onClose, false, true);
+        },
 
-		// private methods
-		_show: function (width, animate) {
-			// add class
-			this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden');
+        // private methods
+        _show: function (width, animate) {
+            // add class
+            this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden');
 
-			// make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
-			this.sideframe.show();
+            // make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
+            this.sideframe.show();
 
-			// check if sideframe should be hidden
-			if(this.settings.sideframe.hidden) this._hide();
+            // check if sideframe should be hidden
+            if(this.settings.sideframe.hidden) this._hide();
 
-			// check if sideframe should be maximized
-			if(this.settings.sideframe.maximized) this._maximize();
+            // check if sideframe should be maximized
+            if(this.settings.sideframe.maximized) this._maximize();
 
-			// otherwise do normal behaviour
-			if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-				if(animate) {
-					this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
-					this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
-				} else {
-					this.sideframe.animate({ 'width': width }, 0);
-					this.body.animate({ 'margin-left': width }, 0);
-					// reset width if larger than available space
-					if(width >= $(window).width()) {
-						this.sideframe.animate({ 'width': $(window).width() - 20 }, 0);
-						this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
-					}
-				}
-				this.sideframe.find('.cms-sideframe-btn').css('right', -20);
-			}
+            // otherwise do normal behaviour
+            if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
+                if(animate) {
+                    this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
+                    this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
+                } else {
+                    this.sideframe.animate({ 'width': width }, 0);
+                    this.body.animate({ 'margin-left': width }, 0);
+                    // reset width if larger than available space
+                    if(width >= $(window).width()) {
+                        this.sideframe.animate({ 'width': $(window).width() - 20 }, 0);
+                        this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
+                    }
+                }
+                this.sideframe.find('.cms-sideframe-btn').css('right', -20);
+            }
 
-			// lock toolbar, set timeout to make sure CMS.API is ready
-			setTimeout(function () {
-				CMS.API.Toolbar._lock(true);
-				CMS.API.Toolbar._showToolbar(true);
-			}, 100);
-		},
+            // lock toolbar, set timeout to make sure CMS.API is ready
+            setTimeout(function () {
+                CMS.API.Toolbar._lock(true);
+                CMS.API.Toolbar._showToolbar(true);
+            }, 100);
+        },
 
-		_hide: function (close) {
-			// add class
-			this.sideframe.find('.cms-sideframe-hide').addClass('cms-sideframe-hidden');
+        _hide: function (close) {
+            // add class
+            this.sideframe.find('.cms-sideframe-hide').addClass('cms-sideframe-hidden');
 
-			var duration = this.options.sideframeDuration;
-			// remove the iframe
-			if(close && this.sideframe.width() <= 0) duration = 0;
-			if(close) this.sideframe.find('iframe').remove();
-			this.sideframe.animate({ 'width': 0 }, duration, function () {
-				if(close) $(this).hide();
-			});
-			this.body.animate({ 'margin-left': 0 }, duration);
-			this.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
+            var duration = this.options.sideframeDuration;
+            // remove the iframe
+            if(close && this.sideframe.width() <= 0) duration = 0;
+            if(close) this.sideframe.find('iframe').remove();
+            this.sideframe.animate({ 'width': 0 }, duration, function () {
+                if(close) $(this).hide();
+            });
+            this.body.animate({ 'margin-left': 0 }, duration);
+            this.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
 
-			// lock toolbar, set timeout to make sure CMS.API is ready
-			setTimeout(function () {
-				CMS.API.Toolbar._lock(false);
-			}, 100);
-		},
+            // lock toolbar, set timeout to make sure CMS.API is ready
+            setTimeout(function () {
+                CMS.API.Toolbar._lock(false);
+            }, 100);
+        },
 
-		_minimize: function (noPositionReset) {
-			this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
-			this.sideframe.find('.cms-sideframe-hide').show();
+        _minimize: function (noPositionReset) {
+            this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
+            this.sideframe.find('.cms-sideframe-hide').show();
 
-			// reset to first state
-			if(!noPositionReset) {
-				this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
-			}
+            // reset to first state
+            if(!noPositionReset) {
+                this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
+            }
 
-			// remove event
-			$(window).unbind('resize.cms.sideframe');
-		},
+            // remove event
+            $(window).unbind('resize.cms.sideframe');
+        },
 
-		_maximize: function () {
-			var that = this;
+        _maximize: function () {
+            var that = this;
 
-			this.sideframe.find('.cms-sideframe-maximize').addClass('cms-sideframe-minimize');
-			this.sideframe.find('.cms-sideframe-hide').hide();
+            this.sideframe.find('.cms-sideframe-maximize').addClass('cms-sideframe-minimize');
+            this.sideframe.find('.cms-sideframe-hide').hide();
 
-			this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden').hide();
-			// do custom animation
-			this.sideframe.animate({ 'width': $(window).width() }, 0);
-			this.body.animate({ 'margin-left': 0 }, 0);
-			// invert icon position
-			this.sideframe.find('.cms-sideframe-btn').css('right', -2);
-			// attach resize event
-			$(window).bind('resize.cms.sideframe', function () {
-				that.sideframe.css('width', $(window).width());
-			});
-		},
+            this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden').hide();
+            // do custom animation
+            this.sideframe.animate({ 'width': $(window).width() }, 0);
+            this.body.animate({ 'margin-left': 0 }, 0);
+            // invert icon position
+            this.sideframe.find('.cms-sideframe-btn').css('right', -2);
+            // attach resize event
+            $(window).bind('resize.cms.sideframe', function () {
+                that.sideframe.css('width', $(window).width());
+            });
+        },
 
-		_startResize: function () {
-			var that = this;
-			var outerOffset = 20;
-			var timer = function () {};
-			// this prevents the iframe from being focusable
-			this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
-			this._minimize(true);
+        _startResize: function () {
+            var that = this;
+            var outerOffset = 20;
+            var timer = function () {};
+            // this prevents the iframe from being focusable
+            this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
+            this._minimize(true);
 
-			$(document).bind('mousemove.cms', function (e) {
-				if(e.clientX <= 320) e.clientX = 320;
-				if(e.clientX >= $(window).width() - outerOffset) e.clientX = $(window).width() - outerOffset;
+            $(document).bind('mousemove.cms', function (e) {
+                if(e.clientX <= 320) e.clientX = 320;
+                if(e.clientX >= $(window).width() - outerOffset) e.clientX = $(window).width() - outerOffset;
 
-				that.sideframe.css('width', e.clientX);
-				that.body.css('margin-left', e.clientX);
+                that.sideframe.css('width', e.clientX);
+                that.body.css('margin-left', e.clientX);
 
-				// update settings
-				that.settings.sideframe.position = e.clientX;
+                // update settings
+                that.settings.sideframe.position = e.clientX;
 
-				// trigger the resize event
-				$(window).trigger('resize.sideframe');
+                // trigger the resize event
+                $(window).trigger('resize.sideframe');
 
-				// save position
-				clearTimeout(timer);
-				timer = setTimeout(function () {
-					that.settings = that.setSettings(that.settings);
-				}, 500);
-			});
-		},
+                // save position
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    that.settings = that.setSettings(that.settings);
+                }, 500);
+            });
+        },
 
-		_stopResize: function () {
-			this.sideframe.find('.cms-sideframe-shim').css('z-index', 1);
+        _stopResize: function () {
+            this.sideframe.find('.cms-sideframe-shim').css('z-index', 1);
 
-			$(document).unbind('mousemove.cms');
-		},
+            $(document).unbind('mousemove.cms');
+        },
 
-		_url: function (url, params) {
-			var arr = [];
-			var keys = [];
-			var values = [];
-			var tmp = '';
-			var urlArray = [];
-			var urlParams = [];
-			var origin = url;
+        _url: function (url, params) {
+            var arr = [];
+            var keys = [];
+            var values = [];
+            var tmp = '';
+            var urlArray = [];
+            var urlParams = [];
+            var origin = url;
 
-			// return url if there is no param
-			if(!(url.split('?').length <= 1 || window.JSON === undefined)) {
-				// setup local vars
-				urlArray = url.split('?');
-				urlParams = urlArray[1].split('&');
-				origin = urlArray[0];
-			}
+            // return url if there is no param
+            if(!(url.split('?').length <= 1 || window.JSON === undefined)) {
+                // setup local vars
+                urlArray = url.split('?');
+                urlParams = urlArray[1].split('&');
+                origin = urlArray[0];
+            }
 
-			// loop through the available params
-			$.each(urlParams, function (index, param) {
-				arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
-			});
-			// loop through the new params
-			$.each(params, function (index, param) {
-				arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
-			});
+            // loop through the available params
+            $.each(urlParams, function (index, param) {
+                arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+            });
+            // loop through the new params
+            $.each(params, function (index, param) {
+                arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+            });
 
-			// merge manually because jquery...
-			$.each(arr, function (index, item) {
-				var i = $.inArray(item.param, keys);
+            // merge manually because jquery...
+            $.each(arr, function (index, item) {
+                var i = $.inArray(item.param, keys);
 
-				if(i === -1) {
-					keys.push(item.param);
-					values.push(item.value);
-				} else {
-					values[i] = item.value;
-				}
-			});
+                if(i === -1) {
+                    keys.push(item.param);
+                    values.push(item.value);
+                } else {
+                    values[i] = item.value;
+                }
+            });
 
-			// merge new url
-			$.each(keys, function (index, key) {
-				tmp += '&' + key + '=' + values[index];
-			});
-			tmp = tmp.replace('&', '?');
-			url = origin + tmp;
+            // merge new url
+            $.each(keys, function (index, key) {
+                tmp += '&' + key + '=' + values[index];
+            });
+            tmp = tmp.replace('&', '?');
+            url = origin + tmp;
 
-			return url;
-		}
+            return url;
+        }
 
-	});
+    });
 
 });
 })(CMS.$);
