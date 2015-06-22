@@ -19,7 +19,7 @@ from cms.toolbar.items import TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.compat import DJANGO_1_4
-from cms.utils.i18n import get_language_tuple, force_language
+from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
 from cms.utils.permissions import get_user_sites_queryset, has_page_change_permission
@@ -353,13 +353,11 @@ class PageToolbar(CMSToolbar):
             if not language_menu:
                 return None
 
-            languages = get_language_tuple(self.current_site.pk)
-            languages_dict = dict(languages)
+            languages = get_language_dict(self.current_site.pk)
 
-            remove = [(code, languages_dict.get(code, code)) for code in self.page.get_languages()]
-            add = [l for l in languages if l not in remove]
-            copy = [(code, name) for code, name in languages if code != self.current_lang and (code, name) in remove]
-
+            remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
+            add = [l for l in languages.items() if l not in remove]
+            copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
             if add:
                 language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
                 page_change_url = admin_reverse('cms_page_change', args=(self.page.pk,))

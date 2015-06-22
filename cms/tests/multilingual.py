@@ -38,7 +38,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
                           ('nav_playground.html', 'nav_playground.html')],
     }
 
-
     def test_create_page(self):
         """
         Test that a page can be created
@@ -121,7 +120,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.assertEqual(page.get_title(language=TESTLANG, fallback=False), page_data['title'])
             self.assertEqual(page.get_slug(fallback=False), page_data['slug'])
             self.assertEqual(page.get_title(fallback=False), page_data['title'])
-    
     
     def test_multilingual_page(self):
         TESTLANG = get_primary_lanaguage()
@@ -211,7 +209,6 @@ class MultilingualTestCase(SettingsOverrideTestCase):
             self.client.logout()
             response = self.client.get("/en/page4/")
             self.assertEqual(response.status_code, 404)
-
 
     def test_detail_view_404_when_no_language_is_found(self):
         page = create_page("page1", "nav_playground.html", "en")

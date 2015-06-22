@@ -494,6 +494,64 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(root_page.get_children()[1], second_level_page_bottom)
         self.assertEqual(root_page.get_children()[0].get_children()[0], third_level_page)
 
+    def test_changelist_get_results(self):
+        admin_user = self.get_superuser()
+        first_level_page = create_page('level1', 'nav_playground.html', 'en', published=True)
+        second_level_page_top = create_page('level21', "nav_playground.html", "en",
+                                            created_by=admin_user, published=True,
+                                            parent=first_level_page)
+        second_level_page_bottom = create_page('level22', "nav_playground.html", "en", # nopyflakes
+                                               created_by=admin_user, published=True,
+                                               parent=self.reload(first_level_page))
+        third_level_page = create_page('level3', "nav_playground.html", "en", # nopyflakes
+                                       created_by=admin_user, published=True,
+                                       parent=second_level_page_top)
+        fourth_level_page = create_page('level23', "nav_playground.html", "en", # nopyflakes
+                                        created_by=admin_user,
+                                        parent=self.reload(first_level_page))
+        self.assertEqual(Page.objects.all().count(), 9)
+
+        url = admin_reverse('cms_%s_changelist' % Page._meta.module_name)
+
+        request = self.get_request(url)
+        request.session = {}
+        request.user = admin_user
+
+        page_admin = site._registry[Page]
+
+        # full blown page list. only draft pages are taken into account
+        cl_params = [request, page_admin.model, page_admin.list_display,
+            page_admin.list_display_links, page_admin.list_filter,
+            page_admin.date_hierarchy, page_admin.search_fields,
+            page_admin.list_select_related, page_admin.list_per_page]
+        if hasattr(page_admin, 'list_max_show_all'):  # django 1.4
+            cl_params.append(page_admin.list_max_show_all)
+        cl_params.extend([page_admin.list_editable, page_admin])
+        cl = CMSChangeList(*tuple(cl_params))
+        cl.get_results(request)
+        self.assertEqual(cl.full_result_count, 5)
+        self.assertEqual(cl.result_count, 5)
+
+        # only one unpublished page is returned
+        request = self.get_request(url+'?q=level23')
+        request.session = {}
+        request.user = admin_user
+        cl_params[0] = request
+        cl = CMSChangeList(*tuple(cl_params))
+        cl.get_results(request)
+        self.assertEqual(cl.full_result_count, 5)
+        self.assertEqual(cl.result_count, 1)
+
+        # a number of pages matches the query
+        request = self.get_request(url+'?q=level2')
+        request.session = {}
+        request.user = admin_user
+        cl_params[0] = request
+        cl = CMSChangeList(*tuple(cl_params))
+        cl.get_results(request)
+        self.assertEqual(cl.full_result_count, 5)
+        self.assertEqual(cl.result_count, 3)
+
     def test_changelist_tree(self):
         """ This test checks for proper jstree cookie unquoting.
 
@@ -570,6 +628,39 @@ class AdminTestCase(AdminTestsBase):
             # Check the ES version of the tree...
             response = self.client.get(url, {'language': 'es-mx'})
             self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'es-mx', es_title, ))
+
+    def test_empty_placeholder_in_correct_language(self):
+        """
+        Test that Cleaning a placeholder only affect current language contents
+        """
+        # create some objects
+        page_en = create_page("EmptyPlaceholderTestPage (EN)", "nav_playground.html", "en")
+        ph = page_en.placeholders.get(slot="body")
+
+        # add the text plugin to the en version of the page
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 1")
+        add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
+
+        # creating a de title of the page and adding plugins to it
+        create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug())
+        add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
+        add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")
+
+        # before cleaning the de placeholder
+        self.assertEqual(ph.get_plugins('en').count(), 2)
+        self.assertEqual(ph.get_plugins('de').count(), 3)
+
+        admin_user, staff = self._get_guys()
+        with self.login_user_context(admin_user):
+            url = '%s?language=de' % admin_reverse('cms_page_clear_placeholder', args=[ph.pk])
+            response = self.client.post(url, {'test': 0})
+
+        self.assertEqual(response.status_code, 302)
+
+        # After cleaning the de placeholder, en placeholder must still have all the plugins
+        self.assertEqual(ph.get_plugins('en').count(), 2)
+        self.assertEqual(ph.get_plugins('de').count(), 0)
 
 
 class AdminTests(AdminTestsBase):

@@ -1,12 +1,15 @@
 # Create your views here.
-from django.views.decorators.csrf import csrf_exempt
-from cms.utils.urlutils import admin_reverse
 from django.core.urlresolvers import resolve
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from cms.test_utils.project.sampleapp.models import Category
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import TemplateView
+
+from cms.test_utils.project.sampleapp.models import Category
+from cms.utils.urlutils import admin_reverse
+
 
 @csrf_exempt
 def exempt_view(request, **kw):
@@ -56,3 +59,23 @@ def plain_view(request):
 
 def notfound(request):
     raise Http404
+
+
+class ClassView(object):
+    def __call__(self, request, *args, **kwargs):
+        context = RequestContext(request, {'content': 'plain text'})
+        return render_to_response("sampleapp/plain.html", context)
+
+
+class ClassBasedView(TemplateView):
+    template_name = 'sampleapp/plain.html'
+
+
+def parentapp_view(request, path):
+    context = RequestContext(request, {'content': 'parent app content'})
+    return render_to_response("sampleapp/plain.html", context)
+
+
+def childapp_view(request, path):
+    context = RequestContext(request, {'content': 'child app content'})
+    return render_to_response("sampleapp/plain.html", context)

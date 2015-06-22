@@ -118,8 +118,8 @@ class MenuPool(object):
                 # A Menu **instance** was registered, this is non-standard, but
                 # acceptable. However, it cannot be "expanded", so, just add it
                 # as-is to the list of expanded_menus.
-                expanded_menus[menu_class_name] = menu_cls
-            elif hasattr(menu_cls, "get_instances"):
+                menu_cls = menu_cls.__class__
+            if hasattr(menu_cls, "get_instances"):
                 # It quacks like a CMSAttachMenu, expand away!
                 # If a menu exists but has no instances,
                 # it's included in the available menus as is
@@ -209,6 +209,8 @@ class MenuPool(object):
         for menu_class_name in self.menus:
             menu = self.menus[menu_class_name]
             try:
+                if isinstance(menu, type):
+                    menu = menu()
                 nodes = menu.get_nodes(request)
             except NoReverseMatch:
                 # Apps might raise NoReverseMatch if an apphook does not yet
@@ -220,8 +222,8 @@ class MenuPool(object):
                         _('Menu %s cannot be loaded. Please, make sure all '
                           'its urls exist and can be resolved.') %
                         menu_class_name)
-                    logger.error("Menu %s could not be loaded." %
-                        menu_class_name, exc_info=True)
+                logger.error("Menu %s could not be loaded." %
+                    menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(
                 nodes, menu_class_name)
@@ -257,33 +259,41 @@ class MenuPool(object):
         return nodes
 
     def _mark_selected(self, request, nodes):
-        sel = None
+        # There /may/ be two nodes that get marked with selected. A published
+        # and a draft version of the node. We'll mark both, later, the unused
+        # one will be removed anyway.
+        sel = []
         for node in nodes:
             node.sibling = False
             node.ancestor = False
             node.descendant = False
-            node.selected = False
-            if node.get_absolute_url() == request.path[
-                    :len(node.get_absolute_url())]:
+            node_abs_url = node.get_absolute_url()
+            if node_abs_url == request.path[:len(node_abs_url)]:
                 if sel:
-                    if len(node.get_absolute_url()) > len(
-                            sel.get_absolute_url()):
-                        sel = node
+                    if len(node_abs_url) > len(sel[0].get_absolute_url()):
+                        sel = [node]
+                    elif len(node_abs_url) == len(sel[0].get_absolute_url()):
+                        sel.append(node)
                 else:
-                    sel = node
-            else:
-                node.selected = False
-        if sel:
-            sel.selected = True
+                    sel = [node]
+        for node in nodes:
+            node.selected = (node in sel)
         return nodes
 
     def get_menus_by_attribute(self, name, value):
+        """
+        Returns the list of menus that match the name/value criteria provided.
+        """
+        # Note that we are limiting the output to only single instances of any
+        # specific menu class. This is to address issue (#4041) which has
+        # cropped-up in 3.0.13/3.0.0.
         self.discover_menus()
-        found = []
+        self._expand_menus()
+        found = set()
         for menu in self.menus.items():
             if hasattr(menu[1], name) and getattr(menu[1], name, None) == value:
-                found.append((menu[0], menu[1].name))
-        return found
+                found.add((menu[1].__class__.__name__, menu[1].name))
+        return sorted(list(found))
 
     def get_nodes_by_attribute(self, nodes, name, value):
         found = []

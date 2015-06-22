@@ -206,7 +206,9 @@ def details(request, slug):
 
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
     xframe_options = page.get_xframe_options()
-    if xframe_options == Page.X_FRAME_OPTIONS_INHERIT:
+    # xframe_options can be None if there's no xframe information on the page
+    # (eg. a top-level page which has xframe options set to "inherit")
+    if xframe_options == Page.X_FRAME_OPTIONS_INHERIT or xframe_options is None:
         # This is when we defer to django's own clickjacking handling
         return response
 

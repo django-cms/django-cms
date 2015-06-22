@@ -34,8 +34,8 @@ setup(
     install_requires=[
         'Django>=1.4,<1.8',
         'django-classy-tags>=0.5',
-        'south>=0.7.2',
-        'html5lib',
+        'south>=1.0.2',
+        'html5lib>=0.90,<0.9999',
         'django-mptt>=0.6,<0.6.2',
         'django-sekizai>=0.7',
         'djangocms-admin-style'

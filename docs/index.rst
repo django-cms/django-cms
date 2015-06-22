@@ -31,7 +31,7 @@ and :doc:`/reference/index` sections.
 Join us online
 **************
 
-django CMS is supported by a friendly and very knowledgable community.
+django CMS is supported by a friendly and very knowledgeable community.
 
 Find us:
 
