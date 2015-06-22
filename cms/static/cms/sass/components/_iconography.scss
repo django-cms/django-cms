@@ -26,52 +26,52 @@
 @function icon-char($filename) {
     $char: "";
 
-    @if $filename == icon-arrow-wide {
+    @if $filename == arrow-wide {
         $char: "E001";
     }
-    @if $filename == icon-arrow {
+    @if $filename == arrow {
         $char: "E002";
     }
-    @if $filename == icon-bin {
+    @if $filename == bin {
         $char: "E003";
     }
-    @if $filename == icon-close {
+    @if $filename == close {
         $char: "E004";
     }
-    @if $filename == icon-copy {
+    @if $filename == copy {
         $char: "E005";
     }
-    @if $filename == icon-handler {
+    @if $filename == handler {
         $char: "E006";
     }
-    @if $filename == icon-home {
+    @if $filename == home {
         $char: "E007";
     }
-    @if $filename == icon-loader {
+    @if $filename == loader {
         $char: "E008";
     }
-    @if $filename == icon-logo {
+    @if $filename == logo {
         $char: "E009";
     }
-    @if $filename == icon-menu {
+    @if $filename == menu {
         $char: "E00A";
     }
-    @if $filename == icon-minus {
+    @if $filename == minus {
         $char: "E00B";
     }
-    @if $filename == icon-pencil {
+    @if $filename == pencil {
         $char: "E00C";
     }
-    @if $filename == icon-plus {
+    @if $filename == plus {
         $char: "E00D";
     }
-    @if $filename == icon-scissors {
+    @if $filename == scissors {
         $char: "E00E";
     }
-    @if $filename == icon-search {
+    @if $filename == search {
         $char: "E00F";
     }
-    @if $filename == icon-window {
+    @if $filename == window {
         $char: "E010";
     }
 
@@ -93,65 +93,65 @@
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
 
 .cms-icon-arrow-wide {
-    @include icon(icon-arrow-wide);
+    @include icon(arrow-wide);
 }
 
 .cms-icon-arrow {
-    @include icon(icon-arrow);
+    @include icon(arrow);
 }
 
 .cms-icon-bin {
-    @include icon(icon-bin);
+    @include icon(bin);
 }
 
 .cms-icon-close {
-    @include icon(icon-close);
+    @include icon(close);
 }
 
 .cms-icon-copy {
-    @include icon(icon-copy);
+    @include icon(copy);
 }
 
 .cms-icon-handler {
-    @include icon(icon-handler);
+    @include icon(handler);
 }
 
 .cms-icon-home {
-    @include icon(icon-home);
+    @include icon(home);
 }
 
 .cms-icon-loader {
-    @include icon(icon-loader);
+    @include icon(loader);
 }
 
 .cms-icon-logo {
-    @include icon(icon-logo);
+    @include icon(logo);
 }
 
 .cms-icon-menu {
-    @include icon(icon-menu);
+    @include icon(menu);
 }
 
 .cms-icon-minus {
-    @include icon(icon-minus);
+    @include icon(minus);
 }
 
 .cms-icon-pencil {
-    @include icon(icon-pencil);
+    @include icon(pencil);
 }
 
 .cms-icon-plus {
-    @include icon(icon-plus);
+    @include icon(plus);
 }
 
 .cms-icon-scissors {
-    @include icon(icon-scissors);
+    @include icon(scissors);
 }
 
 .cms-icon-search {
-    @include icon(icon-search);
+    @include icon(search);
 }
 
 .cms-icon-window {
-    @include icon(icon-window);
+    @include icon(window);
 }
