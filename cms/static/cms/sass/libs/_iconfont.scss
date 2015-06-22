@@ -6,9 +6,9 @@
     font-family: "<%= fontName %>";
     src: url("<%= fontPath %><%= fontName %>.eot?v=3.2.0");
     src: url("<%= fontPath %><%= fontName %>.eot?v=3.2.0#iefix") format("eot"),
-        url("<%= fontPath %><%= fontName %>.woff?v=3.2.0") format("woff"),
-        url("<%= fontPath %><%= fontName %>.ttf?v=3.2.0") format("truetype"),
-        url("<%= fontPath %><%= fontName %>.svg?v=3.2.0#<%= fontName %>") format("svg");
+         url("<%= fontPath %><%= fontName %>.woff?v=3.2.0") format("woff"),
+         url("<%= fontPath %><%= fontName %>.ttf?v=3.2.0") format("truetype"),
+         url("<%= fontPath %><%= fontName %>.svg?v=3.2.0#<%= fontName %>") format("svg");
     font-weight: normal;
     font-style: normal;
 }
