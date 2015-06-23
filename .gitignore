@@ -38,5 +38,5 @@ include/
 lib/
 man/
 share/
-.editorconfig
+!.editorconfig
 cms/static/cms/compass_app_log.txt
