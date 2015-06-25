@@ -181,7 +181,7 @@
             > a {
                 color: white !important;
                 background: adjust-hue($color-blue, 15deg);
-                background: linear-gradient($gradient-blue);
+                background: linear-gradient($btn-action-bggradient);
             }
 
             // add active style

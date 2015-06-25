@@ -42,8 +42,9 @@
     font-weight: 200 !important;
     margin-bottom: 5px !important;
     padding: 5px 12px !important;
+
     border: 1px solid adjust-hue($color-blue, 15deg) !important;
-    background-image: linear-gradient($gradient-blue) !important;
+    background-image: linear-gradient($btn-active-bggradient) !important;
     box-shadow: inset lighten($color-blue, 20%) 0 1px 0;
     &:hover,
     &:active,
