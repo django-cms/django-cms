@@ -15,16 +15,49 @@ $color-window: #fcfcfc;
 $speed-base: 200ms;
 
 // #COLORS/auto#
-$color-grey-5: lighten($color-grey, 58%); // fafafa
-$color-grey-10: lighten($color-grey, 50%); // e5e5e5
-$color-grey-20: lighten($color-grey, 25%); // 454545
-$color-grey-70: darken($color-grey, 13%); // 454545
-$color-grey-90: darken($color-grey, 20%); // 333333
+// These are kept only while refactoring is in progress
+$color-grey-5:    lighten($color-grey, 58%); // fafafa
+$color-grey-10:   lighten($color-grey, 50%); // e5e5e5
+$color-grey-20:   lighten($color-grey, 25%); // a6a6a6
+$color-grey-70:   darken($color-grey, 13%); // 454545
+$color-grey-90:   darken($color-grey, 20%); // 333333
 
 $gradient-toolbar: to bottom, rgba(lighten($color-grey, 58%), 0.97) 0%, rgba(lighten($color-grey, 59%), 0.97) 50%, rgba(lighten($color-grey, 58%), 0.95) 100%;
-$gradient-dark: to bottom, $color-grey, darken($color-grey, 20%);
-$gradient-blue: to bottom, adjust-hue($color-blue, 5deg), adjust-hue($color-blue, 15deg);
-$gradient-green: to bottom, lighten($color-green, 10%) 0%, saturate($color-green, 20%) 50%, saturate($color-green, 30%) 100%;
-$gradient-orange: to bottom, lighten($color-orange, 5%), $color-orange;
-$gradient-red: to bottom, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg);
-$gradient-light: to bottom, lighten($color-grey-10, 5%), $color-grey-10;
+
+//##############################################################################
+// #COLORS new
+$white: #fff;
+$black: #000;
+
+// #COLORS gray
+$gray:            #666;
+$gray-lightest:   lighten($gray, 58%); // #fafafa
+$gray-lighter:    lighten($gray, 50%); // #e5e5e5
+$gray-light:      lighten($gray, 25%); // #a6a6a6
+$gray-darker:     darken($gray, 13%); // #454545
+$gray-darkest:    darken($gray, 20%); // #333
+
+
+//##############################################################################
+// #BUTTONS
+$btn-border-radius-base: 3px;
+
+$btn-default-color: $gray;
+$btn-default-bgcolor: $gray-lighter;
+$btn-default-bggradient: to bottom, $gray-lightest, $gray-lighter;
+$btn-default-border: $gray-lighter;
+
+$btn-action-color: $white;
+$btn-action-bgcolor: adjust-hue($color-blue, 15deg);
+$btn-action-bggradient: to bottom, adjust-hue($color-blue, 5deg), adjust-hue($color-blue, 15deg);
+$btn-action-border: adjust-hue($color-blue, 15deg);
+
+$btn-caution-color: $white;
+$btn-caution-bgcolor: adjust-hue($color-red, 15deg);
+$btn-caution-bggradient: to bottom, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg);
+$btn-caution-border: adjust-hue($color-red, 15deg);
+
+$btn-active-color: $white;
+$btn-active-bgcolor: $gray-darker;
+$btn-active-bggradient: to bottom, $gray, $gray-darkest;
+$btn-active-border: $gray-darkest

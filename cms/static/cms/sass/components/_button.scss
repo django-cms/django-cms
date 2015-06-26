@@ -2,89 +2,90 @@
 // #BUTTONS#
 #cms-toolbar {
     .cms-btn {
-        color: $color-grey;
-        border: 1px solid $color-grey-10;
-        border-radius: 3px;
-        background: $color-grey-10;
-        background: linear-gradient($gradient-light);
-        box-shadow: inset lighten($color-grey-10, 5%) 0 1px 0;
+        color: $btn-default-color;
+        border: 1px solid $btn-default-border;
+        border-radius: $btn-border-radius-base;
+        background-color: $btn-default-bgcolor;
+        background-image: linear-gradient($btn-default-bggradient);
+        box-shadow: inset 0 1px 0 rgba($white, 0.5);
         &:hover,
         &:active,
         &:focus {
-            border: 1px solid $color-grey-10;
-            background: $color-grey-10;
+            border: 1px solid $btn-default-border;
+            background: $btn-default-bgcolor;
             box-shadow: none;
         }
         &:active,
         &:focus {
-            border: 1px solid darken($color-grey-10, 10%);
-            background: darken($color-grey-10, 10%);
+            border: 1px solid darken($btn-default-border, 10%);
+            background: darken($btn-default-bgcolor, 10%);
         }
     }
 
     .cms-btn-disabled {
-        border-top: 1px solid darken($color-grey-10, 10%);
-        border-right: 1px solid darken($color-grey-10, 10%);
-        background: darken($color-grey-5, 5%);
-        box-shadow: inset 0 1px 0 $color-grey-10;
+        border-top: 1px solid darken($btn-default-border, 10%);
+        border-right: 1px solid darken($btn-default-border, 10%);
+        background: $btn-default-bgcolor;
+        box-shadow: inset 0 1px 0 $btn-default-border;
         &:hover,
         &:active,
         &:focus {
-            background-color: $color-grey-10;
+            background: $btn-default-bgcolor;
         }
     }
 
     .cms-btn-active {
-        color: white;
-        border: 1px solid darken($color-grey, 20%) !important;
-        border-bottom: none !important;
-        background: $color-grey;
-        background: linear-gradient($gradient-dark);
-        box-shadow: inset 0 1px 0 lighten($color-grey, 20%);
+        color: $btn-active-color;
+        border: 1px solid $btn-active-border;
+        border-bottom: none;
+        background-color: $btn-active-bgcolor;
+        background-image: linear-gradient($btn-active-bggradient);
+        box-shadow: inset 0 1px 0 rgba($white, 0.5);
         &:hover,
         &:active,
         &:focus {
-            background: $color-grey-70;
-            box-shadow: none;
+            background: $btn-active-bgcolor;
+            border: 1px solid $btn-active-border;
+            border-bottom: none;
         }
         &:active,
         &:focus {
-            background: darken($color-grey-70, 50%);
+            background: darken($btn-active-bgcolor, 10%);
         }
     }
 
     .cms-btn-action {
-        color: white;
-        border: 1px solid adjust-hue($color-blue, 15deg) !important;
-        background: $color-blue;
-        background: linear-gradient($gradient-blue);
-        box-shadow: inset lighten($color-blue, 10%) 0 1px 0;
+        color: $btn-action-color;
+        border: 1px solid $btn-action-border;
+        background-color: $btn-action-bgcolor;
+        background-image: linear-gradient($btn-action-bggradient);
+        box-shadow: inset 0 1px 0 rgba($white, 0.5);
         &:hover,
         &:active,
         &:focus {
-            background: adjust-hue($color-blue, 15deg);
-            box-shadow: none;
+            border: 1px solid $btn-action-border;
+            background: $btn-action-bgcolor;
         }
         &:active,
         &:focus {
-            background: darken(adjust-hue($color-blue, 15deg), 10%);
+            background: darken($btn-action-bgcolor, 10%);
         }
     }
     .cms-btn-caution {
-        color: white;
-        border: 1px solid adjust-hue($color-red, 15deg) !important;
-        background: $color-red;
-        background: linear-gradient($gradient-red);
-        box-shadow: inset lighten($color-red, 20%) 0 1px 0;
+        color: $btn-caution-color;
+        border: 1px solid $btn-caution-border;
+        background-color: $btn-caution-bgcolor;
+        background-image: linear-gradient($btn-caution-bggradient);
+        box-shadow: inset 0 1px 0 rgba($white, 0.5);
         &:hover,
         &:active,
         &:focus {
-            background: adjust-hue($color-red, 15deg);
-            box-shadow: none;
+            border: 1px solid $btn-caution-border;
+            background: $btn-caution-bgcolor
         }
         &:active,
         &:focus {
-            background: darken(adjust-hue($color-red, 15deg), 10%);
+            background: darken($btn-caution-bgcolor, 10%);
         }
     }
     .cms-btn-publish {

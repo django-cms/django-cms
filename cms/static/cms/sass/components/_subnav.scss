@@ -74,7 +74,7 @@
             &:focus {
                 color: white;
                 background: adjust-hue($color-blue, 15deg);
-                background: linear-gradient($gradient-blue);
+                background: linear-gradient($btn-action-bggradient);
             }
             &:first-child {
                 border-top: none;
