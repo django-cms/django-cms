@@ -1,6 +1,5 @@
 {% load i18n menu_tags %}
 
-{% get_available_languages as languages %}
 {% if languages|length > 1 %}
 {% for language in languages %}
 <li class="lang{% ifequal current_language language.0 %} active{% endifequal %}">
