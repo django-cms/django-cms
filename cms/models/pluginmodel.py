@@ -174,6 +174,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             page = None
             if request:
                 page = request.current_page
+            plugin.cms_plugin_instance = instance
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
             if plugin.render_plugin:
                 template = plugin._get_render_template(context, instance, placeholder)

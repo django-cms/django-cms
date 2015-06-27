@@ -361,9 +361,26 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
-=== 3.0.14 (XXXX-XX-XX) ===
+=== 3.0.14 (2015-06-27) ===
 
+- Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability
 - Fixed an issue related to "Empty all" Placeholder feature
+- Fix issue with causes menu classes to be duplicated in advanced settings
+- Fix issue with breadcrumbs not showing
+- Fix issues with show_menu templatetags
+- Fix plugin sorting in py3
+- Fix search results number and items alignment in page changelist
+- Fix X-Frame-Options on top-level pages
+- Preserve information regarding the current view when applying the CMS decorator
+- Fix render_model template tag doesn't show correct change list
+- Fix language fallback for nested plugins
+- Fix order of which application urls are injected into urlpatterns
+- Fix delete non existing page language
+- Fix Scanning for placeholders fails on include tags with a variable as an argument
+- Minor documentation fixes
+- Pin South version to 1.0.2
+- Pin Html5lib version to 0.999 until a current bug is fixed
+- Fix language chooser template
 
 === 3.1 (2015-04-20) ===
 
@@ -380,6 +397,6 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Add templatetag render_model_add_block
 - Add "Structure mode" permission
 
-=== 3.1.1 (XXXX-XX-XX) ===
+=== 3.1.1 (2015-06-27) ===
 
 - Add Django 1.8 support
