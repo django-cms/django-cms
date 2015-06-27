@@ -361,8 +361,9 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
-=== 3.0.14 (XXXX-XX-XX) ===
+=== 3.0.14 (2015-06-27) ===
 
+- Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability
 - Fixed an issue related to "Empty all" Placeholder feature
 - Fix issue with causes menu classes to be duplicated in advanced settings
 - Fix issue with breadcrumbs not showing

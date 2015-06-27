@@ -11,6 +11,7 @@ What's new in 3.0.14
 Bug Fixes
 =========
 
+* Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability.
 * Fix issue with causes menu classes to be duplicated in advanced settings
 * Fix issue with breadcrumbs not showing
 * Fix issues with show_menu templatetags
@@ -41,7 +42,8 @@ of your applications depending on applications urlconf greediness.
 Thanks
 ======
 
-
 Many thanks community members who have submitted issue reports and especially to
 these GitHub users who have also submitted pull requests: douwevandermeij, furiousdave,
 nikolas, olarcheveque, sephii, vstoykov.
+
+A special thank to Matt Wilkes and Sylvain Fankhauser for reporting the security issue.
