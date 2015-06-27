@@ -704,14 +704,14 @@ class AdminTests(AdminTestsBase):
         with self.login_user_context(permless):
             request = self.get_request()
             response = self.admin_class.publish_page(request, page.pk, "en")
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 405)
             page = self.reload(page)
             self.assertFalse(page.is_published('en'))
 
             request = self.get_request(post_data={'no': 'data'})
             response = self.admin_class.publish_page(request, page.pk, "en")
-            # Forbidden
             self.assertEqual(response.status_code, 403)
+            page = self.reload(page)
             self.assertFalse(page.is_published('en'))
 
         admin_user = self.get_admin()
@@ -746,6 +746,10 @@ class AdminTests(AdminTestsBase):
         admin_user = self.get_admin()
         with self.login_user_context(permless):
             request = self.get_request()
+            response = self.admin_class.change_innavigation(request, page.pk)
+            self.assertEqual(response.status_code, 405)
+        with self.login_user_context(permless):
+            request = self.get_request(post_data={'no': 'data'})
             response = self.admin_class.change_innavigation(request, page.pk)
             self.assertEqual(response.status_code, 403)
         with self.login_user_context(permless):
@@ -806,7 +810,7 @@ class AdminTests(AdminTestsBase):
         admin_user = self.get_admin()
         self.page.publish("en")  # Ensure public copy exists before reverting
         with self.login_user_context(admin_user):
-            response = self.client.get(admin_reverse('cms_page_revert_page', args=(self.page.pk, 'en')))
+            response = self.client.post(admin_reverse('cms_page_revert_page', args=(self.page.pk, 'en')))
             self.assertEqual(response.status_code, 302)
             url = response['Location']
             self.assertTrue(url.endswith('?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
