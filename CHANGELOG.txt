@@ -410,3 +410,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix handling of plugin position attribute
 - Fix for some structureboard issues
 - Add setting to hide toolbar when a URL is not handled by django CMS
+- Add editorconfig configuration
+- Make shift tab work correctly in submenu
+- Fix get_language_from_request if POST and GET exists
+- Fix an error in placeholder cache

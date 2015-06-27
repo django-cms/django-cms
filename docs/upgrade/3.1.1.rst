@@ -13,6 +13,7 @@ What's new in 3.1.1
 * Add copy_site command
 * Add setting to disable toolbar for anonymous users
 * Add setting to hide toolbar when a URL is not handled by django CMS
+* Add editorconfig configuration
 
 Bug Fixes
 =========
@@ -20,6 +21,8 @@ Bug Fixes
 * Fix issue with causes menu classes to be duplicated in advanced settings
 * Fix issue with breadcrumbs not showing
 * Fix issues with show_menu templatetags
+* Fix an error in placeholder cache
+* Fix get_language_from_request if POST and GET exists
 * Minor documentation fixes
 * Revert whitespace cleanup on flash player to fix it
 * Correctly restore previous status of dragbars
@@ -42,6 +45,7 @@ Bug Fixes
 * Fix for some structureboard issues
 * Pin South version to 1.0.2
 * Pin Html5lib version to 0.999 until a current bug is fixed
+* Make shift tab work correctly in submenu
 
 
 Potentially backward incompatibile changes
