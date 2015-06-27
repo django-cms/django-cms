@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.core.cache import cache
 from django.template import Template, RequestContext
 from django.conf import settings
 
@@ -16,6 +15,13 @@ from cms.utils import get_cms_setting
 
 class CacheTestCase(CMSTestCase):
     def tearDown(self):
+        from django.core.cache import cache
+        super(CacheTestCase, self).tearDown()
+        cache.clear()
+
+    def setUp(self):
+        from django.core.cache import cache
+        super(CacheTestCase, self).setUp()
         cache.clear()
 
     def test_cache_placeholder(self):
@@ -50,7 +56,6 @@ class CacheTestCase(CMSTestCase):
         with self.assertNumQueries(3):
             template.render(rctx)
         page1.publish('en')
-        cache.clear()
         exclude = [
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
@@ -120,9 +125,6 @@ class CacheTestCase(CMSTestCase):
         plugin_pool.unregister_plugin(NoCachePlugin)
 
     def test_cache_page(self):
-        # Clear the entire cache for a clean slate
-        cache.clear()
-
         # Ensure that we're testing in an environment WITHOUT the MW cache...
         exclude = [
             'django.middleware.cache.UpdateCacheMiddleware',
@@ -182,7 +184,6 @@ class CacheTestCase(CMSTestCase):
             # Test that the above behavior is different when CMS_PAGE_CACHE is
             # set to False (disabled)
             #
-            cache.clear()
             with self.settings(CMS_PAGE_CACHE=False):
 
 
@@ -200,8 +201,6 @@ class CacheTestCase(CMSTestCase):
                 self.assertEqual(response.status_code, 200)
 
     def test_invalidate_restart(self):
-        # Clear the entire cache for a clean slate
-        cache.clear()
 
         # Ensure that we're testing in an environment WITHOUT the MW cache...
         exclude = [
@@ -250,7 +249,6 @@ class CacheTestCase(CMSTestCase):
                 response = self.client.get('/en/')
                 self.assertEqual(response.status_code, 200)
 
-
     def test_sekizai_plugin(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
@@ -265,3 +263,35 @@ class CacheTestCase(CMSTestCase):
         self.assertContains(response, 'alert(')
         response = self.client.get('/en/')
         self.assertContains(response, 'alert(')
+
+    def test_cache_invalidation(self):
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache...
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware'
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            # Silly to do these tests if this setting isn't True
+            page_cache_setting = get_cms_setting('PAGE_CACHE')
+            self.assertTrue(page_cache_setting)
+            page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                                published=True)
+
+            placeholder = page1.placeholders.get(slot="body")
+            add_plugin(placeholder, "TextPlugin", 'en', body="First content")
+            print(_get_cache_version())
+            page1.publish('en')
+            print(_get_cache_version())
+            response = self.client.get('/en/')
+            self.assertContains(response, 'First content')
+            response = self.client.get('/en/')
+            self.assertContains(response, 'First content')
+            print(_get_cache_version())
+            add_plugin(placeholder, "TextPlugin", 'en', body="Second content")
+            page1.publish('en')
+            response = self.client.get('/en/')
+            print(_get_cache_version())
+            self.assertContains(response, 'Second content')

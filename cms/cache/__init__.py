@@ -67,6 +67,7 @@ def invalidate_cms_page_cache():
     # anyway.
     #
     version = _get_cache_version()
+    print("invalidate", version)
     _set_cache_version(version + 1)
 
 
