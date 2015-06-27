@@ -246,7 +246,7 @@ class ReversionTestCase(TransactionCMSTestCase):
                 self.assertEqual(Revision.objects.all().count(), 5)
                 for x in range(10):
                     publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
-                    response = self.client.get(publish_url)
+                    response = self.client.post(publish_url)
                     self.assertEqual(response.status_code, 302)
                 self.assertEqual(Revision.objects.all().count(), 4)
 
