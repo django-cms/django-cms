@@ -682,7 +682,6 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
         from cms.cache import invalidate_cms_page_cache
-        print("invalidate")
         invalidate_cms_page_cache()
 
         return published
