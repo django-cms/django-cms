@@ -823,6 +823,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(force_text(_("The template was successfully changed")))
 
+    @require_POST
     @transaction.atomic
     def move_page(self, request, page_id, extra_context=None):
         """
@@ -908,6 +909,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 helpers.make_revision_with_plugins(page, request.user, message)
             return HttpResponse("ok")
 
+    @require_POST
     @transaction.atomic
     def copy_page(self, request, page_id, extra_context=None):
         """
@@ -941,6 +943,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         context.update(extra_context or {})
         return HttpResponseRedirect('../../')
 
+    @require_POST
     @transaction.atomic
     @create_revision()
     def publish_page(self, request, page_id, language):
@@ -1041,6 +1044,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         revision.delete()
                         deleted.append(revision.pk)
 
+    @require_POST
     @transaction.atomic
     def unpublish(self, request, page_id, language):
         """
@@ -1076,6 +1080,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         return HttpResponseRedirect(path)
 
+    @require_POST
     @transaction.atomic
     def revert_page(self, request, page_id, language):
         page = get_object_or_404(Page, id=page_id)
@@ -1224,6 +1229,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             page.site.domain, url)
         return HttpResponseRedirect(url)
 
+    @require_POST
     def change_innavigation(self, request, page_id):
         """
         Switch the in_navigation of a page

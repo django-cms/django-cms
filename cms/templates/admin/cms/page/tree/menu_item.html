@@ -30,8 +30,8 @@
 				{% if lang in page.languages %}
 				<div class="language-tooltip" hidden="hidden">
 					{% trans "Pick an action:" %}
-					<a href="./{{ page.id }}/{{ lang }}/unpublish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}">{% trans "Unpublish" %}</a>
-					<a href="./{{ page.id }}/{{ lang }}/publish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}">{% trans "Publish" %}</a>
+					<a href="./{{ page.id }}/{{ lang }}/unpublish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}" class="js-ajax-submit">{% trans "Unpublish" %}</a>
+					<a href="./{{ page.id }}/{{ lang }}/publish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}" class="js-ajax-submit">{% trans "Publish" %}</a>
 				</div>
 				{% endif %}
 			{% else %}

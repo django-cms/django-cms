@@ -342,7 +342,7 @@ class PublishingTests(TestCase):
         self.assertEqual(Page.objects.all().count(), 1)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
+            response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'], "http://testserver/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
 
@@ -381,7 +381,7 @@ class PublishingTests(TestCase):
         page = self.create_page("test_admin", published=False)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
+            response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 
@@ -396,7 +396,7 @@ class PublishingTests(TestCase):
         ):
             with self.login_user_context(superuser):
                 with force_language('de'):
-                    response = self.client.get(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
+                    response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 
