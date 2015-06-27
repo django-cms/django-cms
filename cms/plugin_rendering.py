@@ -115,7 +115,6 @@ def render_placeholder(placeholder, context_to_copy,
     if placeholder.has_change_permission(request) or not placeholder.cache_placeholder:
         request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
-        print('content cache')
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
