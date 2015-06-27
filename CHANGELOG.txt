@@ -379,3 +379,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Minor documentation fixes
 - Pin South version to 1.0.2
 - Pin Html5lib version to 0.999 until a current bug is fixed
+- Fix language chooser template
