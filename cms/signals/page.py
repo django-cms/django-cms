@@ -65,7 +65,7 @@ def pre_delete_page(instance, **kwargs):
 def post_delete_page(instance, **kwargs):
     update_home(instance, **kwargs)
     apphook_post_delete_page_checker(instance)
-    from cms.views import invalidate_cms_page_cache
+    from cms.cache import invalidate_cms_page_cache
     invalidate_cms_page_cache()
 
 

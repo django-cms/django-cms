@@ -5,7 +5,6 @@ from os.path import join
 from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -16,6 +15,7 @@ from django.utils.timezone import now
 from django.utils.translation import get_language, ugettext_lazy as _
 
 from cms import constants
+from cms.cache.page import set_xframe_cache, get_xframe_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
@@ -234,7 +234,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             cms_signals.page_moved.send(sender=Page, instance=public_page)
 
             page_utils.check_title_slugs(public_page)
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
     def _copy_titles(self, target, language, published):
@@ -543,7 +543,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # If there was a change, invalidate the cms page cache
         #
         if self.in_navigation != old:
-            from cms.views import invalidate_cms_page_cache
+            from cms.cache import invalidate_cms_page_cache
             invalidate_cms_page_cache()
 
         return self.in_navigation
@@ -681,7 +681,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
         cms_signals.post_publish.send(sender=Page, instance=self, language=language)
 
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
         return published
@@ -715,7 +715,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.save()
         self.mark_descendants_pending(language)
 
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
 
         from cms.signals import post_unpublish
@@ -1245,7 +1245,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
-        xframe_options = cache.get('cms:xframe_options:%s' % self.pk)
+        xframe_options = get_xframe_cache(self)
         if xframe_options is None:
             ancestors = self.get_ancestors()
 
@@ -1261,7 +1261,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 return None
 
             xframe_options = xframe_options[0]
-            cache.set('cms:xframe_options:%s' % self.pk, xframe_options)
+            set_xframe_cache(self, xframe_options)
 
         return xframe_options
 

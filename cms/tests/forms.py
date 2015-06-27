@@ -2,19 +2,20 @@
 from __future__ import with_statement
 from datetime import datetime
 
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-from cms.utils.permissions import set_current_user
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+
 from cms.admin import forms
-from cms.admin.forms import PageUserForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm, \
-    GlobalPagePermissionAdminForm, PageUserGroupForm
+from cms.admin.forms import (PageUserForm, PagePermissionInlineAdminForm,
+                             ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
+                             PageUserGroupForm)
 from cms.api import create_page, create_page_user, assign_user_to_page
+from cms.cache.choices import update_site_and_page_choices, get_site_choices, get_page_choices
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-from cms.forms.utils import (get_site_choices, get_page_choices,
-    update_site_and_page_choices)
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.permissions import set_current_user
 
 
 class Mock_PageSelectFormField(PageSelectFormField):

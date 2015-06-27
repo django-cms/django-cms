@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-import hashlib
 
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
@@ -8,13 +7,12 @@ from django.core.urlresolvers import resolve, Resolver404, reverse
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.context import RequestContext
 from django.template.response import TemplateResponse
-from django.utils.cache import add_never_cache_headers
-from django.utils.encoding import iri_to_uri, force_text
 from django.utils.http import urlquote
-from django.utils.timezone import get_current_timezone_name
+from django.utils.translation import get_language
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_urls
+from cms.cache.page import set_page_cache, get_page_cache
 from cms.models import Page
 from cms.utils import get_template_from_request, get_language_code
 from cms.utils import get_language_from_request
@@ -26,9 +24,6 @@ from cms.utils.i18n import get_redirect_on_fallback
 from cms.utils.i18n import get_language_list
 from cms.utils.i18n import is_language_prefix_patterns_used
 from cms.utils.page_resolver import get_page_from_request
-from django.utils.translation import get_language
-
-CMS_PAGE_CACHE_VERSION_KEY = get_cms_setting("CACHE_PREFIX") + 'CMS_PAGE_CACHE_VERSION'
 
 
 def _handle_no_page(request, slug):
@@ -49,7 +44,6 @@ def details(request, slug):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
-    from django.core.cache import cache
 
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
@@ -58,11 +52,8 @@ def details(request, slug):
             not request.user.is_authenticated()
         )
     ):
-        cache_content = cache.get(
-            _get_cache_key(request),
-            version=_get_cache_version()
-        )
-        if not cache_content is None:
+        cache_content = get_page_cache(request)
+        if cache_content is not None:
             content, headers = cache_content
             response = HttpResponse(content)
             response._headers = headers
@@ -198,7 +189,7 @@ def details(request, slug):
 
     response = TemplateResponse(request, template_name, context)
 
-    response.add_post_render_callback(_cache_page)
+    response.add_post_render_callback(set_page_cache)
 
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
     xframe_options = page.get_xframe_options()
@@ -220,119 +211,3 @@ def details(request, slug):
         response['X-Frame-Options'] = 'DENY'
 
     return response
-
-
-def _cache_page(response):
-    from django.core.cache import cache
-
-    if not get_cms_setting('PAGE_CACHE'):
-        return response
-    request = response._request
-    save_cache = True
-    for placeholder in getattr(request, 'placeholders', []):
-        if not placeholder.cache_placeholder:
-            save_cache = False
-            break
-    if hasattr(request, 'toolbar'):
-        if request.toolbar.edit_mode or request.toolbar.show_toolbar:
-            save_cache = False
-    if request.user.is_authenticated():
-        save_cache = False
-    if not save_cache:
-        add_never_cache_headers(response)
-        return response
-    else:
-        version = _get_cache_version()
-        ttl = get_cms_setting('CACHE_DURATIONS')['content']
-
-        cache.set(
-            _get_cache_key(request),
-            (response.content, response._headers),
-            ttl,
-            version=version
-        )
-        # See note in invalidate_cms_page_cache()
-        _set_cache_version(version)
-
-
-def _get_cache_key(request):
-    #md5 key of current path
-    cache_key = "%s:%d:%s" % (
-        get_cms_setting("CACHE_PREFIX"),
-        settings.SITE_ID,
-        hashlib.md5(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
-    )
-    if settings.USE_TZ:
-        # The datetime module doesn't restrict the output of tzname().
-        # Windows is known to use non-standard, locale-dependant names.
-        # User-defined tzinfo classes may return absolutely anything.
-        # Hence this paranoid conversion to create a valid cache key.
-        tz_name = force_text(get_current_timezone_name(), errors='ignore')
-        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
-    return cache_key
-
-def _get_cache_version():
-    from django.core.cache import cache
-
-    '''
-    Returns the current page cache version, explicitly setting one if not
-    defined.
-    '''
-
-    version = cache.get(CMS_PAGE_CACHE_VERSION_KEY)
-
-    if version:
-        return version
-    else:
-        _set_cache_version(1)
-        return 1
-
-
-def _set_cache_version(version):
-    '''
-    Set the cache version to the specified value.
-    '''
-
-    from django.core.cache import cache
-
-    cache.set(
-        CMS_PAGE_CACHE_VERSION_KEY,
-        version,
-        get_cms_setting('CACHE_DURATIONS')['content']
-    )
-
-
-def invalidate_cms_page_cache():
-    '''
-    Invalidates the CMS PAGE CACHE.
-    '''
-
-    #
-    # NOTE: We're using a cache versioning strategy for invalidating the page
-    # cache when necessary. Instead of wiping all the old entries, we simply
-    # increment the version number rendering all previous entries
-    # inaccessible and left to expire naturally.
-    #
-    # ALSO NOTE: According to the Django documentation, a timeout value of
-    # `None' (in version 1.6+) is supposed to mean "cache forever", however,
-    # this is actually only implemented as only slightly less than 30 days in
-    # some backends (memcached, in particular). In older Djangos, `None' means
-    # "use default value".  To avoid issues arising from different Django
-    # versions and cache backend implementations, we will explicitly set the
-    # lifespan of the CMS_PAGE_CACHE_VERSION entry to whatever is set in
-    # settings.CACHE_DURATIONS['content']. This allows users to adjust as
-    # necessary for their backend.
-    #
-    # To prevent writing cache entries that will live longer than our version
-    # key, we will always re-write the current version number into the cache
-    # just after we write any new cache entries, thus ensuring that the
-    # version number will always outlive any entries written against that
-    # version. This is a cheap operation.
-    #
-    # If there are no new cache writes before the version key expires, its
-    # perfectly OK, since any previous entries cached against that version
-    # will have also expired, so, it'd be pointless to try to access them
-    # anyway.
-    #
-    version = _get_cache_version()
-    _set_cache_version(version + 1)

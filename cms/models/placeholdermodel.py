@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 from cms.utils.compat import DJANGO_1_7
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.template.defaultfilters import title
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.timezone import get_current_timezone_name
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
-from cms.utils import get_cms_setting
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
@@ -84,13 +81,6 @@ class Placeholder(models.Model):
     def get_extra_menu_items(self):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_extra_placeholder_menu_items(self)
-
-    def get_cache_key(self, lang):
-        cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
-        if settings.USE_TZ:
-            tz_name = force_text(get_current_timezone_name(), errors='ignore')
-            cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
-        return cache_key
 
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()
