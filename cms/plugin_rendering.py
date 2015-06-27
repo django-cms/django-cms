@@ -4,6 +4,7 @@ from django.template.loader import render_to_string
 from django.utils import six
 from django.utils.safestring import mark_safe
 
+from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
@@ -114,6 +115,7 @@ def render_placeholder(placeholder, context_to_copy,
     if placeholder.has_change_permission(request) or not placeholder.cache_placeholder:
         request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
+        print('content cache')
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
     # It's kind of duplicate of the similar call in `get_plugins`, but it's required
@@ -133,11 +135,9 @@ def render_placeholder(placeholder, context_to_copy,
     else:
         processors = None
         edit = False
-    from django.core.cache import cache
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
-        cache_key = placeholder.get_cache_key(lang)
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
-            cached_value = cache.get(cache_key)
+            cached_value = get_placeholder_cache(placeholder, lang)
             if not cached_value is None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 return mark_safe(cached_value['content'])
@@ -181,7 +181,7 @@ def render_placeholder(placeholder, context_to_copy,
     result = render_to_string("cms/toolbar/content.html", context)
     changes = watcher.get_changes()
     if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
-        cache.set(cache_key, {'content': result, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
+        set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes})
     context.pop()
     return result
 

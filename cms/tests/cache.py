@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.core.cache import cache
+from django.template import Template, RequestContext
+from django.conf import settings
+
 from cms.api import add_plugin, create_page
+from cms.cache import _get_cache_version
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin, SekizaiPlugin
@@ -7,10 +12,6 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting
-from django.core.cache import cache
-from django.template import Template, RequestContext
-from django.conf import settings
-from cms.views import _get_cache_version
 
 
 class CacheTestCase(CMSTestCase):

@@ -8,11 +8,9 @@ from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
-from cms.models import Page
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
+from cms.cache.placeholder import get_placeholder_cache, get_placeholder_page_cache
+from cms.models import Page, Placeholder, CMSPlugin
 from cms.plugin_rendering import render_plugins, PluginContext, render_placeholder_toolbar
-from cms.templatetags.cms_tags import _clean_key, _get_cache_key
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import ChangeModel
@@ -294,10 +292,9 @@ class RenderingTestCase(CMSTestCase):
 
         template = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
 
-        cache_key = ex1.placeholder.get_cache_key(u"en")
-        cache_value_before = cache.get(cache_key)
+        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en')
         self.render(template, self.test_page, {'ex1': ex1})
-        cache_value_after = cache.get(cache_key)
+        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en')
 
         self.assertEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_after)
@@ -315,10 +312,9 @@ class RenderingTestCase(CMSTestCase):
 
         template = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
 
-        cache_key = ex1.placeholder.get_cache_key(u"en")
-        cache_value_before = cache.get(cache_key)
+        cache_value_before = get_placeholder_cache(ex1.placeholder, 'en')
         self.render(template, self.test_page, {'ex1': ex1})
-        cache_value_after = cache.get(cache_key)
+        cache_value_after = get_placeholder_cache(ex1.placeholder, 'en')
 
         self.assertNotEqual(cache_value_before, cache_value_after)
         self.assertIsNone(cache_value_before)
@@ -374,13 +370,9 @@ class RenderingTestCase(CMSTestCase):
         """
         template = '{% load cms_tags %}<h1>{% show_uncached_placeholder "sub" test_page %}</h1>'
 
-        base_key = _get_cache_key('_show_placeholder_for_page', self.test_page, "en",
-                                  self.test_page.site_id)
-        cache_key = _clean_key('%s_placeholder:%s' % (base_key, "sub"))
-
-        cache_value_before = cache.get(cache_key)
+        cache_value_before = get_placeholder_page_cache(self.test_page, 'en', self.test_page.site_id, 'sub')
         output = self.render(template, self.test_page, {'test_page': self.test_page})
-        cache_value_after = cache.get(cache_key)
+        cache_value_after = get_placeholder_page_cache(self.test_page, 'en', self.test_page.site_id, 'sub')
 
         self.assertEqual(output, '<h1>%s</h1>' % self.test_data['text_sub'])
         self.assertEqual(cache_value_before, cache_value_after)

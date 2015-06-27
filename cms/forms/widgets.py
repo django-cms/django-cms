@@ -11,7 +11,7 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.cache.choices import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 

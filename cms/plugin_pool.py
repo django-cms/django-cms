@@ -28,7 +28,7 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
         self.discovered = True
