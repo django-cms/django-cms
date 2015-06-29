@@ -41,10 +41,14 @@ $gray-darkest:    darken($gray, 20%); // #333
 //##############################################################################
 // BASE Variables
 $border-radius-base: 3px;
+$border-radius-normal: 5px;
 $padding-base: 3px;
+$padding-normal: 10px;
+$padding-large: 20px;
 
 //##############################################################################
 // z-index map
+// the map is built from highest to lowest as it appears on screen
 $z-layers: (
     "clipboard": (
         "base":         99999,
@@ -52,8 +56,10 @@ $z-layers: (
         "draggable":    99,
         "triggers":     999,
     ),
-    "default":            1,
-    "below":             -1,
+    // sideframe > sideframe-frame > iframe >
+    "dialog":           99999,
+    "default":          1,
+    "below":            -1,
 );
 
 
@@ -79,4 +85,10 @@ $btn-caution-border: adjust-hue($color-red, 15deg);
 $btn-active-color: $white;
 $btn-active-bgcolor: $gray-darker;
 $btn-active-bggradient: to bottom, $gray, $gray-darkest;
-$btn-active-border: $gray-darkest
+$btn-active-border: $gray-darkest;
+
+//##############################################################################
+// Dialog
+$dialog-width: 500px;
+$dialog-border-radius: $border-radius-normal;
+$dialog-shadow: 0 0 20px rgba($black, .5);
