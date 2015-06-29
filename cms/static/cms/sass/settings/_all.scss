@@ -39,8 +39,27 @@ $gray-darkest:    darken($gray, 20%); // #333
 
 
 //##############################################################################
+// BASE Variables
+$border-radius-base: 3px;
+$padding-base: 3px;
+
+//##############################################################################
+// z-index map
+$z-layers: (
+    "clipboard": (
+        "base":         99999,
+        "containers":   99,
+        "draggable":    99,
+        "triggers":     999,
+    ),
+    "default":            1,
+    "below":             -1,
+);
+
+
+//##############################################################################
 // #BUTTONS
-$btn-border-radius-base: 3px;
+$btn-border-radius-base: $border-radius-base;
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $gray-lighter;
