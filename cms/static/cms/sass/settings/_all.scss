@@ -39,8 +39,13 @@ $gray-darkest:    darken($gray, 20%); // #333
 
 
 //##############################################################################
+// BASE Variables
+$border-radius-base: 3px;
+$padding-base: 3px;
+
+//##############################################################################
 // #BUTTONS
-$btn-border-radius-base: 3px;
+$btn-border-radius-base: $border-radius-base;
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $gray-lighter;

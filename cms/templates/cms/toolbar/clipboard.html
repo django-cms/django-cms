@@ -6,7 +6,6 @@
 {% with slot="clipboard" %}
 <div class="cms-clipboard">
     <div class="cms-clipboard-triggers">
-        {# maximum of 5, delete link #}
         {% for plugin in local_toolbar.get_clipboard_plugins %}
             {% if not plugin.parent_id %}
             <div class="cms-clipboard-numbers"><a href="#">{{ forloop.index }}</a></div>

@@ -7,98 +7,17 @@
         top: 130px;
         left: 0;
         z-index: 99999;
-        padding: 3px 3px 3px 0;
-        border-radius: 0 3px 3px 0;
-        background: rgba(white, 0.6);
+        padding: $padding-base $padding-base $padding-base 0;
+        border-radius: 0 $border-radius-base $border-radius-base 0;
+        background: rgba($white, 0.6);
 
         p {
             margin: 0;
             padding: 0;
         }
-
-        .cms-clipboard-numbers {
-            margin: 0 0 2px;
-        }
-        .cms-clipboard-numbers a {
-            @extend .cms-icon;
-            @extend .cms-icon-copy;
-            box-sizing: border-box;
-            display: block;
-            overflow: hidden;
-            color: $color-grey-10;
-            font-size: 12px;
-            width: 20px;
-            height: 30px;
-            border: 5px solid $color-grey-70;
-            border-right: none;
-            border-left: none;
-            border-radius: 0 3px 3px 0;
-            background: $color-grey-70;
-            &:before {
-                position: relative;
-                left: 3px;
-                top: 4px;
-            }
-            &:hover,
-            &:active,
-            &:focus {
-                color: #fff;
-                border-color: $color-grey-90;
-                background-color: $color-grey-90;
-            }
-        }
-        .cms-clipboard-numbers .cms-clipboard-numbers {
-            display: none !important;
-        }
-
-        .cms-clipboard-empty a {
-            @extend .cms-icon;
-            @extend .cms-icon-bin;
-            display: block;
-            cursor: pointer;
-            font-size: 11px;
-            color: $color-grey-10;
-            width: 20px;
-            height: 20px;
-            border-radius: 0 3px 3px 0;
-            background: $color-grey-70;
-            &:before {
-                position: relative;
-                left: 3px;
-                top: 4px;
-            }
-            &:hover,
-            &:active,
-            &:focus {
-                color: #fff;
-                background-color: $color-grey-90;
-            }
-        }
-
-        // placeholders
-        .cms-clipboard-triggers {
-            position: relative;
-            z-index: 999;
-        }
-        .cms-clipboard-triggers .cms-clipboard-numbers:nth-child(n+6) {
-            display: none;
-        }
-
-        .cms-clipboard-containers {
-            position: absolute;
-            top: 0;
-            left: -1px;
-            z-index: 99;
-            width: 0;
-        }
-        .cms-clipboard-containers .cms-draggable {
-            width: 190px;
-            margin-left: -220px;
-        }
-
         // custom style for draggable item
         .cms-dragarea {
-            padding-top: 3px;
+            padding-top: $padding-base;
         }
         .cms-draggable {
             position: relative;
@@ -108,7 +27,7 @@
             margin: 0 0 2px;
             padding: 4px 5px 3px 5px;
             border: 1px solid $color-grey-70;
-            border-radius: 3px;
+            border-radius: $border-radius-base;
             cursor: move;
             background: $color-grey-5;
         }
@@ -129,4 +48,83 @@
             display: none;
         }
     }
+    .cms-clipboard-numbers {
+        margin: 0 0 2px;
+    }
+    .cms-clipboard-numbers a {
+        // we have to use icons like this
+        // and not as classes in actual markup because of cms_reset
+        @extend %icon;
+        @include icon(copy);
+        box-sizing: border-box;
+        display: block;
+        overflow: hidden;
+        color: $gray-lighter;
+        font-size: 12px;
+        width: 20px;
+        height: 30px;
+        border: 5px solid $gray-darker;
+        border-right: none;
+        border-left: none;
+        border-radius: 0 $border-radius-base $border-radius-base 0;
+        background: $gray-darker;
+        &:before {
+            position: relative;
+            left: 3px;
+            top: 4px;
+        }
+        &:hover,
+        &:active,
+        &:focus {
+            color: $white;
+            border-color: $gray-darkest;
+            background-color: $gray-darkest;
+        }
+    }
+    .cms-clipboard-numbers .cms-clipboard-numbers {
+        display: none !important;
+    }
+
+    .cms-clipboard-empty a {
+        @extend %icon;
+        @include icon(bin);
+        display: block;
+        cursor: pointer;
+        font-size: 11px;
+        color: $gray-lighter;
+        width: 20px;
+        height: 20px;
+        border-radius: 0 $border-radius-base $border-radius-base 0;
+        background: $gray-darker;
+        &:before {
+            position: relative;
+            left: 3px;
+            top: 4px;
+        }
+        &:hover,
+        &:active,
+        &:focus {
+            color: $white;
+            background-color: $gray-darkest;
+        }
+    }
+
+    // placeholders
+    .cms-clipboard-triggers {
+        position: relative;
+        z-index: 999;
+    }
+
+    .cms-clipboard-containers {
+        position: absolute;
+        top: 0;
+        left: -1px;
+        z-index: 99;
+        width: 0;
+    }
+    .cms-clipboard-containers .cms-draggable {
+        width: 190px;
+        margin-left: -220px;
+    }
+
 }
