@@ -50,6 +50,19 @@ $padding-large: 20px;
 // z-index map
 // the map is built from highest to lowest as it appears on screen
 $z-layers: (
+    "modal": (
+        "base":         999999,
+        "body":         10,
+        "frame":        10,
+        "shim":         20,
+        "breadcrumb": (
+            "base":           100,
+            "trianglebehind": 1,
+            "trianglefront":  2,
+            "title":          3
+        ),
+        "resize":       102,
+    ),
     "clipboard": (
         "base":         99999,
         "containers":   99,
@@ -88,7 +101,11 @@ $btn-active-bggradient: to bottom, $gray, $gray-darkest;
 $btn-active-border: $gray-darkest;
 
 //##############################################################################
+// Modal
+$modal-shadow: 0 0 20px rgba($black, .5);
+
+//##############################################################################
 // Dialog
 $dialog-width: 500px;
 $dialog-border-radius: $border-radius-normal;
-$dialog-shadow: 0 0 20px rgba($black, .5);
+$dialog-shadow: $modal-shadow;
