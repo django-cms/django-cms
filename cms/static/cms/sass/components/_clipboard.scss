@@ -26,10 +26,10 @@
             z-index: 99;
             margin: 0 0 2px;
             padding: 4px 5px 3px 5px;
-            border: 1px solid $color-grey-70;
+            border: 1px solid $gray-darker;
             border-radius: $border-radius-base;
             cursor: move;
-            background: $color-grey-5;
+            background: $gray-lightest;
         }
         .cms-draggable .cms-dragitem {
             padding-left: 20px;
