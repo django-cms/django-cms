@@ -6,7 +6,7 @@
         position: fixed;
         top: 130px;
         left: 0;
-        z-index: 99999;
+        z-index: z(clipboard, base);
         padding: $padding-base $padding-base $padding-base 0;
         border-radius: 0 $border-radius-base $border-radius-base 0;
         background: rgba($white, 0.6);
@@ -23,7 +23,7 @@
             position: relative;
             top: 0;
             left: 0;
-            z-index: 99;
+            z-index: z(clipboard, draggable);
             margin: 0 0 2px;
             padding: 4px 5px 3px 5px;
             border: 1px solid $gray-darker;
@@ -112,14 +112,14 @@
     // placeholders
     .cms-clipboard-triggers {
         position: relative;
-        z-index: 999;
+        z-index: z(clipboard, triggers);
     }
 
     .cms-clipboard-containers {
         position: absolute;
         top: 0;
         left: -1px;
-        z-index: 99;
+        z-index: z(clipboard, containers);
         width: 0;
     }
     .cms-clipboard-containers .cms-draggable {
