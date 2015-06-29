@@ -1,32 +1,5 @@
-//##################################################################################################################
+// ##################################################################################################################
 // #MIXINS#
 @import "zindex";
-
-// https://github.com/Compass/compass/blob/stable/core/stylesheets/compass/typography/text/_replacement.scss
-@mixin hide-content() {
-    $approximate-em-value: 12px / 1em;
-    $wider-than-any-screen: -9999em;
-    text-indent: $wider-than-any-screen * $approximate-em-value;
-    overflow: hidden;
-    text-align: left;
-}
-
-@mixin print-and-retina() {
-    @media print,
-        (-o-min-device-pixel-ratio: 5/4),
-        (-webkit-min-device-pixel-ratio: 1.25),
-        (min-resolution: 1.25dppx) {
-        @content;
-    }
-}
-
-@keyframes cms-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-// end of mixins
+@import "retina";
+@import "custom";
