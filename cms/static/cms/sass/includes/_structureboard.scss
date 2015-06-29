@@ -24,6 +24,10 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 }
 .cms_dragarea-static { background:$color-grey-70 url('../img/toolbar/pattern.png'); }
 
+// subclasses for the simple structure borad without absolute positioning
+.cms_structure-content-simple { padding:5%; }
+.cms_dragarea-simple { position:static; }
+
 //######################################################################################################################
 // #DRAGBAR#
 .cms_dragbar {
@@ -138,12 +142,7 @@ display:none; position:absolute; top:0; right:0; width:100%; height:100%; z-inde
 // end of dragarea
 }
 
-// dragging state
-body > .cms_draggable { list-style-type:none; white-space:nowrap;
-	@include border-radius(3px); padding:4px 5px 3px 5px; margin:0;
-	border-color:$color-grey-10; background:white; }
-
 // hide elements when dragging
-body > .cms_draggable .cms_switcher { display:none !important; }
-body > .cms_draggable .cms_submenu { display:none !important; }
-body > .cms_draggable .cms_draggables { display:none !important; }
+.ui-sortable-helper.cms_draggable .cms_switcher { display:none !important; }
+.ui-sortable-helper.cms_draggable .cms_submenu { display:none !important; }
+.ui-sortable-helper.cms_draggable .cms_draggables { display:none !important; }
