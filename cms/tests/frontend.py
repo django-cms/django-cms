@@ -473,7 +473,7 @@ class FrontAdminTest(CMSLiveTests):
         create_page('apphook', 'simple.html', 'fr', published=True,
                     apphook=Example1App)
         url = '%s/%s/?%s' % (
-            self.live_server_url, '/apphook/detail/class/%s'
+            self.live_server_url, 'apphook/detail/class/%s'
             % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             )
         self.driver.get(url)
