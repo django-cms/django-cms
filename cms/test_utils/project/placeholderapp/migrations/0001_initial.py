@@ -130,12 +130,12 @@ class Migration(SchemaMigration):
             'publish': ('django.db.models.fields.BooleanField', [], {'default': 'True'})
         },
         'placeholderapp.multilingualexample1': {
-            'Meta': {'unique_together': '()', 'object_name': 'MultilingualExample1', 'index_together': '()'},
+            'Meta': {'unique_together': '()', 'object_name': 'MultilingualExample1'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'placeholder_1': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True'})
         },
         'placeholderapp.multilingualexample1translation': {
-            'Meta': {'unique_together': "[('language_code', 'master')]", 'object_name': 'MultilingualExample1Translation', 'db_table': "'placeholderapp_multilingualexample1_translation'", 'index_together': '()'},
+            'Meta': {'unique_together': "[('language_code', 'master')]", 'object_name': 'MultilingualExample1Translation', 'db_table': "'placeholderapp_multilingualexample1_translation'"},
             'char_1': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'char_2': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
