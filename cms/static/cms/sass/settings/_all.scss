@@ -27,6 +27,10 @@ $color-grey-90:   darken($color-grey, 20%); // 333333
 $white: #fff;
 $black: #000;
 
+$color-primary: #0eaaec;
+$color-success: #693;
+$color-danger: #f00;
+
 // #COLORS gray
 $gray:            #666;
 $gray-lightest:   lighten($gray, 58%); // #fafafa
@@ -111,14 +115,19 @@ $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
-$modal-header-height: 27px;
+$modal-header-height: 28px;
 $modal-footer-height: 32px;
+
+$modal-header-icon-size: 8px;
+$modal-header-icon-area-size: 20px;
 
 $modal-breadcrumb-title-width: 36px;
 $modal-breadcrumb-padding-vertical: $padding-normal;
 $modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
+$modal-breadcrumb-hover-color: $black;
 $modal-breadcrumb-hover-bgcolor: $white;
 
+$modal-button-font-size: 12px;
 $modal-button-padding: 2px $padding-normal;
 $modal-button-space: 5px;
 

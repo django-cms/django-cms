@@ -55,6 +55,9 @@
         height: 100%;
     }
 
+    .cms-modal-head {
+        position: relative;
+    }
     .cms-modal-title {
         display: block;
         color: $gray-darker;
@@ -62,7 +65,7 @@
         line-height: $modal-header-height;
         font-weight: bold;
         text-align: center;
-        padding: 0px 75px;
+        padding: 0px ($modal-header-icon-area-size * 3 + $padding-base + $padding-large);
         cursor: move;
         background: $gray-lightest;
     }
@@ -72,36 +75,37 @@
     .cms-modal-maximize {
         display: block;
         position: absolute;
-        font-size: 8px;
-        top: 3px;
-        right: 3px;
+        font-size: $modal-header-icon-size;
+        top: 50%;
+        margin-top: -$modal-header-icon-area-size / 2;
+        right: $padding-base;
         color: $gray-light;
         text-align: center;
-        width: 20px;
-        height: 20px;
+        width: $modal-header-icon-area-size;
+        height: $modal-header-icon-area-size;
         cursor: pointer;
         &:before {
             position: relative;
-            top: 7px;
+            top: ($modal-header-icon-area-size - $modal-header-icon-size) / 2;
         }
         &:hover,
         &:active,
         &:focus {
-            color: $color-blue;
+            color: $color-primary;
         }
     }
     .cms-modal-collapse {
-        right: 40px;
+        right: 2 * $modal-header-icon-area-size + $padding-base;
     }
     .cms-modal-maximize {
-        right: 21px;
+        right: $modal-header-icon-area-size + $padding-base;
     }
     .cms-modal-collapsed {
         @include icon(plus);
-        color: $color-blue;
+        color: $color-primary;
     }
     .cms-modal-maximize-active {
-        color: $color-blue;
+        color: $color-primary;
     }
 
     .cms-modal-resize {
@@ -187,7 +191,7 @@
         }
 
         a:hover {
-            color: $black;
+            color: $modal-breadcrumb-hover-color;
             background: $modal-breadcrumb-hover-bgcolor;
             &:after {
                 border-left-color: $modal-breadcrumb-hover-bgcolor;
@@ -197,9 +201,9 @@
         // last entry highlight
         .cms-modal-breadcrumb-last {
             cursor: default;
-            color: $color-blue;
+            color: $color-primary;
             &:hover {
-                color: $color-blue;
+                color: $color-primary;
             }
         }
     }
@@ -215,7 +219,7 @@
         div {
             $modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
             display: inline-block;
-            font-size: 12px;
+            font-size: $modal-button-font-size;
             margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
             padding: $modal-button-padding;
             cursor: pointer;
