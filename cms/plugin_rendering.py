@@ -93,9 +93,8 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_placeholder(placeholder, context_to_copy,
-        name_fallback="Placeholder", lang=None, default=None, editable=True,
-        use_cache=True):
+def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder",
+                       lang=None, default=None, editable=True, use_cache=True):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.

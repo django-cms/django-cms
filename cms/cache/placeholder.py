@@ -39,7 +39,7 @@ def get_placeholder_cache(placeholder, lang):
 def clear_placeholder_cache(placeholder, lang):
     from django.core.cache import cache
 
-    cache.delete(_placeholder_cache_key(placeholder, lang))
+    cache.delete(_placeholder_cache_key(placeholder, lang), version=_get_cache_version())
 
 
 def _placeholder_page_cache_key(page_lookup, lang, site_id, placeholder_name):
