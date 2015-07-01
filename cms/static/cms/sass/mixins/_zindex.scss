@@ -25,7 +25,7 @@
 }
 @function z($layers...) {
     @if not map-has-nested-keys($z-layers, $layers...) {
-        @warn "No layer found for `#{inspect($layers...)}` in $z-layers map. Property omitted.";
+        @warn "No layer found for `#{inspect($layers)}` in $z-layers map. Property omitted.";
     }
 
     @return map-deep-get($z-layers, $layers...);
