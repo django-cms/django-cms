@@ -58,10 +58,11 @@
     .cms-modal-title {
         display: block;
         color: $gray-darker;
-        font-size: 13px;
+        font-size: $modal-header-title-font-size;
+        line-height: $modal-header-height;
         font-weight: bold;
         text-align: center;
-        padding: 4px 75px 3px;
+        padding: 0px 75px;
         cursor: move;
         background: $gray-lightest;
     }

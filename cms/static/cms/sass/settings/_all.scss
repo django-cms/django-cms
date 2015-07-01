@@ -39,6 +39,7 @@ $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-
 
 //##############################################################################
 // BASE Variables
+$font-size-normal: 13px;
 $line-height-normal: 20px;
 
 $border-radius-base: 3px;
@@ -105,10 +106,12 @@ $btn-active-border: $gray-darkest;
 
 //##############################################################################
 // Modal
+$modal-header-title-font-size: $font-size-normal;
 $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
+$modal-header-height: 27px;
 $modal-footer-height: 32px;
 
 $modal-breadcrumb-title-width: 36px;
