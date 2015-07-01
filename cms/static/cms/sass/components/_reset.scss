@@ -15,7 +15,7 @@
     input,
     textarea {
         color: #222;
-        font: normal 13px/20px Helvetica,Arial,sans-serif;
+        font: normal 13px/#{$line-height-normal} Helvetica,Arial,sans-serif;
         text-align: left;
         text-decoration: none;
         height: auto;

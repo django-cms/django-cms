@@ -39,8 +39,11 @@ $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-
 
 //##############################################################################
 // BASE Variables
+$line-height-normal: 20px;
+
 $border-radius-base: 3px;
 $border-radius-normal: 5px;
+
 $padding-base: 3px;
 $padding-normal: 10px;
 $padding-large: 20px;
@@ -105,7 +108,18 @@ $btn-active-border: $gray-darkest;
 $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
+
 $modal-footer-height: 32px;
+
+$modal-breadcrumb-title-width: 36px;
+$modal-breadcrumb-padding-vertical: $padding-normal;
+$modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
+$modal-breadcrumb-hover-bgcolor: $white;
+
+$modal-button-padding: 2px $padding-normal;
+$modal-button-space: 5px;
+
+$modal-resize-size: 20px;
 
 //##############################################################################
 // Dialog

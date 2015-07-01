@@ -110,8 +110,8 @@
         z-index: z(modal, resize);
         font-size: 10px;
         color: $gray-light;
-        width: 20px;
-        height: 20px;
+        width: $modal-resize-size;
+        height: $modal-resize-size;
         cursor: nw-resize;
         span {
             margin: 6px 0 0 6px;
@@ -121,18 +121,14 @@
     .cms-modal-breadcrumb {
         display: none;
         position: relative;
-        float: left;
         z-index: z(modal, breadcrumb, base);
-        font-size: 12px;
-        line-height: 12px;
         width: 100%;
-        min-width: 225px;
-        height: 32px;
+        height: $modal-footer-height;
 
         .cms-modal-breadcrumb-items {
             position: absolute;
             top: 0;
-            left: 35px;
+            left: $modal-breadcrumb-title-width - 1px;
             width: 9999px;
             background: $color-window;
         }
@@ -142,11 +138,14 @@
             float: left;
             color: $gray-light;
             font-size: 12px;
-            line-height: 12px;
-            padding: 10px 16px 10px (16px + 8px);
+            line-height: $modal-footer-height - 2 * $modal-breadcrumb-padding-vertical;
+            padding: $modal-breadcrumb-padding-vertical
+                $modal-breadcrumb-padding-horizontal
+                $modal-breadcrumb-padding-horizontal
+                1.5 * $modal-breadcrumb-padding-horizontal;
         }
         a:first-child {
-            padding-left: 16px;
+            padding-left: $modal-breadcrumb-padding-horizontal;
         }
         a:after,
         a:before {
@@ -157,17 +156,17 @@
             top: -1px;
             width: 0;
             height: 0;
-            border-top: 17px solid transparent;
-            border-bottom: 17px solid transparent;
+            border-top: ($modal-footer-height / 2 + 1px) solid transparent;
+            border-bottom: ($modal-footer-height / 2 + 1px) solid transparent;
         }
         a:after {
             z-index: z(modal, breadcrumb, trianglefront);
-            border-left: 8px solid $color-window;
+            border-left: ($modal-footer-height / 4) solid $color-window;
         }
         a:before {
             z-index: z(modal, breadcrumb, trianglebehind);
             margin-left: 1px;
-            border-left: 8px solid $gray-lighter;
+            border-left: ($modal-footer-height / 4) solid $gray-lighter;
         }
 
         // home icon
@@ -175,22 +174,22 @@
             position: relative;
             z-index: z(modal, breadcrumb, title);
             color: $gray-lighter;
-            font-size: 15px;
+            font-size: $modal-footer-height / 2;
             text-align: center;
-            width: 36px;
-            height: 32px;
+            width: $modal-breadcrumb-title-width;
+            height: $modal-footer-height;
             border-right: 1px solid $gray-lighter;
             &:before {
                 position: relative;
-                top: 8px;
+                top: $modal-footer-height / 4;
             }
         }
 
         a:hover {
-            color: black;
-            background: white;
+            color: $black;
+            background: $modal-breadcrumb-hover-bgcolor;
             &:after {
-                border-left-color: white;
+                border-left-color: $modal-breadcrumb-hover-bgcolor;
             }
         }
 
@@ -209,16 +208,15 @@
         position: absolute;
         top: 0;
         right: 0;
-        float: right;
         z-index: z(modal, buttons);
-        padding: 0 20px 0 10px;
-        border-radius: 0 0 5px 0;
+        padding: 0 $modal-resize-size 0 $padding-normal;
         background: $color-window;
         div {
-            float: right;
+            $modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
+            display: inline-block;
             font-size: 12px;
-            margin: 3px 5px 3px 0;
-            padding: 2px 10px;
+            margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
+            padding: $modal-button-padding;
             cursor: pointer;
         }
     }
