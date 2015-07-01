@@ -11,9 +11,10 @@
         left: 50%;
         overflow: hidden;
         z-index: z(modal, base);
-        border-radius: 5px;
-        background: $white;
+        border-radius: $modal-border-radius;
+        background: $modal-bgcolor;
         box-shadow: $modal-shadow;
+        user-select: none;
         transform: translateZ(0);
 
     }
@@ -22,16 +23,14 @@
         z-index: z(modal, body);
         width: 800px;
         height: 400px;
-        border-top: 1px solid $color-grey-10;
-        border-bottom: 1px solid $color-grey-10;
+        border-top: 1px solid $gray-lighter;
+        border-bottom: 1px solid $gray-lighter;
     }
     .cms-modal-foot {
         position: relative;
         clear: both;
-        overflow: hidden;
-        height: 32px;
-        border-radius: 0 0 5px 5px;
-        background: $color-grey-5;
+        height: $modal-footer-height;
+        background: $gray-lightest;
     }
     // this elements shows up on top of an iframe as soon as the dragging starts
     // so if you are moving the mouse really fast and mouse hovers over an iframe
@@ -58,14 +57,13 @@
 
     .cms-modal-title {
         display: block;
-        color: $color-grey-70;
+        color: $gray-darker;
         font-size: 13px;
         font-weight: bold;
         text-align: center;
         padding: 4px 75px 3px;
-        border-radius: 5px 5px 0 0;
         cursor: move;
-        background: $color-grey-5;
+        background: $gray-lightest;
     }
 
     .cms-modal-collapse,
@@ -76,7 +74,7 @@
         font-size: 8px;
         top: 3px;
         right: 3px;
-        color: $color-grey-20;
+        color: $gray-light;
         text-align: center;
         width: 20px;
         height: 20px;
@@ -98,7 +96,7 @@
         right: 21px;
     }
     .cms-modal-collapsed {
-        @extend .cms-icon-plus;
+        @include icon(plus);
         color: $color-blue;
     }
     .cms-modal-maximize-active {
@@ -111,7 +109,7 @@
         bottom: 0;
         z-index: z(modal, resize);
         font-size: 10px;
-        color: $color-grey-20;
+        color: $gray-light;
         width: 20px;
         height: 20px;
         cursor: nw-resize;
@@ -124,7 +122,6 @@
         display: none;
         position: relative;
         float: left;
-        overflow: hidden;
         z-index: z(modal, breadcrumb, base);
         font-size: 12px;
         line-height: 12px;
@@ -143,10 +140,10 @@
         a {
             position: relative;
             float: left;
-            color: $color-grey-20;
+            color: $gray-light;
             font-size: 12px;
             line-height: 12px;
-            padding: 10px 0 10px 36px;
+            padding: 10px 16px 10px (16px + 8px);
         }
         a:first-child {
             padding-left: 16px;
@@ -157,35 +154,32 @@
             display: block;
             position: absolute;
             left: 100%;
-            top: 50%;
+            top: -1px;
             width: 0;
             height: 0;
-            margin-top: -44px;
-            border-top: 44px solid transparent;
-            border-bottom: 44px solid transparent;
+            border-top: 17px solid transparent;
+            border-bottom: 17px solid transparent;
         }
         a:after {
             z-index: z(modal, breadcrumb, trianglefront);
-            border-left: 22px solid $color-window;
+            border-left: 8px solid $color-window;
         }
         a:before {
             z-index: z(modal, breadcrumb, trianglebehind);
             margin-left: 1px;
-            border-left: 22px solid $color-grey-10;
+            border-left: 8px solid $gray-lighter;
         }
 
         // home icon
         .cms-modal-breadcrumb-title {
             position: relative;
             z-index: z(modal, breadcrumb, title);
-            color: $color-grey-10;
+            color: $gray-lighter;
             font-size: 15px;
             text-align: center;
             width: 36px;
             height: 32px;
-            border-right: 1px solid $color-grey-10;
-            border-radius: 0 0 0 5px;
-            background: white;
+            border-right: 1px solid $gray-lighter;
             &:before {
                 position: relative;
                 top: 8px;
@@ -220,7 +214,6 @@
         padding: 0 20px 0 10px;
         border-radius: 0 0 5px 0;
         background: $color-window;
-        user-select: none;
         div {
             float: right;
             font-size: 12px;

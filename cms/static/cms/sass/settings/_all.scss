@@ -22,8 +22,6 @@ $color-grey-20:   lighten($color-grey, 25%); // a6a6a6
 $color-grey-70:   darken($color-grey, 13%); // 454545
 $color-grey-90:   darken($color-grey, 20%); // 333333
 
-$gradient-toolbar: to bottom, rgba(lighten($color-grey, 58%), 0.97) 0%, rgba(lighten($color-grey, 59%), 0.97) 50%, rgba(lighten($color-grey, 58%), 0.95) 100%;
-
 //##############################################################################
 // #COLORS new
 $white: #fff;
@@ -37,6 +35,7 @@ $gray-light:      lighten($gray, 25%); // #a6a6a6
 $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
 
+$gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
 
 //##############################################################################
 // BASE Variables
@@ -61,6 +60,7 @@ $z-layers: (
             "trianglefront":  2,
             "title":          3
         ),
+        "buttons":      101,
         "resize":       102,
     ),
     "clipboard": (
@@ -103,6 +103,9 @@ $btn-active-border: $gray-darkest;
 //##############################################################################
 // Modal
 $modal-shadow: 0 0 20px rgba($black, .5);
+$modal-bgcolor: $white;
+$modal-border-radius: $border-radius-normal;
+$modal-footer-height: 32px;
 
 //##############################################################################
 // Dialog
