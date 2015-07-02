@@ -8,7 +8,6 @@ $color-black: #000;
 $color-grey: #666;
 $color-blue: #0eaaec;
 $color-green: #693;
-$color-orange: #c93;
 $color-red: #f00;
 $color-window: #fcfcfc;
 
@@ -30,9 +29,10 @@ $black: #000;
 $color-primary: #0eaaec;
 $color-success: #693;
 $color-danger: #f00;
+$color-warning: #c93;
 
 // #COLORS gray
-$gray:            #666;
+$gray:            lighten($black, 40%); // #666;
 $gray-lightest:   lighten($gray, 58%); // #fafafa
 $gray-lighter:    lighten($gray, 50%); // #e5e5e5
 $gray-light:      lighten($gray, 25%); // #a6a6a6
@@ -118,6 +118,10 @@ $btn-active-border: $gray-darkest;
 
 //##############################################################################
 // Modal
+$clipboard-buttons-position-top: 130px;
+
+//##############################################################################
+// Modal
 $modal-header-title-font-size: $font-size-normal;
 $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
@@ -126,8 +130,8 @@ $modal-border-radius: $border-radius-normal;
 $modal-header-height: 28px;
 $modal-footer-height: 32px;
 
-$modal-header-icon-size: 8px;
-$modal-header-icon-area-size: 20px;
+$modal-header-button-icon-size: 8px;
+$modal-header-button-area-size: 20px;
 
 $modal-breadcrumb-title-width: 36px;
 $modal-breadcrumb-padding-vertical: $padding-normal;
@@ -146,3 +150,12 @@ $modal-resize-size: 20px;
 $dialog-width: 500px;
 $dialog-border-radius: $border-radius-normal;
 $dialog-shadow: $modal-shadow;
+
+//##############################################################################
+// Sideframe
+$sideframe-buttons-position-top: 50px;
+$sideframe-border-width: 2px;
+$sideframe-resize-knob-size: 6px 50px;
+$sideframe-button-area-size: 20px;
+$sideframe-button-icon-size: 8px;
+$sideframe-button-space: 2px;
