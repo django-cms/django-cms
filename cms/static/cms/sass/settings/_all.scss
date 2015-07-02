@@ -182,7 +182,17 @@ $structureboard-dragarea-space: $padding-normal / 2;
 $structureboard-dragarea-padding: $padding-normal / 2;
 
 $structureboard-dragbar-height: 16px;
-$structureboard-dragbar: 1px;
 $structureboard-dragbar-color: $white;
 $structureboard-dragbar-text-shadow: 0 1px 0 $black;
-$structureboard-dragbar-icon-space: 15px;
+$structureboard-dragbar-icon-space: 16px;
+$structureboard-dragbar-icon-size: 10px;
+
+$structureboard-draggable-inner-padding: 6px;
+$structureboard-draggable-space: 3px;
+$structureboard-draggable-odd-child-bgcolor: $gray-lightest;
+$structureboard-draggable-even-child-bgcolor: $white;
+
+$structureboard-dragitem-icon-size: 10px;
+$structureboard-dragitem-height: $line-height-normal;
+
+$submenu-icon-size: 16px;
