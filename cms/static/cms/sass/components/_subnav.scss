@@ -6,9 +6,9 @@
         display: block;
         position: absolute;
         cursor: pointer;
-        right: 5px;
+        right: 0px;
         width: 20px;
-        height: 15px;
+        height: $submenu-icon-size;
         &:before {
             @extend .cms-icon;
             position: relative;

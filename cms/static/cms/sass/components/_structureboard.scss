@@ -5,7 +5,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 9999;
+    z-index: z(structure, base);
     width: 100%;
     height: 100%;
 
@@ -16,16 +16,16 @@
         right: 0;
         bottom: 0;
         left: 0;
-        z-index: 10;
+        z-index: z(structure, dimmer);
         width: 100%;
         height: 100%;
-        background: rgba(white, 0.95);
+        background: $structure-bgcolor;
     }
     .cms-structure-content {
         position: absolute;
         top: 0;
         left: 0;
-        z-index: 100;
+        z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
     }
@@ -35,76 +35,75 @@
 #cms-toolbar .cms-structure {
     //###########################################################
     // #DRAGAREA#
+    // basically a cms placeholder representation
     .cms-dragarea {
         position: absolute;
         box-sizing: border-box;
-        margin: 0 0 5px;
-        padding: 5px 5px 4px;
-        border-radius: 3px;
-        background: $color-grey-70;
+        margin: 0 0 $structure-dragarea-space;
+        padding: $structure-dragarea-padding
+            $structure-dragarea-padding
+            ($structure-dragarea-padding - 1px);
+        border-radius: $border-radius-base;
+        background: $gray-darker;
     }
     .cms-dragarea-static {
-        background-color: $color-grey-70;
-        background-image: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, .1) 25%,
-            transparent 25%,
-            transparent 50%,
-            rgba(255, 255, 255, .1) 50%,
-            rgba(255, 255, 255, .1) 75%,
-            transparent 75%,
-            transparent
-        );
+        background-color: $gray-darker;
+        background-image: linear-gradient($gradient-striped-light);
         background-size: 10px 10px;
     }
 
     //###########################################################
     // #DRAGBAR#
+    //
+    // Placeholder box title
     .cms-dragbar {
         position: relative;
         top: 0;
         left: 0;
-        z-index: 9999;
-        font-size: 13px;
-        line-height: 20px;
-        border-radius: 3px;
+        z-index: z(structure, content, dragbar);
+        font-size: $font-size-normal;
+        line-height: $line-height-normal;
+        border-radius: $border-radius-base;
 
         .cms-dragbar-title {
-            @extend .cms-icon-arrow-wide;
+            @include icon(arrow-wide);
+            position: relative;
             cursor: pointer;
-            color: white;
-            font-size: 12px;
+            color: $structure-dragbar-color;
+            font-size: $font-size-normal - 1px;
             font-weight: 500;
-            line-height: 17px;
+            line-height: $structure-dragbar-height + 1px;
             text-transform: uppercase;
-            text-shadow: 0 1px 0 black;
-            height: 16px;
-            padding: 0 0 0 15px;
+            text-shadow: $structure-dragbar-text-shadow;
+            height: $structure-dragbar-height;
+            padding: 0 0 0 $structure-dragbar-icon-space;
+            margin-right: $submenu-icon-size;
 
             &:before {
-                @extend .cms-icon;
+                @extend %icon;
                 position: absolute;
-                top: -4px;
-                left: -5px;
-                font-size: 9px;
-                color: $color-grey-20;
-                width: 16px;
-                height: 16px;
+                top: ($structure-dragbar-height - $structure-dragbar-icon-size) / 2;
+                left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2;
+                font-size: $structure-dragbar-icon-size;
+                color: $gray-light;
                 transform: rotate(180deg);
             }
             &:hover:before {
-                color: #fff;
+                color: $white;
             }
         }
         .cms-dragbar-title-expanded:before {
             transform: rotate(-90deg);
-            left: 2px;
+            left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2 - 1px;
+        }
+        .cms-submenu {
+            margin-top: ($structure-dragbar-height - $submenu-icon-size) / 2;
         }
     }
 
     // #DRAGBAR/empty#
     .cms-dragbar-empty {
-        font-size: 11px;
+        font-size: $font-size-normal - 2px;
         text-transform: uppercase;
         padding-top: 0;
         padding-bottom: 0;
@@ -123,19 +122,7 @@
     .cms-draggables .cms-draggables {
         display: none;
         min-height: 25px;
-        padding-left: 6px;
-    }
-    .cms-draggables .cms-draggables > .cms-draggable:first-child,
-    .cms-draggables .cms-draggables > .cms-draggable:only-child,
-    .cms-draggable > .cms-draggable {
-        margin-top: 0;
-    }
-
-    .cms-draggables > .cms-draggable:last-child {
-        margin-bottom: 1px;
-    }
-    .cms-draggables .cms-draggables > .cms-draggable:last-child {
-        margin-bottom: 2px;
+        padding-left: $structure-draggable-inner-padding;
     }
 
     // #DRAGGABLES/general#
@@ -144,121 +131,126 @@
         position: relative;
         top: 0;
         left: 0;
-        z-index: 99;
-        margin: 5px 0 0;
+        z-index: z(structure, content, draggable);
+        margin: $structure-draggable-space 0 0;
         margin-left: 0 !important;
-        padding: 4px 5px 3px 5px;
-        border-radius: 3px;
+        // differences are fine-tuning
+        padding: ($structure-dragarea-padding - 1px)
+            $structure-dragarea-padding;
+        border-radius: $border-radius-base;
         list-style-type: none;
 
         // levels
         .cms-draggable {
             position: relative;
-            z-index: 99;
+            z-index: z(structure, content, draggable);
             white-space: nowrap;
-            border-color: $color-grey-10;
-            background: white;
+            border-color: $gray-lighter;
+            background: $structure-draggable-even-child-bgcolor;
             &:hover {
-                border-color: $color-grey-20;
+                border-color: $gray-light;
             }
+        }
+        .cms-draggable .cms-draggable {
+            margin-top: $structure-draggable-space + 1px;
         }
         .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background: $color-grey-5;
+            background-color: $structure-draggable-even-child-bgcolor;
         }
         .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background: white;
+            background-color: $structure-draggable-odd-child-bgcolor;
         }
 
         // menu overwrites
         .cms-submenu {
             display: none;
-            margin-top: 2px;
+            margin-top: ($structure-dragitem-height - $submenu-icon-size) / 2;
             &:before {
-                color: $color-grey-70;
-                left: 2px;
-                top: -1px;
+                color: $gray-darker;
             }
         }
         .cms-submenu-dropdown {
-            top: 22px;
-            right: -6px;
+            top: ($structure-dragitem-height + $submenu-icon-size) / 2 + 4px;
+            right: -($structure-dragarea-padding + 1px);
         }
         .cms-submenu-quicksearch {
-            top: -6px;
-            right: -5px;
-            height: 28px;
-            border-left: 1px dotted $color-grey-10;
+            $quicksearch-height: $structure-dragitem-height + 2 * $structure-draggable-space;
+            top: 50%;
+            right: -$structure-dragarea-padding;
+            height: $quicksearch-height;
+            margin-top: -($quicksearch-height / 2);
+            border-left: 1px dotted $gray-lighter;
             border-radius: 0;
-            background: $color-grey-5;
+            background: $gray-lightest;
             &:before {
-                color: $color-grey-70;
+                color: $gray-darker;
             }
         }
         .cms-submenu-quicksearch input {
-            color: black;
+            color: $black;
             margin-top: 1px;
         }
 
         .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: white;
+            background-color: $structure-draggable-odd-child-bgcolor;
         }
         .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $color-grey-5;
+            background-color: $structure-draggable-even-child-bgcolor;
         }
 
+        .cms-dragitem {
+            line-height: $structure-dragitem-height;
+        }
         .cms-dragitem-text {
             display: inline-block;
             overflow: visible;
             width: 90%;
-            height: 15px;
         }
     }
 
     // #DRAGGABLES/specific#
     .cms-draggable {
-        z-index: 100;
-        color: black;
-        border: 1px solid $color-grey-5;
-        background: $color-grey-5;
-        &:hover {
-            box-shadow: inset 0 0 3px $color-grey-10;
-        }
+        z-index: z(structure, content, draggable) + 1;
+        color: $black;
+        border: 1px solid $gray-lightest;
+        background: $gray-lightest;
     }
     .cms-droppable {
-        color: darken($color-grey-10, 15%);
-        border: 1px dashed darken($color-grey-10, 15%);
-        border-radius: 3px;
+        color: darken($gray-lighter, 15%);
+        border: 1px dashed darken($gray-lighter, 15%);
+        border-radius: $border-radius-base;
     }
 
     .cms-dragitem {
+        position: relative;
         cursor: move;
     }
     .cms-dragitem-collapsable,
     .cms-dragitem-expanded {
-        padding-left: 15px;
+        padding-left: $structure-dragbar-icon-space;
         cursor: pointer;
     }
     .cms-dragitem-collapsable {
-        @extend .cms-icon-arrow-wide;
+        @include icon(arrow-wide);
         &:before {
-            @extend .cms-icon;
+            @extend %icon;
             position: absolute;
-            left: 5px;
-            top: 8px;
-            font-size: 10px;
-            color: $color-grey-70;
+            left: ($structure-dragbar-icon-space - $structure-dragitem-icon-size) / 2;
+            top: ($structure-dragitem-height - $structure-dragitem-icon-size) / 2;
+            font-size: $structure-dragitem-icon-size;
+            color: $gray-darker;
             transform: rotate(180deg);
         }
         &:hover:before {
-            color: #000;
+            color: $black;
         }
     }
     .cms-dragitem-expanded:before {
@@ -270,7 +262,7 @@
         left: -1px;
         width: 100%;
         height: 100%;
-        border-radius: 3px;
+        border-radius: $border-radius-base;
         opacity: 0.6;
     }
 
@@ -278,34 +270,34 @@
 
     .cms-draggable-selected .cms-dragitem,
     .cms-draggable-selected .cms-dragitem strong {
-        color: adjust-hue($color-blue, 15deg);
+        color: adjust-hue($color-primary, 15deg);
     }
     .cms-draggable-selected .cms-draggable .cms-dragitem,
     .cms-draggable-selected .cms-draggable .cms-dragitem strong {
-        color: black;
+        color: $black;
     }
 
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-green, 40%);
-        border-color: lighten($color-green, 40%);
+        color: lighten($color-success, 40%);
+        border-color: lighten($color-success, 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: white;
-        background: rgba(102, 153, 51, 0.2);
+        color: $white;
+        background: rgba($color-success, 0.2);
     }
     .cms-dragitem-success {
-        border: 1px solid lighten($color-green, 40%);
-        background: lighten($color-green, 40%);
+        border: 1px solid lighten($color-success, 40%);
+        background: lighten($color-success, 40%);
     }
 
     .cms-draggable-disallowed,
     .cms-draggable-hover-disallowed {
-        color: saturate($color-red, 80%);
-        border: 1px dashed saturate($color-red, 80%);
-        background: rgba(255, 0, 0, 0.1);
+        color: saturate($color-danger, 80%);
+        border: 1px dashed saturate($color-danger, 80%);
+        background: rgba($color-danger, 0.1);
     }
 
     //.cms-placeholder .cms-draggables .cms-draggable { margin-left:0 !important; }
@@ -326,11 +318,12 @@
 body > .cms-draggable {
     white-space: nowrap;
     margin: 0;
-    padding: 4px 5px 3px 5px;
-    border-color: $color-grey-10;
-    border-radius: 3px;
+    padding: ($structure-dragarea-padding - 1px)
+        $structure-dragarea-padding;
+    border-color: $gray-lighter;
+    border-radius: $border-radius-base;
     list-style-type: none;
-    background: white;
+    background: $structure-draggable-even-child-bgcolor;
 }
 
 // hide elements when dragging
