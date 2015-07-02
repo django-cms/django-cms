@@ -19,7 +19,7 @@
         z-index: z(structureboard, dimmer);
         width: 100%;
         height: 100%;
-        background: $structureboard-bgcolor;
+        background: $structure-bgcolor;
     }
     .cms-structure-content {
         position: absolute;
@@ -39,10 +39,10 @@
     .cms-dragarea {
         position: absolute;
         box-sizing: border-box;
-        margin: 0 0 $structureboard-dragarea-space;
-        padding: $structureboard-dragarea-padding
-            $structureboard-dragarea-padding
-            ($structureboard-dragarea-padding - 1px);
+        margin: 0 0 $structure-dragarea-space;
+        padding: $structure-dragarea-padding
+            $structure-dragarea-padding
+            ($structure-dragarea-padding - 1px);
         border-radius: $border-radius-base;
         background: $gray-darker;
     }
@@ -69,22 +69,22 @@
             @include icon(arrow-wide);
             position: relative;
             cursor: pointer;
-            color: $structureboard-dragbar-color;
+            color: $structure-dragbar-color;
             font-size: $font-size-normal - 1px;
             font-weight: 500;
-            line-height: $structureboard-dragbar-height + 1px;
+            line-height: $structure-dragbar-height + 1px;
             text-transform: uppercase;
-            text-shadow: $structureboard-dragbar-text-shadow;
-            height: $structureboard-dragbar-height;
-            padding: 0 0 0 $structureboard-dragbar-icon-space;
+            text-shadow: $structure-dragbar-text-shadow;
+            height: $structure-dragbar-height;
+            padding: 0 0 0 $structure-dragbar-icon-space;
             margin-right: $submenu-icon-size;
 
             &:before {
                 @extend %icon;
                 position: absolute;
-                top: ($structureboard-dragbar-height - $structureboard-dragbar-icon-size) / 2;
-                left: ($structureboard-dragbar-icon-space - $structureboard-dragbar-icon-size) / 2;
-                font-size: $structureboard-dragbar-icon-size;
+                top: ($structure-dragbar-height - $structure-dragbar-icon-size) / 2;
+                left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2;
+                font-size: $structure-dragbar-icon-size;
                 color: $gray-light;
                 transform: rotate(180deg);
             }
@@ -94,10 +94,10 @@
         }
         .cms-dragbar-title-expanded:before {
             transform: rotate(-90deg);
-            left: ($structureboard-dragbar-icon-space - $structureboard-dragbar-icon-size) / 2 - 1px;
+            left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2 - 1px;
         }
         .cms-submenu {
-            margin-top: ($structureboard-dragbar-height - $submenu-icon-size) / 2;
+            margin-top: ($structure-dragbar-height - $submenu-icon-size) / 2;
         }
     }
 
@@ -122,7 +122,7 @@
     .cms-draggables .cms-draggables {
         display: none;
         min-height: 25px;
-        padding-left: $structureboard-draggable-inner-padding;
+        padding-left: $structure-draggable-inner-padding;
     }
 
     // #DRAGGABLES/general#
@@ -132,11 +132,11 @@
         top: 0;
         left: 0;
         z-index: z(structureboard, content, draggable);
-        margin: $structureboard-draggable-space 0 0;
+        margin: $structure-draggable-space 0 0;
         margin-left: 0 !important;
         // differences are fine-tuning
-        padding: ($structureboard-dragarea-padding - 1px)
-            $structureboard-dragarea-padding;
+        padding: ($structure-dragarea-padding - 1px)
+            $structure-dragarea-padding;
         border-radius: $border-radius-base;
         list-style-type: none;
 
@@ -146,41 +146,41 @@
             z-index: z(structureboard, content, draggable);
             white-space: nowrap;
             border-color: $gray-lighter;
-            background: $structureboard-draggable-even-child-bgcolor;
+            background: $structure-draggable-even-child-bgcolor;
             &:hover {
                 border-color: $gray-light;
             }
         }
         .cms-draggable .cms-draggable {
-            margin-top: $structureboard-draggable-space + 1px;
+            margin-top: $structure-draggable-space + 1px;
         }
         .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background-color: $structureboard-draggable-even-child-bgcolor;
+            background-color: $structure-draggable-even-child-bgcolor;
         }
         .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background-color: $structureboard-draggable-odd-child-bgcolor;
+            background-color: $structure-draggable-odd-child-bgcolor;
         }
 
         // menu overwrites
         .cms-submenu {
             display: none;
-            margin-top: ($structureboard-dragitem-height - $submenu-icon-size) / 2;
+            margin-top: ($structure-dragitem-height - $submenu-icon-size) / 2;
             &:before {
                 color: $gray-darker;
             }
         }
         .cms-submenu-dropdown {
-            top: ($structureboard-dragitem-height + $submenu-icon-size) / 2 + 4px;
-            right: -($structureboard-dragarea-padding + 1px);
+            top: ($structure-dragitem-height + $submenu-icon-size) / 2 + 4px;
+            right: -($structure-dragarea-padding + 1px);
         }
         .cms-submenu-quicksearch {
-            $quicksearch-height: $structureboard-dragitem-height + 2 * $structureboard-draggable-space;
+            $quicksearch-height: $structure-dragitem-height + 2 * $structure-draggable-space;
             top: 50%;
-            right: -$structureboard-dragarea-padding;
+            right: -$structure-dragarea-padding;
             height: $quicksearch-height;
             margin-top: -($quicksearch-height / 2);
             border-left: 1px dotted $gray-lighter;
@@ -198,16 +198,16 @@
         .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $structureboard-draggable-odd-child-bgcolor;
+            background-color: $structure-draggable-odd-child-bgcolor;
         }
         .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $structureboard-draggable-even-child-bgcolor;
+            background-color: $structure-draggable-even-child-bgcolor;
         }
 
         .cms-dragitem {
-            line-height: $structureboard-dragitem-height;
+            line-height: $structure-dragitem-height;
         }
         .cms-dragitem-text {
             display: inline-block;
@@ -235,7 +235,7 @@
     }
     .cms-dragitem-collapsable,
     .cms-dragitem-expanded {
-        padding-left: $structureboard-dragbar-icon-space;
+        padding-left: $structure-dragbar-icon-space;
         cursor: pointer;
     }
     .cms-dragitem-collapsable {
@@ -243,9 +243,9 @@
         &:before {
             @extend %icon;
             position: absolute;
-            left: ($structureboard-dragbar-icon-space - $structureboard-dragitem-icon-size) / 2;
-            top: ($structureboard-dragitem-height - $structureboard-dragitem-icon-size) / 2;
-            font-size: $structureboard-dragitem-icon-size;
+            left: ($structure-dragbar-icon-space - $structure-dragitem-icon-size) / 2;
+            top: ($structure-dragitem-height - $structure-dragitem-icon-size) / 2;
+            font-size: $structure-dragitem-icon-size;
             color: $gray-darker;
             transform: rotate(180deg);
         }
@@ -318,12 +318,12 @@
 body > .cms-draggable {
     white-space: nowrap;
     margin: 0;
-    padding: ($structureboard-dragarea-padding - 1px)
-        $structureboard-dragarea-padding;
+    padding: ($structure-dragarea-padding - 1px)
+        $structure-dragarea-padding;
     border-color: $gray-lighter;
     border-radius: $border-radius-base;
     list-style-type: none;
-    background: $structureboard-draggable-even-child-bgcolor;
+    background: $structure-draggable-even-child-bgcolor;
 }
 
 // hide elements when dragging

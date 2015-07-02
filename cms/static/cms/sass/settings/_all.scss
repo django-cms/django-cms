@@ -176,23 +176,23 @@ $clipboard-button-icon-size: 12px;
 
 //##############################################################################
 // Structureboard
-$structureboard-bgcolor: rgba($white, 0.95);
+$structure-bgcolor: rgba($white, 0.95);
 
-$structureboard-dragarea-space: $padding-normal / 2;
-$structureboard-dragarea-padding: $padding-normal / 2;
+$structure-dragarea-space: $padding-normal / 2;
+$structure-dragarea-padding: $padding-normal / 2;
 
-$structureboard-dragbar-height: 16px;
-$structureboard-dragbar-color: $white;
-$structureboard-dragbar-text-shadow: 0 1px 0 $black;
-$structureboard-dragbar-icon-space: 16px;
-$structureboard-dragbar-icon-size: 10px;
+$structure-dragbar-height: 16px;
+$structure-dragbar-color: $white;
+$structure-dragbar-text-shadow: 0 1px 0 $black;
+$structure-dragbar-icon-space: 16px;
+$structure-dragbar-icon-size: 10px;
 
-$structureboard-draggable-inner-padding: 6px;
-$structureboard-draggable-space: 3px;
-$structureboard-draggable-odd-child-bgcolor: $gray-lightest;
-$structureboard-draggable-even-child-bgcolor: $white;
+$structure-draggable-inner-padding: 6px;
+$structure-draggable-space: 3px;
+$structure-draggable-odd-child-bgcolor: $gray-lightest;
+$structure-draggable-even-child-bgcolor: $white;
 
-$structureboard-dragitem-icon-size: 10px;
-$structureboard-dragitem-height: $line-height-normal;
+$structure-dragitem-icon-size: 10px;
+$structure-dragitem-height: $line-height-normal;
 
 $submenu-icon-size: 16px;
