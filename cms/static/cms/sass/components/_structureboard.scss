@@ -5,7 +5,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    z-index: z(structureboard, base);
+    z-index: z(structure, base);
     width: 100%;
     height: 100%;
 
@@ -16,7 +16,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        z-index: z(structureboard, dimmer);
+        z-index: z(structure, dimmer);
         width: 100%;
         height: 100%;
         background: $structure-bgcolor;
@@ -25,7 +25,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        z-index: z(structureboard, content, base);
+        z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
     }
@@ -60,7 +60,7 @@
         position: relative;
         top: 0;
         left: 0;
-        z-index: z(structureboard, content, dragbar);
+        z-index: z(structure, content, dragbar);
         font-size: $font-size-normal;
         line-height: $line-height-normal;
         border-radius: $border-radius-base;
@@ -131,7 +131,7 @@
         position: relative;
         top: 0;
         left: 0;
-        z-index: z(structureboard, content, draggable);
+        z-index: z(structure, content, draggable);
         margin: $structure-draggable-space 0 0;
         margin-left: 0 !important;
         // differences are fine-tuning
@@ -143,7 +143,7 @@
         // levels
         .cms-draggable {
             position: relative;
-            z-index: z(structureboard, content, draggable);
+            z-index: z(structure, content, draggable);
             white-space: nowrap;
             border-color: $gray-lighter;
             background: $structure-draggable-even-child-bgcolor;
@@ -218,7 +218,7 @@
 
     // #DRAGGABLES/specific#
     .cms-draggable {
-        z-index: z(structureboard, content, draggable) + 1;
+        z-index: z(structure, content, draggable) + 1;
         color: $black;
         border: 1px solid $gray-lightest;
         background: $gray-lightest;
