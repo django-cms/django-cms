@@ -508,7 +508,6 @@ $(document).ready(function () {
 				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
-						if(item.is('input') || item.is('button')) item[0].click();
 						if(item.is('a')) that._loadContent(item.prop('href'), title);
 
 						// trigger only when blue action buttons are triggered
@@ -524,6 +523,7 @@ $(document).ready(function () {
 								that.hideFrame = true;
 							}
 						}
+						if(item.is('input') || item.is('button')) item[0].click();
 					});
 
 				// append element
