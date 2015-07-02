@@ -5,7 +5,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    z-index: 9999;
+    z-index: z(structureboard, base);
     width: 100%;
     height: 100%;
 
@@ -16,16 +16,16 @@
         right: 0;
         bottom: 0;
         left: 0;
-        z-index: 10;
+        z-index: z(structureboard, dimmer);
         width: 100%;
         height: 100%;
-        background: rgba(white, 0.95);
+        background: $structureboard-bgcolor;
     }
     .cms-structure-content {
         position: absolute;
         top: 0;
         left: 0;
-        z-index: 100;
+        z-index: z(structureboard, content, base);
         width: 100%;
         height: 100%;
     }
@@ -35,65 +35,61 @@
 #cms-toolbar .cms-structure {
     //###########################################################
     // #DRAGAREA#
+    // basically a cms placeholder representation
     .cms-dragarea {
         position: absolute;
         box-sizing: border-box;
-        margin: 0 0 5px;
-        padding: 5px 5px 4px;
-        border-radius: 3px;
-        background: $color-grey-70;
+        margin: 0 0 $structureboard-dragarea-space;
+        padding: $structureboard-dragarea-padding
+            $structureboard-dragarea-padding
+            ($structureboard-dragarea-padding - 1px);
+        border-radius: $border-radius-base;
+        background: $gray-darker;
     }
     .cms-dragarea-static {
-        background-color: $color-grey-70;
-        background-image: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, .1) 25%,
-            transparent 25%,
-            transparent 50%,
-            rgba(255, 255, 255, .1) 50%,
-            rgba(255, 255, 255, .1) 75%,
-            transparent 75%,
-            transparent
-        );
+        background-color: $gray-darker;
+        background-image: linear-gradient($gradient-striped-light);
         background-size: 10px 10px;
     }
 
     //###########################################################
     // #DRAGBAR#
+    //
+    // Placeholder box title
     .cms-dragbar {
         position: relative;
         top: 0;
         left: 0;
-        z-index: 9999;
-        font-size: 13px;
-        line-height: 20px;
-        border-radius: 3px;
+        z-index: z(structureboard, content, dragbar);
+        font-size: $font-size-normal;
+        line-height: $line-height-normal;
+        border-radius: $border-radius-base;
 
         .cms-dragbar-title {
-            @extend .cms-icon-arrow-wide;
+            @include icon(arrow-wide);
             cursor: pointer;
-            color: white;
-            font-size: 12px;
+            color: $structureboard-dragbar-color;
+            font-size: $font-size-normal - 1px;
             font-weight: 500;
-            line-height: 17px;
+            line-height: $structureboard-dragbar-height + 1px;
             text-transform: uppercase;
-            text-shadow: 0 1px 0 black;
-            height: 16px;
-            padding: 0 0 0 15px;
+            text-shadow: $structureboard-dragbar-text-shadow;
+            height: $structureboard-dragbar-height;
+            padding: 0 0 0 $structureboard-dragbar-icon-space;
 
             &:before {
-                @extend .cms-icon;
+                @extend %icon;
                 position: absolute;
                 top: -4px;
                 left: -5px;
                 font-size: 9px;
-                color: $color-grey-20;
+                color: $gray-light;
                 width: 16px;
                 height: 16px;
                 transform: rotate(180deg);
             }
             &:hover:before {
-                color: #fff;
+                color: $white;
             }
         }
         .cms-dragbar-title-expanded:before {
@@ -144,7 +140,7 @@
         position: relative;
         top: 0;
         left: 0;
-        z-index: 99;
+        z-index: z(structureboard, content, draggable);
         margin: 5px 0 0;
         margin-left: 0 !important;
         padding: 4px 5px 3px 5px;
@@ -154,18 +150,18 @@
         // levels
         .cms-draggable {
             position: relative;
-            z-index: 99;
+            z-index: z(structureboard, content, draggable);
             white-space: nowrap;
-            border-color: $color-grey-10;
+            border-color: $gray-lighter;
             background: white;
             &:hover {
-                border-color: $color-grey-20;
+                border-color: $gray-light;
             }
         }
         .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background: $color-grey-5;
+            background: $gray-lightest;
         }
         .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
@@ -178,7 +174,7 @@
             display: none;
             margin-top: 2px;
             &:before {
-                color: $color-grey-70;
+                color: $gray-darker;
                 left: 2px;
                 top: -1px;
             }
@@ -191,11 +187,11 @@
             top: -6px;
             right: -5px;
             height: 28px;
-            border-left: 1px dotted $color-grey-10;
+            border-left: 1px dotted $gray-lighter;
             border-radius: 0;
-            background: $color-grey-5;
+            background: $gray-lightest;
             &:before {
-                color: $color-grey-70;
+                color: $gray-darker;
             }
         }
         .cms-submenu-quicksearch input {
@@ -211,7 +207,7 @@
         .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $color-grey-5;
+            background-color: $gray-lightest;
         }
 
         .cms-dragitem-text {
@@ -224,17 +220,17 @@
 
     // #DRAGGABLES/specific#
     .cms-draggable {
-        z-index: 100;
+        z-index: z(structureboard, content, draggable) + 1;
         color: black;
-        border: 1px solid $color-grey-5;
-        background: $color-grey-5;
+        border: 1px solid $gray-lightest;
+        background: $gray-lightest;
         &:hover {
-            box-shadow: inset 0 0 3px $color-grey-10;
+            box-shadow: inset 0 0 3px $gray-lighter;
         }
     }
     .cms-droppable {
-        color: darken($color-grey-10, 15%);
-        border: 1px dashed darken($color-grey-10, 15%);
+        color: darken($gray-lighter, 15%);
+        border: 1px dashed darken($gray-lighter, 15%);
         border-radius: 3px;
     }
 
@@ -254,7 +250,7 @@
             left: 5px;
             top: 8px;
             font-size: 10px;
-            color: $color-grey-70;
+            color: $gray-darker;
             transform: rotate(180deg);
         }
         &:hover:before {
@@ -278,7 +274,7 @@
 
     .cms-draggable-selected .cms-dragitem,
     .cms-draggable-selected .cms-dragitem strong {
-        color: adjust-hue($color-blue, 15deg);
+        color: adjust-hue($color-primary, 15deg);
     }
     .cms-draggable-selected .cms-draggable .cms-dragitem,
     .cms-draggable-selected .cms-draggable .cms-dragitem strong {
@@ -288,8 +284,8 @@
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-green, 40%);
-        border-color: lighten($color-green, 40%);
+        color: lighten($color-success, 40%);
+        border-color: lighten($color-success, 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
@@ -297,14 +293,14 @@
         background: rgba(102, 153, 51, 0.2);
     }
     .cms-dragitem-success {
-        border: 1px solid lighten($color-green, 40%);
-        background: lighten($color-green, 40%);
+        border: 1px solid lighten($color-success, 40%);
+        background: lighten($color-success, 40%);
     }
 
     .cms-draggable-disallowed,
     .cms-draggable-hover-disallowed {
-        color: saturate($color-red, 80%);
-        border: 1px dashed saturate($color-red, 80%);
+        color: saturate($color-danger, 80%);
+        border: 1px dashed saturate($color-danger, 80%);
         background: rgba(255, 0, 0, 0.1);
     }
 
@@ -327,7 +323,7 @@ body > .cms-draggable {
     white-space: nowrap;
     margin: 0;
     padding: 4px 5px 3px 5px;
-    border-color: $color-grey-10;
+    border-color: $gray-lighter;
     border-radius: 3px;
     list-style-type: none;
     background: white;

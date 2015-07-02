@@ -40,6 +40,7 @@ $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
 
 $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
+$gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
 
 //##############################################################################
 // BASE Variables
@@ -84,6 +85,15 @@ $z-layers: (
         // shim-while-resizing: 20
         "frame":        10,
         "shim":         1,
+    ),
+    "structureboard": (
+        "base":         9999,
+        "content": (
+            "base":     100,
+            "dragbar":  9999,
+            "draggable": 99,
+        ),
+        "dimmer":       10,
     ),
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,
@@ -164,3 +174,15 @@ $clipboard-buttons-position-top: 130px;
 $clipboard-button-area-size: 20px;
 $clipboard-button-icon-size: 12px;
 
+//##############################################################################
+// Structureboard
+$structureboard-bgcolor: rgba($white, 0.95);
+
+$structureboard-dragarea-space: $padding-normal / 2;
+$structureboard-dragarea-padding: $padding-normal / 2;
+
+$structureboard-dragbar-height: 16px;
+$structureboard-dragbar: 1px;
+$structureboard-dragbar-color: $white;
+$structureboard-dragbar-text-shadow: 0 1px 0 $black;
+$structureboard-dragbar-icon-space: 15px;
