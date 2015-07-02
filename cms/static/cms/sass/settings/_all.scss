@@ -118,10 +118,6 @@ $btn-active-border: $gray-darkest;
 
 //##############################################################################
 // Modal
-$clipboard-buttons-position-top: 130px;
-
-//##############################################################################
-// Modal
 $modal-header-title-font-size: $font-size-normal;
 $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
@@ -159,3 +155,12 @@ $sideframe-resize-knob-size: 6px 50px;
 $sideframe-button-area-size: 20px;
 $sideframe-button-icon-size: 8px;
 $sideframe-button-space: 2px;
+
+//##############################################################################
+// Clipboard
+
+// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
+$clipboard-buttons-position-top: 130px;
+$clipboard-button-area-size: 20px;
+$clipboard-button-icon-size: 12px;
+
