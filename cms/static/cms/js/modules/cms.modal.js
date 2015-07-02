@@ -465,6 +465,15 @@ $(document).ready(function () {
 				row = iframe.contents().find('.save-box:eq(0)');
 			}
 			row.hide(); // hide submit-row
+			var form = iframe.contents().find('form');
+			//avoids conflict between the browser's form validation and Django's validation
+			form.submit(function () {
+				if (that.hideFrame) { //submit button was clicked
+					that.modal.find('.cms_modal-frame iframe').hide();
+					//page has been saved, run checkup
+					that.saved = true;
+				}
+			});
 			var buttons = row.find('input, a, button');
 			var render = $('<span />'); // seriously jquery...
 
@@ -499,7 +508,6 @@ $(document).ready(function () {
 				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
-						if(item.is('input') || item.is('button')) item[0].click();
 						if(item.is('a')) that._loadContent(item.prop('href'), title);
 
 						// trigger only when blue action buttons are triggered
@@ -507,11 +515,15 @@ $(document).ready(function () {
  							that.options.newPlugin = null;
  							// reset onClose when delete is triggered
 							if(item.hasClass('deletelink')) that.options.onClose = null;
-							// hide iframe
-							that.modal.find('.cms_modal-frame iframe').hide();
-							// page has been saved or deleted, run checkup
-							that.saved = true;
+							if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
+								that.modal.find('.cms_modal-frame iframe').hide();
+								// page has been saved or deleted, run checkup
+								that.saved = true;
+							} else { // submit button uses the form's submit event
+								that.hideFrame = true;
+							}
 						}
+						if(item.is('input') || item.is('button')) item[0].click();
 					});
 
 				// append element

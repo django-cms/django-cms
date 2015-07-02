@@ -24,6 +24,9 @@ class Example1(models.Model):
     date_field = models.DateField(null=True)
     placeholder = PlaceholderField('placeholder')
     publish = models.BooleanField(default=True)
+    decimal_field = models.DecimalField(
+        max_digits=5, decimal_places=1,
+        blank=True, null=True,)
 
     static_admin_url = ''
 
