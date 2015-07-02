@@ -65,7 +65,7 @@
         line-height: $modal-header-height;
         font-weight: bold;
         text-align: center;
-        padding: 0px ($modal-header-icon-area-size * 3 + $padding-base + $padding-large);
+        padding: 0px ($modal-header-button-area-size * 3 + $padding-base + $padding-large);
         cursor: move;
         background: $gray-lightest;
     }
@@ -75,18 +75,18 @@
     .cms-modal-maximize {
         display: block;
         position: absolute;
-        font-size: $modal-header-icon-size;
+        font-size: $modal-header-button-icon-size;
         top: 50%;
-        margin-top: -$modal-header-icon-area-size / 2;
+        margin-top: -$modal-header-button-area-size / 2;
         right: $padding-base;
         color: $gray-light;
         text-align: center;
-        width: $modal-header-icon-area-size;
-        height: $modal-header-icon-area-size;
+        width: $modal-header-button-area-size;
+        height: $modal-header-button-area-size;
         cursor: pointer;
         &:before {
             position: relative;
-            top: ($modal-header-icon-area-size - $modal-header-icon-size) / 2;
+            top: ($modal-header-button-area-size - $modal-header-button-icon-size) / 2;
         }
         &:hover,
         &:active,
@@ -95,10 +95,10 @@
         }
     }
     .cms-modal-collapse {
-        right: 2 * $modal-header-icon-area-size + $padding-base;
+        right: 2 * $modal-header-button-area-size + $padding-base;
     }
     .cms-modal-maximize {
-        right: $modal-header-icon-area-size + $padding-base;
+        right: $modal-header-button-area-size + $padding-base;
     }
     .cms-modal-collapsed {
         @include icon(plus);

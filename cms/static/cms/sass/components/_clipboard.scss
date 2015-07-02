@@ -4,7 +4,7 @@
     .cms-clipboard {
         display: none;
         position: fixed;
-        top: 130px;
+        top: $clipboard-buttons-position-top;
         left: 0;
         z-index: z(clipboard, base);
         padding: $padding-base $padding-base $padding-base 0;
@@ -58,26 +58,25 @@
         @include icon(copy);
         box-sizing: border-box;
         display: block;
+        position: relative;
         overflow: hidden;
         color: $gray-lighter;
-        font-size: 12px;
-        width: 20px;
-        height: 30px;
-        border: 5px solid $gray-darker;
-        border-right: none;
-        border-left: none;
+        font-size: $clipboard-button-icon-size;
+        width: $clipboard-button-area-size;
+        height: 1.5 * $clipboard-button-area-size;
         border-radius: 0 $border-radius-base $border-radius-base 0;
         background: $gray-darker;
         &:before {
-            position: relative;
-            left: 3px;
-            top: 4px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -($clipboard-button-icon-size / 2);
+            margin-left: -($clipboard-button-icon-size / 2);
         }
         &:hover,
         &:active,
         &:focus {
             color: $white;
-            border-color: $gray-darkest;
             background-color: $gray-darkest;
         }
     }
@@ -88,18 +87,21 @@
     .cms-clipboard-empty a {
         @extend %icon;
         @include icon(bin);
+        position: relative;
         display: block;
         cursor: pointer;
-        font-size: 11px;
+        font-size: $clipboard-button-icon-size - 1px;
+        width: $clipboard-button-area-size;
+        height: $clipboard-button-area-size;
         color: $gray-lighter;
-        width: 20px;
-        height: 20px;
         border-radius: 0 $border-radius-base $border-radius-base 0;
         background: $gray-darker;
         &:before {
-            position: relative;
-            left: 3px;
-            top: 4px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -($clipboard-button-icon-size / 2);
+            margin-left: -($clipboard-button-icon-size / 2);
         }
         &:hover,
         &:active,
