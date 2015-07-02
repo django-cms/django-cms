@@ -1,5 +1,7 @@
 //######################################################################################################################
 // #SIDEFRAME#
+//
+// "Pages" frame on the left
 #cms-toolbar {
     .cms-sideframe {
         display: none;
@@ -7,7 +9,7 @@
         top: 0;
         left: 0;
         overflow: visible !important;
-        z-index: 99999;
+        z-index: z(sideframe, base);
         width: 0;
         height: 100%;
 
@@ -16,7 +18,7 @@
     .cms-sideframe-frame {
         position: relative;
         overflow: hidden;
-        z-index: 10;
+        z-index: z(sideframe, frame);
         width: 100%;
         height: 100%;
         background: white;
@@ -34,17 +36,20 @@
         position: absolute;
         top: 0;
         right: -2px;
-        z-index: 30;
+        z-index: z(sideframe, resize);
         width: 2px;
         height: 100%;
         cursor: col-resize;
         background: $color-grey-70;
     }
+    // when resizing the sideframe shime get's z-index between frame
+    // and resize in order for mouse events not to trigger on iframe, same as
+    // with modal
     .cms-sideframe-shim {
         position: absolute;
         top: 0;
         left: 0;
-        z-index: 1;
+        z-index: z(sideframe, shim);
         width: 100%;
         height: 100%;
         background: transparent;
@@ -64,7 +69,7 @@
         position: absolute;
         top: 50px;
         right: -20px;
-        z-index: 40;
+        z-index: z(sideframe, buttons);
     }
     .cms-sideframe-close,
     .cms-sideframe-hide,

@@ -77,6 +77,14 @@ $z-layers: (
         "draggable":    99,
         "triggers":     999,
     ),
+    "sideframe": (
+        "base":         99999,
+        "buttons":      40,
+        "resize":       30,
+        // shim-while-resizing: 20
+        "frame":        10,
+        "shim":         1,
+    ),
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,
     "default":          1,
