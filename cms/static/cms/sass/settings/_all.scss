@@ -92,6 +92,9 @@ $z-layers: (
             "base":     100,
             "dragbar":  9999,
             "draggable": 99,
+            // special case as parent z-index is changed in js
+            "quicksearch": 1000,
+            "dropdown":    999,
         ),
         "dimmer":       10,
     ),

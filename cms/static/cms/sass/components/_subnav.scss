@@ -2,7 +2,7 @@
 // #SUBNAV#
 #cms-toolbar {
     .cms-submenu {
-        @extend .cms-icon-menu;
+        @include icon(menu);
         display: block;
         position: absolute;
         cursor: pointer;
@@ -10,7 +10,7 @@
         width: 20px;
         height: $submenu-icon-size;
         &:before {
-            @extend .cms-icon;
+            @extend %icon;
             position: relative;
             left: 4px;
             font-size: 16px;
@@ -35,7 +35,7 @@
         right: 0;
         overflow: auto;
         zoom: 1;
-        z-index: 999;
+        z-index: z(structure, content, dropdown);
         min-width: 140px;
         max-height: 230px;
         border: 1px solid $color-grey-10;
@@ -93,20 +93,20 @@
     }
 
     .cms-submenu-quicksearch {
-        @extend .cms-icon-search;
+        @include icon(search);
         cursor: default;
         display: none;
         position: absolute;
         top: -5px;
         right: -5px;
-        z-index: 1000;
+        z-index: z(structure, content, quicksearch);
         text-align: right;
         height: 25px;
         border-radius: 4px;
         background: $color-grey-70;
 
         &:before {
-            @extend .cms-icon;
+            @extend %icon;
             position: absolute;
             right: 6px;
             top: 6px;
