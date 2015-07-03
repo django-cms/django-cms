@@ -25,14 +25,15 @@
             left: 0;
             z-index: z(clipboard, draggable);
             margin: 0 0 2px;
-            padding: 4px 5px 3px 5px;
             border: 1px solid $gray-darker;
             border-radius: $border-radius-base;
             cursor: move;
             background: $gray-lightest;
         }
         .cms-draggable .cms-dragitem {
-            padding-left: 20px;
+            padding-left: $clipboard-button-area-size + $structure-dragarea-padding;
+            line-height: $clipboard-button-area-size * 1.5 - 2px;
+            height: $clipboard-button-area-size * 1.5 - 2px;
         }
         .cms-draggable .cms-dragitem .cms-submenu {
             display: none !important;
@@ -40,8 +41,8 @@
         .cms-draggable .cms-dragitem-text {
             display: inline-block;
             overflow: hidden;
-            width: 140px;
-            height: 15px;
+            width: 190px - $clipboard-button-area-size - $structure-dragarea-padding - 40px;
+            height: $clipboard-button-area-size * 1.5 - 2px;
         }
 
         .cms-plugins {

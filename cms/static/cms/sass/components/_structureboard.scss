@@ -42,7 +42,7 @@
         margin: 0 0 $structure-dragarea-space;
         padding: $structure-dragarea-padding
             $structure-dragarea-padding
-            ($structure-dragarea-padding - 1px);
+            $structure-dragarea-padding;
         border-radius: $border-radius-base;
         background: $gray-darker;
     }
@@ -77,7 +77,7 @@
             text-shadow: $structure-dragbar-text-shadow;
             height: $structure-dragbar-height;
             padding: 0 0 0 $structure-dragbar-icon-space;
-            margin-right: $submenu-icon-size;
+            margin-right: $submenu-icon-area-size;
 
             &:before {
                 @extend %icon;
@@ -95,9 +95,6 @@
         .cms-dragbar-title-expanded:before {
             transform: rotate(-90deg);
             left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2 - 1px;
-        }
-        .cms-submenu {
-            margin-top: ($structure-dragbar-height - $submenu-icon-size) / 2;
         }
     }
 
@@ -135,8 +132,7 @@
         margin: $structure-draggable-space 0 0;
         margin-left: 0 !important;
         // differences are fine-tuning
-        padding: ($structure-dragarea-padding - 1px)
-            $structure-dragarea-padding;
+        padding: $structure-dragarea-padding;
         border-radius: $border-radius-base;
         list-style-type: none;
 
@@ -152,33 +148,32 @@
             }
         }
         .cms-draggable .cms-draggable {
-            margin-top: $structure-draggable-space + 1px;
+            margin-top: $structure-draggable-space;
         }
         .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background-color: $structure-draggable-even-child-bgcolor;
+            background-color: $structure-draggable-odd-child-bgcolor;
         }
         .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background-color: $structure-draggable-odd-child-bgcolor;
+            background-color: $structure-draggable-even-child-bgcolor;
         }
 
         // menu overwrites
         .cms-submenu {
             display: none;
-            margin-top: ($structure-dragitem-height - $submenu-icon-size) / 2;
             &:before {
                 color: $gray-darker;
             }
         }
         .cms-submenu-dropdown {
-            top: ($structure-dragitem-height + $submenu-icon-size) / 2 + 4px;
-            right: -($structure-dragarea-padding + 1px);
+            top: $structure-dragitem-height + $structure-dragarea-padding;
+            right: -$structure-dragarea-padding;
         }
         .cms-submenu-quicksearch {
-            $quicksearch-height: $structure-dragitem-height + 2 * $structure-draggable-space;
+            $quicksearch-height: $structure-dragitem-height + $structure-draggable-space + $structure-dragarea-padding;
             top: 50%;
             right: -$structure-dragarea-padding;
             height: $quicksearch-height;
@@ -198,12 +193,12 @@
         .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $structure-draggable-odd-child-bgcolor;
+            background-color: $structure-draggable-even-child-bgcolor;
         }
         .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
         .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $structure-draggable-even-child-bgcolor;
+            background-color: $structure-draggable-odd-child-bgcolor;
         }
 
         .cms-dragitem {
@@ -299,8 +294,6 @@
         border: 1px dashed saturate($color-danger, 80%);
         background: rgba($color-danger, 0.1);
     }
-
-    //.cms-placeholder .cms-draggables .cms-draggable { margin-left:0 !important; }
 
     // hide arrow when adding plugin-in-plugin within disabled item
     .cms-draggable-disabled > .cms-dragitem-collapsable {
