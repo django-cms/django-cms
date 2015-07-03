@@ -790,7 +790,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
         try:
             reverted, clean = page.undo()
-            if not clean:
+            if clean is None:
+                messages.error(request, _("Error when applying the undo. Page has not been modified."))
+            elif not clean:
                 messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         except IndexError as e:
             return HttpResponseBadRequest(e.message)
@@ -809,7 +811,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
         try:
             reverted, clean = page.redo()
-            if not clean:
+            if clean is None:
+                messages.error(request, _("Error when applying the undo. Page has not been modified."))
+            elif not clean:
                 messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
         except IndexError as e:
             return HttpResponseBadRequest(e.message)
