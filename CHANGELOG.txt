@@ -432,3 +432,8 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix get_language_from_request if POST and GET exists
 - Fix an error in placeholder cache
 - Fix language chooser template
+
+=== 3.1.2 (2015-07-02) ===
+
+- Fix placeholder cache invalidation under some circumstances
+- Update translations

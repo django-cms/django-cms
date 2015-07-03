@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.template import Template, RequestContext
 from django.conf import settings
+from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page
-from cms.cache import _get_cache_version
+from cms.cache import _get_cache_version, invalidate_cms_page_cache
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
+from cms.plugin_rendering import render_placeholder
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin, SekizaiPlugin
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -291,3 +294,39 @@ class CacheTestCase(CMSTestCase):
             page1.publish('en')
             response = self.client.get('/en/')
             self.assertContains(response, 'Second content')
+
+    def test_render_placeholder_cache(self):
+        """
+        Regression test for #4223
+
+        Assert that placeholder cache is cleared correctly when a plugin is saved
+        """
+        invalidate_cms_page_cache()
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph1 = ex.placeholder
+        ###
+        # add the test plugin
+        ##
+        test_plugin = add_plugin(ph1, u"TextPlugin", u"en", body="Some text")
+        test_plugin.save()
+
+        # asserting initial text
+        context = SekizaiContext()
+        context['request'] = self.get_request()
+        text = render_placeholder(ph1, context)
+        self.assertEqual(text, "Some text")
+
+        # deleting local plugin cache
+        del ph1._plugins_cache
+        test_plugin.body = 'Other text'
+        test_plugin.save()
+
+        # plugin text has changed, so the placeholder rendering
+        text = render_placeholder(ph1, context)
+        self.assertEqual(text, "Other text")
