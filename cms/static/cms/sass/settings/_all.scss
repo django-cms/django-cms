@@ -220,3 +220,13 @@ $submenu-quicksearch-input-width: $submenu-dropdown-width - $submenu-quicksearch
 $submenu-quicksearch-input-font-size: $font-size-normal - 1px;
 $submenu-quicksearch-input-line-height: $submenu-quicksearch-input-font-size;
 
+
+//##############################################################################
+// Tooltip
+$tooltip-font-size: $font-size-normal - 2px;
+$tooltip-padding: 5px 7px;
+$tooltip-line-height: $tooltip-font-size + 2 * nth($tooltip-padding, 1);
+$tooltip-icon-area-size: 22px;
+$tooltip-icon-size: 14px;
+$tooltip-first-line-color: $gray-lighter;
+$tooltip-second-line-color: $white;
