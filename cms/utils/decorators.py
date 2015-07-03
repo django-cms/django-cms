@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.utils.http import urlquote
 
-from cms.views import _handle_no_page
+from cms.page_rendering import _handle_no_page
 
 
 def cms_perms(func):
