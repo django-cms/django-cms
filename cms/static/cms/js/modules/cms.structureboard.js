@@ -295,10 +295,25 @@ $(document).ready(function () {
 			this.placeholders.show();
 
 			// attach event
-			$(window).bind('resize.sideframe', function () {
-				that._resizeBoard();
-			}).trigger('resize.sideframe');
-
+			if (CMS.config.simpleStructureBoard) {
+				var content = $('.cms_structure-content');
+				var areas = content.find('.cms_dragarea');
+				// set correct css attributes for the new mode
+				content.addClass('cms_structure-content-simple');
+				areas.addClass('cms_dragarea-simple');
+				// lets reorder placeholders
+				areas.each(function (index, item) {
+					if ($(item).hasClass('cms_dragarea-static')) {
+						content.append(item)
+					}
+				});
+				// now lets get the first instance and add some padding
+				areas.filter('.cms_dragarea-static').eq(0).css('margin-top', '50px');
+			} else {
+				$(window).bind('resize.sideframe', function () {
+					that._resizeBoard();
+				}).trigger('resize.sideframe');
+			}
 		},
 
 		_hideBoard: function () {
