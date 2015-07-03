@@ -92,6 +92,9 @@ $z-layers: (
             "base":     100,
             "dragbar":  9999,
             "draggable": 99,
+            // special case as parent z-index is changed in js
+            "quicksearch": 1000,
+            "dropdown":    999,
         ),
         "dimmer":       10,
     ),
@@ -179,20 +182,51 @@ $clipboard-button-icon-size: 12px;
 $structure-bgcolor: rgba($white, 0.95);
 
 $structure-dragarea-space: $padding-normal / 2;
-$structure-dragarea-padding: $padding-normal / 2;
+$structure-dragarea-padding: $structure-dragarea-space;
 
 $structure-dragbar-height: 16px;
 $structure-dragbar-color: $white;
 $structure-dragbar-text-shadow: 0 1px 0 $black;
-$structure-dragbar-icon-space: 16px;
+$structure-dragbar-icon-space: $structure-dragbar-height;
 $structure-dragbar-icon-size: 10px;
 
 $structure-draggable-inner-padding: 6px;
-$structure-draggable-space: 3px;
+$structure-draggable-space: $structure-dragarea-space;
 $structure-draggable-odd-child-bgcolor: $gray-lightest;
 $structure-draggable-even-child-bgcolor: $white;
 
 $structure-dragitem-icon-size: 10px;
 $structure-dragitem-height: $line-height-normal;
 
+//##############################################################################
+// Structureboard
+$submenu-icon-area-size: $structure-dragitem-height;
 $submenu-icon-size: 16px;
+$submenu-icon-color: $white;
+
+$submenu-item-font-size: $font-size-normal - 1px;
+$submenu-item-height: $line-height-normal + 2px;
+$submenu-item-padding-horizontal: 8px;
+$submenu-item-color: $black;
+$submenu-item-hover-color: $white;
+
+$submenu-dropdown-width: 140px;
+$submenu-dropdown-height: 10 * $submenu-item-height + 2px;
+$submenu-dropdown-bgcolor: $white;
+
+$submenu-quicksearch-icon-size: 14px;
+$submenu-quicksearch-padding: $structure-dragarea-padding * 2 + $submenu-quicksearch-icon-size;
+$submenu-quicksearch-input-width: $submenu-dropdown-width - $submenu-quicksearch-padding;
+$submenu-quicksearch-input-font-size: $font-size-normal - 1px;
+$submenu-quicksearch-input-line-height: $submenu-quicksearch-input-font-size;
+
+
+//##############################################################################
+// Tooltip
+$tooltip-font-size: $font-size-normal - 2px;
+$tooltip-padding: 5px 7px;
+$tooltip-line-height: $tooltip-font-size + 2 * nth($tooltip-padding, 1);
+$tooltip-icon-area-size: 22px;
+$tooltip-icon-size: 14px;
+$tooltip-first-line-color: $gray-lighter;
+$tooltip-second-line-color: $white;

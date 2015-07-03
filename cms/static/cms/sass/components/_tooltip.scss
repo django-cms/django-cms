@@ -4,39 +4,41 @@
 // used when hover over plugins in edit mode
 #cms-toolbar {
     .cms-tooltip {
-        @extend .cms-icon-pencil;
+        @include icon(pencil);
         visibility: hidden;
         position: absolute;
         top: 0;
         left: 0;
-        font-size: 11px;
+        font-size: $tooltip-font-size;
+        line-height: $tooltip-line-height;
         font-weight: bold;
-        color: $color-grey-10;
-        line-height: 11px;
+        color: $tooltip-first-line-color;
         white-space: nowrap;
-        padding: 5px 7px 5px 22px;
+        padding: 0px nth($tooltip-padding, 2) 0px $tooltip-icon-area-size;
         margin: 0;
-        border-radius: 3px;
-        background: $color-grey-70;
+        border-radius: $border-radius-base;
+        background: $gray-darker;
 
         &:before {
-            @extend .cms-icon;
-            font-size: 14px;
+            @extend %icon;
+            font-size: $tooltip-icon-size;
+            top: 50%;
+            left: ($tooltip-icon-area-size - $tooltip-icon-size) / 2;
+            margin-top: -($tooltip-icon-size / 2);
             position: absolute;
-            left: 4px;
-            top: 3px;
         }
 
         span {
             position: absolute;
-            top: 18px;
+            top: 100%;
             right: 0;
+            margin-top: -(nth($tooltip-padding, 1) - 1px);
             float: right;
-            color: white;
+            color: $tooltip-second-line-color;
             font-weight: normal;
-            padding: 5px 7px;
-            border-radius: 3px 0 3px 3px;
-            background: $color-grey-70;
+            padding: 0 nth($tooltip-padding, 2);
+            border-radius: $border-radius-base 0 $border-radius-base $border-radius-base;
+            background: $gray-darker;
         }
     }
 }
