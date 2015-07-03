@@ -160,7 +160,7 @@ parts of the CMS - so do the best you can with them.
 Other labels
 ============
 
-:term:`backport`, :term:`blocker`, :term:`has patch` or :term:`easy pickings` labels should be applied as appropriate, to healthy (blue) tickets only/
+:term:`backport`, :term:`blocker`, :term:`has patch` or :term:`easy pickings` labels should be applied as appropriate, to healthy (blue) tickets only.
 
 Comments
 ========
@@ -188,7 +188,7 @@ Every issue should have a status, and be given one as soon as possible. **An iss
 one status applied to it**.
 
 Many of these statuses apply equally well to both issues and pull requests, but some make sense
-only for one or the other
+only for one or the other:
 
 .. glossary::
 
