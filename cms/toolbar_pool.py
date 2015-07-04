@@ -27,7 +27,9 @@ class ToolbarPool(object):
                 self.register(cls)
                 self.force_register = False
         else:
+            # FIXME: Remove in 3.4
             load('cms_toolbar')
+            load('cms_toolbars')
         self._discovered = True
 
     def clear(self):
@@ -35,6 +37,14 @@ class ToolbarPool(object):
         self._discovered = False
 
     def register(self, toolbar):
+        import os
+        import inspect
+        import warnings
+        source_file = os.path.basename(inspect.stack()[1][1])
+        if source_file == 'cms_toolbar.py':
+            warnings.warn('cms_toolbar.py filename is deprecated, '
+                          'and it will be removed in version 3.4; '
+                          'please rename it to cms_toolbar.py', DeprecationWarning)
         if not self.force_register and get_cms_setting('TOOLBARS'):
             return toolbar
         from cms.toolbar_base import CMSToolbar
