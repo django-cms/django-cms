@@ -501,8 +501,6 @@ $(document).ready(function () {
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
  							that.options.newPlugin = null;
- 							// reset onClose when delete is triggered
-							//if(item.hasClass('deletelink')) that.options.onClose = null;
 							// hide iframe
 							that.modal.find('.cms_modal-frame iframe').hide();
 							// page has been saved or deleted, run checkup
@@ -585,9 +583,8 @@ $(document).ready(function () {
 				// also check that no delete-confirmation is required
 				if(that.saved && !contents.find('.delete-confirmation').length) {
 					if(that.options.onClose){
-						that.reloadBrowser(that.options.onClose);
-					}
-					else {
+						that.reloadBrowser(that.options.onClose, false, true);
+					} else {
 						that.reloadBrowser(window.location.href, false, true);
 					}
 				} else {
