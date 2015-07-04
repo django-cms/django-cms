@@ -97,7 +97,7 @@ Adding a Toolbar Menu Item for your Page extension
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page. (Page isn't an
 editable attribute in the default admin interface.).
-To add toolbar items for your extension create a file named ``cms_toolbar.py``
+To add toolbar items for your extension create a file named ``cms_toolbars.py``
 in one of your apps, and add the relevant menu entries for the extension on each page.
 
 

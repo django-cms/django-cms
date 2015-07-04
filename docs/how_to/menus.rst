@@ -17,7 +17,7 @@ menus of django CMS sites.
 Menus
 *****
 
-Create a ``menu.py`` in your application and write the following inside::
+Create a ``cms_menus.py`` in your application and write the following inside::
 
     from menus.base import Menu, NavigationNode
     from menus.menu_pool import menu_pool
@@ -38,6 +38,10 @@ Create a ``menu.py`` in your application and write the following inside::
             return nodes
 
     menu_pool.register_menu(TestMenu)
+
+.. note:: Up to version 3.1 the module was named ``menu.py``, please
+          update your existing modules to the new naming convention.
+          Support for the old name will be removed in version 3.4.
 
 If you refresh a page you should now see the menu entries from above.
 The get_nodes function should return a list of
@@ -164,7 +168,7 @@ How it works
 ============
 
 Normally, you'd want to place modifiers in your application's
-``menu.py``.
+``cms_menus.py``.
 
 To make your modifier available, it then needs to be registered with
 ``menus.menu_pool.menu_pool``.

@@ -1,6 +1,6 @@
-#########
+########
 Apphooks
-#########
+########
 
 An **Apphook** allows you to attach a Django application to a page. For example,
 you might have a news application that you'd like integrated with django CMS. In
@@ -8,7 +8,7 @@ this case, you can create a normal django CMS page without any content of its
 own, and attach the news application to the page; the news application's content
 will be delivered at the page's URL.
 
-To create an apphook place a ``cms_app.py`` in your application. And in it write
+To create an apphook place a ``cms_apps.py`` in your application. And in it write
 the following::
 
     from cms.app_base import CMSApp
@@ -20,6 +20,11 @@ the following::
         urls = ["myapp.urls"]
 
     apphook_pool.register(MyApphook)
+
+.. note:: Up to version 3.1 the module was named ``cms_app.py``, please
+          update your existing modules to the new naming convention.
+          Support for the old name will be removed in version 3.4.
+
 
 Replace ``myapp.urls`` with the path to your applications ``urls.py``. Now edit
 a page and open the advanced settings tab. Select your new apphook under
@@ -37,7 +42,7 @@ a page and open the advanced settings tab. Select your new apphook under
 .. note::
 
     If at some point you want to remove this apphook after deleting the
-    cms_app.py there is a cms management command called uninstall apphooks that
+    cms_apps.py there is a cms management command called uninstall apphooks that
     removes the specified apphook(s) from all pages by name. eg. ``manage.py cms
     uninstall apphooks MyApphook``. To find all names for uninstallable apphooks
     there is a command for this as well ``manage.py cms list apphooks``.

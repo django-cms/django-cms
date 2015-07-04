@@ -152,7 +152,7 @@ Don't forget that show_menu recurses - so it will do *all* of the below for *eac
 * ``{% show_menu %}`` - the templatetag in the template
     * :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()`
         * :py:meth:`menus.menu_pool.MenuPool.get_nodes()`
-            * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's menu.py, and registers:
+            * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's cms_menus.py, and registers:
  				* Menu classes, placing them in the self.menus dict
 				* Modifier classes, placing them in the self.modifiers list
             * :py:meth:`menus.menu_pool.MenuPool._build_nodes()`

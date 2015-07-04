@@ -20,11 +20,11 @@ There are two ways to control what gets shown in the toolbar.
 One is the :setting:`CMS_TOOLBARS`. This gives you full control over which
 classes are loaded, but requires that you specify them all manually.
 
-The other is to provide ``cms_toolbar.py`` files in your apps, which will be
+The other is to provide ``cms_toolbars.py`` files in your apps, which will be
 automatically loaded as long :setting:`CMS_TOOLBARS` is not set (or set to
 ``None``).
 
-If you use the automated way, your ``cms_toolbar.py`` file should contain
+If you use the automated way, your ``cms_toolbars.py`` file should contain
 classes that extend from ``cms.toolbar_base.CMSToolbar`` and are registered using :meth:`cms.toolbar_pool.toolbar_pool.register`.
 The register function can be used as a decorator.
 
@@ -66,6 +66,10 @@ A simple example, registering a class that does nothing::
         def request_hook(self):
             pass
 
+
+.. note:: Up to version 3.1 the module was named ``cms_toolbar.py``, please
+          update your existing modules to the new naming convention.
+          Support for the old name will be removed in version 3.4.
 
 .. warning::
 
@@ -125,7 +129,7 @@ menus::
     from django.utils.translation import ugettext_lazy as _
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar.items import Break
-    from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+    from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
     from cms.toolbar_base import CMSToolbar
 
     @toolbar_pool.register
@@ -186,7 +190,7 @@ certain admin functions for managing office locations in a project::
     from cms.toolbar_base import CMSToolbar
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar.items import Break, SubMenu
-    from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+    from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 
     @toolbar_pool.register
     class OfficesToolbar(CMSToolbar):
