@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import importlib
@@ -35,6 +35,7 @@ if User is None:
         "in settings.INSTALLED_APPS" % (settings.AUTH_USER_MODEL, user_app_name)
     )
 
+
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
 ACCESS_PAGE = 1
@@ -55,6 +56,7 @@ ACCESS_CHOICES = (
     (ACCESS_DESCENDANTS, _('Page descendants')),
     (ACCESS_PAGE_AND_DESCENDANTS, _('Page and descendants')),
 )
+
 
 class AbstractPagePermission(models.Model):
     """Abstract page permissions
@@ -128,10 +130,16 @@ class PagePermission(AbstractPagePermission):
         return "%s :: %s has: %s" % (page, self.audience, force_text(dict(ACCESS_CHOICES)[self.grant_on]))
 
 
+class PageUserManager(UserManager):
+    use_in_migrations = False
+
+
 class PageUser(User):
     """Cms specific user data, required for permission system
     """
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="created_users")
+
+    objects = PageUserManager()
 
     class Meta:
         verbose_name = _('User (page)')
