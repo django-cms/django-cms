@@ -67,6 +67,7 @@ Other Plugins
 * djangocms-grid
 * djangocms-oembed
 * djangocms-table
+* djangocms-flash
 
 
 File and image handling
