@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_8
 from cms.utils.compat.dj import is_installed as app_is_installed
 
 
@@ -22,7 +22,7 @@ def validate_settings():
     """
     Check project settings file for required options
     """
-    if DJANGO_1_7:
+    if DJANGO_1_8:
         if 'django.core.context_processors.request' not in settings.TEMPLATE_CONTEXT_PROCESSORS:
             raise ImproperlyConfigured('django CMS requires django.core.context_processors.request in settings.TEMPLATE_CONTEXT_PROCESSORS to work correctly.')
     else:
