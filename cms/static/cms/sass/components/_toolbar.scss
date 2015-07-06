@@ -24,7 +24,7 @@
             position: relative;
             float: left;
             z-index: z(toolbar, left);
-            padding-left: $toolbar-padding;
+            padding-left: $toolbar-left-space;
         }
         .cms-toolbar-right {
             position: relative;
@@ -34,10 +34,10 @@
         }
 
         .cms-toolbar-left .cms-toolbar-item {
-            margin-left: $toolbar-padding;
+            margin-left: $toolbar-left-space;
         }
         .cms-toolbar-right .cms-toolbar-item {
-            margin-right: $toolbar-padding * 2;
+            margin-right: $toolbar-right-space;
         }
 
         // items
@@ -103,14 +103,14 @@
         }
         > li:first-child > a span {
             font-weight: 800;
-            line-height: 12px;
         }
         .cms-icon {
             display: none;
             position: absolute;
-            top: 7px;
+            top: 50%;
             right: 7px;
-            font-size: 10px;
+            margin-top: -($toolbar-dropdown-item-icon-size / 2);
+            font-size: $toolbar-dropdown-item-icon-size;
             transform: rotate(180deg);
         }
 
@@ -119,7 +119,7 @@
             ul {
                 display: block;
                 position: absolute;
-                top: 30px;
+                top: $toolbar-height;
                 left: 0;
                 min-width: 180px;
                 padding: $toolbar-dropdown-padding;
@@ -213,7 +213,7 @@
     .cms-messages {
         display: none;
         position: fixed;
-        top: 30px;
+        top: $toolbar-height;
         z-index: z(messages);
         color: white;
         font-size: 12px;
@@ -244,11 +244,11 @@
         }
         ul {
             display: inline;
-            color: white;
+            color: $white;
         }
         ul li {
             display: inline;
-            color: white;
+            color: $white;
             font-weight: 200;
         }
 
@@ -282,11 +282,9 @@
         a {
             @extend .cms-icon;
             @extend .cms-icon-logo;
-            font-size: 21px;
-            line-height: 21px;
-            width: 90px;
-            height: 20px;
-            margin: 4px 0;
+            font-size: $toolbar-logo-height;
+            line-height: $toolbar-height;
+            height: $toolbar-height;
             transition: color $speed-base;
 
             span {
@@ -368,22 +366,24 @@
 
     // #TOOLBAR/elements/buttongroups#
     .cms-toolbar-item-buttons {
-        margin: 4px 0 4px;
+        $margin: ($toolbar-height - $toolbar-button-height) / 2;
+        margin: $margin 0 $margin;
 
         a {
             float: left;
-            font-size: 11px;
-            line-height: 1;
-            padding: 5px 12px;
+            line-height: $toolbar-button-height;
+            height: $toolbar-button-height;
+            font-size: $toolbar-button-font-size;
+            padding: 0 $toolbar-button-padding-horizontal;
         }
         a:first-child {
-            border-radius: 3px 0 0 3px;
+            border-radius: $toolbar-button-border-radius 0 0 $toolbar-button-border-radius;
         }
         a:last-child {
-            border-radius: 0 3px 3px 0;
+            border-radius: 0 $toolbar-button-border-radius $toolbar-button-border-radius 0;
         }
         a:only-child {
-            border-radius: 3px;
+            border-radius: $toolbar-button-border-radius;
         }
     }
 
@@ -413,9 +413,13 @@
                 color: $gray-darkest;
             }
             span {
-                font-size: 10px;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin-left: -($toolbar-trigger-icon-size / 2);
+                margin-top: -($toolbar-trigger-icon-size / 2 + 1px);
+                font-size: $toolbar-trigger-icon-size;
                 color: $gray-darker;
-                margin: 8px 0 0 -2px;
                 transition: transform $speed-base;
                 transform: rotate(270deg);
                 background: none;
@@ -424,15 +428,15 @@
     }
     // #TOOLBAR/elements/loader#
     .cms-toolbar-trigger-expanded a span {
-        margin-top: 9px;
         transform: rotate(90deg);
     }
     .cms-toolbar-loader a span {
         @extend .cms-icon-loader;
-        position: relative;
-        top: -5px;
-        font-size: 20px;
-        line-height: 20px;
+        position: absolute;
+        margin-top: -($toolbar-trigger-loader-size / 2);
+        margin-left: -($toolbar-trigger-loader-size / 2);
+        font-size: $toolbar-trigger-loader-size;
+        line-height: $toolbar-trigger-loader-size;
         color: $color-primary;
         background: transparent;
         animation: cms-spin 2s infinite linear;
@@ -445,17 +449,17 @@
         position: fixed;
         top: 0;
         right: 0;
-        z-index: 100;
-        color: white;
+        z-index: z(screenblock);
+        color: $screenblock-color;
         text-align: center;
         width: 100%;
         height: 100%;
-        background-color: $black;
-        background: rgba($black, 0.9);
+        background-color: $screenblock-bgcolor;
+        background: rgba($screenblock-bgcolor, 0.9);
     }
 
     .cms-screenblock-inner {
-        margin-top: 300px;
+        margin-top: $screenblock-inner-position;
         h1 {
             font-size: 28px;
             line-height: 30px;
@@ -466,7 +470,7 @@
             text-align: center;
         }
         a {
-            color: white;
+            color: $white;
         }
         a:hover {
             text-decoration: underline;
