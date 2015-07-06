@@ -41,6 +41,7 @@ $gray-darkest:    darken($gray, 20%); // #333
 
 $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
+$gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transparent 50%, rgba($white, .8) 50%, rgba($white, .8) 75%, transparent 75%, transparent;
 
 //##############################################################################
 // BASE Variables
@@ -58,6 +59,7 @@ $padding-large: 20px;
 // z-index map
 // the map is built from highest to lowest as it appears on screen
 $z-layers: (
+    "debug":            99999999,
     "modal": (
         "base":         999999,
         "body":         10,
@@ -72,6 +74,14 @@ $z-layers: (
         "buttons":      101,
         "resize":       102,
     ),
+    "messages":         999999,
+    "toolbar-trigger":  999999,
+    "toolbar": (
+        "base":         999999,
+        "left":         10,
+        "right":        10,
+    ),
+    "screenblock":      100,
     "clipboard": (
         "base":         99999,
         "containers":   99,
@@ -100,6 +110,7 @@ $z-layers: (
     ),
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,
+    "base":             9999999,
     "default":          1,
     "below":            -1,
 );
@@ -230,3 +241,18 @@ $tooltip-icon-area-size: 22px;
 $tooltip-icon-size: 14px;
 $tooltip-first-line-color: $gray-lighter;
 $tooltip-second-line-color: $white;
+
+//##############################################################################
+// Toolbar
+$toolbar-height: 30px;
+$toolbar-shadow: 0 0 5px rgba($black, 0.2);
+$toolbar-padding: 10px;
+
+$toolbar-debug-height: 5px;
+$toolbar-debug-bgsize: 10px 10px;
+$toolbar-debug-bgcolor: #fcd200;
+
+$toolbar-trigger-width: $toolbar-height;
+$toolbar-trigger-height: $toolbar-height;
+
+$toolbar-right-hide-breakpoint: 800px;
