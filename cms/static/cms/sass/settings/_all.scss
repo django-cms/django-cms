@@ -114,6 +114,7 @@ $z-layers: (
 //##############################################################################
 // #BUTTONS
 $btn-border-radius-base: $border-radius-base;
+$btn-default-shadow: inset 0 1px 0 rgba($white, 0.5);
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $gray-lighter;
@@ -239,7 +240,7 @@ $tooltip-second-line-color: $white;
 
 //##############################################################################
 // Toolbar
-$toolbar-height: 40px;
+$toolbar-height: 30px;
 $toolbar-shadow: 0 0 5px rgba($black, 0.2);
 $toolbar-left-space: 10px;
 
@@ -268,6 +269,7 @@ $toolbar-dropdown-shadow: 0 1px 1px rgba($black, 0.4);
 $toolbar-dropdown-bgcolor: $white;
 $toolbar-dropdown-border-radius: $border-radius-base + 1px;
 
+$toolbar-dropdown-min-width: 180px;
 $toolbar-dropdown-item-height: 24px;
 $toolbar-dropdown-item-padding: 0 10px 0 15px; // has to be 0 $value;
 $toolbar-dropdown-item-icon-size: 10px;
@@ -277,6 +279,30 @@ $toolbar-button-font-size: 11px;
 $toolbar-button-padding-horizontal: 12px;
 $toolbar-button-border-radius: $border-radius-base;
 
+//##############################################################################
+// Toolbar messages + screenblock + login form
+$messages-width: 300px;
+$messages-padding: 6px 10px 8px;
+$messages-color: $white;
+$messages-font-size: 12px;
+$messages-line-height: 16px;
+$messages-border-radius: $border-radius-base;
+$messages-bgcolor: $black;
+$messages-font-weight: 200;
+$messages-close-area-size: 20px;
+$messages-close-icon-size: 10px;
+
 $screenblock-color: $white;
 $screenblock-bgcolor: $black;
 $screenblock-inner-position: 300px;
+
+$login-form-input-font-size: $font-size-normal;
+$login-form-input-color: $gray;
+$login-form-input-width: 100px;
+$login-form-input-height: 23px;
+$login-form-input-padding-horizontal: 5px;
+$login-form-input-border: lighten($gray, 45%);
+$login-form-input-border-radius: $border-radius-base;
+
+$login-form-submit-color: $white;
+$login-form-submit-padding-horizontal: 15px;

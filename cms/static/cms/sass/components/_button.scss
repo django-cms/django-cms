@@ -7,7 +7,7 @@
         border-radius: $btn-border-radius-base;
         background-color: $btn-default-bgcolor;
         background-image: linear-gradient($btn-default-bggradient);
-        box-shadow: inset 0 1px 0 rgba($white, 0.5);
+        box-shadow: $btn-default-shadow;
         &:hover,
         &:active,
         &:focus {
@@ -40,7 +40,7 @@
         border-bottom: none;
         background-color: $btn-active-bgcolor;
         background-image: linear-gradient($btn-active-bggradient);
-        box-shadow: inset 0 1px 0 rgba($white, 0.5);
+        box-shadow: $btn-default-shadow;
         &:hover,
         &:active,
         &:focus {
@@ -59,7 +59,7 @@
         border: 1px solid $btn-action-border;
         background-color: $btn-action-bgcolor;
         background-image: linear-gradient($btn-action-bggradient);
-        box-shadow: inset 0 1px 0 rgba($white, 0.5);
+        box-shadow: $btn-default-shadow;
         &:hover,
         &:active,
         &:focus {
@@ -76,7 +76,7 @@
         border: 1px solid $btn-caution-border;
         background-color: $btn-caution-bgcolor;
         background-image: linear-gradient($btn-caution-bggradient);
-        box-shadow: inset 0 1px 0 rgba($white, 0.5);
+        box-shadow: $btn-default-shadow;
         &:hover,
         &:active,
         &:focus {
