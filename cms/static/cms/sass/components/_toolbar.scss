@@ -15,7 +15,7 @@
         z-index: z(toolbar, base);
         width: 100%;
         height: $toolbar-height;
-        border-bottom: 1px solid $color-grey !important;
+        border-bottom: 1px solid $gray !important;
         background-color: $white;
         background-image: linear-gradient($gradient-toolbar);
         box-shadow: $toolbar-shadow;
@@ -168,7 +168,7 @@
             // anchor hover
             > a {
                 color: white !important;
-                background: adjust-hue($color-blue, 15deg);
+                background: adjust-hue($color-primary, 15deg);
                 background: linear-gradient($btn-action-bggradient);
             }
 
@@ -183,7 +183,7 @@
             height: 1px;
             margin: 0 0 4px;
             padding: 0 0 3px;
-            border-bottom: 1px solid $color-grey-10;
+            border-bottom: 1px solid $gray-lighter;
         }
 
         .cms-toolbar-item-navigation-disabled {
@@ -223,7 +223,7 @@
         margin: 0;
         padding: 6px 10px 8px;
         border-radius: 0 0 3px 3px;
-        background: rgba(black, 0.74);
+        background: rgba($black, 0.74);
         * {
             color: white;
             font-size: 12px;
@@ -232,13 +232,13 @@
         }
 
         a {
-            color: $color-blue;
+            color: $color-primary;
         }
         a:hover {
             text-decoration: underline;
         }
         strong {
-            color: lighten($color-blue, 10%);
+            color: lighten($color-primary, 10%);
             font-weight: 200;
         }
         ul {
@@ -265,12 +265,12 @@
                 font-size: 10px;
             }
             &:hover span {
-                color: $color-blue;
+                color: $color-primary;
             }
         }
     }
     .cms-messages-error strong {
-        color: $color-red;
+        color: $color-danger;
     }
 
     //###########################################################
@@ -295,7 +295,7 @@
             &:hover,
             &:active,
             &:focus {
-                color: $color-blue;
+                color: $color-primary;
             }
         }
     }
@@ -315,20 +315,20 @@
         }
         input[type="text"],
         input[type="password"] {
-            color: $color-grey;
+            color: $gray;
             font-size: 13px;
             line-height: 13px;
             width: 100px;
             margin: 0;
             padding: 3px 5px;
-            border: 1px solid lighten($color-grey, 45%);
+            border: 1px solid lighten($gray, 45%);
             border-radius: 3px;
             box-shadow: 0px 1px 0px white;
 
             &:focus {
                 transition: outline 0.2s;
-                border-color: $color-blue;
-                box-shadow: inset 0px 0px 2px $color-grey-10;
+                border-color: $color-primary;
+                box-shadow: inset 0px 0px 2px $gray-lighter;
             }
         }
         input[type="submit"] {
@@ -338,30 +338,30 @@
             text-transform: uppercase;
             height: 23px;
             padding: 1px 15px 0;
-            border: 1px solid darken($color-grey, 20%);
+            border: 1px solid $gray-darkest;
             border-radius: 3px;
             cursor: pointer;
             background: linear-gradient($btn-active-bggradient);
-            background-color: $color-grey;
-            box-shadow: inset 0 1px 0 lighten($color-grey, 20%);
+            background-color: $gray;
+            box-shadow: inset 0 1px 0 lighten($gray, 20%);
 
             &:hover,
             &:active,
             &:focus {
-                background: $color-grey-70;
+                background: $gray-darker;
                 box-shadow: none;
             }
             &:active,
             &:focus {
-                background: darken($color-grey-70, 50%);
+                background: darken($gray-darker, 50%);
             }
         }
 
         .cms-error {
-            color: $color-red;
+            color: $color-danger;
         }
         .cms-error input {
-            border: 1px solid $color-red;
+            border: 1px solid $color-danger;
         }
     }
 
@@ -392,8 +392,8 @@
         top: 0;
         right: 0;
         z-index: z(toolbar-trigger);
-        border-bottom: 1px solid $color-grey;
-        border-left: 1px solid $color-grey;
+        border-bottom: 1px solid $gray;
+        border-left: 1px solid $gray;
 
         a {
             display: block;
@@ -402,18 +402,18 @@
             text-align: center;
             border-top: 1px solid $white;
             border-left: 1px solid $white;
-            background: $color-grey-5;
+            background: $gray-lightest;
             &:hover {
                 background: #fff;
             }
             &:hover span,
             &:active span,
             &:focus span {
-                color: $color-grey-90;
+                color: $gray-darkest;
             }
             span {
                 font-size: 10px;
-                color: $color-grey-70;
+                color: $gray-darker;
                 margin: 8px 0 0 -2px;
                 transition: transform $speed-base;
                 transform: rotate(270deg);
@@ -432,7 +432,7 @@
         top: -5px;
         font-size: 20px;
         line-height: 20px;
-        color: $color-blue;
+        color: $color-primary;
         background: transparent;
         animation: cms-spin 2s infinite linear;
     }
@@ -461,7 +461,7 @@
         }
         h1,
         p {
-            color: $color-grey-20;
+            color: $gray-light;
             text-align: center;
         }
         a {
