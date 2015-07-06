@@ -256,3 +256,18 @@ $toolbar-trigger-width: $toolbar-height;
 $toolbar-trigger-height: $toolbar-height;
 
 $toolbar-right-hide-breakpoint: 800px;
+
+$toolbar-menu-item-padding: 0 ($line-height-normal / 2);
+$toolbar-menu-item-color: $black;
+$toolbar-menu-item-hover-color: $white;
+$toolbar-menu-item-hover-bgcolor: adjust-hue($color-primary, 15deg);
+$toolbar-menu-item-hover-bggradient: $btn-action-bggradient;
+
+$toolbar-dropdown-padding: 3px 0;
+$toolbar-dropdown-shadow: 0 1px 1px rgba($black, 0.4);
+$toolbar-dropdown-bgcolor: $white;
+$toolbar-dropdown-border-radius: $border-radius-base + 1px;
+
+$toolbar-dropdown-item-height: 24px;
+$toolbar-dropdown-item-padding: 0 10px 0 15px;
+

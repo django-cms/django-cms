@@ -89,12 +89,13 @@
         li {
             position: relative;
             float: left;
-            zoom: 1;
         }
         li a {
             float: left;
-            zoom: 1;
-            padding: 5px 10px;
+            color: $toolbar-menu-item-color;
+            padding: $toolbar-menu-item-padding;
+            line-height: $toolbar-height;
+            height: $toolbar-height;
             cursor: default;
         }
         li ul {
@@ -121,36 +122,36 @@
                 top: 30px;
                 left: 0;
                 min-width: 180px;
-                padding: 3px 0;
-                border: 1px solid white;
+                padding: $toolbar-dropdown-padding;
+                border: 1px solid $white;
                 border-top: none;
-                border-radius: 0 0 4px 4px;
-                background-color: white;
-                background: rgba(white, 0.97);
-                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+                border-radius: 0 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius;
+                background-color: $toolbar-dropdown-bgcolor;
+                background: rgba($toolbar-dropdown-bgcolor, 0.97);
+                box-shadow: $toolbar-dropdown-shadow;
             }
             ul li {
                 float: none;
-                zoom: 1;
             }
             ul li a {
                 display: block;
                 float: none;
-                zoom: 1;
                 white-space: nowrap;
-                padding: 2px 10px 2px 15px;
+                line-height: $toolbar-dropdown-item-height;
+                height: $toolbar-dropdown-item-height;
+                padding: $toolbar-dropdown-item-padding;
                 cursor: pointer;
             }
             ul ul {
-                border-top: 1px solid #f5f5f5;
-                border-radius: 0 4px 4px 0;
+                border-top: 1px solid $gray-lightest;
+                border-radius: 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius 0;
             }
 
             // second level
             .cms-toolbar-item-navigation-children {
                 ul {
                     display: none;
-                    top: -4px;
+                    top: -(nth($toolbar-dropdown-padding, 1) + 1px);
                     left: 100%;
                 }
                 > a {
@@ -167,9 +168,9 @@
 
             // anchor hover
             > a {
-                color: white !important;
-                background: adjust-hue($color-primary, 15deg);
-                background: linear-gradient($btn-action-bggradient);
+                color: $toolbar-menu-item-hover-color !important;
+                background: $toolbar-menu-item-hover-bgcolor;
+                background: linear-gradient($toolbar-menu-item-hover-bggradient);
             }
 
             // add active style
@@ -193,7 +194,7 @@
                 &:hover,
                 &:active,
                 &:focus {
-                    color: black !important;
+                    color: $toolbar-menu-item-color !important;
                     background: none !important;
                     box-shadow: none;
                 }
@@ -404,7 +405,7 @@
             border-left: 1px solid $white;
             background: $gray-lightest;
             &:hover {
-                background: #fff;
+                background: $white;
             }
             &:hover span,
             &:active span,
@@ -449,8 +450,8 @@
         text-align: center;
         width: 100%;
         height: 100%;
-        background: rgba(black, 0.9);
-        background-color: black;
+        background-color: $black;
+        background: rgba($black, 0.9);
     }
 
     .cms-screenblock-inner {
