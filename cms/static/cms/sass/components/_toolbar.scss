@@ -2,9 +2,9 @@
 // #TOOLBAR#
 #cms-toolbar {
     position: absolute;
-    top: 5px;
+    top: $toolbar-debug-height;
     left: 0;
-    z-index: 9999999;
+    z-index: z(base);
     width: 100%;
 
     .cms-toolbar {
@@ -12,35 +12,32 @@
         position: fixed;
         top: 0;
         left: 0;
-        z-index: 999999;
+        z-index: z(toolbar, base);
         width: 100%;
-        min-width: 320px;
-        height: 30px;
-        border-bottom: 1px solid $color-grey !important;
-        background: rgba($color-grey-5, 0);
-        background: linear-gradient($gradient-toolbar);
-        /* hack for ie9 */ background/**/: #fcfcfc;
-        background-color: white;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        height: $toolbar-height;
+        border-bottom: 1px solid $gray !important;
+        background-color: $white;
+        background-image: linear-gradient($gradient-toolbar);
+        box-shadow: $toolbar-shadow;
 
         .cms-toolbar-left {
             position: relative;
             float: left;
-            z-index: 10;
-            padding-left: 10px;
+            z-index: z(toolbar, left);
+            padding-left: $toolbar-left-space;
         }
         .cms-toolbar-right {
             position: relative;
             float: right;
-            z-index: 10;
-            padding-right: 32px;
+            z-index: z(toolbar, right);
+            padding-right: $toolbar-trigger-width + 2px;
         }
 
         .cms-toolbar-left .cms-toolbar-item {
-            margin-left: 10px;
+            margin-left: $toolbar-left-space;
         }
         .cms-toolbar-right .cms-toolbar-item {
-            margin-right: 20px;
+            margin-right: $toolbar-right-space;
         }
 
         // items
@@ -53,7 +50,7 @@
     }
 
     // do some responsive magic
-    @media only screen and (max-width: 800px) {
+    @media only screen and (max-width: $toolbar-right-hide-breakpoint) {
         .cms-toolbar-right {
             display: none;
         }
@@ -63,36 +60,27 @@
     // #TOOLBAR/debug#
     &.cms-toolbar-debug {
         .cms-toolbar {
-            top: 5px !important;
+            top: $toolbar-debug-height !important;
         }
         .cms-toolbar-trigger {
-            top: 5px !important;
+            top: $toolbar-debug-height !important;
         }
 
         .cms-debug-bar {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 99999999;
+            z-index: z(debug);
             width: 100%;
-            height: 5px;
-            border-bottom: 1px solid #ddd;
-            background-color: #fcd200;
-            background-image: linear-gradient(
-                135deg,
-                rgba(255, 255, 255, .8) 25%,
-                transparent 25%,
-                transparent 50%,
-                rgba(255, 255, 255, .8) 50%,
-                rgba(255, 255, 255, .8) 75%,
-                transparent 75%,
-                transparent
-            );
-            background-size: 10px 10px;
+            height: $toolbar-debug-height;
+            border-bottom: 1px solid $gray-lighter;
+            background-color: $toolbar-debug-bgcolor;
+            background-image: linear-gradient($gradient-striped-dark);
+            background-size: $toolbar-debug-bgsize;
         }
     }
     &.cms-toolbar-debug #container {
-        padding-top: 35px !important;
+        padding-top: $toolbar-height + $toolbar-debug-height !important;
     }
 
     //###########################################################
@@ -101,12 +89,13 @@
         li {
             position: relative;
             float: left;
-            zoom: 1;
         }
         li a {
             float: left;
-            zoom: 1;
-            padding: 5px 10px;
+            color: $toolbar-menu-item-color;
+            padding: $toolbar-menu-item-padding;
+            line-height: $toolbar-height;
+            height: $toolbar-height;
             cursor: default;
         }
         li ul {
@@ -114,14 +103,14 @@
         }
         > li:first-child > a span {
             font-weight: 800;
-            line-height: 12px;
         }
         .cms-icon {
             display: none;
             position: absolute;
-            top: 7px;
+            top: 50%;
             right: 7px;
-            font-size: 10px;
+            margin-top: -($toolbar-dropdown-item-icon-size / 2);
+            font-size: $toolbar-dropdown-item-icon-size;
             transform: rotate(180deg);
         }
 
@@ -130,39 +119,39 @@
             ul {
                 display: block;
                 position: absolute;
-                top: 30px;
+                top: $toolbar-height;
                 left: 0;
-                min-width: 180px;
-                padding: 3px 0;
-                border: 1px solid white;
+                min-width: $toolbar-dropdown-min-width;
+                padding: $toolbar-dropdown-padding;
+                border: 1px solid $white;
                 border-top: none;
-                border-radius: 0 0 4px 4px;
-                background-color: white;
-                background: rgba(white, 0.97);
-                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+                border-radius: 0 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius;
+                background-color: $toolbar-dropdown-bgcolor;
+                background: rgba($toolbar-dropdown-bgcolor, 0.97);
+                box-shadow: $toolbar-dropdown-shadow;
             }
             ul li {
                 float: none;
-                zoom: 1;
             }
             ul li a {
                 display: block;
                 float: none;
-                zoom: 1;
                 white-space: nowrap;
-                padding: 2px 10px 2px 15px;
+                line-height: $toolbar-dropdown-item-height;
+                height: $toolbar-dropdown-item-height;
+                padding: $toolbar-dropdown-item-padding;
                 cursor: pointer;
             }
             ul ul {
-                border-top: 1px solid #f5f5f5;
-                border-radius: 0 4px 4px 0;
+                border-top: 1px solid $gray-lightest;
+                border-radius: 0 $toolbar-dropdown-border-radius $toolbar-dropdown-border-radius 0;
             }
 
             // second level
             .cms-toolbar-item-navigation-children {
                 ul {
                     display: none;
-                    top: -4px;
+                    top: -(nth($toolbar-dropdown-padding, 1) + 1px);
                     left: 100%;
                 }
                 > a {
@@ -179,9 +168,9 @@
 
             // anchor hover
             > a {
-                color: white !important;
-                background: adjust-hue($color-blue, 15deg);
-                background: linear-gradient($btn-action-bggradient);
+                color: $toolbar-menu-item-hover-color !important;
+                background: $toolbar-menu-item-hover-bgcolor;
+                background: linear-gradient($toolbar-menu-item-hover-bggradient);
             }
 
             // add active style
@@ -195,7 +184,7 @@
             height: 1px;
             margin: 0 0 4px;
             padding: 0 0 3px;
-            border-bottom: 1px solid $color-grey-10;
+            border-bottom: 1px solid $gray-lighter;
         }
 
         .cms-toolbar-item-navigation-disabled {
@@ -205,7 +194,7 @@
                 &:hover,
                 &:active,
                 &:focus {
-                    color: black !important;
+                    color: $toolbar-menu-item-color !important;
                     background: none !important;
                     box-shadow: none;
                 }
@@ -224,43 +213,43 @@
     .cms-messages {
         display: none;
         position: fixed;
-        top: 30px;
-        z-index: 999999;
-        color: white;
-        font-size: 12px;
-        font-weight: 200;
-        line-height: 16px;
-        width: 300px;
-        min-height: 14px;
+        top: $toolbar-height;
+        z-index: z(messages);
+        color: $messages-color;
+        font-size: $messages-font-size;
+        font-weight: $messages-font-weight;
+        line-height: $messages-line-height;
+        width: $messages-width;
+        min-height: $messages-line-height;
         margin: 0;
-        padding: 6px 10px 8px;
-        border-radius: 0 0 3px 3px;
-        background: rgba(black, 0.74);
+        padding: $messages-padding;
+        border-radius: 0 0 $messages-border-radius $messages-border-radius;
+        background: rgba($messages-bgcolor, 0.74);
         * {
-            color: white;
-            font-size: 12px;
-            font-weight: 200;
-            line-height: 16px;
+            color: $messages-color;
+            font-size: $messages-font-size;
+            font-weight: $messages-font-weight;
+            line-height: $messages-line-height;
         }
 
         a {
-            color: $color-blue;
+            color: $color-primary;
         }
         a:hover {
             text-decoration: underline;
         }
         strong {
-            color: lighten($color-blue, 10%);
-            font-weight: 200;
+            color: lighten($color-primary, 10%);
+            font-weight: $messages-font-weight;
         }
         ul {
             display: inline;
-            color: white;
+            color: $messages-color;
         }
         ul li {
             display: inline;
-            color: white;
-            font-weight: 200;
+            color: $messages-color;
+            font-weight: $messages-font-weight;
         }
 
         .cms-messages-close {
@@ -268,21 +257,19 @@
             display: none;
             float: right;
             position: relative;
-            top: 0;
-            left: 8px;
-            width: 20px;
-            height: 14px;
-            margin-left: 10px;
+            width: $messages-close-area-size;
+            height: $messages-close-area-size;
+            text-align: right;
             span {
-                font-size: 10px;
+                font-size: $messages-close-icon-size;
             }
             &:hover span {
-                color: $color-blue;
+                color: $color-primary;
             }
         }
     }
     .cms-messages-error strong {
-        color: $color-red;
+        color: $color-danger;
     }
 
     //###########################################################
@@ -293,11 +280,9 @@
         a {
             @extend .cms-icon;
             @extend .cms-icon-logo;
-            font-size: 21px;
-            line-height: 21px;
-            width: 90px;
-            height: 20px;
-            margin: 4px 0;
+            font-size: $toolbar-logo-height;
+            line-height: $toolbar-height;
+            height: $toolbar-height;
             transition: color $speed-base;
 
             span {
@@ -307,94 +292,98 @@
             &:hover,
             &:active,
             &:focus {
-                color: $color-blue;
+                color: $color-primary;
             }
         }
     }
 
     // #TOOLBAR/elements/form#
     .cms-form-login {
-        padding: 3px 0 0 0;
-
         label {
-            float: left;
-            padding-left: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: $toolbar-height;
+            padding-left: $toolbar-left-space;
+            margin: 0;
             cursor: pointer;
         }
         label span {
             display: inline-block;
-            padding-top: 1px;
         }
         input[type="text"],
         input[type="password"] {
-            color: $color-grey;
-            font-size: 13px;
-            line-height: 13px;
-            width: 100px;
+            color: $login-form-input-color;
+            font-size: $login-form-input-font-size;
+            height: $login-form-input-height - 2px;
+            line-height: $login-form-input-height - 2px;
+            width: $login-form-input-width;
             margin: 0;
-            padding: 3px 5px;
-            border: 1px solid lighten($color-grey, 45%);
-            border-radius: 3px;
-            box-shadow: 0px 1px 0px white;
+            padding: 0px $login-form-input-padding-horizontal;
+            border: 1px solid $login-form-input-border;
+            border-radius: $login-form-input-border-radius;
+            box-shadow: 0px 1px 0px $white;
 
             &:focus {
                 transition: outline 0.2s;
-                border-color: $color-blue;
-                box-shadow: inset 0px 0px 2px $color-grey-10;
+                border-color: $color-primary;
+                box-shadow: inset 0px 0px 2px $gray-lighter;
             }
         }
         input[type="submit"] {
-            display: block;
-            color: white;
-            font-size: 12px;
+            color: $login-form-submit-color;
+            font-size: $login-form-input-font-size - 1px;
             text-transform: uppercase;
-            height: 23px;
-            padding: 1px 15px 0;
-            border: 1px solid darken($color-grey, 20%);
-            border-radius: 3px;
+            height: $login-form-input-height;
+            padding: 0px $login-form-submit-padding-horizontal;
+            border: 1px solid $btn-active-border;
+            border-bottom: none;
+            border-radius: $login-form-input-border-radius;
             cursor: pointer;
-            background: linear-gradient($btn-active-bggradient);
-            background-color: $color-grey;
-            box-shadow: inset 0 1px 0 lighten($color-grey, 20%);
+            background-color: $btn-active-bgcolor;
+            background-image: linear-gradient($btn-active-bggradient);
+            box-shadow: $btn-default-shadow;
 
             &:hover,
             &:active,
             &:focus {
-                background: $color-grey-70;
-                box-shadow: none;
+                background: $btn-active-bgcolor;
+                border: 1px solid $btn-active-border;
+                border-bottom: none;
             }
             &:active,
             &:focus {
-                background: darken($color-grey-70, 50%);
+                background: darken($btn-active-bgcolor, 10%);
             }
         }
 
         .cms-error {
-            color: $color-red;
+            color: $color-danger;
         }
         .cms-error input {
-            border: 1px solid $color-red;
+            border: 1px solid $color-danger;
         }
     }
 
     // #TOOLBAR/elements/buttongroups#
     .cms-toolbar-item-buttons {
-        margin: 4px 0 4px;
+        $margin: ($toolbar-height - $toolbar-button-height) / 2;
+        margin: $margin 0 $margin;
 
         a {
             float: left;
-            font-size: 11px;
-            line-height: 1;
-            padding: 5px 12px;
+            line-height: $toolbar-button-height;
+            height: $toolbar-button-height;
+            font-size: $toolbar-button-font-size;
+            padding: 0 $toolbar-button-padding-horizontal;
         }
         a:first-child {
-            border-radius: 3px 0 0 3px;
+            border-radius: $toolbar-button-border-radius 0 0 $toolbar-button-border-radius;
         }
         a:last-child {
-            border-radius: 0 3px 3px 0;
+            border-radius: 0 $toolbar-button-border-radius $toolbar-button-border-radius 0;
         }
         a:only-child {
-            border-radius: 3px;
+            border-radius: $toolbar-button-border-radius;
         }
     }
 
@@ -403,30 +392,34 @@
         position: fixed;
         top: 0;
         right: 0;
-        z-index: 999999;
-        border-bottom: 1px solid $color-grey;
-        border-left: 1px solid $color-grey;
+        z-index: z(toolbar-trigger);
+        border-bottom: 1px solid $gray;
+        border-left: 1px solid $gray;
 
         a {
             display: block;
-            width: 30px;
-            height: 29px;
+            width: $toolbar-trigger-width;
+            height: $toolbar-trigger-height - 1px;
             text-align: center;
-            border-top: 1px solid white;
-            border-left: 1px solid white;
-            background: $color-grey-5;
+            border-top: 1px solid $white;
+            border-left: 1px solid $white;
+            background: $gray-lightest;
             &:hover {
-                background: #fff;
+                background: $white;
             }
             &:hover span,
             &:active span,
             &:focus span {
-                color: $color-grey-90;
+                color: $gray-darkest;
             }
             span {
-                font-size: 10px;
-                color: $color-grey-70;
-                margin: 8px 0 0 -2px;
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                margin-left: -($toolbar-trigger-icon-size / 2);
+                margin-top: -($toolbar-trigger-icon-size / 2 + 1px);
+                font-size: $toolbar-trigger-icon-size;
+                color: $gray-darker;
                 transition: transform $speed-base;
                 transform: rotate(270deg);
                 background: none;
@@ -435,16 +428,16 @@
     }
     // #TOOLBAR/elements/loader#
     .cms-toolbar-trigger-expanded a span {
-        margin-top: 9px;
         transform: rotate(90deg);
     }
     .cms-toolbar-loader a span {
         @extend .cms-icon-loader;
-        position: relative;
-        top: -5px;
-        font-size: 20px;
-        line-height: 20px;
-        color: $color-blue;
+        position: absolute;
+        margin-top: -($toolbar-trigger-loader-size / 2);
+        margin-left: -($toolbar-trigger-loader-size / 2);
+        font-size: $toolbar-trigger-loader-size;
+        line-height: $toolbar-trigger-loader-size;
+        color: $color-primary;
         background: transparent;
         animation: cms-spin 2s infinite linear;
     }
@@ -456,28 +449,28 @@
         position: fixed;
         top: 0;
         right: 0;
-        z-index: 100;
-        color: white;
+        z-index: z(screenblock);
+        color: $screenblock-color;
         text-align: center;
         width: 100%;
         height: 100%;
-        background: rgba(black, 0.9);
-        background-color: black;
+        background-color: $screenblock-bgcolor;
+        background: rgba($screenblock-bgcolor, 0.9);
     }
 
     .cms-screenblock-inner {
-        margin-top: 300px;
+        margin-top: $screenblock-inner-position;
         h1 {
             font-size: 28px;
             line-height: 30px;
         }
         h1,
         p {
-            color: $color-grey-20;
+            color: $gray-light;
             text-align: center;
         }
         a {
-            color: white;
+            color: $white;
         }
         a:hover {
             text-decoration: underline;

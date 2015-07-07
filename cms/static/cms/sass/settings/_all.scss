@@ -2,13 +2,8 @@
 // #SETTINGS#
 
 // #COLORS#
-$color-white: #fff;
-$color-black: #000;
-
 $color-grey: #666;
 $color-blue: #0eaaec;
-$color-green: #693;
-$color-red: #f00;
 $color-window: #fcfcfc;
 
 $speed-base: 200ms;
@@ -41,6 +36,7 @@ $gray-darkest:    darken($gray, 20%); // #333
 
 $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
+$gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transparent 50%, rgba($white, .8) 50%, rgba($white, .8) 75%, transparent 75%, transparent;
 
 //##############################################################################
 // BASE Variables
@@ -58,6 +54,7 @@ $padding-large: 20px;
 // z-index map
 // the map is built from highest to lowest as it appears on screen
 $z-layers: (
+    "debug":            99999999,
     "modal": (
         "base":         999999,
         "body":         10,
@@ -71,6 +68,13 @@ $z-layers: (
         ),
         "buttons":      101,
         "resize":       102,
+    ),
+    "messages":         999999,
+    "toolbar-trigger":  999999,
+    "toolbar": (
+        "base":         999999,
+        "left":         10,
+        "right":        10,
     ),
     "clipboard": (
         "base":         99999,
@@ -98,8 +102,10 @@ $z-layers: (
         ),
         "dimmer":       10,
     ),
+    "screenblock":      100,
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,
+    "base":             9999999,
     "default":          1,
     "below":            -1,
 );
@@ -108,6 +114,7 @@ $z-layers: (
 //##############################################################################
 // #BUTTONS
 $btn-border-radius-base: $border-radius-base;
+$btn-default-shadow: inset 0 1px 0 rgba($white, 0.5);
 
 $btn-default-color: $gray;
 $btn-default-bgcolor: $gray-lighter;
@@ -115,14 +122,14 @@ $btn-default-bggradient: to bottom, $gray-lightest, $gray-lighter;
 $btn-default-border: $gray-lighter;
 
 $btn-action-color: $white;
-$btn-action-bgcolor: adjust-hue($color-blue, 15deg);
-$btn-action-bggradient: to bottom, adjust-hue($color-blue, 5deg), adjust-hue($color-blue, 15deg);
-$btn-action-border: adjust-hue($color-blue, 15deg);
+$btn-action-bgcolor: adjust-hue($color-primary, 15deg);
+$btn-action-bggradient: to bottom, adjust-hue($color-primary, 5deg), adjust-hue($color-primary, 15deg);
+$btn-action-border: adjust-hue($color-primary, 15deg);
 
 $btn-caution-color: $white;
-$btn-caution-bgcolor: adjust-hue($color-red, 15deg);
-$btn-caution-bggradient: to bottom, adjust-hue($color-red, 5deg), adjust-hue($color-red, 15deg);
-$btn-caution-border: adjust-hue($color-red, 15deg);
+$btn-caution-bgcolor: adjust-hue($color-danger, 15deg);
+$btn-caution-bggradient: to bottom, adjust-hue($color-danger, 5deg), adjust-hue($color-danger, 15deg);
+$btn-caution-border: adjust-hue($color-danger, 15deg);
 
 $btn-active-color: $white;
 $btn-active-bgcolor: $gray-darker;
@@ -230,3 +237,72 @@ $tooltip-icon-area-size: 22px;
 $tooltip-icon-size: 14px;
 $tooltip-first-line-color: $gray-lighter;
 $tooltip-second-line-color: $white;
+
+//##############################################################################
+// Toolbar
+$toolbar-height: 30px;
+$toolbar-shadow: 0 0 5px rgba($black, 0.2);
+$toolbar-left-space: 10px;
+
+$toolbar-debug-height: 5px;
+$toolbar-debug-bgsize: 10px 10px;
+$toolbar-debug-bgcolor: #fcd200;
+
+$toolbar-logo-height: 21px;
+
+$toolbar-trigger-width: $toolbar-height;
+$toolbar-trigger-height: $toolbar-height;
+$toolbar-trigger-icon-size: 10px;
+$toolbar-trigger-loader-size: 20px;
+
+$toolbar-right-hide-breakpoint: 800px;
+$toolbar-right-space: 20px;
+
+$toolbar-menu-item-padding: 0 ($line-height-normal / 2); // has to be 0 $value;;
+$toolbar-menu-item-color: $black;
+$toolbar-menu-item-hover-color: $white;
+$toolbar-menu-item-hover-bgcolor: adjust-hue($color-primary, 15deg);
+$toolbar-menu-item-hover-bggradient: $btn-action-bggradient;
+
+$toolbar-dropdown-padding: 3px 0;
+$toolbar-dropdown-shadow: 0 1px 1px rgba($black, 0.4);
+$toolbar-dropdown-bgcolor: $white;
+$toolbar-dropdown-border-radius: $border-radius-base + 1px;
+
+$toolbar-dropdown-min-width: 180px;
+$toolbar-dropdown-item-height: 24px;
+$toolbar-dropdown-item-padding: 0 10px 0 15px; // has to be 0 $value;
+$toolbar-dropdown-item-icon-size: 10px;
+
+$toolbar-button-height: 22px;
+$toolbar-button-font-size: 11px;
+$toolbar-button-padding-horizontal: 12px;
+$toolbar-button-border-radius: $border-radius-base;
+
+//##############################################################################
+// Toolbar messages + screenblock + login form
+$messages-width: 300px;
+$messages-padding: 6px 10px 8px;
+$messages-color: $white;
+$messages-font-size: 12px;
+$messages-line-height: 16px;
+$messages-border-radius: $border-radius-base;
+$messages-bgcolor: $black;
+$messages-font-weight: 200;
+$messages-close-area-size: 20px;
+$messages-close-icon-size: 10px;
+
+$screenblock-color: $white;
+$screenblock-bgcolor: $black;
+$screenblock-inner-position: 300px;
+
+$login-form-input-font-size: $font-size-normal;
+$login-form-input-color: $gray;
+$login-form-input-width: 100px;
+$login-form-input-height: 23px;
+$login-form-input-padding-horizontal: 5px;
+$login-form-input-border: lighten($gray, 45%);
+$login-form-input-border-radius: $border-radius-base;
+
+$login-form-submit-color: $white;
+$login-form-submit-padding-horizontal: 15px;
