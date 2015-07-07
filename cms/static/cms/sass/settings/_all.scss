@@ -1,23 +1,9 @@
 // ##################################################################################################################
 // #SETTINGS#
 
-// #COLORS#
-$color-grey: #666;
-$color-blue: #0eaaec;
-$color-window: #fcfcfc;
-
 $speed-base: 200ms;
 
-// #COLORS/auto#
-// These are kept only while refactoring is in progress
-$color-grey-5:    lighten($color-grey, 58%); // fafafa
-$color-grey-10:   lighten($color-grey, 50%); // e5e5e5
-$color-grey-20:   lighten($color-grey, 25%); // a6a6a6
-$color-grey-70:   darken($color-grey, 13%); // 454545
-$color-grey-90:   darken($color-grey, 20%); // 333333
-
-//##############################################################################
-// #COLORS new
+// #COLORS#
 $white: #fff;
 $black: #000;
 
@@ -25,6 +11,7 @@ $color-primary: #0eaaec;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
+$color-window: #fcfcfc;
 
 // #COLORS gray
 $gray:            lighten($black, 40%); // #666;
@@ -160,6 +147,9 @@ $modal-button-padding: 2px $padding-normal;
 $modal-button-space: 5px;
 
 $modal-resize-size: 20px;
+
+$modal-content-padding: 10px;
+$modal-content-module-padding: 10px;
 
 //##############################################################################
 // Dialog
