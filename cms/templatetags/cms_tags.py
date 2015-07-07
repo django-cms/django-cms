@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from copy import copy
 from datetime import datetime
 from itertools import chain
-import re
+
+from copy import copy
 
 try:
     from collections import OrderedDict
@@ -36,6 +36,9 @@ from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 from cms import __version__
+from cms.cache.page import get_page_url_cache, set_page_url_cache
+from cms.cache.placeholder import (get_placeholder_page_cache, set_placeholder_page_cache,
+                                   get_placeholder_cache)
 from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
@@ -59,21 +62,6 @@ def has_permission(page, request):
 
 
 register.filter(has_permission)
-
-CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
-
-
-def _clean_key(key):
-    return CLEAN_KEY_PATTERN.sub('-', key)
-
-
-def _get_cache_key(name, page_lookup, lang, site_id):
-    if isinstance(page_lookup, Page):
-        page_key = str(page_lookup.pk)
-    else:
-        page_key = str(page_lookup)
-    page_key = _clean_key(page_key)
-    return get_cms_setting('CACHE_PREFIX') + name + '__page_lookup:' + page_key + '_site:' + str(site_id) + '_lang:' + str(lang)
 
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
@@ -134,6 +122,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                     mail_managers(subject, body, fail_silently=True)
             return None
 
+
 class PageUrl(AsTag):
     name = 'page_url'
 
@@ -161,7 +150,6 @@ class PageUrl(AsTag):
             return ''
 
     def get_value(self, context, page_lookup, lang, site):
-        from django.core.cache import cache
 
         site_id = get_site_id(site)
         request = context.get('request', False)
@@ -172,17 +160,12 @@ class PageUrl(AsTag):
         if lang is None:
             lang = get_language_from_request(request)
 
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
-            '_type:absolute_url'
-
-        url = cache.get(cache_key)
-
-        if not url:
+        url = get_page_url_cache(page_lookup, lang, site_id)
+        if url is None:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url,
-                          get_cms_setting('CACHE_DURATIONS')['content'])
+                set_page_url_cache(page_lookup, lang, site_id, url)
         if url:
             return url
         return ''
@@ -193,7 +176,6 @@ register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
-    from django.core.cache import cache
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
         placeholder = placeholder_cache[page.pk].get(name, None)
@@ -207,9 +189,8 @@ def _get_placeholder(current_page, page, context, name):
         fetch_placeholders = placeholders
     else:
         for placeholder in placeholders:
-            cache_key = placeholder.get_cache_key(get_language())
-            cached_value = cache.get(cache_key)
-            if not cached_value is None:
+            cached_value = get_placeholder_cache(placeholder, get_language())
+            if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 placeholder.content_cache = cached_value['content']
             else:
@@ -229,7 +210,6 @@ def _get_placeholder(current_page, page, context, name):
 
 
 def get_placeholder_content(context, request, current_page, name, inherit, default):
-    from django.core.cache import cache
     edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
     pages = [current_page]
     # don't display inherited plugins in edit mode, so that the user doesn't
@@ -245,9 +225,8 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):
-                cache_key = placeholder.get_cache_key(get_language())
-                cached_value = cache.get(cache_key)
-                if not cached_value is None:
+                cached_value = get_placeholder_cache(placeholder, get_language())
+                if cached_value is not None:
                     restore_sekizai_context(context, cached_value['sekizai'])
                     return mark_safe(cached_value['content'])
         if not get_plugins(request, placeholder, page.get_template()):
@@ -428,6 +407,7 @@ class PluginChildClasses(InclusionTag):
             plugin_class = plugin.get_plugin_class()
             if plugin_class.allow_children:
                 instance, plugin = plugin.get_plugin_instance()
+                plugin.cms_plugin_instance = instance
                 childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
                 # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
                 child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
@@ -575,7 +555,6 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
-    from django.core.cache import cache
     validate_placeholder_name(placeholder_name)
 
     if DJANGO_1_7:
@@ -591,9 +570,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         lang = get_language_from_request(request)
 
     if cache_result:
-        base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
-        cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
-        cached_value = cache.get(cache_key)
+        cached_value = get_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name)
         if cached_value:
             restore_sekizai_context(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
@@ -610,7 +587,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     content = render_placeholder(placeholder, context, placeholder_name, use_cache=cache_result)
     changes = watcher.get_changes()
     if cache_result:
-        cache.set(cache_key, {'content': content, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
+        set_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name,
+                                   {'content': content, 'sekizai': changes})
 
     if content:
         return {'content': mark_safe(content)}

@@ -947,3 +947,21 @@ This should be an integer preferably taken from the Page object e.g.
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
 
+
+CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
+=================================
+
+default:
+    ``False``
+
+Enable or disable the absolute positioning within the structure board.
+
+By default the absolute positioned board is activated. Setting this attribute
+to ``False`` will prevent the absolute positioning and order the placeholders
+beneath each other. Static placeholders have a visual gap in the simple mode.
+
+
+Example::
+
+    CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = True
+

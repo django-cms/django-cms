@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cms.cache.placeholder import clear_placeholder_cache
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import CMSPlugin, Title, Page, StaticPlaceholder, Placeholder
 
@@ -20,10 +21,7 @@ def set_dirty(plugin, delete_cache=True):
         language = plugin.language
 
         if delete_cache:
-            from django.core.cache import cache
-
-            key = placeholder.get_cache_key(language)
-            cache.delete(key)
+            clear_placeholder_cache(placeholder, language)
 
         attached_model = placeholder._get_attached_model()
 

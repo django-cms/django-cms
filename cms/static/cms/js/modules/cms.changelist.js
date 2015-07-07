@@ -181,8 +181,17 @@ $(document).ready(function () {
                 // cancel if not confirmed
                 if(!confirm(that.options.lang.publish.replace('§', $(this).text().toLowerCase()))) return false;
 
-                // publish page and update
-                window.location.href = $(this).attr('href');
+                // send post request to prevent xss attacks
+                $.ajax({
+                    'type': 'post',
+                    'url': $(this).prop('href'),
+                    'success': function () {
+                        CMS.API.Helpers.reloadBrowser();
+                    },
+                    'error': function (request) {
+                        throw new Error(request);
+                    }
+                });
             });
         },
 
@@ -570,7 +579,7 @@ $(document).ready(function () {
                 else {
                     href = $(this).attr('href');
                 }
-                window.location = href;                    
+                window.location = href;
             });
 
             var copy_splits = window.location.href.split("copy=");

@@ -72,14 +72,14 @@ http://docs.django-cms.org/en/latest/introduction/index.html
 Quick Start
 ***********
 
-You can use the `django CMS installer <https://github.com/nephila/djangocms-installer>`_::
+You can use the `django CMS installer <http://djangocms-installer.readthedocs.org>`_::
 
     $ pip install --upgrade virtualenv
     $ virtualenv env
     $ source env/bin/activate
     (env) $ pip install djangocms-installer
     (env) $ mkdir myproject && cd myproject
-    (env) $ djangocms -p . my_demo
+    (env) $ djangocms -p -f . my_demo
     (env) $ python manage.py
 
 
@@ -90,9 +90,9 @@ Getting Help
 Please head over to our IRC channel, #django-cms, on irc.freenode.net or write
 to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 
-************
+******************
 Commercial support
-************
+******************
 
 This project is backed by `Divio <https://divio.ch>`_. If you need help
 implementing or hosting django CMS, please contact us: sales@divio.ch.

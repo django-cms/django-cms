@@ -27,7 +27,7 @@ def apphook_post_page_checker(page):
                 old_page.application_urls != page.application_urls or old_page.application_namespace != page.application_namespace)) or (
             not old_page and page.application_urls):
 
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)
 
@@ -68,7 +68,7 @@ def apphook_post_delete_title_checker(instance, **kwargs):
     """
     Check if this was an apphook
     """
-    from cms.views import invalidate_cms_page_cache
+    from cms.cache import invalidate_cms_page_cache
     invalidate_cms_page_cache()
     if instance.page.application_urls:
         request_finished.connect(trigger_restart, dispatch_uid=DISPATCH_UID)

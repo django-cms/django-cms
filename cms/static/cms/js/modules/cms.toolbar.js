@@ -214,7 +214,27 @@ $(document).ready(function () {
 
                 // in case of the publish button
                 btn.find('.cms-publish-page').bind(that.click, function (e) {
-                    if(!confirm(that.config.lang.publish)) e.preventDefault();
+                    if(!confirm(that.config.lang.publish)) {
+                        e.preventDefault();
+                    }
+                });
+
+                btn.find('.cms-btn-publish').bind(that.click, function (e) {
+                    e.preventDefault();
+                    // send post request to prevent xss attacks
+                    $.ajax({
+                        'type': 'post',
+                        'url': $(this).prop('href'),
+                        'data': {
+                            'csrfmiddlewaretoken': CMS.config.csrf
+                        },
+                        'success': function () {
+                            CMS.API.Helpers.reloadBrowser();
+                        },
+                        'error': function (request) {
+                            throw new Error(request);
+                        }
+                    });
                 });
             });
         },
@@ -508,6 +528,5 @@ $(document).ready(function () {
         }
 
     });
-
 });
 })(CMS.$);
