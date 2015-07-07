@@ -2,6 +2,7 @@
 // #MODAL#
 
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
     /*!
@@ -40,7 +41,9 @@ $(document).ready(function () {
             this.saved = false;
 
             // if the modal is initialized the first time, set the events
-            if(!this.modal.data('ready')) this._events();
+            if(!this.modal.data('ready')) {
+                this._events();
+            }
 
             // ready modal
             this.modal.data('ready', true);
@@ -92,7 +95,7 @@ $(document).ready(function () {
             // cancel if another lightbox is already being opened
             if(CMS.API.locked) {
                 CMS.API.locked = false;
-                return false
+                return false;
             } else {
                 CMS.API.locked = true;
             }
@@ -122,7 +125,9 @@ $(document).ready(function () {
             this._loadContent(url, name);
 
             // insure modal is not maximized
-            if(this.modal.find('.cms-modal-collapsed').length) this._minimize();
+            if(this.modal.find('.cms-modal-collapsed').length) {
+                this._minimize();
+            }
 
             // reset styles
             this.modal.css({
@@ -147,7 +152,9 @@ $(document).ready(function () {
             this.modal.find('.cms-modal-maximize').removeClass('cms-modal-maximize-active');
             this.maximized = false;
             // in case, the window is larger than the windows height, we trigger fullscreen mode
-            if(height >= screenHeight) this.triggerMaximized = true;
+            if(height >= screenHeight) {
+                this.triggerMaximized = true;
+            }
 
             // we need to render the breadcrumb
             this._setBreadcrumb(breadcrumb);
@@ -173,7 +180,9 @@ $(document).ready(function () {
             }
 
             // handle refresh option
-            if(this.options.onClose) this.reloadBrowser(this.options.onClose, false, true);
+            if(this.options.onClose) {
+                this.reloadBrowser(this.options.onClose, false, true);
+            }
 
             // reset maximize or minimize states for #3111
             setTimeout(function () {
@@ -215,7 +224,9 @@ $(document).ready(function () {
                 CMS.API.Toolbar._loader(false);
 
                 // check if we should maximize
-                if(that.triggerMaximized) that._maximize();
+                if(that.triggerMaximized) {
+                    that._maximize();
+                }
 
                 // changed locked status to allow other modals again
                 CMS.API.locked = false;
@@ -223,7 +234,9 @@ $(document).ready(function () {
 
             // add esc close event
             $(document).bind('keydown.cms', function (e) {
-                if(e.keyCode === 27) that.close();
+                if(e.keyCode === 27) {
+                    that.close();
+                }
             });
 
             // set focus to modal
@@ -243,7 +256,9 @@ $(document).ready(function () {
             var title = this.modal.find('.cms-modal-title');
 
             // cancel action if maximized
-            if(this.maximized) return false;
+            if(this.maximized) {
+                return false;
+            }
 
             if(this.minimized === false) {
                 // ensure toolbar is shown
@@ -303,7 +318,9 @@ $(document).ready(function () {
             var title = this.modal.find('.cms-modal-title');
 
             // cancel action when minimized
-            if(this.minimized) return false;
+            if(this.minimized) {
+                return false;
+            }
 
             if(this.maximized === false) {
                 // maximize
@@ -360,9 +377,13 @@ $(document).ready(function () {
 
         _startMove: function (initial) {
             // cancel if maximized
-            if(this.maximized) return false;
+            if(this.maximized) {
+                return false;
+            }
             // cancel action when minimized
-            if(this.minimized) return false;
+            if(this.minimized) {
+                return false;
+            }
 
             var that = this;
             var position = that.modal.position();
@@ -388,7 +409,9 @@ $(document).ready(function () {
 
         _startResize: function (initial) {
             // cancel if in fullscreen
-            if(this.maximized) return false;
+            if(this.maximized) {
+                return false;
+            }
             // continue
             var that = this;
             var container = this.modal.find('.cms-modal-body');
@@ -408,7 +431,9 @@ $(document).ready(function () {
                 var max = 680;
 
                 // add some limits
-                if(w <= max || h <= 100) return false;
+                if(w <= max || h <= 100) {
+                    return false;
+                }
 
                 // set centered animation
                 container.css({
@@ -433,8 +458,12 @@ $(document).ready(function () {
             var crumb = '';
 
             // cancel if there is no breadcrumb)
-            if(!breadcrumb || breadcrumb.length <= 0) return false;
-            if(!breadcrumb[0].title) return false;
+            if(!breadcrumb || breadcrumb.length <= 0) {
+                return false;
+            }
+            if(!breadcrumb[0].title) {
+                return false;
+            }
 
             // load breadcrumb
             $.each(breadcrumb, function (index, item) {
@@ -483,27 +512,39 @@ $(document).ready(function () {
                 item = $(item);
 
                 // cancel if item is a hidden input
-                if(item.attr('type') === 'hidden') return false;
+                if(item.attr('type') === 'hidden') {
+                    return false;
+                }
 
                 // create helper variables
                 var title = item.attr('value') || item.text();
                 var cls = 'cms-btn';
 
                 // set additional special css classes
-                if(item.hasClass('default')) cls = 'cms-btn cms-btn-action';
-                if(item.hasClass('deletelink')) cls = 'cms-btn cms-btn-caution';
+                if(item.hasClass('default')) {
+                    cls = 'cms-btn cms-btn-action';
+                }
+                if(item.hasClass('deletelink')) {
+                    cls = 'cms-btn cms-btn-caution';
+                }
 
                 // create the element and attach events
                 var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
                     el.bind(that.click, function () {
-                        if(item.is('input') || item.is('button')) item[0].click();
-                        if(item.is('a')) that._loadContent(item.prop('href'), title);
+                        if(item.is('input') || item.is('button')) {
+                            item[0].click();
+                        }
+                        if(item.is('a')) {
+                            that._loadContent(item.prop('href'), title);
+                        }
 
                         // trigger only when blue action buttons are triggered
                         if(item.hasClass('default') || item.hasClass('deletelink')) {
                              that.options.newPlugin = null;
                              // reset onClose when delete is triggered
-                            if(item.hasClass('deletelink')) that.options.onClose = null;
+                            if(item.hasClass('deletelink')) {
+                                that.options.onClose = null;
+                            }
                             // hide iframe
                             that.modal.find('.cms-modal-frame iframe').hide();
                             // page has been saved or deleted, run checkup
@@ -557,12 +598,16 @@ $(document).ready(function () {
 
                 // show messages in toolbar if provided
                 var messages = iframe.contents().find('.messagelist li');
-                    if(messages.length) CMS.API.Toolbar.openMessage(messages.eq(0).text());
+                    if(messages.length) {
+                        CMS.API.Toolbar.openMessage(messages.eq(0).text());
+                    }
                     messages.remove();
                 var contents = iframe.contents();
 
                 // determine if we should close the modal or reload
-                if(messages.length && that.enforceReload) that.reloadBrowser();
+                if(messages.length && that.enforceReload) {
+                    that.reloadBrowser();
+                }
                 if(messages.length && that.enforceClose) {
                     that.close();
                     return false;
@@ -590,7 +635,9 @@ $(document).ready(function () {
                     iframe.show();
                     // set title of not provided
                     var innerTitle = iframe.contents().find('#content h1:eq(0)');
-                    if(name === undefined) title.html(innerTitle.text());
+                    if(name === undefined) {
+                        title.html(innerTitle.text());
+                    }
                     innerTitle.remove();
 
                     // than show
@@ -601,7 +648,9 @@ $(document).ready(function () {
 
                     // attach close event
                     contents.find('body').bind('keydown.cms', function (e) {
-                        if(e.keyCode === 27) that.close();
+                        if(e.keyCode === 27) {
+                            that.close();
+                        }
                     });
                     contents.find('body').addClass('cms-modal-window');
 
@@ -620,7 +669,9 @@ $(document).ready(function () {
         },
 
         _changeContent: function (el) {
-            if(el.hasClass('cms-modal-breadcrumb-last')) return false;
+            if(el.hasClass('cms-modal-breadcrumb-last')) {
+                return false;
+            }
 
             var parents = el.parent().find('a');
                 parents.removeClass('cms-modal-breadcrumb-last');

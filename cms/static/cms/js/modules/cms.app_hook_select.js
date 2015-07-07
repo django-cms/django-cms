@@ -3,6 +3,7 @@
 
 /* global apphooks_configuration */
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
 
@@ -22,11 +23,11 @@ $(document).ready(function () {
         if($(appCfgs).length > 0 && apphooks_configuration[opt.val()]){
             appCfgs.html('');
             for(var i=0; i < apphooks_configuration[opt.val()].length; i++) {
-                selectedCfgs = '';
-                if(apphooks_configuration[opt.val()][i][0] == apphooks_configuration_value) {
+                var selectedCfgs = '';
+                if(apphooks_configuration[opt.val()][i][0] === apphooks_configuration_value) {
                     selectedCfgs = 'selected="selected"';
                 }
-                appCfgs.append('<option ' + selectedCfgs + ' value="' + apphooks_configuration[opt.val()][i][0] + '">' + apphooks_configuration[opt.val()][i][1] + '</option>')
+                appCfgs.append('<option ' + selectedCfgs + ' value="' + apphooks_configuration[opt.val()][i][0] + '">' + apphooks_configuration[opt.val()][i][1] + '</option>');
             }
             appCfgsAdd.attr('href', apphooks_configuration_url[opt.val()]);
             appCfgsRow.removeClass('hidden');
@@ -61,7 +62,7 @@ $(document).ready(function () {
 
         // When selecting back the original apphook we try
         // to restore the original configuration
-        if(selected.val() == opt.val()) {
+        if(selected.val() === opt.val()) {
             if(original_ns) {
                 appNs.val(original_ns);
             }

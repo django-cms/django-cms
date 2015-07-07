@@ -2,6 +2,7 @@
 // #CHANGELIST#
 
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
     /*!
@@ -72,11 +73,13 @@ $(document).ready(function () {
 
             // jquery.functional
             $.curry = function(fn) {
-                if (arguments.length < 2) return fn;
+                if (arguments.length < 2) {
+                    return fn;
+                }
                 args = $.makeArray(arguments).slice(1, arguments.length);
                 return function() {
                     return fn.apply(this, args.concat($.makeArray(arguments)));
-                }
+                };
             };
 
             $.__callbackPool = {};
@@ -91,8 +94,8 @@ $(document).ready(function () {
             };
 
             $.callbackCall = function(name/*, extra arg0, extra arg1, ..*/){
-                if (!name || !name in $.__callbackPool) {
-                    throw "No callback registered with name: " + name;
+                if (!name || !(name in $.__callbackPool)) {
+                    throw 'No callback registered with name: ' + name;
                 }
                 $.__callbackPool[name].apply(this, $.makeArray(arguments).slice(1, arguments.length));
                 $.callbackRemove(name);
@@ -105,7 +108,7 @@ $(document).ready(function () {
 
             // very simple yellow fade plugin..
             $.fn.yft = function(){
-                this.effect("highlight", {}, 1000);
+                this.effect('highlight', {}, 1000);
             };
 
             // jquery replace plugin :)
@@ -135,16 +138,24 @@ $(document).ready(function () {
                 clearTimeout(langTimer);
 
                 // cancel if tooltip already visible
-                if(el.is(':visible')) return false;
+                if(el.is(':visible')) {
+                    return false;
+                }
 
                 // set correct position
                 el.css('right', 20 + $(this).position().left);
 
                 // figure out what should be shown
                 anchors.hide();
-                if(span.hasClass('unpublished') || span.hasClass('unpublishedparent')) anchors.eq(1).show();
-                if(span.hasClass('published')) anchors.eq(0).show();
-                if(span.hasClass('dirty')) anchors.show().parent().addClass('language-tooltip-multiple');
+                if(span.hasClass('unpublished') || span.hasClass('unpublishedparent')) {
+                    anchors.eq(1).show();
+                }
+                if(span.hasClass('published')) {
+                    anchors.eq(0).show();
+                }
+                if(span.hasClass('dirty')) {
+                    anchors.show().parent().addClass('language-tooltip-multiple');
+                }
 
                 // hide all elements
                 $(langTooltips).fadeOut(langDelay);
@@ -179,7 +190,9 @@ $(document).ready(function () {
                 e.preventDefault();
 
                 // cancel if not confirmed
-                if(!confirm(that.options.lang.publish.replace('§', $(this).text().toLowerCase()))) return false;
+                if(!confirm(that.options.lang.publish.replace('§', $(this).text().toLowerCase()))) {
+                    return false;
+                }
 
                 // send post request to prevent xss attacks
                 $.ajax({
@@ -207,7 +220,7 @@ $(document).ready(function () {
 
             // adds functionality to the filter
             $('#changelist-filter-button').bind('click', function () {
-                $("#changelist-filter").toggle();
+                $('#changelist-filter').toggle();
             });
 
             // set correct active entry
@@ -232,7 +245,7 @@ $(document).ready(function () {
                 node.after(msg);
                 node.parent().find('.col2').hide();
                 msg.fadeOut(1000, function () {
-                    node.parent().find('.col2').show()
+                    node.parent().find('.col2').show();
                 });
                 // check for reload changes
                 if(window.self !== window.top) {
@@ -259,19 +272,21 @@ $(document).ready(function () {
             var tree;
             // global initTree function
             initTree = function(){
+                /*jshint newcap: false */
                 tree = new tree_component();
+                /*jshint newcap: true */
                 var options = {
                     rules: {
-                        clickable: "all",
-                        renameable: "none",
-                        deletable: "all",
-                        creatable: "all",
-                        draggable: "all",
-                        dragrules: "all",
-                        droppable: "all",
-                        metadata : "mdata",
+                        clickable: 'all',
+                        renameable: 'none',
+                        deletable: 'all',
+                        creatable: 'all',
+                        draggable: 'all',
+                        dragrules: 'all',
+                        droppable: 'all',
+                        metadata : 'mdata',
                         use_inline: true
-                        //droppable : ["tree_drop"]
+                        //droppable : ['tree_drop']
                     },
                     path: false,
                     ui: {
@@ -279,31 +294,31 @@ $(document).ready(function () {
                         rtl: false,
                         animation: 0,
                         hover_mode: true,
-                        //theme_path: script_url_path() + "/../jstree/themes/",
-                        a_class: "title"
+                        //theme_path: script_url_path() + '/../jstree/themes/',
+                        a_class: 'title'
                     },
                     cookies : {
-                        prefix: "djangocms_nodes"
+                        prefix: 'djangocms_nodes'
                     },
                     callback: {
                         beforemove  : function(what, where, position) {
-                            item_id = what.id.split("page_")[1];
-                            target_id = where.id.split("page_")[1];
+                            item_id = what.id.split('page_')[1];
+                            target_id = where.id.split('page_')[1];
                             old_node = what;
 
-                            if($(what).parent().children("li").length > 1){
-                                if($(what).next("li").length){
-                                    old_target = $(what).next("li")[0];
-                                    old_position = "right";
+                            if($(what).parent().children('li').length > 1){
+                                if($(what).next('li').length){
+                                    old_target = $(what).next('li')[0];
+                                    old_position = 'right';
                                 }
-                                if($(what).prev("li").length){
-                                    old_target = $(what).prev("li")[0];
-                                    old_position = "left";
+                                if($(what).prev('li').length){
+                                    old_target = $(what).prev('li')[0];
+                                    old_position = 'left';
                                 }
                             }else{
-                                if($(what).attr("rel") != "topnode"){
+                                if($(what).attr('rel') !== 'topnode'){
                                     old_target = $(what).parent().parent()[0];
-                                    old_position = "inside";
+                                    old_position = 'inside';
                                 }
                             }
 
@@ -311,15 +326,15 @@ $(document).ready(function () {
                             return true;
                         },
                         onmove: function(what, where, position){
-                            item_id = what.id.split("page_")[1];
-                            target_id = where.id.split("page_")[1];
+                            item_id = what.id.split('page_')[1];
+                            target_id = where.id.split('page_')[1];
 
-                            if (position == "before") {
-                                position = "left";
-                            }else if (position == "after") {
-                                position = "right";
-                            }else if(position == "inside"){
-                                position = "last-child";
+                            if (position === 'before') {
+                                position = 'left';
+                            }else if (position === 'after') {
+                                position = 'right';
+                            }else if(position === 'inside'){
+                                position = 'last-child';
                             }
                             moveTreeItem(what, item_id, target_id, position, false);
                         },
@@ -333,13 +348,13 @@ $(document).ready(function () {
                     }
                 };
 
-                if (!$($("div.tree").get(0)).hasClass('root_allow_children')){
+                if (!$($('div.tree').get(0)).hasClass('root_allow_children')){
                     // disalow possibility for adding subnodes to main tree, user doesn't
                     // have permissions for this
-                    options.rules.dragrules = ["node inside topnode", "topnode inside topnode", "node * node"];
+                    options.rules.dragrules = ['node inside topnode', 'topnode inside topnode', 'node * node'];
                 }
 
-                tree.init($("div.tree"), options);
+                tree.init($('div.tree'), options);
             };
 
             selected_page = false;
@@ -362,7 +377,7 @@ $(document).ready(function () {
 
                 // just for debuging!!
                 /*s.complete = function(xhr, status) {
-                    if (status == "error" && that.options.settings.debug) {
+                    if (status == 'error' && that.options.settings.debug) {
                         $('body').before(xhr.responseText);
                     }
                 }*/
@@ -372,13 +387,15 @@ $(document).ready(function () {
                 return _oldAjax(s);
             };
 
-            function refresh(){
-                window.location = window.location.href;
-            }
+            // // defined but never used
+            // function refresh(){
+            //     window.location = window.location.href;
+            // }
 
-            function refreshIfChildren(pageId){
-                return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
-            }
+            // // defined but never used
+            // function refreshIfChildren(pageId){
+            //     return $('#page_' + pageId).find('li[id^=page_]').length ? refresh : function(){ return true; };
+            // }
 
             /**
              * Loads remote dialog to dialogs div.
@@ -389,44 +406,61 @@ $(document).ready(function () {
              * @param {Function} callback Standard callback function.
              */
             function loadDialog(url, data, noDialogCallback, callback){
-                if (data === undefined) data = {};
+                if (data === undefined) {
+                    data = {};
+                }
                 $.post(url, data, function(response) {
-                    if (response == '' && noDialogCallback) noDialogCallback();
+                    if (response === '' && noDialogCallback) {
+                        noDialogCallback();
+                    }
                     $('#dialogs').empty().append(response);
-                    if (callback) callback(response);
+                    if (callback) {
+                        callback(response);
+                    }
                 });
             }
+
+            function mark_copy_node(id){
+                $('a.move-target, span.move-target-container, span.line').show();
+                $('#page_'+id).addClass('selected');
+                $('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
+                $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
+                return 'copy';
+            }
+
 
             // let's start event delegation
             $('#changelist li').click(function(e) {
                 // I want a link to check the class
-                if(e.target.tagName == 'IMG' || e.target.tagName == 'SPAN') {
+                if(e.target.tagName === 'IMG' || e.target.tagName === 'SPAN') {
                     target = e.target.parentNode;
                 } else {
                     target = e.target;
                 }
                 var jtarget = $(target);
-                if(jtarget.hasClass("move")) {
+                var id;
+                var page_id;
+                if(jtarget.hasClass('move')) {
                     // prepare tree for move / cut paste
-                    var id = e.target.id.split("move-link-")[1];
-                    if(id==null){
-                        id = e.target.parentNode.id.split("move-link-")[1];
+                    id = e.target.id.split('move-link-')[1];
+                    if(!id){
+                        id = e.target.parentNode.id.split('move-link-')[1];
                     }
-                    var page_id = id;
+                    page_id = id;
                     selected_page = page_id;
-                    action = "move";
+                    action = 'move';
                     $('span.move-target-container, span.line, a.move-target').show();
-                    $('#page_'+page_id).addClass("selected");
+                    $('#page_'+page_id).addClass('selected');
                     $('#page_'+page_id+' span.move-target-container').hide();
                     e.stopPropagation();
                     return false;
                 }
 
-                if(jtarget.hasClass("copy")) {
+                if(jtarget.hasClass('copy')) {
                     // prepare tree for copy
-                    id = e.target.id.split("copy-link-")[1];
-                    if(id==null){
-                        id = e.target.parentNode.id.split("copy-link-")[1];
+                    id = e.target.id.split('copy-link-')[1];
+                    if(!id){
+                        id = e.target.parentNode.id.split('copy-link-')[1];
                     }
                     selected_page = id;
                     action = mark_copy_node(id);
@@ -434,27 +468,27 @@ $(document).ready(function () {
                     return false;
                 }
 
-                if(jtarget.hasClass("viewpage")) {
+                if(jtarget.hasClass('viewpage')) {
                     var view_page_url = $('#' + target.id + '-select').val();
                     if(view_page_url){
                         window.open(view_page_url);
                     }
                 }
 
-                if(jtarget.hasClass("addlink")) {
+                if(jtarget.hasClass('addlink')) {
                     if (!/#$/g.test(jtarget.attr('href'))) {
                         // if there is url instead of # inside href, follow this url
                         // used if user haves add_page
                         return true;
                     }
 
-                    $("tr").removeClass("target");
-                    $("#changelist table").removeClass("table-selected");
-                    page_id = target.id.split("add-link-")[1];
+                    $('tr').removeClass('target');
+                    $('#changelist table').removeClass('table-selected');
+                    page_id = target.id.split('add-link-')[1];
                     selected_page = page_id;
-                    action = "add";
-                    $('tr').removeClass("selected");
-                    $('#page-row-'+page_id).addClass("selected");
+                    action = 'add';
+                    $('tr').removeClass('selected');
+                    $('#page-row-'+page_id).addClass('selected');
                     $('.move-target-container').hide();
                     $('a.move-target, span.line, #move-target-'+page_id).show();
                     e.stopPropagation();
@@ -463,30 +497,32 @@ $(document).ready(function () {
 
                 // don't assume admin site is root-level
                 // grab base url to construct full absolute URLs
-                admin_base_url = document.URL.split("/cms/page/")[0] + "/";
+                admin_base_url = document.URL.split('/cms/page/')[0] + '/';
 
+                var pageId;
+                var language;
                 // in navigation
                 if(jtarget.hasClass('navigation-checkbox')) {
                     e.stopPropagation();
 
-                    var pageId = jtarget.attr('name').split('navigation-')[1];
-                    var language = jtarget.closest('.cont').find('a[lang]').attr('lang') || '';
+                    pageId = jtarget.attr('name').split('navigation-')[1];
+                    language = jtarget.closest('.cont').find('a[lang]').attr('lang') || '';
 
                     // if I don't put data in the post, django doesn't get it
                     reloadItem(jtarget, admin_base_url + 'cms/page/' + pageId + '/change-navigation/?language=' + language, { 1:1 });
                 }
 
                  // lazy load descendants on tree open
-                if(jtarget.hasClass("closed")) {
+                if(jtarget.hasClass('closed')) {
                     // only load them once
-                    if(jtarget.find('ul > li').length == 0 && !jtarget.hasClass("loading")) {
+                    if(jtarget.find('ul > li').length === 0 && !jtarget.hasClass('loading')) {
                         // keeps this event from firing multiple times before
                         // the dom as changed. it still needs to propagate for
                         // the other click event on this element to fire
-                        jtarget.addClass("loading");
-                        var pageId = $(jtarget).attr("id").split("page_")[1];
-                        var language = $(jtarget).children('div.cont').children('div.col1').children('.title').attr('lang')
-                        $.get(admin_base_url + "cms/page/" + pageId + "/" + language + "/descendants/", {}, function(r, status) {
+                        jtarget.addClass('loading');
+                        pageId = $(jtarget).attr('id').split('page_')[1];
+                        language = $(jtarget).children('div.cont').children('div.col1').children('.title').attr('lang');
+                        $.get(admin_base_url + 'cms/page/' + pageId + '/' + language + '/descendants/', {}, function(r) {
                             jtarget.children('ul').append(r);
                             // show move targets if needed
                             if($('span.move-target-container:visible').length > 0) {
@@ -499,35 +535,35 @@ $(document).ready(function () {
                     }
                 }
 
-                if(jtarget.hasClass("move-target")) {
-                    if(jtarget.hasClass("left")){
-                        position = "left";
+                if(jtarget.hasClass('move-target')) {
+                    if(jtarget.hasClass('left')){
+                        position = 'left';
                     }
-                    if(jtarget.hasClass("right")){
-                        position = "right";
+                    if(jtarget.hasClass('right')){
+                        position = 'right';
                     }
-                    if(jtarget.hasClass("last-child")){
-                        position = "last-child";
+                    if(jtarget.hasClass('last-child')){
+                        position = 'last-child';
                     }
-                    target_id = target.parentNode.id.split("move-target-")[1];
+                    target_id = target.parentNode.id.split('move-target-')[1];
 
-                    if(action=="move") {
+                    if(action==='move') {
                         moveTreeItem(null, selected_page, target_id, position, tree);
                         $('.move-target-container').hide();
-                    }else if(action=="copy") {
+                    }else if(action==='copy') {
                         site = $('#site-select')[0].value;
                         copyTreeItem(selected_page, target_id, position, site);
                         $('.move-target-container').hide();
-                    }else if(action=="add") {
+                    }else if(action==='add') {
                         site = $('#site-select')[0].value;
-                        window.location.href = window.location.href.split("?")[0].split("#")[0] + 'add/?target='+target_id+"&amp;position="+position+"&amp;site="+site;
+                        window.location.href = window.location.href.split('?')[0].split('#')[0] + 'add/?target='+target_id+'&amp;position='+position+'&amp;site='+site;
                     }
                     e.stopPropagation();
                     return false;
                 }
                 return true;
             });
-            $("div#sitemap").show();
+            $('div#sitemap').show();
 
             function reCalc(){
                 $.syncCols();
@@ -538,7 +574,9 @@ $(document).ready(function () {
             $('#site-select').change(function(){
                 var form = $(this).closest('form');
                 // add correct value for copy
-                if(action === 'copy') $('#site-copy').val(selected_page);
+                if(action === 'copy') {
+                    $('#site-copy').val(selected_page);
+                }
                 // submit form
                 form.submit();
             });
@@ -560,7 +598,7 @@ $(document).ready(function () {
                     $('a[data-alt-class]').each(function(){
                         var self = $(this);
                         self.toggleClass(self.data('alt-class'), evt.type === 'keydown');
-                    })
+                    });
                 }
             });
 
@@ -582,10 +620,12 @@ $(document).ready(function () {
                 window.location = href;
             });
 
-            var copy_splits = window.location.href.split("copy=");
+            var copy_splits = window.location.href.split('copy=');
             if(copy_splits.length > 1){
-                var id = copy_splits[1].split("&")[0];
+                var id = copy_splits[1].split('&')[0];
+                // jshint latedef: false
                 var action = mark_copy_node(id);
+                // jshint latedef: true
                 selected_page = id;
             }
 
@@ -595,7 +635,7 @@ $(document).ready(function () {
                         position:position,
                         target:target_id,
                         site:site,
-                        callback: $.callbackRegister("_copyTreeItem", _copyTreeItem, item_id, target_id, position, site)
+                        callback: $.callbackRegister('_copyTreeItem', _copyTreeItem, item_id, target_id, position, site)
                     });
                 }
                 return _copyTreeItem(item_id, target_id, position, site);
@@ -609,25 +649,17 @@ $(document).ready(function () {
                 };
                 data = $.extend(data, options);
 
-                $.post("./" + item_id + "/copy-page/", data, function(decoded) {
+                $.post('./' + item_id + '/copy-page/', data, function(decoded) {
                     response = decoded.content;
-                    status = decoded.status;
-                    if(status==200) {
+                    var status = decoded.status;
+                    if(status===200) {
                         // reload tree
                         window.location = window.location.href;
                     }else{
                         alert(response);
-                        moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
+                        moveError($('#page_'+item_id + ' div.col1:eq(0)'),response);
                     }
                 });
-            }
-
-            function mark_copy_node(id){
-                $('a.move-target, span.move-target-container, span.line').show();
-                $('#page_'+id).addClass("selected");
-                $('#page_'+id).parent().parent().children('div.cont').find('a.move-target.first-child, span.second').hide();
-                $('#page_'+id).parent().parent().children('ul').children('li').children('div.cont').find('a.move-target.left, a.move-target.right, span.first, span.second').hide();
-                return "copy";
             }
 
             /**
@@ -640,19 +672,23 @@ $(document).ready(function () {
              * @param {Function} callback Optional calback function
              */
             function reloadItem(el, url, data, callback, errorCallback) {
-                if (data === undefined) data = {};
+                if (data === undefined) {
+                    data = {};
+                }
 
                 if (/\/\?/ig.test(window.location.href)) {
                     // probably some filter here, tell backend, we need a filtered
                     // version of item
-                    data['fitlered'] = 1;
+                    data.fitlered = 1;
                 }
 
                 function onSuccess(response, textStatus) {
                     var status = true;
                     var target = null;
 
-                    if(callback) status = callback(response, textStatus);
+                    if(callback) {
+                        status = callback(response, textStatus);
+                    }
                     if(status) {
                         if (/page_\d+/.test($(el).attr('id'))) {
                             // one level higher
@@ -664,7 +700,9 @@ $(document).ready(function () {
                         var parent = target.parent();
 
                         // remove the element if something went wrong
-                        if(response == 'NotFound') return parent.remove();
+                        if(response === 'NotFound') {
+                            return parent.remove();
+                        }
 
                         var origin = $('.messagelist');
                         target.replace(response);
@@ -688,33 +726,35 @@ $(document).ready(function () {
                     'success': onSuccess,
                     'error': function (XMLHttpRequest, textStatus, errorThrown) {
                         // errorCallback is passed through the reloadItem function
-                        if(errorCallback) errorCallback(XMLHttpRequest, textStatus, errorThrown);
+                        if(errorCallback) {
+                            errorCallback(XMLHttpRequest, textStatus, errorThrown);
+                        }
                     },
-                    'xhr': (window.ActiveXObject) ? function(){try {return new window.ActiveXObject("Microsoft.XMLHTTP");} catch(e) {}} : function() {return new window.XMLHttpRequest();}
+                    'xhr': (window.ActiveXObject) ? function(){try {return new window.ActiveXObject('Microsoft.XMLHTTP');} catch(e) {}} : function() {return new window.XMLHttpRequest();}
                 });
             }
 
             function moveTreeItem(jtarget, item_id, target_id, position, tree){
                 reloadItem(
-                    jtarget, "./" + item_id + "/move-page/",
+                    jtarget, './' + item_id + '/move-page/',
 
                     { position: position, target: target_id },
 
                     // on success
-                    function(decoded,textStatus){
+                    function(decoded){
                         response = decoded.content;
-                        status = decoded.status;
-                        if(status==200) {
+                        var status = decoded.status;
+                        if(status===200) {
                             if (tree) {
                                 var tree_pos = {'left': 'before', 'right': 'after'}[position] || 'inside';
-                                tree.moved("#page_" + item_id, $("#page_" + target_id + " a.title")[0], tree_pos, false, false);
+                                tree.moved('#page_' + item_id, $('#page_' + target_id + ' a.title')[0], tree_pos, false, false);
                             } else {
-                                moveSuccess($('#page_'+item_id + " div.col1:eq(0)"));
+                                moveSuccess($('#page_'+item_id + ' div.col1:eq(0)'));
                             }
                             return false;
                         }
                         else {
-                            moveError($('#page_'+item_id + " div.col1:eq(0)"),response);
+                            moveError($('#page_'+item_id + ' div.col1:eq(0)'),response);
                             return false;
                         }
                     }
@@ -752,7 +792,7 @@ $(document).ready(function () {
                 }
                 if(col2_width > max_col2_width){
                     max_col2_width = col2_width;
-                    max_col2 = col2
+                    max_col2 = col2;
                 }
             });
 
@@ -768,7 +808,7 @@ $(document).ready(function () {
 
                     if(max_reached || w > (min_width - offset)){
                         hidden_count = hidden_count + 1;
-                        max_reached = true
+                        max_reached = true;
                     }
                 });
 
@@ -776,11 +816,11 @@ $(document).ready(function () {
                     $(this).each(function() {
                         $(this).children('div.cont').children('div.col2').children('div').slice(-hidden_count).each(function(){
                             $(this).css('display', 'none');
-                        })
+                        });
                     });
                     $('div#sitemap ul.header div.col2').children().slice(-hidden_count).each(function(){
                         $(this).css('display','none');
-                    })
+                    });
                 }
             }
         }

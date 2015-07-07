@@ -20,6 +20,7 @@ var CMS = {
 //##################################################################################################################
 // #CMS.API#
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
     /*!
@@ -72,14 +73,14 @@ $(document).ready(function () {
 
             // add timeout if provided
             parent.setTimeout(function () {
-                if (url && url != parent.location.href) {
+                if (url && url !== parent.location.href) {
                     // location.reload() takes precedence over this, so we
                     // don't want to reload the page if we need a redirect
                     parent.location.href = url;
                 }
                 else {
                     // ensure page is always reloaded #3413
-                    parent.location.reload()
+                    parent.location.reload();
                 }
             }, timeout || 0);
         },
@@ -102,7 +103,7 @@ $(document).ready(function () {
             $.ajaxSetup({
                 beforeSend: function (xhr) {
                     // set csrf_token
-                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    xhr.setRequestHeader('X-CSRFToken', csrf_token);
                 }
             });
         },
@@ -156,13 +157,17 @@ $(document).ready(function () {
             // merge settings
             settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
             // set loader
-            if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
+            if(CMS.API.Toolbar) {
+                CMS.API.Toolbar._loader(true);
+            }
 
             // use local storage or session
             if(window.localStorage) {
                 // save within local storage
                 localStorage.setItem('cms_cookie', settings);
-                if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
+                if(CMS.API.Toolbar) {
+                    CMS.API.Toolbar._loader(false);
+                }
             } else {
                 // save within session
                 CMS.API.locked = true;
@@ -179,7 +184,9 @@ $(document).ready(function () {
                         CMS.API.locked = false;
                         // determine if logged in or not
                         settings = (data) ? JSON.parse(data) : CMS.config.settings;
-                        if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
+                        if(CMS.API.Toolbar) {
+                            CMS.API.Toolbar._loader(false);
+                        }
                     },
                     'error': function (jqXHR) {
                         that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
@@ -198,13 +205,17 @@ $(document).ready(function () {
             var that = this;
             var settings;
             // set loader
-            if(CMS.API.Toolbar) CMS.API.Toolbar._loader(true);
+            if(CMS.API.Toolbar) {
+                CMS.API.Toolbar._loader(true);
+            }
 
             // use local storage or session
             if(window.localStorage) {
                 // get from local storage
                 settings = JSON.parse(localStorage.getItem('cms_cookie'));
-                if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
+                if(CMS.API.Toolbar) {
+                    CMS.API.Toolbar._loader(false);
+                }
             } else {
                 CMS.API.locked = true;
                 // get from session
@@ -216,7 +227,9 @@ $(document).ready(function () {
                         CMS.API.locked = false;
                         // determine if logged in or not
                         settings = (data) ? JSON.parse(data) : CMS.config.settings;
-                        if(CMS.API.Toolbar) CMS.API.Toolbar._loader(false);
+                        if(CMS.API.Toolbar) {
+                            CMS.API.Toolbar._loader(false);
+                        }
                     },
                     'error': function (jqXHR) {
                         that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
@@ -224,7 +237,9 @@ $(document).ready(function () {
                 });
             }
 
-            if(settings === null) settings = this.setSettings(CMS.config.settings);
+            if(settings === null) {
+                settings = this.setSettings(CMS.config.settings);
+            }
 
             // save settings
             CMS.settings = settings;

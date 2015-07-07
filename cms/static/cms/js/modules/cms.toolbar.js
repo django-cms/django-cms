@@ -2,6 +2,7 @@
 // #TOOLBAR#
 
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
     /*!
@@ -54,16 +55,24 @@ $(document).ready(function () {
             // hide publish button
             var publishBtn = $('.cms-btn-publish').parent();
                 publishBtn.hide();
-            if($('.cms-btn-publish-active').length) publishBtn.show();
+            if($('.cms-btn-publish-active').length) {
+                publishBtn.show();
+            }
 
             // check if debug is true
-            if(CMS.config.debug) this._debug();
+            if(CMS.config.debug) {
+                this._debug();
+            }
 
             // check if there are messages and display them
-            if(CMS.config.messages) this.openMessage(CMS.config.messages);
+            if(CMS.config.messages) {
+                this.openMessage(CMS.config.messages);
+            }
 
             // check if there are error messages and display them
-            if(CMS.config.error) this.showError(CMS.config.error);
+            if(CMS.config.error) {
+                this.showError(CMS.config.error);
+            }
 
             // enforce open state if user is not logged in but requests the toolbar
             if(!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
@@ -86,7 +95,9 @@ $(document).ready(function () {
             }
 
             // if there is a screenblock, do some resize magic
-            if(this.screenBlock.length) this._screenBlock();
+            if(this.screenBlock.length) {
+                this._screenBlock();
+            }
 
             // add toolbar ready class to body and fire event
             this.body.addClass('cms-ready');
@@ -114,10 +125,10 @@ $(document).ready(function () {
                 // remove events from first level
                 item.find('a').bind(that.click, function (e) {
                     e.preventDefault();
-                    if($(this).attr('href') !== ''
-                        && $(this).attr('href') !== '#'
-                        && !$(this).parent().hasClass(disabled)
-                        && !$(this).parent().hasClass(disabled)) {
+                    if($(this).attr('href') !== '' &&
+                       $(this).attr('href') !== '#' &&
+                       !$(this).parent().hasClass(disabled) &&
+                       !$(this).parent().hasClass(disabled)) {
                         that._delegate($(this));
                         reset();
                         return false;
@@ -141,7 +152,9 @@ $(document).ready(function () {
                     // activate hover selection
                     item.find('> li').bind('mouseenter', function () {
                         // cancel if item is already active
-                        if($(this).hasClass(hover)) return false;
+                        if($(this).hasClass(hover)) {
+                            return false;
+                        }
                         $(this).trigger(that.click);
                     });
 
@@ -157,7 +170,9 @@ $(document).ready(function () {
 
                     // do not attach hover effect if disabled
                     // cancel event if element has already hover class
-                    if(el.hasClass(disabled) || el.hasClass(hover)) return false;
+                    if(el.hasClass(disabled) || el.hasClass(hover)) {
+                        return false;
+                    }
 
                     // reset
                     lists.find('li').removeClass(hover);
@@ -209,7 +224,7 @@ $(document).ready(function () {
                     btn.on('click', function (e) {
                         e.preventDefault();
                         that._delegate($(this).find('a'));
-                    })
+                    });
                 }
 
                 // in case of the publish button
@@ -242,7 +257,9 @@ $(document).ready(function () {
         // public methods
         toggleToolbar: function (show) {
             // overwrite state when provided
-            if(show) this.settings.toolbar = 'collapsed';
+            if(show) {
+                this.settings.toolbar = 'collapsed';
+            }
             // toggle bar
             (this.settings.toolbar === 'collapsed') ? this._showToolbar(200) : this._hideToolbar(200);
         },
@@ -269,17 +286,23 @@ $(document).ready(function () {
                 });
 
             // set top to 0 if toolbar is collapsed
-            if(this.settings.toolbar === 'collapsed') top = 0;
+            if(this.settings.toolbar === 'collapsed') {
+                top = 0;
+            }
 
             // do we need to add debug styles?
-            if(this.config.debug) top = top + 5;
+            if(this.config.debug) {
+                top = top + 5;
+            }
 
             // set correct position and show
             this.messages.css('top', -height).show();
 
             // error handling
             this.messages.removeClass('cms-messages-error');
-            if(error) this.messages.addClass('cms-messages-error');
+            if(error) {
+                this.messages.addClass('cms-messages-error');
+            }
 
             // dir should be left, center, right
             dir = dir || 'center';
@@ -315,7 +338,7 @@ $(document).ready(function () {
             // cancel autohide if delay is 0
             if(delay === 0) {
                 close.show();
-                return false
+                return false;
             }
             // add delay to hide
             this.timer = setTimeout(function () {
@@ -335,7 +358,9 @@ $(document).ready(function () {
             // check if we have a confirmation text
             var question = (text) ? confirm(text) : true;
             // cancel if question has been denied
-            if(!question) return false;
+            if(!question) {
+                return false;
+            }
 
             // set loader
             this._loader(true);
@@ -367,7 +392,9 @@ $(document).ready(function () {
         showError: function (msg, reload) {
             this.openMessage(msg, 'center', 0, true);
             // force reload if param is passed
-            if(reload) CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
+            if(reload) {
+                CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
+            }
         },
 
         // private methods
@@ -376,18 +403,22 @@ $(document).ready(function () {
             this.toolbar.slideDown(speed);
             // animate html
             this.body.animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed, function () {
-                $(this).addClass('cms-toolbar-expanded')
+                $(this).addClass('cms-toolbar-expanded');
             });
             // set messages top to toolbar height
             this.messages.css('top', 31);
             // set new settings
             this.settings.toolbar = 'expanded';
-            if(!init) this.settings = this.setSettings(this.settings);
+            if(!init) {
+                this.settings = this.setSettings(this.settings);
+            }
         },
 
         _hideToolbar: function (speed, init) {
             // cancel if sideframe is active
-            if(this.lockToolbar) return false;
+            if(this.lockToolbar) {
+                return false;
+            }
 
             this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
             this.toolbar.slideUp(speed);
@@ -397,7 +428,9 @@ $(document).ready(function () {
             this.messages.css('top', 0);
             // set new settings
             this.settings.toolbar = 'collapsed';
-            if(!init) this.settings = this.setSettings(this.settings);
+            if(!init) {
+                this.settings = this.setSettings(this.settings);
+            }
         },
 
         _setSwitcher: function (el) {

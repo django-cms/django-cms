@@ -2,6 +2,7 @@
 // #CLIPBOARD#
 
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
     /*!
@@ -51,12 +52,16 @@ $(document).ready(function () {
                 // clear timeout
                 clearTimeout(that.timer);
 
-                if(e.type === 'mouseleave' && !that.containers.has(e.toElement).length) hide();
+                if(e.type === 'mouseleave' && !that.containers.has(e.toElement).length) {
+                    hide();
+                }
 
                 var index = that.clipboard.find('.cms-clipboard-triggers a').index(this);
                 var el = that.containers.eq(index);
                 // cancel if element is already open
-                if(el.data('open') === true) return false;
+                if(el.data('open') === true) {
+                    return false;
+                }
 
                 // show element
                 that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
@@ -68,7 +73,9 @@ $(document).ready(function () {
                 clearTimeout(that.timer);
 
                 // cancel if we trigger mouseover
-                if(e.type === 'mouseover') return false;
+                if(e.type === 'mouseover') {
+                    return false;
+                }
 
                 // we need a little timer to detect if we should hide the menu
                 hide();
