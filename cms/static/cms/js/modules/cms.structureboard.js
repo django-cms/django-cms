@@ -3,6 +3,7 @@
 
 (function($) {
 // CMS.$ will be passed for $
+'use strict';
 $(document).ready(function () {
     /*!
      * StructureBoard
@@ -53,13 +54,19 @@ $(document).ready(function () {
             var that = this;
 
             // cancel if there are no dragareas
-            if(!this.dragareas.length) return false;
+            if(!this.dragareas.length) {
+                return false;
+            }
 
             // cancel if there is no structure / content switcher
-            if(!this.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) return false;
+            if(!this.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                return false;
+            }
 
             // setup toolbar mode
-            if(this.settings.mode === 'structure') setTimeout(function () { that.show(true); }, 100);
+            if(this.settings.mode === 'structure') {
+                setTimeout(function () { that.show(true); }, 100);
+            }
 
             // check if modes should be visible
             if(this.placeholders.length) {
@@ -80,7 +87,9 @@ $(document).ready(function () {
             modes.eq(1).bind(this.click, function (e) {
                 e.preventDefault();
                 // cancel if already active
-                if(that.settings.mode === 'edit') return false;
+                if(that.settings.mode === 'edit') {
+                    return false;
+                }
                 // otherwise hide
                 that.hide();
             });
@@ -88,7 +97,9 @@ $(document).ready(function () {
             modes.eq(0).bind(this.click, function (e) {
                 e.preventDefault();
                 // cancel if already active
-                if(that.settings.mode === 'structure') return false;
+                if(that.settings.mode === 'structure') {
+                    return false;
+                }
                 // otherwise show
                 that.show();
             });
@@ -100,12 +111,16 @@ $(document).ready(function () {
                 // 32 = space
                 if(e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
                     // cancel if there is no structure / content switcher
-                    if(!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) return false;
+                    if(!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                        return false;
+                    }
                     e.preventDefault();
                     that.hide();
                 } else if(e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
                     // cancel if there is no structure / content switcher
-                    if(!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) return false;
+                    if(!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                        return false;
+                    }
                     e.preventDefault();
                     that.show();
                 } else if(e.keyCode === 16) {
@@ -124,7 +139,9 @@ $(document).ready(function () {
         // public methods
         show: function (init) {
             // cancel show if live modus is active
-            if(CMS.config.mode === 'live') return false;
+            if(CMS.config.mode === 'live') {
+                return false;
+            }
 
             // set active item
             var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
@@ -135,7 +152,9 @@ $(document).ready(function () {
 
             // apply new settings
             this.settings.mode = 'structure';
-            if(!init) this.settings = this.setSettings(this.settings);
+            if(!init) {
+                this.settings = this.setSettings(this.settings);
+            }
 
             // ensure all elements are visible
             this.dragareas.show();
@@ -146,7 +165,9 @@ $(document).ready(function () {
 
         hide: function (init) {
             // cancel show if live modus is active
-            if(CMS.config.mode === 'live') return false;
+            if(CMS.config.mode === 'live') {
+                return false;
+            }
 
             // set active item
             var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
@@ -159,7 +180,9 @@ $(document).ready(function () {
             this.clipboard.hide();
 
             this.settings.mode = 'edit';
-            if(!init) this.settings = this.setSettings(this.settings);
+            if(!init) {
+                this.settings = this.setSettings(this.settings);
+            }
 
             // hide canvas
             this._hideBoard();
@@ -167,7 +190,9 @@ $(document).ready(function () {
 
         getId: function (el) {
             // cancel if no element is defined
-            if(el === undefined || el === null || el.length <= 0) return false;
+            if(el === undefined || el === null || el.length <= 0) {
+                return false;
+            }
 
             var id = null;
             var cls = el.attr('class').split(' ')[1];
@@ -197,13 +222,14 @@ $(document).ready(function () {
         },
 
         setActive: function (id, state) {
-            var that = this;
             // resets
             this.dragitems.removeClass('cms-draggable-selected');
             this.plugins.removeClass('cms-plugin-active');
 
             // only reset if no id is provided
-            if(id === false) return false;
+            if(id === false) {
+                return false;
+            }
 
             // attach active class to current element
             var dragitem = $('.cms-draggable-' + id);
@@ -254,7 +280,9 @@ $(document).ready(function () {
                     timer = setTimeout(function () {
                         clicks = 0;
                         // cancel if link contains a hash
-                        if($(e.currentTarget).attr('href').indexOf('#') === 0) return false;
+                        if($(e.currentTarget).attr('href').indexOf('#') === 0) {
+                            return false;
+                        }
                         // we need to redirect to the default behaviours
                         // all events will be lost in edit mode, use '#' if href should not be triggered
                         window.location.href = $(e.currentTarget).attr('href');
@@ -282,14 +310,18 @@ $(document).ready(function () {
             // add dimmer close
             this.dimmer.bind('mousedown mouseup', function (e) {
                 // cancel on rightclick
-                if(e.which === 3 || e.button === 2) return false;
+                if(e.which === 3 || e.button === 2) {
+                    return false;
+                }
                 // proceed
                 clearTimeout(timer);
                 timer = setTimeout(function () {
                     that.hide();
                 }, 500);
 
-                if(e.type === 'mouseup') clearTimeout(timer);
+                if(e.type === 'mouseup') {
+                    clearTimeout(timer);
+                }
             });
 
             this.plugins.not(this.render_model).hide();
@@ -305,7 +337,7 @@ $(document).ready(function () {
                 // lets reorder placeholders
                 areas.each(function (index, item) {
                     if ($(item).hasClass('cms-dragarea-static')) {
-                        content.append(item)
+                        content.append(item);
                     }
                 });
                 // now lets get the first instance and add some padding
@@ -420,7 +452,9 @@ $(document).ready(function () {
                     $('.cms-dragbar-empty-wrapper').hide();
 
                     // cancel if isAllowed returns false
-                    if(!that.state) return false;
+                    if(!that.state) {
+                        return false;
+                    }
 
                     // handle dropped event
                     if(dropped) {
@@ -455,13 +489,17 @@ $(document).ready(function () {
                 },
                 'isAllowed': function(placeholder, placeholderParent, originalItem) {
                     // cancel if action is excecuted
-                    if(CMS.API.locked) return false;
+                    if(CMS.API.locked) {
+                        return false;
+                    }
                     // getting restriction array
                     var bounds = [];
                     // save original state events
                     var original = $('.cms-plugin-' + that.getId(originalItem));
                     // cancel if item has no settings
-                    if(original.length === 0 || original.data('settings') === null) return false;
+                    if(original.length === 0 || original.data('settings') === null) {
+                        return false;
+                    }
                     var type = original.data('settings').plugin_type;
                     // prepare variables for bound
                     var holderId = that.getId(placeholder.closest('.cms-dragarea'));
@@ -469,12 +507,20 @@ $(document).ready(function () {
                     var plugin = $('.cms-plugin-' + that.getId(placeholder.closest('.cms-draggable')));
 
                     // now set the correct bounds
-                    if(holder.length) bounds = holder.data('settings').plugin_restriction;
-                    if(plugin.length) bounds = plugin.data('settings').plugin_restriction;
-                    if(dropzone) bounds = dropzone.data('settings').plugin_restriction;
+                    if(holder.length) {
+                        bounds = holder.data('settings').plugin_restriction;
+                    }
+                    if(plugin.length) {
+                        bounds = plugin.data('settings').plugin_restriction;
+                    }
+                    if(dropzone) {
+                        bounds = dropzone.data('settings').plugin_restriction;
+                    }
 
                     // if parent has class disabled, dissalow drop
-                    if(placeholder.parent().hasClass('cms-draggable-disabled')) return false;
+                    if(placeholder.parent().hasClass('cms-draggable-disabled')) {
+                        return false;
+                    }
 
                     // if restrictions is still empty, proceed
                     that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;

@@ -2,6 +2,7 @@
 // #CHANGEFORM#
 
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
 
@@ -13,22 +14,32 @@ $(document).ready(function () {
 
     // hide rows when hidden input fields are added
     $('input[type="hidden"]').each(function () {
-        $(this).parent('.form-row').hide()
+        $(this).parent('.form-row').hide();
     });
 
     // determine if slug is empty
-    if(slug.val() === '') prefill = true;
+    if(slug.val() === '') {
+        prefill = true;
+    }
 
     // always bind the title > slug generation and do the validation inside for better ux
     title.bind('keyup', function() {
         var value = title.val();
         // international language handling
-        if(window.UNIHANDECODER) value = UNIHANDECODER.decode(value);
+        if(window.UNIHANDECODER) {
+            value = UNIHANDECODER.decode(value);
+        }
         // if slug is empty, prefill again
-        if(prefill === false && slug.val() === '') prefill = true;
+        if(prefill === false && slug.val() === '') {
+            prefill = true;
+        }
         // urlify
+        // jshint newcap: false
         var urlified = URLify(value, 64);
-        if(prefill) slug.val(urlified);
+        // jshint newcap: true
+        if(prefill) {
+            slug.val(urlified);
+        }
     });
     // autocall
     title.trigger('keyup');
@@ -54,14 +65,18 @@ $(document).ready(function () {
         var answer = true;
         if(slug.length) {
             // check if the slug has the changed attribute
-            if(slug.data('changed') || title.data('changed')) changed = true;
+            if(slug.data('changed') || title.data('changed')) {
+                changed = true;
+            }
         }
 
         if(changed) {
-            var question = gettext("Are you sure you want to change tabs without saving the page first?");
+            var question = gettext('Are you sure you want to change tabs without saving the page first?');
             answer = confirm(question);
         }
-        if(answer) window.location.href = url;
+        if(answer) {
+            window.location.href = url;
+        }
     };
 
 });

@@ -31,10 +31,9 @@ var PROJECT_PATH = {
 
 var PROJECT_PATTERNS = {
     js: [
-        PROJECT_PATH.js + '/**/*.js',
+        PROJECT_PATH.js + '/modules/*.js',
+        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
         '/gulpfile.js',
-        '!' + PROJECT_PATH.js + '/libs/*.js',
-        '!' + PROJECT_PATH.js + '/jstree/*.js'
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'

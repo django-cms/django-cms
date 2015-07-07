@@ -2,6 +2,7 @@
 // #SIDEFRAME#
 
 (function($) {
+'use strict';
 // CMS.$ will be passed for $
 $(document).ready(function () {
     /*!
@@ -35,7 +36,9 @@ $(document).ready(function () {
             this.enforceReload = false;
 
             // if the modal is initialized the first time, set the events
-            if(!this.sideframe.data('ready')) this._events();
+            if(!this.sideframe.data('ready')) {
+                this._events();
+            }
 
             // ready sideframe
             this.sideframe.data('ready', true);
@@ -95,12 +98,22 @@ $(document).ready(function () {
             var holder = this.sideframe.find('.cms-sideframe-frame');
             var initialized = false;
 
+            function insertHolder(iframe) {
+                // show iframe after animation
+                that.sideframe.find('.cms-sideframe-frame').addClass('cms-loader');
+                holder.html(iframe);
+            }
+
             // push required params if defined
             // only apply params on tree view
             if(url.indexOf(CMS.config.request.tree) >= 0) {
                 var params = [];
-                if(CMS.config.request.language) params.push(language);
-                if(CMS.config.request.page_id) params.push(page_id);
+                if(CMS.config.request.language) {
+                    params.push(language);
+                }
+                if(CMS.config.request.page_id) {
+                    params.push(page_id);
+                }
                 url = this._url(url, params);
             }
 
@@ -120,7 +133,9 @@ $(document).ready(function () {
                 iframe.show();
 
                 // add debug infos
-                if(that.config.debug) iframe.contents().find('body').addClass('cms-debug');
+                if(that.config.debug) {
+                    iframe.contents().find('body').addClass('cms-debug');
+                }
 
                 // save url in settings
                 that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
@@ -132,7 +147,9 @@ $(document).ready(function () {
                 });
 
                 // attach reload event
-                if(initialized) that.reloadBrowser(false, false, true);
+                if(initialized) {
+                    that.reloadBrowser(false, false, true);
+                }
                 initialized = true;
 
                 // adding django hacks
@@ -158,12 +175,6 @@ $(document).ready(function () {
                 }, this.options.sideframeDuration);
                 // display the frame
                 this._show(width, animate);
-            }
-
-            function insertHolder(iframe) {
-                // show iframe after animation
-                that.sideframe.find('.cms-sideframe-frame').addClass('cms-loader');
-                holder.html(iframe);
             }
         },
 
@@ -198,10 +209,14 @@ $(document).ready(function () {
             this.sideframe.show();
 
             // check if sideframe should be hidden
-            if(this.settings.sideframe.hidden) this._hide();
+            if(this.settings.sideframe.hidden) {
+                this._hide();
+            }
 
             // check if sideframe should be maximized
-            if(this.settings.sideframe.maximized) this._maximize();
+            if(this.settings.sideframe.maximized) {
+                this._maximize();
+            }
 
             // otherwise do normal behaviour
             if(!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
@@ -233,10 +248,16 @@ $(document).ready(function () {
 
             var duration = this.options.sideframeDuration;
             // remove the iframe
-            if(close && this.sideframe.width() <= 0) duration = 0;
-            if(close) this.sideframe.find('iframe').remove();
+            if(close && this.sideframe.width() <= 0) {
+                duration = 0;
+            }
+            if(close) {
+                this.sideframe.find('iframe').remove();
+            }
             this.sideframe.animate({ 'width': 0 }, duration, function () {
-                if(close) $(this).hide();
+                if(close) {
+                    $(this).hide();
+                }
             });
             this.body.animate({ 'margin-left': 0 }, duration);
             this.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
@@ -287,8 +308,12 @@ $(document).ready(function () {
             this._minimize(true);
 
             $(document).bind('mousemove.cms', function (e) {
-                if(e.clientX <= 320) e.clientX = 320;
-                if(e.clientX >= $(window).width() - outerOffset) e.clientX = $(window).width() - outerOffset;
+                if(e.clientX <= 320) {
+                    e.clientX = 320;
+                }
+                if(e.clientX >= $(window).width() - outerOffset) {
+                    e.clientX = $(window).width() - outerOffset;
+                }
 
                 that.sideframe.css('width', e.clientX);
                 that.body.css('margin-left', e.clientX);
