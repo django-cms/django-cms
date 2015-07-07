@@ -13,10 +13,10 @@
     display: none;
 }
 #content {
-    margin: 10px 10px 0;
+    margin: $modal-content-padding $modal-content-padding 0;
 }
 #content .module {
-    padding: 10px;
+    padding: $modal-content-module-padding;
 }
 
 #container {
