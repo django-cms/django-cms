@@ -13,15 +13,15 @@
     display: none;
 }
 #container {
-    padding-top: 30px;
+    padding-top: $toolbar-height;
 }
 .cms-debug #container {
-    padding-top: 35px;
+    padding-top: $toolbar-height + $toolbar-debug-height;
 }
 
 #container .breadcrumbs {
     display: block;
-    background: $color-grey !important;
+    background: $gray !important;
 }
 #content {
     padding-top: 10px;
@@ -43,18 +43,18 @@
     margin-bottom: 5px !important;
     padding: 5px 12px !important;
 
-    border: 1px solid adjust-hue($color-blue, 15deg) !important;
+    border: 1px solid adjust-hue($color-primary, 15deg) !important;
     background-image: linear-gradient($btn-action-bggradient) !important;
-    box-shadow: inset lighten($color-blue, 20%) 0 1px 0;
+    box-shadow: inset lighten($color-primary, 20%) 0 1px 0;
     &:hover,
     &:active,
     &:focus {
-        background: adjust-hue($color-blue, 15deg) !important;
+        background: adjust-hue($color-primary, 15deg) !important;
         box-shadow: none !important;
     }
     &:active,
     &:focus {
-        background: darken(adjust-hue($color-blue, 15deg), 10%) !important;
+        background: darken(adjust-hue($color-primary, 15deg), 10%) !important;
     }
 }
 
@@ -63,6 +63,6 @@
     font-weight: 200 !important;
     margin-bottom: 5px !important;
     padding: 5px 12px !important;
-    border: 1px solid $color-grey-10 !important;
+    border: 1px solid $gray-lighter !important;
     box-shadow: none !important;
 }

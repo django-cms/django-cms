@@ -28,12 +28,12 @@
 }
 
 #cke_id_body {
-    border: 1px solid $color-grey-10 !important;
+    border: 1px solid $gray-lighter !important;
 
     .cke_top,
     .cke_bottom {
-        border-color: $color-grey-10 !important;
-        background: $color-grey-5 !important;
+        border-color: $gray-lighter !important;
+        background: $gray-lightest !important;
         box-shadow: none !important;
     }
 }
