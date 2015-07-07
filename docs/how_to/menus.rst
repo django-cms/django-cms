@@ -17,7 +17,7 @@ menus of django CMS sites.
 Menus
 *****
 
-Create a ``cms_menus.py`` in your application and write the following inside::
+Create a ``cms_menus.py`` in your application, with the following::
 
     from menus.base import Menu, NavigationNode
     from menus.menu_pool import menu_pool
@@ -39,53 +39,52 @@ Create a ``cms_menus.py`` in your application and write the following inside::
 
     menu_pool.register_menu(TestMenu)
 
-.. note:: Up to version 3.1 the module was named ``menu.py``, please
+.. note:: Up to version 3.1 this module was named ``menu.py``. Please
           update your existing modules to the new naming convention.
           Support for the old name will be removed in version 3.4.
 
-If you refresh a page you should now see the menu entries from above.
-The get_nodes function should return a list of
+If you refresh a page you should now see the menu entries above.
+The ``get_nodes`` function should return a list of
 :class:`NavigationNode <menus.base.NavigationNode>` instances. A
 :class:`NavigationNode` takes the following arguments:
 
 ``title``
-  What the menu entry should read as
+  Text for the menu node
 
 ``url``
-  Link if menu entry is clicked.
+  URL for the menu node link
 
 ``id``
-  A unique id for this menu.
+  A unique id for this menu
 
 ``parent_id=None``
-  If this is a child of another node supply the id of the parent here.
+  If this is a child of another node, supply the id of the parent here.
 
 ``parent_namespace=None``
   If the parent node is not from this menu you can give it the parent
   namespace. The namespace is the name of the class. In the above example that
-  would be: "TestMenu"
+  would be: ``TestMenu``
 
 ``attr=None``
   A dictionary of additional attributes you may want to use in a modifier or
-  in the template.
+  in the template
 
 ``visible=True``
-  Whether or not this menu item should be visible.
+  Whether or not this menu item should be visible
 
 Additionally, each :class:`NavigationNode` provides a number of methods which are
 detailed in the :class:`NavigationNode <menus.base.NavigationNode>` API references.
 
 
-Customize menus at runtime
+Customise menus at runtime
 ==========================
 
-To adapt your menus according to request dependent conditions (say: anonymous /
-logged in user), you can use `Navigation Modifiers`_  or you can leverage existing
-ones.
+To adapt your menus according to request dependent conditions (say: anonymous/logged in user), you
+can use `Navigation Modifiers`_ or you can make use of existing ones.
 
-For example it's possible to add ``{'visible_for_anonymous': False}`` /
-``{'visible_for_authenticated': False}`` attributes recognized by the
-django CMS core ``AuthVisibility`` modifier.
+For example it's possible to add ``{'visible_for_anonymous':
+False}``/``{'visible_for_authenticated': False}`` attributes recognised by the django CMS core
+``AuthVisibility`` modifier.
 
 Complete example::
 
@@ -138,7 +137,7 @@ that with the example from above::
     menu_pool.register_menu(TestMenu)
 
 
-Now you can link this Menu to a page in the 'Advanced' tab of the page
+Now you can link this Menu to a page in the *Advanced* tab of the page
 settings under attached menu.
 
 .. _integration_modifiers:
@@ -200,28 +199,28 @@ It has a method :meth:`~menus.base.Modifier.modify` that should return a list
 of :class:`~menus.base.NavigationNode` instances.
 :meth:`~menus.base.Modifier.modify` should take the following arguments:
 
-`request`
+``request``
   A Django request instance. You want to modify based on sessions, or
   user or permissions?
 
-`nodes`
+``nodes``
   All the nodes. Normally you want to return them again.
 
-`namespace`
+``namespace``
   A Menu Namespace. Only given if somebody requested a menu with only nodes
   from this namespace.
 
-`root_id`
+``root_id``
   Was a menu request based on an ID?
 
-`post_cut`
+``post_cut``
   Every modifier is called two times. First on the whole tree. After that the
   tree gets cut to only show the nodes that are shown in the current menu.
   After the cut the modifiers are called again with the final tree. If this is
   the case ``post_cut`` is ``True``.
 
-`breadcrumb`
-  Is this not a menu call but a breadcrumb call?
+``breadcrumb``
+  Is this breadcrumb call rather than a menu call?
 
 
 Here is an example of a built-in modifier that marks all node levels::

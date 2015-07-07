@@ -21,7 +21,7 @@ What's new in 3.2
 Renaming cms_app, cms_toolbar, menu modules
 ===========================================
 
-``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` naming convention has been changed to
+``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` have been renamed to
 ``cms_apps.py``, ``cms_toolbars.py`` and ``cms_menus.py`` for consistency.
 
 Old names are still supported but deprecated; support will be removed in 3.4.
@@ -29,16 +29,16 @@ Old names are still supported but deprecated; support will be removed in 3.4.
 Action required
 ---------------
 
-Rename ``cms_app.py`` to ``cms_apps.py``, ``cms_toolbar.py`` to ``cms_toolbar.py``
-and ``menu.py`` to ``menus.py``.
+In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
+``cms_toolbar.py`` to ``cms_toolbar.py`` and ``menu.py`` to ``menus.py``.
 
 *****************************
 Backward incompatible changes
 *****************************
 
 * ``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` shipped in django CMS have been renamed
-  to the new naming convention. In case you import those modules, you have to change the code
-  accordingly.
+  according to the new naming convention. If you import those modules, you will need to amend
+  your ``import`` statements appropriately.
 
 
 .. _upgrade-guide-3.2:
