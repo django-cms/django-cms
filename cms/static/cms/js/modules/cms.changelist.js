@@ -271,11 +271,11 @@
                 var tree;
                 // global initTree function
                 initTree = function () {
-                    /*jshint newcap: false */
-                    /*jscs:disable requireCapitalizedConstructors */
+                    // jshint newcap: false
+                    // jscs:disable requireCapitalizedConstructors
                     tree = new tree_component();
-                    /*jscs:enable requireCapitalizedConstructors */
-                    /*jshint newcap: true */
+                    // jscs:enable requireCapitalizedConstructors
+                    // jshint newcap: true
                     var options = {
                         rules: {
                             clickable: 'all',
