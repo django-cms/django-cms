@@ -8,7 +8,7 @@
         "gulp-iconfont-css": "0.0.9",
         "gulp-if": "1.2.5",
         "gulp-minify-css": "1.1.6",
-        "gulp-sass": "2.0.1",
+        "gulp-sass": "2.0.3",
         "gulp-sourcemaps": "1.5.2",
         "gulp-util": "3.0.5",
         "minimist": "1.1.1"

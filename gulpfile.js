@@ -19,7 +19,7 @@ var argv = require('minimist')(process.argv.slice(2));
 var options = {
     debug: argv.debug
 };
-var PROJECT_ROOT = '.';
+var PROJECT_ROOT = __dirname + '/cms/static/cms';
 var PROJECT_PATH = {
     'sass': PROJECT_ROOT + '/sass',
     'css': PROJECT_ROOT + '/css',
