@@ -106,7 +106,7 @@ examples, or ask.
 JS Linting
 ----------
 
-Javascript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
+JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
 <http://jscs.info>`_. In order to run the linters you need to do this:
 
 .. code-block:: sh
