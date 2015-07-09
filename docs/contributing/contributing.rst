@@ -312,7 +312,7 @@ django CMS you need to have the following dependencies installed:
 
     1. `Node <https://nodejs.org/>`_ (will install npm as well).
     2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
-    3. Local dependencies ``cd cms/static/cms && npm install``
+    3. Local dependencies ``npm install``
 
 Styles
 ======
@@ -325,17 +325,17 @@ are located within ``cms/static/cms/sass`` and can be compiled using the
 In order to compile the stylesheets you need to run this command from the repo
 root::
 
-    cd cms/static/cms && gulp sass
+    gulp sass
 
 While developing it is also possible to run a watcher that compiles Sass files
 on change::
 
-    cd cms/static/cms && gulp
+    gulp
 
 By default, sourcemaps are not included in the compiled files. In order to turn
 them on while developing just add the ``--debug`` option::
 
-	cd cms/static/cms && gulp --debug
+	gulp --debug
 
 Icons
 =====
@@ -347,7 +347,7 @@ the icon classes and ultimately compiles to css.
 
 In order to compile the webfont you need to run::
 
-    cd cms/static/cms && gulp icons
+    gulp icons
 
 This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
 into the webfont. All classes will be automatically added to
