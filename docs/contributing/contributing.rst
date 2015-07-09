@@ -103,6 +103,19 @@ Boilerplate`_
 Frontend code should be formatted for readability. If in doubt, follow existing
 examples, or ask.
 
+JS Linting
+----------
+
+Javascript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
+<http://jscs.info>`_. In order to run the linters you need to do this:
+
+.. code-block:: sh
+
+    cd django-cms/cms/static/cms
+    gulp lint
+
+Or you can also run the watcher by just running ``gulp``.
+
 Process
 =======
 
