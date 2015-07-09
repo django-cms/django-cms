@@ -32,8 +32,8 @@ var PROJECT_PATH = {
 var PROJECT_PATTERNS = {
     js: [
         PROJECT_PATH.js + '/modules/*.js',
-        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
-        '/gulpfile.js',
+        PROJECT_PATH.js + '/gulpfile.js',
+        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js'
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
@@ -73,7 +73,7 @@ gulp.task('icons', function () {
         fontName: 'django-cms-iconfont',
         normalize: true
     }))
-    .on('glyphs', function(glyphs, options) {
+    .on('glyphs', function (glyphs, options) {
         gutil.log.bind(glyphs, options);
     })
     .pipe(gulp.dest(PROJECT_PATH.icons));
