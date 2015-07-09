@@ -43,7 +43,7 @@ Create a new directory to work in, and cd into it::
 
 Run it to create a new Django project called ``mysite``::
 
-    djangocms -p -f . mysite
+    djangocms -f -p . mysite
 
 .. note::
    The ``-f`` flag tells the installer to install and configure Django Filer, a useful application
