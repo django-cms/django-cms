@@ -11,8 +11,8 @@ var iconfontCss = require('gulp-iconfont-css');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
-// var jshint = require('gulp-jshint');
-// var jscs = require('gulp-jscs');
+var jshint = require('gulp-jshint');
+var jscs = require('gulp-jscs');
 
 var argv = require('minimist')(process.argv.slice(2));
 
