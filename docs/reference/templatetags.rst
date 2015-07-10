@@ -468,7 +468,7 @@ This will render to:
 .. code-block:: html+django
 
     <!-- The content of the H1 is the active area that triggers the frontend editor -->
-    <h1><div class="cms_plugin cms_plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
+    <h1><div class="cms-plugin cms-plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
 
 **Arguments:**
 
@@ -527,7 +527,7 @@ This will render to:
 .. code-block:: html+django
 
     <!-- This whole block is the active area that triggers the frontend editor -->
-    <div class="cms_plugin cms_plugin-myapp-mymodel-1">
+    <div class="cms-plugin cms-plugin-myapp-mymodel-1">
         <h1>{{ my_model.title }}</h1>
         <div class="body">
             {{ my_model.date|date:"d F Y" }}
@@ -578,7 +578,7 @@ It will render to something like:
 
     <h3>
         <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
-        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_icon">
+        <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-icon">
             <!-- The image below is the active area that triggers the frontend editor -->
             <img src="/static/cms/img/toolbar/render_model_placeholder.png">
         </div>
@@ -587,7 +587,7 @@ It will render to something like:
 .. note::
 
         Icon and position can be customized via CSS by setting a background
-        to the ``.cms_render_model_icon img`` selector.
+        to the ``.cms-render-model-icon img`` selector.
 
 **Arguments:**
 
@@ -627,7 +627,7 @@ It will render to something like:
 
     <h3>
         <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
-        <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+        <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-add">
             <!-- The image below is the active area that triggers the frontend editor -->
             <img src="/static/cms/img/toolbar/render_model_placeholder.png">
         </div>
@@ -636,7 +636,7 @@ It will render to something like:
 .. note::
 
         Icon and position can be customized via CSS by setting a background
-        to the ``.cms_render_model_add img`` selector.
+        to the ``.cms-render-model-add img`` selector.
 
 **Arguments:**
 
@@ -685,7 +685,7 @@ It will render to something like:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-myapp-mymodel-1 cms_render_model_add">
+    <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-add">
       <div>New Object</div>
     </div>
 

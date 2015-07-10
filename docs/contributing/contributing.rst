@@ -97,11 +97,11 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
 HTML, CSS and JavaScript
 ------------------------
 
-As of django CMS 3.2, we will use spaces within frontend code, not tabs as previously. In the
-meantime, please continue using tabs - all tabs will be converted to spaces in a single commit
-for 3.2.
+As of django CMS 3.2, we are using the same guidelines as described in `Aldryn
+Boilerplate`_
 
-Frontend code should be formatted for readability. If in doubt, follow existing examples, or ask.
+Frontend code should be formatted for readability. If in doubt, follow existing
+examples, or ask.
 
 Process
 =======
@@ -307,19 +307,65 @@ contribute. All changes there will be automatically sent to the project.
 Frontend
 ********
 
+In order to be able to work with the frontend tooling contributing to the
+django CMS you need to have the following dependencies installed:
 
-We are using `SASS/Compass <compass-style.org>`_ for our styles. The files
-are located within ``cms/static/cms/sass`` and can be compiled using the compass
-command ``compass watch cms/static/cms/`` from within the django-cms root.
+    1. `Node <https://nodejs.org/>`_ (will install npm as well).
+    2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
+    3. Local dependencies ``npm install``
 
-This will invoke the **config.rb** within ``cms/static/cms/`` using the predefined
-settings.
+Styles
+======
+
+We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
+are located within ``cms/static/cms/sass`` and can be compiled using the
+`libsass <http://libsass.org/>`_ implementation of Sass compiler through
+`Gulp <http://gulpjs.com/>`_.
+
+In order to compile the stylesheets you need to run this command from the repo
+root::
+
+    gulp sass
+
+While developing it is also possible to run a watcher that compiles Sass files
+on change::
+
+    gulp
+
+By default, sourcemaps are not included in the compiled files. In order to turn
+them on while developing just add the ``--debug`` option::
+
+	gulp --debug
+
+Icons
+=====
+
+We are using `gulp-iconfont <https://github.com/backflip/gulp-iconfont>`_ to
+generate icon webfonts into ``cms/static/cms/fonts/``. This also creates
+``_iconography.scss`` within ``cms/static/cms/sass/components`` which adds all
+the icon classes and ultimately compiles to css.
+
+In order to compile the webfont you need to run::
+
+    gulp icons
+
+This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
+into the webfont. All classes will be automatically added to
+``_iconography.scss`` as previously mentioned.
+
+Additionally we created an SVG template within
+``cms/static/cms/font/src/_template.svgz`` that you should use when converting
+or creating additional icons. It is named *svgz* so it doesn't get compiled
+into the font. When using *Adobe Illustrator* please mind the
+`following settings <images/svg_settings.png>`_.
+
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
 .. _fork: http://github.com/divio/django-cms
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
+.. _Aldryn Boilerplate : http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _GitHub : http://www.github.com
 .. _GitHub help : http://help.github.com

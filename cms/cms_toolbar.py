@@ -80,7 +80,7 @@ class PlaceholderToolbar(CMSToolbar):
             if sp.has_change_permission(self.request):
                 return self.add_structure_mode_item()
 
-    def add_structure_mode_item(self, extra_classes=('cms_toolbar-item-cms-mode-switcher',)):
+    def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         build_mode = self.toolbar.build_mode
         build_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
@@ -300,7 +300,7 @@ class PageToolbar(CMSToolbar):
 
     # Buttons
 
-    def add_publish_button(self, classes=('cms_btn-action', 'cms_btn-publish',)):
+    def add_publish_button(self, classes=('cms-btn-action', 'cms-btn-publish',)):
         # only do dirty lookups if publish permission is granted else button isn't added anyway
         if self.toolbar.edit_mode and self.has_publish_permission():
             classes = list(classes or [])
@@ -311,13 +311,13 @@ class PageToolbar(CMSToolbar):
                                      self.page_is_pending(self.page, self.current_lang))))
 
             if dirty:
-                classes.append('cms_btn-publish-active')
+                classes.append('cms-btn-publish-active')
 
             if self.dirty_statics or (self.page and self.page.is_published(self.current_lang)):
                 title = _('Publish changes')
             else:
                 title = _('Publish page now')
-                classes.append('cms_publish-page')
+                classes.append('cms-publish-page')
 
             params = {}
 
@@ -356,7 +356,7 @@ class PageToolbar(CMSToolbar):
         pos = len(self.toolbar.right_items)
         self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
 
-    def add_page_settings_button(self, extra_classes=('cms_btn-action',)):
+    def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
         url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.language)
         self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 
@@ -540,5 +540,5 @@ class PageToolbar(CMSToolbar):
             revert_question = _('Are you sure you want to revert to live?')
             history_menu.add_ajax_item(_('Revert to live'), action=revert_action, question=revert_question,
                                        disabled=not self.page.is_dirty(self.current_lang),
-                                       on_success=refresh, extra_classes=('cms_toolbar-revert',))
+                                       on_success=refresh, extra_classes=('cms-toolbar-revert',))
             history_menu.add_modal_item(_('View history'), url=admin_reverse('cms_page_history', args=(self.page.pk,)))

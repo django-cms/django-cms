@@ -1,0 +1,156 @@
+//######################################################################################################################
+// #SUBNAV#
+#cms-toolbar {
+    .cms-submenu {
+        @include icon(menu);
+        display: block;
+        position: absolute;
+        cursor: pointer;
+        right: 0px;
+        width: $submenu-icon-area-size;
+        height: 100%;
+        &:before {
+            @extend %icon;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            margin-top: -($submenu-icon-size / 2);
+            font-size: $submenu-icon-size;
+            color: $submenu-icon-color;
+        }
+    }
+
+    .cms-submenu-lang {
+        position: absolute;
+        top: 50%;
+        height: $line-height-normal;
+        margin-top: -($line-height-normal / 2);
+        line-height: $line-height-normal;
+        right: 3px;
+        padding: 0 5px;
+        border: 1px solid $gray-lighter;
+        border-radius: $border-radius-base;
+        background: $white;
+    }
+
+    .cms-submenu-dropdown {
+        display: none;
+        position: absolute;
+        top: $structure-dragbar-height + $structure-dragarea-space;
+        right: 0;
+        overflow: auto;
+        z-index: z(structure, content, dropdown);
+        min-width: $submenu-dropdown-width;
+        max-height: $submenu-dropdown-height;
+        border: 1px solid $gray-lighter;
+        background: $submenu-dropdown-bgcolor;
+
+        // force scrollbars on subnav menu
+        // not yet working on firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=77790
+        &::-webkit-scrollbar {
+            width: 7px;
+            background: $gray-lighter;
+
+            -webkit-appearance: none;
+        }
+        &::-webkit-scrollbar-thumb {
+            border-left: 1px solid $gray-lighter;
+            background-color: $gray-darker;
+        }
+
+        .cms-submenu-item {
+            zoom: 1;
+        }
+        .cms-submenu-item a,
+        span {
+            display: block;
+            font-size: $submenu-item-font-size;
+            line-height: $submenu-item-height;
+            height: $submenu-item-height;
+            text-align: left;
+            padding: 0px $submenu-item-padding-horizontal;
+        }
+
+        .cms-submenu-item a {
+            color: $submenu-item-color;
+            &:hover,
+            &:focus {
+                color: $submenu-item-hover-color;
+                background: adjust-hue($color-primary, 15deg);
+                background: linear-gradient($btn-action-bggradient);
+            }
+            &:first-child {
+                border-top: none;
+            }
+        }
+        .cms-submenu-item span {
+            color: $submenu-item-color;
+            font-weight: bold;
+            border-top: 1px solid $gray-light;
+            border-bottom: 1px solid $gray-lighter;
+            cursor: default;
+        }
+        .cms-submenu-item:first-child span {
+            border-top: none;
+        }
+    }
+
+    .cms-submenu-quicksearch {
+        $quicksearch-height: $structure-dragbar-height + $structure-draggable-space + $structure-dragarea-padding;
+        @include icon(search);
+        cursor: default;
+        display: none;
+        position: absolute;
+        top: 50%;
+        right: -$structure-dragarea-padding;
+        z-index: z(structure, content, quicksearch);
+        text-align: right;
+        height: $quicksearch-height;
+        margin-top: -($quicksearch-height / 2);
+        border-radius: $border-radius-base + 1px;
+        background: $gray-darker;
+
+        &:before {
+            @extend %icon;
+            position: absolute;
+            right: $structure-dragarea-padding;
+            top: 50%;
+            margin-top: -($submenu-quicksearch-icon-size / 2);
+            font-size: $submenu-quicksearch-icon-size;
+            color: white;
+        }
+    }
+    .cms-submenu-quicksearch label {
+        cursor: pointer;
+        height: 100%;
+    }
+    .cms-submenu-quicksearch input {
+        display: block;
+        color: white;
+        font-size: $submenu-quicksearch-input-font-size;
+        line-height: $submenu-quicksearch-input-line-height;
+        text-align: right;
+        width: $submenu-quicksearch-input-width;
+        height: 100%;
+        margin-right: $submenu-quicksearch-padding;
+        padding: 0px 1px;
+        border: none;
+        background: none;
+        -webkit-appearance: none;
+    }
+
+    // scrollhint
+    .cms-submenu-scroll-hint {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        color: $gray-light;
+        font-size: $submenu-item-font-size;
+        line-height: $submenu-item-height;
+        height: $submenu-item-height;
+        text-align: center;
+        width: 100%;
+        background-color: $gray-lighter;
+    }
+}

@@ -11,7 +11,7 @@ trim_trailing_whitespace = true
 insert_final_newline = true
 
 [*.{scss,js,html}]
-indent_style = tab
+indent_style = space
 
 [*.rst]
 max_line_length = 80

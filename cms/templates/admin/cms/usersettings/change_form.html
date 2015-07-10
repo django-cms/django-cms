@@ -11,10 +11,10 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-	<a href="{% cms_admin_url 'index' %}">{% trans 'Home' %}</a>
-	&rsaquo; <a href="{% cms_admin_url 'app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
-	&rsaquo; {{ opts.verbose_name_plural|capfirst }}
-	&rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
+    <a href="{% cms_admin_url 'index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% cms_admin_url 'app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
+    &rsaquo; {{ opts.verbose_name_plural|capfirst }}
+    &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
 {% endblock %}
 
@@ -22,6 +22,6 @@
 
 {% block submit_buttons_bottom %}
 <div class="submit-row">
-	<input type="submit" value="{% trans 'Save' %}" class="default" name="_save" {{ onclick_attrib }}/>
+    <input type="submit" value="{% trans 'Save' %}" class="default" name="_save" {{ onclick_attrib }}/>
 </div>
 {% endblock %}
