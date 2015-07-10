@@ -111,7 +111,6 @@ JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
 
 .. code-block:: sh
 
-    cd django-cms/cms/static/cms
     gulp lint
 
 Or you can also run the watcher by just running ``gulp``.
