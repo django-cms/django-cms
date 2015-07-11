@@ -60,8 +60,8 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
         processors = []
     if isinstance(template, six.string_types):
         content = render_to_string(template, context)
-    elif isinstance(template, Template) or (hasattr(template, 'template') and\
-         hasattr(template, 'render') and isinstance(template.template, Template)):
+    elif (isinstance(template, Template) or (hasattr(template, 'template') and\
+         hasattr(template, 'render') and isinstance(template.template, Template))):
         content = template.render(context)
     else:
         content = ''
