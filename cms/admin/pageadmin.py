@@ -224,7 +224,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             copy_target = Page.objects.get(pk=copy_target_id)
             if not copy_target.has_view_permission(request):
                 raise PermissionDenied()
-            obj = Page.objects.get(pk=obj.pk) #mptt reload
+            obj = obj.reload()
             copy_target._copy_attributes(obj, clean=True)
             obj.save()
             for lang in copy_target.languages.split(','):
