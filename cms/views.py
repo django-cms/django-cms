@@ -63,16 +63,18 @@ def details(request, slug):
     page = get_page_from_request(request, use_path=slug)
     if not page:
         return _handle_no_page(request, slug)
-    current_language = request.REQUEST.get('language', None)
+    current_language = request.GET.get('language', None)
+    if not current_language:
+        current_language = request.POST.get('language', None)
     if current_language:
         current_language = get_language_code(current_language)
-        if not current_language in get_language_list(page.site_id):
+        if current_language not in get_language_list(page.site_id):
             current_language = None
     if current_language is None:
         current_language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
         if current_language:
             current_language = get_language_code(current_language)
-            if not current_language in get_language_list(page.site_id):
+            if current_language not in get_language_list(page.site_id):
                 current_language = None
     if current_language is None:
         current_language = get_language_code(get_language())

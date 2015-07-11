@@ -108,6 +108,6 @@ def render_admin_menu_item(request, page, template=None, language=None):
         'has_add_permission': permissions.has_page_add_permission(request),
         'site_languages': languages,
     }
-    filtered = 'filtered' in request.REQUEST
+    filtered = 'filtered' in request.GET or 'filtered' in request.POST
     context.update(get_admin_menu_item_context(request, page, filtered, language))
     return render(request, template, context)
