@@ -1,0 +1,10 @@
+diff a/cms/static/cms/js/modules/cms.modal.js b/cms/static/cms/js/modules/cms.modal.js	(rejected hunks)
+@@ -516,7 +516,7 @@ $(document).ready(function () {
+  							that.options.newPlugin = null;
+  							// reset onClose when delete is triggered
+ 							if(item.hasClass('deletelink')) that.options.onClose = null;
+-							if (! item.hasClass('default')) {// hide iframe when using buttons other than submit
++							if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
+ 								that.modal.find('.cms_modal-frame iframe').hide();
+ 								// page has been saved or deleted, run checkup
+ 								that.saved = true;
