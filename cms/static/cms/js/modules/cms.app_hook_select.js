@@ -1,7 +1,7 @@
 //##################################################################################################################
 // #APPHOOKS#
 
-/* global apphooks_configuration */
+/* global apphooks_configuration, CMS */
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
@@ -24,7 +24,7 @@
                 appCfgs.html('');
                 for (var i = 0; i < apphooks_configuration[opt.val()].length; i++) {
                     var selectedCfgs = '';
-                    if (apphooks_configuration[opt.val()][i][0] === apphooks_configuration_value) {
+                    if (apphooks_configuration[opt.val()][i][0] === window.apphooks_configuration_value) {
                         selectedCfgs = 'selected="selected"';
                     }
                     appCfgs.append(
@@ -33,7 +33,7 @@
                         '</option>'
                     );
                 }
-                appCfgsAdd.attr('href', apphooks_configuration_url[opt.val()]);
+                appCfgsAdd.attr('href', window.apphooks_configuration_url[opt.val()]);
                 appCfgsRow.removeClass('hidden');
                 appNsRow.addClass('hidden');
             } else {

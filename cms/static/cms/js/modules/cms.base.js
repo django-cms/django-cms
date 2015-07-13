@@ -5,15 +5,15 @@
 window.django = window.django || undefined;
 
 // ensuring jQuery namespace is set correctly
-window.jQuery = (django && django.jQuery) ? django.jQuery : window.jQuery || undefined;
+window.jQuery = (window.django && window.django.jQuery) ? window.django.jQuery : window.jQuery || undefined;
 
 // ensuring Class namespace is set correctly
 window.Class = window.Class || undefined;
 
 // ensuring CMS namespace is set correctly
 var CMS = {
-    $: (typeof jQuery === 'function') ? jQuery : undefined,
-    Class: (typeof Class === 'function') ? Class : undefined,
+    $: (typeof window.jQuery === 'function') ? window.jQuery : undefined,
+    Class: (typeof window.Class === 'function') ? window.Class : undefined,
     API: {}
 };
 

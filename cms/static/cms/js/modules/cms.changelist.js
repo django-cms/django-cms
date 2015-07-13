@@ -1,5 +1,6 @@
 //##################################################################################################################
 // #CHANGELIST#
+/* global CMS, tree_component */
 
 (function ($) {
     'use strict';
@@ -28,7 +29,7 @@
                     this.setupTree();
 
                     // init tree component
-                    initTree();
+                    window.initTree();
                 } else {
                     // when filtered is active, prevent tree actions
                     this.setupFunctions();
@@ -76,7 +77,7 @@
                     if (arguments.length < 2) {
                         return fn;
                     }
-                    args = $.makeArray(arguments).slice(1, arguments.length);
+                    var args = $.makeArray(arguments).slice(1, arguments.length);
                     return function () {
                         return fn.apply(this, args.concat($.makeArray(arguments)));
                     };
@@ -196,12 +197,12 @@
 
                     // send post request to prevent xss attacks
                     $.ajax({
-                        'type': 'post',
-                        'url': $(this).prop('href'),
-                        'success': function () {
+                        type: 'post',
+                        url: $(this).prop('href'),
+                        success: function () {
                             CMS.API.Helpers.reloadBrowser();
                         },
-                        'error': function (request) {
+                        error: function (request) {
                             throw new Error(request);
                         }
                     });
@@ -270,7 +271,7 @@
                 var that = this;
                 var tree;
                 // global initTree function
-                initTree = function () {
+                window.initTree = function () {
                     // jshint newcap: false
                     // jscs:disable requireCapitalizedConstructors
                     tree = new tree_component();
@@ -303,23 +304,23 @@
                         },
                         callback: {
                             beforemove  : function (what, where, position) {
-                                item_id = what.id.split('page_')[1];
-                                target_id = where.id.split('page_')[1];
-                                old_node = what;
+                                window.item_id = what.id.split('page_')[1];
+                                window.target_id = where.id.split('page_')[1];
+                                window.old_node = what;
 
                                 if ($(what).parent().children('li').length > 1) {
                                     if ($(what).next('li').length) {
-                                        old_target = $(what).next('li')[0];
-                                        old_position = 'right';
+                                        window.old_target = $(what).next('li')[0];
+                                        window.old_position = 'right';
                                     }
                                     if ($(what).prev('li').length) {
-                                        old_target = $(what).prev('li')[0];
-                                        old_position = 'left';
+                                        window.old_target = $(what).prev('li')[0];
+                                        window.old_position = 'left';
                                     }
                                 } else {
                                     if ($(what).attr('rel') !== 'topnode') {
-                                        old_target = $(what).parent().parent()[0];
-                                        old_position = 'inside';
+                                        window.old_target = $(what).parent().parent()[0];
+                                        window.old_position = 'inside';
                                     }
                                 }
 
@@ -327,17 +328,17 @@
                                 return true;
                             },
                             onmove: function (what, where, position) {
-                                item_id = what.id.split('page_')[1];
-                                target_id = where.id.split('page_')[1];
+                                window.item_id = what.id.split('page_')[1];
+                                window.target_id = where.id.split('page_')[1];
 
                                 if (position === 'before') {
                                     position = 'left';
-                                }else if (position === 'after') {
+                                } else if (position === 'after') {
                                     position = 'right';
-                                }else if (position === 'inside') {
+                                } else if (position === 'inside') {
                                     position = 'last-child';
                                 }
-                                moveTreeItem(what, item_id, target_id, position, false);
+                                moveTreeItem(what, window.item_id, window.target_id, position, false);
                             },
 
                             onload: function () {
@@ -358,7 +359,7 @@
                     tree.init($('div.tree'), options);
                 };
 
-                selected_page = false;
+                window.selected_page = false;
                 action = false;
 
                 var _oldAjax = $.ajax;
@@ -368,7 +369,7 @@
                     // always
                     $('#loader-message').show();
 
-                    callback = s.success || false;
+                    var callback = s.success || false;
                     s.success = function (data, status) {
                         if (callback) {
                             callback(data, status);
@@ -439,11 +440,11 @@
                 $('#changelist li').click(function (e) {
                     // I want a link to check the class
                     if (e.target.tagName === 'IMG' || e.target.tagName === 'SPAN') {
-                        target = e.target.parentNode;
+                        window.target = e.target.parentNode;
                     } else {
-                        target = e.target;
+                        window.target = e.target;
                     }
-                    var jtarget = $(target);
+                    var jtarget = $(window.target);
                     var id;
                     var page_id;
                     if (jtarget.hasClass('move')) {
@@ -453,7 +454,7 @@
                             id = e.target.parentNode.id.split('move-link-')[1];
                         }
                         page_id = id;
-                        selected_page = page_id;
+                        window.selected_page = page_id;
                         action = 'move';
                         $('span.move-target-container, span.line, a.move-target').show();
                         $('#page_' + page_id).addClass('selected');
@@ -468,14 +469,14 @@
                         if (!id) {
                             id = e.target.parentNode.id.split('copy-link-')[1];
                         }
-                        selected_page = id;
+                        window.selected_page = id;
                         action = mark_copy_node(id);
                         e.stopPropagation();
                         return false;
                     }
 
                     if (jtarget.hasClass('viewpage')) {
-                        var view_page_url = $('#' + target.id + '-select').val();
+                        var view_page_url = $('#' + window.target.id + '-select').val();
                         if (view_page_url) {
                             window.open(view_page_url);
                         }
@@ -490,8 +491,8 @@
 
                         $('tr').removeClass('target');
                         $('#changelist table').removeClass('table-selected');
-                        page_id = target.id.split('add-link-')[1];
-                        selected_page = page_id;
+                        page_id = window.target.id.split('add-link-')[1];
+                        window.selected_page = page_id;
                         action = 'add';
                         $('tr').removeClass('selected');
                         $('#page-row-' + page_id).addClass('selected');
@@ -503,7 +504,7 @@
 
                     // don't assume admin site is root-level
                     // grab base url to construct full absolute URLs
-                    admin_base_url = document.URL.split('/cms/page/')[0] + '/';
+                    window.admin_base_url = document.URL.split('/cms/page/')[0] + '/';
 
                     var pageId;
                     var language;
@@ -517,7 +518,7 @@
                         // if I don't put data in the post, django doesn't get it
                         reloadItem(
                             jtarget,
-                            admin_base_url + 'cms/page/' + pageId + '/change-navigation/?language=' + language,
+                            window.admin_base_url + 'cms/page/' + pageId + '/change-navigation/?language=' + language,
                             { 1: 1 }
                         );
                     }
@@ -536,7 +537,7 @@
                                 .children('div.col1')
                                 .children('.title').attr('lang');
                             $.get(
-                                admin_base_url + 'cms/page/' + pageId + '/' + language + '/descendants/',
+                                window.admin_base_url + 'cms/page/' + pageId + '/' + language + '/descendants/',
                                 {},
                                 function (r) {
                                     jtarget.children('ul').append(r);
@@ -556,27 +557,28 @@
 
                     if (jtarget.hasClass('move-target')) {
                         if (jtarget.hasClass('left')) {
-                            position = 'left';
+                            window.position = 'left';
                         }
                         if (jtarget.hasClass('right')) {
-                            position = 'right';
+                            window.position = 'right';
                         }
                         if (jtarget.hasClass('last-child')) {
-                            position = 'last-child';
+                            window.position = 'last-child';
                         }
-                        target_id = target.parentNode.id.split('move-target-')[1];
+                        window.target_id = window.target.parentNode.id.split('move-target-')[1];
 
                         if (action === 'move') {
-                            moveTreeItem(null, selected_page, target_id, position, tree);
+                            moveTreeItem(null, window.selected_page, window.target_id, window.position, tree);
                             $('.move-target-container').hide();
                         } else if (action === 'copy') {
-                            site = $('#site-select')[0].value;
-                            copyTreeItem(selected_page, target_id, position, site);
+                            window.site = $('#site-select')[0].value;
+                            copyTreeItem(window.selected_page, window.target_id, window.position, window.site);
                             $('.move-target-container').hide();
                         } else if (action === 'add') {
-                            site = $('#site-select')[0].value;
+                            window.site = $('#site-select')[0].value;
                             window.location.href = window.location.href.split('?')[0].split('#')[0] +
-                                'add/?target=' + target_id + '&amp;position=' + position + '&amp;site=' + site;
+                                'add/?target=' + window.target_id + '&amp;position=' + window.position +
+                                '&amp;site=' + window.site;
                         }
                         e.stopPropagation();
                         return false;
@@ -595,7 +597,7 @@
                     var form = $(this).closest('form');
                     // add correct value for copy
                     if (action === 'copy') {
-                        $('#site-copy').val(selected_page);
+                        $('#site-copy').val(window.selected_page);
                     }
                     // submit form
                     form.submit();
@@ -645,7 +647,7 @@
                     // jshint latedef: false
                     var action = mark_copy_node(id);
                     // jshint latedef: true
-                    selected_page = id;
+                    window.selected_page = id;
                 }
 
                 function copyTreeItem(item_id, target_id, position, site) {
@@ -671,14 +673,14 @@
                     data = $.extend(data, options);
 
                     $.post('./' + item_id + '/copy-page/', data, function (decoded) {
-                        response = decoded.content;
+                        var response = decoded.content;
                         var status = decoded.status;
                         if (status === 200) {
                             // reload tree
                             window.location = window.location.href;
                         } else {
                             alert(response);
-                            moveError($('#page_' + item_id + ' div.col1:eq(0)'), response);
+                            window.moveError($('#page_' + item_id + ' div.col1:eq(0)'), response);
                         }
                     });
                 }
@@ -771,7 +773,7 @@
 
                         // on success
                         function (decoded) {
-                            response = decoded.content;
+                            var response = decoded.content;
                             var status = decoded.status;
                             if (status === 200) {
                                 if (tree) {
@@ -784,11 +786,11 @@
                                         false
                                     );
                                 } else {
-                                    moveSuccess($('#page_' + item_id + ' div.col1:eq(0)'));
+                                    window.moveSuccess($('#page_' + item_id + ' div.col1:eq(0)'));
                                 }
                                 return false;
                             } else {
-                                moveError($('#page_' + item_id + ' div.col1:eq(0)'), response);
+                                window.moveError($('#page_' + item_id + ' div.col1:eq(0)'), response);
                                 return false;
                             }
                         }

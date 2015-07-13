@@ -1,5 +1,6 @@
 //##################################################################################################################
 // #PLUGINS#
+/* global CMS */
 
 (function ($) {
     'use strict';
@@ -473,7 +474,7 @@
                         that.editPlugin(response.url, that.options.plugin_name, response.breadcrumb);
                     };
                 }
-                that.editPlugin(response.url, that.options.plugin_name, response.breadcrumb);
+                this.editPlugin(response.url, this.options.plugin_name, response.breadcrumb);
             },
 
             _setSubnav: function (nav) {
