@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from treebeard.mp_tree import MP_NodeQuerySet
+from django.db.models.query import QuerySet
 
 
-class PublisherQuerySet(MP_NodeQuerySet):
+class PublisherQuerySet(QuerySet):
     """Added publisher specific filters to queryset.
     """
     def drafts(self):
