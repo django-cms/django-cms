@@ -92,6 +92,45 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
             self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
 
+    def test_treebeard_delete(self):
+        """
+        This is a test for #4102
+
+        When deleting a page, parent must be updated too, to reflect the new tree status.
+        This is handled by MP_NodeQuerySet (which was not used before the fix)
+
+        """
+        page1 = create_page('home', 'nav_playground.html', 'en')
+        page2 = create_page('page2', 'nav_playground.html', 'en', parent=page1)
+        page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2)
+        page1 = page1.reload()
+        page2 = page2.reload()
+        page3 = page3.reload()
+
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 1)
+        self.assertFalse(page1.is_leaf())
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
+
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
+
+        page3.delete()
+        page1 = page1.reload()
+        page2 = page2.reload()
+
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 1)
+        self.assertFalse(page1.is_leaf())
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 0)
+        self.assertTrue(page2.is_leaf())
+
     def test_create_page_admin(self):
         """
         Test that a page can be created via the admin
