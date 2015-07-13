@@ -194,6 +194,7 @@ def check_sekizai(output):
         else:
             section.finish_error("Sekizai configuration has errors")
 
+
 @define_check
 def check_i18n(output):
     with output.section("Internationalization") as section:
@@ -217,6 +218,27 @@ def check_i18n(output):
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+
+
+@define_check
+def check_middlewares(output):
+    with output.section("Middlewares") as section:
+        required_middlewares = (
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+            'cms.middleware.language.LanguageCookieMiddleware',
+        )
+        for middleware in required_middlewares:
+            if middleware not in settings.MIDDLEWARE_CLASSES:
+                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+
 
 @define_check
 def check_deprecated_settings(output):
