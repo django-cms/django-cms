@@ -1,5 +1,6 @@
 //##################################################################################################################
 // #STRUCTUREBOARD#
+/* global CMS */
 
 (function ($) {
     // CMS.$ will be passed for $
@@ -401,6 +402,7 @@
                 var dropped = false;
                 var droparea = null;
                 var dropzone = null;
+                var timer = function () {};
 
                 this.sortables.nestedSortable({
                     items: '.cms-draggable',

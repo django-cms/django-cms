@@ -1,5 +1,6 @@
 //##################################################################################################################
 // #CHANGEFORM#
+/* global CMS, URLify, gettext */
 
 (function ($) {
     'use strict';
@@ -27,7 +28,7 @@
             var value = title.val();
             // international language handling
             if (window.UNIHANDECODER) {
-                value = UNIHANDECODER.decode(value);
+                value = window.UNIHANDECODER.decode(value);
             }
             // if slug is empty, prefill again
             if (prefill === false && slug.val() === '') {
