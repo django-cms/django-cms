@@ -1303,8 +1303,15 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
             object_key = '_object' if isinstance(obj, models.Model) else ''
             method_name = '_%s%s_permission' % (action, object_key)
             getattr(self, method_name)(user, obj, key)
+            # This is 'fragile' as it depends on Django internals
+            # This is true for Django < 1.8
             if hasattr(user, '_perm_cache'):
                 delattr(user, '_perm_cache')
+            # This is true for Django >= 1.8
+            if hasattr(user, '_user_perm_cache'):
+                delattr(user, '_user_perm_cache')
+            if hasattr(user, '_group_perm_cache'):
+                delattr(user, '_group_perm_cache')
 
 
 class PlaceholderConfTests(TestCase):
