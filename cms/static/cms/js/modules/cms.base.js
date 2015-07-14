@@ -1,3 +1,8 @@
+/*!
+ * CMS.API.Helpers
+ * Multiple helpers used accross all CMS features
+ */
+
 //##################################################################################################################
 // #COMPATIBILITY#
 
@@ -19,10 +24,6 @@ var CMS = {
 
 //##################################################################################################################
 // #CMS.API#
-/*!
- * CMS.API.Helpers
- * Multiple helpers used accross all CMS features
- */
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
