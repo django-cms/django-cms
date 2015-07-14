@@ -783,4 +783,3 @@ $(document).ready(function () {
 	});
 
 });
-})(CMS.$);

@@ -1,0 +1,12 @@
+{
+    "preset": "crockford",
+
+    "maximumLineLength": {
+        "value": 120,
+        "allowRegex": true,
+        "allowUrlComments": true
+    },
+    "disallowQuotedKeysInObjects": null,
+    "requireMultipleVarDecl": null,
+    "disallowDanglingUnderscores": null
+}

@@ -1,5 +1,5 @@
 from django.test.simple import DjangoTestSuiteRunner
-from cms.utils.compat.dj import force_unicode
+from django.utils.encoding import force_text
 import operator
 import time
 from django.utils.unittest import TestSuite
@@ -13,7 +13,7 @@ def time_it(func):
         func(*args, **kwargs)
         end = time.time()
 
-        TIMINGS[force_unicode(func)] = end - start
+        TIMINGS[force_text(func)] = end - start
     return _inner
 
 

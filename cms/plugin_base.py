@@ -8,12 +8,6 @@ from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.core.urlresolvers import reverse
-from django.contrib import admin
-from django.core.exceptions import ImproperlyConfigured
-from django.forms.models import ModelForm
-from django.utils.encoding import smart_str
-from django.utils.translation import ugettext_lazy as _
 
 try:
     from django.contrib.admin.options import (RenameBaseModelAdminMethods as
@@ -21,14 +15,29 @@ try:
 except ImportError:
     from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
 
-from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
-from cms.utils import get_cms_setting, get_language_list
-from cms.utils.compat.metaclasses import with_metaclass
-from cms.utils.placeholder import get_placeholder_conf
+from cms.utils import get_language_list
 from cms.utils.urlutils import admin_reverse
-from cms.utils.compat.dj import force_unicode, python_2_unicode_compatible
-from cms.exceptions import SubClassNeededError, Deprecated, PluginLimitReached
-from cms.models import CMSPlugin, Placeholder
+from cms.utils.compat.dj import force_unicode
+from cms.exceptions import PluginLimitReached
+from cms.models import Placeholder
+from django import forms
+from django.contrib import admin
+from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import reverse
+from django.utils import six
+from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
+from django.utils.translation import ugettext_lazy as _
+try:  # Django 1.6, 1.7
+    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
+        ModelAdminMetaClass)
+except:  # Django 1.8+
+    ModelAdminMetaClass = forms.MediaDefiningClass
+
+from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
+from cms.exceptions import SubClassNeededError, Deprecated
+from cms.models import CMSPlugin
+from cms.utils import get_cms_setting
+from cms.utils.placeholder import get_placeholder_conf
 
 
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
@@ -66,7 +75,7 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
             form_attrs = {
                 'Meta': type('Meta', (object,), form_meta_attrs)
             }
-            new_plugin.form = type('%sForm' % name, (ModelForm,), form_attrs)
+            new_plugin.form = type('%sForm' % name, (forms.ModelForm,), form_attrs)
         # Set the default fieldsets
         if not new_plugin.fieldsets:
             basic_fields = []
@@ -100,7 +109,7 @@ class CMSPluginBaseMetaclass(ModelAdminMetaClass):
 
 
 @python_2_unicode_compatible
-class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
     module = _("Generic")  # To be overridden in child classes
@@ -129,6 +138,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     disable_child_plugin = False
 
     cache = get_cms_setting('PLUGIN_CACHE')
+    system = False
 
     opts = {}
 
@@ -375,7 +385,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_unicode(self.name), force_unicode(instance))
+        return "%s - %s" % (force_text(self.name), force_text(instance))
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -471,8 +481,18 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
 
 class PluginMenuItem(object):
-    def __init__(self, name, url, data, question=None):
+    def __init__(self, name, url, data, question=None, action='ajax'):
+        """
+        Creates an item in the plugin / placeholder menu
+
+        :param name: Item name (label)
+        :param url: URL the item points to. This URL will be called using POST
+        :param data: Data to be POSTed to the above URL
+        :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
+        :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+        """
         self.name = name
         self.url = url
         self.data = json.dumps(data)
         self.question = question
+        self.action = action

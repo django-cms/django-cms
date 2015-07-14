@@ -18,7 +18,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
-from cms.test_utils.util.context_managers import SettingsOverride
 
 if hasattr(reversion.models, 'VERSION_CHANGE'):
     from reversion.models import VERSION_CHANGE
@@ -282,13 +281,13 @@ class ReversionTestCase(TransactionCMSTestCase):
 
     def test_publish_limits(self):
         with self.login_user_context(self.user):
-            with SettingsOverride(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
+            with self.settings(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
                 self.assertEqual(Revision.objects.all().count(), 4)
                 for x in range(10):
                     publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
-                    response = self.client.get(publish_url)
+                    response = self.client.post(publish_url)
                     self.assertEqual(response.status_code, 302)
                 self.assertEqual(Revision.objects.all().count(), 4)
 

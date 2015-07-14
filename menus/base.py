@@ -15,17 +15,20 @@ class Menu(object):
         """
         raise NotImplementedError
 
+
 class Modifier(object):
 
-    def modify(self, request, nodes, namespace, root_id,  post_cut, breadcrumb):
+    def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         pass
+
 
 class NavigationNode(object):
 
-    def __init__(self, title, url, id, parent_id=None, parent_namespace=None, attr=None, visible=True):
-        self.children = [] # do not touch
-        self.parent = None # do not touch, code depends on this
-        self.namespace = None # TODO: Assert why we need this and above
+    def __init__(self, title, url, id, parent_id=None, parent_namespace=None,
+                 attr=None, visible=True):
+        self.children = []  # do not touch
+        self.parent = None  # do not touch, code depends on this
+        self.namespace = None  # TODO: Assert why we need this and above
         self.title = title
         self.url = url
         self.id = id

@@ -6,8 +6,7 @@ import dj_database_url
 import django
 from django.utils import six
 
-from cms.utils.compat import DJANGO_1_6
-
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 gettext = lambda s: s
 
@@ -52,28 +51,7 @@ def configure(db_url, **extra):
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
         SECRET_KEY='key',
-        TEMPLATE_LOADERS=(
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
-            'django.template.loaders.eggs.Loader',
-        ),
-        TEMPLATE_CONTEXT_PROCESSORS=[
-            "django.contrib.auth.context_processors.auth",
-            'django.contrib.messages.context_processors.messages',
-            "django.core.context_processors.i18n",
-            "django.core.context_processors.debug",
-            "django.core.context_processors.request",
-            "django.core.context_processors.media",
-            'django.core.context_processors.csrf',
-            "cms.context_processors.cms_settings",
-            "sekizai.context_processors.sekizai",
-            "django.core.context_processors.static",
-        ],
-        TEMPLATE_DIRS=[
-            os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
-        ],
         MIDDLEWARE_CLASSES=[
-            #'debug_toolbar.middleware.DebugToolbarMiddleware',
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
             'django.contrib.sessions.middleware.SessionMiddleware',
@@ -81,6 +59,7 @@ def configure(db_url, **extra):
             'django.contrib.messages.middleware.MessageMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.BrokenLinkEmailsMiddleware',
             'django.middleware.common.CommonMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
@@ -214,12 +193,13 @@ def configure(db_url, **extra):
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin'),
+                            'TextPlugin', 'MultiColumnPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
             'col_left': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin', 'EmptyPlugin'),
                 'name': gettext("left column"),
                 'plugin_modules': {
                     'LinkPlugin': 'Different Grouper'
@@ -230,12 +210,13 @@ def configure(db_url, **extra):
             },
             'col_right': {
                 'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin',
+                            'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {
                 "plugins": ('TextPlugin',),
-                "extra_context": {"width": 250},
+                "extra_context": {"extra_width": 250},
                 "name": "extra context"
             },
         },
@@ -265,6 +246,55 @@ def configure(db_url, **extra):
         ALLOWED_HOSTS=['localhost'],
     )
     from django.utils.functional import empty
+    settings._wrapped = empty
+    defaults.update(extra)
+
+    if DJANGO_1_7:
+        defaults.update(dict(
+            TEMPLATE_CONTEXT_PROCESSORS=[
+                "django.contrib.auth.context_processors.auth",
+                'django.contrib.messages.context_processors.messages',
+                "django.core.context_processors.i18n",
+                "django.core.context_processors.debug",
+                "django.core.context_processors.request",
+                "django.core.context_processors.media",
+                'django.core.context_processors.csrf',
+                "cms.context_processors.cms_settings",
+                "sekizai.context_processors.sekizai",
+                "django.core.context_processors.static",
+            ],
+            TEMPLATE_LOADERS=(
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.eggs.Loader',
+            ),
+            TEMPLATE_DIRS=[
+                os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
+            ],
+        ))
+    else:
+        defaults['TEMPLATES'] = [
+            {
+                'NAME': 'django',
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+                'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
+                'OPTIONS': {
+                    'context_processors': [
+                        "django.contrib.auth.context_processors.auth",
+                        'django.contrib.messages.context_processors.messages',
+                        "django.template.context_processors.i18n",
+                        "django.template.context_processors.debug",
+                        "django.template.context_processors.request",
+                        "django.template.context_processors.media",
+                        'django.template.context_processors.csrf',
+                        "cms.context_processors.cms_settings",
+                        "sekizai.context_processors.sekizai",
+                        "django.template.context_processors.static",
+                    ],
+                }
+            }
+        ]
 
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
@@ -280,26 +310,26 @@ def configure(db_url, **extra):
             'djangocms_picture': 'djangocms_picture.migrations',
             'djangocms_style': 'djangocms_style.migrations',
             'djangocms_teaser': 'djangocms_teaser.migrations',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations',
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.south_migrations',
             'djangocms_video': 'djangocms_video.migrations',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.fake',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.fake',
-            'fileapp': 'cms.test_utils.project.fileapp.fake',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.fake',
-            'sampleapp': 'cms.test_utils.project.sampleapp.fake',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.fake',
-            'fakemlng': 'cms.test_utils.project.fakemlng.fake',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.fake',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.fake',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.fake',
-            'extensionapp': 'cms.test_utils.project.extensionapp.fake',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.fake',
-            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.fake',
+            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.south_migrations',
+            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.south_migrations',
+            'fileapp': 'cms.test_utils.project.fileapp.south_migrations',
+            'placeholderapp': 'cms.test_utils.project.placeholderapp.south_migrations',
+            'sampleapp': 'cms.test_utils.project.sampleapp.south_migrations',
+            'emailuserapp': 'cms.test_utils.project.emailuserapp.south_migrations',
+            'customuserapp': 'cms.test_utils.project.customuserapp.south_migrations',
+            'fakemlng': 'cms.test_utils.project.fakemlng.south_migrations',
+            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.south_migrations',
+            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.south_migrations',
+            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.south_migrations',
+            'extensionapp': 'cms.test_utils.project.extensionapp.south_migrations',
+            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.south_migrations',
+            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.south_migrations',
         }
+        defaults['SOUTH_TESTS_MIGRATE'] = defaults.get('TESTS_MIGRATE', False)
     else:
         defaults['MIGRATION_MODULES'] = {
-            'cms': 'cms.migrations',
-            'menus': 'menus.migrations',
             'djangocms_column': 'djangocms_column.migrations_django',
             'djangocms_file': 'djangocms_file.migrations_django',
             'djangocms_flash': 'djangocms_flash.migrations_django',
@@ -309,7 +339,6 @@ def configure(db_url, **extra):
             'djangocms_picture': 'djangocms_picture.migrations_django',
             'djangocms_style': 'djangocms_style.migrations_django',
             'djangocms_teaser': 'djangocms_teaser.migrations_django',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
             'djangocms_video': 'djangocms_video.migrations_django',
             'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations',
             'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations',
@@ -325,13 +354,22 @@ def configure(db_url, **extra):
             'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
         }
+        if not defaults.get('TESTS_MIGRATE', False):
+            # Disable migrations for Django 1.7+
+            class DisableMigrations(object):
+
+                def __contains__(self, item):
+                    return True
+
+                def __getitem__(self, item):
+                    return "notmigrations"
+
+            defaults['MIGRATION_MODULES'] = DisableMigrations()
 
     if 'AUTH_USER_MODEL' in extra:
         custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
         defaults['INSTALLED_APPS'].insert(defaults['INSTALLED_APPS'].index('cms'), custom_user_app)
 
-    settings._wrapped = empty
-    defaults.update(extra)
     # add data from env
     extra_settings = os.environ.get("DJANGO_EXTRA_SETTINGS", None)
 

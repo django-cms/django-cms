@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool
 
+
 class SampleAppMenu(Menu):
 
     def get_nodes(self, request):
@@ -27,8 +28,10 @@ class SampleAppMenu(Menu):
 
 menu_pool.register_menu(SampleAppMenu)
 
+
 class StaticMenu(CMSAttachMenu):
     name = _("Static Menu")
+
     def get_nodes(self, request):
         nodes = []
         n = NavigationNode('static root page', "/fresh/", 1)
@@ -43,18 +46,11 @@ class StaticMenu(CMSAttachMenu):
 
 menu_pool.register_menu(StaticMenu)
 
-class StaticMenu2(CMSAttachMenu):
-    name = _("Static Menu2")
-    def get_nodes(self, request):
-        nodes = []
-        n = NavigationNode('static2 root page', "/fresh/", 1)
-        n2 = NavigationNode('static2 settings page', "/bye/", 2)
-        n3 = NavigationNode('static2 account page', "/hello/", 3)
-        n4 = NavigationNode('static2 my profile page', "/hello/world/", 4, 3)
-        nodes.append(n)
-        nodes.append(n2)
-        nodes.append(n3)
-        nodes.append(n4)
-        return nodes
 
+class StaticMenu2(StaticMenu):
+    name = _("Static Menu2")
 menu_pool.register_menu(StaticMenu2)
+
+class StaticMenu3(StaticMenu):
+    name = _("Static Menu3")
+menu_pool.register_menu(StaticMenu3)

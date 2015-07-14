@@ -42,7 +42,7 @@ There's more than one way to do this, but here's one to help you get started::
 
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
-    pip install -Ur django-cms/test_requirements/django-1.6.txt
+    pip install -r django-cms/test_requirements/django-1.6.txt
 
     # run the test suite
     # note that you must be in the django-cms directory when you do this,
@@ -125,6 +125,12 @@ dj-database-url compatible value.
 Runs the test suite. Optionally takes test labels as arguments to limit the tests which should be run.
 Test labels should be in the same format as used in ``manage.py test``.
 
+.. option:: --xvfb
+
+    Use a virtual X framebuffer for frontend testing, requires `xvfbwrapper <https://github.com/cgoldberg/xvfbwrapper>`_ to be installed.
+
+    With this option you won't need a physical display.
+
 .. option:: --parallel
 
     Runs tests in parallel, using one worker process per available CPU core.
@@ -179,6 +185,16 @@ Run a server locally for testing. This is similar to ``manage.py runserver``.
 .. option:: --bind <bind>
 
     Interface to bind to. Defaults to 127.0.0.1.
+
+.. option:: --migrate
+
+    Use migrations instead of plain syncdb.
+
+.. option:: application-name, migration-number
+
+    Options to specify a single migration to migrate to. When using Django 1.6
+    it only works if --migrate option is specified.
+
 
 
 ``develop.py shell``

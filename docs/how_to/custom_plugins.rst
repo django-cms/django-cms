@@ -97,10 +97,10 @@ The simplest plugin
 *******************
 
 You may use ``python manage.py startapp`` to set up the basic layout for you
-plugin app. Alternatively, just add a file called ``cms_plugins.py`` to an
+plugin app (remember to add your plugin to ``INSTALLED_APPS``). Alternatively, just add a file called ``cms_plugins.py`` to an
 existing Django application.
 
-In there, you place your plugins. For our example, include the following code::
+In ``cms_plugins.py``, you place your plugins. For our example, include the following code::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
@@ -110,6 +110,7 @@ In there, you place your plugins. For our example, include the following code::
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
         render_template = "hello_plugin.html"
+        cache = False
 
     plugin_pool.register_plugin(HelloPlugin)
 
@@ -142,6 +143,11 @@ There are two required attributes on those classes:
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
+* ``cache``: This is a property that tells the plugin rendering system in django
+  CMS whether to cache the plugin’s output to speed-up subsequent views of the
+  same plugin. By default, the cms caches. Since we want each visitor to see
+  output that is specific to him or her, we need to tell the cms to not cache
+  this plugin.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
 is ``True`` (the default):
@@ -217,6 +223,7 @@ Now we need to change our plugin definition to use this model, so our new
         model = Hello
         name = _("Hello Plugin")
         render_template = "hello_plugin.html"
+        cache = False
 
         def render(self, context, instance, placeholder):
             context['instance'] = instance
@@ -305,7 +312,7 @@ have two models, one for the plugin and one for those items::
         plugin = models.ForeignKey(
             ArticlePluginModel,
             related_name="associated_item"
-            )
+        )
 
 You'll then need the ``copy_relations()`` method on your plugin model to loop
 over the associated items and copy them, giving the copies foreign keys to the
@@ -381,17 +388,17 @@ Since :class:`cms.plugin_base.CMSPluginBase` extends
 for your plugins just as you would customize your admin interfaces.
 
 The template that the plugin editing mechanism uses is
-``cms/templates/admin/cms/page/plugin_change_form.html``. You might need to
+``cms/templates/admin/cms/page/plugin/change_form.html``. You might need to
 change this.
 
 If you want to customise this the best way to do it is:
 
-* create a template of your own that extends ``cms/templates/admin/cms/page/plugin_change_form.html``
+* create a template of your own that extends ``cms/templates/admin/cms/page/plugin/change_form.html``
   to provide the functionality you require;
 * provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a
   ``change_form_template`` attribute pointing at your new template.
 
-Extending ``admin/cms/page/plugin_change_form.html`` ensures that you'll keep
+Extending ``admin/cms/page/plugin/change_form.html`` ensures that you'll keep
 a unified look and functionality across your plugins.
 
 There are various reasons *why* you might want to do this. For example, you
@@ -400,7 +407,7 @@ variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
 block.super }}`` to inherit the existing items that were in the parent
 template.
 
-Or: ``cms/templates/admin/cms/page/plugin_change_form.html`` extends Django's
+Or: ``cms/templates/admin/cms/page/plugin/change_form.html`` extends Django's
 own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
 and your plugin admin might require something newer. In this case, in your
 custom ``change_form_template`` you could do something like::

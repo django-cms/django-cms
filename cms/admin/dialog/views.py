@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404, HttpResponse
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 
 from cms.models import Page
 from cms.utils import get_cms_setting
@@ -27,4 +27,4 @@ def get_copy_dialog(request, page_id):
         'callback': request.REQUEST['callback'],
     }
 
-    return render_to_response("admin/cms/page/tree/copy_premissions.html", context)
+    return render(request, "admin/cms/page/tree/copy_premissions.html", context)

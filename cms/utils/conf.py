@@ -4,11 +4,10 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.utils.six.moves.urllib.parse import urljoin
 
 from cms import constants
-from cms.utils.compat.urls import urljoin
 
 
 __all__ = ['get_cms_setting']
@@ -56,10 +55,14 @@ DEFAULTS = {
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'MAX_PAGE_PUBLISH_REVERSIONS': 10,
     'MAX_PAGE_HISTORY_REVERSIONS': 15,
+    'TOOLBAR_ANONYMOUS_ON': True,
     'TOOLBAR_URL__EDIT_ON': 'edit',
     'TOOLBAR_URL__EDIT_OFF': 'edit_off',
     'TOOLBAR_URL__BUILD': 'build',
+    'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
+    'APP_NAME':None,
+    'TOOLBAR_HIDE':False
 }
 
 
@@ -96,6 +99,11 @@ def get_toolbar_url__build():
     return get_cms_setting('TOOLBAR_URL__BUILD')
 
 
+@default('CMS_TOOLBAR_URL__DISABLE')
+def get_toolbar_url__disable():
+    return get_cms_setting('TOOLBAR_URL__DISABLE')
+
+
 def get_templates():
     from cms.utils.django_load import load_from_file
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
@@ -109,7 +117,13 @@ def get_templates():
         # app_directories template loaders do
         prefix = ''
         # Relative to TEMPLATE_DIRS for filesystem loader
-        for basedir in settings.TEMPLATE_DIRS:
+
+        try:
+            path = settings.TEMPLATE_DIRS
+        except IndexError:
+            path = [template['DIRS'][0] for template in settings.TEMPLATES]
+
+        for basedir in path:
             if tpldir.find(basedir) == 0:
                 prefix = tpldir.replace(basedir + os.sep, '')
                 break
@@ -160,7 +174,7 @@ def _ensure_languages_settings(languages):
             defaults[key] = True
 
     for site, language_list in languages.items():
-        if not isinstance(site, six.integer_types):
+        if site != hash(site):
             raise ImproperlyConfigured(
                 "CMS_LANGUAGES can only be filled with integers (site IDs) and 'default'"
                 " for default values. %s is not a valid key." % site)
@@ -194,13 +208,13 @@ def _ensure_languages_settings(languages):
             lang_code != language_object['code']]
 
     languages['default'] = defaults
-    languages[VERIFIED] = True  # this will be busted by SettingsOverride and cause a re-check
+    languages[VERIFIED] = True  # this will be busted by @override_settings and cause a re-check
 
     return languages
 
 
 def get_languages():
-    if not isinstance(settings.SITE_ID, six.integer_types):
+    if settings.SITE_ID != hash(settings.SITE_ID):
         raise ImproperlyConfigured(
             "SITE_ID must be an integer"
         )
@@ -240,6 +254,7 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
     'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
     'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
+    'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
 }
 
 

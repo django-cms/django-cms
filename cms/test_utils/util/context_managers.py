@@ -2,55 +2,15 @@
 import sys
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
-from tempfile import template, mkdtemp
+from tempfile import template, mkdtemp, _exists
 
-from django.conf import settings
-from django.core.signals import request_started
-from django.db import reset_queries
-from django.template import context
+from django.contrib.auth import get_user_model
 from django.utils.six.moves import StringIO
 from django.utils.translation import get_language, activate
-
-from cms.utils.compat.dj import get_user_model
 
 
 class NULL:
     pass
-
-
-class SettingsOverride(object):
-    """
-    Overrides Django settings within a context and resets them to their inital
-    values on exit.
-
-    Example:
-
-        with SettingsOverride(DEBUG=True):
-            # do something
-    """
-
-    def __init__(self, **overrides):
-        self.overrides = overrides
-        self.special_handlers = {
-            'TEMPLATE_CONTEXT_PROCESSORS': self.template_context_processors,
-        }
-
-    def __enter__(self):
-        self.old = {}
-        for key, value in self.overrides.items():
-            self.old[key] = getattr(settings, key, NULL)
-            setattr(settings, key, value)
-
-    def __exit__(self, type, value, traceback):
-        for key, value in self.old.items():
-            if value is not NULL:
-                setattr(settings, key, value)
-            else:
-                delattr(settings,key) # do not pollute the context!
-            self.special_handlers.get(key, lambda:None)()
-
-    def template_context_processors(self):
-        context._standard_context_processors = None
 
 
 class StdOverride(object):
@@ -111,12 +71,8 @@ class TemporaryDirectory:
         return self.name
 
     def cleanup(self):
-        try:
-            from tempfile import _exists
-            if _exists(self.name):
-                _rmtree(self.name)
-        except ImportError:
-            pass
+        if _exists(self.name):
+            _rmtree(self.name)
 
     def __exit__(self, exc, value, tb):
         self.cleanup()
@@ -166,36 +122,6 @@ class ChangeModel(object):
             else:
                 setattr(self.instance, key, old_value)
         self.instance.save()
-
-class _AssertNumQueriesContext(object):
-    def __init__(self, test_case, num, connection):
-        self.test_case = test_case
-        self.num = num
-        self.connection = connection
-
-    def __enter__(self):
-        self.old_debug = settings.DEBUG
-        settings.DEBUG = True
-        self.starting_queries = len(self.connection.queries)
-        request_started.disconnect(reset_queries)
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        settings.DEBUG = self.old_debug
-        request_started.connect(reset_queries)
-        if exc_type is not None:
-            return
-
-        final_queries = len(self.connection.queries)
-        executed = final_queries - self.starting_queries
-
-        queries = '\n'.join([q['sql'] for q in self.connection.queries[self.starting_queries:]])
-
-        self.test_case.assertEqual(
-            executed, self.num, "%d queries executed, %d expected. Queries executed:\n%s" % (
-                executed, self.num, queries
-            )
-        )
 
 
 @contextmanager

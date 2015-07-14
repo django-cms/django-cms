@@ -2,6 +2,7 @@
 
 from itertools import chain
 
+from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import NoReverseMatch, reverse_lazy
@@ -13,7 +14,6 @@ from django.utils.translation import ugettext as _
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
 from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
-from cms.utils.compat.dj import force_unicode
 
 
 class PageSelectWidget(MultiWidget):
@@ -58,7 +58,7 @@ class PageSelectWidget(MultiWidget):
             initial_value = u''
         else:
             initial_value = initial
-        if force_unicode(initial_value) != force_unicode(data_value):
+        if force_text(initial_value) != force_text(data_value):
             return True
         return False
 
@@ -101,10 +101,10 @@ class PageSelectWidget(MultiWidget):
     };
     var handlePageChange = function(page_id) {
         if (page_id) {
-            $("#id_%(name)s_2 option").prop('selected', false);
-            $("#id_%(name)s_2 option[value=" + page_id + "]").prop('selected', true);
+            $("#id_%(name)s_2 option").attr('selected', false);
+            $("#id_%(name)s_2 option[value=" + page_id + "]").attr('selected', true);
         } else {
-            $("#id_%(name)s_2 option[value=]").prop('selected', true);
+            $("#id_%(name)s_2 option[value=]").attr('selected', true);
         };
     };
     $("#id_%(name)s_0").change(function(){
@@ -187,7 +187,7 @@ class PageSmartLinkWidget(TextInput):
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': force_unicode(self.ajax_url)
+            'ajax_url': force_text(self.ajax_url)
         }]
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
@@ -267,3 +267,44 @@ class AppHookSelect(Select):
         for option_value, option_label in chain(self.choices, choices):
             output.append(self.render_option(selected_choices, option_value, option_label))
         return '\n'.join(output)
+
+
+class ApplicationConfigSelect(Select):
+    """
+    Special widget -populate by javascript- that shows application configurations
+    depending on selected Apphooks.
+
+    Required data are injected in the page as javascript data that cms.app_hook_select.js
+    uses to create the appropriate data structure.
+
+    A stub 'add-another' link is created and filled in with the correct URL by the same
+    javascript.
+    """
+
+    class Media:
+        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
+
+    def __init__(self, attrs=None, choices=(), app_configs={}):
+        self.app_configs = app_configs
+        super(ApplicationConfigSelect, self).__init__(attrs, choices)
+
+    def render(self, name, value, attrs=None, choices=()):
+        output = [super(ApplicationConfigSelect, self).render(name, value, attrs, choices)]
+        output.append('<script>\n')
+        output.append('var apphooks_configuration = {\n')
+        for application, cms_app in self.app_configs.items():
+            output.append("'%s': [%s]," % (application, ",".join(["['%s', '%s']" % (config.pk, force_text(config)) for config in cms_app.get_configs()])))
+        output.append('\n};\n')
+        output.append('var apphooks_configuration_url = {\n')
+        for application, cms_app in self.app_configs.items():
+            output.append("'%s': '%s'," % (application, cms_app.get_config_add_url()))
+        output.append('\n};\n')
+        output.append('var apphooks_configuration_value = \'%s\';\n' % value)
+        output.append('</script>')
+
+        related_url = ''
+        output.append('<a href="%s" class="add-another" id="add_%s" onclick="return showAddAnotherPopup(this);"> '
+                      % (related_url, name))
+        output.append('<img src="%s" width="10" height="10" alt="%s"/></a>'
+                      % (static('admin/img/icon_addlink.gif'), _('Add Another')))
+        return mark_safe(''.join(output))

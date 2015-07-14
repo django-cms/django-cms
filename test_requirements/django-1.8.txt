@@ -1,0 +1,6 @@
+-r requirements_base.txt
+https://github.com/django/django/tarball/stable/1.8.x/django.tar.gz#egg=django
+django-reversion>=1.8,<1.9
+https://github.com/KristianOellegaard/django-hvad/archive/master.zip
+https://github.com/yakky/django-sekizai/archive/further_18.zip
+https://github.com/vad/django-classy-tags/archive/fix/recursion-in-django18.zip

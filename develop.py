@@ -10,7 +10,6 @@ import os
 import sys
 import warnings
 
-from django import VERSION
 from django.core.exceptions import DjangoRuntimeWarning
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command, CommandError
@@ -39,7 +38,7 @@ Usage:
     develop.py isolated test [<test-label>...] [--parallel] [--migrate]
                              [--xvfb]
     develop.py server [--port=<port>] [--bind=<bind>] [--migrate]
-                      [--user=<user>]
+                      [--user=<user>] [<application-name> <migration-number>]
     develop.py shell
     develop.py compilemessages
     develop.py makemessages
@@ -64,15 +63,19 @@ Options:
 '''
 
 
-def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
+def server(bind='127.0.0.1', port=8000, migrate_cmd=False, app_name=None, migration=None):
     if os.environ.get("RUN_MAIN") != "true":
-        from cms.utils.compat.dj import get_user_model
+        from django.contrib.auth import get_user_model  # must be imported lazily
         if DJANGO_1_6:
             from south.management.commands import syncdb, migrate
             if migrate_cmd:
                 syncdb.Command().handle_noargs(interactive=False, verbosity=1,
                                                database='default')
-                migrate.Command().handle(interactive=False, verbosity=1)
+                if app_name:
+                    migrate.Command().handle(interactive=False, verbosity=1, app=app_name,
+                                             target=migration)
+                else:
+                    migrate.Command().handle(interactive=False, verbosity=1)
             else:
                 syncdb.Command().handle_noargs(interactive=False, verbosity=1,
                                                database='default',
@@ -80,7 +83,10 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
                 migrate.Command().handle(interactive=False, verbosity=1,
                                          fake=True)
         else:
-            call_command("migrate", database='default')
+            if app_name:
+                call_command("migrate", app_name, migration, database='default')
+            else:
+                call_command("migrate", database='default')
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
             usr = User()
@@ -100,8 +106,13 @@ def server(bind='127.0.0.1', port=8000, migrate_cmd=False):
             print('')
     from django.contrib.staticfiles.management.commands import runserver
     rs = runserver.Command()
-    rs.stdout = sys.stdout
-    rs.stderr = sys.stderr
+    try:
+        from django.core.management.base import OutputWrapper
+        rs.stdout = OutputWrapper(sys.stdout)
+        rs.stderr = OutputWrapper(sys.stderr)
+    except ImportError:
+        rs.stdout = sys.stdout
+        rs.stderr = sys.stderr
     rs.use_ipv6 = False
     rs._raw_ipv6 = False
     rs.addr = bind
@@ -123,28 +134,43 @@ def _split(itr, num):
 
 def _get_test_labels():
     test_labels = []
-    for module in [name for _, name, _ in pkgutil.iter_modules(
-            [os.path.join("cms", "tests")])]:
-        clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
-        for clsname, cls in clsmembers.items():
-            for method, _ in cls.methods.items():
-                if method.startswith('test_'):
-                    test_labels.append('cms.%s.%s' % (clsname, method))
+    if DJANGO_1_6:
+        for module in [name for _, name, _ in pkgutil.iter_modules(
+                [os.path.join("cms", "tests")])]:
+            clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+            for clsname, cls in clsmembers.items():
+                for method, _ in cls.methods.items():
+                    if method.startswith('test_'):
+                        test_labels.append('cms.%s.%s' % (clsname, method))
+    else:
+        for module in [name for _, name, _ in pkgutil.iter_modules(
+                [os.path.join("cms", "tests")])]:
+            clsmembers = pyclbr.readmodule("cms.tests.%s" % module)
+            for clsname, cls in clsmembers.items():
+                for method, _ in cls.methods.items():
+                    if method.startswith('test_'):
+                        test_labels.append('cms.tests.%s.%s' % (clsname, method))
     test_labels = sorted(test_labels)
     return test_labels
 
 
-def _test_run_worker(test_labels, failfast=False,
-                     test_runner='django.test.simple.DjangoTestSuiteRunner'):
+def _test_run_worker(test_labels, failfast=False, test_runner=None):
     warnings.filterwarnings(
         'error', r"DateTimeField received a naive datetime",
         RuntimeWarning, r'django\.db\.models\.fields')
     from django.conf import settings
-    settings.TEST_RUNNER = test_runner
     from django.test.utils import get_runner
+    if not test_runner:
+        if DJANGO_1_6:
+            test_runner = 'django.test.simple.DjangoTestSuiteRunner'
+        else:
+            test_runner = 'django.test.runner.DiscoverRunner'
+    if not test_labels:
+        test_labels = _get_test_labels()
+    settings.TEST_RUNNER = test_runner
     TestRunner = get_runner(settings)
-
-    test_runner = TestRunner(verbosity=1, interactive=False, failfast=failfast)
+    test_runner = TestRunner(verbosity=1, pattern="*.py", top_level='cms',
+                             interactive=False, failfast=failfast)
     failures = test_runner.run_tests(test_labels)
     return failures
 
@@ -217,6 +243,8 @@ def makemigrations(migrate_plugins=True, merge=False, squash=False):
     ]
     if os.environ.get("AUTH_USER_MODEL") == "emailuserapp.EmailUser":
         applications.append('emailuserapp')
+    if os.environ.get("AUTH_USER_MODEL") == "customuserapp.User":
+        applications.append('customuserapp')
     if migrate_plugins:
         applications.extend([
             # official plugins
@@ -313,19 +341,19 @@ def main():
         "DATABASE_URL",
         "sqlite://localhost/%s" % default_name
     )
-    migrate = args.get('--migrate', False)
+    migrate = (args.get('--migrate', False) or
+               args.get('makemigrations', False) or
+               args.get('squashmigrations', False))
 
     with temp_dir() as STATIC_ROOT:
         with temp_dir() as MEDIA_ROOT:
-            use_tz = VERSION[:2] >= (1, 4)
-
             configs = {
                 'db_url': db_url,
                 'ROOT_URLCONF': 'cms.test_utils.project.urls',
                 'STATIC_ROOT': STATIC_ROOT,
                 'MEDIA_ROOT': MEDIA_ROOT,
-                'USE_TZ': use_tz,
-                'SOUTH_TESTS_MIGRATE': migrate,
+                'USE_TZ': True,
+                'TESTS_MIGRATE': migrate,
             }
 
             if args['test']:
@@ -338,13 +366,7 @@ def main():
                 auth_user_model = os.environ.get("AUTH_USER_MODEL", None)
 
             if auth_user_model:
-                if VERSION[:2] < (1, 5):
-                    print()
-                    print("Custom user models are not supported "
-                          "before Django 1.5")
-                    print()
-                else:
-                    configs['AUTH_USER_MODEL'] = auth_user_model
+                configs['AUTH_USER_MODEL'] = auth_user_model
 
             configure(**configs)
 
@@ -392,7 +414,9 @@ def main():
                 server(
                     args['--bind'],
                     args['--port'],
-                    args.get('--migrate', True)
+                    args.get('--migrate', True),
+                    args.get('<application-name>', None),
+                    args.get('<migration-number>', None)
                 )
             elif args['shell']:
                 shell()

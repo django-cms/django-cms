@@ -30,8 +30,8 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
 
         if options.get('interactive'):
             confirm = input("""
-You have requested to delete any instances of uninstalled plugins and unsaved plugin instances.
-There are %d uninstalled plugins and %d unsaved_plugins.
+You have requested to delete any instances of uninstalled plugins and empty plugin instances.
+There are %d uninstalled plugins and %d empty plugins.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), len(unsaved_instances)))
         else:
@@ -39,7 +39,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), le
 
         if confirm == 'yes':
             # delete items whose plugin is uninstalled and items with unsaved instances
-            self.stdout.write(u"... deleting any instances of uninstalled plugins and unsaved plugin instances\n")
+            self.stdout.write(u"... deleting any instances of uninstalled plugins and empty plugin instances\n")
 
             for instance in uninstalled_instances:
                 instance.delete()

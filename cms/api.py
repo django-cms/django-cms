@@ -8,6 +8,7 @@ calling these methods!
 """
 import datetime
 
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
@@ -15,6 +16,9 @@ from django.core.exceptions import ValidationError
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
+from django.utils.translation import activate
+
+from cms import constants
 from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
@@ -28,20 +32,11 @@ from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals
+from cms.utils.permissions import _thread_locals, current_user, has_page_change_permission
 from menus.menu_pool import menu_pool
 
-
-#===============================================================================
-# Constants
-#===============================================================================
-
-VISIBILITY_ALL = None
-VISIBILITY_USERS = 1
-VISIBILITY_STAFF = 2
 
 #===============================================================================
 # Helpers/Internals
@@ -58,13 +53,14 @@ def _generate_valid_slug(source, parent, language):
         qs = Title.objects.filter(language=language, page__parent=parent)
     else:
         qs = Title.objects.filter(language=language, page__parent__isnull=True)
-    used = qs.values_list('slug', flat=True)
+    used = list(qs.values_list('slug', flat=True))
     baseslug = slugify(source)
     slug = baseslug
     i = 1
-    while slug in used:
-        slug = '%s-%s' % (baseslug, i)
-        i += 1
+    if used:
+        while slug in used:
+            slug = '%s-%s' % (baseslug, i)
+            i += 1
     return slug
 
 
@@ -73,12 +69,14 @@ def _verify_apphook(apphook, namespace):
     Verifies the apphook given is valid and returns the normalized form (name)
     """
     apphook_pool.discover_apps()
-    if hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
+    if isinstance(apphook, CMSApp):
         try:
-            assert apphook in apphook_pool.apps.values()
+            assert apphook.__class__ in [app.__class__ for app in apphook_pool.apps.values()]
         except AssertionError:
             print(apphook_pool.apps.values())
             raise
+        apphook_name = apphook.__class__.__name__
+    elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
     elif isinstance(apphook, six.string_types):
         try:
@@ -127,7 +125,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
                 navigation_extenders=None, published=False, site=None,
-                login_required=False, limit_visibility_in_menu=VISIBILITY_ALL,
+                login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
     """
     Create a CMS Page and it's title for the given language
@@ -179,7 +177,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
         assert navigation_extenders in menus
 
     # validate menu visibility
-    accepted_limitations = (VISIBILITY_ALL, VISIBILITY_USERS, VISIBILITY_STAFF)
+    accepted_limitations = (constants.VISIBILITY_ALL, constants.VISIBILITY_USERS, constants.VISIBILITY_ANONYMOUS)
     assert limit_visibility_in_menu in accepted_limitations
 
     # validate position
@@ -219,12 +217,10 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-    page.add_root(instance=page)
-    page = page.reload()
+    page = page.add_root(instance=page)
 
     if parent:
-        page.move(target=parent, pos=position)
-        page = page.reload()
+        page = page.move(target=parent, pos=position)
 
     create_title(
         language=language,
@@ -344,11 +340,10 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
         parent_id=parent_id,
     )
 
-    plugin_base.add_root(instance=plugin_base)
+    plugin_base = plugin_base.add_root(instance=plugin_base)
 
     if target:
-        plugin_base.move(target, pos=position)
-        plugin_base = CMSPlugin.objects.get(pk=plugin_base.pk)
+        plugin_base = plugin_base.move(target, pos=position)
     plugin = plugin_model(**data)
     plugin_base.set_base_attr(plugin)
     plugin.save()
@@ -450,8 +445,39 @@ def publish_page(page, user, language):
     request = FakeRequest(user)
     if not page.has_publish_permission(request):
         raise PermissionDenied()
-    page.publish(language)
+    # Set the current_user to have the page's changed_by
+    # attribute set correctly.
+    # 'user' is a user object, but current_user() just wants the username (a string).
+    with current_user(user.get_username()):
+        page.publish(language)
     return page.reload()
+
+
+def publish_pages(include_unpublished=False, language=None, site=None):
+    """
+    Create published public version of selected drafts.
+    """
+    qs = Page.objects.drafts()
+    if not include_unpublished:
+        qs = qs.filter(title_set__published=True).distinct()
+    if site:
+        qs = qs.filter(site=site)
+
+    output_language = None
+    for i, page in enumerate(qs):
+        add = True
+        titles = page.title_set
+        if not include_unpublished:
+            titles = titles.filter(published=True)
+        for lang in titles.values_list("language", flat=True):
+            if language is None or lang == language:
+                if not output_language:
+                    output_language = lang
+                if not page.publish(lang):
+                    add = False
+        # we may need to activate the first (main) language for proper page title rendering
+        activate(output_language)
+        yield (page, add)
 
 
 def get_page_draft(page):
@@ -505,3 +531,18 @@ def copy_plugins_to_language(page, source_language, target_language,
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
+
+
+def can_change_page(request):
+    """
+    Check whether a user has the permission to change the page.
+
+    This will work across all permission-related setting, with a unified interface
+    to permission checking.
+    """
+    # check global permissions if CMS_PERMISSION is active
+    global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
+    # check if user has page edit permission
+    page_permission = request.current_page and request.current_page.has_change_permission(request)
+
+    return global_permission or page_permission

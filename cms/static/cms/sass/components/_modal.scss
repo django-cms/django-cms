@@ -1,0 +1,228 @@
+//##################################################################################################################
+// #MODAL#
+//
+// Editing plugins in frontend
+
+#cms-toolbar {
+    .cms-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        overflow: hidden;
+        z-index: z(modal, base);
+        border-radius: $modal-border-radius;
+        background: $modal-bgcolor;
+        box-shadow: $modal-shadow;
+        user-select: none;
+        transform: translateZ(0);
+
+    }
+    .cms-modal-body {
+        position: relative;
+        z-index: z(modal, body);
+        width: 800px;
+        height: 400px;
+        border-top: 1px solid $gray-lighter;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    .cms-modal-foot {
+        position: relative;
+        clear: both;
+        height: $modal-footer-height;
+        background: $gray-lightest;
+    }
+    // this elements shows up on top of an iframe as soon as the dragging starts
+    // so if you are moving the mouse really fast and mouse hovers over an iframe
+    // mouse events do not go to the iframe but keep firing in the parent document
+    .cms-modal-shim {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: z(modal, shim);
+        width: 100%;
+        height: 100%;
+    }
+    .cms-modal-frame {
+        position: relative;
+        z-index: z(modal, frame);
+        width: 100%;
+        height: 100%;
+    }
+    .cms-modal-frame iframe {
+        width: 100%;
+        height: 100%;
+    }
+
+    .cms-modal-head {
+        position: relative;
+    }
+    .cms-modal-title {
+        display: block;
+        color: $gray-darker;
+        font-size: $modal-header-title-font-size;
+        line-height: $modal-header-height;
+        font-weight: bold;
+        text-align: center;
+        padding: 0px ($modal-header-button-area-size * 3 + $padding-base + $padding-large);
+        cursor: move;
+        background: $gray-lightest;
+    }
+
+    .cms-modal-collapse,
+    .cms-modal-close,
+    .cms-modal-maximize {
+        display: block;
+        position: absolute;
+        font-size: $modal-header-button-icon-size;
+        top: 50%;
+        margin-top: -$modal-header-button-area-size / 2;
+        right: $padding-base;
+        color: $gray-light;
+        text-align: center;
+        width: $modal-header-button-area-size;
+        height: $modal-header-button-area-size;
+        cursor: pointer;
+        &:before {
+            position: relative;
+            top: ($modal-header-button-area-size - $modal-header-button-icon-size) / 2;
+        }
+        &:hover,
+        &:active,
+        &:focus {
+            color: $color-primary;
+        }
+    }
+    .cms-modal-collapse {
+        right: 2 * $modal-header-button-area-size + $padding-base;
+    }
+    .cms-modal-maximize {
+        right: $modal-header-button-area-size + $padding-base;
+    }
+    .cms-modal-collapsed {
+        @include icon(plus);
+        color: $color-primary;
+    }
+    .cms-modal-maximize-active {
+        color: $color-primary;
+    }
+
+    .cms-modal-resize {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        z-index: z(modal, resize);
+        font-size: 10px;
+        color: $gray-light;
+        width: $modal-resize-size;
+        height: $modal-resize-size;
+        cursor: nw-resize;
+        span {
+            margin: 6px 0 0 6px;
+        }
+    }
+
+    .cms-modal-breadcrumb {
+        display: none;
+        position: relative;
+        z-index: z(modal, breadcrumb, base);
+        width: 100%;
+        height: $modal-footer-height;
+
+        .cms-modal-breadcrumb-items {
+            position: absolute;
+            top: 0;
+            left: $modal-breadcrumb-title-width - 1px;
+            width: 9999px;
+            background: $color-window;
+        }
+
+        a {
+            position: relative;
+            float: left;
+            color: $gray-light;
+            font-size: 12px;
+            line-height: $modal-footer-height - 2 * $modal-breadcrumb-padding-vertical;
+            padding: $modal-breadcrumb-padding-vertical
+                $modal-breadcrumb-padding-horizontal
+                $modal-breadcrumb-padding-horizontal
+                1.5 * $modal-breadcrumb-padding-horizontal;
+        }
+        a:first-child {
+            padding-left: $modal-breadcrumb-padding-horizontal;
+        }
+        a:after,
+        a:before {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 100%;
+            top: -1px;
+            width: 0;
+            height: 0;
+            border-top: ($modal-footer-height / 2 + 1px) solid transparent;
+            border-bottom: ($modal-footer-height / 2 + 1px) solid transparent;
+        }
+        a:after {
+            z-index: z(modal, breadcrumb, trianglefront);
+            border-left: ($modal-footer-height / 4) solid $color-window;
+        }
+        a:before {
+            z-index: z(modal, breadcrumb, trianglebehind);
+            margin-left: 1px;
+            border-left: ($modal-footer-height / 4) solid $gray-lighter;
+        }
+
+        // home icon
+        .cms-modal-breadcrumb-title {
+            position: relative;
+            z-index: z(modal, breadcrumb, title);
+            color: $gray-lighter;
+            font-size: $modal-footer-height / 2;
+            text-align: center;
+            width: $modal-breadcrumb-title-width;
+            height: $modal-footer-height;
+            border-right: 1px solid $gray-lighter;
+            &:before {
+                position: relative;
+                top: $modal-footer-height / 4;
+            }
+        }
+
+        a:hover {
+            color: $modal-breadcrumb-hover-color;
+            background: $modal-breadcrumb-hover-bgcolor;
+            &:after {
+                border-left-color: $modal-breadcrumb-hover-bgcolor;
+            }
+        }
+
+        // last entry highlight
+        .cms-modal-breadcrumb-last {
+            cursor: default;
+            color: $color-primary;
+            &:hover {
+                color: $color-primary;
+            }
+        }
+    }
+
+    // buttons
+    .cms-modal-buttons {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: z(modal, buttons);
+        padding: 0 $modal-resize-size 0 $padding-normal;
+        background: $color-window;
+        div {
+            $modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
+            display: inline-block;
+            font-size: $modal-button-font-size;
+            margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
+            padding: $modal-button-padding;
+            cursor: pointer;
+        }
+    }
+}

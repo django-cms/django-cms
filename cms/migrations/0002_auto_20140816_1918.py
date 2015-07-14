@@ -17,10 +17,7 @@ user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0001_initial'),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('cms', '0001_initial'),
-        ('sites', '0001_initial'),
     ]
 
     operations = [

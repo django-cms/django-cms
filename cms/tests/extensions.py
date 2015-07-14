@@ -2,6 +2,7 @@ from copy import deepcopy
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
@@ -13,9 +14,8 @@ from cms.extensions import PageExtension
 from cms.models import Page
 from cms.test_utils.project.extensionapp.models import (MyPageExtension,
                                                         MyTitleExtension)
-from cms.test_utils.testcases import SettingsOverrideTestCase as TestCase
+from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.tests import AdminTestsBase
-from cms.utils.compat.dj import get_user_model
 
 
 class ExtensionsTestCase(TestCase):
@@ -69,7 +69,7 @@ class ExtensionsTestCase(TestCase):
             from django.apps import apps
             del apps.all_models['cms']['testpageextension']
             del apps.all_models['cms']['testtitleextension']
-        except ImportError:
+        except (ImportError, KeyError):  # Django 1.6
             pass
 
     def get_page_extension_class(self):
@@ -77,6 +77,9 @@ class ExtensionsTestCase(TestCase):
 
         class TestPageExtension(PageExtension):
             content = models.CharField('Content', max_length=50)
+
+            class Meta:
+                abstract = True
 
         return TestPageExtension
 
@@ -86,6 +89,9 @@ class ExtensionsTestCase(TestCase):
         class TestTitleExtension(TitleExtension):
             content = models.CharField('Content', max_length=50)
 
+            class Meta:
+                abstract = True
+
         return TestTitleExtension
 
     def get_none_extension_class(self):
@@ -93,6 +99,59 @@ class ExtensionsTestCase(TestCase):
             pass
 
         return TestNoneExtension
+
+    def test_copy_extensions(self):
+        root = create_page('Root', "nav_playground.html", "en", published=True)
+        page = create_page('Test Page Extension', "nav_playground.html", "en",
+                           parent=root.get_draft_object())
+        subpage = create_page('Test subpage Extension', "nav_playground.html", "en",
+                              parent=page)
+        page = Page.objects.get(pk=page.pk)
+        page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
+        page_extension.save()
+        page.mypageextension = page_extension
+        title = page.get_title_obj()
+        title_extension = MyTitleExtension(extended_object=title, extra_title='title extension 1')
+        title_extension.save()
+        page.mytitleextension = title_extension
+
+        subpage_extension = MyPageExtension(extended_object=subpage, extra='page extension 2')
+        subpage_extension.save()
+        subpage.mypageextension = subpage_extension
+        subtitle = subpage.get_title_obj()
+        subtitle_extension = MyTitleExtension(extended_object=subtitle, extra_title='title extension 2')
+        subtitle_extension.save()
+        subpage.mytitleextension = subtitle_extension
+
+        # asserting original extensions
+        self.assertEqual(len(extension_pool.get_page_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+
+        copied_page = page.copy_page(None, page.site, position='last-child')
+
+        # asserting original + copied extensions
+        self.assertEqual(len(extension_pool.get_page_extensions()), 4)
+        self.assertEqual(len(extension_pool.get_title_extensions()), 4)
+
+        # testing extension content
+        old_page_extensions = [page_extension, subpage_extension]
+        old_title_extension = [title_extension, subtitle_extension]
+        for index, new_page in enumerate([copied_page] + list(copied_page.get_descendants())):
+            self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
+                             old_page_extensions[index].extra)
+            self.assertEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].extra_title,
+                             old_title_extension[index].extra_title)
+            # check that objects are actually different
+            self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
+                                old_page_extensions[index].pk)
+            self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
+                                old_title_extension[index].pk)
+
+        # Test deleting original page for #3987
+        page.delete()
+        # asserting original extensions are gone, but copied ones should still exist
+        self.assertEqual(len(extension_pool.get_page_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
 
     def test_publish_page_extension(self):
         page = create_page('Test Page Extension', "nav_playground.html", "en")

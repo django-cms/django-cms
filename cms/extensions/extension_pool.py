@@ -60,23 +60,43 @@ class ExtensionPool(object):
         public_page = draft_page.publisher_public
 
         if self.page_extensions:
-            self._copy_page_extensions(draft_page, public_page, language)
+            self._copy_page_extensions(draft_page, public_page, language, clone=False)
             self._remove_orphaned_page_extensions()
         if self.title_extensions:
-            self._copy_title_extensions(draft_page, public_page, language)
+            self._copy_title_extensions(draft_page, None, language, clone=False)
             self._remove_orphaned_title_extensions()
 
-    def _copy_page_extensions(self, draft_page, public_page, language):
+    def _copy_page_extensions(self, source_page, target_page, language, clone=False):
         for extension in self.page_extensions:
-            for instance in extension.objects.filter(extended_object=draft_page):
-                instance.copy_to_public(public_page, language)
+            for instance in extension.objects.filter(extended_object=source_page):
+                if clone:
+                    instance.copy(target_page, language)
+                else:
+                    instance.copy_to_public(target_page, language)
 
-    def _copy_title_extensions(self, draft_page, public_page, language):
-        draft_title = draft_page.title_set.get(language=language)
-        public_title = draft_title.publisher_public
+    def _copy_title_extensions(self, source_page, target_page, language, clone=False):
+        source_title = source_page.title_set.get(language=language)
+        if target_page:
+            target_title = target_page.title_set.get(language=language)
+        else:
+            target_title = source_title.publisher_public
         for extension in self.title_extensions:
-            for instance in extension.objects.filter(extended_object=draft_title):
-                instance.copy_to_public(public_title, language)
+            for instance in extension.objects.filter(extended_object=source_title):
+                if clone:
+                    instance.copy(target_title, language)
+                else:
+                    instance.copy_to_public(target_title, language)
+
+    def copy_extensions(self, source_page, target_page, languages=None):
+        if not languages:
+            languages = source_page.get_languages()
+        if self.page_extensions:
+            self._copy_page_extensions(source_page, target_page, None, clone=True)
+            self._remove_orphaned_page_extensions()
+        for language in languages:
+            if self.title_extensions:
+                self._copy_title_extensions(source_page, target_page, language, clone=True)
+                self._remove_orphaned_title_extensions()
 
     def _remove_orphaned_page_extensions(self):
         for extension in self.page_extensions:
@@ -92,5 +112,22 @@ class ExtensionPool(object):
                 draft_extension=None
             ).delete()
 
+    def get_page_extensions(self, page=None):
+        extensions = []
+        for extension in self.page_extensions:
+            if page:
+                extensions.extend(list(extension.objects.filter(extended_object=page)))
+            else:
+                extensions.extend(list(extension.objects.all()))
+        return extensions
+
+    def get_title_extensions(self, title=None):
+        extensions = []
+        for extension in self.title_extensions:
+            if title:
+                extensions.extend(list(extension.objects.filter(extended_object=title)))
+            else:
+                extensions.extend(list(extension.objects.all()))
+        return extensions
 
 extension_pool = ExtensionPool()

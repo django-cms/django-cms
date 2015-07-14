@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Python < 2.7
+    from django.utils.datastructures import SortedDict as OrderedDict
+
 from django.conf import settings
-from django.conf.urls import patterns
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
@@ -199,10 +204,11 @@ def get_app_patterns():
 
     title_qs = Title.objects.public().filter(page__site=current_site)
 
-    hooked_applications = {}
+    hooked_applications = OrderedDict()
 
     # Loop over all titles with an application hooked to them
-    for title in title_qs.exclude(page__application_urls=None).exclude(page__application_urls='').select_related():
+    # TODO: Need to be fixed for django-treebeard when forward ported to 3.1
+    for title in title_qs.exclude(page__application_urls=None).exclude(page__application_urls='').order_by('-page__path').select_related():
         path = title.path
         mix_id = "%s:%s:%s" % (path + "/", title.page.application_urls, title.language)
         if mix_id in included:
@@ -229,8 +235,7 @@ def get_app_patterns():
             if app.permissions:
                 _set_permissions(current_patterns, app.exclude_permissions)
 
-            extra_patterns = patterns('', *current_patterns)
-            resolver.url_patterns_dict[lang] = extra_patterns
+            resolver.url_patterns_dict[lang] = current_patterns
         app_patterns.append(resolver)
         APP_RESOLVERS.append(resolver)
     return app_patterns

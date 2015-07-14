@@ -4,31 +4,30 @@ import copy
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
-from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
+from django.test.utils import override_settings
 from django.utils.translation import activate
-from menus.base import NavigationNode
+from menus.base import NavigationNode, Menu
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page
 from cms.menu import CMSMenu, get_visible_pages
-from cms.models import Page
+from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.test_utils.project.sampleapp.menu import StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
-    SoftrootFixture, ExtendedMenusFixture)
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride,
-    LanguageOverride)
+                                           SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.context_managers import LanguageOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_user_model, user_related_name
 from cms.utils.i18n import force_language
 
 
-class BaseMenuTest(SettingsOverrideTestCase):
+class BaseMenuTest(CMSTestCase):
 
     def _get_nodes(self, path='/'):
         node1 = NavigationNode('1', '/1/', 1)
@@ -57,6 +56,85 @@ class BaseMenuTest(SettingsOverrideTestCase):
 
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
+
+
+class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
+
+    def setUp(self):
+        super(MenuDiscoveryTest, self).setUp()
+        menu_pool.discovered = False
+        self.old_menu = menu_pool.menus
+        menu_pool.menus = {}
+        menu_pool.discover_menus()
+        menu_pool.register_menu(StaticMenu)
+        menu_pool.register_menu(StaticMenu2)
+
+    def tearDown(self):
+        menu_pool.menus = self.old_menu
+        menu_pool._expanded = False
+        super(MenuDiscoveryTest, self).tearDown()
+
+    def test_menu_types_expansion_basic(self):
+        request = self.get_request('/')
+
+        menu_pool.discover_menus()
+        self.assertFalse(menu_pool._expanded)
+        for key, menu in menu_pool.menus.items():
+            self.assertTrue(issubclass(menu, Menu))
+        defined_menus = len(menu_pool.menus)
+
+        # Testing expansion after get_nodes
+        menu_pool.get_nodes(request)
+        self.assertTrue(menu_pool._expanded)
+        for key, menu in menu_pool.menus.items():
+            self.assertTrue(isinstance(menu, Menu))
+        self.assertEqual(defined_menus, len(menu_pool.menus))
+
+    def test_menu_expanded(self):
+        menu_pool.discovered = False
+        menu_pool.discover_menus()
+
+        with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            page = create_page("apphooked-page", "nav_playground.html", "en",
+                               published=True, apphook="SampleApp",
+                               navigation_extenders='StaticMenu')
+
+            menu_pool._expanded = False
+            self.assertFalse(menu_pool._expanded)
+            self.assertTrue(menu_pool.discovered)
+            menu_pool._expand_menus()
+
+            self.assertTrue(menu_pool._expanded)
+            self.assertTrue(menu_pool.discovered)
+            # Counts the number of StaticMenu (which is expanded) and StaticMenu2
+            # (which is not) and checks the keyname for the StaticMenu instances
+            static_menus = 2
+            static_menus_2 = 1
+            for key, menu in menu_pool.menus.items():
+                if key.startswith('StaticMenu:'):
+                    static_menus -= 1
+                    self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
+
+                if key == 'StaticMenu2':
+                    static_menus_2 -= 1
+
+            self.assertEqual(static_menus, 0)
+            self.assertEqual(static_menus_2, 0)
+
+    def test_multiple_menus(self):
+        with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True, apphook="SampleApp2")
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True,
+                        navigation_extenders='StaticMenu')
+            create_page("apphooked-page", "nav_playground.html", "en",
+                        published=True, apphook="NamespacedApp", apphook_namespace='whatever',
+                        navigation_extenders='StaticMenu')
+            menu_pool._expanded = False
+            menu_pool._expand_menus()
+
+            self.assertEqual(len(menu_pool.get_menus_by_attribute("cms_enabled", True)), 2)
 
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """
@@ -87,7 +165,7 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         context = self.get_context()
         context['child'] = self.get_page(1)
         # test standard show_menu
-        with SettingsOverride(DEBUG=True, TEMPLATE_DEBUG=True):
+        with self.settings(DEBUG=True, TEMPLATE_DEBUG=True):
             tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
 
@@ -144,7 +222,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         context = self.get_context()
         context['child'] = self.get_page(1)
         # test standard show_menu
-        with SettingsOverride(DEBUG=True, TEMPLATE_DEBUG=True):
+        with self.settings(DEBUG=True, TEMPLATE_DEBUG=True):
             tpl = Template("{% load menu_tags %}{% show_menu 0 0 0 0 'menu/menu.html' child %}")
             self.assertRaises(TemplateSyntaxError, tpl.render, context)
 
@@ -251,7 +329,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         for node in nodes:
             self.assertEqual(len(node.children), 0)
 
-
     def test_only_level_one(self):
         context = self.get_context()
         # test standard show_menu
@@ -261,7 +338,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(len(nodes), len(self.get_level(2)))
         for node in nodes:
             self.assertEqual(len(node.children), 0)
-
 
     def test_only_level_one_active(self):
         context = self.get_context()
@@ -369,7 +445,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # test simple language chooser with default args
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
         lang_settings[1][0]['public'] = False
-        with SettingsOverride(CMS_LANGUAGES=lang_settings):
+        with self.settings(CMS_LANGUAGES=lang_settings):
             context = self.get_context(path=self.get_page(3).get_absolute_url())
             tpl = Template("{% load menu_tags %}{% language_chooser %}")
             tpl.render(context)
@@ -609,7 +685,8 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(len(nodes), 0)
 
 
-class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
+@override_settings(CMS_PERMISSION=False)
+class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
     """
     Tree in fixture (as taken from issue 662):
 
@@ -634,9 +711,6 @@ class AdvancedSoftrootTests(SoftrootFixture, SettingsOverrideTestCase):
 
         If we are above that page, the children of this page are not shown.
     """
-    settings_overrides = {
-        'CMS_PERMISSION': False
-    }
 
     def tearDown(self):
         Page.objects.all().delete()
@@ -794,6 +868,7 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
 
     def test_show_submenu_num_queries(self):
         page = self.get_page(6)
+        subpage = self.get_page(8)
         context = self.get_context(page.get_absolute_url())
 
         # test standard show_menu
@@ -810,20 +885,23 @@ class ShowSubMenuCheck(SubMenusFixture, BaseMenuTest):
             """
             tpl = Template("{% load menu_tags %}{% show_sub_menu %}")
             tpl.render(context)
+            nodes = context['children']
+            self.assertEqual(len(nodes), 1)
+            self.assertEqual(nodes[0].id, subpage.pk)
 
 
 class ShowMenuBelowIdTests(BaseMenuTest):
+    """
+    Test for issue 521
+
+    Build the following tree:
+
+        A
+        |-B
+          |-C
+          \-D (not in nav)
+    """
     def test_not_in_navigation(self):
-        """
-        Test for issue 521
-
-        Build the following tree:
-
-            A
-            |-B
-              |-C
-              \-D (not in nav)
-        """
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
@@ -844,6 +922,107 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         child = children[0]
         self.assertEqual(child.id, c.publisher_public.id)
 
+    def test_menu_beyond_soft_root(self):
+        """
+        Test for issue 4107
+
+        Build the following tree:
+
+            A
+            |-B (soft_root)
+              |-C
+        """
+        stdkwargs = {
+            'template': 'nav_playground.html',
+            'language': 'en',
+            'published': True,
+            'in_navigation': True,
+        }
+        a = create_page('A', reverse_id='a', **stdkwargs)
+        b = create_page('B', parent=a, soft_root=True, **stdkwargs)
+        c = create_page('C', parent=b, **stdkwargs)
+
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        a_node = nodes[0]
+        self.assertEqual(a_node.id, a.publisher_public.pk)  # On A, show from A
+        self.assertEqual(len(a_node.children), 1)
+        b_node = a_node.children[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(b.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On B, show from B
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(c.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On C, show from B
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(a.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On A, show from B (since below A)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(b.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On B, show from B (since below A)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
+        context = self.get_context(c.get_absolute_url())
+        tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
+        tpl.render(context)
+        nodes = context['children']
+        # check whole menu
+        self.assertEqual(len(nodes), 1)
+        b_node = nodes[0]
+        self.assertEqual(b_node.id, b.publisher_public.pk)  # On C, show from B (since below A)
+        self.assertEqual(len(b_node.children), 1)
+        c_node = b_node.children[0]
+        self.assertEqual(c_node.id, c.publisher_public.pk)
+        self.assertEqual(len(c_node.children), 0)
+
     def test_not_in_navigation_num_queries(self):
         """
         Test for issue 521
@@ -858,8 +1037,8 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         a = create_page('A', 'nav_playground.html', 'en', published=True,
                         in_navigation=True, reverse_id='a')
         b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        create_page('C', 'nav_playground.html', 'en', parent=b,
+                        published=True, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', parent=b,
                         published=True, in_navigation=True)
         create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
                     published=True, in_navigation=False)
@@ -880,6 +1059,14 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
                 tpl.render(context)
+            nodes = context['children']
+            self.assertEqual(len(nodes), 1, nodes)
+            node = nodes[0]
+            self.assertEqual(node.id, b.publisher_public.id)
+            children = node.children
+            self.assertEqual(len(children), 1, repr(children))
+            child = children[0]
+            self.assertEqual(child.id, c.publisher_public.id)
 
     def test_menu_in_soft_root(self):
         """
@@ -912,267 +1099,199 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         node = nodes[0]
         self.assertEqual(node.id, b.publisher_public.id)
 
-class ViewPermissionMenuTests(SettingsOverrideTestCase):
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
-    }
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='staff',
+)
+class ViewPermissionMenuTests(CMSTestCase):
+
+    def setUp(self):
+        self.page = create_page('page', 'nav_playground.html', 'en')
+        self.pages = [self.page]
+        self.user = self.get_standard_user()
 
     def get_request(self, user=None):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'POST': {},
+            'GET': {},
             'session': {},
         }
         return type('Request', (object,), attrs)
 
     def test_public_for_all_staff(self):
-        request = self.get_request()
+        request = self.get_request(self.user)
         request.user.is_staff = True
-        page = Page()
-        page.pk = 1
-        pages = [page]
-        result = get_visible_pages(request, pages)
-        self.assertEqual(result, [1])
-
-    def test_public_for_all_staff_assert_num_queries(self):
-        request = self.get_request()
-        request.user.is_staff = True
-        page = Page()
-        page.pk = 1
-        pages = [page]
         with self.assertNumQueries(1):
             """
-                The queries are:
-                PagePermission count query
+            The queries are:
+            PagePermission count query
             """
-            get_visible_pages(request, pages)
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
 
+    @override_settings(CMS_PUBLIC_FOR='all')
     def test_public_for_all(self):
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-        request = self.get_request(user)
-        page = Page()
-        page.pk = 1
-        pages = [page]
-        result = get_visible_pages(request, pages)
-        self.assertEqual(result, [1])
-
-    def test_public_for_all_num_queries(self):
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-        request = self.get_request(user)
-        site = Site()
-        site.pk = 1
-        page = Page()
-        page.pk = 1
-        pages = [page]
-        with self.assertNumQueries(2):
+        request = self.get_request(self.user)
+        with self.assertNumQueries(1):
             """
             The queries are:
             PagePermission query for affected pages
-            GlobalpagePermission query for user
             """
-            get_visible_pages(request, pages, site)
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
 
+    @override_settings(CMS_PUBLIC_FOR='all')
     def test_unauthed(self):
         request = self.get_request()
-        page = Page()
-        page.pk = 1
-        pages = [page]
-        result = get_visible_pages(request, pages)
-        self.assertEqual(result, [1])
-
-    def test_unauthed_num_queries(self):
-        request = self.get_request()
-        site = Site()
-        site.pk = 1
-        page = Page()
-        page.pk = 1
-        pages = [page]
         with self.assertNumQueries(1):
             """
             The query is:
             PagePermission query for affected pages
-
-            global is not executed because it's lazy
             """
-            get_visible_pages(request, pages, site)
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
 
     def test_authed_basic_perm(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            User = get_user_model()
-            user = User()
-            user.username = "test"
-            user.is_staff = True
-            user.save()
-            user.user_permissions.add(Permission.objects.get(codename='view_page'))
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            pages = [page]
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
-
-    def test_authed_basic_perm_num_queries(self):
-        site = Site()
-        site.pk = 1
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            User = get_user_model()
-            user = User()
-            user.username = "test"
-            user.is_staff = True
-            user.save()
-            user.user_permissions.add(Permission.objects.get(codename='view_page'))
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            pages = [page]
-            with self.assertNumQueries(2):
-                """
-                The queries are:
-                PagePermission count query
-                GlobalpagePermission count query
-                """
-                get_visible_pages(request, pages, site)
+        self.user.user_permissions.add(Permission.objects.get(codename='view_page'))
+        request = self.get_request(self.user)
+        with self.assertNumQueries(5):
+            """
+            The queries are:
+            Site
+            PagePermission count query
+            GlobalpagePermission count query
+            User permissions
+            Content type
+            """
+            result = get_visible_pages(request, self.pages, self.page.site)
+            self.assertEqual(result, [self.page.pk])
 
     def test_authed_no_access(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            pages = [page]
-            result = get_visible_pages(request, pages)
+        request = self.get_request(self.user)
+        with self.assertNumQueries(5):
+            """
+            The queries are:
+            Site
+            View Permission Calculation Query
+            GlobalpagePermission query for user
+            User permissions
+            Content type
+            """
+            result = get_visible_pages(request, self.pages, self.page.site)
             self.assertEqual(result, [])
-
-    def test_authed_no_access_num_queries(self):
-        site = Site()
-        site.pk = 1
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            pages = [page]
-            with self.assertNumQueries(2):
-                """
-                The queries are:
-                View Permission Calculation Query
-                globalpagepermissino calculation
-                """
-                get_visible_pages(request, pages, site)
 
     def test_unauthed_no_access(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            request = self.get_request()
-            page = Page()
-            page.pk = 1
-            pages = [page]
-            result = get_visible_pages(request, pages)
+        request = self.get_request()
+        with self.assertNumQueries(1):
+            result = get_visible_pages(request, self.pages)
             self.assertEqual(result, [])
 
-    def test_unauthed_no_access_num_queries(self):
-        site = Site()
-        site.pk = 1
-        request = self.get_request()
-        page = Page()
-        page.pk = 1
-        pages = [page]
-        with self.assertNumQueries(1):
-            get_visible_pages(request, pages, site)
-
     def test_page_permissions(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            PagePermission.objects.create(can_view=True, user=user, page=page)
-            pages = [page]
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [page.pk])
-
-    def test_page_permissions_num_queries(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            PagePermission.objects.create(can_view=True, user=user, page=page)
-            pages = [page]
-            with self.assertNumQueries(3):
-                """
-                The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                """
-                get_visible_pages(request, pages)
-
-
-    def test_page_permissions_view_groups(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            group = Group.objects.create(name='testgroup')
-
-            user_set = getattr(group, user_related_name)
-            user_set.add(user)
-
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            PagePermission.objects.create(can_view=True, group=group, page=page)
-            pages = [page]
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [page.pk])
-
-    def test_page_permissions_view_groups_num_queries(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            group = Group.objects.create(name='testgroup')
-
-            user_set = getattr(group, user_related_name)
-            user_set.add(user)
-
-            request = self.get_request(user)
-            page = create_page('A', 'nav_playground.html', 'en')
-            PagePermission.objects.create(can_view=True, group=group, page=page)
-            pages = [page]
-            with self.assertNumQueries(4):
-                """
-                The queries are:
-                PagePermission query for affected pages
-                GlobalpagePermission query for user
-                Group query via PagePermission
-                """
-                get_visible_pages(request, pages)
-
-    def test_global_permission(self):
-        with SettingsOverride(CMS_PUBLIC_FOR='staff'):
-            user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-            GlobalPagePermission.objects.create(can_view=True, user=user)
-            request = self.get_request(user)
-            page = Page()
-            page.pk = 1
-            pages = [page]
-            result = get_visible_pages(request, pages)
-            self.assertEqual(result, [1])
-
-    def test_global_permission_num_queries(self):
-        site = Site()
-        site.pk = 1
-        user = get_user_model().objects.create_user('user', 'user@domain.com', 'user')
-        GlobalPagePermission.objects.create(can_view=True, user=user)
-        request = self.get_request(user)
-        site = Site()
-        site.pk = 1
-        page = Page()
-        page.pk = 1
-        pages = [page]
+        request = self.get_request(self.user)
+        PagePermission.objects.create(can_view=True, user=self.user, page=self.page)
         with self.assertNumQueries(2):
             """
             The queries are:
             PagePermission query for affected pages
             GlobalpagePermission query for user
             """
-            get_visible_pages(request, pages, site)
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
 
-class SoftrootTests(SettingsOverrideTestCase):
+    def test_page_permissions_view_groups(self):
+        group = Group.objects.create(name='testgroup')
+        self.user.groups.add(group)
+        request = self.get_request(self.user)
+        PagePermission.objects.create(can_view=True, group=group, page=self.page)
+        with self.assertNumQueries(3):
+            """
+            The queries are:
+            PagePermission query for affected pages
+            GlobalpagePermission query for user
+            Group query via PagePermission
+            """
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
+
+    def test_global_permission(self):
+        GlobalPagePermission.objects.create(can_view=True, user=self.user)
+        request = self.get_request(self.user)
+        group = Group.objects.create(name='testgroup')
+        PagePermission.objects.create(can_view=True, group=group, page=self.page)
+        with self.assertNumQueries(2):
+            """
+            The queries are:
+            PagePermission query for affected pages
+            GlobalpagePermission query for user
+            """
+            result = get_visible_pages(request, self.pages)
+            self.assertEqual(result, [self.page.pk])
+
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='all',
+)
+class PublicViewPermissionMenuTests(CMSTestCase):
+
+    def setUp(self):
+        """
+        Create this published hierarchy:
+        A
+        B1     B2
+        C1 C2  C3 C4
+        """
+        l = 'nav_playground.html'
+        kw = dict(published=True, in_navigation=True)
+        a = create_page('a', l, 'en', **kw)
+        b1 = create_page('b1', l, 'en', parent=a, **kw)
+        b2 = create_page('b2', l, 'en', parent=a, **kw)
+        c1 = create_page('c1', l, 'en', parent=b1, **kw)
+        c2 = create_page('c2', l, 'en', parent=b1, **kw)
+        c3 = create_page('c3', l, 'en', parent=b2, **kw)
+        c4 = create_page('c4', l, 'en', parent=b2, **kw)
+        self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
+        self.site = a.site
+
+        self.user = self._create_user("standard", is_staff=False, is_superuser=False)
+        self.other = self._create_user("other", is_staff=False, is_superuser=False)
+        PagePermission.objects.create(page=b1, user=self.user, can_view=True,
+                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        PagePermission.objects.create(page=b2, user=self.other, can_view=True,
+                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        attrs = {
+            'user': self.user,
+            'REQUEST': {},
+            'POST': {},
+            'GET': {},
+            'session': {},
+        }
+        self.request = type('Request', (object,), attrs)
+
+    def test_draft_list_access(self):
+        result = get_visible_pages(self.request, self.pages, self.site)
+        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
+        pages = list(pages)
+        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+
+    def test_draft_qs_access(self):
+        result = get_visible_pages(self.request, Page.objects.drafts(), self.site)
+        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
+        pages = list(pages)
+        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+
+    def test_public_qs_access(self):
+        result = get_visible_pages(self.request, Page.objects.public(), self.site)
+        pages = Page.objects.filter(id__in=result).values_list('title_set__title', flat=True)
+        pages = list(pages)
+        self.assertEqual(pages, ['a', 'b1', 'c1', 'c2'])
+
+
+@override_settings(CMS_PERMISSION=False)
+class SoftrootTests(CMSTestCase):
     """
     Ask evildmp/superdmp if you don't understand softroots!
 
@@ -1239,9 +1358,6 @@ class SoftrootTests(SettingsOverrideTestCase):
                 Techniques
                 Instruments
     """
-    settings_overrides = {
-        'CMS_PERMISSION': False
-    }
 
     def test_basic_home(self):
         """

@@ -4,6 +4,7 @@ import itertools
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.models import Permission
 from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
@@ -15,8 +16,9 @@ from django.http import HttpResponseRedirect
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from django.template.loader import get_template
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
+from django.utils.encoding import force_text
 from django.utils.numberformat import format
 from djangocms_link.cms_plugins import LinkPlugin
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -32,22 +34,23 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
     Example1,
     MultilingualExample1,
     TwoPlaceholderExample,
 )
+from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import (SettingsOverride, UserLoginContext)
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat.dj import force_unicode, get_user_model
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
-from cms.utils.placeholder import PlaceholderNoAction, MLNGPlaceholderActions, get_placeholder_conf
-from cms.utils.plugins import get_placeholders, assign_plugins
+from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
+                                   get_placeholder_conf, get_placeholders, _get_nodelist,
+                                   _scan_placeholders)
+from cms.utils.plugins import assign_plugins
 from cms.utils.urlutils import admin_reverse
 
 
@@ -115,6 +118,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholders = get_placeholders('placeholder_tests/outside_nested_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
+    def test_placeholder_scanning_var(self):
+        t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
+        phs = _scan_placeholders(t.nodelist)
+        self.assertListEqual(sorted(phs), sorted([u'a_placeholder']))
+
+        t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
+        phs = _scan_placeholders(t.nodelist)
+        self.assertListEqual(sorted(phs), sorted([u'two', u'new_one', u'base_outside']))
+
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
@@ -158,6 +170,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2, ], list(ph2.cmsplugin_set.order_by('position')))
 
+    @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs(self):
         """
         Checks #1366 error condition.
@@ -165,44 +178,43 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         containing an hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
-        with SettingsOverride(CMS_PERMISSION=False):
-            ex = Example1(
-                char_1='one',
-                char_2='two',
-                char_3='tree',
-                char_4='four'
-            )
-            ex.save()
-            ph1 = ex.placeholder
-            ###
-            # add the test plugin
-            ###
-            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
-            test_plugin.save()
-            pl_url = "%sedit-plugin/%s/" % (
-                admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
-                test_plugin.pk)
-            response = self.client.post(pl_url, {})
-            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph1 = ex.placeholder
+        ###
+        # add the test plugin
+        ###
+        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin.save()
+        pl_url = "%sedit-plugin/%s/" % (
+            admin_reverse('placeholderapp_example1_change', args=(ex.pk,)),
+            test_plugin.pk)
+        response = self.client.post(pl_url, {})
+        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
+    @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs_page(self):
         """
         Sibling test of the above, on a page.
         #1366 does not apply to placeholder defined in a page
         """
-        with SettingsOverride(CMS_PERMISSION=False):
-            page = create_page('page', 'col_two.html', 'en')
-            ph1 = page.placeholders.get(slot='col_left')
-            ###
-            # add the test plugin
-            ###
-            test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
-            test_plugin.save()
-            pl_url = "%sedit-plugin/%s/" % (
-                admin_reverse('cms_page_change', args=(page.pk,)),
-                test_plugin.pk)
-            response = self.client.post(pl_url, {})
-            self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
+        page = create_page('page', 'col_two.html', 'en')
+        ph1 = page.placeholders.get(slot='col_left')
+        ###
+        # add the test plugin
+        ###
+        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin.save()
+        pl_url = "%sedit-plugin/%s/" % (
+            admin_reverse('cms_page_change', args=(page.pk,)),
+            test_plugin.pk)
+        response = self.client.post(pl_url, {})
+        self.assertContains(response, "CMS.API.Helpers.reloadBrowser")
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
@@ -211,7 +223,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         template = Template("{% load cms_tags %}{% render_placeholder placeholder %}")
         ctx = Context()
         self.assertEqual(template.render(ctx), "")
-        request = self.get_request('/')
+        request = self.get_request('/', language=settings.LANGUAGES[0][0])
         rctx = RequestContext(request)
         self.assertEqual(template.render(rctx), "")
         placeholder = Placeholder.objects.create(slot="test")
@@ -222,7 +234,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertEqual(placeholder.cmsplugin_set.count(), 1)
         rctx = RequestContext(request)
         placeholder = self.reload(placeholder)
-        rctx['placeholder'] = placeholder
+        rctx.update({'placeholder': placeholder})
         self.assertEqual(template.render(rctx).strip(), "test")
 
     def test_placeholder_tag_language(self):
@@ -232,11 +244,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
         request = self.get_request('/')
         rctx = RequestContext(request)
-        rctx['placeholder'] = placeholder
-        rctx['language'] = 'en'
+        rctx.update({
+            'placeholder': placeholder,
+            'language': 'en'
+        })
         self.assertEqual(template.render(rctx).strip(), "English")
         del placeholder._plugins_cache
-        rctx['language'] = 'de'
+        rctx.update({
+            'placeholder': placeholder,
+            'language': 'de'
+        })
         self.assertEqual(template.render(rctx).strip(), "Deutsch")
 
     def test_get_placeholder_conf(self):
@@ -265,7 +282,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'limits': {},
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             #test no inheritance
             returned = get_placeholder_conf('plugins', 'main')
             self.assertEqual(returned, TEST_CONF['main']['plugins'])
@@ -280,24 +297,16 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
 
     def test_placeholder_context_leaking(self):
-        TEST_CONF = {'test': {'extra_context': {'width': 10}}}
+        TEST_CONF = {'test': {'extra_context': {'extra_width': 10}}}
         ph = Placeholder.objects.create(slot='test')
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
-        context = NoPushPopContext()
+        context = SekizaiContext()
         context['request'] = self.get_request()
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=TEST_CONF):
+        with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
             render_placeholder(ph, context)
-            self.assertTrue('width' in context)
-            self.assertEqual(context['width'], 10)
+            self.assertFalse('extra_width' in context)
             ph.render(context, None)
-            self.assertTrue('width' in context)
-            self.assertEqual(context['width'], 10)
+            self.assertFalse('extra_width' in context)
 
     def test_placeholder_scanning_nested_super(self):
         placeholders = get_placeholders('placeholder_tests/nested_super_level1.html')
@@ -305,6 +314,20 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
+
+    def test_placeholder_field_db_table(self):
+        """
+        Test for leaking Django 1.7 Model._meta.db_table monkeypatching
+        on sqlite See #3891
+        This test for a side-effect of the above which prevents placeholder
+        fields to return the 
+        """
+        example = Category.objects.create(
+            name='category',
+            parent=None, depth=1,
+        )
+        self.assertEqual(example.description._get_attached_fields()[0].model, Category)
+        self.assertEqual(len(example.description._get_attached_fields()), 1)
 
     def test_placeholder_field_valid_slotname(self):
         self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
@@ -352,39 +375,35 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_de = title_de.page.placeholders.get(slot='col_left')
         add_plugin(placeholder_en, TextPlugin, 'en', body='en body')
 
-        class NoPushPopContext(SekizaiContext):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = NoPushPopContext()
+        context_de = SekizaiContext()
         context_de['request'] = self.get_request(language="de", page=page_en)
 
-        # First test the default (non-fallback) behavior)
+        # First test the default (fallback) behavior)
         ## English page should have the text plugin
         content_en = render_placeholder(placeholder_en, context_en)
         self.assertRegexpMatches(content_en, "^en body$")
 
-        ## Deutsch page should have no text
+        ## Deutsch page have text due to fallback
         content_de = render_placeholder(placeholder_de, context_de)
-        self.assertNotRegex(content_de, "^en body$")
-        self.assertEqual(len(content_de), 0)
+        self.assertRegexpMatches(content_de, "^en body$")
+        self.assertEqual(len(content_de), 7)
 
         conf = {
             'col_left': {
-                'language_fallback': True,
+                'language_fallback': False,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        # configure non fallback
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## Deutsch page should have no text
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de = render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "^en body$")
-            context_de2 = NoPushPopContext()
+            ## Deutsch page should inherit english content
+            self.assertNotRegex(content_de, "^en body$")
+            context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
@@ -402,6 +421,49 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             content_de = render_placeholder(placeholder_de, context_de)
             self.assertRegexpMatches(content_de, "^de body$")
 
+    def test_nested_plugins_language_fallback(self):
+        """ Tests language_fallback placeholder configuration for nested plugins"""
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        title_de = create_title("de", "page_de", page_en)
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+        placeholder_de = title_de.page.placeholders.get(slot='col_left')
+        link_en = add_plugin(placeholder_en, LinkPlugin, 'en', name='en name', url='http://example.com/en')
+        add_plugin(placeholder_en, TextPlugin, 'en',  target=link_en, body='en body')
+
+        context_en = SekizaiContext()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_de = SekizaiContext()
+        context_de['request'] = self.get_request(language="de", page=page_en)
+
+        conf = {
+            'col_left': {
+                'language_fallback': True,
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\">")
+            self.assertRegexpMatches(content_de, "en body")
+            context_de2 = SekizaiContext()
+            request = self.get_request(language="de", page=page_en)
+            request.user = self.get_superuser()
+            request.toolbar = CMSToolbar(request)
+            request.toolbar.edit_mode = True
+            context_de2['request'] = request
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            content_de2 = render_placeholder(placeholder_de, context_de2)
+            self.assertFalse("en body" in content_de2)
+            # remove the cached plugins instances
+            del(placeholder_de._plugins_cache)
+            cache.clear()
+            # Then we add a plugin to check for proper rendering
+            link_de = add_plugin(placeholder_en, LinkPlugin, 'de', name='de name', url='http://example.com/de')
+            add_plugin(placeholder_en, TextPlugin, 'de',  target=link_de, body='de body')
+            content_de = render_placeholder(placeholder_de, context_de)
+            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\">")
+            self.assertRegexpMatches(content_de, "de body")
+
     def test_plugins_non_default_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
         page_en = create_page('page_en', 'col_two.html', 'en')
@@ -410,18 +472,12 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_de = page_en.placeholders.get(slot='col_left')
         add_plugin(placeholder_de, TextPlugin, 'de', body='de body')
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
-        context_de = NoPushPopContext()
+        context_de = SekizaiContext()
         context_de['request'] = self.get_request(language="de", page=page_en)
 
-        # First test the default (non-fallback) behavior)
+        # First test the default (fallback) behavior)
         ## Deutsch page should have the text plugin
         content_de = render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
@@ -429,19 +485,20 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         cache.clear()
         ## English page should have no text
         content_en = render_placeholder(placeholder_en, context_en)
-        self.assertNotRegex(content_en, "^de body$")
-        self.assertEqual(len(content_en), 0)
+        self.assertRegexpMatches(content_en, "^de body$")
+        self.assertEqual(len(content_en), 7)
         del(placeholder_en._plugins_cache)
         cache.clear()
         conf = {
             'col_left': {
-                'language_fallback': True,
+                'language_fallback': False,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        # configure non-fallback
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             ## English page should have deutsch text
             content_en = render_placeholder(placeholder_en, context_en)
-            self.assertRegexpMatches(content_en, "^de body$")
+            self.assertNotRegex(content_en, "^de body$")
 
             # remove the cached plugins instances
             del(placeholder_en._plugins_cache)
@@ -462,13 +519,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         placeholder_en = page_en.placeholders.get(slot='col_left')
         add_plugin(placeholder_sidebar_en, TextPlugin, 'en', body='en body')
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
-        context_en = NoPushPopContext()
+        context_en = SekizaiContext()
         context_en['request'] = self.get_request(language="en", page=page_en)
 
         conf = {
@@ -476,7 +527,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 'language_fallback': True,
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             # call assign plugins first, as this is what is done in real cms life
             # for all placeholders in a page at once
             assign_plugins(context_en['request'],
@@ -492,12 +543,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
     def test_plugins_prepopulate(self):
         """ Tests prepopulate placeholder configuration """
 
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
-
         conf = {
             'col_left': {
                 'default_plugins' : [
@@ -512,10 +557,10 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
                 ]
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
-            context = NoPushPopContext()
+            context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             # Our page should have "en default body 1" AND "en default body 2"
             content = render_placeholder(placeholder, context)
@@ -526,12 +571,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         """
         Validate a default textplugin with a nested default link plugin
         """
-
-        class NoPushPopContext(Context):
-            def push(self):
-                pass
-
-            pop = push
 
         conf = {
             'col_left': {
@@ -562,10 +601,10 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             },
         }
 
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             page = create_page('page_en', 'col_two.html', 'en')
             placeholder = page.placeholders.get(slot='col_left')
-            context = NoPushPopContext()
+            context = SekizaiContext()
             context['request'] = self.get_request(language="en", page=page)
             render_placeholder(placeholder, context)
             plugins = placeholder.get_plugins_list()
@@ -586,7 +625,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         page.reload()
         for placeholder in page.placeholders.all():
             add_plugin(placeholder, "TextPlugin", "en", body="body")
-        with SettingsOverride(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
+        with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True):
             # Superuser
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
@@ -667,15 +706,17 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         renders of that template will render the super block twice.
         """
 
+        nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
         self.assertNotIn('one',
-            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
             "but _2.html does not.")
 
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
+        nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
         self.assertNotIn('one',
-            get_template("placeholder_tests/test_super_extends_2.html").nodelist[0].blocks.keys(),
+            nodelist[0].blocks.keys(),
             "test_super_extends_1.html still should not contain a block "
             "called 'one' after rescanning placeholders.")
 
@@ -807,8 +848,113 @@ class PlaceholderModelTests(CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = force_unicode(ph)
+        result = force_text(ph)
         self.assertEqual(result, u'test')
+
+    def test_request_placeholders_permission_check_model(self):
+        # Setup instance
+        ex = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        page_en = create_page('page_en', 'col_two.html', 'en')
+
+        context_en = SekizaiContext()
+
+        # no user: no placeholders but no error either
+        factory = RequestFactory()
+        context_en['request'] = factory.get(page_en.get_absolute_url())
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
+        self.assertEqual(len(context_en['request'].placeholders), 0)
+        self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
+
+        # request.placeholders is populated for superuser
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = self.get_superuser()
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(ex.placeholder, context_en['request'].placeholders)
+
+        # request.placeholders is not populated for staff user with no permission
+        user = self.get_staff_user_with_no_permissions()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = user
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
+        self.assertEqual(len(context_en['request'].placeholders), 0)
+        self.assertNotIn(ex.placeholder, context_en['request'].placeholders)
+
+        # request.placeholders is populated for staff user with permission on the model
+        user.user_permissions.add(Permission.objects.get(codename=get_permission_codename('change', ex._meta)))
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = get_user_model().objects.get(pk=user.pk)
+        render_placeholder(ex.placeholder, context_en, use_cache=False)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(ex.placeholder, context_en['request'].placeholders)
+
+    def test_request_placeholders_permission_check_page(self):
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        placeholder_en = page_en.placeholders.get(slot='col_left')
+
+        context_en = SekizaiContext()
+
+        # request.placeholders is populated for superuser
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = self.get_superuser()
+        render_placeholder(placeholder_en, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(placeholder_en, context_en['request'].placeholders)
+
+        # request.placeholders is not populated for staff user with no permission
+        user = self.get_staff_user_with_no_permissions()
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = user
+        render_placeholder(placeholder_en, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 0)
+        self.assertNotIn(placeholder_en, context_en['request'].placeholders)
+
+        # request.placeholders is populated for staff user with permission on the model
+        user.user_permissions.add(Permission.objects.get(codename='change_page'))
+        context_en['request'] = self.get_request(language="en", page=page_en)
+        context_en['request'].user = get_user_model().objects.get(pk=user.pk)
+        render_placeholder(placeholder_en, context_en)
+        self.assertEqual(len(context_en['request'].placeholders), 1)
+        self.assertIn(placeholder_en, context_en['request'].placeholders)
+
+    def test_request_placeholders_permission_check_templatetag(self):
+        """
+        Tests that {% render_placeholder %} templatetag check for placeholder permission
+        """
+        page_en = create_page('page_en', 'col_two.html', 'en')
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
+                       char_4="char_4")
+        ex1.save()
+        template = '{% load cms_tags %}{% render_placeholder ex1.placeholder %}'
+        context = {'ex1': ex1}
+
+        # request.placeholders is populated for superuser
+        request = self.get_request(language="en", page=page_en)
+        request.user = self.get_superuser()
+        self.render_template_obj(template, context, request)
+        self.assertEqual(len(request.placeholders), 2)
+        self.assertIn(ex1.placeholder, request.placeholders)
+
+        # request.placeholders is not populated for staff user with no permission
+        user = self.get_staff_user_with_no_permissions()
+        request = self.get_request(language="en", page=page_en)
+        request.user = user
+        self.render_template_obj(template, context, request)
+        self.assertEqual(len(request.placeholders), 0)
+        self.assertNotIn(ex1.placeholder, request.placeholders)
+
+        # request.placeholders is populated for staff user with permission on the model
+        user.user_permissions.add(Permission.objects.get(codename='change_example1'))
+        request = self.get_request(language="en", page=page_en)
+        request.user = get_user_model().objects.get(pk=user.pk)
+        self.render_template_obj(template, context, request)
+        self.assertEqual(len(request.placeholders), 2)
+        self.assertIn(ex1.placeholder, request.placeholders)
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
@@ -886,7 +1032,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(post_data)
                 request.GET = get_data
                 response = admin_instance.add_plugin(request) # first
@@ -907,7 +1053,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(data)
                 request.GET = request.POST
                 response = admin_instance.add_plugin(request) # first
@@ -931,7 +1077,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_2 = add_plugin(**data)
         plugin_3 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
                 response = admin_instance.move_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -956,7 +1102,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_1 = add_plugin(**data)
         plugin_2 = add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': target_placeholder.pk, 'plugin_id': plugin_1.pk})
                 response = admin_instance.move_plugin(request) # first
                 self.assertEqual(response.status_code, 200)
@@ -978,7 +1124,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         plugin_1 = add_plugin(**data)
         add_plugin(**data)
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request({'placeholder_id': source_placeholder.pk, 'plugin_id': plugin_1.pk,
                                                  'plugin_order': 1, })
                 response = admin_instance.move_plugin(request) # first
@@ -989,7 +1135,7 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         admin_instance = self.get_admin()
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with SettingsOverride(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 plugin = add_plugin(
                     placeholder=placeholder,
                     plugin_type='TextPlugin',
@@ -1042,20 +1188,12 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
 
     def _give_permission(self, user, model, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        codename = get_permission_codename(permission_type, model._meta)
         user.user_permissions.add(Permission.objects.get(codename=codename))
 
     def _delete_permission(self, user, model, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        codename = get_permission_codename(permission_type, model._meta)
         user.user_permissions.remove(Permission.objects.get(codename=codename))
-
-    def _give_object_permission(self, user, object, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, object.__class__._meta.object_name.lower())
-        UserObjectPermission.objects.assign_perm(codename, user=user, obj=object)
-
-    def _delete_object_permission(self, user, object, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, object.__class__._meta.object_name.lower())
-        UserObjectPermission.objects.remove_perm(codename, user=user, obj=object)
 
     def _post_request(self, user):
         data = {
@@ -1069,12 +1207,16 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         return request
 
     def test_plugin_add_requires_permissions(self):
-        """User wants to add a plugin to the example app placeholder but has no permissions"""
+        """User wants to add a plugin to the example app placeholder (with and without perms)"""
         self._test_plugin_action_requires_permissions('add')
 
     def test_plugin_edit_requires_permissions(self):
-        """User wants to edit a plugin to the example app placeholder but has no permissions"""
+        """User wants to edit a plugin to the example app placeholder (with and without perms)"""
         self._test_plugin_action_requires_permissions('change')
+
+    def test_plugin_delete_requires_permissions(self):
+        """User wants to delete a plugin to the example app placeholder (with and without perms)"""
+        self._test_plugin_action_requires_permissions('delete')
 
     def _test_plugin_action_requires_permissions(self, key):
         example = self._create_example()
@@ -1104,8 +1246,90 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
             else:
                 expected_status_code = HttpResponseForbidden.status_code
             self.assertEqual(response.status_code, expected_status_code)
+        """
+        checks all combinations of plugin, app and object permission for all
+        available actions (add, delete, change)
+        
+        * `itertools.product(*[[False, True]]*3)` is an iterable of all combinations available 
+           with 3 booleans. e.g : `(True, True, True)`, `(True, True, False)`,  etc.
+        * `Text` is the CMSPlugin Model from djangocms_text_ckeditor
+        * `Exemple1` is the Model from placeholderapp test app
+        * `self.example_object` is an instance of this model which have a placeholder
+        * `perms` is a dict with "add", "change" and "delete" keys with corresponding
+          permissions assigned to user.
+        An user can "action" on a Text plugin if he has "action" perm on the Text plugin AND
+        some perms on Model OR instance:
+            * `add` plugin needs (`add` OR `change`) on Example1
+            * `change` plugin needs (`add` OR `change`) on (Example1 OR example_object)
+            * `delete` plugin needs (`add` OR `change` OR `delete`) on (Example1 OR example_object)
+
+
+        ## Testing performance issue
+
+        This method could tests the 2^3^3 = 512 perms combinations: 
+          True/False combinations (2)
+          on Plugin, Model and instance (^3) 
+          for add, change and delete perms (^3)
+        but we remove some unuseful tests :
+          * when user has not perm on Plugin, we only test the most permissive case : when he has 
+            perms on instance AND model. (nb tests is now (2^3 - (2^2-1))^3 = 125)
+          * as adding perm on an instance is currently the same than adding perm to the model, 
+            we don't test case of instance perms. (nb tests is now (2^(3-1) - (2^(2-1)-1))^3 = 27)
+        """
+        self._create_example()
+        if key not in ('add', 'change', 'delete'):
+            raise Exception("key '%s' is not valid. "
+                            "Only 'add', 'change' and 'delete are allowed" % key)
+        if key in ('change', 'delete'):
+            self._create_plugin()
+
+        # until perms on instance stay the same than perms on Model, we do not test instance perms
+        # objects_list = [Text, Example1, self.example_object,]
+        objects_list = [Text, Example1]
+        objects_labels = [getattr(o, '__name__', 'example_object') for o in objects_list]
+        perms_combinations = list(itertools.product(*[[False, True]]*len(objects_list)))
+
+        # only keep False, True* combinations
+        for combination in itertools.product(*[[False, True]]*(len(objects_list)-1)):
+            if combination == (True,) * (len(objects_list)-1):
+                continue  # all True : we keep it
+            perms_combinations.remove((False,) + combination)
+
+        request = self._post_request(self._testuser())
+        has_perm = getattr(self.get_admin(), 'has_%s_plugin_permission' % key)
+        has_perm_kwargs = {'request': request}
+        if key in ('change', 'delete'):
+            has_perm_kwargs['plugin'] = self._plugin
+        elif key == 'add':
+            has_perm_kwargs['placeholder'] = self.example_object.placeholder
+            has_perm_kwargs['plugin_type'] = 'TextPlugin'
+        perms = {}
+
+        for add_perms in perms_combinations:
+            self._set_perms(request.user, objects_list, add_perms, 'add')
+            perms['add'] = dict(zip(objects_labels, add_perms))
+            for change_perms in perms_combinations:
+                self._set_perms(request.user, objects_list, change_perms, 'change')
+                perms['change'] = dict(zip(objects_labels, change_perms))
+                for delete_perms in perms_combinations:
+                    self._set_perms(request.user, objects_list, delete_perms, 'delete')
+                    perms['delete'] = dict(zip(objects_labels, delete_perms))
+
+                    other_should_pass = (perms['add']['Example1'], perms['change']['Example1'])
+                    if self.example_object in objects_list:
+                        other_should_pass += (perms['add']['example_object'], perms['change']['example_object'])
+                    if key == 'delete':
+                        other_should_pass += (perms['delete']['Example1'],)
+                        if self.example_object in objects_list:
+                            other_should_pass += (perms['delete']['example_object'],)
+                    should_pass = perms[key]['Text'] and (True in other_should_pass)
+                    if should_pass != has_perm(**has_perm_kwargs):
+                        msg = 'User SHOULD %s able to perform "%s" action with those perms : %s'
+                        self.fail(msg % ('BE' if should_pass else 'NOT BE', key, perms))
         # cleanup
-        self._set_perms(normal_guy, [Text, Example1, self.example_object], (False,)*3, key)
+        self._set_perms(request.user, objects_list, (False,)*len(objects_list), 'add')
+        self._set_perms(request.user, objects_list, (False,)*len(objects_list), 'delete')
+        self._set_perms(request.user, objects_list, (False,)*len(objects_list), 'change')
 
     def _set_perms(self, user, objects, perms, key):
         for obj, perm in zip(objects, perms):
@@ -1113,6 +1337,15 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
             object_key = '_object' if isinstance(obj, models.Model) else ''
             method_name = '_%s%s_permission' % (action, object_key)
             getattr(self, method_name)(user, obj, key)
+            # This is 'fragile' as it depends on Django internals
+            # This is true for Django < 1.8
+            if hasattr(user, '_perm_cache'):
+                delattr(user, '_perm_cache')
+            # This is true for Django >= 1.8
+            if hasattr(user, '_user_perm_cache'):
+                delattr(user, '_user_perm_cache')
+            if hasattr(user, '_group_perm_cache'):
+                delattr(user, '_group_perm_cache')
 
 
 class PlaceholderConfTests(TestCase):
@@ -1127,7 +1360,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1144,7 +1377,7 @@ class PlaceholderConfTests(TestCase):
                 'plugins': ['LinkPlugin'],
             },
         }
-        with SettingsOverride(CMS_PLACEHOLDER_CONF=conf):
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
@@ -1160,11 +1393,7 @@ class PlaceholderI18NTest(CMSTestCase):
         return u
 
     def test_hvad_tabs(self):
-        ex = MultilingualExample1(
-            char_1='one',
-            char_2='two',
-        )
-        ex.save()
+        ex = MultilingualExample1.objects.language('en').create(char_1='one', char_2='two')
         self._testuser()
         self.client.login(username='test', password='test')
 
@@ -1172,13 +1401,12 @@ class PlaceholderI18NTest(CMSTestCase):
         self.assertContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_no_tabs(self):
-        ex = Example1(
+        ex = Example1.objects.create(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
         )
-        ex.save()
         self._testuser()
         self.client.login(username='test', password='test')
 
@@ -1186,13 +1414,12 @@ class PlaceholderI18NTest(CMSTestCase):
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
-        ex = TwoPlaceholderExample(
+        ex = TwoPlaceholderExample.objects.create(
             char_1='one',
             char_2='two',
             char_3='one',
             char_4='two',
         )
-        ex.save()
         self._testuser()
         self.client.login(username='test', password='test')
 

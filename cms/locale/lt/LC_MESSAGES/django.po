@@ -4,1045 +4,1091 @@
 # 
 # Translators:
 # Jelena <jelena.kutalovskaja@gmail.com>, 2014
+# Matas Dailyda, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-12 09:31+0100\n"
-"PO-Revision-Date: 2015-01-11 21:30+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"POT-Creation-Date: 2015-06-27 21:30+0200\n"
+"PO-Revision-Date: 2015-06-10 17:34+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django-cms/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Poedit-Country: SWITZERLAND\n"
-"X-Poedit-Language: English\n"
-"X-Poedit-SourceCharset: utf-8\n"
+
+#: admin/dialog/forms.py:10
+msgid "Copy permissions"
+msgstr "Kopijuoti teises"
+
+#: admin/forms.py:69 admin/forms.py:165 admin/forms.py:208 cms_toolbar.py:184
+#: models/settingmodels.py:11
+msgid "Language"
+msgstr "Kalba"
+
+#: admin/forms.py:70 admin/forms.py:166 admin/forms.py:209
+msgid "The current language of the content fields."
+msgstr "Turinio laukų dabartinė kalba."
+
+#: admin/forms.py:71
+msgid "Page type"
+msgstr "Puslapio tipas"
+
+#: admin/forms.py:72
+msgid "Title"
+msgstr "Pavadinimas"
+
+#: admin/forms.py:73
+msgid "The default title"
+msgstr "Numatytasis pavadinimas"
+
+#: admin/forms.py:74
+msgid "Slug"
+msgstr "Nuoroda"
+
+#: admin/forms.py:75
+msgid "The part of the title that is used in the URL"
+msgstr "Pavadinimo dalis, kuri yra naudojama URL"
+
+#: admin/forms.py:76
+msgid "Menu Title"
+msgstr "Meniu pavadinimas"
+
+#: admin/forms.py:77
+msgid "Overwrite what is displayed in the menu"
+msgstr "Perrašyti tai kas atvaizduojama meniu"
+
+#: admin/forms.py:78
+msgid "Page Title"
+msgstr "Puslapio pavadinimas"
+
+#: admin/forms.py:79
+msgid ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr "Perrašo tai kas atvaizduojama jūsų naršyklės viršutinėje juostoje ar naršyklės žymėse (bookmarks)"
+
+#: admin/forms.py:81
+msgid "Description meta tag"
+msgstr "Aprašymo meta žymenys"
+
+#: admin/forms.py:83
+msgid "A description of the page used by search engines."
+msgstr "Puslapio aprašymas naudojamas paieškos sistemose."
+
+#: admin/forms.py:132
+msgid "Another page with this slug already exists"
+msgstr "Kitas puslapis su tokia nuoroda jau egzistuoja"
+
+#: admin/forms.py:160
+msgid "Slug must not be empty."
+msgstr "Nuoroda negali būti tuščia."
+
+#: admin/forms.py:188
+msgid "Application"
+msgstr "Aplikacija"
+
+#: admin/forms.py:190
+msgid "Hook application to this page."
+msgstr "Prikabinti aplikaciją šiam puslapiui."
+
+#: admin/forms.py:191
+msgid "Overwrite URL"
+msgstr "Perrašyti URL"
+
+#: admin/forms.py:192
+msgid "Keep this field empty if standard path should be used."
+msgstr "Palikite šį lauką tuščią jeigu bus naudojamas standartinis kelias."
+
+#: admin/forms.py:196
+msgid "X Frame Options"
+msgstr "X Frame nustatymai"
+
+#: admin/forms.py:197
+msgid "Whether this page can be embedded in other pages or websites"
+msgstr "Ar šis puslapis gali būti įterptas i kitus puslapius ar tinklalapius."
+
+#: admin/forms.py:202
+msgid "Redirect"
+msgstr "Nukreipti"
+
+#: admin/forms.py:203
+msgid "Redirects to this URL."
+msgstr "Nukreipia į šį puslapį."
+
+#: admin/forms.py:204
+msgid "Start typing..."
+msgstr "Pradėkite rašyti..."
+
+#: admin/forms.py:213
+msgid "Application configurations"
+msgstr "Aplikacijų nustatymai"
+
+#: admin/forms.py:219
+msgid "Language independent options"
+msgstr "Nuo kalbos nepriklausomi nustatymai."
+
+#: admin/forms.py:303
+msgid "A page with this reverse URL id exists already."
+msgstr "Puslapis su tokia nuoroda jau egzistuoja."
+
+#: admin/forms.py:320
+msgid "An application instance using this configuration already exists."
+msgstr "Aplikacijos objektas naudojantis šiuos nustatymus jau egzistuoja."
+
+#: admin/forms.py:328 admin/forms.py:339
+msgid "An application instance with this name already exists."
+msgstr "Aplikacijos objektas su tokiu pavadinimu jau egzistuoja."
+
+#: admin/forms.py:395 migrations/0001_initial.py:72
+#: migrations/0001_initial.py:135 models/permissionmodels.py:63
+#: test_utils/project/customuserapp/models.py:60
+msgid "user"
+msgstr "vartotojas"
+
+#: admin/forms.py:458
+msgid ""
+"Add page permission requires also access to children, or descendants, "
+"otherwise added page can't be changed by its creator."
+msgstr "Puslapio pridėjimo teisė taip pat reikalauja prieigos prie vidinių elementų, kitaip pridėto puslapio nebus galima redaguoti."
+
+#: admin/forms.py:463
+msgid "Add page permission also requires edit page permission."
+msgstr "Puslapio teisių pridėjimas taip pat reikalauja puslapio redagavimo teisės"
+
+#: admin/forms.py:491
+msgid "can_view"
+msgstr "gali peržiūrėti"
+
+#: admin/forms.py:502
+msgid "Please select user or group first."
+msgstr "Visų pirma pasirinkte vartotoją arba grupę."
+
+#: admin/forms.py:513 admin/forms.py:520 admin/forms.py:524
+#: templates/admin/cms/usersettings/change_form.html:17
+#: templatetags/cms_tags.py:758
+msgid "Add"
+msgstr "Pridėti"
+
+#: admin/forms.py:514 admin/forms.py:521 admin/forms.py:525
+msgid "Change"
+msgstr "Pakeisti"
+
+#: admin/forms.py:515 admin/forms.py:522 admin/forms.py:526
+#: templates/admin/cms/extensions/change_form.html:8
+#: templates/admin/cms/page/plugin/submit_line.html:5
+#: templates/admin/cms/page/submit_row.html:7
+#: templates/admin/cms/page/tree/menu_item.html:66
+#: templates/cms/toolbar/dragitem.html:15
+msgid "Delete"
+msgstr "Pašalinti"
+
+#: admin/forms.py:516
+msgid "Recover (any) pages"
+msgstr "Atkurti (bet kokius) puslapius"
+
+#: admin/forms.py:544
+msgid "Notify user"
+msgstr "Informuoti vartotoją"
+
+#: admin/forms.py:546
+msgid ""
+"Send email notification to user about username or password change. Requires "
+"user email."
+msgstr "Siųsti vartotojui pranešimą elektroniniu paštu apie prisijungimo vardo arba slaptažodžio keitimą. Reikalingas vartotojo elektroninis paštas."
+
+#: admin/forms.py:567
+msgid "New password"
+msgstr "Naujas slaptažodis"
+
+#: admin/forms.py:569
+msgid "New password confirmation"
+msgstr "Naujo slaptažodžio patvirtinimas"
+
+#: admin/forms.py:594
+msgid "Email notification requires valid email address."
+msgstr "Reikalingas validus el. pašto adresas."
+
+#: admin/forms.py:596
+msgid ""
+"The permission to add new pages requires the permission to change pages!"
+msgstr "Teisė pridėti naują puslapį reikalauja teisės keisti puslapius!"
+
+#: admin/forms.py:598
+msgid ""
+"The permission to add new users requires the permission to change users!"
+msgstr "Teisė pridėti naujus vartotojus reikalauja teisės keisti vartotojus!"
+
+#: admin/forms.py:600
+msgid "To add permissions you also need to edit them!"
+msgstr "Norėdami pridėti teises taip pat turite jas redaguoti!"
+
+#: admin/pageadmin.py:341 templates/admin/cms/page/submit_row.html:9
+msgid "Advanced Settings"
+msgstr "Papildomi nustatymai"
+
+#: admin/pageadmin.py:344 cms_toolbar.py:475
+msgid "Publishing dates"
+msgstr "Publikavimo datos"
+
+#: admin/pageadmin.py:350
+msgid "Change Permissions"
+msgstr "Pakeisti teises"
+
+#: admin/pageadmin.py:393
+msgid "Add Page Type"
+msgstr "Pridėti puslapio tipą"
+
+#: admin/pageadmin.py:397
+msgid "Add Page Copy"
+msgstr "Pridėti puslapio kopiją"
+
+#: admin/pageadmin.py:597
+#, python-format
+msgid "%(plugin_name)s plugin added to %(placeholder)s"
+msgstr "%(plugin_name)s įskiepis pridėtas į %(placeholder)s"
+
+#: admin/pageadmin.py:605
+#, python-format
+msgid "Copied plugins to %(placeholder)s"
+msgstr "Įskiepiai nukopijuoti į %(placeholder)s"
+
+#: admin/pageadmin.py:616
+#, python-format
+msgid ""
+"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+msgstr "%(plugin_name)s įskiepis redaguotas pozicijoje %(position)s ir rezervuotoje vietoje %(placeholder)s"
+
+#: admin/pageadmin.py:628
+msgid "Plugins were moved"
+msgstr "Įskiepiai buvo perkelti"
+
+#: admin/pageadmin.py:635
+#, python-format
+msgid ""
+"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
+"deleted."
+msgstr "%(plugin_name)s įskiepis pozicijoje %(position)s ir rezervuotoje vietoje %(placeholder)s buvo pašalintas."
+
+#: admin/pageadmin.py:648
+#, python-format
+msgid "All plugins in the placeholder \"%(name)s\" were deleted."
+msgstr "Visi įskiepiai rezervuotoje vietoje \"%(name)s\" buvo pašalinti."
+
+#: admin/pageadmin.py:667
+msgid "You do not have permission to change pages."
+msgstr "Jūs neturite teisių kiesti puslapių."
+
+#: admin/pageadmin.py:679
+msgid "Database error"
+msgstr "Duomenų bazės klaida"
+
+#: admin/pageadmin.py:778 admin/pageadmin.py:797 admin/pageadmin.py:1084
+#: admin/pageadmin.py:1121
+msgid "You do not have permission to change this page"
+msgstr "Jūs neturite teisės keisti šio puslapio"
+
+#: admin/pageadmin.py:782 admin/pageadmin.py:801
+msgid "Page reverted but slug stays the same because of url collisions."
+msgstr "Puslapis grąžintas bet nuoroda išlieka ta pati dėl nuorodų konflikto."
+
+#: admin/pageadmin.py:812
+msgid "You do not have permission to change the template"
+msgstr "Jūs neturite teisių keisti šio šablono"
+
+#: admin/pageadmin.py:816
+msgid "Template not valid"
+msgstr "Blogas šablonas"
+
+#: admin/pageadmin.py:821
+#, python-format
+msgid "Template changed to %s"
+msgstr "Šablonas pakeistas į %s"
+
+#: admin/pageadmin.py:824
+msgid "The template was successfully changed"
+msgstr "Šablonas buvo sėkmingai pakeistas"
+
+#: admin/pageadmin.py:846
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "Klaida! Jūs neturite teisių perkelti šį puslapį. Perkraukite puslapį"
+
+#: admin/pageadmin.py:851
+msgid "Page moved"
+msgstr "Puslapis perkeltas"
+
+#: admin/pageadmin.py:897 admin/placeholderadmin.py:237
+#: admin/placeholderadmin.py:283
+msgid "Language must be set to a supported language!"
+msgstr "Kalba turi būti nustatyta į palaikomą kalbą!"
+
+#: admin/pageadmin.py:902 admin/placeholderadmin.py:302
+msgid "You do not have permission to copy these plugins."
+msgstr "Jūs neturite teisių kopijuoti šių įskiepių"
+
+#: admin/pageadmin.py:905
+#, python-format
+msgid "Copied plugins from %(source_language)s to %(target_language)s"
+msgstr "Įskiepiai nukopijuoti iš %(source_language)s į %(target_language)s"
+
+#: admin/pageadmin.py:955
+msgid "You do not have permission to publish this page"
+msgstr "Jūs neturite teisės publikuoti šio puslapio"
+
+#: admin/pageadmin.py:972 admin/pageadmin.py:984
+msgid "Page not published! A parent page is not published yet."
+msgstr "Puslapis nepublikuotas! Pradinis puslapis vis dar nepublikuotas."
+
+#: admin/pageadmin.py:974
+msgid "The content was successfully published."
+msgstr "Turinys buvo sėkmingai publikuotas."
+
+#: admin/pageadmin.py:986
+msgid "There was a problem publishing your content"
+msgstr "Iškilo problema publikuojant jūsų turinį"
+
+#: admin/pageadmin.py:1052
+msgid "You do not have permission to unpublish this page"
+msgstr "Jūs neturite teisės nebepublikuoti šio puslapio"
+
+#: admin/pageadmin.py:1054
+msgid "This page was never published"
+msgstr "Šis puslapis nebuvo publikuotas"
+
+#: admin/pageadmin.py:1057
+#, python-format
+msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+msgstr "%(language)s kalbos puslapis \"%(page)s\" sėkmingai nebepublikuojamas"
+
+#: admin/pageadmin.py:1088
+#, python-format
+msgid "The page \"%s\" was successfully reverted."
+msgstr "Puslapis \"%s\" buvo sėkmingai sugrąžintas į pirminę versiją."
+
+#: admin/pageadmin.py:1125
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s objektas su pirminiu raktu %(key)r neegzistuoja."
+
+#: admin/pageadmin.py:1131
+msgid "There only exists one translation for this page"
+msgstr "Egzistuoja tik vienas šio puslapio vertimas"
+
+#: admin/pageadmin.py:1173
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "Pavadinimas ir įskiepiai su %(language)s kalbomis buvo pašalinti"
+
+#: admin/pageadmin.py:1196 admin/placeholderadmin.py:488
+#: admin/placeholderadmin.py:532
+msgid "Are you sure?"
+msgstr "Ar jūs esate tikri?"
+
+#: admin/pageadmin.py:1236
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Jūs neturite teisės keisti šio puslapio atvaizdavimo navigacijoje statuso"
+
+#: admin/pageadmin.py:1258
+msgid "Page Types"
+msgstr "Puslapio tipai"
+
+#: admin/pageadmin.py:1338
+msgid "You do not have permission to edit this page"
+msgstr "Jūs neturite teisės redaguoti šio puslapio"
+
+#: admin/permissionadmin.py:90
+msgid "View restriction"
+msgstr "Peržiūrėjimo apribojimas"
+
+#: admin/permissionadmin.py:91
+msgid "View restrictions"
+msgstr "Peržiūrėjimo apribojimai"
+
+#: admin/permissionadmin.py:148 models/permissionmodels.py:123
+msgid "Page permissions"
+msgstr "Puslapio teisės"
+
+#: admin/permissionadmin.py:149
+msgid "User & Group permissions"
+msgstr "Vartotojo ir grupės teisės"
+
+#: admin/permissionadmin.py:150
+msgid "Page permissions management"
+msgstr "Puslapio teisių valdymas"
+
+#: admin/placeholderadmin.py:67
+#, python-format
+msgid "Field %s not found"
+msgstr "Laukas %s nerastas"
+
+#: admin/placeholderadmin.py:74
+msgid "You do not have permission to edit this item"
+msgstr "Jūs neturite teisės redaguoti šio objekto"
+
+#: admin/placeholderadmin.py:216
+msgid "You do not have permission to add a plugin"
+msgstr "Jūs neturite teisės prideti įskiepį"
+
+#: admin/placeholderadmin.py:239
+msgid "Parent plugin language must be same as language!"
+msgstr "Pradinio įskiepio kalba turi būti tokia pati!"
+
+#: admin/placeholderadmin.py:335
+msgid "Plugin not found"
+msgstr "Įskiepis nerastas"
+
+#: admin/placeholderadmin.py:340
+msgid "You do not have permission to edit this plugin"
+msgstr "Jūs neturite teisės redaguoti šio įskiepio"
+
+#: admin/placeholderadmin.py:423
+msgid "You have no permission to move this plugin"
+msgstr "Jūs neturite teisės perkelti šio įskiepio"
+
+#: admin/placeholderadmin.py:461 admin/placeholderadmin.py:476
+msgid "You do not have permission to delete this plugin"
+msgstr "Jūs neturite teisės pašalinti šio įskiepio"
+
+#: admin/placeholderadmin.py:480
+#, python-format
+msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgstr "Įskiepis %(name)s  \"%(obj)s\" buvo sėkmingai pašalintas."
+
+#: admin/placeholderadmin.py:486 admin/placeholderadmin.py:530
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "Negalima pašalinti %(name)s"
+
+#: admin/placeholderadmin.py:506 admin/placeholderadmin.py:522
+msgid "You do not have permission to clear this placeholder"
+msgstr "Jūs neturite teisiės išvalyti šios rezervuotos vietos"
+
+#: admin/placeholderadmin.py:525
+#, python-format
+msgid "The placeholder \"%(obj)s\" was cleared successfully."
+msgstr "Rezervuota vieta \"%(obj)s\" buvo sėkmingai išvalyta."
+
+#: admin/placeholderadmin.py:535
+msgid "placeholder"
+msgstr "rezervuota vieta"
 
 #: apps.py:9 templates/cms/toolbar/items/logo.html:2
 msgid "django CMS"
 msgstr "django CMS"
 
-#: cms_plugins.py:18
+#: cms_plugins.py:17
 msgid "Placeholder"
-msgstr ""
+msgstr "Rezervuota vieta"
 
 #: cms_plugins.py:31
 msgid "Alias"
-msgstr ""
+msgstr "Alias (kitas vardas)"
 
-#: cms_plugins.py:54 cms_plugins.py:63
+#: cms_plugins.py:56 cms_plugins.py:65
 msgid "Create Alias"
-msgstr ""
+msgstr "Sukurti alias (kitą varda)"
 
-#: cms_toolbar.py:90
+#: cms_toolbar.py:91
 msgid "Structure"
 msgstr "Struktūra"
 
-#: cms_toolbar.py:91
+#: cms_toolbar.py:92
 msgid "Content"
 msgstr "Turinys"
 
-#: cms_toolbar.py:122
+#: cms_toolbar.py:129
 msgid "Sites"
-msgstr "Puslapiai"
-
-#: cms_toolbar.py:123
-msgid "Admin Sites"
-msgstr ""
+msgstr "Tinklalapiai"
 
 #: cms_toolbar.py:130
+msgid "Admin Sites"
+msgstr "Administravimo puslapiai"
+
+#: cms_toolbar.py:137
 msgid "Administration"
 msgstr "Administravimo panelė"
 
-#: cms_toolbar.py:134
+#: cms_toolbar.py:141
 msgid "User settings"
 msgstr "Vartotojo nustatymai"
 
-#: cms_toolbar.py:148
+#: cms_toolbar.py:145
+msgid "Disable toolbar"
+msgstr "Išjungti įrankių juostą"
+
+#: cms_toolbar.py:159
 msgid "Users"
 msgstr "Vartotojai"
 
-#: cms_toolbar.py:167 tests/toolbar.py:392 tests/toolbar.py:407
-#: tests/toolbar.py:439
+#: cms_toolbar.py:178 tests/toolbar.py:739 tests/toolbar.py:754
+#: tests/toolbar.py:787
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Atsijungti %s"
 
-#: cms_toolbar.py:167
+#: cms_toolbar.py:178
 msgid "Logout"
 msgstr "Atsijungti"
 
-#: cms_toolbar.py:173 admin/forms.py:64 admin/forms.py:174 admin/forms.py:216
-#: models/settingmodels.py:12
-msgid "Language"
-msgstr "Kalba"
-
-#: cms_toolbar.py:302
+#: cms_toolbar.py:317
 msgid "Publish changes"
 msgstr "Publikuoti pakeitimus"
 
-#: cms_toolbar.py:304
+#: cms_toolbar.py:319
 msgid "Publish page now"
 msgstr "Publikuoti puslapį"
 
-#: cms_toolbar.py:346 cms_toolbar.py:431
+#: cms_toolbar.py:361 cms_toolbar.py:444
 msgid "Page settings"
 msgstr "Puslapio nustatymai"
 
-#: cms_toolbar.py:366
+#: cms_toolbar.py:379
 #, python-format
 msgid "Add %(language)s Translation"
 msgstr "Pridėti  %(language)s vertimą"
 
-#: cms_toolbar.py:374
+#: cms_toolbar.py:387
 #, python-format
 msgid "Delete %(language)s Translation"
-msgstr "Ištrinti %(language)s vertimą"
+msgstr "Pašalinti %(language)s vertimą"
 
-#: cms_toolbar.py:383
+#: cms_toolbar.py:396
 #, python-format
 msgid "Copy all plugins from %s"
-msgstr ""
+msgstr "Kopijuoti visus įskiepius iš %s"
 
-#: cms_toolbar.py:384
+#: cms_toolbar.py:397
 #, python-format
 msgid "Are you sure you want copy all plugins from %s?"
-msgstr ""
+msgstr "Ar tikrai norite nukopijuoti visus įskiepius iš %s?"
 
-#: cms_toolbar.py:398
+#: cms_toolbar.py:411
 msgid "Pages"
 msgstr "Puslapiai"
 
-#: cms_toolbar.py:406 templates/admin/cms/page/permissions.html:5
+#: cms_toolbar.py:419 templates/admin/cms/page/permissions.html:5
 msgid "Page"
 msgstr "Puslapis"
 
-#: cms_toolbar.py:409
+#: cms_toolbar.py:422
 msgid "Add Page"
-msgstr ""
+msgstr "Pridėti puslapį"
 
-#: cms_toolbar.py:412
+#: cms_toolbar.py:425
 msgid "New Page"
-msgstr ""
-
-#: cms_toolbar.py:413
-msgid "New Sub Page"
-msgstr ""
-
-#: cms_toolbar.py:414
-msgid "Duplicate this Page"
-msgstr ""
+msgstr "Naujas puslapis"
 
 #: cms_toolbar.py:426
+msgid "New Sub Page"
+msgstr "Naujas vidinis puslapis"
+
+#: cms_toolbar.py:427
+msgid "Duplicate this Page"
+msgstr "Dublikuoti šį puslapį"
+
+#: cms_toolbar.py:439
 msgid "Edit this Page"
 msgstr "Redaguoti šį puslapį"
 
-#: cms_toolbar.py:436
+#: cms_toolbar.py:449
 msgid "Templates"
 msgstr "Šablonai"
 
-#: cms_toolbar.py:452
+#: cms_toolbar.py:465
 msgid "Advanced settings"
 msgstr "Papildomi nustatymai"
 
-#: cms_toolbar.py:458
+#: cms_toolbar.py:471
 msgid "Permissions"
-msgstr "Leidimai"
+msgstr "Teisės"
 
-#: cms_toolbar.py:462 admin/pageadmin.py:343
-msgid "Publishing dates"
-msgstr ""
-
-#: cms_toolbar.py:468
+#: cms_toolbar.py:481
 msgid "Hide in navigation"
 msgstr "Paslėpti navigacijoje"
 
-#: cms_toolbar.py:468
+#: cms_toolbar.py:481
 msgid "Display in navigation"
 msgstr "Atvaizduoti navigacijoje"
 
-#: cms_toolbar.py:475
+#: cms_toolbar.py:488
 msgid "Unpublish page"
-msgstr ""
+msgstr "Anuliuoti puslapio publikavimą"
 
-#: cms_toolbar.py:478
+#: cms_toolbar.py:491
 msgid "Publish page"
 msgstr "Publikuoti puslapį"
 
-#: cms_toolbar.py:489
+#: cms_toolbar.py:502
 msgid "Delete page"
-msgstr "Ištrinti puslapį"
+msgstr "Pašalinti puslapį"
 
-#: cms_toolbar.py:498
+#: cms_toolbar.py:511
 msgid "Save as Page Type"
-msgstr ""
+msgstr "Išsaugoti kaip puslapio tipą"
 
-#: cms_toolbar.py:503 templates/admin/cms/page/history/revision_header.html:10
+#: cms_toolbar.py:516 templates/admin/cms/page/history/revision_header.html:10
 msgid "History"
 msgstr "Istorija"
 
-#: cms_toolbar.py:521
+#: cms_toolbar.py:534
 msgid "Undo"
-msgstr ""
+msgstr "Atšaukti"
 
-#: cms_toolbar.py:522
+#: cms_toolbar.py:535
 msgid "Redo"
-msgstr ""
+msgstr "Atstatyti"
 
-#: cms_toolbar.py:527
+#: cms_toolbar.py:540
 msgid "Are you sure you want to revert to live?"
-msgstr ""
+msgstr "Ar tikrai noritę grįžti i aktualų atvaizdavimą?"
 
-#: cms_toolbar.py:528
+#: cms_toolbar.py:541
 msgid "Revert to live"
-msgstr ""
+msgstr "Grįžti į aktualų"
 
-#: cms_toolbar.py:530
+#: cms_toolbar.py:544
 msgid "View history"
 msgstr "Žiūrėti istoriją"
 
-#: plugin_base.py:83
-msgid "Advanced options"
-msgstr "Papildomi nustatymai"
-
-#: plugin_base.py:100
-msgid "Generic"
-msgstr ""
-
-#: plugin_base.py:287
-msgid "There are no further settings for this plugin. Please press save."
-msgstr ""
-
-#: admin/forms.py:65 admin/forms.py:175 admin/forms.py:217
-msgid "The current language of the content fields."
-msgstr ""
-
-#: admin/forms.py:66
-msgid "Page type"
-msgstr ""
-
-#: admin/forms.py:67
-msgid "Title"
-msgstr "Pavadinimas"
-
-#: admin/forms.py:68
-msgid "The default title"
-msgstr "Pagrindinis pavadinimas"
-
-#: admin/forms.py:69
-msgid "Slug"
-msgstr ""
-
-#: admin/forms.py:70
-msgid "The part of the title that is used in the URL"
-msgstr ""
-
-#: admin/forms.py:71
-msgid "Menu Title"
-msgstr "Meniu Pavadinimas"
-
-#: admin/forms.py:72
-msgid "Overwrite what is displayed in the menu"
-msgstr ""
-
-#: admin/forms.py:73
-msgid "Page Title"
-msgstr "Puslapio Pavadinimas"
-
-#: admin/forms.py:74
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-
-#: admin/forms.py:76
-msgid "Description meta tag"
-msgstr ""
-
-#: admin/forms.py:78
-msgid "A description of the page used by search engines."
-msgstr ""
-
-#: admin/forms.py:135
-msgid "Another page with this slug already exists"
-msgstr ""
-
-#: admin/forms.py:163
-msgid "Slug must not be empty."
-msgstr ""
-
-#: admin/forms.py:197
-msgid "Application"
-msgstr "Aplikacija"
-
-#: admin/forms.py:199
-msgid "Hook application to this page."
-msgstr ""
-
-#: admin/forms.py:200
-msgid "Overwrite URL"
-msgstr "Perrašyti URL"
-
-#: admin/forms.py:201
-msgid "Keep this field empty if standard path should be used."
-msgstr ""
-
-#: admin/forms.py:205
-msgid "X Frame Options"
-msgstr ""
-
-#: admin/forms.py:206
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
-
-#: admin/forms.py:211
-msgid "Redirect"
-msgstr "Nukreipti"
-
-#: admin/forms.py:212
-msgid "Redirects to this URL."
-msgstr "Nukreipia į šį puslapį."
-
-#: admin/forms.py:212
-msgid "Start typing..."
-msgstr ""
-
-#: admin/forms.py:269
-msgid "A page with this reverse URL id exists already."
-msgstr ""
-
-#: admin/forms.py:287
-msgid ""
-"You selected an apphook with an \"app_name\".\n"
-"                            You must enter a unique instance name."
-msgstr ""
-
-#: admin/forms.py:307
-msgid "A instance name with this name already exists."
-msgstr ""
-
-#: admin/forms.py:347 models/permissionmodels.py:71
-#: test_utils/project/customuserapp/models.py:60
-msgid "user"
-msgstr "vartotojas"
-
-#: admin/forms.py:411
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
-msgstr ""
-
-#: admin/forms.py:416
-msgid "Add page permission also requires edit page permission."
-msgstr ""
-
-#: admin/forms.py:443
-msgid "can_view"
-msgstr ""
-
-#: admin/forms.py:454
-msgid "Please select user or group first."
-msgstr "Visų pirmą pasirinkte vartotoją arba grupę."
-
-#: admin/forms.py:461 admin/forms.py:468 admin/forms.py:472
-#: templates/admin/cms/usersettings/change_form.html:8
-#: templatetags/cms_tags.py:771
-msgid "Add"
-msgstr "Pridėti"
-
-#: admin/forms.py:462 admin/forms.py:469 admin/forms.py:473
-#: templates/cms/toolbar/toolbar.html:36
-#: templates/cms/toolbar/items/live_draft.html:7
-msgid "Change"
-msgstr "Pakeisti"
-
-#: admin/forms.py:463 admin/forms.py:470 admin/forms.py:474
-#: templates/admin/cms/extensions/change_form.html:8
-#: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/menu_item.html:66
-#: templates/cms/toolbar/dragitem.html:15
-msgid "Delete"
-msgstr "Ištrinti"
-
-#: admin/forms.py:464
-msgid "Recover (any) pages"
-msgstr "Gražinti (bet kokius) puslapius"
-
-#: admin/forms.py:492
-msgid "Notify user"
-msgstr "Informuoti vartotoją"
-
-#: admin/forms.py:494
-msgid ""
-"Send email notification to user about username or password change. Requires "
-"user email."
-msgstr ""
-
-#: admin/forms.py:514
-msgid "New password"
-msgstr "Naujas slaptažodis"
-
-#: admin/forms.py:516
-msgid "New password confirmation"
-msgstr "Naujo slaptažodžio patvirtinimas"
-
-#: admin/forms.py:541
-msgid "Email notification requires valid email address."
-msgstr "Reikalingas validus el. pašto adresas."
-
-#: admin/forms.py:543
-msgid ""
-"The permission to add new pages requires the permission to change pages!"
-msgstr ""
-
-#: admin/forms.py:545
-msgid ""
-"The permission to add new users requires the permission to change users!"
-msgstr ""
-
-#: admin/forms.py:547
-msgid "To add permissions you also need to edit them!"
-msgstr ""
-
-#: admin/pageadmin.py:340 templates/admin/cms/page/submit_row.html:9
-msgid "Advanced Settings"
-msgstr "Papildomi nustatymai"
-
-#: admin/pageadmin.py:349
-msgid "Change Permissions"
-msgstr "Pakeisti Leidimus"
-
-#: admin/pageadmin.py:397
-msgid "Add Page Type"
-msgstr ""
-
-#: admin/pageadmin.py:401
-msgid "Add Page Copy"
-msgstr ""
-
-#: admin/pageadmin.py:607
-#, python-format
-msgid "%(plugin_name)s plugin added to %(placeholder)s"
-msgstr ""
-
-#: admin/pageadmin.py:615
-#, python-format
-msgid "Copied plugins to %(placeholder)s"
-msgstr ""
-
-#: admin/pageadmin.py:626
-#, python-format
-msgid ""
-"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-msgstr ""
-
-#: admin/pageadmin.py:638
-msgid "Plugins were moved"
-msgstr ""
-
-#: admin/pageadmin.py:645
-#, python-format
-msgid ""
-"%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-"deleted."
-msgstr ""
-
-#: admin/pageadmin.py:658
-#, python-format
-msgid "All plugins in the placeholder \"%(name)s\" were deleted."
-msgstr ""
-
-#: admin/pageadmin.py:677
-msgid "You do not have permission to change pages."
-msgstr ""
-
-#: admin/pageadmin.py:689
-msgid "Database error"
-msgstr "Duomenų bazės klaida"
-
-#: admin/pageadmin.py:792 admin/pageadmin.py:859 admin/pageadmin.py:1189
-#: admin/pageadmin.py:1226
-msgid "You do not have permission to change this page"
-msgstr "Jūs neturite teisių keisti šį puslapį"
-
-#: admin/pageadmin.py:843 admin/pageadmin.py:909
-msgid "Page reverted but slug stays the same because of url collisions."
-msgstr ""
-
-#: admin/pageadmin.py:917
-msgid "You do not have permission to change the template"
-msgstr ""
-
-#: admin/pageadmin.py:921
-msgid "Template not valid"
-msgstr "Blogas šablonas"
-
-#: admin/pageadmin.py:926
-#, python-format
-msgid "Template changed to %s"
-msgstr ""
-
-#: admin/pageadmin.py:929
-msgid "The template was successfully changed"
-msgstr ""
-
-#: admin/pageadmin.py:951
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
-msgstr ""
-
-#: admin/pageadmin.py:956
-msgid "Page moved"
-msgstr ""
-
-#: admin/pageadmin.py:1002 admin/placeholderadmin.py:257
-#: admin/placeholderadmin.py:306
-msgid "Language must be set to a supported language!"
-msgstr ""
-
-#: admin/pageadmin.py:1007 admin/placeholderadmin.py:325
-msgid "You do not have permission to copy these plugins."
-msgstr ""
-
-#: admin/pageadmin.py:1010
-#, python-format
-msgid "Copied plugins from %(source_language)s to %(target_language)s"
-msgstr ""
-
-#: admin/pageadmin.py:1060
-msgid "You do not have permission to publish this page"
-msgstr "Jūs neturite teisių publikuoti puslapį"
-
-#: admin/pageadmin.py:1077 admin/pageadmin.py:1089
-msgid "Page not published! A parent page is not published yet."
-msgstr ""
-
-#: admin/pageadmin.py:1079
-msgid "The content was successfully published."
-msgstr ""
-
-#: admin/pageadmin.py:1091
-msgid "There was a problem publishing your content"
-msgstr ""
-
-#: admin/pageadmin.py:1157
-msgid "You do not have permission to unpublish this page"
-msgstr ""
-
-#: admin/pageadmin.py:1159
-msgid "This page was never published"
-msgstr ""
-
-#: admin/pageadmin.py:1162
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr ""
-
-#: admin/pageadmin.py:1193
-#, python-format
-msgid "The page \"%s\" was successfully reverted."
-msgstr ""
-
-#: admin/pageadmin.py:1230
-#, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
-
-#: admin/pageadmin.py:1236
-msgid "There only exists one translation for this page"
-msgstr ""
-
-#: admin/pageadmin.py:1265
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
-
-#: admin/pageadmin.py:1288 admin/placeholderadmin.py:522
-#: admin/placeholderadmin.py:561
-msgid "Are you sure?"
-msgstr "Jūs esate tikras?"
-
-#: admin/pageadmin.py:1328
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr ""
-
-#: admin/pageadmin.py:1350
-msgid "Page Types"
-msgstr ""
-
-#: admin/pageadmin.py:1407
-msgid "You do not have permission to edit this page"
-msgstr ""
-
-#: admin/permissionadmin.py:90
-msgid "View restriction"
-msgstr ""
-
-#: admin/permissionadmin.py:91
-msgid "View restrictions"
-msgstr ""
-
-#: admin/permissionadmin.py:148 models/permissionmodels.py:131
-msgid "Page permissions"
-msgstr "Puslapio leidimai"
-
-#: admin/permissionadmin.py:149
-msgid "User & Group permissions"
-msgstr "Vartotojo &  Grupės leidimai"
-
-#: admin/permissionadmin.py:150
-msgid "Page permissions management"
-msgstr "Puslapio leidimų valdymas"
-
-#: admin/placeholderadmin.py:76
-#, python-format
-msgid "Field %s not found"
-msgstr ""
-
-#: admin/placeholderadmin.py:83
-msgid "You do not have permission to edit this item"
-msgstr ""
-
-#: admin/placeholderadmin.py:233
-msgid "You do not have permission to add a plugin"
-msgstr ""
-
-#: admin/placeholderadmin.py:259
-msgid "Parent plugin language must be same as language!"
-msgstr ""
-
-#: admin/placeholderadmin.py:363
-msgid "You do not have permission to edit this plugin"
-msgstr ""
-
-#: admin/placeholderadmin.py:446
-msgid "You have no permission to move this plugin"
-msgstr ""
-
-#: admin/placeholderadmin.py:499 admin/placeholderadmin.py:510
-msgid "You do not have permission to delete this plugin"
-msgstr ""
-
-#: admin/placeholderadmin.py:514
-#, python-format
-msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
-msgstr ""
-
-#: admin/placeholderadmin.py:520 admin/placeholderadmin.py:559
-#, python-format
-msgid "Cannot delete %(name)s"
-msgstr ""
-
-#: admin/placeholderadmin.py:540 admin/placeholderadmin.py:551
-msgid "You do not have permission to clear this placeholder"
-msgstr ""
-
-#: admin/placeholderadmin.py:554
-#, python-format
-msgid "The placeholder \"%(obj)s\" was cleared successfully."
-msgstr ""
-
-#: admin/placeholderadmin.py:564
-msgid "placeholder"
-msgstr ""
-
-#: admin/dialog/forms.py:10
-msgid "Copy permissions"
-msgstr "Kopijuoti leidimus"
-
-#: forms/fields.py:31
+#: forms/fields.py:33
 msgid "Select a valid site"
-msgstr ""
+msgstr "Pasirinkite tinkamą svetainę"
 
-#: forms/fields.py:32
+#: forms/fields.py:34
 msgid "Select a valid page"
-msgstr ""
+msgstr "Pasirinkite tinkamą puslapį"
 
-#: forms/widgets.py:221
+#: forms/widgets.py:222 forms/widgets.py:309
 msgid "Add Another"
 msgstr "Pridėti papildomą"
 
-#: models/pagemodel.py:38
-msgid "for logged in users only"
-msgstr ""
+#: migrations/0001_initial.py:26 migrations/0001_initial.py:60
+#: migrations/0001_initial.py:83 migrations/0001_initial.py:123
+msgid "ID"
+msgstr "ID"
 
-#: models/pagemodel.py:39
-msgid "for anonymous users only"
-msgstr ""
-
-#: models/pagemodel.py:48
-msgid "Inherit from parent page"
-msgstr ""
-
-#: models/pagemodel.py:49
-msgid "Deny"
-msgstr ""
-
-#: models/pagemodel.py:50
-msgid "Only this website"
-msgstr ""
-
-#: models/pagemodel.py:51
-msgid "Allow"
-msgstr ""
-
-#: models/pagemodel.py:56
-msgid "created by"
-msgstr "sukūrė"
-
-#: models/pagemodel.py:57
-msgid "changed by"
-msgstr "redagavo"
-
-#: models/pagemodel.py:62 templates/admin/cms/page/tree/menu_item.html:73
-msgid "publication date"
-msgstr "publikavimo data"
-
-#: models/pagemodel.py:63
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr ""
-
-#: models/pagemodel.py:64 templates/admin/cms/page/tree/menu_item.html:74
-msgid "publication end date"
-msgstr ""
-
-#: models/pagemodel.py:65
-msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
-
-#: models/pagemodel.py:71
-msgid "in navigation"
-msgstr ""
-
-#: models/pagemodel.py:72
-msgid "soft root"
-msgstr ""
-
-#: models/pagemodel.py:73
-msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
-
-#: models/pagemodel.py:74
-msgid "id"
-msgstr "id"
-
-#: models/pagemodel.py:75
-msgid ""
-"A unique identifier that is used with the page_url templatetag for linking "
-"to this page"
-msgstr ""
-
-#: models/pagemodel.py:76
-msgid "attached menu"
-msgstr ""
-
-#: models/pagemodel.py:77 templates/admin/cms/page/tree/menu_item.html:77
-msgid "template"
-msgstr "šablonas"
-
-#: models/pagemodel.py:78
-msgid "The template used to render the content."
-msgstr ""
-
-#: models/pagemodel.py:80
-msgid "The site the page is accessible at."
-msgstr ""
-
-#: models/pagemodel.py:80
-msgid "site"
-msgstr "puslapis"
-
-#: models/pagemodel.py:83
-msgid "login required"
-msgstr "prisijunkite"
-
-#: models/pagemodel.py:84
-msgid "menu visibility"
-msgstr ""
-
-#: models/pagemodel.py:86
-msgid "limit when this page is visible in the menu"
-msgstr ""
-
-#: models/pagemodel.py:88
-msgid "application"
-msgstr "aplikacija"
-
-#: models/pagemodel.py:89
-msgid "application instance name"
-msgstr ""
-
-#: models/pagemodel.py:125 models/permissionmodels.py:125
-#: models/titlemodels.py:27 test_utils/project/sampleapp/ns_urls.py:10
-msgid "page"
-msgstr "puslapis"
-
-#: models/pagemodel.py:126
-msgid "pages"
-msgstr "puslapiai"
-
-#: models/pagemodel.py:823
-msgid "Empty"
-msgstr ""
-
-#: models/pagemodel.py:944
-msgid "default"
-msgstr "pagrindinis"
-
-#: models/permissionmodels.py:60
-msgid "Current page"
-msgstr "Dabartinis puslapis"
-
-#: models/permissionmodels.py:61
-msgid "Page children (immediate)"
-msgstr ""
-
-#: models/permissionmodels.py:62
-msgid "Page and children (immediate)"
-msgstr ""
-
-#: models/permissionmodels.py:63
-msgid "Page descendants"
-msgstr ""
-
-#: models/permissionmodels.py:64
-msgid "Page and descendants"
-msgstr ""
-
-#: models/permissionmodels.py:72
-msgid "group"
-msgstr "grupė"
-
-#: models/permissionmodels.py:75
-msgid "can edit"
-msgstr "galo redaguoti"
-
-#: models/permissionmodels.py:76
-msgid "can add"
-msgstr "gali pridėti"
-
-#: models/permissionmodels.py:77
-msgid "can delete"
-msgstr "gali ištrinti"
-
-#: models/permissionmodels.py:78
-msgid "can change advanced settings"
-msgstr "gali keisti papildomus nustatymus"
-
-#: models/permissionmodels.py:79
-msgid "can publish"
-msgstr "gali publikuoti"
-
-#: models/permissionmodels.py:80
-msgid "can change permissions"
-msgstr "gali keisti leidimus"
-
-#: models/permissionmodels.py:80
-msgid "on page level"
-msgstr ""
-
-#: models/permissionmodels.py:81
-msgid "can move"
-msgstr "gali perkelti"
-
-#: models/permissionmodels.py:82
-msgid "view restricted"
-msgstr ""
-
-#: models/permissionmodels.py:82
-msgid "frontend view restriction"
-msgstr ""
-
-#: models/permissionmodels.py:106
-msgid "can recover pages"
-msgstr "gali gražinti puslapius"
-
-#: models/permissionmodels.py:106
-msgid "can recover any deleted page"
-msgstr "gal gražinti bet kokį ištrinta puslapį"
-
-#: models/permissionmodels.py:107
-msgid "If none selected, user haves granted permissions to all sites."
-msgstr ""
-
-#: models/permissionmodels.py:107
-msgid "sites"
-msgstr "puslapiai"
-
-#: models/permissionmodels.py:112
-msgid "Page global permission"
-msgstr "Globalūs puslapio leidimai"
-
-#: models/permissionmodels.py:113
-msgid "Pages global permissions"
-msgstr "Globalūs puslapių leidimai"
-
-#: models/permissionmodels.py:124 templates/admin/cms/page/permissions.html:15
-msgid "Grant on"
-msgstr ""
-
-#: models/permissionmodels.py:130
-msgid "Page permission"
-msgstr "Puslapio leidimai"
-
-#: models/permissionmodels.py:145
-msgid "User (page)"
-msgstr "Vartotojas (puslapis)"
-
-#: models/permissionmodels.py:146
-msgid "Users (page)"
-msgstr "Vartotojai (puslapis)"
-
-#: models/permissionmodels.py:156
-msgid "User group (page)"
-msgstr "Vartotojo grupė (puslapis)"
-
-#: models/permissionmodels.py:157
-msgid "User groups (page)"
-msgstr "Vartotojo grupės (puslapis)"
-
-#: models/placeholdermodel.py:26
-msgid "slot"
-msgstr ""
-
-#: models/placeholdermodel.py:27
-msgid "width"
-msgstr "plotis"
-
-#: models/pluginmodel.py:75
+#: migrations/0001_initial.py:27 models/pluginmodel.py:78
 msgid "position"
 msgstr "pozicija"
 
-#: models/pluginmodel.py:76 models/titlemodels.py:15
+#: migrations/0001_initial.py:28 models/pluginmodel.py:79
+#: models/titlemodels.py:17
 msgid "language"
 msgstr "kalba"
 
-#: models/pluginmodel.py:77
+#: migrations/0001_initial.py:29 models/pluginmodel.py:80
 msgid "plugin_name"
-msgstr ""
+msgstr "įskiepio pavadinimas"
 
-#: models/pluginmodel.py:78 models/titlemodels.py:28
+#: migrations/0001_initial.py:30 models/pluginmodel.py:81
+#: models/titlemodels.py:30
 msgid "creation date"
 msgstr "sukūrimo data"
 
-#: models/pluginmodel.py:139
+#: migrations/0001_initial.py:61 migrations/0001_initial.py:124
+#: models/permissionmodels.py:67
+msgid "can edit"
+msgstr "gali redaguoti"
+
+#: migrations/0001_initial.py:62 migrations/0001_initial.py:125
+#: models/permissionmodels.py:68
+msgid "can add"
+msgstr "gali pridėti"
+
+#: migrations/0001_initial.py:63 migrations/0001_initial.py:126
+#: models/permissionmodels.py:69
+msgid "can delete"
+msgstr "gali pašalinti"
+
+#: migrations/0001_initial.py:64 migrations/0001_initial.py:127
+#: models/permissionmodels.py:70
+msgid "can change advanced settings"
+msgstr "gali keisti papildomus nustatymus"
+
+#: migrations/0001_initial.py:65 migrations/0001_initial.py:128
+#: models/permissionmodels.py:71
+msgid "can publish"
+msgstr "gali publikuoti"
+
+#: migrations/0001_initial.py:66 migrations/0001_initial.py:129
+#: models/permissionmodels.py:72
+msgid "can change permissions"
+msgstr "gali keisti teises"
+
+#: migrations/0001_initial.py:67 migrations/0001_initial.py:130
+#: models/permissionmodels.py:73
+msgid "can move"
+msgstr "gali perkelti"
+
+#: migrations/0001_initial.py:68 migrations/0001_initial.py:131
+#: models/permissionmodels.py:74
+msgid "view restricted"
+msgstr "peržiūrėjimas apribotas"
+
+#: migrations/0001_initial.py:69 models/permissionmodels.py:98
+msgid "can recover pages"
+msgstr "gali grąžinti puslapius"
+
+#: migrations/0001_initial.py:70 migrations/0001_initial.py:133
+#: models/permissionmodels.py:64
+msgid "group"
+msgstr "grupė"
+
+#: migrations/0001_initial.py:71 models/permissionmodels.py:99
+msgid "sites"
+msgstr "tinklalapiai"
+
+#: migrations/0001_initial.py:84 models/pagemodel.py:62
+msgid "created by"
+msgstr "sukūrė"
+
+#: migrations/0001_initial.py:85 models/pagemodel.py:65
+msgid "changed by"
+msgstr "redagavo"
+
+#: migrations/0001_initial.py:88 models/pagemodel.py:71
+#: templates/admin/cms/page/tree/menu_item.html:73
+msgid "publication date"
+msgstr "publikavimo data"
+
+#: migrations/0001_initial.py:89 models/pagemodel.py:73
+#: templates/admin/cms/page/tree/menu_item.html:74
+msgid "publication end date"
+msgstr "publikavimo pabaigos datą"
+
+#: migrations/0001_initial.py:90 models/pagemodel.py:80
+msgid "in navigation"
+msgstr "yra navigacijoje"
+
+#: migrations/0001_initial.py:91 models/pagemodel.py:81
+msgid "soft root"
+msgstr "soft root"
+
+#: migrations/0001_initial.py:92 models/pagemodel.py:83
+msgid "id"
+msgstr "id"
+
+#: migrations/0001_initial.py:93 models/pagemodel.py:85
+msgid "attached menu"
+msgstr "prikabintas meniu"
+
+#: migrations/0001_initial.py:94 models/pagemodel.py:86
+#: templates/admin/cms/page/tree/menu_item.html:77
+msgid "template"
+msgstr "šablonas"
+
+#: migrations/0001_initial.py:95 models/pagemodel.py:92
+msgid "login required"
+msgstr "būtinas prisijungimas"
+
+#: migrations/0001_initial.py:96 models/pagemodel.py:93
+msgid "menu visibility"
+msgstr "meniu matomumas"
+
+#: migrations/0001_initial.py:98 models/pagemodel.py:97
+msgid "application"
+msgstr "aplikacija"
+
+#: migrations/0001_initial.py:99 models/pagemodel.py:98
+msgid "application instance name"
+msgstr "aplikacijos objekto pavadinimas"
+
+#: migrations/0001_initial.py:110 models/pagemodel.py:89
+msgid "site"
+msgstr "tinklalapis"
+
+#: migrations/0001_initial.py:132 models/permissionmodels.py:116
+#: templates/admin/cms/page/permissions.html:15
+msgid "Grant on"
+msgstr "Suteikti"
+
+#: migrations/0001_initial.py:134 models/pagemodel.py:130
+#: models/permissionmodels.py:117 models/titlemodels.py:29
+#: test_utils/project/sampleapp/ns_urls.py:8
+msgid "page"
+msgstr "puslapis"
+
+#: models/pagemodel.py:43
+msgid "for logged in users only"
+msgstr "tik prisijungusiems vartotojams"
+
+#: models/pagemodel.py:44
+msgid "for anonymous users only"
+msgstr "tik neregistruotiems lankytojams"
+
+#: models/pagemodel.py:53
+msgid "Inherit from parent page"
+msgstr "Paveldėti iš pirminio puslapio"
+
+#: models/pagemodel.py:54
+msgid "Deny"
+msgstr "Atmesti"
+
+#: models/pagemodel.py:55
+msgid "Only this website"
+msgstr "Tik šis tinklalapis"
+
+#: models/pagemodel.py:56
+msgid "Allow"
+msgstr "Leisti"
+
+#: models/pagemodel.py:72
+msgid ""
+"When the page should go live. Status must be \"Published\" for page to go "
+"live."
+msgstr "Kada puslapis turėtų būti pradedamas atvaizduoti. Būsena turi būti \"Publikuota\" kad puslapis būtų atvaizduojamas."
+
+#: models/pagemodel.py:74
+msgid "When to expire the page. Leave empty to never expire."
+msgstr "Kada puslapis nustos galioti. Palikite tuščią kad galiotų neribotą laiką."
+
+#: models/pagemodel.py:82
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Visi pirminiai elementai nebus atvaizduojami navigacijoje"
+
+#: models/pagemodel.py:84
+msgid ""
+"A unique identifier that is used with the page_url templatetag for linking "
+"to this page"
+msgstr "Unikalus identifikatorius, naudojamas su page_url templatetag nukreipiant į šį puslapį"
+
+#: models/pagemodel.py:87
+msgid "The template used to render the content."
+msgstr "Šablonas naudojamas turinio atvaizdavimui."
+
+#: models/pagemodel.py:89
+msgid "The site the page is accessible at."
+msgstr "Tinklalapis kuriame puslapis yra pasiekiamas."
+
+#: models/pagemodel.py:95
+msgid "limit when this page is visible in the menu"
+msgstr "apriboti, kada šis puslapis yra matomas meniu"
+
+#: models/pagemodel.py:131
+msgid "pages"
+msgstr "puslapiai"
+
+#: models/pagemodel.py:879
+msgid "Empty"
+msgstr "Valyti"
+
+#: models/pagemodel.py:1000
+msgid "default"
+msgstr "pagrindinis"
+
+#: models/permissionmodels.py:52
+msgid "Current page"
+msgstr "Dabartinis puslapis"
+
+#: models/permissionmodels.py:53
+msgid "Page children (immediate)"
+msgstr "Puslapio vidiniai elementai (tiesioginiai)"
+
+#: models/permissionmodels.py:54
+msgid "Page and children (immediate)"
+msgstr "Puslapis ir vidiniai elementai (tiesioginiai)"
+
+#: models/permissionmodels.py:55
+msgid "Page descendants"
+msgstr "Puslapio palikuonys"
+
+#: models/permissionmodels.py:56
+msgid "Page and descendants"
+msgstr "Puslapis ir palikuonys"
+
+#: models/permissionmodels.py:72
+msgid "on page level"
+msgstr "puslapio lygyje"
+
+#: models/permissionmodels.py:74
+msgid "frontend view restriction"
+msgstr "peržiūrėjimo apribojimas"
+
+#: models/permissionmodels.py:98
+msgid "can recover any deleted page"
+msgstr "gali grąžinti bet kokį pašalintą puslapį"
+
+#: models/permissionmodels.py:99
+msgid "If none selected, user haves granted permissions to all sites."
+msgstr "Jeigu niekas nepasirinkta, vartotojui bus suteiktos teisės visiems tinklalapiams."
+
+#: models/permissionmodels.py:104
+msgid "Page global permission"
+msgstr "Globalios puslapio teisės"
+
+#: models/permissionmodels.py:105
+msgid "Pages global permissions"
+msgstr "Globalios puslapių teisės"
+
+#: models/permissionmodels.py:122
+msgid "Page permission"
+msgstr "Puslapio teisės"
+
+#: models/permissionmodels.py:137
+msgid "User (page)"
+msgstr "Vartotojas (puslapis)"
+
+#: models/permissionmodels.py:138
+msgid "Users (page)"
+msgstr "Vartotojai (puslapis)"
+
+#: models/permissionmodels.py:148
+msgid "User group (page)"
+msgstr "Vartotojo grupė (puslapis)"
+
+#: models/permissionmodels.py:149
+msgid "User groups (page)"
+msgstr "Vartotojo grupės (puslapis)"
+
+#: models/placeholdermodel.py:24
+msgid "slot"
+msgstr "lizdas"
+
+#: models/placeholdermodel.py:25
+msgid "width"
+msgstr "plotis"
+
+#: models/pluginmodel.py:125
 msgid "<Empty>"
-msgstr ""
+msgstr "<Tuščias>"
 
-#: models/settingmodels.py:13
+#: models/settingmodels.py:12
 msgid "The language for the admin interface and toolbar"
-msgstr ""
+msgstr "Kalba administravimo sąsajai ir įrankių juostai"
 
-#: models/settingmodels.py:17
+#: models/settingmodels.py:16
 msgid "user setting"
 msgstr "vartotojo nustatymas"
 
-#: models/settingmodels.py:18
+#: models/settingmodels.py:17
 msgid "user settings"
 msgstr "vartotojo nustatymai"
 
-#: models/static_placeholder.py:25
+#: models/static_placeholder.py:27
 msgid "by template"
-msgstr ""
+msgstr "pagal šabloną"
 
-#: models/static_placeholder.py:26
+#: models/static_placeholder.py:28
 msgid "by code"
-msgstr ""
+msgstr "pagal kodą"
 
-#: models/static_placeholder.py:29
+#: models/static_placeholder.py:31
 msgid "static placeholder name"
-msgstr ""
+msgstr "statinės rezervuotos vietos pavadinimas"
 
-#: models/static_placeholder.py:30
+#: models/static_placeholder.py:32
 msgid ""
 "Descriptive name to identify this static placeholder. Not displayed to "
 "users."
-msgstr ""
-
-#: models/static_placeholder.py:32
-msgid "placeholder code"
-msgstr ""
-
-#: models/static_placeholder.py:33
-msgid "To render the static placeholder in templates."
-msgstr ""
+msgstr "Apibudinantis pavadinimas atpažinti šią statinę rezervuotą vietą. Nerodoma vartotojams."
 
 #: models/static_placeholder.py:34
+msgid "placeholder code"
+msgstr "rezervuotos vietos kodas"
+
+#: models/static_placeholder.py:35
+msgid "To render the static placeholder in templates."
+msgstr "Atvaizduoti statinę rezervuotą vietą šablonuose."
+
+#: models/static_placeholder.py:36
 msgid "placeholder content"
-msgstr ""
+msgstr "rezervuotos vietos turinys"
 
-#: models/static_placeholder.py:38
+#: models/static_placeholder.py:40
 msgid "creation_method"
-msgstr ""
+msgstr "sukūrimo metodas"
 
-#: models/static_placeholder.py:44
+#: models/static_placeholder.py:46
 msgid "static placeholder"
-msgstr ""
+msgstr "statinė rezervuota vieta"
 
-#: models/static_placeholder.py:45
+#: models/static_placeholder.py:47
 msgid "static placeholders"
-msgstr ""
+msgstr "statinės rezervuotos vietos"
 
-#: models/static_placeholder.py:61
+#: models/static_placeholder.py:63
 msgid "A static placeholder with the same site and code already exists"
-msgstr ""
+msgstr "Statinė rezervuota vieta su tuo pačiu tinklalapiu ir kodu jau egzistuoja"
 
-#: models/titlemodels.py:16 models/titlemodels.py:17 models/titlemodels.py:19
+#: models/titlemodels.py:18 models/titlemodels.py:19 models/titlemodels.py:21
 msgid "title"
 msgstr "pavadinimas"
 
-#: models/titlemodels.py:18
-msgid "overwrite the title (html title tag)"
-msgstr ""
-
 #: models/titlemodels.py:20
-msgid "overwrite the title in the menu"
-msgstr ""
+msgid "overwrite the title (html title tag)"
+msgstr "perrašyti pavadinimą (html pavadinimo žymę)"
 
-#: models/titlemodels.py:21
+#: models/titlemodels.py:22
+msgid "overwrite the title in the menu"
+msgstr "perrašyti pavadinimą esantį meniu"
+
+#: models/titlemodels.py:23
 msgid "description"
 msgstr "aprašymas"
 
-#: models/titlemodels.py:22
-msgid "The text displayed in search engines."
-msgstr ""
-
-#: models/titlemodels.py:23
-msgid "slug"
-msgstr ""
-
 #: models/titlemodels.py:24
+msgid "The text displayed in search engines."
+msgstr "Tekstas atvaizduojamas paieškos sistemose."
+
+#: models/titlemodels.py:25
+msgid "slug"
+msgstr "nuoroda"
+
+#: models/titlemodels.py:26
 msgid "Path"
 msgstr "Kelias"
 
-#: models/titlemodels.py:25
+#: models/titlemodels.py:27
 msgid "has url overwrite"
-msgstr ""
+msgstr "turi url perrašymą"
 
-#: models/titlemodels.py:26
+#: models/titlemodels.py:28
 msgid "redirect"
 msgstr "nukreipti"
 
-#: models/titlemodels.py:31
+#: models/titlemodels.py:33
 msgid "is published"
 msgstr "publikuotas"
 
+#: plugin_base.py:81
+msgid "Advanced options"
+msgstr "Papildomi nustatymai"
+
+#: plugin_base.py:98
+msgid "Generic"
+msgstr "Bendrasis"
+
+#: plugin_base.py:285
+msgid "There are no further settings for this plugin. Please press save."
+msgstr "Daugiau nustatymų šiam įskiepiui nėra. Spauskite išsaugoti."
+
+#: south_migrations/0071_mptt_to_mp.py:54
+#, python-format
+msgid "Path Overflow from: '%s'"
+msgstr "Kelias perpildytas iš: '%s'"
+
+#: south_migrations/0071_mptt_to_mp.py:104
+msgid ""
+"The new node is too deep in the tree, try increasing the path.max_length "
+"property and UPDATE your database"
+msgstr "Naujas mazgas yra pernelyg giliai medyje, pabandykite padidinti path.max_length nustatymą ir atnaujinti savo duomenų bazę"
+
 #: templates/admin/cms/extensions/change_form.html:5
 #: templates/admin/cms/page/change_form.html:74
+#: templates/admin/cms/page/plugin/submit_line.html:3
 #: templates/admin/cms/page/submit_row.html:4
 #: templates/admin/cms/page/tree/copy_premissions.html:19
-#: templates/admin/cms/usersettings/change_form.html:16
+#: templates/admin/cms/usersettings/change_form.html:25
 msgid "Save"
 msgstr "Išsaugoti"
 
 #: templates/admin/cms/mail/base.html:55
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
-msgstr ""
+msgstr "Prisijungti prie administravimo <a href=\"%(login_url)s\">čia</a>."
 
 #: templates/admin/cms/mail/base.txt:8
 #, python-format
@@ -1073,7 +1119,7 @@ msgstr[2] "Ištaisykite žemiau esančias klaidas."
 
 #: templates/admin/cms/page/change_form.html:62
 msgid "All permissions"
-msgstr "Visi leidimai"
+msgstr "Visos teisės"
 
 #: templates/admin/cms/page/change_form.html:63
 #: templates/admin/cms/page/tree/base.html:80
@@ -1081,9 +1127,35 @@ msgid "Loading..."
 msgstr "Kraunama..."
 
 #: templates/admin/cms/page/change_form.html:75
+#: templates/admin/cms/page/plugin/submit_line.html:9
 #: templates/admin/cms/page/submit_row.html:14
 msgid "Save and continue editing"
 msgstr "Išsaugoti ir testi redagavimą"
+
+#: templates/admin/cms/page/history/recover_header.html:12
+#: templates/admin/cms/page/history/revision_header.html:6
+#: templates/admin/cms/page/tree/base.html:9
+#: templates/admin/cms/usersettings/change_form.html:14
+msgid "Home"
+msgstr "Pagrindinis"
+
+#: templates/admin/cms/page/history/recover_header.html:15
+#, python-format
+msgid "Recover deleted %(verbose_name)s"
+msgstr "Atkurti pašalintus %(verbose_name)s"
+
+#: templates/admin/cms/page/history/recover_header.html:21
+msgid "Press the save button below to recover this version of the object."
+msgstr "Spauskite išsaugojimo mygtuką kad atsatytumėte šią objekto versiją."
+
+#: templates/admin/cms/page/history/revision_header.html:11
+#, python-format
+msgid "Revert %(verbose_name)s"
+msgstr "Grąžinti %(verbose_name)s"
+
+#: templates/admin/cms/page/history/revision_header.html:20
+msgid "Press the save button below to revert to this version of the object."
+msgstr "Spauskite išsaugojimo mygtuką kad grąžintumėte į šią objekto versiją."
 
 #: templates/admin/cms/page/permissions.html:6
 msgid "User"
@@ -1103,7 +1175,7 @@ msgstr "Gali pridėti"
 
 #: templates/admin/cms/page/permissions.html:10
 msgid "Can delete"
-msgstr "Gali trinti"
+msgstr "Gali pašalinti"
 
 #: templates/admin/cms/page/permissions.html:11
 msgid "Can publish"
@@ -1115,11 +1187,11 @@ msgstr "Gali keisti teises"
 
 #: templates/admin/cms/page/permissions.html:13
 msgid "Can move"
-msgstr ""
+msgstr "Gali perkelti"
 
 #: templates/admin/cms/page/permissions.html:14
 msgid "Can view"
-msgstr ""
+msgstr "Gali peržiūrėti"
 
 #: templates/admin/cms/page/permissions.html:22
 #: templates/admin/cms/page/permissions.html:23
@@ -1136,48 +1208,25 @@ msgstr "Visi"
 
 #: templates/admin/cms/page/permissions.html:52
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Puslapis nepaveldi jokių teisių."
 
-#: templates/admin/cms/page/submit_row.html:8
-msgid "Basic Infos"
-msgstr ""
+#: templates/admin/cms/page/plugin/error_form.html:4
+msgid "Edit model"
+msgstr "Redagavimo modelis"
 
+#: templates/admin/cms/page/plugin/submit_line.html:7
 #: templates/admin/cms/page/submit_row.html:12
 msgid "Save as new"
 msgstr "Išsaugoti kaip naują"
 
+#: templates/admin/cms/page/plugin/submit_line.html:8
 #: templates/admin/cms/page/submit_row.html:13
 msgid "Save and add another"
 msgstr "Išsaugoti ir pridėti naują"
 
-#: templates/admin/cms/page/history/recover_header.html:12
-#: templates/admin/cms/page/history/revision_header.html:6
-#: templates/admin/cms/page/tree/base.html:9
-#: templates/admin/cms/usersettings/change_form.html:5
-msgid "Home"
-msgstr "Pagrindinis"
-
-#: templates/admin/cms/page/history/recover_header.html:15
-#, python-format
-msgid "Recover deleted %(verbose_name)s"
-msgstr ""
-
-#: templates/admin/cms/page/history/recover_header.html:21
-msgid "Press the save button below to recover this version of the object."
-msgstr ""
-
-#: templates/admin/cms/page/history/revision_header.html:11
-#, python-format
-msgid "Revert %(verbose_name)s"
-msgstr ""
-
-#: templates/admin/cms/page/history/revision_header.html:20
-msgid "Press the save button below to revert to this version of the object."
-msgstr ""
-
-#: templates/admin/cms/page/plugin/error_form.html:4
-msgid "Edit model"
-msgstr ""
+#: templates/admin/cms/page/submit_row.html:8
+msgid "Basic Settings"
+msgstr "Paprasti nustatymai"
 
 #: templates/admin/cms/page/tree/base.html:4
 msgid "List of pages"
@@ -1193,21 +1242,20 @@ msgstr "Sėkmingai perkeltas"
 
 #: templates/admin/cms/page/tree/base.html:55
 msgid "Changes within the tree might require a refresh."
-msgstr ""
+msgstr "Pakeitimai medyje gali reikalauti perkrovimo."
 
 #: templates/admin/cms/page/tree/base.html:56
 msgid "An error occured. Please reload the page"
-msgstr "Klaida. Prašome perkrauti puslapį."
+msgstr "Įvyko klaida. Prašome perkrauti puslapį."
 
 #: templates/admin/cms/page/tree/base.html:57
-#, python-format
-msgid "Are you sure you want to %s this page?"
-msgstr ""
+msgid "Are you sure you want to § this page?"
+msgstr "Ar tikrai norite § šį puslapį?"
 
 #: templates/admin/cms/page/tree/base.html:73
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr "Gražinti ištrintus %(name)s"
+msgstr "Atkurti pašalintus %(name)s"
 
 #: templates/admin/cms/page/tree/base.html:76
 #, python-format
@@ -1216,7 +1264,7 @@ msgstr "Pridėti %(name)s"
 
 #: templates/admin/cms/page/tree/base.html:88
 msgid "Pages on:"
-msgstr "Puslapiai ant:"
+msgstr "Paslapiuose:"
 
 #: templates/admin/cms/page/tree/base.html:108
 msgid "Filter:"
@@ -1236,33 +1284,33 @@ msgstr "Filtras"
 
 #: templates/admin/cms/page/tree/base_header.html:10
 msgid "Menu"
-msgstr ""
+msgstr "Meniu"
 
 #: templates/admin/cms/page/tree/base_header.html:11
 msgid "Actions"
-msgstr ""
+msgstr "Veiksmai"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Info"
-msgstr ""
+msgstr "Informacija"
 
 #: templates/admin/cms/page/tree/base_header.html:26
 msgid ""
 "<em>There is no page around yet.</em><br /><a href=\"add/\" "
 "class=\"addlink\">Add page</a> now."
-msgstr ""
+msgstr "<em>Nėra jokio puslapio</em><br /><a href=\"add/\" class=\"addlink\">Pridėkite puslapį</a> dabar."
 
 #: templates/admin/cms/page/tree/copy_premissions.html:5
 msgid "Copy options"
-msgstr ""
+msgstr "Kopijavimo nustatymai"
 
 #: templates/admin/cms/page/tree/copy_premissions.html:6
 msgid "Choose copy options"
-msgstr ""
+msgstr "Pasirinkite kopijavimo nustatymus"
 
 #: templates/admin/cms/page/tree/copy_premissions.html:20
 msgid "Close"
-msgstr ""
+msgstr "Uždaryti"
 
 #: templates/admin/cms/page/tree/menu_item.html:6
 msgid "select this page"
@@ -1274,61 +1322,61 @@ msgstr "redaguoti šį puslapį"
 
 #: templates/admin/cms/page/tree/menu_item.html:17
 msgid "insert above"
-msgstr ""
+msgstr "įterpti virš"
 
 #: templates/admin/cms/page/tree/menu_item.html:18
 msgid "insert below"
-msgstr ""
+msgstr "įterpti žemiau"
 
 #: templates/admin/cms/page/tree/menu_item.html:20
 msgid "insert inside"
-msgstr ""
+msgstr "įterpti į vidų"
 
 #: templates/admin/cms/page/tree/menu_item.html:24
 msgid "softroot"
-msgstr ""
+msgstr "softroot"
 
 #: templates/admin/cms/page/tree/menu_item.html:24
 msgid "home"
-msgstr ""
+msgstr "pradinis"
 
 #: templates/admin/cms/page/tree/menu_item.html:25
 #, python-format
 msgid "Application: %(apphook)s"
-msgstr ""
+msgstr "Aplikacija: %(apphook)s"
 
 #: templates/admin/cms/page/tree/menu_item.html:29
 #, python-format
 msgid "Edit this page in %(language)s "
-msgstr ""
+msgstr "Redaguoti šį puslapį %(language)s  kalboje"
 
 #: templates/admin/cms/page/tree/menu_item.html:32
 msgid "Pick an action:"
-msgstr ""
+msgstr "Pasirinkite veiksmą:"
 
 #: templates/admin/cms/page/tree/menu_item.html:33
 msgid "Unpublish"
-msgstr ""
+msgstr "Anuliuoti publikavimą"
 
 #: templates/admin/cms/page/tree/menu_item.html:34
 msgid "Publish"
-msgstr ""
+msgstr "Publikuoti"
 
 #: templates/admin/cms/page/tree/menu_item.html:42
 msgid "in menu"
-msgstr ""
+msgstr "yra meniu"
 
 #: templates/admin/cms/page/tree/menu_item.html:42
 msgid "not in menu"
-msgstr ""
+msgstr "nesantis meniu"
 
 #: templates/admin/cms/page/tree/menu_item.html:51
 msgid "Page settings (SHIFT-click for advanced settings)"
-msgstr ""
+msgstr "Puslapio nustatymai (išplėstiniams parametrams spustelėkite klavišą SHIFT)"
 
 #: templates/admin/cms/page/tree/menu_item.html:51
 msgid "page settings"
-msgstr ""
+msgstr "puslapio nustatymai"
 
 #: templates/admin/cms/page/tree/menu_item.html:53
 #: templates/cms/toolbar/dragitem.html:12
@@ -1342,7 +1390,7 @@ msgstr "kopijuoti"
 #: templates/admin/cms/page/tree/menu_item.html:56
 #: templates/admin/cms/page/tree/menu_item.html:60
 msgid "Add Child"
-msgstr ""
+msgstr "Pridėti vidinį elemntą"
 
 #: templates/admin/cms/page/tree/menu_item.html:56
 #: templates/admin/cms/page/tree/menu_item.html:60
@@ -1360,7 +1408,7 @@ msgstr "iškirpti"
 
 #: templates/admin/cms/page/tree/menu_item.html:66
 msgid "delete"
-msgstr "ištrinti"
+msgstr "pašalinti"
 
 #: templates/admin/cms/page/tree/menu_item.html:71
 msgid "info"
@@ -1368,19 +1416,19 @@ msgstr "informacija"
 
 #: templates/admin/cms/page/tree/menu_item.html:75
 msgid "is restricted"
-msgstr ""
+msgstr "yra apribotas"
 
 #: templates/admin/cms/page/tree/menu_item.html:76
 msgid "last change by"
-msgstr ""
+msgstr "paskutinis pakeitimas pagal"
 
 #: templates/cms/toolbar/clipboard.html:24
 msgid "Empty Clipboard"
-msgstr ""
+msgstr "Valyti iškarpinę"
 
 #: templates/cms/toolbar/dragbar.html:7 templates/cms/toolbar/dragitem.html:9
 msgid "Quicksearch"
-msgstr ""
+msgstr "Greita paieška"
 
 #: templates/cms/toolbar/dragbar.html:9 templates/cms/toolbar/dragitem.html:11
 msgid "Settings"
@@ -1396,59 +1444,70 @@ msgstr "Kopijuoti iš"
 
 #: templates/cms/toolbar/dragbar.html:14
 msgid "Empty all"
-msgstr ""
+msgstr "Valyti visus"
 
 #: templates/cms/toolbar/dragbar.html:25
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "Mesti įskiepį čia"
 
-#: templates/cms/toolbar/dragitem.html:14 templatetags/cms_tags.py:762
-#: templatetags/cms_tags.py:765
+#: templates/cms/toolbar/dragitem.html:14
+#: templates/cms/toolbar/items/live_draft.html:9 templatetags/cms_tags.py:749
+#: templatetags/cms_tags.py:752
 msgid "Edit"
 msgstr "Redaguoti"
 
 #: templates/cms/toolbar/dragitem_menu.html:5
 msgid "Available plugins"
-msgstr ""
+msgstr "Galimi įskiepiai"
 
 #: templates/cms/toolbar/dragitem_menu.html:10
 msgid "Scroll for more"
-msgstr ""
+msgstr "Slinkite kad matytumete daugiau"
+
+#: templates/cms/toolbar/items/live_draft.html:5
+msgid "Save as draft"
+msgstr "Išsaugoti kaip juodraštį"
+
+#: templates/cms/toolbar/items/live_draft.html:14
+msgid "Live"
+msgstr "Aktualus"
+
+#: templates/cms/toolbar/items/live_draft.html:14
+msgid "Draft"
+msgstr "Juodraštis"
+
+#: templates/cms/toolbar/items/login.html:6 toolbar/toolbar.py:27
+msgid "Username"
+msgstr "Vartotojo vardas"
+
+#: templates/cms/toolbar/items/login.html:7
+msgid "Password"
+msgstr "Slaptažodis"
 
 #: templates/cms/toolbar/toolbar.html:8
 msgid "Double-click to edit"
 msgstr "Redaguoti - dvigubas paspaudimas"
 
-#: templates/cms/toolbar/toolbar.html:33
-#: templates/cms/toolbar/items/live_draft.html:4
-msgid "Live"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:34
-#: templates/cms/toolbar/items/live_draft.html:5
-msgid "Draft"
-msgstr ""
-
-#: templates/cms/toolbar/toolbar.html:41
+#: templates/cms/toolbar/toolbar.html:32
 msgid "Toggle toolbar"
-msgstr ""
+msgstr "Perjungti įrankių juostą"
 
-#: templates/cms/toolbar/toolbar.html:83
+#: templates/cms/toolbar/toolbar.html:74
 msgid "Start"
 msgstr "Pradėti"
 
-#: templates/cms/toolbar/toolbar.html:118
+#: templates/cms/toolbar/toolbar.html:109
 msgid "This page has no preview!"
-msgstr ""
+msgstr "Šis puslapis neturi peržiūros galimybės!"
 
-#: templates/cms/toolbar/toolbar.html:119
+#: templates/cms/toolbar/toolbar.html:110
 msgid "It is being redirected to:"
-msgstr ""
+msgstr "Yra nukreipiamas į:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:41
 #, python-format
 msgid "Development version using django CMS %(cms_version)s"
-msgstr ""
+msgstr "Vystymo versija naudojanti django CMS %(cms_version)s"
 
 #: templates/cms/toolbar/toolbar_javascript.html:42
 msgid "Cancel"
@@ -1456,147 +1515,139 @@ msgstr "Atšaukti"
 
 #: templates/cms/toolbar/toolbar_javascript.html:43
 msgid "The following error occured:"
-msgstr ""
+msgstr "Įvyko tokia klaida:"
 
 #: templates/cms/toolbar/toolbar_javascript.html:44
 msgid "Action successfull... reloading."
-msgstr ""
+msgstr "Veiksmas atliktas sėkmingai... perkraunama."
 
 #: templates/cms/toolbar/toolbar_javascript.html:45
 msgid "Are you sure you want to delete this plugin?"
-msgstr ""
+msgstr "Ar tikrai norite pašalinti ši įskiepį?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:46
 msgid "Are you sure you want to publish this page?"
-msgstr ""
+msgstr "Ar tikrai norite publikuoti šį puslapį?"
 
 #: templates/cms/toolbar/toolbar_javascript.html:64
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
-msgstr ""
+msgstr "<strong>Prisijungti nepavyko.</strong> Patikrinkite savo duomenis ir bandykit dar kartą."
 
 #: templates/cms/toolbar/toolbar_javascript.html:65
 msgid "This page has unpublished changes."
-msgstr ""
+msgstr "Šis puslapis turi nepublikuotų pakeitimų."
 
-#: templates/cms/toolbar/items/login.html:5 toolbar/toolbar.py:23
-msgid "Username"
-msgstr "Vartotojo vardas"
-
-#: templates/cms/toolbar/items/login.html:6
-msgid "Password"
-msgstr "Slaptažodis"
-
-#: templatetags/cms_admin.py:68
+#: templatetags/cms_admin.py:61
 msgid "unpublished changes"
-msgstr ""
+msgstr "nepublikuoti pakeitimai"
 
-#: templatetags/cms_admin.py:71
+#: templatetags/cms_admin.py:64
 msgid "published"
 msgstr "publikuota"
 
-#: templatetags/cms_admin.py:80
+#: templatetags/cms_admin.py:73
 msgid "unpublished parent"
-msgstr ""
+msgstr "nepublikuotas pradinis elementas"
 
-#: templatetags/cms_admin.py:83
+#: templatetags/cms_admin.py:76
 msgid "unpublished"
-msgstr ""
+msgstr "nepublikuotas"
 
-#: templatetags/cms_admin.py:86
+#: templatetags/cms_admin.py:79
 msgid "no content"
 msgstr "turinio nėra"
 
-#: templatetags/cms_admin.py:175 templatetags/cms_admin.py:181
+#: templatetags/cms_admin.py:168 templatetags/cms_admin.py:174
 #, python-format
 msgid "<span>%(icon)s</span>"
 msgstr "<span>%(icon)s</span>"
 
-#: templatetags/cms_tags.py:109
+#: templatetags/cms_tags.py:107
 #, python-format
 msgid "Page not found on %(domain)s"
-msgstr ""
+msgstr "Puslapis nerastas %(domain)s"
 
-#: templatetags/cms_tags.py:110
+#: templatetags/cms_tags.py:108
 #, python-format
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr ""
+msgstr "Šablono žymė negalėjo rasti puslapio su argumentais `%(page_lookup)s\n`. Užklausos URL buvo: http://%(host)s%(path)s"
 
-#: test_utils/cli.py:140 test_utils/cli.py:151
+#: test_utils/cli.py:118 test_utils/cli.py:129
 msgid "English"
 msgstr "Anglų"
 
-#: test_utils/cli.py:141 test_utils/cli.py:163 test_utils/cli.py:186
+#: test_utils/cli.py:119 test_utils/cli.py:141 test_utils/cli.py:164
 msgid "French"
 msgstr "Prancuzų"
 
-#: test_utils/cli.py:142 test_utils/cli.py:157 test_utils/cli.py:180
-#: test_utils/cli.py:199
+#: test_utils/cli.py:120 test_utils/cli.py:135 test_utils/cli.py:158
+#: test_utils/cli.py:177
 msgid "German"
 msgstr "Vokiečių"
 
-#: test_utils/cli.py:143 test_utils/cli.py:168
+#: test_utils/cli.py:121 test_utils/cli.py:146
 msgid "Brazilian Portuguese"
-msgstr ""
+msgstr "Brazilijos portugalų"
 
-#: test_utils/cli.py:144 test_utils/cli.py:193
+#: test_utils/cli.py:122 test_utils/cli.py:171
 msgid "Dutch"
-msgstr ""
+msgstr "Olandų"
 
-#: test_utils/cli.py:209
+#: test_utils/cli.py:187
 msgid "two columns"
-msgstr ""
+msgstr "du stulpeliai"
 
-#: test_utils/cli.py:210
+#: test_utils/cli.py:188
 msgid "three columns"
-msgstr ""
+msgstr "trys stulpeliai"
 
-#: test_utils/cli.py:211
+#: test_utils/cli.py:189
 msgid "navigation examples"
-msgstr ""
+msgstr "navigacijos pavyzdžiai"
 
-#: test_utils/cli.py:219
+#: test_utils/cli.py:197
 msgid "sidebar column"
-msgstr ""
+msgstr "šoninė juosta"
 
-#: test_utils/cli.py:224
+#: test_utils/cli.py:203
 msgid "left column"
-msgstr ""
+msgstr "kairys stulpelis"
 
-#: test_utils/cli.py:229
+#: test_utils/cli.py:208
 msgid "Add a link"
 msgstr "Pridėti nuorodą"
 
-#: test_utils/cli.py:235
+#: test_utils/cli.py:215
 msgid "right column"
-msgstr ""
+msgstr "dešinys stulpelis"
 
 #: test_utils/project/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:4
 #: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:4
 msgid "Two columns"
-msgstr ""
+msgstr "Du stulpeliai"
 
 #: test_utils/project/custom_templates/__init__.py:5
 #: test_utils/project/templates/inner_dir/custom_templates/__init__.py:5
 #: test_utils/project/templates/inner_dir/custom_templates_2/__init__.py:5
 msgid "Three columns"
-msgstr ""
+msgstr "Trys stulpeliai"
 
 #: test_utils/project/customuserapp/models.py:39
 msgid "username"
-msgstr ""
+msgstr "vartotojo vardas"
 
 #: test_utils/project/customuserapp/models.py:40
 msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+"Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgstr "Privalomas. 300 simbolių arba mažiau. Raidės, skaičiai ir @/./+/-/_ simboliai"
 
 #: test_utils/project/customuserapp/models.py:43
 msgid "Enter a valid username."
-msgstr ""
+msgstr "Įveskite taisyklingą vartotojo vardą."
 
 #: test_utils/project/customuserapp/models.py:45
 msgid "email address"
@@ -1604,33 +1655,33 @@ msgstr "el. pašto adresas"
 
 #: test_utils/project/customuserapp/models.py:46
 msgid "staff status"
-msgstr ""
+msgstr "personalo būsena"
 
 #: test_utils/project/customuserapp/models.py:47
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Nustato ar vartotojas gali prisijungti prie šio admininistravimo puslapio."
 
 #: test_utils/project/customuserapp/models.py:49
 msgid "active"
-msgstr ""
+msgstr "aktyvus"
 
 #: test_utils/project/customuserapp/models.py:50
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr ""
+msgstr "Nustato ar šis vartotojas turi būti traktuojamas kaip aktyvus. Atžymėkite užuot šalinę vartotoją."
 
 #: test_utils/project/customuserapp/models.py:61
 msgid "users"
-msgstr ""
+msgstr "vartotojai"
 
 #: test_utils/project/extensionapp/cms_toolbar.py:47
 msgid "Title Extension"
-msgstr ""
+msgstr "Pavadinimo išplėtimas"
 
 #: test_utils/project/extensionapp/cms_toolbar.py:85
 msgid "Page Extension"
-msgstr ""
+msgstr "Puslapio išplėtimas"
 
 #: test_utils/project/objectpermissionsapp/models.py:46
 msgid "object ID"
@@ -1638,47 +1689,55 @@ msgstr "objekto ID"
 
 #: test_utils/project/placeholderapp/cms_app.py:7
 msgid "Example1 App"
-msgstr ""
+msgstr "Aplikacijos pavyzdys1"
 
-#: test_utils/project/placeholderapp/cms_app.py:13
+#: test_utils/project/placeholderapp/cms_app.py:14
 msgid "MultilingualExample1 App"
-msgstr ""
+msgstr "Aplikacijos daugiakalbis pavyzdys1"
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:21
+#: test_utils/project/placeholderapp/cms_toolbar.py:24
 msgid "Example1"
-msgstr ""
+msgstr "Pavyzdys1"
 
-#: test_utils/project/placeholderapp/cms_toolbar.py:22
+#: test_utils/project/placeholderapp/cms_toolbar.py:25
 msgid "Examples"
-msgstr ""
+msgstr "Pavyzdžiai"
 
 #: test_utils/project/pluginapp/plugins/extra_context/cms_plugins.py:9
 msgid "Extra Context"
-msgstr ""
+msgstr "Papildomas kontekstas"
 
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:11
 #: test_utils/project/pluginapp/plugins/manytomany_rel/cms_plugins.py:27
 msgid "Articles"
-msgstr ""
+msgstr "Straipsniai"
 
 #: test_utils/project/sampleapp/cms_app.py:8
 msgid "Sample App"
-msgstr ""
+msgstr "Pavyzdinė aplikacija"
 
 #: test_utils/project/sampleapp/cms_app.py:17
 msgid "Sample App with excluded permissions"
-msgstr ""
+msgstr "Pavyzdinė aplikacija su panaikintomis teisėmis"
 
 #: test_utils/project/sampleapp/cms_app.py:28
 msgid "Sample App 2"
-msgstr ""
+msgstr "Pavyzdinė aplikacija 2"
 
-#: test_utils/project/sampleapp/cms_app.py:35
+#: test_utils/project/sampleapp/cms_app.py:36
 msgid "Namespaced App"
-msgstr ""
+msgstr "Namespaced aplikacija"
+
+#: test_utils/project/sampleapp/cms_app.py:48
+msgid "Parent app"
+msgstr "Pradinė aplikacija"
+
+#: test_utils/project/sampleapp/cms_app.py:55
+msgid "Child app"
+msgstr "Vidinė aplikacija"
 
 #: test_utils/project/sampleapp/cms_toolbar.py:21
-#: test_utils/project/sampleapp/views.py:31
+#: test_utils/project/sampleapp/views.py:30
 msgid "Category"
 msgstr "Kategorija"
 
@@ -1688,43 +1747,51 @@ msgstr "Kategorijos"
 
 #: test_utils/project/sampleapp/cms_toolbar.py:23
 msgid "Add Category"
-msgstr "Pridėti Kategoriją"
-
-#: test_utils/project/sampleapp/menu.py:16
-msgid "sample root page"
-msgstr ""
+msgstr "Pridėti kategoriją"
 
 #: test_utils/project/sampleapp/menu.py:17
-msgid "sample settings page"
-msgstr ""
+msgid "sample root page"
+msgstr "pavyzdinis šaknis puslapis"
 
 #: test_utils/project/sampleapp/menu.py:18
-msgid "sample account page"
-msgstr ""
+msgid "sample settings page"
+msgstr "pavyzdinis nustatymų puslapis"
 
 #: test_utils/project/sampleapp/menu.py:19
+msgid "sample account page"
+msgstr "pavyzdinis vartotojo puslapis"
+
+#: test_utils/project/sampleapp/menu.py:20
 msgid "sample my profile page"
-msgstr ""
+msgstr "pavyzdinis profilio puslapis"
 
-#: test_utils/project/sampleapp/menu.py:31
+#: test_utils/project/sampleapp/menu.py:33
 msgid "Static Menu"
-msgstr ""
+msgstr "Statinis meniu"
 
-#: test_utils/project/sampleapp/menu.py:47
+#: test_utils/project/sampleapp/menu.py:51
 msgid "Static Menu2"
-msgstr ""
+msgstr "Statinis meniu2"
 
-#: test_utils/project/sampleapp/urls.py:13
+#: test_utils/project/sampleapp/menu.py:55
+msgid "Static Menu3"
+msgstr "Statinis meniu3"
+
+#: test_utils/project/sampleapp/urls.py:14
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
-#: test_utils/project/sampleapp/views.py:33
+#: test_utils/project/sampleapp/views.py:32
 msgid "Change Category"
-msgstr "Pakeisti Kategoriją"
+msgstr "Pakeisti kategoriją"
+
+#: test_utils/project/templates/registration/logged_out.html:7
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Dėkojame už turiningai su tinklalapiu šiandien praleistą laiką."
 
 #: utils/mail.py:37
 msgid "CMS - your user account was created."
-msgstr "CMS - jūsų vartojo paskyra  sukurta."
+msgstr "CMS - jūsų vartojo paskyra sukurta."
 
 #: utils/mail.py:39
 msgid "CMS - your user account was changed."
@@ -1732,7 +1799,7 @@ msgstr "CMS - jūsų vartotojo paskyra buvo pakeista."
 
 #: utils/page_resolver.py:131
 msgid "Invalid URL, use /my/url format."
-msgstr "Blogas URL, prašome įveskite tokio formato: /mano/puslapis."
+msgstr "Blogas URL, prašome įveti tokio formato: /mano/puslapis."
 
 #: utils/page_resolver.py:159
 #, python-format
@@ -1741,67 +1808,18 @@ msgid ""
 msgid_plural ""
 "Pages %(pages)s have the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(pages)s puslapis turi tą patį url '%(url)s' kaip dabartinis puslapis \"%(instance)s\"."
+msgstr[1] "%(pages)s puslapiai turi tą patį url '%(url)s' kaip dabartinis puslapis \"%(instance)s\"."
+msgstr[2] "%(pages)s puslapių turi tą patį url '%(url)s' kaip dabartinis puslapis \"%(instance)s\"."
 
-#: utils/plugins.py:380
+#: utils/plugins.py:233
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Ši rezervuota vieta  jau turi maksimalų skaičių įskiepių (%s)."
 
-#: utils/plugins.py:390
+#: utils/plugins.py:243
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
-
-#~ msgid "No Plugin selected. Selected one on the left side"
-#~ msgstr "No Plugin selected. Select one on the left side"
-
-#~ msgid "Inherit the template of the nearest ancestor"
-#~ msgstr "Inherit from the parent page"
-
-#~ msgid "Email"
-#~ msgstr "email address"
-
-#~ msgid "last name"
-#~ msgstr "publish request"
-
-#~ msgid "Use latitude & longitude to fine tune the map position."
-#~ msgstr "Use latitude & longitude to fine tune the map position."
-
-#~ msgid "An email adress has priority over a text link."
-#~ msgstr "An email address has priority over a text link."
-
-#~ msgid ""
-#~ "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approvement by you."
-#~ msgstr "Page <a href=\"%(admin_url)s\">%(page)s</a> may require approval by you."
-
-#~ msgid "move req."
-#~ msgstr "move request"
-
-#~ msgid "url overwrite"
-#~ msgstr "URL overwrite"
-
-#~ msgid "req. app."
-#~ msgstr "approval required"
-
-#~ msgid "(requires approvement at %(moderation_level)s level)"
-#~ msgstr "(requires approval at %(moderation_level)s level)"
-
-#~ msgid "Request approvemet"
-#~ msgstr "Request approval"
-
-#~ msgid "CMS - Page %s requires approvement."
-#~ msgstr "CMS - Page %s requires approval."
-
-#~ msgid "move"
-#~ msgstr "move request"
-
-#~ msgid "fgcolor"
-#~ msgstr "foreground color"
-
-#~ msgid "Wanted language has not been translated yet."
-#~ msgstr "Requested language has not been translated yet."
+msgstr "Ši rezervuota vieta  jau turi maksimalų skaičių (%(limit)s) leistinų %(plugin_name)s įskiepių."

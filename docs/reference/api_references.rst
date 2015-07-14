@@ -55,10 +55,10 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to authenticated users.
 
 
-.. data:: VISIBILITY_STAFF
+.. data:: VISIBILITY_ANONYMOUS
 
     Used for the ``limit_menu_visibility`` keyword argument to
-    :func:`create_page`. Limits menu visibility to staff users.
+    :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
 .. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
@@ -92,7 +92,7 @@ Functions and constants
     :type site: :class:`django.contrib.sites.models.Site` instance
     :param bool login_required: Whether users must be logged in or not to view this page
     :param limit_menu_visibility: Limits visibility of this page in the menu
-    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_STAFF`
+    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
 
@@ -165,6 +165,15 @@ Functions and constants
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
     :param string language: The target language to publish to
+
+.. function:: publish_pages(include_unpublished=False, language=None, site=None)
+
+    Publishes multiple pages defined by parameters.
+
+    :param bool include_unpublished: Set to ``True`` to publish all drafts, including unpublished ones; otherwise, only already published pages will be republished
+    :param string language: If given, only pages in this language will be published; otherwise, all languages will be published
+    :param site: Specify a site to publish pages for specified site only; if not specified pages from all sites are published
+    :type site: :class:`django.contrib.sites.models.Site` instance
 
 .. function:: get_page_draft(page):
 
@@ -366,6 +375,11 @@ cms.toolbar.toolbar
     .. attribute:: toolbar_language
 
         Language used by the toolbar.
+
+    .. attribute:: watch_models
+
+        A list of model this toolbar works on; used for redirections after editing
+        (:ref:`url_changes`).
 
     .. method:: add_item(item, position=None)
 

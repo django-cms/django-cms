@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-from django.contrib.sites.models import Site
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.sites.models import Site
+from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.menu import get_visible_pages
@@ -10,8 +12,7 @@ from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.utils.compat.dj import get_user_model, user_related_name
+from cms.test_utils.testcases import CMSTestCase
 from menus.menu_pool import menu_pool
 
 __all__ = [
@@ -20,7 +21,7 @@ __all__ = [
 ]
 
 
-class ViewPermissionTests(SettingsOverrideTestCase):
+class ViewPermissionTests(CMSTestCase):
     """
     Test various combinations of view permissions pages and menus
     Focus on the different grant types and inheritance options of grant on
@@ -145,7 +146,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                user_set = getattr(group, user_related_name)
+                user_set = getattr(group, 'user_set')
                 user_set.add(user)
                 group.save()
 
@@ -259,6 +260,7 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'POST': {},
             'GET': {},
             'path': path,
             'session': {},
@@ -269,14 +271,14 @@ class ViewPermissionTests(SettingsOverrideTestCase):
         return dict((page.get_absolute_url(language=language), page) for page in pages)
 
 
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='all',
+)
 class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
     """
     Test CMS_PUBLIC_FOR=all group access and menu nodes rendering
     """
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
-    }
 
     def test_public_pages_anonymous_norestrictions(self):
         """
@@ -515,7 +517,23 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self.assertViewAllowed(urls["/en/page_d/"], user)
         self.assertViewAllowed(urls["/en/page_d/page_d_a/"], user)
 
+    def test_non_view_permission_doesnt_hide(self):
+        """
+        PagePermissions with can_view=False shouldn't hide pages in the menu.
+        """
+        self._setup_user_groups()
+        all_pages = self._setup_tree_pages()
+        page = Page.objects.drafts().get(title_set__title="page_b")
+        group = Group.objects.get(name=self.GROUPNAME_1)
+        PagePermission.objects.create(can_view=False, group=group, page=page)
+        urls = self.get_url_dict(all_pages)
+        self.assertInMenu(urls["/en/page_b/"], AnonymousUser())
 
+
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='all',
+)
 class ViewPermissionTreeBugTests(ViewPermissionTests):
     """Test issue 1113
     https://github.com/divio/django-cms/issues/1113
@@ -523,10 +541,6 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     grant_on=ACCESS_PAGE_AND_CHILDREN or ACCESS_PAGE_AND_DESCENDANTS to page 6
     Test if this affects the menu entries and page visibility
     """
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'all',
-    }
     GROUPNAME_6 = 'group_6_ACCESS_PAGE'
 
     def _setup_pages(self):
@@ -562,7 +576,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        user_set = getattr(group, user_related_name)
+        user_set = getattr(group, 'user_set')
         user_set.add(user)
         group.save()
 

@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
+from django.test.utils import override_settings
+from django.contrib.auth import get_user_model
+
 from cms.tests.menu_page_viewperm import ViewPermissionTests
-from cms.utils.compat.dj import get_user_model
 
 __all__ = [
     'ViewPermissionComplexMenuStaffNodeTests',
 ]
 
 
+@override_settings(
+    CMS_PERMISSION=True,
+    CMS_PUBLIC_FOR='staff',
+)
 class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
     """
     Test CMS_PUBLIC_FOR=staff group access and menu nodes rendering
     """
-    settings_overrides = {
-        'CMS_PERMISSION': True,
-        'CMS_PUBLIC_FOR': 'staff',
-    }
 
     def test_public_pages_anonymous_norestrictions(self):
         """

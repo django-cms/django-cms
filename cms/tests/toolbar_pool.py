@@ -1,7 +1,6 @@
 from cms.utils.conf import get_cms_setting
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 
@@ -53,7 +52,7 @@ class ToolbarPoolTests(CMSTestCase):
     def test_settings(self):
         toolbars = toolbar_pool.toolbars
         toolbar_pool.clear()
-        with SettingsOverride(CMS_TOOLBARS=['cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar']):
+        with self.settings(CMS_TOOLBARS=['cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar']):
             toolbar_pool.register(TestToolbar)
             self.assertEqual(len(list(self.pool.get_toolbars().keys())), 2)
             api.create_page("home", "simple.html", "en", published=True)
@@ -61,3 +60,7 @@ class ToolbarPoolTests(CMSTestCase):
                 response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
                 self.assertEqual(response.status_code, 200)
         toolbar_pool.toolbars = toolbars
+
+    def test_watch_models(self):
+        toolbar_pool.discover_toolbars()
+        self.assertEqual(type(toolbar_pool.get_watch_models()), list)
