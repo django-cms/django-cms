@@ -56,7 +56,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/jstree/tree_component.js'
     ],
     'bundle.admin.base.min.js': [
-        PROJECT_PATH.js + '/lib/jquery.min.js',
+        PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/modules/cms.base.js'
     ]
@@ -120,10 +120,12 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
     gulp.task('bundle:' + bundleName, function () {
         return gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
-            .pipe(concat(bundleName, {
-                newLine: ';'
+            .pipe(uglify({
+                preserveComments: 'some'
             }))
-            .pipe(uglify())
+            .pipe(concat(bundleName, {
+                newLine: '\n'
+            }))
             .pipe(gulpif(options.debug, sourcemaps.write()))
             .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
     });

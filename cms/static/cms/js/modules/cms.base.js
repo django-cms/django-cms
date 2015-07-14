@@ -19,14 +19,14 @@ var CMS = {
 
 //##################################################################################################################
 // #CMS.API#
+/*!
+ * CMS.API.Helpers
+ * Multiple helpers used accross all CMS features
+ */
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
     $(document).ready(function () {
-        /*!
-         * CNS.API.Helpers
-         * Multiple helpers used accross all CMS features
-         */
         CMS.API.Helpers = {
 
             // redirects to a specific url or reloads browser
