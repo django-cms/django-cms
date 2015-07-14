@@ -13,6 +13,8 @@ var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -33,13 +35,21 @@ var PROJECT_PATTERNS = {
     js: [
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
-        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js'
+        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
+        '!' + PROJECT_PATH.js + '/bundle.*.js'
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'
+    ]
+};
+
+var JS_BUNDLES = {
+    jstree: [
+        PROJECT_PATH.js + '/jstree/_lib/_all.js',
+        PROJECT_PATH.js + '/jstree/tree_component.js'
     ]
 };
 
@@ -95,9 +105,25 @@ gulp.task('lint:javascript', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
+gulp.task('bundle', function () {
+    Object.keys(JS_BUNDLES).forEach(function (bundleName) {
+        var bundleFiles = JS_BUNDLES[bundleName];
+
+        gulp.src(bundleFiles)
+            .pipe(gulpif(options.debug, sourcemaps.init()))
+            .pipe(concat('bundle.' + bundleName + '.min.js', {
+                newLine: ';'
+            }))
+            .pipe(uglify())
+            .pipe(gulpif(options.debug, sourcemaps.write()))
+            .pipe(gulp.dest(PROJECT_PATH.js));
+    });
+});
+
 gulp.task('watch', function () {
     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
+    gulp.watch(PROJECT_PATTERNS.js, ['bundle']);
 });
 
 gulp.task('default', ['sass', 'lint', 'watch']);

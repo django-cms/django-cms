@@ -290,7 +290,7 @@
                             use_inline: true
                             //droppable : ['tree_drop']
                         },
-                        path: false,
+                        path: window.location.origin + '/static/cms/js/jstree/',
                         ui: {
                             dots: true,
                             rtl: false,
