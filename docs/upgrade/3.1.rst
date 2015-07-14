@@ -41,7 +41,7 @@ Other than this, end users should not notice any changes.
 
 .. note:: User feedback required
 
-    We require as much feedback as possible about the performance of django-treebeard in this 
+    We require as much feedback as possible about the performance of django-treebeard in this
     release. Please let us know your experiences with it, especially if you encounter any problems.
 
 .. note:: Backward incompatible change
@@ -140,7 +140,7 @@ queries that are generated, in order to make it faster.
 
 .. note:: User feedback required
 
-    We require as much feedback as possible about the performance of this feature in this 
+    We require as much feedback as possible about the performance of this feature in this
     release. Please let us know your experiences with it, especially if you encounter any problems.
 
 Toolbar API extension
@@ -248,8 +248,10 @@ Settings update
 Update the database
 ===================
 
-* Rename the custom plugin table names, either by applying relevant migrations (if any) or
-  renaming the tables manually;
+* Rename plugin table names, to conform to the new naming scheme (see above). **Be warned** that not
+  all third-party plugin applications may provide these migrations - in this case you will need to
+  rename the table manually. Following the upgrade, django CMS will look for the tables for these
+  plugins under their new name, and will report that they don't exist if it can't find them.
 * The migration for MPTT to ``django-treebeard`` is handled by the django CMS migrations,
   thus apply migrations to update your database::
 
