@@ -737,15 +737,15 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         page.publish('en')
         page.publish('de')
 
-        child_page = create_page("child_page", "nav_playground.html", "en",
+        child_page = create_page("child page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
         create_title('de', child_page.get_title(), child_page)
         child_page.publish('en')
         child_page.publish('de')
 
-        child_child_page = create_page("child_child_page", "nav_playground.html",
+        child_child_page = create_page("child child page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
-        create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
+        create_title("de", '%s de' % child_child_page.get_title(), child_child_page)
         child_child_page.publish('en')
         child_child_page.publish('de')
 
@@ -764,15 +764,15 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         output = tag.get_context(fake_context, 'en')
         url = output['content']
 
-        self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
+        self.assertEqual(url, '/en/child-page/child-child-page/extra_1/')
 
         output = tag.get_context(fake_context, 'de')
         url = output['content']
         # look the extra "_de"
-        self.assertEqual(url, '/de/child_page/child_child_page_de/extra_1/')
+        self.assertEqual(url, '/de/child-page/child-child-page-de/extra_1/')
 
         output = tag.get_context(fake_context, 'fr')
         url = output['content']
-        self.assertEqual(url, '/fr/child_page/child_child_page/extra_1/')
+        self.assertEqual(url, '/fr/child-page/child-child-page/extra_1/')
 
         apphook_pool.clear()
