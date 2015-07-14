@@ -59,6 +59,19 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/modules/cms.base.js'
+    ],
+    'bundle.toolbar.min.js': [
+        PROJECT_PATH.js + '/libs/jquery.min.js',
+        PROJECT_PATH.js + '/libs/class.min.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
+        PROJECT_PATH.js + '/modules/cms.base.js',
+        PROJECT_PATH.js + '/modules/cms.modal.js',
+        PROJECT_PATH.js + '/modules/cms.sideframe.js',
+        PROJECT_PATH.js + '/modules/cms.clipboard.js',
+        PROJECT_PATH.js + '/modules/cms.plugins.js',
+        PROJECT_PATH.js + '/modules/cms.structureboard.js',
+        PROJECT_PATH.js + '/modules/cms.toolbar.js'
     ]
 };
 
