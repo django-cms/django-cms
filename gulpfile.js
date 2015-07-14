@@ -57,8 +57,8 @@ var JS_BUNDLES = {
     ],
     'bundle.admin.base.min.js': [
         PROJECT_PATH.js + '/lib/jquery.min.js',
-        PROJECT_PATH.js + 'libs/class.min.js',
-        PROJECT_PATH.js + 'modules/cms.base.js'
+        PROJECT_PATH.js + '/libs/class.min.js',
+        PROJECT_PATH.js + '/modules/cms.base.js'
     ]
 };
 
@@ -114,11 +114,11 @@ gulp.task('lint:javascript', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('bundle', function () {
-    Object.keys(JS_BUNDLES).forEach(function (bundleName) {
-        var bundleFiles = JS_BUNDLES[bundleName];
+Object.keys(JS_BUNDLES).forEach(function (bundleName) {
+    var bundleFiles = JS_BUNDLES[bundleName];
 
-        gulp.src(bundleFiles)
+    gulp.task('bundle:' + bundleName, function () {
+        return gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
             .pipe(concat(bundleName, {
                 newLine: ';'
@@ -128,11 +128,17 @@ gulp.task('bundle', function () {
             .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
     });
 });
+gulp.task('bundle', Object.keys(JS_BUNDLES).map(function (bundleName) {
+    return 'bundle:' + bundleName;
+}));
 
 gulp.task('watch', function () {
     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
-    gulp.watch(PROJECT_PATTERNS.js, ['bundle']);
+    Object.keys(JS_BUNDLES).forEach(function (bundleName) {
+        var bundleFiles = JS_BUNDLES[bundleName];
+        gulp.watch(bundleFiles, ['bundle:' + bundleName]);
+    });
 });
 
 gulp.task('default', ['sass', 'lint', 'bundle', 'watch']);
