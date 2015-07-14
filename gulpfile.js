@@ -51,10 +51,6 @@ var PROJECT_PATTERNS = {
  * from array of paths that are the value.
  */
 var JS_BUNDLES = {
-    'bundle.jstree.min.js': [
-        PROJECT_PATH.js + '/jstree/_lib/_all.js',
-        PROJECT_PATH.js + '/jstree/tree_component.js'
-    ],
     'bundle.admin.base.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
@@ -65,7 +61,9 @@ var JS_BUNDLES = {
     ],
     'bundle.admin.changelist.min.js': [
         PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
-        PROJECT_PATH.js + '/modules/cms.changelist.js'
+        PROJECT_PATH.js + '/modules/cms.changelist.js',
+        PROJECT_PATH.js + '/jstree/_lib/_all.js',
+        PROJECT_PATH.js + '/jstree/tree_component.js'
     ],
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
