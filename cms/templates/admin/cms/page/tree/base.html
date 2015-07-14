@@ -45,6 +45,7 @@ $(document).ready(function () {
     // initialize tree
     new CMS.TreeManager({
         'settings': {
+            'staticPath': '{{ STATIC_URL }}',
             'permission': {{ CMS_PERMISSION|bool }},
             'debug': {{ DEBUG|bool }},
             'filtered': {{ cl.is_filtered|bool }}

@@ -290,7 +290,8 @@
                             use_inline: true
                             //droppable : ['tree_drop']
                         },
-                        path: window.location.origin + '/static/cms/js/jstree/',
+                        // has to be absolute full path
+                        path: window.location.origin + that.options.settings.staticPath + 'cms/js/jstree/',
                         ui: {
                             dots: true,
                             rtl: false,
