@@ -1181,23 +1181,12 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
 
     def _give_permission(self, user, model, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        codename = get_permission_codename(permission_type, model._meta)
         user.user_permissions.add(Permission.objects.get(codename=codename))
 
     def _delete_permission(self, user, model, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        codename = get_permission_codename(permission_type, model._meta)
         user.user_permissions.remove(Permission.objects.get(codename=codename))
-
-    """
-    Those two methods are not usefull until this is not the same than adding perms to Model
-    def _give_object_permission(self, user, object, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, object.__class__._meta.object_name.lower())
-        UserObjectPermission.objects.assign_perm(codename, user=user, obj=object)
-
-    def _delete_object_permission(self, user, object, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, object.__class__._meta.object_name.lower())
-        UserObjectPermission.objects.remove_perm(codename, user=user, obj=object)
-    """
 
     def _post_request(self, user):
         data = {
@@ -1247,7 +1236,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
           True/False combinations (2)
           on Plugin, Model and instance (^3) 
           for add, change and delete perms (^3)
-        but we remove some unusefull tests : 
+        but we remove some unuseful tests :
           * when user has not perm on Plugin, we only test the most permissive case : when he has 
             perms on instance AND model. (nb tests is now (2^3 - (2^2-1))^3 = 125)
           * as adding perm on an instance is currently the same than adding perm to the model, 
@@ -1255,21 +1244,21 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         """
         self._create_example()
         if key not in ('add', 'change', 'delete'):
-            raise Exception("key '%s' is not valid. \
-                             Only 'add', 'change' and 'delete are allowed" % key)
+            raise Exception("key '%s' is not valid. "
+                            "Only 'add', 'change' and 'delete are allowed" % key)
         if key in ('change', 'delete'):
             self._create_plugin()
 
-        #until perms on instance stay the same than perms on Model, we do not test instance perms
-        #objects_list = [Text, Example1, self.example_object,]
-        objects_list = [Text, Example1,]
+        # until perms on instance stay the same than perms on Model, we do not test instance perms
+        # objects_list = [Text, Example1, self.example_object,]
+        objects_list = [Text, Example1]
         objects_labels = [getattr(o, '__name__', 'example_object') for o in objects_list]
         perms_combinations = list(itertools.product(*[[False, True]]*len(objects_list)))
 
-        #only keep False, True* combinations
+        # only keep False, True* combinations
         for combination in itertools.product(*[[False, True]]*(len(objects_list)-1)):
             if combination == (True,) * (len(objects_list)-1):
-                continue #all True : we keep it
+                continue  # all True : we keep it
             perms_combinations.remove((False,) + combination)
 
         request = self._post_request(self._testuser())
@@ -1300,7 +1289,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
                         if self.example_object in objects_list:
                             other_should_pass += (perms['delete']['example_object'],)
                     should_pass = perms[key]['Text'] and (True in other_should_pass)
-                    if should_pass != has_perm(**has_perm_kwargs) :
+                    if should_pass != has_perm(**has_perm_kwargs):
                         msg = 'User SHOULD %s able to perform "%s" action with those perms : %s'
                         self.fail(msg % ('BE' if should_pass else 'NOT BE', key, perms))
         # cleanup
