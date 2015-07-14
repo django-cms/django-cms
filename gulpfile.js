@@ -124,7 +124,7 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
                 preserveComments: 'some'
             }))
             .pipe(concat(bundleName, {
-                newLine: '\n'
+                newLine: '\n\n'
             }))
             .pipe(gulpif(options.debug, sourcemaps.write()))
             .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
