@@ -577,7 +577,7 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
-                # The target page now has a pk, so can be used as a target
+            # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
             # trigger home update
@@ -736,6 +736,11 @@ class Page(with_metaclass(PageMetaClass, MPTTModel)):
             return sorted(self.languages.split(','))
         else:
             return []
+
+    def get_published_languages(self):
+        if self.publisher_is_draft:
+            return self.get_languages()
+        return sorted([language for language in self.get_languages() if self.is_published(language)])
 
     def get_cached_ancestors(self, ascending=True):
         if ascending:
