@@ -11,6 +11,8 @@ var iconfontCss = require('gulp-iconfont-css');
 var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
+var jshint = require('gulp-jshint');
+var jscs = require('gulp-jscs');
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -21,16 +23,22 @@ var options = {
 };
 var PROJECT_ROOT = __dirname + '/cms/static/cms';
 var PROJECT_PATH = {
-    'sass': PROJECT_ROOT + '/sass',
-    'css': PROJECT_ROOT + '/css',
-    'icons': PROJECT_ROOT + '/fonts'
+    js: PROJECT_ROOT + '/js',
+    sass: PROJECT_ROOT + '/sass',
+    css: PROJECT_ROOT + '/css',
+    icons: PROJECT_ROOT + '/fonts'
 };
 
 var PROJECT_PATTERNS = {
-    'sass': [
+    js: [
+        PROJECT_PATH.js + '/modules/*.js',
+        PROJECT_PATH.js + '/gulpfile.js',
+        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js'
+    ],
+    sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
     ],
-    'icons': [
+    icons: [
         PROJECT_PATH.icons + '/src/*.svg'
     ]
 };
@@ -65,14 +73,31 @@ gulp.task('icons', function () {
         fontName: 'django-cms-iconfont',
         normalize: true
     }))
-    .on('glyphs', function(glyphs, options) {
+    .on('glyphs', function (glyphs, options) {
         gutil.log.bind(glyphs, options);
     })
     .pipe(gulp.dest(PROJECT_PATH.icons));
 });
 
-gulp.task('watch', function () {
-    gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
+gulp.task('lint', ['lint:javascript']);
+gulp.task('lint:javascript', function () {
+    // DOCS: http://jshint.com/docs/
+    return gulp.src(PROJECT_PATTERNS.js)
+        .pipe(jshint())
+        .pipe(jscs())
+        .on('error', function (error) {
+            gutil.log('\n' + error.message);
+            if (process.env.CI) {
+                // Force the process to exit with error code
+                process.exit(1);
+            }
+        })
+        .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('default', ['sass', 'watch']);
+gulp.task('watch', function () {
+    gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
+    gulp.watch(PROJECT_PATTERNS.js, ['lint']);
+});
+
+gulp.task('default', ['sass', 'lint', 'watch']);
