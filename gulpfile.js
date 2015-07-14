@@ -46,8 +46,12 @@ var PROJECT_PATTERNS = {
     ]
 };
 
+/*
+ * Object keys are filenames of bundles that will be compiled
+ * from array of paths that are the value.
+ */
 var JS_BUNDLES = {
-    jstree: [
+    'bundle.jstree.min.js': [
         PROJECT_PATH.js + '/jstree/_lib/_all.js',
         PROJECT_PATH.js + '/jstree/tree_component.js'
     ]
@@ -111,7 +115,7 @@ gulp.task('bundle', function () {
 
         gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
-            .pipe(concat('bundle.' + bundleName + '.min.js', {
+            .pipe(concat(bundleName, {
                 newLine: ';'
             }))
             .pipe(uglify())
