@@ -36,7 +36,7 @@ var PROJECT_PATTERNS = {
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
         '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
-        '!' + PROJECT_PATH.js + '/bundle.*.js'
+        '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
@@ -54,6 +54,11 @@ var JS_BUNDLES = {
     'bundle.jstree.min.js': [
         PROJECT_PATH.js + '/jstree/_lib/_all.js',
         PROJECT_PATH.js + '/jstree/tree_component.js'
+    ],
+    'bundle.admin.base.min.js': [
+        PROJECT_PATH.js + '/lib/jquery.min.js',
+        PROJECT_PATH.js + 'libs/class.min.js',
+        PROJECT_PATH.js + 'modules/cms.base.js'
     ]
 };
 
@@ -120,7 +125,7 @@ gulp.task('bundle', function () {
             }))
             .pipe(uglify())
             .pipe(gulpif(options.debug, sourcemaps.write()))
-            .pipe(gulp.dest(PROJECT_PATH.js));
+            .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
     });
 });
 
@@ -130,4 +135,4 @@ gulp.task('watch', function () {
     gulp.watch(PROJECT_PATTERNS.js, ['bundle']);
 });
 
-gulp.task('default', ['sass', 'lint', 'watch']);
+gulp.task('default', ['sass', 'lint', 'bundle', 'watch']);
