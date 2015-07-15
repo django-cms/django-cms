@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-<<<<<<< HEAD
 from contextlib import contextmanager
-=======
 import base64
->>>>>>> move-jpg-out-of-py-str
 import datetime
 import json
 import os
