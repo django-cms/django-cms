@@ -9,12 +9,6 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 
-try:
-    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
-                                              ModelAdminMetaClass)
-except ImportError:
-    from django.forms.widgets import (MediaDefiningClass as ModelAdminMetaClass)
-
 from cms.utils import get_language_list
 from cms.utils.urlutils import admin_reverse
 from cms.utils.compat.dj import force_unicode
