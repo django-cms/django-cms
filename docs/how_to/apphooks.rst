@@ -1,12 +1,15 @@
 #########
-App-Hooks
+Apphooks
 #########
 
-With App-Hooks you can attach whole Django applications to pages. For example
-you have a news app and you want it attached to your news page.
+An **Apphook** allows you to attach a Django application to a page. For example,
+you might have a news application that you'd like integrated with django CMS. In
+this case, you can create a normal django CMS page without any content of its
+own, and attach the news application to the page; the news application's content
+will be delivered at the page's URL.
 
-To create an apphook create a ``cms_app.py`` in your application. And in it
-write the following::
+To create an apphook place a ``cms_app.py`` in your application. And in it write
+the following::
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
@@ -18,25 +21,26 @@ write the following::
 
     apphook_pool.register(MyApphook)
 
-Replace ``myapp.urls`` with the path to your applications ``urls.py``.
-
-Now edit a page and open the advanced settings tab. Select your new apphook
-under "Application". Save the page.
+Replace ``myapp.urls`` with the path to your applications ``urls.py``. Now edit
+a page and open the advanced settings tab. Select your new apphook under
+"Application". Save the page.
 
 .. warning::
 
     Whenever you add or remove an apphook, change the slug of a page containing
-    an apphook or the slug if a page which has a descendant with an apphook,
-    you have to restart your server to re-load the URL caches.
+    an apphook or the slug if a page which has a descendant with an apphook, you
+    have to restart your server to re-load the URL caches.
+
+    An apphook won't appear until it is published. Take note that this also
+    means all parent pages must also be published.
 
 .. note::
 
-    If at some point you want to remove this apphook after deleting the cms_app.py
-    there is a cms management command called uninstall apphooks
-    that removes the specified apphook(s) from all pages by name.
-    eg. ``manage.py cms uninstall apphooks MyApphook``.
-    To find all names for uninstallable apphooks there is a command for this as well
-    ``manage.py cms list apphooks``.
+    If at some point you want to remove this apphook after deleting the
+    cms_app.py there is a cms management command called uninstall apphooks that
+    removes the specified apphook(s) from all pages by name. eg. ``manage.py cms
+    uninstall apphooks MyApphook``. To find all names for uninstallable apphooks
+    there is a command for this as well ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a urls.py that looks like this::
@@ -66,9 +70,9 @@ The ``main_view`` should now be available at ``/hello/world/`` and the
     default :class:`~django.template.Context` instance.
 
 
-*************
-Apphook Menus
-*************
+**************
+Apphook menus
+**************
 
 If you want to add a menu to that page as well that may represent some views
 in your app add it to your apphook like this::
@@ -132,7 +136,7 @@ We would now create a menu out of these categories::
 
     menu_pool.register_menu(CategoryMenu)
 
-If you add this menu now to your app-hook::
+If you add this menu now to your apphook::
 
     from myapp.menus import CategoryMenu
 
@@ -147,7 +151,7 @@ You get the static entries of :class:`MyAppMenu` and the dynamic entries of
 .. _multi_apphook:
 
 ***************************************
-Attaching an Application multiple times
+Attaching an application multiple times
 ***************************************
 
 If you want to attach an application multiple times to different pages you have 2 possibilities.
@@ -246,7 +250,7 @@ Or, if you are rendering a plugin, of the context instance::
 .. _apphook_permissions:
 
 *******************
-Apphook Permissions
+Apphook permissions
 *******************
 
 By default all apphooks have the same permissions set as the page they are assigned to.
@@ -285,8 +289,9 @@ with CMS permission decorator, then use ``exclude_permissions`` property of apph
         exclude_permissions = ["some_nested_app"]
 
 
-For example, django-oscar_ apphook integration needs to be used with exclude permissions of dashboard app,
-because it use `customizable access function`__. So, your apphook in this case will looks like this::
+For example, django-oscar_ apphook integration needs to be used with exclude permissions of
+dashboard app, because it use `customizable access function`__. So, your apphook in this case will
+looks like this::
 
     class OscarApp(CMSApp):
         name = _("Oscar")
@@ -298,9 +303,9 @@ because it use `customizable access function`__. So, your apphook in this case w
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
 .. __: https://github.com/tangentlabs/django-oscar/blob/0.7.2/oscar/apps/dashboard/nav.py#L57
 
-***********************************************
+************************************************
 Automatically restart server on apphook changes
-***********************************************
+************************************************
 
 As mentioned above, whenever you add or remove an apphook, change the slug of a
 page containing an apphook or the slug if a page which has a descendant with an

@@ -1,12 +1,11 @@
+..  _contributing:
+
 ##########################
 Contributing to django CMS
 ##########################
 
 Like every open-source project, django CMS is always looking for motivated
 individuals to contribute to its source code.
-
-There's more guidance on `how to contribute in our documentation
-<http://docs.django-cms.org/en/latest/introduction>`_.
 
 
 Key points:
@@ -16,7 +15,7 @@ Key points:
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@django-cms.org`_.
 
-        Please don't raise it on:
+        Please **do not** raise it on:
 
         * IRC
         * GitHub
@@ -24,6 +23,7 @@ Key points:
 
         or in any other public forum until we have had a chance to deal with it.
 
+..  _community-resources:
 
 *********
 Community
@@ -52,6 +52,7 @@ only for the stuff we host on GitHub:
 #. When you feel your code is good enough for inclusion, "send us a `pull
    request`_", by using the nice GitHub web interface.
 
+.. _contributing-code:
 
 *****************
 Contributing Code
@@ -79,9 +80,11 @@ The `GitHub help`_ is very well written and will get you started on using git
 and GitHub in a jiffy. It is an invaluable resource for newbies and old timers
 alike.
 
-
 Syntax and conventions
 ======================
+
+Python
+------
 
 We try to conform to `PEP8`_ as much as possible. A few highlights:
 
@@ -91,9 +94,35 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
   is "it should look good in a terminal-base editor" (eg vim), but we try not be
   [Godwin's law] about it.
 
-It is worth to mention that we use **tabs** within HTML, SASS/SCSS and JavaScript.
-Please refrain from using spaces anywhere except if it helps code readability.
+HTML, CSS and JavaScript
+------------------------
 
+As of django CMS 3.2, we are using the same guidelines as described in `Aldryn
+Boilerplate`_
+
+Frontend code should be formatted for readability. If in doubt, follow existing
+examples, or ask.
+
+JS Linting
+----------
+
+JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
+<http://jscs.info>`_. In order to run the linters you need to do this:
+
+.. code-block:: sh
+
+    gulp lint
+
+Or you can also run the watcher by just running ``gulp``.
+
+JS Bundling
+-----------
+
+Javascript files are split up for easier development, but in the end they are
+bundled together and minified to decrease amount of requests made and improve
+performance. In order to do that we use ``gulp`` task runner, where ``bundle``
+command is available. Configuration and list of dependencies for each bundle are
+stored inside the ``gulpfile.js``.
 
 Process
 =======
@@ -107,7 +136,7 @@ This is how you fix a bug or add a feature:
 #. Open a pull request.
 
 And at any point in that process, you can add: *discuss discuss discuss*,
-because it's always useful for everyone to pass ideas around and look at thngs
+because it's always useful for everyone to pass ideas around and look at things
 together.
 
 :ref:`testing` is really important: a pull request that lowers our testing
@@ -118,6 +147,7 @@ that the fix works.
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
 
+.. _contributing-documentation:
 
 **************************
 Contributing Documentation
@@ -127,14 +157,15 @@ Perhaps considered "boring" by hard-core coders, documentation is sometimes even
 more important than code! This is what brings fresh blood to a project, and
 serves as a reference for old timers. On top of this, documentation is the one
 area where less technical people can help most - you just need to write
-semi-decent English. People need to understand you. We don't care about style or
-correctness.
+simple, unfussy English. Elegance of style is a secondary consideration, and
+your prose can be improved later if necessary.
 
 Documentation should be:
 
 - written using valid `Sphinx`_/`restructuredText`_ syntax (see below for
-  specifics) and the file extension should be ``.rst``
-- written in English (we have standardised on British spellings)
+  specifics); the file extension should be ``.rst``
+- wrapped at 100 characters per line
+- written in English, using British English spelling and punctuation
 - accessible - you should assume the reader to be moderately familiar with
   Python and Django, but not anything else. Link to documentation of libraries
   you use, for example, even if they are "obvious" to you
@@ -167,17 +198,17 @@ Documentation structure
 
 Our documentation is divided into the following main sections:
 
-* :doc:`/introduction/index` (``introduction``): step-by-step tutorials to get
+* :doc:`/introduction/index` (``introduction``): step-by-step, beginning-to-end tutorials to get
   you up and running
-* :doc:`/how_to/index` (``how_to``): guides covering more advanced development
+* :doc:`/how_to/index` (``how_to``): step-by-step guides covering more advanced development
 * :doc:`/topics/index` (``topics``): explanations of key parts of the system
 * :doc:`/reference/index` (``reference``): technical reference for APIs, key
   models
   and so on
 * :doc:`/contributing/index` (``contributing``)
 * :doc:`/upgrade/index` (``upgrade``)
-* (in progress Using django CMS (``user``): guides for *using* rather than
-  setting up or developing for the CMS
+* :doc:`/user/index` (``user``): guides for *using* rather than setting up or developing for the
+  CMS
 
 
 Documentation markup
@@ -186,34 +217,96 @@ Documentation markup
 Sections
 --------
 
-We use Python documentation conventions for section marking:
+We mostly follow the Python documentation conventions for section marking::
 
-* ``#`` with overline, for parts
-* ``*`` with overline, for chapters
-* ``=``, for sections
-* ``-``, for subsections
-* ``^``, for subsubsections
-* ``"``, for paragraphs
+    ##########
+    Page title
+    ##########
+
+    *******
+    heading
+    *******
+
+    sub-heading
+    ===========
+
+    sub-sub-heading
+    ---------------
+
+    sub-sub-sub-heading
+    ^^^^^^^^^^^^^^^^^^^
+
+    sub-sub-sub-sub-heading
+    """""""""""""""""""""""
 
 Inline markup
 -------------
 
-* use backticks - ````settings.py```` - for:
-    * literals
-    * filenames
-    * names of fields and other items in the Admin interface:
-* use emphasis - ``*Home*`` around:
-    * the names of available options in the Admin
-    * values in or of fields
-* use strong emphasis - ``**Add page**`` around:
-    * buttons that perform an action
+* use backticks - `````` - for:
+    * literals::
+
+        The ``cms.models.pagemodel`` contains several important methods.
+
+    * filenames::
+
+        Before you start, edit ``settings.py``.
+
+    * names of fields and other specific items in the Admin interface::
+
+        Edit the ``Redirect`` field.
+
+* use emphasis - ``*Home*`` - around:
+    * the names of available options in or parts of the Admin::
+
+        To hide and show the *Toolbar*, use the...
+
+    * the names of important modes or states::
+
+        ... in order to switch to *Edit mode*.
+
+    * values in or of fields::
+
+        Enter *Home* in the field.
+
+* use strong emphasis - ``**`` - around:
+    * buttons that perform an action::
+
+        Hit **Save as draft**.
+
+Rules for using technical words
+-------------------------------
+
+There should be one consistent way of rendering any technical word, depending on its context.
+Please follow these rules:
+
+* in general use, simply use the word as if it were any ordinary word, with no capitalisation or
+  highlighting: "Your placeholder can now be used."
+* at the start of sentences or titles, capitalise in the usual way: "Placeholder management guide"
+* when introducing the term for the the first time, or for the first time in a document, you may
+  highlight it to draw attention to it: "**Placeholders** are special model fields".
+* when the word refers specifically to an object in the code, highlight it as a literal:
+  "``Placeholder`` methods can be overwritten as required" - when appropriate, link the term to
+  further reference documentation as well as simply highlighting it.
 
 References
 ----------
 
+Create::
+
+    .. _testing:
+
+and use::
+
+     :ref:`testing`
+
+internal cross-references liberally.
+
+
 Use absolute links to other documentation pages - ``:doc:`/how_to/toolbar``` -
 rather than relative links - ``:doc:`/../toolbar```. This makes it easier to
 run search-and-replaces when items are moved in the structure.
+
+.. _contributing-translations:
 
 ************
 Translations
@@ -223,7 +316,6 @@ For translators we have a `Transifex account
 <https://www.transifex.com/projects/p/django-cms/>`_ where you can translate
 the .po files and don't need to install git or mercurial to be able to
 contribute. All changes there will be automatically sent to the project.
-
 
     .. raw:: html
 
@@ -236,19 +328,65 @@ contribute. All changes there will be automatically sent to the project.
 Frontend
 ********
 
+In order to be able to work with the frontend tooling contributing to the
+django CMS you need to have the following dependencies installed:
 
-We are using `SASS/Compass <compass-style.org>`_ for our styles. The files
-are located within ``cms/static/cms/sass`` and can be compiled using the compass
-command ``compass watch cms/static/cms/`` from within the django-cms root.
+    1. `Node <https://nodejs.org/>`_ (will install npm as well).
+    2. `Globally installed gulp <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md#1-install-gulp-globally>`_
+    3. Local dependencies ``npm install``
 
-This will invoke the **config.rb** within ``cms/static/cms/`` using the predefined
-settings.
+Styles
+======
+
+We are using `Sass <http://sass-lang.com/>`_ for our styles. The files
+are located within ``cms/static/cms/sass`` and can be compiled using the
+`libsass <http://libsass.org/>`_ implementation of Sass compiler through
+`Gulp <http://gulpjs.com/>`_.
+
+In order to compile the stylesheets you need to run this command from the repo
+root::
+
+    gulp sass
+
+While developing it is also possible to run a watcher that compiles Sass files
+on change::
+
+    gulp
+
+By default, sourcemaps are not included in the compiled files. In order to turn
+them on while developing just add the ``--debug`` option::
+
+	gulp --debug
+
+Icons
+=====
+
+We are using `gulp-iconfont <https://github.com/backflip/gulp-iconfont>`_ to
+generate icon webfonts into ``cms/static/cms/fonts/``. This also creates
+``_iconography.scss`` within ``cms/static/cms/sass/components`` which adds all
+the icon classes and ultimately compiles to css.
+
+In order to compile the webfont you need to run::
+
+    gulp icons
+
+This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
+into the webfont. All classes will be automatically added to
+``_iconography.scss`` as previously mentioned.
+
+Additionally we created an SVG template within
+``cms/static/cms/font/src/_template.svgz`` that you should use when converting
+or creating additional icons. It is named *svgz* so it doesn't get compiled
+into the font. When using *Adobe Illustrator* please mind the
+`following settings <images/svg_settings.png>`_.
+
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
 .. _fork: http://github.com/divio/django-cms
 .. _Sphinx: http://sphinx.pocoo.org/
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
+.. _Aldryn Boilerplate : http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/guidelines/index.html
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _GitHub : http://www.github.com
 .. _GitHub help : http://help.github.com

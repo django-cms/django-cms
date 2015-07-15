@@ -240,7 +240,7 @@ processors you will need to change their function signature to add the extra
 argument.
 
 Apphooks
-========
+=========
 
 Apphooks have moved from the title to the page model. This means you can no
 longer have separate apphooks for each language. A new ``application instance name``

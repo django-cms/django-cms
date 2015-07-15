@@ -1,25 +1,26 @@
 from __future__ import with_statement
 import sys
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
+from django.core.exceptions import PermissionDenied
 from django.template import TemplateDoesNotExist
 from django.test.testcases import TestCase
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from menus.menu_pool import menu_pool
 
-from cms.api import _generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page
+from cms.api import _generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page, publish_page
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
+from cms.models.permissionmodels import GlobalPagePermission
 from cms.plugin_base import CMSPluginBase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
-from cms.utils.compat.dj import get_user_model
 
 
 def _grant_page_permission(user, codename):
@@ -76,7 +77,7 @@ class PythonAPITests(TestCase):
     def test_invalid_template(self):
         kwargs = self._get_default_create_page_arguments()
         kwargs['template'] = "not_valid.htm"
-        with SettingsOverride(CMS_TEMPLATES=(("not_valid.htm", "notvalid"),)):
+        with self.settings(CMS_TEMPLATES=[("not_valid.htm", "notvalid")]):
             self.assertRaises(TemplateDoesNotExist, create_page, **kwargs)
             kwargs['template'] = TEMPLATE_INHERITANCE_MAGIC
         create_page(**kwargs)
@@ -88,7 +89,7 @@ class PythonAPITests(TestCase):
             '%s.%s' % (APP_MODULE, APP_NAME),
         )
 
-        with SettingsOverride(CMS_APPHOOKS=apphooks):
+        with self.settings(CMS_APPHOOKS=apphooks):
             apphook_pool.clear()
             apphook = apphook_pool.get_apphook(APP_NAME)
             page = create_page(apphook=apphook,
@@ -213,7 +214,30 @@ class PythonAPITests(TestCase):
         self.assertEqual(page.get_title_obj_attribute('path'), 'test/home')
 
     def test_create_reverse_id_collision(self):
-
         create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertTrue(Page.objects.count(), 2)
+
+    def test_publish_page(self):
+        page_attrs = self._get_default_create_page_arguments()
+        page_attrs['language'] = 'en'
+        page_attrs['published'] = False
+        page = create_page(**page_attrs)
+        self.assertFalse(page.is_published('en'))
+        self.assertEqual(page.changed_by, 'script')
+        user = get_user_model().objects.create_user(username='user', email='user@django-cms.org',
+                                                    password='user')
+        # Initially no permission
+        self.assertRaises(PermissionDenied, publish_page, page, user, 'en')
+        user.is_staff = True
+        user.save()
+        # Permissions are cached on user instances, so create a new one.
+        user = get_user_model().objects.get(pk=user.pk)
+        _grant_page_permission(user, 'publish')
+        gpp = GlobalPagePermission.objects.create(user=user, can_publish=True)
+        gpp.sites.add(page.site)
+        publish_page(page, user, 'en')
+        # Reload the page to get updates.
+        page = page.reload()
+        self.assertTrue(page.is_published('en'))
+        self.assertEqual(page.changed_by, user.get_username())

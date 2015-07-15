@@ -1,124 +1,115 @@
 {% load i18n l10n %}
 
 {% language request.toolbar.toolbar_language %}
-<div id="cms_toolbar" class="cms_reset{% if not user.is_authenticated %} cms_toolbar-auth{% endif %}{% if debug %} cms_toolbar-debug{% endif %}" dir="ltr">
+<div id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr">
 
-	{# debug, tooltip #}
-	<div class="cms_debug-bar"></div>
-	<div class="cms_tooltip">{% trans "Double-click to edit" %}<span></span></div>
+    {# debug, tooltip #}
+    <div class="cms-debug-bar"></div>
+    <div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
 
-	{# start: toolbar #}
-	<div class="cms_toolbar">
-		<div class="cms_toolbar-left">
-			{% include "cms/toolbar/items/logo.html" %}
+    {# start: toolbar #}
+    <div class="cms-toolbar">
+        <div class="cms-toolbar-left">
+            {% include "cms/toolbar/items/logo.html" %}
 
-			{% if not user.is_authenticated %}
-			{% include "cms/toolbar/items/login.html" %}
-			{% else %}
-			<ul class="cms_toolbar-item cms_toolbar-item-navigation">
-				{% for item in request.toolbar.get_left_items %}
-					{{ item.render }}
-				{% endfor %}
-			</ul>
-			{% endif %}
-		</div>
+            {% if not user.is_authenticated %}
+            {% include "cms/toolbar/items/login.html" %}
+            {% else %}
+            <ul class="cms-toolbar-item cms-toolbar-item-navigation">
+                {% for item in request.toolbar.get_left_items %}
+                    {{ item.render }}
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
 
-		<div class="cms_toolbar-right">
-			{% for item in request.toolbar.get_right_items %}
-				{{ item.render }}
-			{% endfor %}
-			{% if request.toolbar.can_change %}
-			<div class="cms_toolbar-item cms_toolbar-item_switch{% if not request.toolbar.edit_mode %} cms_toolbar-item_switch-active{% endif %}">
-				<a href="{% if request.toolbar.edit_mode %}?{{ request.toolbar.edit_mode_url_off }}{% else %}?{{ request.toolbar.edit_mode_url_on }}{% endif %}">
-					<span class="cms_toolbar-item_switch-on">{% trans "Live" %}</span>
-					<span class="cms_toolbar-item_switch-off">{% trans "Draft" %}</span>
-				</a>
-				<span class="cms_toolbar-item_switch-knob">{% trans "Change" %}</span>
-			</div>
-			{% endif %}
-		</div>
-	</div>
-	<div class="cms_toolbar-trigger"><a href="#">{% trans "Toggle toolbar" %}</a></div>
-	{# end: toolbar #}
+        <div class="cms-toolbar-right">
+            {% for item in request.toolbar.get_right_items %}
+                {{ item.render }}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="cms-toolbar-trigger"><a href="#" title="{% trans 'Toggle toolbar' %}"><span class="cms-icon cms-icon-arrow"></span></a></div>
+    {# end: toolbar #}
 
-	{# start: messages #}
-	<div class="cms_messages">
-		<div class="cms_messages-close"></div>
-		<div class="cms_messages-inner"></div>
-	</div>
-	{# end: messages #}
+    {# start: messages #}
+    <div class="cms-messages">
+        <div class="cms-messages-close" title="{% trans 'Close' %}"><span class="cms-icon cms-icon-close"></span></div>
+        <div class="cms-messages-inner"></div>
+    </div>
+    {# end: messages #}
 
-	{# start: sidebar #}
-	<div class="cms_sideframe">
-		<div class="cms_sideframe-resize"><span class="cms_sideframe-knob"></span></div>
-		<div class="cms_sideframe-frame"></div>
-		<div class="cms_sideframe-shim"></div>
-		<div class="cms_sideframe-btn">
-			<div class="cms_sideframe-close"></div>
-			<div class="cms_sideframe-hide"></div>
-			<div class="cms_sideframe-maximize"></div>
-		</div>
-		<div class="cms_sideframe-copy"></div>
-	</div>
-	{# end: sidebar #}
+    {# start: sidebar #}
+    <div class="cms-sideframe">
+        <div class="cms-sideframe-resize"><span class="cms-sideframe-knob"></span></div>
+        <div class="cms-sideframe-frame"></div>
+        <div class="cms-sideframe-shim"></div>
+        <div class="cms-sideframe-btn">
+            <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
+            <div class="cms-sideframe-hide"><span class="cms-icon cms-icon-arrow"></span></div>
+            <div class="cms-sideframe-maximize"><span class="cms-icon cms-icon-window"></span></div>
+        </div>
+        <div class="cms-sideframe-copy"></div>
+    </div>
+    {# end: sidebar #}
 
-	{# start: clipboard #}
-	{{ clipboard }}
-	{# end: clipboard #}
+    {# start: addons #}
+    {{ addons }}
+    {# end: addons #}
 
-	{# start: modal #}
-	<div class="cms_modal">
-		<div class="cms_modal-head">
-			<span class="cms_modal-title">&nbsp;</span>
-			<span class="cms_modal-collapse">-</span>
-			<span class="cms_modal-maximize">+</span>
-			<span class="cms_modal-close">x</span>
-		</div>
-		<div class="cms_modal-body">
-			<div class="cms_modal-shim"></div>
-			<div class="cms_modal-frame"></div>
-		</div>
-		<div class="cms_modal-foot">
-			<div class="cms_modal-breadcrumb">
-				<span class="cms_modal-breadcrumb-title">{% trans "Start" %}</span>
-				<span class="cms_modal-breadcrumb-items">&nbsp;</span>
-			</div>
-			<div class="cms_modal-buttons"></div>
-			<div class="cms_modal-resize"></div>
-		</div>
-	</div>
-	{# end: modal #}
+    {# start: modal #}
+    <div class="cms-modal">
+        <div class="cms-modal-head">
+            <span class="cms-modal-title">&nbsp;</span>
+            <span class="cms-modal-collapse cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
+            <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
+            <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
+        </div>
+        <div class="cms-modal-body">
+            <div class="cms-modal-shim"></div>
+            <div class="cms-modal-frame"></div>
+        </div>
+        <div class="cms-modal-foot">
+            <div class="cms-modal-breadcrumb">
+                <span class="cms-modal-breadcrumb-title cms-icon cms-icon-home" title="{% trans 'Breadcrumbs' %}"></span>
+                <span class="cms-modal-breadcrumb-items">&nbsp;</span>
+            </div>
+            <div class="cms-modal-buttons"></div>
+            <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
+        </div>
+    </div>
+    {# end: modal #}
 
-	{# start: structure #}
-	<div class="cms_structure">
-		<div class="cms_structure-content">
-			{% for placeholder in request.toolbar.placeholders.values %}
-			<div class="cms_dragarea cms_dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms_dragarea-static{% endif %}">
-				{% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
+    {# start: structure #}
+    <div class="cms-structure">
+        <div class="cms-structure-content">
+            {% for placeholder in request.toolbar.placeholders.values %}
+            <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
+                {% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
-				{# <div class="cms_dragitem cms_dragitem-1888"> #}
-				<div class="cms_draggables">
-				{% with placeholder.slot as slot %}
-				{% for plugin in placeholder.get_cached_plugins %}
-					{% include "cms/toolbar/dragitem.html" with plugin=plugin %}
-				{% endfor %}
-				{% endwith %}
-				</div>
-				{# </div> #}
-			</div>
-			{% endfor %}
-		</div>
-		<div class="cms_structure-dimmer"></div>
-	</div>
-	{# end: structure #}
+                {# <div class="cms-dragitem cms-dragitem-1888"> #}
+                <div class="cms-draggables">
+                {% with placeholder.slot as slot %}
+                {% for plugin in placeholder.get_cached_plugins %}
+                    {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+                {% endfor %}
+                {% endwith %}
+                </div>
+                {# </div> #}
+            </div>
+            {% endfor %}
+        </div>
+        <div class="cms-structure-dimmer"></div>
+    </div>
+    {# end: structure #}
 
-	{% if request.toolbar.redirect_url %}
-	<div class="cms_screenblock">
-		<div class="cms_screenblock-inner">
-			<h1>{% trans "This page has no preview!" %}</h1>
-			<p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
-		</div>
-	</div>
-	{% endif %}
+    {% if request.toolbar.redirect_url %}
+    <div class="cms-screenblock">
+        <div class="cms-screenblock-inner">
+            <h1>{% trans "This page has no preview!" %}</h1>
+            <p>{% trans "It is being redirected to:" %} <a href="{{ request.toolbar.redirect_url }}">{{ request.toolbar.redirect_url }}</a></p>
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endlanguage %}

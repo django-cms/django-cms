@@ -28,6 +28,12 @@ class PageExtensionAdmin(ExtensionAdmin):
             raise PermissionDenied()
         obj.delete()
 
+    def get_model_perms(self, request):
+        """
+        Return empty perms dict thus hiding the model from admin index.
+        """
+        return {}
+
     def get_queryset(self, request):
         return super(PageExtensionAdmin, self).get_queryset(request).filter(extended_object__publisher_is_draft=True)
 
@@ -69,6 +75,12 @@ class TitleExtensionAdmin(ExtensionAdmin):
             raise PermissionDenied()
         obj.delete()
 
+    def get_model_perms(self, request):
+        """
+        Return empty perms dict thus hiding the model from admin index.
+        """
+        return {}
+
     def get_queryset(self, request):
         return super(TitleExtensionAdmin, self).get_queryset(request).filter(extended_object__page__publisher_is_draft=True)
 
@@ -91,4 +103,3 @@ class TitleExtensionAdmin(ExtensionAdmin):
             except self.model.DoesNotExist:
                 pass
         return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)
-

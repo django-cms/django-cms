@@ -97,7 +97,7 @@ Adding a Toolbar Menu Item for your Page extension
 You'll also want to make your model editable from the cms toolbar in order to
 associate each instance of the extension model with a page. (Page isn't an
 editable attribute in the default admin interface.).
-To add toolbar items for your extension creare a file named ``cms_toolbar.py``
+To add toolbar items for your extension create a file named ``cms_toolbar.py``
 in one of your apps, and add the relevant menu entries for the extension on each page.
 
 
@@ -109,6 +109,7 @@ Simplified toolbar API
 
 Since 3.0.6 a simplified toolbar API is available to handle the more common cases::
 
+    from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
     from django.utils.translation import ugettext_lazy as _
     from .models import IconExtension
@@ -187,7 +188,7 @@ low-level API to edit the toolbar according to your needs::
                 # Nothing to do
                 return
 
-            # check global permissions if CMS_PERMISSIONS is active
+            # check global permissions if CMS_PERMISSION is active
             if get_cms_setting('PERMISSION'):
                 has_global_current_page_change_permission = has_page_change_permission(self.request)
             else:

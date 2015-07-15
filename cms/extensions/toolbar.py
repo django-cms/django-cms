@@ -61,7 +61,7 @@ class ExtensionToolbar(CMSToolbar):
         if not page:
             # Nothing to do
             return
-        # check global permissions if CMS_PERMISSIONS is active
+        # check global permissions if CMS_PERMISSION is active
         if get_cms_setting('PERMISSION'):
             has_global_current_page_change_permission = has_page_change_permission(self.request)
         else:
@@ -124,7 +124,7 @@ class ExtensionToolbar(CMSToolbar):
         page = self._get_page()
         urls = []
         if language:
-            titles = page.get_title_object(language),
+            titles = page.get_title_obj(language),
         else:
             titles = page.title_set.all()
         # Titles

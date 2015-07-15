@@ -4,9 +4,9 @@ from collections import defaultdict
 
 from django.template.loader import render_to_string
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
-from cms.utils.compat.dj import force_unicode
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 
 
@@ -37,7 +37,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
     RIGHT = RIGHT
-    
+
     def __init__(self):
         self.items = []
         self.menus = {}
@@ -214,7 +214,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % force_unicode(self.name)
+        return '<Menu:%s>' % force_text(self.name)
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -257,7 +257,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % force_unicode(self.name)
+        return '<LinkItem:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -274,7 +274,7 @@ class SideframeItem(BaseItem):
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT):
         super(SideframeItem, self).__init__(side)
-        self.name = "%s ..." % force_unicode(name)
+        self.name = "%s ..." % force_text(name)
         self.url = url
         self.active = active
         self.disabled = disabled
@@ -282,7 +282,7 @@ class SideframeItem(BaseItem):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % force_unicode(self.name)
+        return '<SideframeItem:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -299,7 +299,7 @@ class ModalItem(SideframeItem):
     template = "cms/toolbar/items/item_modal.html"
 
     def __repr__(self):
-        return '<ModalItem:%s>' % force_unicode(self.name)
+        return '<ModalItem:%s>' % force_text(self.name)
 
 
 class AjaxItem(BaseItem):
@@ -320,7 +320,7 @@ class AjaxItem(BaseItem):
         self.on_success = on_success
 
     def __repr__(self):
-        return '<AjaxItem:%s>' % force_unicode(self.name)
+        return '<AjaxItem:%s>' % force_text(self.name)
 
     def get_context(self):
         data = {}
@@ -370,7 +370,7 @@ class Button(BaseButton):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<Button:%s>' % force_unicode(self.name)
+        return '<Button:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -394,7 +394,7 @@ class ModalButton(Button):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<ModalButton:%s>' % force_unicode(self.name)
+        return '<ModalButton:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -411,7 +411,7 @@ class SideframeButton(ModalButton):
     template = "cms/toolbar/items/button_sideframe.html"
 
     def __repr__(self):
-        return '<SideframeButton:%s>' % force_unicode(self.name)
+        return '<SideframeButton:%s>' % force_text(self.name)
 
 
 class ButtonList(BaseItem):
@@ -443,6 +443,16 @@ class ButtonList(BaseItem):
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
         item = ModalButton(name, url,
+                      active=active,
+                      disabled=disabled,
+                      extra_classes=extra_classes,
+                      on_close=on_close,
+        )
+        self.buttons.append(item)
+        return item
+
+    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
+        item = SideframeButton(name, url,
                       active=active,
                       disabled=disabled,
                       extra_classes=extra_classes,

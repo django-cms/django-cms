@@ -10,7 +10,7 @@ Python APIs for creating CMS contents. This is done in :mod:`cms.api` and not
 on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers. Also the functions defined in this
 module do sanity checks on arguments.
-    
+
 .. warning:: None of the functions in this module does any security or permission
              checks. They verify their input values to be sane wherever
              possible, however permission checks should be implemented manually
@@ -55,10 +55,10 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to authenticated users.
 
 
-.. data:: VISIBILITY_STAFF
+.. data:: VISIBILITY_ANONYMOUS
 
     Used for the ``limit_menu_visibility`` keyword argument to
-    :func:`create_page`. Limits menu visibility to staff users.
+    :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
 .. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
@@ -66,7 +66,7 @@ Functions and constants
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
     creates a :class:`cms.models.titlemodel.Title` instance for the specified
     language.
-    
+
     :param string title: Title of the page
     :param string template: Template to use for this page. Must be in :setting:`CMS_TEMPLATES`
     :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
@@ -92,13 +92,13 @@ Functions and constants
     :type site: :class:`django.contrib.sites.models.Site` instance
     :param bool login_required: Whether users must be logged in or not to view this page
     :param limit_menu_visibility: Limits visibility of this page in the menu
-    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_STAFF`
+    :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
 
 
 .. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None)
-    
+
     Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
 
     :param string language: Language code for this page. Must be in :setting:`django:LANGUAGES`
@@ -123,15 +123,15 @@ Functions and constants
     :param plugin_type: What type of plugin to add
     :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` subclass, must be a valid plugin
     :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
-    :param string position: Position to add this plugin to the placeholder, must be a valid django-treebeard position
+    :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
     :param target: Parent plugin. Must be plugin instance
     :param kwargs data: Data for the plugin type instance
 
 
-.. function:: create_page_user(created_by, user, can_add_page=True, can_change_page=True, can_delete_page=True, can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, can_delete_pageuser=True, can_add_pagepermission=True, can_change_pagepermission=True, can_delete_pagepermission=True, grant_all=False) 
-    
+.. function:: create_page_user(created_by, user, can_add_page=True, can_change_page=True, can_delete_page=True, can_recover_page=True, can_add_pageuser=True, can_change_pageuser=True, can_delete_pageuser=True, can_add_pagepermission=True, can_change_pagepermission=True, can_delete_pagepermission=True, grant_all=False)
+
     Creates a page user for the user provided and returns that page user.
-    
+
     :param created_by: The user that creates the page user
     :type created_by: :class:`django.contrib.auth.models.User` instance
     :param user: The user to create the page user from
@@ -141,11 +141,11 @@ Functions and constants
 
 
 .. function:: assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=False, can_change=False, can_delete=False, can_change_advanced_settings=False, can_publish=False, can_change_permissions=False, can_move_page=False, grant_all=False)
-    
-    Assigns a user to a page and gives them some permissions. Returns the 
+
+    Assigns a user to a page and gives them some permissions. Returns the
     :class:`cms.models.permissionmodels.PagePermission` object that gets
     created.
-    
+
     :param page: The page to assign the user to
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user to assign to the page
@@ -154,17 +154,26 @@ Functions and constants
     :type grant_on: :data:`cms.models.permissionmodels.ACCESS_PAGE`, :data:`cms.models.permissionmodels.ACCESS_CHILDREN`, :data:`cms.models.permissionmodels.ACCESS_DESCENDANTS` or :data:`cms.models.permissionmodels.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
-    
+
 
 .. function:: publish_page(page, user, language)
 
     Publishes a page.
-    
+
     :param page: The page to publish
     :type page: :class:`cms.models.pagemodel.Page` instance
     :param user: The user that performs this action
     :type user: :class:`django.contrib.auth.models.User` instance
     :param string language: The target language to publish to
+
+.. function:: publish_pages(include_unpublished=False, language=None, site=None)
+
+    Publishes multiple pages defined by parameters.
+
+    :param bool include_unpublished: Set to ``True`` to publish all drafts, including unpublished ones; otherwise, only already published pages will be republished
+    :param string language: If given, only pages in this language will be published; otherwise, all languages will be published
+    :param site: Specify a site to publish pages for specified site only; if not specified pages from all sites are published
+    :type site: :class:`django.contrib.sites.models.Site` instance
 
 .. function:: get_page_draft(page):
 
@@ -199,7 +208,7 @@ Create a page called ``'My Page`` using the template ``'my_template.html'`` and
 add a text plugin with the content ``'hello world'``. This is done in English::
 
     from cms.api import create_page, add_plugin
-    
+
     page = create_page('My Page', 'my_template.html', 'en')
     placeholder = page.placeholders.get(slot='body')
     add_plugin(placeholder, 'TextPlugin', 'en', body='hello world')
@@ -239,17 +248,17 @@ cms.plugin_base
 .. class:: CMSPluginBase
 
     Inherits ``django.contrib.admin.options.ModelAdmin``.
-        
+
     .. attribute:: admin_preview
-    
+
         Defaults to ``False``, if ``True`` there will be a preview in the admin.
-        
+
     .. attribute:: change_form_template
 
-        Custom template to use to render the form to edit this plugin.    
-    
+        Custom template to use to render the form to edit this plugin.
+
     .. attribute:: form
-    
+
         Custom form class to be used to edit this plugin.
 
     .. method:: get_plugin_urls(instance)
@@ -264,43 +273,43 @@ cms.plugin_base
         Is the :class:`CMSPlugin` model we created earlier. If you don't need
         model because you just want to display some template logic, use
         :class:`CMSPlugin` from :mod:`cms.models` as the model instead.
-        
+
     .. attribute:: module
 
         Will group the plugin in the plugin editor. If module is ``None``,
         plugin is grouped "Generic" group.
-    
+
     .. attribute:: name
-        
+
         Will be displayed in the plugin editor.
-        
+
     .. attribute:: render_plugin
-    
+
         If set to ``False``, this plugin will not be rendered at all.
-        
+
     .. attribute:: render_template
-    
+
         Will be rendered with the context returned by the render function.
-        
+
     .. attribute:: text_enabled
-    
+
         Whether this plugin can be used in text plugins or not.
-        
+
     .. method:: icon_alt(instance)
-        
+
         Returns the alt text for the icon used in text plugins, see
-        :meth:`icon_src`. 
-        
+        :meth:`icon_src`.
+
     .. method:: icon_src(instance)
-    
+
         Returns the url to the icon to be used for the given instance when that
         instance is used inside a text plugin.
-        
+
     .. method:: render(context, instance, placeholder)
-    
+
         This method returns the context to be used to render the template
         specified in :attr:`render_template`.
-        
+
         :param context: Current template context.
         :param instance: Plugin instance that is being rendered.
         :param placeholder: Name of the placeholder the plugin is in.
@@ -366,6 +375,11 @@ cms.toolbar.toolbar
     .. attribute:: toolbar_language
 
         Language used by the toolbar.
+
+    .. attribute:: watch_models
+
+        A list of model this toolbar works on; used for redirections after editing
+        (:ref:`url_changes`).
 
     .. method:: add_item(item, position=None)
 
@@ -612,7 +626,7 @@ menus.base
 .. class:: NavigationNode(title, url, id[, parent_id=None][, parent_namespace=None][, attr=None][, visible=True])
 
     A navigation node in a menu tree.
-        
+
     :param string title: The title to display this menu item with.
     :param string url: The URL associated with this menu item.
     :param id: Unique (for the current tree) ID of this item.

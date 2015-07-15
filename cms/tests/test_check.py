@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+from copy import deepcopy
 import os
-import unittest
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, base
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from cms.api import add_plugin
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.test_utils.project.extensionapp.models import MyPageExtension
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
-from cms.utils.compat import DJANGO_1_6
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
@@ -51,21 +51,21 @@ class CheckAssertMixin(object):
             self.assertEqual(getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key)))
 
 
-class CheckTests(unittest.TestCase, CheckAssertMixin):
+class CheckTests(CheckAssertMixin, SimpleTestCase):
     def test_test_confs(self):
         self.assertCheck(True, errors=0, warnings=0)
 
     def test_cms_moderator_deprecated(self):
-        with SettingsOverride(CMS_MODERATOR=True):
+        with self.settings(CMS_MODERATOR=True):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_cms_flat_urls_deprecated(self):
-        with SettingsOverride(CMS_FLAT_URLS=True):
+        with self.settings(CMS_FLAT_URLS=True):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_no_sekizai(self):
         if DJANGO_1_6:
-            with SettingsOverride(INSTALLED_APPS=['cms', 'menus']):
+            with self.settings(INSTALLED_APPS=['cms', 'menus']):
                 old_libraries = base.libraries
                 base.libraries = {}
                 old_templatetags_modules = base.templatetags_modules
@@ -73,7 +73,7 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
                 self.assertRaises(TemplateSyntaxError, check, TestOutput())
                 base.libraries = old_libraries
                 base.templatetags_modules = old_templatetags_modules
-        else:
+        elif DJANGO_1_7:
             from django.apps import apps
             apps.set_available_apps(['cms', 'menus'])
             old_libraries = base.libraries
@@ -84,33 +84,63 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
             base.libraries = old_libraries
             base.templatetags_modules = old_templatetags_modules
             apps.unset_available_apps()
+        else:
+            from django.apps import apps
+            base.get_templatetags_modules.cache_clear()
+            apps.set_available_apps(['cms', 'menus'])
+            self.assertCheck(False, errors=2)
+            apps.unset_available_apps()
 
     def test_no_sekizai_template_context_processor(self):
-        with SettingsOverride(TEMPLATE_CONTEXT_PROCESSORS=[]):
+        if DJANGO_1_7:
+            override = {'TEMPLATE_CONTEXT_PROCESSORS': []}
+        else:
+            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+            override['TEMPLATES'][0]['OPTIONS']['context_processors'] = []
+        with self.settings(**override):
             self.assertCheck(False, errors=2)
 
     def test_old_style_i18n_settings(self):
-        with SettingsOverride(CMS_LANGUAGES=[('en', 'English')]):
+        with self.settings(CMS_LANGUAGES=[('en', 'English')]):
             self.assertRaises(ImproperlyConfigured, self.assertCheck, True, warnings=1, errors=0)
 
     def test_cms_hide_untranslated_deprecated(self):
-        with SettingsOverride(CMS_HIDE_UNTRANSLATED=True):
+        with self.settings(CMS_HIDE_UNTRANSLATED=True):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_cms_language_fallback_deprecated(self):
-        with SettingsOverride(CMS_LANGUAGE_FALLBACK=True):
+        with self.settings(CMS_LANGUAGE_FALLBACK=True):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_cms_language_conf_deprecated(self):
-        with SettingsOverride(CMS_LANGUAGE_CONF=True):
+        with self.settings(CMS_LANGUAGE_CONF=True):
             self.assertCheck(True, warnings=1, errors=0)
 
+    def test_middlewares(self):
+        MIDDLEWARE_CLASSES=[
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.http.ConditionalGetMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.doc.XViewMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        self.assertCheck(True, warnings=0, errors=0)
+        with self.settings(MIDDLEWARE_CLASSES=MIDDLEWARE_CLASSES):
+            self.assertCheck(False, warnings=0, errors=2)
+
     def test_cms_site_languages_deprecated(self):
-        with SettingsOverride(CMS_SITE_LANGUAGES=True):
+        with self.settings(CMS_SITE_LANGUAGES=True):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_cms_frontend_languages_deprecated(self):
-        with SettingsOverride(CMS_FRONTEND_LANGUAGES=True):
+        with self.settings(CMS_FRONTEND_LANGUAGES=True):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_copy_relations_fk_check(self):
@@ -142,27 +172,33 @@ class CheckTests(unittest.TestCase, CheckAssertMixin):
             'project',
             'alt_templates'
         )
-        with SettingsOverride(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
-            self.assertCheck(True, warnings=1, errors=0)
+        if DJANGO_1_7:
+            with self.settings(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
+                self.assertCheck(True, warnings=1, errors=0)
+        else:
+            NEWTEMPLATES = deepcopy(settings.TEMPLATES)
+            NEWTEMPLATES[0]['DIRS'] = [alt_dir]
+            with self.settings(TEMPLATES=NEWTEMPLATES, CMS_TEMPLATES=[]):
+                self.assertCheck(True, warnings=1, errors=0)
 
     def test_non_numeric_site_id(self):
         self.assertCheck(True, warnings=0, errors=0)
-        with SettingsOverride(SITE_ID='broken'):
+        with self.settings(SITE_ID='broken'):
             self.assertCheck(False, warnings=0, errors=1)
 
 
-class CheckWithDatabaseTests(TestCase, CheckAssertMixin):
+class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
 
     def test_check_plugin_instances(self):
         self.assertCheck(True, warnings=0, errors=0 )
 
-        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp"]
-        with SettingsOverride(INSTALLED_APPS=apps):
+        apps = ["cms", "menus", "sekizai", "cms.test_utils.project.sampleapp", "treebeard"]
+        with self.settings(INSTALLED_APPS=apps):
             placeholder = Placeholder.objects.create(slot="test")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, TextPlugin, "en", body="en body")
             add_plugin(placeholder, "LinkPlugin", "en",
-                name="A Link", url="https://www.django-cms.org")
+                       name="A Link", url="https://www.django-cms.org")
 
             # create a CMSPlugin with an unsaved instance
             instanceless_plugin = CMSPlugin(language="en", plugin_type="TextPlugin")

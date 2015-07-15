@@ -16,7 +16,11 @@ from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext_lazy as _
-from django.utils.datastructures import SortedDict
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
@@ -26,13 +30,12 @@ class CMSToolbarLoginForm(AuthenticationForm):
         kwargs['prefix'] = kwargs.get('prefix', 'cms')
         super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)
 
-    def check_for_test_cookie(self): pass  # for some reason this test fails in our case. but login works.
-
 
 class CMSToolbar(ToolbarAPIMixin):
     """
     The default CMS Toolbar
     """
+    watch_models = []
 
     def __init__(self, request):
         super(CMSToolbar, self).__init__()
@@ -41,41 +44,25 @@ class CMSToolbar(ToolbarAPIMixin):
         self.populated = False
         self.post_template_populated = False
         self.menus = {}
-        self.request = request
-        self.login_form = CMSToolbarLoginForm(request=request)
-        self.is_staff = self.request.user.is_staff
-        self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
-        self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
-        self.use_draft = self.is_staff and self.edit_mode or self.build_mode
-        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         self.obj = None
         self.redirect_url = None
-        if settings.USE_I18N:
-            self.language = get_language_from_request(request)
-        else:
-            self.language = settings.LANGUAGE_CODE
+        self.request = None
+        self.is_staff = None
+        self.edit_mode = None
+        self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        self.disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+        self.build_mode = None
+        self.use_draft = None
+        self.show_toolbar = None
+        self.login_form = None
+        self.clipboard = None
+        self.language = None
+        self.toolbar_language = None
+        self.simple_structure_mode = getattr(settings, 'CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE', False)
+        self.show_toolbar = True
+        self.init_toolbar(request)
 
-        # We need to store the current language in case the user's preferred language is different.
-        self.toolbar_language = self.language
-
-        if self.is_staff:
-            try:
-                user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
-            except UserSettings.DoesNotExist:
-                user_settings = UserSettings(language=self.language, user=self.request.user)
-                placeholder = Placeholder(slot="clipboard")
-                placeholder.save()
-                user_settings.clipboard = placeholder
-                user_settings.save()
-            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
-                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
-                self.toolbar_language = user_settings.language
-            else:
-                user_settings.language = self.language
-                user_settings.save()
-            self.clipboard = user_settings.clipboard
         with force_language(self.language):
             try:
                 decorator = resolve(self.request.path_info).func
@@ -104,10 +91,67 @@ class CMSToolbar(ToolbarAPIMixin):
                 break
             parts.pop()
 
-        self.toolbars = SortedDict()
+        self.toolbars = OrderedDict()
         for key in toolbars:
             toolbar = toolbars[key](self.request, self, toolbars[key].check_current_app(key, self.app_name), self.app_name)
             self.toolbars[key] = toolbar
+
+    def init_toolbar(self, request):
+        self.request = request
+        self.is_staff = self.request.user.is_staff
+        self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
+        self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
+        self.use_draft = self.is_staff and self.edit_mode or self.build_mode
+        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.login_form = CMSToolbarLoginForm(request=request)
+        if self.request.session.get('cms_toolbar_disabled', False):
+            self.show_toolbar = False
+        if settings.USE_I18N:
+            self.language = get_language_from_request(request)
+        else:
+            self.language = settings.LANGUAGE_CODE
+
+        # We need to store the current language in case the user's preferred language is different.
+        self.toolbar_language = self.language
+
+        user_settings = self.get_user_settings()
+        if user_settings:
+            if (settings.USE_I18N and user_settings.language in dict(settings.LANGUAGES)) or (
+                    not settings.USE_I18N and user_settings.language == settings.LANGUAGE_CODE):
+                self.toolbar_language = user_settings.language
+            else:
+                user_settings.language = self.language
+                user_settings.save()
+            self.clipboard = user_settings.clipboard
+
+        if hasattr(self, 'toolbars'):
+            for key, toolbar in self.toolbars.items():
+                self.toolbars[key].request = self.request
+
+    def get_user_settings(self):
+        user_settings = None
+        if self.is_staff:
+            try:
+                user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
+            except UserSettings.DoesNotExist:
+                user_settings = UserSettings(language=self.language, user=self.request.user)
+                placeholder = Placeholder(slot="clipboard")
+                placeholder.save()
+                user_settings.clipboard = placeholder
+                user_settings.save()
+        return user_settings
+
+    def render_addons(self, context):
+        addons = []
+        for toolbar in self.toolbars.values():
+            addons.extend(toolbar.render_addons(context))
+        return ''.join(addons)
+
+    def post_template_render_addons(self, context):
+        addons = []
+        for toolbar in self.toolbars.values():
+            addons.extend(toolbar.post_template_render_addons(context))
+        return ''.join(addons)
 
     @property
     def csrf_token(self):
@@ -183,6 +227,27 @@ class CMSToolbar(ToolbarAPIMixin):
             return self.obj.pk
         return ''
 
+    def get_object_public_url(self):
+        if self.obj:
+            with force_language(self.request.LANGUAGE_CODE):
+                try:
+                    return self.obj.get_public_url()
+                except:
+                    pass
+        return ''
+
+    def get_object_draft_url(self):
+        if self.obj:
+            with force_language(self.request.LANGUAGE_CODE):
+                try:
+                    return self.obj.get_draft_url()
+                except:
+                    try:
+                        return self.obj.get_absolute_url()
+                    except:
+                        pass
+        return ''
+
     # Internal API
 
     def _add_item(self, item, position):
@@ -209,12 +274,6 @@ class CMSToolbar(ToolbarAPIMixin):
         else:
             return self.left_items.index(item)
 
-    def get_clipboard_plugins(self):
-        self.populate()
-        if not hasattr(self, "clipboard"):
-            return []
-        return self.clipboard.get_plugins()
-
     def get_left_items(self):
         self.populate()
         return self.left_items
@@ -231,7 +290,9 @@ class CMSToolbar(ToolbarAPIMixin):
             return
         self.populated = True
         # never populate the toolbar on is_staff=False
-        if not self.is_staff:
+        # FIXME: In 3.1 we should really update the request/staff status
+        # when toolbar is used in the cms_toolbar templatetag
+        if not self.request.user.is_staff:
             return
         if self.request.session.get('cms_log_latest', False):
             del self.request.session['cms_log_latest']
@@ -242,7 +303,9 @@ class CMSToolbar(ToolbarAPIMixin):
         if self.post_template_populated:
             return
         self.post_template_populated = True
-        if not self.is_staff:
+        # FIXME: In 3.1 we should really update the request/staff status
+        # when toolbar is used in the cms_toolbar templatetag
+        if not self.request.user.is_staff:
             return
         self._call_toolbar('post_template_populate')
 
@@ -292,4 +355,3 @@ class CMSToolbar(ToolbarAPIMixin):
                 result = getattr(toolbar, func_name)()
                 if isinstance(result, HttpResponse):
                     return result
-

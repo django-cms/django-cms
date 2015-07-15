@@ -4,11 +4,12 @@ import datetime
 import os
 import time
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
-from django.test import LiveServerTestCase
+from django.test.utils import override_settings
 from django.utils import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,24 +22,28 @@ from cms.api import create_page, create_title, add_plugin
 from cms.appresolver import clear_app_resolvers
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import AppAlreadyRegistered
-from cms.models import Page, CMSPlugin
+from cms.models import CMSPlugin, Page, Placeholder
 from cms.test_utils.project.placeholderapp.cms_app import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import SettingsOverrideTestCase
-from cms.test_utils.util.context_managers import SettingsOverride
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.dj import get_user_model
+from cms.utils.compat import DJANGO_1_6
 from cms.utils.conf import get_cms_setting
 
+if DJANGO_1_6:
+    from django.test import LiveServerTestCase as StaticLiveServerTestCase
+else:
+    from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-class CMSLiveTests(LiveServerTestCase, CMSTestCase):
+
+class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
+    driver = None
     @classmethod
     def setUpClass(cls):
-        super(CMSLiveTests, cls).setUpClass()
-        cache.clear()
         if os.environ.get('SELENIUM', '') != '':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
+        super(CMSLiveTests, cls).setUpClass()
+        cache.clear()
         if os.environ.get("TRAVIS_BUILD_NUMBER"):
             capabilities = webdriver.DesiredCapabilities.CHROME
             capabilities['version'] = '31'
@@ -59,7 +64,8 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.driver.quit()
+        if cls.driver:
+            cls.driver.quit()
         super(CMSLiveTests, cls).tearDownClass()
 
     def tearDown(self):
@@ -167,14 +173,14 @@ class ToolbarBasicTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
         password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
     def test_toolbar_login_view(self):
         User = get_user_model()
@@ -200,7 +206,7 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.send_keys("what")
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
     def test_toolbar_login_cbv(self):
         User = get_user_model()
@@ -224,49 +230,48 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.send_keys("what")
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
+    @override_settings(DEBUG=True)
     def test_basic_add_pages(self):
-        with SettingsOverride(DEBUG=True):
-            User = get_user_model()
-            self.assertEqual(Page.objects.all().count(), 0)
-            self.assertTrue(User.objects.all().count(), 1)
-            driver = self.driver
-            driver.get(self.base_url + "/de/")
-            driver.find_element_by_id("add-page").click()
-            driver.find_element_by_id("id_username").clear()
-            driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
-            driver.find_element_by_id("id_password").clear()
-            driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
-            driver.find_element_by_css_selector("input[type=\"submit\"]").click()
-            driver.find_element_by_name("_save").click()
-            driver.find_element_by_link_text(u"Seite hinzufügen").click()
-            driver.find_element_by_id("id_title").clear()
-            driver.find_element_by_id("id_title").send_keys("SubPage")
-            driver.find_element_by_name("_save").click()
+        User = get_user_model()
+        self.assertEqual(Page.objects.all().count(), 0)
+        self.assertTrue(User.objects.all().count(), 1)
+        driver = self.driver
+        driver.get(self.base_url + "/de/")
+        driver.find_element_by_id("add-page").click()
+        driver.find_element_by_id("id_username").clear()
+        driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
+        driver.find_element_by_id("id_password").clear()
+        driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
+        driver.find_element_by_css_selector("input[type=\"submit\"]").click()
+        driver.find_element_by_name("_save").click()
+        driver.find_element_by_link_text(u"Seite hinzufügen").click()
+        driver.find_element_by_id("id_title").clear()
+        driver.find_element_by_id("id_title").send_keys("SubPage")
+        driver.find_element_by_name("_save").click()
 
 
-class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
-    settings_overrides = {
-        'LANGUAGE_CODE': 'en',
-        'LANGUAGES': (('en', 'English'),
-                      ('it', 'Italian')),
-        'CMS_LANGUAGES': {
-            1: [ {'code' : 'en',
-                  'name': 'English',
-                  'public': True},
-                 {'code': 'it',
-                  'name': 'Italian',
-                  'public': True},
-            ],
-            'default': {
-                'public': True,
-                'hide_untranslated': False,
-            }
+@override_settings(
+    LANGUAGE_CODE='en',
+    LANGUAGES=(('en', 'English'),
+               ('it', 'Italian')),
+    CMS_LANGUAGES={
+        1: [{'code' : 'en',
+             'name': 'English',
+             'public': True},
+            {'code': 'it',
+             'name': 'Italian',
+             'public': True},
+        ],
+        'default': {
+            'public': True,
+            'hide_untranslated': False,
         },
-        'SITE_ID': 1,
-    }
-
+    },
+    SITE_ID=1,
+)
+class PlaceholderBasicTests(CMSLiveTests):
 
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
@@ -289,8 +294,8 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
     def _login(self):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
-        
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -298,7 +303,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
     def test_copy_from_language(self):
         self._login()
@@ -309,22 +314,22 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 0)
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms_dragbar .cms_submenu')
+        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
 
-        submenu_link_selector = '.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
         copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
         copy_from_english.click()
 
         # Done, check if the text plugin was copied and it is only one
 
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)
@@ -337,15 +342,15 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms_submenu')
+        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
@@ -354,7 +359,7 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         copy.click()
 
         time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms_clipboard')
+        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
 
         WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
 
@@ -368,15 +373,15 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
         drag = ActionChains(self.driver).click_and_hold(
-            clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
-        );
+            clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
+        )
 
         drag.perform()
 
         time.sleep(0.1)
 
         drag = ActionChains(self.driver).move_to_element(
-            self.driver.find_element_by_css_selector('.cms_dragarea-1')
+            self.driver.find_element_by_css_selector('.cms-dragarea-1')
         )
         drag.perform()
 
@@ -397,11 +402,11 @@ class PlaceholderBasicTests(CMSLiveTests, SettingsOverrideTestCase):
         self.assertEqual(len(plugins), 2)
 
 
-class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
-    settings_overrides = {
-        'SITE_ID': 1,
-        'CMS_PERMISSION': False,
-    }
+@override_settings(
+    SITE_ID=1,
+    CMS_PERMISSION=False,
+)
+class StaticPlaceholderPermissionTests(CMSLiveTests):
 
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
@@ -409,8 +414,6 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
         self.page = create_page('Home', 'static.html', 'en', published=True)
 
         self.base_url = self.live_server_url
-
-        self.placeholder_name = 'cms_placeholder-5'
 
         self.user = self._create_user("testuser", is_staff=True)
         self.user.user_permissions = Permission.objects.exclude(codename="edit_static_placeholder")
@@ -425,7 +428,7 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
 
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -433,11 +436,14 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
+
+        pk = Placeholder.objects.filter(slot='logo').order_by('id')[0].pk
+        placeholder_name = 'cms-placeholder-%s' % pk
 
         # test static placeholder permission (content of static placeholders is NOT editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, self.placeholder_name)
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, placeholder_name)
 
         # update userpermission
         edit_permission = Permission.objects.get(codename="edit_static_placeholder")
@@ -445,4 +451,4 @@ class StaticPlaceholderPermissionTests(CMSLiveTests, SettingsOverrideTestCase):
 
         # test static placeholder permission (content of static placeholders is editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertTrue(self.driver.find_element_by_class_name(self.placeholder_name))
+        self.assertTrue(self.driver.find_element_by_class_name(placeholder_name))

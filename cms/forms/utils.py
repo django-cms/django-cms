@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 
-from cms.exceptions import LanguageError
-from cms.models import Page
-from cms.models.titlemodels import Title
-from cms.utils import i18n
-from cms.utils.conf import get_cms_setting
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save, post_delete
 from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 
+from cms.cache.choices import (clean_site_choices_cache, clean_page_choices_cache,
+                               _site_cache_key, _page_cache_key)
+from cms.exceptions import LanguageError
+from cms.models import Page, Title
+from cms.utils import i18n
+
 
 def update_site_and_page_choices(lang=None):
     lang = lang or i18n.get_current_language()
-    SITE_CHOICES_KEY = get_site_cache_key(lang)
-    PAGE_CHOICES_KEY = get_page_cache_key(lang)
+    SITE_CHOICES_KEY = _site_cache_key(lang)
+    PAGE_CHOICES_KEY = _page_cache_key(lang)
     title_queryset = (Title.objects.drafts()
-    .select_related('page', 'page__site')
-    .order_by('page__path'))
+                      .select_related('page', 'page__site')
+                      .order_by('page__path'))
     pages = defaultdict(SortedDict)
     sites = {}
     for title in title_queryset:
@@ -65,7 +65,7 @@ def update_site_and_page_choices(lang=None):
 def get_site_choices(lang=None):
     from django.core.cache import cache
     lang = lang or i18n.get_current_language()
-    site_choices = cache.get(get_site_cache_key(lang))
+    site_choices = cache.get(_site_cache_key(lang))
     if site_choices is None:
         site_choices, page_choices = update_site_and_page_choices(lang)
     return site_choices
@@ -74,41 +74,10 @@ def get_site_choices(lang=None):
 def get_page_choices(lang=None):
     from django.core.cache import cache
     lang = lang or i18n.get_current_language()
-    page_choices = cache.get(get_page_cache_key(lang))
+    page_choices = cache.get(_page_cache_key(lang))
     if page_choices is None:
         site_choices, page_choices = update_site_and_page_choices(lang)
     return page_choices
-
-
-def _get_key(prefix, lang):
-    return "%s-%s" % (prefix, lang)
-
-
-def get_site_cache_key(lang):
-    return _get_key(get_cms_setting('SITE_CHOICES_CACHE_KEY'), lang)
-
-
-def get_page_cache_key(lang):
-    return _get_key(get_cms_setting('PAGE_CHOICES_CACHE_KEY'), lang)
-
-
-def _clean_many(prefix):
-    from django.core.cache import cache
-    keys = []
-    if settings.USE_I18N:
-        for lang in [language[0] for language in settings.LANGUAGES]:
-            keys.append(_get_key(prefix, lang))
-    else:
-        keys = [_get_key(prefix, settings.LANGUAGE_CODE)]
-    cache.delete_many(keys)
-
-
-def clean_site_choices_cache(sender, **kwargs):
-    _clean_many(get_cms_setting('SITE_CHOICES_CACHE_KEY'))
-
-
-def clean_page_choices_cache(sender, **kwargs):
-    _clean_many(get_cms_setting('PAGE_CHOICES_CACHE_KEY'))
 
 
 post_save.connect(clean_page_choices_cache, sender=Page)

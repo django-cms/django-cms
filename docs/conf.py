@@ -12,7 +12,8 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
-import sys, os
+import os
+import sys
 
 # If extensions (or modules to document with autodoc) are in another
 # directory, add these directories to sys.path here. If the directory is
@@ -51,7 +52,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django cms'
-copyright = u'2009, Patrick Lauber'
+copyright = u'2009-2015, Patrick Lauber'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -203,8 +204,8 @@ latex_paper_size = 'a4'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'djangocms.tex', u'django cms Documentation',
-   u'Patrick Lauber', 'manual'),
+    ('index', 'djangocms.tex', u'django cms Documentation',
+     u'Patrick Lauber', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top

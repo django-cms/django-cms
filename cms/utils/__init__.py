@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
-
 from cms import constants
 from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_site_id  # nopyflakes
@@ -20,8 +19,10 @@ def get_template_from_request(request, obj=None, no_current_page=False):
     template = None
     if len(get_cms_setting('TEMPLATES')) == 1:
         return get_cms_setting('TEMPLATES')[0][0]
-    if "template" in request.REQUEST:
-        template = request.REQUEST['template']
+    if hasattr(request, 'POST') and "template" in request.POST:
+        template = request.POST['template']
+    elif hasattr(request, 'GET') and "template" in request.GET:
+        template = request.GET['template']
     if not template and obj is not None:
         template = obj.get_template()
     if not template and not no_current_page and hasattr(request, "current_page"):
@@ -33,7 +34,7 @@ def get_template_from_request(request, obj=None, no_current_page=False):
             # Happens on admin's request when changing the template for a page
             # to "inherit".
             return obj.get_template()
-        return template    
+        return template
     return get_cms_setting('TEMPLATES')[0][0]
 
 
@@ -41,7 +42,11 @@ def get_language_from_request(request, current_page=None):
     """
     Return the most obvious language according the request
     """
-    language = request.REQUEST.get('language', None)
+    language = None
+    if hasattr(request, 'POST'):
+        language = request.POST.get('language', None)
+    if hasattr(request, 'GET') and not language:
+        language = request.GET.get('language', None)
     site_id = current_page.site_id if current_page else None
     if language:
         language = get_language_code(language)

@@ -4,9 +4,11 @@ from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.management.commands.subcommands.check import CheckInstallation
 from cms.management.commands.subcommands.list import ListCommand
 from cms.management.commands.subcommands.moderator import ModeratorCommand
+from cms.management.commands.subcommands.publisher_publish import PublishCommand
 from cms.management.commands.subcommands.tree import FixTreeCommand
 from cms.management.commands.subcommands.uninstall import UninstallCommand
 from cms.management.commands.subcommands.copy_lang import CopyLangCommand
+from cms.management.commands.subcommands.copy_site import CopySiteCommand
 from cms.management.commands.subcommands.delete_orphaned_plugins import DeleteOrphanedPluginsCommand
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -29,8 +31,10 @@ class Command(SubcommandsCommand):
         'moderator': ModeratorCommand,
         'fix-tree': FixTreeCommand,
         'copy-lang': CopyLangCommand,
+        'copy-site': CopySiteCommand,
         'delete_orphaned_plugins': DeleteOrphanedPluginsCommand,
         'check': CheckInstallation,
+        'publisher_publish': PublishCommand,
     }
 
     @property

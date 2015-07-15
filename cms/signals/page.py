@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+import warnings
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.template import TemplateDoesNotExist
+
 from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import NoHomeFound
+from cms.models import Page
 from cms.signals.apphook import apphook_post_delete_page_checker, apphook_post_page_checker
 from cms.signals.title import update_title, update_title_paths
-from django.core.exceptions import ObjectDoesNotExist
-
-from cms.models import Page
 from menus.menu_pool import menu_pool
 
 
@@ -21,7 +24,10 @@ def pre_save_page(instance, **kwargs):
 
 def post_save_page(instance, **kwargs):
     if not kwargs.get('raw'):
-        instance.rescan_placeholders()
+        try:
+            instance.rescan_placeholders()
+        except TemplateDoesNotExist as e:
+            warnings.warn('Exception occurred: %s template does not exists' % e)
         update_home(instance)
     if instance.old_page is None or instance.old_page.parent_id != instance.parent_id or instance.is_home != instance.old_page.is_home:
         pages = [instance] + list(instance.get_descendants())
@@ -59,7 +65,7 @@ def pre_delete_page(instance, **kwargs):
 def post_delete_page(instance, **kwargs):
     update_home(instance, **kwargs)
     apphook_post_delete_page_checker(instance)
-    from cms.views import invalidate_cms_page_cache
+    from cms.cache import invalidate_cms_page_cache
     invalidate_cms_page_cache()
 
 
@@ -107,5 +113,3 @@ def update_home(instance, **kwargs):
         page._publisher_keep_state = True
         page._home_checked = True
         page.save()
-
-

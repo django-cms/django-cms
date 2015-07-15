@@ -14,6 +14,9 @@ These are the recommended plugins to use with django CMS.
 
 .. :class:: djangocms_file.cms_plugins.FilePlugin
 
+.. important::
+    See the note on :ref:`installed_apps` about ordering.
+
 ****
 File
 ****

@@ -2,7 +2,7 @@
 Plugins
 #######
 
-In this tutorial we're going to take a Django poll app and integrate it intoœ the CMS.
+In this tutorial we're going to take a Django poll app and integrate it into the CMS.
 
 Install the polls app
 #####################
@@ -26,33 +26,40 @@ You should end up with a folder structure similar to this::
                     urls.py
                     views.py
 
-Let's add it this application to our project. Add ``'polls'`` to the end
-of `INSTALLED_APPS` in your project's `settings.py`.
+Let's add it this application to our project. Add ``'polls'`` to the end of ``INSTALLED_APPS`` in
+your project's `settings.py` (see the note on :ref:`installed_apps` about ordering ).
 
-Add the following line to ``urlpatterns`` in the project's ``urls.py``::
+Add the following line to ``urlpatterns`` in the project's ``urls.py``:
+
+.. code-block:: python
 
     url(r'^polls/', include('polls.urls', namespace='polls')),
 
-Make sure this line is included **before** the line for the django-cms urls::
+Make sure this line is included **before** the line for the django-cms urls:
+
+.. code-block:: python
 
     url(r'^', include('cms.urls')),
 
 django CMS's URL pattern needs to be last, because it "swallows up" anything
 that hasn't already been matched by a previous pattern.
 
-Now run the application's migrations using ``south``::
+Now run the application's migrations:
+
+.. code-block:: bash
 
     python manage.py migrate polls
 
-At this point you should be able to add create polls and choices in the Django
+At this point you should be able to create polls and choices in the Django
 admin - localhost:8000/admin/ - and fill them in at ``/polls/``.
 
 However, in pages of the polls application we only have minimal templates, and
 no navigation or styling. Let's improve this by overriding the polls
 application's base template.
 
-add ``my_site/templates/polls/base.html``::
+add ``my_site/templates/polls/base.html``:
 
+.. code-block:: html+django
 
     {% extends 'base.html' %}
 
@@ -106,6 +113,8 @@ The Plugin Model
 
 In your poll application’s ``models.py`` add the following:
 
+.. code-block:: python
+
     from django.db import models
     from cms.models import CMSPlugin
     from polls.models import Poll
@@ -120,7 +129,7 @@ In your poll application’s ``models.py`` add the following:
 .. note::
 
     django CMS plugins inherit from :class:`cms.models.CMSPlugin` (or a
-    subclass thereof) and not :class:`models.Mod el <django.db.models.Model>`.
+    subclass thereof) and not :class:`models.Model <django.db.models.Model>`.
 
 The Plugin Class
 ================
@@ -131,9 +140,11 @@ information to render your plugin.
 
 For our poll plugin, we're going to write the following plugin class:
 
+.. code-block:: python
+
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from djangocms_polls.models import PollPlugin
+    from polls_plugin.models import PollPlugin
     from django.utils.translation import ugettext as _
 
 
@@ -170,22 +181,32 @@ the plugin which :attr:`render_template
 
 In this case the template needs to be at
 ``polls_plugin/templates/djangocms_polls/poll_plugin.html`` and should look
-something like this::
+something like this:
+
+.. code-block:: html+django
 
     <h1>{{ instance.poll.question }}</h1>
 
     <form action="{% url 'polls:vote' instance.poll.id %}" method="post">
         {% csrf_token %}
-        {% for choice in instance.poll.choice_set.all %}
-            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
-        {% endfor %}
+        <div class="form-group">
+            {% for choice in instance.poll.choice_set.all %}
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="choice" value="{{ choice.id }}">
+                        {{ choice.choice_text }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
         <input type="submit" value="Vote" />
     </form>
 
-Now add ``djangocms_polls`` to ``INSTALLED_APPS`` and create a database migration to add the plugin table (using South):
 
-    python manage.py schemamigration polls_plugin --init
+Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
+to add the plugin table::
+
+    python manage.py makemigrations polls_plugin
     python manage.py migrate polls_plugin
 
 Finally, start the runserver and visit http://localhost:8000/.

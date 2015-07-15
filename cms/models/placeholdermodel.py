@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-from cms.utils.urlutils import admin_reverse
+from cms.utils.compat import DJANGO_1_7
+from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.db import models
 from django.template.defaultfilters import title
-from django.utils.encoding import force_text
-from django.utils.timezone import get_current_timezone_name
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from django.conf import settings
-from django.contrib import admin
 
 from cms.exceptions import LanguageError
-from cms.utils import get_cms_setting
-from cms.utils.compat.dj import python_2_unicode_compatible
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
+from cms.utils.urlutils import admin_reverse
 
 
 @python_2_unicode_compatible
@@ -31,6 +29,9 @@ class Placeholder(models.Model):
 
     class Meta:
         app_label = 'cms'
+        permissions = (
+            (u"use_structure", u"Can use Structure mode"),
+        )
 
     def __str__(self):
         return self.slot
@@ -81,13 +82,6 @@ class Placeholder(models.Model):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.get_extra_placeholder_menu_items(self)
 
-    def get_cache_key(self, lang):
-        cache_key = '%srender_placeholder:%s.%s' % (get_cms_setting("CACHE_PREFIX"), self.pk, str(lang))
-        if settings.USE_TZ:
-            tz_name = force_text(get_current_timezone_name(), errors='ignore')
-            cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
-        return cache_key
-
     def _get_url(self, key, pk=None):
         model = self._get_attached_model()
         args = []
@@ -105,18 +99,37 @@ class Placeholder(models.Model):
         Generic method to check the permissions for a request for a given key,
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
+          * 'add' and 'change' permissions on placeholder need either on add or change 
+            permission on attached object to be granted.
+          * 'delete' need either on add, change or delete
         """
-        if request.user.is_superuser:
+        if getattr(request, 'user', None) and request.user.is_superuser:
             return True
-        if self.page:
-            return self._get_object_permission(self.page, request, key)
-        for obj in self._get_attached_objects():
-            return self._get_object_permission(obj, request, key)
+        perm_keys = {
+            'add': ('add', 'change',),
+            'change': ('add', 'change',),
+            'delete': ('add', 'change', 'delete'),
+        }
+        if key not in perm_keys:
+            raise Exception("%s is not a valid perm key. "
+                            "'Only 'add', 'change' and 'delete' are allowed" % key)
+        objects = [self.page] if self.page else self._get_attached_objects()
+        obj_perm = None
+        for obj in objects:
+            obj_perm = False
+            for key in perm_keys[key]:
+                if self._get_object_permission(obj, request, key):
+                    obj_perm = True
+                    break
+            if not obj_perm:
+                return False
+        return obj_perm
 
     def _get_object_permission(self, obj, request, key):
+        if not getattr(request, 'user', None):
+            return False
         opts = obj._meta
-        perm_accessor = getattr(opts, 'get_%s_permission' % key)
-        perm_code = '%s.%s' % (opts.app_label, perm_accessor())
+        perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
         return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
 
     def has_change_permission(self, request):
@@ -128,7 +141,7 @@ class Placeholder(models.Model):
     def has_delete_permission(self, request):
         return self._get_permission(request, 'delete')
 
-    def render(self, context, width, lang=None, editable=True):
+    def render(self, context, width, lang=None, editable=True, use_cache=True):
         '''
         Set editable = False to disable front-end rendering for this render.
         '''
@@ -137,8 +150,9 @@ class Placeholder(models.Model):
             return '<!-- missing request -->'
         width = width or self.default_width
         if width:
-            context.update({'width': width})
-        return render_placeholder(self, context, lang=lang, editable=editable)
+            context['width'] = width
+        return render_placeholder(self, context, lang=lang, editable=editable,
+                                  use_cache=use_cache)
 
     def _get_attached_fields(self):
         """
@@ -151,7 +165,11 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
+                if DJANGO_1_7:
+                    parent = rel.model
+                else:
+                    parent = rel.related_model
+                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.count():
@@ -167,13 +185,21 @@ class Placeholder(models.Model):
             relations = self._meta.get_all_related_objects()
 
             for rel in relations:
-                if rel.model == Page or rel.model == StaticPlaceholder:
+                if DJANGO_1_7:
+                    parent = rel.model
+                else:
+                    parent = rel.related_model
+                if parent == Page or parent == StaticPlaceholder:
                     relations.insert(0, relations.pop(relations.index(rel)))
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if rel.model in admin.site._registry and isinstance(admin.site._registry[rel.model], PlaceholderAdminMixin):
+                if DJANGO_1_7:
+                    parent = rel.model
+                else:
+                    parent = rel.related_model
+                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
                         if field.count():

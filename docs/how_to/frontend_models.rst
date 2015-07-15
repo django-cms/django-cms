@@ -6,17 +6,16 @@ Frontend editing for Page and Django models
 
 .. versionadded:: 3.0
 
-django CMS frontend editing can also be used to edit non-placeholder fields from
-the frontend, both for pages and your standard Django models.
+As well as ``PlaceholderFields``, 'ordinary' Django model fields (both on CMS Pages and your own
+Django models) can also be edited through django CMS's frontend editing interface. This is very
+convenient for the user because it saves having to switch between frontend and admin views.
 
-Using this interface, you can double click on a value of a model instance in
-the frontend and access the instance changeform in a popup window, like the page
-changeform.
-
+Using this interface, model instance values that can be edited show the "Double-click to edit"
+hint on hover. Double-clicking opens a pop-up window containing the changeform for that model.
 
 .. warning::
 
-    Templatetag used by this feature mark as safe the content of the rendered
+    Templatetags used by this feature mark as safe the content of the rendered
     model attribute. This may be a security risk if used on fields which may
     hold non-trusted content. Be aware, and use the templatetags accordingly.
 
@@ -29,11 +28,13 @@ changeform.
     hvad-enabled object does not exists in the current language.
     As a workaround ``render_model_icon`` can be used instead.
 
+.. _render_model_templatetags:
+
 ************
 Templatetags
 ************
 
-This feature relies on four templatetag sharing common code:
+This feature relies on four templatetags sharing common code:
 
 * :ttag:`render_model`
 * :ttag:`render_model_icon`
@@ -69,7 +70,7 @@ All three titles::
     {% render_model request.current_page "titles" %}
 
 
-You can always customize the editable fields by providing the
+You can always customise the editable fields by providing the
 `edit_field` parameter::
 
     {% render_model request.current_page "title" "page_title,menu_title" %}
@@ -96,36 +97,39 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-cms-page-changelist-1">
+    <div class="cms-plugin cms-plugin-cms-page-changelist-1">
         <h3>Menu</h3>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/another">another</a></li>
             [...]
     </div>
-    
+
 .. warning:
-    
+
     Be aware that depending on the layout of your menu templates, clickable
     area of the menu may completely overlap with the active area of the
     frontend editor thus preventing editing. In this case you may use
     ``{% render_model_icon %}``.
     The same conflict exists when menu template is managed by a plugin.
 
-******************
-Django models edit
-******************
+********************************
+Editing 'ordinary' Django models
+********************************
 
-For Django models you can further customize what's editable on the frontend
-and the resulting forms.
+As noted above, your own Django models can also present their fields for editing in the frontend.
+This is achieved by using the ``FrontendEditableAdminMixin`` base class.
 
-Complete changeform edit
-========================
+Note that this is only required for fields **other than** ``PlaceholderFields``.
+``PlaceholderFields`` are automatically made available for frontend editing.
 
-You need to properly setup your admin class by adding the ``FrontendEditableAdminMixin``
-mixin to the parents of your admin class (see
-:mod:`Django admin documentation <django.contrib.admin>` for further information)
-on Django admin::
+Configure the model's admin class
+=================================
+
+Configure your admin class by adding the ``FrontendEditableAdminMixin`` mixin to it (see
+:mod:`Django admin documentation <django.contrib.admin>` for general Django admin information).
+
+::
 
     from cms.admin.placeholderadmin import FrontendEditableAdminMixin
     from django.contrib import admin
@@ -134,7 +138,10 @@ on Django admin::
     class MyModelAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
         ...
 
-Then setup the templates adding ``render_model`` templatetag::
+The ordering is important: as usual, **mixins must come first**.
+
+Then set up the templates where you want to expose the model for editing, adding a ``render_model``
+templatetag::
 
     {% load cms_tags %}
 
@@ -215,13 +222,13 @@ Example ``view_url``::
 
 
 Example ``view_method``::
-    
+
     class MyModel(models.Model):
         char = models.CharField(max_length=10)
-        
+
         def some_method(self, request):
             return "/some/url"
-    
+
 
     {% load cms_tags %}
 
@@ -244,7 +251,7 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-myapp-mymodel-changelist-1">
+    <div class="cms-plugin cms-plugin-myapp-mymodel-changelist-1">
         My Model Instance Name
     </div>
 

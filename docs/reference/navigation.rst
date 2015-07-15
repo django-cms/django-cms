@@ -98,8 +98,9 @@ You can give it the same optional parameters as ``show_menu``::
         {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
     </ul>
 
-Note that soft roots will not affect the menu when
-using ``show_menu_below_id``.
+Unlike :ttag:`show_menu`, however, soft roots will not affect the menu when 
+using :ttag:`show_menu_below_id`.
+
 
 .. templatetag:: show_sub_menu
 

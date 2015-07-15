@@ -2,11 +2,11 @@
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import url, patterns, include
-from django.contrib.formtools.wizard.views import normalize_name
+from django.conf.urls import url, include
 from django.db.models import signals
 from django.template.defaultfilters import slugify
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
@@ -14,9 +14,9 @@ from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
 from cms.utils.django_load import load
-from cms.utils.helpers import reversion_register
+from cms.utils.helpers import reversion_register, normalize_name
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import force_unicode, is_installed
+from cms.utils.compat.dj import is_installed
 
 
 class PluginPool(object):
@@ -28,7 +28,7 @@ class PluginPool(object):
     def discover_plugins(self):
         if self.discovered:
             return
-        from cms.views import invalidate_cms_page_cache
+        from cms.cache import invalidate_cms_page_cache
         invalidate_cms_page_cache()
         load('cms_plugins')
         self.discovered = True
@@ -111,10 +111,7 @@ class PluginPool(object):
         signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
                                    dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
         if is_installed('reversion'):
-            try:
-                from reversion.registration import RegistrationError
-            except ImportError:
-                from reversion.revisions import RegistrationError
+            from reversion.revisions import RegistrationError
             try:
                 reversion_register(plugin.model)
             except RegistrationError:
@@ -163,7 +160,7 @@ class PluginPool(object):
         ) or ()
         for plugin in plugins:
             include_plugin = False
-            if placeholder and not plugin.require_parent:
+            if placeholder and not plugin.get_require_parent(placeholder, page):
                 include_plugin = not allowed_plugins and setting_key == "plugins" or plugin.__name__ in allowed_plugins
             if plugin.page_only and not include_page_only:
                 include_plugin = False
@@ -200,16 +197,19 @@ class PluginPool(object):
             url_patterns = []
             for plugin in self.get_all_plugins():
                 p = plugin()
-                slug = slugify(force_unicode(normalize_name(p.__class__.__name__)))
-                url_patterns += patterns('',
-                                         url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
-                )
+                slug = slugify(force_text(normalize_name(p.__class__.__name__)))
+                url_patterns += [
+                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                ]
         finally:
             # Reactivate translation
             activate(lang)
 
         return url_patterns
 
+    def get_system_plugins(self):
+        self.discover_plugins()
+        self.set_plugin_meta()
+        return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
 
 plugin_pool = PluginPool()
-

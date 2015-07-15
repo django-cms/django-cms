@@ -285,6 +285,7 @@ selected poll and its sub-methods::
 
         return render(request, 'polls/detail.html', {'poll': poll})
 
+.. _url_changes:
 
 ---------------------
 Detecting url changes
@@ -320,7 +321,9 @@ Example::
             ...
 
 After you add this every change to an instance of ``Poll`` via sideframe or modal window will trigger a redirect to
-the ``get_absolute_url()`` of the poll instance that was edited.
+the URL of the poll instance that was edited, according to the toolbar status: if in *draft* mode
+the ``get_draft_url()`` is returned (or ``get_absolute_url()`` if the former does not exists),
+if in *live* mode and the method exists ``get_public_url()`` is returned;
 
 
 ********

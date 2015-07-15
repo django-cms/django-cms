@@ -2,4 +2,5 @@
 django>=1.7,<1.8
 django-reversion>=1.8,<1.9
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip
-
+django-classy-tags>=0.5
+django-sekizai>=0.7

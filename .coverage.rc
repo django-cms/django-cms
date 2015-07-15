@@ -6,8 +6,6 @@ branch = False
 omit =
     cms/migrations/*
     cms/south_migrations/*
-    cms/plugins/*/migrations/*
-    cms/stacks/migrations/*
     cms/tests/*
     cms/test_utils/*
     menus/migrations/*

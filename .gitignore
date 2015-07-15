@@ -38,5 +38,9 @@ include/
 lib/
 man/
 share/
-.editorconfig
+!.editorconfig
+!.jscsrc
+!.jshintrc
 cms/static/cms/compass_app_log.txt
+cms/static/cms/node_modules
+!cms/static/cms/js/dist

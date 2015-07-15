@@ -50,13 +50,13 @@ Plugin and apphook management commands
 
     The ``delete_orphaned_plugins`` command **permanently deletes** data from
     your database. You should make a backup of your database before using it!
-    
+
 Identifies and deletes orphaned plugins.
 
 Orphaned plugins are ones that exist in the CMSPlugins table, but:
 
 * have a plugin_type that is no longer even installed
-* have no corresponding saved instance in that particular plugin type's table  
+* have no corresponding saved instance in that particular plugin type's table
 
 Such plugins will cause problems when trying to use operations that need to copy
 pages (and thefore plugins), which includes ``cms moderator on`` as well as page
@@ -117,6 +117,27 @@ Example::
 
     cms copy-lang en de force-copy site=2 verbose
 
+.. _cms-copy-site-command:
+
+``cms copy-site``
+=================
+
+The ``copy-site`` subcommand can be used to copy content (pages and plugins)
+from one site to another.
+The subcommand copy content from the ``from_site`` to ``to_site``; please note
+that static placehoders are copied as they are shared across sites.
+The whole source tree is copied, in the root of the target website.
+Existing pages on the target website are not modified.
+
+You must provide two arguments:
+
+* ``from_site``: the site to copy the content from;
+* ``to_site``: the site to copy the content to.
+
+Example::
+
+    cms copy-site 1 2
+
 *******************
 Moderation commands
 *******************
@@ -131,18 +152,13 @@ used moderation in the past.
 .. warning::
 
     This command **alters data** in your database. You should make a backup of
-    your database before using it! **Never** run this command without first 
+    your database before using it! **Never** run this command without first
     checking for orphaned plugins, using the ``cms list plugins`` command, and
     if necessary ``delete_orphaned_plugins``. Running  ``cms moderator`` with
     orphaned plugins will fail and leave bad data in your database.
 
-
-**************************************
-Additional commands
-**************************************
-
-``publisher_publish``
-======================
+``cms publisher_publish``
+=========================
 
 If you want to publish many pages at once, this command can help you. By default,
 this command publishes drafts for all public pages.
@@ -163,18 +179,33 @@ Example::
     publisher_publish
 
     #publish all drafts in all pages
-    publisher_publish --unpublished
+    cms publisher_publish --unpublished
 
     #publish drafts for public pages in deutsch
-    publisher_publish --language=de
+    cms publisher_publish --language=de
 
     #publish all drafts in deutsch
-    publisher_publish --unpublished --language=de
+    cms publisher_publish --unpublished --language=de
 
     #publish all drafts in deutsch, but only for site with id=2
-    publisher_publish --unpublished --language=de --site=2
+    cms publisher_publish --unpublished --language=de --site=2
 
 .. warning::
 
     This command publishes drafts. You should review drafts before using this
     command, because they will become public.
+
+**********************
+Maintenance and repair
+**********************
+
+.. _fix-mptt:
+
+``fix-mptt``
+============
+
+Occasionally, the MPTT tree can become corrupted (this is one of the reasons for :doc:`our move
+away from MPTT to MP in django CMS 3.1 </upgrade/3.1>`). Typical symptoms include problems when
+trying to copy or delete plugins or pages.
+
+Once a database has been migrated from MPTT to MP, there is no use for this command.

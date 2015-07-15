@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
-from distutils.version import LooseVersion
 import json
 
-import django
+from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import render
 from django.utils.encoding import smart_str
 
-from cms.models import Page, GlobalPagePermission
-from cms.utils import get_language_from_request
-from cms.utils import get_language_list
-from cms.utils import get_cms_setting
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
+from cms.models import Page, GlobalPagePermission
+from cms.utils import get_language_from_request, get_language_list, get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 
 NOT_FOUND_RESPONSE = "NotFound"
-DJANGO_1_4 = LooseVersion(django.get_version()) < LooseVersion('1.5')
 
 
 def jsonify_request(response):
@@ -25,9 +21,11 @@ def jsonify_request(response):
          * status: original response status code
          * content: original response content
     """
-    content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
-    return HttpResponse(json.dumps(content),
-                        content_type="application/json")
+    if DJANGO_1_7:
+        content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
+    else:
+        content = {'status': response.status_code, 'content': smart_str(response.content, response.charset)}
+    return HttpResponse(json.dumps(content), content_type="application/json")
 
 
 publisher_classes = {
@@ -46,13 +44,11 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
 
     site = Site.objects.get_current()
     lang = get_language_from_request(request)
-    #slug = page.get_slug(language=lang, fallback=True) # why was this here ??
     metadata = ""
     if get_cms_setting('PERMISSION'):
-        # jstree metadata generator 
+        # jstree metadata generator
         md = []
 
-        #if not has_add_page_permission:
         if not has_move_page_permission:
             md.append(('valid_children', False))
             md.append(('draggable', False))
@@ -70,13 +66,12 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
             global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
                 request.user, page.site_id).exists()
             request.user._global_add_perm_cache = global_add_perm
-        if request.user.has_perm(opts.app_label + '.' + opts.get_add_permission()) and global_add_perm:
+        if request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts)) and global_add_perm:
             has_add_on_same_level_permission = True
     from cms.utils import permissions
     if not has_add_on_same_level_permission and page.parent_id:
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site_id)
-        #has_add_on_same_level_permission = has_add_page_on_same_level_permission(request, page)
     context = {
         'page': page,
         'site': site,
@@ -109,15 +104,10 @@ def render_admin_menu_item(request, page, template=None, language=None):
     # languages
     from cms.utils import permissions
     languages = get_language_list(page.site_id)
-    context = RequestContext(request, {
+    context = {
         'has_add_permission': permissions.has_page_add_permission(request),
         'site_languages': languages,
-    })
-
+    }
     filtered = 'filtered' in request.REQUEST
     context.update(get_admin_menu_item_context(request, page, filtered, language))
-    # add mimetype to help out IE
-    if DJANGO_1_4:
-        return render_to_response(template, context, mimetype="text/html; charset=utf-8")
-    else:
-        return render_to_response(template, context, content_type="text/html; charset=utf-8")
+    return render(request, template, context)

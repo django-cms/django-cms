@@ -15,12 +15,12 @@ system - amongst others.
 Divio AG
 ********
 
-django CMS was released under a BSD licence in 2009. It was created at `Divio 
-AG <https://divio.ch/>`_ of Zürich, Switzerland, by 
-`Patrick Lauber <https://github.com/digi604/>`_, who led its development for 
+django CMS was released under a BSD licence in 2009. It was created at `Divio
+AG <https://divio.ch/>`_ of Zürich, Switzerland, by
+`Patrick Lauber <https://github.com/digi604/>`_, who led its development for
 several years.
 
-Divio remains thoroughly committed to django CMS both as a high-quality technical 
+Divio remains thoroughly committed to django CMS both as a high-quality technical
 product and as a healthy open source project.
 
 Divio's role in steering the project's development is formalised in the
@@ -85,7 +85,6 @@ Current core developers
 * Iacopo Spalletti http://github.com/yakky
 * Jonas Obrist http://github.com/ojii
 * Martin Koistinen http://github.com/mkoistinen
-* Øyvind Saltvik http://github.com/fivethreeo
 * Paulo Alvarado http://github.com/czpython
 * Patrick Lauber http://github.com/digi604
 * Stefan Foulis http://github.com/stefanfoulis
@@ -94,6 +93,7 @@ Retired core developers
 =======================
 
 * Chris Glass http://github.com/chrisglass
+* Øyvind Saltvik http://github.com/fivethreeo
 
 
 Election of new core developers
@@ -153,6 +153,5 @@ The current members of the technical board are:
 * Jonas Obrist
 * Martin Koistinen
 * Matteo Larghi
-* Patrick Lauber
 
 The board will co-opt new members as appropriate.

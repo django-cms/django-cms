@@ -4,6 +4,7 @@ from django.template.loader import render_to_string
 from django.utils import six
 from django.utils.safestring import mark_safe
 
+from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
@@ -33,8 +34,11 @@ class PluginContext(Context):
     using the "processors" keyword argument.
     """
 
-    def __init__(self, dict, instance, placeholder, processors=None, current_app=None):
-        super(PluginContext, self).__init__(dict, current_app=current_app)
+    def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
+        if current_app:
+            super(PluginContext, self).__init__(dict_)
+        else:
+            super(PluginContext, self).__init__(dict_, current_app=current_app)
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
@@ -50,11 +54,14 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     Renders a single plugin and applies the post processors to it's rendered
     content.
     """
+    if current_app:
+        context['request'].current_app = current_app
     if not processors:
         processors = []
     if isinstance(template, six.string_types):
-        content = render_to_string(template, context_instance=context)
-    elif isinstance(template, Template):
+        content = render_to_string(template, context)
+    elif (isinstance(template, Template) or (hasattr(template, 'template') and
+         hasattr(template, 'render') and isinstance(template.template, Template))):
         content = template.render(context)
     else:
         content = ''
@@ -87,8 +94,8 @@ def render_plugins(plugins, context, placeholder, processors=None):
     return out
 
 
-def render_placeholder(placeholder, context_to_copy,
-        name_fallback="Placeholder", lang=None, default=None, editable=True):
+def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder",
+                       lang=None, default=None, editable=True, use_cache=True):
     """
     Renders plugins for a placeholder on the given page using shallow copies of the
     given context, and returns a string containing the rendered output.
@@ -100,12 +107,13 @@ def render_placeholder(placeholder, context_to_copy,
     if not placeholder:
         return
     from cms.utils.plugins import get_plugins
-    context = context_to_copy
+    context = context_to_copy.new(context_to_copy)
     context.push()
     request = context['request']
     if not hasattr(request, 'placeholders'):
         request.placeholders = []
-    request.placeholders.append(placeholder)
+    if placeholder.has_change_permission(request) or not placeholder.cache_placeholder:
+        request.placeholders.append(placeholder)
     if hasattr(placeholder, 'content_cache'):
         return mark_safe(placeholder.content_cache)
     page = placeholder.page if placeholder else None
@@ -126,11 +134,9 @@ def render_placeholder(placeholder, context_to_copy,
     else:
         processors = None
         edit = False
-    from django.core.cache import cache
-    if get_cms_setting('PLACEHOLDER_CACHE'):
-        cache_key = placeholder.get_cache_key(lang)
+    if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
-            cached_value = cache.get(cache_key)
+            cached_value = get_placeholder_cache(placeholder, lang)
             if not cached_value is None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 return mark_safe(cached_value['content'])
@@ -146,13 +152,10 @@ def render_placeholder(placeholder, context_to_copy,
     # TODO this should actually happen as a plugin context processor, but these currently overwrite
     # existing context -- maybe change this order?
     slot = getattr(placeholder, 'slot', None)
-    extra_context = {}
     if slot:
-        extra_context = get_placeholder_conf("extra_context", slot, template, {})
-    for key, value in extra_context.items():
-        if key not in context:
-            context[key] = value
-
+        for key, value in get_placeholder_conf("extra_context", slot, template, {}).items():
+            if key not in context:
+                context[key] = value
     content = []
     watcher = Watcher(context)
     content.extend(render_plugins(plugins, context, placeholder, processors))
@@ -176,8 +179,8 @@ def render_placeholder(placeholder, context_to_copy,
     context['edit'] = edit
     result = render_to_string("cms/toolbar/content.html", context)
     changes = watcher.get_changes()
-    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE'):
-        cache.set(cache_key, {'content': result, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
+    if placeholder and not edit and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
+        set_placeholder_cache(placeholder, lang, content={'content': result, 'sekizai': changes})
     context.pop()
     return result
 
@@ -200,7 +203,7 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
     context.push()
 
     # to restrict child-only plugins from draggables..
-    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)]
+    context['allowed_plugins'] = [cls.__name__ for cls in plugin_pool.get_all_plugins(slot, page)] + plugin_pool.get_system_plugins()
     context['placeholder'] = placeholder
     context['language'] = save_language
     context['page'] = page

@@ -2,13 +2,13 @@
 from copy import deepcopy
 from django.contrib import admin
 from django.contrib.admin import site
+from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext as _
 
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, PagePermission, GlobalPagePermission, PageUser
-from cms.utils.compat.dj import get_user_model
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 from cms.utils.permissions import get_user_permission_level
@@ -44,7 +44,7 @@ class PagePermissionInlineAdmin(TabularInline):
     def get_queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise can user see only permissions for 
+        all permissions. Otherwise can user see only permissions for
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to itself)
         """
@@ -153,10 +153,10 @@ class GenericCmsPermissionAdmin(object):
             model, title = perm_model
             opts, fields = model._meta, []
             name = model.__name__.lower()
-            for t in ('add', 'change', 'delete'):
-                fn = getattr(opts, 'get_%s_permission' % t)
-                if request.user.has_perm(opts.app_label + '.' + fn()):
-                    fields.append('can_%s_%s' % (t, name))
+            for key in ('add', 'change', 'delete'):
+                perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
+                if request.user.has_perm(perm_code):
+                    fields.append('can_%s_%s' % (key, name))
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
         return fieldsets

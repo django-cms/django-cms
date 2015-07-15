@@ -37,7 +37,7 @@ with newer South releases.
 To ease the upgrading process, all the migrations for the `cms` application
 have been consolidated into a single migration file, `0001_initial.py`.
 
-*   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to 
+*   migration 0001 is a *real* migration, that gets you to the same point migrations 0001-0036 used to
 *   the migrations 0002 to 0036 inclusive still exist, but are now all *dummy*
     migrations
 *   migrations 0037 and later are *new* migrations
@@ -128,7 +128,7 @@ Removed the MultilingualMiddleware
 
 We removed the MultilingualMiddleware. This removed rather some unattractive
 monkey-patching of the ``reverse()`` function as well. As a benefit we now
-support localization of urls and Apphook urls with standard Django helpers.
+support localisation of URLs and apphook URLs with standard Django helpers.
 
 
 For django 1.4 more infos can be found here:

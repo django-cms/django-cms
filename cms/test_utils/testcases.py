@@ -4,22 +4,22 @@ import sys
 import warnings
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.template.context import Context
+from django.template.context import Context, RequestContext
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.utils.timezone import now
 from django.utils.translation import activate
+from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.models import Page
-from cms.test_utils.util.context_managers import (UserLoginContext,
-    SettingsOverride)
-from cms.utils.compat.dj import get_user_model
-from cms.utils.compat.urls import urljoin, unquote
+from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.permissions import set_current_user
 
 
@@ -115,7 +115,7 @@ class BaseCMSTestCase(object):
         """
         User = get_user_model()
 
-        fields = dict(email=username + '@django-cms.org',
+        fields = dict(email=username + '@django-cms.org', last_login=now(),
                       is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
         )
 
@@ -167,8 +167,15 @@ class BaseCMSTestCase(object):
         This is a non superuser staff
         """
         staff = self._create_user("staff", is_staff=True, is_superuser=False,
-                                  add_permissions=True)
+                                  add_default_permissions=True)
         return staff
+
+    def get_standard_user(self):
+        """
+        Used in security tests
+        """
+        standard = self._create_user("standard", is_staff=False, is_superuser=False)
+        return standard
 
     def get_new_page_data(self, parent_id=''):
         page_data = {
@@ -189,7 +196,6 @@ class BaseCMSTestCase(object):
         self.counter += 1
         return page_data
 
-
     def get_new_page_data_dbfields(self, parent=None, site=None,
                                    language=None,
                                    template='nav_playground.html', ):
@@ -203,7 +209,6 @@ class BaseCMSTestCase(object):
         }
         self.counter = self.counter + 1
         return page_data
-
 
     def get_pagedata_from_dbfields(self, page_data):
         """Converts data created by get_new_page_data_dbfields to data
@@ -219,7 +224,6 @@ class BaseCMSTestCase(object):
         page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
         page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
         return page_data
-
 
     def print_page_structure(self, qs):
         """Just a helper to see the page struct.
@@ -382,6 +386,15 @@ class BaseCMSTestCase(object):
 
     assertWarns = failUnlessWarns
 
+    def render_template_obj(self, template, context, request):
+        try:
+            from django.template import engines
+            template_obj = engines['django'].from_string(template)
+            return template_obj.render(context, request)
+        except ImportError:
+            from django.template import Template
+            template_obj = Template(template)
+            return template_obj.render(RequestContext(request, context))
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
     pass
@@ -389,22 +402,3 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
-
-
-class SettingsOverrideTestCase(CMSTestCase):
-    settings_overrides = {}
-
-    def _pre_setup(self):
-        self._enter_settings_override()
-        super(SettingsOverrideTestCase, self)._pre_setup()
-
-    def _enter_settings_override(self):
-        self._settings_ctx_manager = SettingsOverride(**self.settings_overrides)
-        self._settings_ctx_manager.__enter__()
-
-    def _post_teardown(self):
-        super(SettingsOverrideTestCase, self)._post_teardown()
-        self._exit_settings_override()
-
-    def _exit_settings_override(self):
-        self._settings_ctx_manager.__exit__(None, None, None)

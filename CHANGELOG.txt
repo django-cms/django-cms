@@ -292,4 +292,148 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added list of retired core developers
 - Added branch policy documentaion
 
-=== 3.1 (unreleased) ===
+==== 3.0.8 (2015-01-11) ===
+- Add require_parent option to CMS_PLACEHOLDER_CONF
+- Fix django-mptt version depenency to be PEP440 compatible
+- Fix some Django 1.4 compatibility issues
+- Add toolbar sanity check
+- Fix behavior with CMSPluginBase.get_render_template()
+- Fix issue on django >= 1.6 with page form fields.
+- Resolve jQuery namespace issues in admin page tree and changeform
+- Fix issues for PageField in Firefox/Safari
+- Fix some Python 3.4 compatibility issue when using proxy modles
+- Fix corner case in plugin copy
+- Documentation fixes
+- Minor code cleanups
+
+==== 3.0.9 (2015-01-11) ===
+- Revert a change that caused a regression in toolbar login
+- Fix an error in a translated phrase
+- Fix error when moving items in the page tree
+
+=== 3.0.10 (2015-02-14) ===
+- Improved Py3 compatibility
+- Improved the behavior when changing the operator's language
+- Numerous documentation updates
+- Revert a change that caused an issue with saving plugins in some browsers
+- Fix an issue where urls were not refreshed when a page slug changes
+- Fix an issue with FR translations
+- Fixed an issue preventing the correct rendering of custom contextual menu items for plugins
+- Fixed an issue relating to recovering deleted pages
+- Fixed an issue that caused the uncached placeholder tag to display cached content
+- Fixed an issue where extra slashed would appear in apphooked URLs when APPEND_SLASH=False
+- Fixed issues relating to the logout function
+
+=== 3.0.11 (2015-03-05) ===
+
+- Core support for multiple instances of the same apphook'ed application
+- Fixed the template tag `render_model_add`
+- Fixed an issue with reverting to Live
+- Fixed a missing migration issue
+- Fixed an issue when using the PageField widget
+- Fixed an issue where duplicate page slugs is not prevented in some cases
+- Fixed an issue where copying a page didn't copy its extensions
+- Fixed an issue where translations where broken when operating on a page
+- Fixed an edge-case SQLite issue under Django 1.7
+- Fixed an issue with confirmation dialog
+- Fixed an issue with deprecated 'mimetype'
+- Fixed an issue where `cms check`
+- Documentation updates
+
+=== 3.0.12 (2015-03-06) ===
+
+- Fixed a typo in JavaScript which prevents page tree from working
+
+=== 3.0.13 (2015-04-15) ===
+
+- Numerous documentation including installation and tutorial updates
+- Numerous improvements to translations
+- Improves reliability of apphooks
+- Improves reliabiliy of Advanced Settings on page when using apphooks
+- Allow page deletion after template removal
+- Improves upstream caching accuracy
+- Improves CMSAttachMenu registration
+- Improves handling of mistyped URLs
+- Improves redirection as a result of changes to page slugs, etc.
+- Improves performance of "watched models"
+- Improves frontend performance relating to resizing the sideframe
+- Corrects an issue where items might not be visible in structue mode menus
+- Limits version of django-mptt used in CMS for 3.0.x
+- Prevent accidental upgrades to Django 1.8, which is not yet supported
+
+=== 3.0.14 (2015-06-27) ===
+
+- Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability
+- Fixed an issue related to "Empty all" Placeholder feature
+- Fix issue with causes menu classes to be duplicated in advanced settings
+- Fix issue with breadcrumbs not showing
+- Fix issues with show_menu templatetags
+- Fix plugin sorting in py3
+- Fix search results number and items alignment in page changelist
+- Fix X-Frame-Options on top-level pages
+- Preserve information regarding the current view when applying the CMS decorator
+- Fix render_model template tag doesn't show correct change list
+- Fix language fallback for nested plugins
+- Fix order of which application urls are injected into urlpatterns
+- Fix delete non existing page language
+- Fix Scanning for placeholders fails on include tags with a variable as an argument
+- Minor documentation fixes
+- Pin South version to 1.0.2
+- Pin Html5lib version to 0.999 until a current bug is fixed
+- Fix language chooser template
+
+=== 3.1 (2015-04-20) ===
+
+- Remove django-mptt in favor of django-treebeard
+- Remove compatibility with Django 1.4 / 1.5
+- General code cleanup
+- Simplify loading of view restrictions in the menu
+- South is not marked as optional; to use south on Django 1.6 install django-cms[south]
+- Add system_plugin attribute to CMSPluginBase that allow the plugin to override any configured restriction
+- Change placeholder language fallback default to True
+- Remove plugin table naming compatibility layer
+- Remove deprecated cms.context_processors.media context processor
+- Add templatetag render_plugin_block
+- Add templatetag render_model_add_block
+- Add "Structure mode" permission
+
+=== 3.1.1 (2015-06-27) ===
+
+- Add Django 1.8 support
+- Tutorial updates and improvements
+- Fix issue with causes menu classes to be duplicated in advanced settings
+- Fix issue with breadcrumbs not showing
+- Fix issues with show_menu templatetags
+- Minor documentation fixes
+- Revert whitespace cleanup on flash player to fix it
+- Correctly restore previous status of dragbars
+- Add copy_site command
+- Fix an issue related to "Empty all" Placeholder feature
+- Fix plugin sorting in py3
+- Fix language-related issues when retrieving page URL
+- Add setting to disable toolbar for anonymous users
+- Fix search results number and items alignment in page changelist
+- Preserve information regarding the current view when applying the CMS decorator
+- Fix errors with toolbar population
+- Fix error with watch_models type
+- Fix error with plugin breadcrumbs order
+- Change the label "Save and close" to "Save as draft"
+- Fix X-Frame-Options on top-level pages
+- Fix order of which application urls are injected into urlpatterns
+- Fix delete non existing page language
+- Fix language fallback for nested plugins
+- Fix render_model template tag doesn't show correct change list
+- Fix Scanning for placeholders fails on include tags with a variable as an argument
+- Fix handling of plugin position attribute
+- Fix for some structureboard issues
+- Add setting to hide toolbar when a URL is not handled by django CMS
+- Add editorconfig configuration
+- Make shift tab work correctly in submenu
+- Fix get_language_from_request if POST and GET exists
+- Fix an error in placeholder cache
+- Fix language chooser template
+
+=== 3.1.2 (2015-07-02) ===
+
+- Fix placeholder cache invalidation under some circumstances
+- Update translations

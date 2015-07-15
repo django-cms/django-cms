@@ -1,44 +1,57 @@
 # -*- coding: utf-8 -*-
-from copy import copy
 from datetime import datetime
 from itertools import chain
-import re
-from classytags.values import StringValue
-from cms.utils.urlutils import admin_reverse
+
+from copy import copy
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
+from django.db.models import Model
+from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
 from django.utils import six
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
+from django.utils.six import string_types
 from django.utils.translation import ugettext_lazy as _, get_language
-from classytags.arguments import Argument, MultiValueArgument, \
-    MultiKeywordArgument
+
+from classytags.arguments import (Argument, MultiValueArgument,
+                                  MultiKeywordArgument)
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
+from classytags.values import StringValue
 from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
 from cms import __version__
+from cms.cache.page import get_page_url_cache, set_page_url_cache
+from cms.cache.placeholder import (get_placeholder_page_cache, set_placeholder_page_cache,
+                                   get_placeholder_cache)
 from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_site_id
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
 from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.urlutils import admin_reverse
 
 
 register = template.Library()
@@ -49,21 +62,6 @@ def has_permission(page, request):
 
 
 register.filter(has_permission)
-
-CLEAN_KEY_PATTERN = re.compile(r'[^a-zA-Z0-9_-]')
-
-
-def _clean_key(key):
-    return CLEAN_KEY_PATTERN.sub('-', key)
-
-
-def _get_cache_key(name, page_lookup, lang, site_id):
-    if isinstance(page_lookup, Page):
-        page_key = str(page_lookup.pk)
-    else:
-        page_key = str(page_lookup)
-    page_key = _clean_key(page_key)
-    return get_cms_setting('CACHE_PREFIX') + name + '__page_lookup:' + page_key + '_site:' + str(site_id) + '_lang:' + str(lang)
 
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
@@ -113,9 +111,17 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            if settings.SEND_BROKEN_LINK_EMAILS:
+            if getattr(settings, 'SEND_BROKEN_LINK_EMAILS', False):
                 mail_managers(subject, body, fail_silently=True)
+            elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in settings.MIDDLEWARE_CLASSES:
+                middle = BrokenLinkEmailsMiddleware()
+                domain = request.get_host()
+                path = request.get_full_path()
+                referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+                if not middle.is_ignorable_request(request, path, domain, referer):
+                    mail_managers(subject, body, fail_silently=True)
             return None
+
 
 class PageUrl(AsTag):
     name = 'page_url'
@@ -144,7 +150,6 @@ class PageUrl(AsTag):
             return ''
 
     def get_value(self, context, page_lookup, lang, site):
-        from django.core.cache import cache
 
         site_id = get_site_id(site)
         request = context.get('request', False)
@@ -155,17 +160,12 @@ class PageUrl(AsTag):
         if lang is None:
             lang = get_language_from_request(request)
 
-        cache_key = _get_cache_key('page_url', page_lookup, lang, site_id) + \
-            '_type:absolute_url'
-
-        url = cache.get(cache_key)
-
-        if not url:
+        url = get_page_url_cache(page_lookup, lang, site_id)
+        if url is None:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
                 url = page.get_absolute_url(language=lang)
-                cache.set(cache_key, url,
-                          get_cms_setting('CACHE_DURATIONS')['content'])
+                set_page_url_cache(page_lookup, lang, site_id, url)
         if url:
             return url
         return ''
@@ -176,7 +176,6 @@ register.tag('page_id_url', PageUrl)
 
 
 def _get_placeholder(current_page, page, context, name):
-    from django.core.cache import cache
     placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
     if page.pk in placeholder_cache:
         placeholder = placeholder_cache[page.pk].get(name, None)
@@ -190,9 +189,8 @@ def _get_placeholder(current_page, page, context, name):
         fetch_placeholders = placeholders
     else:
         for placeholder in placeholders:
-            cache_key = placeholder.get_cache_key(get_language())
-            cached_value = cache.get(cache_key)
-            if not cached_value is None:
+            cached_value = get_placeholder_cache(placeholder, get_language())
+            if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 placeholder.content_cache = cached_value['content']
             else:
@@ -212,7 +210,6 @@ def _get_placeholder(current_page, page, context, name):
 
 
 def get_placeholder_content(context, request, current_page, name, inherit, default):
-    from django.core.cache import cache
     edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
     pages = [current_page]
     # don't display inherited plugins in edit mode, so that the user doesn't
@@ -228,9 +225,8 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
             if hasattr(placeholder, 'content_cache'):
                 return mark_safe(placeholder.content_cache)
             if not hasattr(placeholder, 'cache_checked'):
-                cache_key = placeholder.get_cache_key(get_language())
-                cached_value = cache.get(cache_key)
-                if not cached_value is None:
+                cached_value = get_placeholder_cache(placeholder, get_language())
+                if cached_value is not None:
                     restore_sekizai_context(context, cached_value['sekizai'])
                     return mark_safe(cached_value['content'])
         if not get_plugins(request, placeholder, page.get_template()):
@@ -273,8 +269,6 @@ class Placeholder(Tag):
 
     Keyword arguments:
     name -- the name of the placeholder
-    width -- additional width attribute (integer) which gets added to the plugin context
-    (deprecated, use `{% with 320 as width %}{% placeholder "foo"}{% endwith %}`)
     inherit -- optional argument which if given will result in inheriting
         the content of the placeholder with the same name on parent pages
     or -- optional argument which if given will make the template tag a block
@@ -303,6 +297,7 @@ class Placeholder(Tag):
             if nodelist:
                 return nodelist.render(context)
             return ''
+        content = ''
         try:
             content = get_placeholder_content(context, request, page, name, inherit, nodelist)
         except PlaceholderNotFound:
@@ -348,10 +343,7 @@ class RenderPlugin(InclusionTag):
         if not plugin:
             return {'content': ''}
 
-        try:
-            placeholder = context['cms_placeholder_instance']
-        except KeyError:
-            placeholder = plugin.placeholder
+        placeholder = plugin.placeholder
 
         processors = self.get_processors(context, plugin, placeholder)
 
@@ -415,6 +407,7 @@ class PluginChildClasses(InclusionTag):
             plugin_class = plugin.get_plugin_class()
             if plugin_class.allow_children:
                 instance, plugin = plugin.get_plugin_instance()
+                plugin.cms_plugin_instance = instance
                 childs = [plugin_pool.get_plugin(cls) for cls in plugin.get_child_classes(slot, page)]
                 # Builds the list of dictionaries containing module, name and value for the plugin dropdowns
                 child_plugin_classes = get_toolbar_plugin_struct(childs, slot, page, parent=plugin_class)
@@ -455,7 +448,7 @@ class ExtraMenuItems(InclusionTag):
             plugin_class_inst = plugin.get_plugin_class_instance()
             item = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin)
             if item:
-                items.append(item)
+                items += item
             plugin_classes = plugin_pool.get_all_plugins()
             for plugin_class in plugin_classes:
                 plugin_class_inst = plugin_class()
@@ -550,6 +543,7 @@ class PageAttribute(AsTag):
 
 register.tag(PageAttribute)
 
+
 def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
                                site=None, cache_result=True):
     """
@@ -561,10 +555,13 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     See _get_page_by_untyped_arg() for detailed information on the allowed types
     and their interpretation for the page_lookup argument.
     """
-    from django.core.cache import cache
     validate_placeholder_name(placeholder_name)
 
-    request = context.get('request', False)
+    if DJANGO_1_7:
+        request = context.get('request', False)
+    else:
+        request = context.request
+
     site_id = get_site_id(site)
 
     if not request:
@@ -573,9 +570,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
         lang = get_language_from_request(request)
 
     if cache_result:
-        base_key = _get_cache_key('_show_placeholder_for_page', page_lookup, lang, site_id)
-        cache_key = _clean_key('%s_placeholder:%s' % (base_key, placeholder_name))
-        cached_value = cache.get(cache_key)
+        cached_value = get_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name)
         if cached_value:
             restore_sekizai_context(context, cached_value['sekizai'])
             return {'content': mark_safe(cached_value['content'])}
@@ -589,10 +584,11 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             raise
         return {'content': ''}
     watcher = Watcher(context)
-    content = render_placeholder(placeholder, context, placeholder_name)
+    content = render_placeholder(placeholder, context, placeholder_name, use_cache=cache_result)
     changes = watcher.get_changes()
     if cache_result:
-        cache.set(cache_key, {'content': content, 'sekizai': changes}, get_cms_setting('CACHE_DURATIONS')['content'])
+        set_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name,
+                                   {'content': content, 'sekizai': changes})
 
     if content:
         return {'content': mark_safe(content)}
@@ -657,19 +653,19 @@ class CMSToolbar(RenderBlock):
         request = context.get('request', None)
         toolbar = getattr(request, 'toolbar', None)
         if toolbar:
+            toolbar.init_toolbar(request)
             toolbar.populate()
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
-        context['cms_version'] = __version__
+        context['cms_version'] =  __version__
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
                 # needed to populate the context with sekizai content
                 render_to_string('cms/toolbar/toolbar_javascript.html', context)
-                clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
+                context['addons'] =  mark_safe(toolbar.render_addons(context))
         else:
             language = None
-            clipboard = ''
         # render everything below the tag
         rendered_contents = nodelist.render(context)
         # sanity checks
@@ -682,10 +678,10 @@ class CMSToolbar(RenderBlock):
         # render the toolbar content
         request.toolbar.post_template_populate()
         with force_language(language):
-            context['clipboard'] = clipboard
-            content = render_to_string('cms/toolbar/toolbar.html', context)
+            addons = mark_safe(toolbar.post_template_render_addons(context))
+            toolbar = render_to_string('cms/toolbar/toolbar.html', context)
         # return the toolbar content and the content below
-        return '%s\n%s' % (content, rendered_contents)
+        return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
 
 register.tag(CMSToolbar)
 
@@ -897,8 +893,9 @@ class CMSEditableObject(InclusionTag):
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
-            view_url = 'admin:cms_page_changelist'
-        querystring = {'language': language}
+            view_url = 'admin:%s_%s_changelist' % (
+                instance._meta.app_label, instance._meta.model_name)
+        querystring = OrderedDict((('language', language),))
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
@@ -980,12 +977,63 @@ class CMSEditableObjectAdd(CMSEditableObject):
         """
         Uses _get_empty_context and adds the `render_model_icon` variable.
         """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
         extra_context = self._get_empty_context(context, instance, None,
                                                 language, view_url, view_method,
                                                 editmode=False)
         extra_context['render_model_add'] = True
         return extra_context
 register.tag(CMSEditableObjectAdd)
+
+
+class CMSEditableObjectAddBlock(CMSEditableObject):
+    """
+    Templatetag that links arbitrary content to the addform for the specified
+    model (based on the provided model instance).
+    """
+    name = 'render_model_add_block'
+    options = Options(
+        Argument('instance'),
+        Argument('language', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
+        blocks=[('endrender_model_add_block', 'nodelist')],
+    )
+
+    def render_tag(self, context, **kwargs):
+        """
+        Renders the block and then inject the resulting HTML in the template
+        context
+        """
+        context.push()
+        template = self.get_template(context, **kwargs)
+        data = self.get_context(context, **kwargs)
+        data['content'] = mark_safe(kwargs['nodelist'].render(data))
+        data['rendered_content'] = data['content']
+        output = render_to_string(template, data)
+        context.pop()
+        if kwargs.get('varname'):
+            context[kwargs['varname']] = output
+            return ''
+        else:
+            return output
+
+    def get_context(self, context, instance, language,
+                    view_url, view_method, varname, nodelist):
+        """
+        Uses _get_empty_context and adds the `render_model_icon` variable.
+        """
+        if isinstance(instance, Model) and not instance.pk:
+            instance.pk = 0
+        extra_context = self._get_empty_context(context, instance, None,
+                                                language, view_url, view_method,
+                                                editmode=False)
+        extra_context['render_model_add'] = True
+        return extra_context
+register.tag(CMSEditableObjectAddBlock)
 
 
 class CMSEditableObjectBlock(CMSEditableObject):
@@ -1086,7 +1134,6 @@ class StaticPlaceholderNode(Tag):
         else:
             placeholder = static_placeholder.public
         placeholder.is_static = True
-        context.update({'cms_placeholder_instance': placeholder})
         content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
         return content
 register.tag(StaticPlaceholderNode)
@@ -1112,16 +1159,22 @@ class RenderPlaceholder(AsTag):
         request = context.get('request', None)
         placeholder = kwargs.get('placeholder')
         width = kwargs.get('width')
+        nocache = kwargs.get('nocache', False)
         language = kwargs.get('language')
-
         if not request:
             return ''
         if not placeholder:
             return ''
+
+        if isinstance(placeholder, string_types):
+            placeholder = PlaceholderModel.objects.get(slot=placeholder)
         if not hasattr(request, 'placeholders'):
             request.placeholders = []
-        request.placeholders.append(placeholder)
-        return safe(placeholder.render(context, width, lang=language, editable=editable))
+        if placeholder.has_change_permission(request):
+            request.placeholders.append(placeholder)
+        context = context.new(context)
+        return safe(placeholder.render(context, width, lang=language,
+                                       editable=editable, use_cache=not nocache))
 
     def get_value_for_context(self, context, **kwargs):
         return self._get_value(context, editable=False, **kwargs)
@@ -1131,6 +1184,20 @@ class RenderPlaceholder(AsTag):
 
 register.tag(RenderPlaceholder)
 
+
+class RenderUncachedPlaceholder(RenderPlaceholder):
+    """
+    Uncached version of RenderPlaceholder
+    This templatetag will neither get the result from cache, nor will update
+    the cache value for the given placeholder
+    """
+    name = 'render_uncached_placeholder'
+
+    def _get_value(self, context, editable=True, **kwargs):
+        kwargs['nocache'] = True
+        return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
+
+register.tag(RenderUncachedPlaceholder)
 
 NULL = object()
 

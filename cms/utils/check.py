@@ -5,9 +5,9 @@ import inspect
 from itertools import chain
 import os
 
+from django.db.models.loading import get_app_paths
 from django.conf import settings
-from django.template import Lexer, TOKEN_BLOCK
-from django.utils import six
+from django.template.base import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
@@ -15,7 +15,8 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat.dj import get_app_paths, is_installed
+from cms.utils.compat import DJANGO_1_7
+from cms.utils.compat.dj import is_installed
 
 
 SUCCESS = 1
@@ -169,10 +170,17 @@ def check_sekizai(output):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
-        if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
-            section.success("Sekizai template context processor is installed")
+        if DJANGO_1_7:
+            if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
+                section.success("Sekizai template context processor is installed")
+            else:
+                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
         else:
-            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+            processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+            if 'sekizai.context_processors.sekizai' in processors:
+                section.success("Sekizai template context processor is installed")
+            else:
+                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -186,6 +194,7 @@ def check_sekizai(output):
         else:
             section.finish_error("Sekizai configuration has errors")
 
+
 @define_check
 def check_i18n(output):
     with output.section("Internationalization") as section:
@@ -198,7 +207,7 @@ def check_i18n(output):
         for lang in getattr(settings, 'LANGUAGES', ()):
             if lang[0].find('_') > -1:
                 section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        if isinstance(settings.SITE_ID, six.integer_types):
+        if settings.SITE_ID == hash(settings.SITE_ID):
             for site, items in get_cms_setting('LANGUAGES').items():
                 if type(site) == int:
                     for lang in items:
@@ -209,6 +218,27 @@ def check_i18n(output):
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
+
+
+@define_check
+def check_middlewares(output):
+    with output.section("Middlewares") as section:
+        required_middlewares = (
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'cms.middleware.user.CurrentUserMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+            'cms.middleware.language.LanguageCookieMiddleware',
+        )
+        for middleware in required_middlewares:
+            if middleware not in settings.MIDDLEWARE_CLASSES:
+                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+
 
 @define_check
 def check_deprecated_settings(output):
@@ -236,7 +266,7 @@ def check_plugin_instances(output):
                 section.error("%s has instances but is no longer installed" % plugin_type["type"] )
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
@@ -272,7 +302,7 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._meta.get_all_related_objects():
-                if rel.model != CMSPlugin and rel.model != AliasPluginModel:
+                if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),
@@ -284,10 +314,16 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                    c_to_s(extension),
-                    c_to_s(rel.related.parent_model),
-                ))
+                if DJANGO_1_7:
+                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                        c_to_s(extension),
+                        c_to_s(rel.related.parent_model),
+                    ))
+                else:
+                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                        extension,
+                        rel.related,
+                    ))
             for rel in extension._meta.get_all_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
@@ -321,7 +357,10 @@ def _load_all_templates(directory):
 @define_check
 def deprecations(output):
     # deprecated placeholder_tags scan (1 in 3.1)
-    templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
+    if DJANGO_1_7:
+        templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
+    else:
+        templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
     templates_dirs.extend(
         [os.path.join(path, 'templates') for path in get_app_paths()]
     )

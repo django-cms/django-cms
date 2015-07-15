@@ -18,11 +18,11 @@ your CMS
 Configuration
 *************
 
- * Add :mod:`django.contrib.sitemaps` to your project's :setting:`django:INSTALLED_APPS`
-   setting.
- * Add ``from cms.sitemaps import CMSSitemap`` to the top of your main ``urls.py``.
- * Add ``url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}}),``
-   to your urlpatterns.
+ * add :mod:`django.contrib.sitemaps` to your project's :setting:`django:INSTALLED_APPS`
+   setting
+ * add ``from cms.sitemaps import CMSSitemap`` to the top of your main ``urls.py``
+ * add ``url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}}),``
+   to your urlpatterns
 
 
 ***********************
@@ -32,4 +32,4 @@ django.contrib.sitemaps
 More information about :mod:`django.contrib.sitemaps` can be found in the official
 `Django documentation <http://docs.djangoproject.com/en/dev/ref/contrib/sitemaps/>`_.
 
- 
+
