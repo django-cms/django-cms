@@ -115,6 +115,15 @@ JavaScript is linted using `JSHint <http://jshint.com/>`_ and `JSCS
 
 Or you can also run the watcher by just running ``gulp``.
 
+JS Bundling
+-----------
+
+Javascript files are split up for easier development, but in the end they are
+bundled together and minified to decrease amount of requests made and improve
+performance. In order to do that we use ``gulp`` task runner, where ``bundle``
+command is available. Configuration and list of dependencies for each bundle are
+stored inside the ``gulpfile.js``.
+
 Process
 =======
 
