@@ -72,14 +72,14 @@ http://docs.django-cms.org/en/latest/introduction/index.html
 Quick Start
 ***********
 
-You can use the `django CMS installer <https://github.com/nephila/djangocms-installer>`_::
+You can use the `django CMS installer <http://djangocms-installer.readthedocs.org>`_::
 
     $ pip install --upgrade virtualenv
     $ virtualenv env
     $ source env/bin/activate
     (env) $ pip install djangocms-installer
     (env) $ mkdir myproject && cd myproject
-    (env) $ djangocms -p . my_demo
+    (env) $ djangocms -p -f . my_demo
     (env) $ python manage.py
 
 

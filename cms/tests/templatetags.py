@@ -366,7 +366,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         output = tag.render(context)
         self.assertEqual(
             output,
-            '<div class="cms_plugin cms_plugin-{0}">Test</div>'.format(
+            '<div class="cms-plugin cms-plugin-{0}">Test</div>'.format(
                 plugin.pk
             )
         )
@@ -422,8 +422,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request, {'category': Category()})
         with self.assertNumQueries(0):
             output = template.render(context)
-        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
-        'cms_render_model_add'
+        expected = 'cms-plugin cms-plugin-sampleapp-category-add-0 '
+        'cms-render-model-add'
         self.assertIn(expected, output)
 
         # Now test that it does NOT render when not in edit mode
@@ -457,8 +457,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         context = RequestContext(request, {'category': Category()})
         with self.assertNumQueries(0):
             output = template.render(context)
-        expected = 'cms_plugin cms_plugin-sampleapp-category-add-0 '
-        'cms_render_model_add'
+        expected = 'cms-plugin cms-plugin-sampleapp-category-add-0 '
+        'cms-render-model-add'
         self.assertIn(expected, output)
 
         # Now test that it does NOT render when not in edit mode

@@ -1,11 +1,11 @@
 {% load i18n %}{% spaceless %}
-<div class="cms_toolbar-item cms_toolbar-item-buttons cms_toolbar-item_switch_save-edit">
+<div class="cms-toolbar-item cms-toolbar-item-buttons cms-toolbar-item-switch-save-edit">
     {% if request.toolbar.edit_mode %}
-    <a class="cms_btn cms_btn-action cms_btn-switch-save" href="{{ request.toolbar.get_object_public_url }}?{{ request.toolbar.edit_mode_url_off }}">
+    <a class="cms-btn cms-btn-action cms-btn-switch-save" href="{{ request.toolbar.get_object_public_url }}?{{ request.toolbar.edit_mode_url_off }}">
         {% trans "Save as draft" %}
     </a>
     {% else %}
-    <a class="cms_btn cms_btn-active cms_btn-switch-edit" href="{{ request.toolbar.get_object_draft_url }}?{{ request.toolbar.edit_mode_url_on }}">
+    <a class="cms-btn cms-btn-active cms-btn-switch-edit" href="{{ request.toolbar.get_object_draft_url }}?{{ request.toolbar.edit_mode_url_on }}">
         {% trans "Edit" %}
     </a>
     {% endif %}

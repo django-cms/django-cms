@@ -6,7 +6,7 @@
 - Pull translations (tx pull -f -a)
 - Compile translations (django-admin.py compilemessages)
 - Check CHANGELOG that all closed PRs are present.
-- Prepare blog post
+- Prepare blog post, including "Release" tag 
 - update AUTHORS file (python develop.py authors)
 - Make a release commit
 - Tag release commit

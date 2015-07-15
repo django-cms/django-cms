@@ -185,7 +185,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
-        self.assertContains(response, '<div id="cms_toolbar"')
+        self.assertContains(response, '<div id="cms-toolbar"')
         self.assertContains(response, 'cms.base.css')
 
     def test_markup_generic_module(self):
@@ -194,7 +194,7 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<div class="cms_submenu-item cms_submenu-item-title"><span>Generic</span>')
+        self.assertContains(response, '<div class="cms-submenu-item cms-submenu-item-title"><span>Generic</span>')
 
     def test_markup_flash_custom_module(self):
         superuser = self.get_superuser()
@@ -204,7 +204,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="LinkPlugin">')
         self.assertContains(response,
-                            '<div class="cms_submenu-item cms_submenu-item-title"><span>Different Grouper</span>')
+                            '<div class="cms-submenu-item cms-submenu-item-title"><span>Different Grouper</span>')
 
     def test_markup_menu_items(self):
         superuser = self.get_superuser()
@@ -213,9 +213,9 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,
-                            '<div class="cms_submenu-item"><a href="/some/url/" data-rel="ajax"')
+                            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"')
         self.assertContains(response,
-                            '<div class="cms_submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
+                            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"')
 
     def test_markup_toolbar_url_page(self):
         superuser = self.get_superuser()
@@ -269,7 +269,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('%s?%s' % (
                 page_3.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms_toolbar-item_switch')
+        self.assertNotContains(response, 'cms-toolbar-item-switch')
         self.assertEqual(page_3.get_public_url(), '')
         self.assertNotEqual(page_3.get_draft_url(), page_3.get_public_url())
 
@@ -342,22 +342,22 @@ class ToolbarTests(ToolbarTestBase):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'cms_form-login')
+        self.assertContains(response, 'cms-form-login')
 
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
     def test_hide_toolbar_login_anonymous_setting(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms_form-login')
+        self.assertNotContains(response, 'cms-form-login')
 
     def test_hide_toolbar_login_nonstaff(self):
         create_page("toolbar-page", "nav_playground.html", "en", published=True)
         with self.login_user_context(self.get_nonstaff()):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms_form-login')
-        self.assertNotContains(response, 'cms_toolbar')
+        self.assertNotContains(response, 'cms-form-login')
+        self.assertNotContains(response, 'cms-toolbar')
 
     def test_admin_logout_staff(self):
         with override_settings(CMS_PERMISSION=True):
@@ -872,7 +872,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                 'placeholderapp', 'example1', 'char_1', ex1.pk))
 
     def test_invalid_item(self):
@@ -892,7 +892,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s cms_render_model"></div>' % ex1.pk)
+            '<div class="cms-plugin cms-plugin-%s cms-render-model"></div>' % ex1.pk)
 
     def test_as_varname(self):
         user = self.get_staff()
@@ -911,7 +911,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertNotContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s cms_render_model"></div>' % ex1.pk)
+            '<div class="cms-plugin cms-plugin-%s cms-render-model"></div>' % ex1.pk)
 
     def test_edit_render_placeholder(self):
         """
@@ -940,8 +940,8 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_placeholder cms_placeholder-{0}"></div>\n'
-            '<div class="cms_plugin cms_plugin-{1}">{2}</div></h1>'.format(ex1.placeholder.pk,
+            '<h1><div class="cms-placeholder cms-placeholder-{0}"></div>\n'
+            '<div class="cms-plugin cms-plugin-{1}">{2}</div></h1>'.format(ex1.placeholder.pk,
                                                                            plugin.pk, render_placeholder_body)
             )
 
@@ -961,12 +961,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         self.assertContains(
             response,
-            'CMS.Plugin(\'cms_plugin-{0}\''.format(plugin.pk)
+            'CMS.Plugin(\'cms-plugin-{0}\''.format(plugin.pk)
         )
 
         self.assertContains(
             response,
-            'CMS.Plugin(\'cms_placeholder-{0}\''.format(ex1.placeholder.pk)
+            'CMS.Plugin(\'cms-placeholder-{0}\''.format(ex1.placeholder.pk)
         )
 
     def test_filters(self):
@@ -987,7 +987,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                 'placeholderapp', 'example1', 'char_1', ex1.pk, truncatewords(ex1.char_1, 2)))
 
     def test_filters_date(self):
@@ -1009,7 +1009,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                 'placeholderapp', 'example1', 'date_field', ex1.pk,
                 ex1.date_field.strftime("%Y-%m-%d")))
 
@@ -1023,7 +1023,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">%s</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">%s</div></h1>' % (
                 'placeholderapp', 'example1', 'date_field', ex1.pk,
                 ex1.date_field.strftime("%Y %m %d")))
 
@@ -1062,7 +1062,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-%s cms-render-model-icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(response, "'onClose': 'REFRESH_PAGE',")
 
@@ -1083,7 +1083,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-%s cms-render-model-icon"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
 
     def test_icon_followed_by_render_model_block_tag(self):
@@ -1112,11 +1112,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            "new CMS.Plugin('cms_plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
+            "new CMS.Plugin('cms-plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
 
         self.assertContains(
             response,
-            "new CMS.Plugin('cms_plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
+            "new CMS.Plugin('cms-plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
 
     def test_add_tag(self):
         user = self.get_staff()
@@ -1135,7 +1135,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-add-%s cms-render-model-add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
 
     def test_add_tag_class(self):
@@ -1155,7 +1155,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-add-%s cms-render-model-add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', '0'))
 
     def test_add_tag_classview(self):
@@ -1176,7 +1176,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = view_func(request, pk=ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-add-%s cms_render_model_add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-add-%s cms-render-model-add"><img src="/static/cms/img/toolbar/render_model_placeholder.png"></div>' % (
                 'placeholderapp', 'example1', '0'))
 
     def test_block_tag(self):
@@ -1206,7 +1206,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertNotContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model_icon"><img src="/static/cms/img/toolbar/render_model_icon.png"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-%s cms-render-model-icon"><img src="/static/cms/img/toolbar/render_model_icon.png"></div>' % (
                 'placeholderapp', 'example1', ex1.pk))
 
         # This template does not render anything as content is saved in a
@@ -1231,7 +1231,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model cms_render_model_block">' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-%s cms-render-model cms-render-model-block">' % (
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
@@ -1257,7 +1257,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-%s cms_render_model cms_render_model_block">' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-%s cms-render-model cms-render-model-block">' % (
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
@@ -1278,7 +1278,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-changelist-%s cms_render_model cms_render_model_block">' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-changelist-%s cms-render-model cms-render-model-block">' % (
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(
             response,
@@ -1301,7 +1301,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model"></div>' % (
+            '<div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model"></div>' % (
                 'placeholderapp', 'example1', 'fake_field', ex1.pk))
 
         # no attribute
@@ -1316,7 +1316,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-%s cms_render_model"></div>' % ex1.pk)
+            '<div class="cms-plugin cms-plugin-%s cms-render-model"></div>' % ex1.pk)
 
     def test_callable_item(self):
         user = self.get_staff()
@@ -1335,7 +1335,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_view_method(self):
@@ -1392,7 +1392,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_admin_url(self):
@@ -1411,7 +1411,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response,
-                            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+                            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_admin_url_extra_field(self):
@@ -1430,7 +1430,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response,
-                            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+                            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
         self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_2", response.content.decode('utf8')))
@@ -1452,7 +1452,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
         self.assertContains(response, "/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
@@ -1475,7 +1475,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_item_from_context(self):
@@ -1496,7 +1496,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                                item_name="callable_item")
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">char_1</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">char_1</div></h1>' % (
                 'placeholderapp', 'example1', 'callable_item', ex1.pk))
 
     def test_edit_field(self):
@@ -1552,7 +1552,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view_multi(request, exm.pk)
         self.assertContains(
             response,
-            '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">one</div></h1>' % (
+            '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">one</div></h1>' % (
                 'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
         self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/en/" % exm.pk)
         self.assertTrue(re.search(self.edit_fields_rx % "char_1", response.content.decode('utf8')))
@@ -1563,7 +1563,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view_multi(request, exm.pk)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">un</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">un</div></h1>' % (
                     'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
             self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
             self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
@@ -1584,7 +1584,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view_multi_unfiltered(request, exm.pk)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">un</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">un</div></h1>' % (
                     'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
             self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/fr/" % exm.pk)
             self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
@@ -1594,7 +1594,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response = detail_view_multi_unfiltered(request, exm.pk)
             self.assertContains(
                 response,
-                '<h1><div class="cms_plugin cms_plugin-%s-%s-%s-%s cms_render_model">un</div></h1>' % (
+                '<h1><div class="cms-plugin cms-plugin-%s-%s-%s-%s cms-render-model">un</div></h1>' % (
                     'placeholderapp', 'multilingualexample1', 'char_1', exm.pk))
             self.assertContains(response, "/admin/placeholderapp/multilingualexample1/edit-field/%s/de/" % exm.pk)
             self.assertTrue(re.search(self.edit_fields_rx % "char_1%2Cchar_2", response.content.decode('utf8')))
@@ -1654,19 +1654,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = details(request, '')
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-cms-page-get_page_title-%s cms_render_model">%s</div>' % (
+            '<div class="cms-plugin cms-plugin-cms-page-get_page_title-%s cms-render-model">%s</div>' % (
                 page.pk, page.get_page_title(language)))
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-cms-page-get_menu_title-%s cms_render_model">%s</div>' % (
+            '<div class="cms-plugin cms-plugin-cms-page-get_menu_title-%s cms-render-model">%s</div>' % (
                 page.pk, page.get_menu_title(language)))
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-cms-page-get_title-%s cms_render_model">%s</div>' % (
+            '<div class="cms-plugin cms-plugin-cms-page-get_title-%s cms-render-model">%s</div>' % (
                 page.pk, page.get_title(language)))
         self.assertContains(
             response,
-            '<div class="cms_plugin cms_plugin-cms-page-changelist-%s cms_render_model cms_render_model_block"><h3>Menu</h3></div>' % page.pk)
+            '<div class="cms-plugin cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block"><h3>Menu</h3></div>' % page.pk)
         self.assertContains(
             response,
             "'edit_plugin': '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('cms_page_changelist'), language))

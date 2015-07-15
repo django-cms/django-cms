@@ -99,13 +99,31 @@ class Placeholder(models.Model):
         Generic method to check the permissions for a request for a given key,
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
+          * 'add' and 'change' permissions on placeholder need either on add or change 
+            permission on attached object to be granted.
+          * 'delete' need either on add, change or delete
         """
         if getattr(request, 'user', None) and request.user.is_superuser:
             return True
-        if self.page:
-            return self._get_object_permission(self.page, request, key)
-        for obj in self._get_attached_objects():
-            return self._get_object_permission(obj, request, key)
+        perm_keys = {
+            'add': ('add', 'change',),
+            'change': ('add', 'change',),
+            'delete': ('add', 'change', 'delete'),
+        }
+        if key not in perm_keys:
+            raise Exception("%s is not a valid perm key. "
+                            "'Only 'add', 'change' and 'delete' are allowed" % key)
+        objects = [self.page] if self.page else self._get_attached_objects()
+        obj_perm = None
+        for obj in objects:
+            obj_perm = False
+            for key in perm_keys[key]:
+                if self._get_object_permission(obj, request, key):
+                    obj_perm = True
+                    break
+            if not obj_perm:
+                return False
+        return obj_perm
 
     def _get_object_permission(self, obj, request, key):
         if not getattr(request, 'user', None):

@@ -116,6 +116,25 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
         with self.settings(CMS_LANGUAGE_CONF=True):
             self.assertCheck(True, warnings=1, errors=0)
 
+    def test_middlewares(self):
+        MIDDLEWARE_CLASSES=[
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.http.ConditionalGetMiddleware',
+            'django.contrib.sessions.middleware.SessionMiddleware',
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.messages.middleware.MessageMiddleware',
+            'django.middleware.csrf.CsrfViewMiddleware',
+            'django.middleware.locale.LocaleMiddleware',
+            'django.middleware.doc.XViewMiddleware',
+            'django.middleware.common.CommonMiddleware',
+            'cms.middleware.page.CurrentPageMiddleware',
+            'cms.middleware.toolbar.ToolbarMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        self.assertCheck(True, warnings=0, errors=0)
+        with self.settings(MIDDLEWARE_CLASSES=MIDDLEWARE_CLASSES):
+            self.assertCheck(False, warnings=0, errors=2)
+
     def test_cms_site_languages_deprecated(self):
         with self.settings(CMS_SITE_LANGUAGES=True):
             self.assertCheck(True, warnings=1, errors=0)

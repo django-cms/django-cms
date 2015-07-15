@@ -14,11 +14,12 @@ from django.test.utils import override_settings
 from cms.api import create_page, create_title, publish_page
 from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission, UserSettings, Placeholder
+from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
-from cms.views import _handle_no_page, details
+from cms.views import details
 from menus.menu_pool import menu_pool
 
 
@@ -149,13 +150,13 @@ class ViewTests(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en", published=True)
         # Anon user
         response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.assertNotContains(response, "cms_toolbar-item_switch_save-edit", 200)
+        self.assertNotContains(response, "cms_toolbar-item-switch-save-edit", 200)
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.assertContains(response, "cms_toolbar-item_switch_save-edit", 1, 200)
+        self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
         # Admin but with no permission
         user = self.get_staff_user_with_no_permissions()
@@ -163,12 +164,12 @@ class ViewTests(CMSTestCase):
 
         with self.login_user_context(user):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.assertNotContains(response, "cms_toolbar-item_switch_save-edit", 200)
+        self.assertNotContains(response, "cms-toolbar-item-switch-save-edit", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.assertContains(response, "cms_toolbar-item_switch_save-edit", 1, 200)
+        self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
 
     def test_toolbar_switch_urls(self):

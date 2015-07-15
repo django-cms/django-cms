@@ -173,14 +173,14 @@ class ToolbarBasicTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertTrue(User.objects.all().count(), 1)
         self.driver.get(url)
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
         password_input.send_keys(getattr(self.user, User.USERNAME_FIELD))
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
     def test_toolbar_login_view(self):
         User = get_user_model()
@@ -206,7 +206,7 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.send_keys("what")
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
     def test_toolbar_login_cbv(self):
         User = get_user_model()
@@ -230,7 +230,7 @@ class ToolbarBasicTests(CMSLiveTests):
         password_input.send_keys("what")
         password_input.submit()
         self.wait_page_loaded()
-        self.assertTrue(self.driver.find_element_by_class_name('cms_error'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
     @override_settings(DEBUG=True)
     def test_basic_add_pages(self):
@@ -295,7 +295,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
 
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -303,7 +303,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
     def test_copy_from_language(self):
         self._login()
@@ -314,22 +314,22 @@ class PlaceholderBasicTests(CMSLiveTests):
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 0)
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms_dragbar .cms_submenu')
+        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
 
-        submenu_link_selector = '.cms_submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
         copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
         copy_from_english.click()
 
         # Done, check if the text plugin was copied and it is only one
 
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms_draggable:nth-child(1)')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)
@@ -342,15 +342,15 @@ class PlaceholderBasicTests(CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
-        build_button = self.driver.find_element_by_css_selector('.cms_toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms_submenu')
+        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
 
         hov = ActionChains(self.driver).move_to_element(submenu)
         hov.perform()
@@ -359,7 +359,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         copy.click()
 
         time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms_clipboard')
+        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
 
         WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
 
@@ -373,7 +373,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
         drag = ActionChains(self.driver).click_and_hold(
-            clipboard.find_element_by_css_selector('.cms_draggable:nth-child(1)')
+            clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
         )
 
         drag.perform()
@@ -381,7 +381,7 @@ class PlaceholderBasicTests(CMSLiveTests):
         time.sleep(0.1)
 
         drag = ActionChains(self.driver).move_to_element(
-            self.driver.find_element_by_css_selector('.cms_dragarea-1')
+            self.driver.find_element_by_css_selector('.cms-dragarea-1')
         )
         drag.perform()
 
@@ -428,7 +428,7 @@ class StaticPlaceholderPermissionTests(CMSLiveTests):
         url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.driver.get(url)
 
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms_toolbar-item_logout')
+        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
         username_input = self.driver.find_element_by_id("id_cms-username")
         username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
         password_input = self.driver.find_element_by_id("id_cms-password")
@@ -436,10 +436,10 @@ class StaticPlaceholderPermissionTests(CMSLiveTests):
         password_input.submit()
         self.wait_page_loaded()
 
-        self.assertTrue(self.driver.find_element_by_class_name('cms_toolbar-item-navigation'))
+        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
 
         pk = Placeholder.objects.filter(slot='logo').order_by('id')[0].pk
-        placeholder_name = 'cms_placeholder-%s' % pk
+        placeholder_name = 'cms-placeholder-%s' % pk
 
         # test static placeholder permission (content of static placeholders is NOT editable)
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))

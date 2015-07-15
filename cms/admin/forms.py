@@ -11,7 +11,6 @@ try:
 except ImportError:
     from django.forms.util import ErrorList
 from django.forms.widgets import HiddenInput
-from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
@@ -29,6 +28,7 @@ from cms.utils.page_resolver import is_valid_url
 from cms.utils.permissions import (get_current_user, get_subordinate_users,
                                    get_subordinate_groups,
                                    get_user_permission_level)
+from cms.utils.urlify import urlify
 from menus.menu_pool import menu_pool
 
 
@@ -155,7 +155,7 @@ class PageForm(forms.ModelForm):
         return cleaned_data
 
     def clean_slug(self):
-        slug = slugify(self.cleaned_data['slug'])
+        slug = urlify(self.cleaned_data['slug'])
         if not slug:
             raise ValidationError(_("Slug must not be empty."))
         return slug

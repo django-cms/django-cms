@@ -204,7 +204,15 @@ Permissions
 
 To be able to edit a placeholder user must be a ``staff`` member and needs either edit permissions
 on the model that contains the :class:`~cms.models.fields.PlaceholderField`, or permissions for
-that specific instance of that model.
+that specific instance of that model. Required permissions for edit actions are:
+
+* to ``add``: require ``add`` **or** ``change`` permission on related Model or instance.
+* to ``change``: require ``add`` **or** ``change`` permission on related Model or instance.
+* to ``delete``: require ``add`` **or** ``change`` **or** ``delete`` permission on related Model 
+  or instance.
+
+With this logic, an user who can ``change`` a Model's instance but can not ``add`` a new 
+Model's instance will be able to add some placeholders or plugins to existing Model's instances.
 
 Model permissions are usually added through the default Django auth application and its admin
 interface. Object-level permission can be handled by writing a custom Auth Backend as described in

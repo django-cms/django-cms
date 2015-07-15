@@ -1,107 +1,116 @@
-/*##################################################|*/
-/* #CMS# */
-(function($) {
-// CMS.$ will be passed for $
-$(document).ready(function () {
-	/*!
-	 * Clipboard
-	 * Handles copy & paste
-	 */
-	CMS.Clipboard = new CMS.Class({
+//##################################################################################################################
+// #CLIPBOARD#
+/* global CMS */
 
-		implement: [CMS.API.Helpers],
+(function ($) {
+    'use strict';
+    // CMS.$ will be passed for $
+    $(document).ready(function () {
+        /*!
+         * Clipboard
+         * Handles copy & paste
+         */
+        CMS.Clipboard = new CMS.Class({
 
-		options: {
-			'position': 220, // offset to top
-			'speed': 100,
-			'id': null,
-			'url': ''
-		},
+            implement: [CMS.API.Helpers],
 
-		initialize: function (options) {
-			this.clipboard = $('.cms_clipboard');
-			this.options = $.extend(true, {}, this.options, options);
-			this.config = CMS.config;
-			this.settings = CMS.settings;
+            options: {
+                'position': 220, // offset to top
+                'speed': 100,
+                'id': null,
+                'url': ''
+            },
 
-			// elements
-			this.containers = this.clipboard.find('.cms_clipboard-containers > .cms_draggable');
-			this.triggers = this.clipboard.find('.cms_clipboard-triggers a');
-			this.triggerRemove = this.clipboard.find('.cms_clipboard-empty a');
+            initialize: function (options) {
+                this.clipboard = $('.cms-clipboard');
+                this.options = $.extend(true, {}, this.options, options);
+                this.config = CMS.config;
+                this.settings = CMS.settings;
 
-			// states
-			this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
-			this.timer = function () {};
+                // elements
+                this.containers = this.clipboard.find('.cms-clipboard-containers > .cms-draggable');
+                this.triggers = this.clipboard.find('.cms-clipboard-triggers a');
+                this.triggerRemove = this.clipboard.find('.cms-clipboard-empty a');
 
-			// setup initial stuff
-			this._setup();
+                // states
+                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
+                this.timer = function () {};
 
-			// setup events
-			this._events();
-		},
+                // setup initial stuff
+                this._setup();
 
-		// initial methods
-		_setup: function () {
-			var that = this;
+                // setup events
+                this._events();
+            },
 
-			// attach visual events
-			this.triggers.bind('mouseenter mouseleave', function (e) {
-				e.preventDefault();
-				// clear timeout
-				clearTimeout(that.timer);
+            // initial methods
+            _setup: function () {
+                var that = this;
 
-				if(e.type === 'mouseleave' && !that.containers.has(e.toElement).length) hide();
+                // attach visual events
+                this.triggers.bind('mouseenter mouseleave', function (e) {
+                    e.preventDefault();
+                    // clear timeout
+                    clearTimeout(that.timer);
 
-				var index = that.clipboard.find('.cms_clipboard-triggers a').index(this);
-				var el = that.containers.eq(index);
-				// cancel if element is already open
-				if(el.data('open') === true) return false;
+                    if (e.type === 'mouseleave' && !that.containers.has(e.toElement).length) {
+                        hide();
+                    }
 
-				// show element
-				that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
-				el.stop().animate({ 'margin-left': 0 }, that.options.speed);
-				el.data('open', true);
-			});
-			that.containers.bind('mouseover mouseleave', function (e) {
-				// clear timeout
-				clearTimeout(that.timer);
+                    var index = that.clipboard.find('.cms-clipboard-triggers a').index(this);
+                    var el = that.containers.eq(index);
+                    // cancel if element is already open
+                    if (el.data('open') === true) {
+                        return false;
+                    }
 
-				// cancel if we trigger mouseover
-				if(e.type === 'mouseover') return false;
+                    // show element
+                    that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
+                    el.stop().animate({ 'margin-left': 0 }, that.options.speed);
+                    el.data('open', true);
+                });
+                that.containers.bind('mouseover mouseleave', function (e) {
+                    // clear timeout
+                    clearTimeout(that.timer);
 
-				// we need a little timer to detect if we should hide the menu
-				hide();
-			});
+                    // cancel if we trigger mouseover
+                    if (e.type === 'mouseover') {
+                        return false;
+                    }
 
-			function hide() {
-				that.timer = setTimeout(function () {
-					that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
-				}, that.options.speed);
-			}
-		},
+                    // we need a little timer to detect if we should hide the menu
+                    hide();
+                });
 
-		_events: function () {
-			var that = this;
+                function hide() {
+                    that.timer = setTimeout(function () {
+                        that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
+                    }, that.options.speed);
+                }
+            },
 
-			// add remove event
-			this.triggerRemove.bind(this.click, function (e) {
-				e.preventDefault();
-				that.clear(function () {
-				    // remove element on success
-				    that.clipboard.hide();
-				});
-			});
-		},
+            _events: function () {
+                var that = this;
 
-		// public methods
-		clear: function (callback) {
-			// post needs to be a string, it will be converted using JSON.parse
-			var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-			// redirect to ajax
-			CMS.API.Toolbar.openAjax(this.config.clipboard.url, post, '', callback);
-		}
+                // add remove event
+                this.triggerRemove.bind(this.click, function (e) {
+                    e.preventDefault();
+                    that.clear(function () {
+                        // remove element on success
+                        that.clipboard.hide();
+                    });
+                });
+            },
 
-	});
+            // public methods
+            clear: function (callback) {
+                // post needs to be a string, it will be converted using JSON.parse
+                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+                // redirect to ajax
+                CMS.API.Toolbar.openAjax(this.config.clipboard.url, post, '', callback);
+            }
 
-});
+        });
+
+    });
 })(CMS.$);
