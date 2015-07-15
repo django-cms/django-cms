@@ -270,6 +270,8 @@
             setupTree: function () {
                 var that = this;
                 var tree;
+                var origin = window.location.protocol + '//' + window.location.hostname +
+                    (window.location.port ? ':' + window.location.port : '');
                 // global initTree function
                 window.initTree = function () {
                     // jshint newcap: false
@@ -290,7 +292,8 @@
                             use_inline: true
                             //droppable : ['tree_drop']
                         },
-                        path: false,
+                        // has to be absolute full path
+                        path: origin + that.options.settings.staticPath + 'cms/js/jstree/',
                         ui: {
                             dots: true,
                             rtl: false,

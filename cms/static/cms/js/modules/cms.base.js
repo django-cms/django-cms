@@ -1,3 +1,8 @@
+/*!
+ * CMS.API.Helpers
+ * Multiple helpers used accross all CMS features
+ */
+
 //##################################################################################################################
 // #COMPATIBILITY#
 
@@ -23,10 +28,6 @@ var CMS = {
     'use strict';
     // CMS.$ will be passed for $
     $(document).ready(function () {
-        /*!
-         * CNS.API.Helpers
-         * Multiple helpers used accross all CMS features
-         */
         CMS.API.Helpers = {
 
             // redirects to a specific url or reloads browser
