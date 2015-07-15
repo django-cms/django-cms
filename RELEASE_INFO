@@ -5,8 +5,10 @@
 - Build newest english JS translations (django-admin.py makemessages -l en -d djangojs)
 - Pull translations (tx pull -f -a)
 - Compile translations (django-admin.py compilemessages)
+- Make sure css files are compiled from latest sass source (gulp sass)
+- Make sure js files are bundled and minified propery from latest source (gulp bundle)
 - Check CHANGELOG that all closed PRs are present.
-- Prepare blog post, including "Release" tag 
+- Prepare blog post, including "Release" tag
 - update AUTHORS file (python develop.py authors)
 - Make a release commit
 - Tag release commit
