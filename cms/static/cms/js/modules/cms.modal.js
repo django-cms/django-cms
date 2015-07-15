@@ -5,7 +5,7 @@
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
-    $(document).ready(function () {
+    $(function () {
         /*!
          * Modal
          * Controls a cms specific modal
@@ -15,13 +15,13 @@
             implement: [CMS.API.Helpers],
 
             options: {
-                'onClose': false,
-                'minHeight': 400,
-                'minWidth': 800,
-                'modalDuration': 300,
-                'newPlugin': false,
-                'urls': {
-                    'css_modal': 'cms/css/cms.toolbar.modal.css'
+                onClose: false,
+                minHeight: 400,
+                minWidth: 800,
+                modalDuration: 300,
+                newPlugin: false,
+                urls: {
+                    css_modal: 'cms/css/cms.toolbar.modal.css'
                 }
             },
 
@@ -55,22 +55,22 @@
                 var that = this;
 
                 // attach events to window
-                this.modal.find('.cms-modal-collapse').bind(this.click, function (e) {
+                this.modal.find('.cms-modal-collapse').on(this.click, function (e) {
                     e.preventDefault();
                     that._minimize();
                 });
-                this.modal.find('.cms-modal-title').bind('mousedown.cms', function (e) {
+                this.modal.find('.cms-modal-title').on('mousedown.cms', function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
-                this.modal.find('.cms-modal-title').bind('dblclick.cms', function () {
+                this.modal.find('.cms-modal-title').on('dblclick.cms', function () {
                     that._maximize();
                 });
-                this.modal.find('.cms-modal-resize').bind('mousedown.cms', function (e) {
+                this.modal.find('.cms-modal-resize').on('mousedown.cms', function (e) {
                     e.preventDefault();
                     that._startResize(e);
                 });
-                this.modal.find('.cms-modal-maximize').bind(this.click, function (e) {
+                this.modal.find('.cms-modal-maximize').on(this.click, function (e) {
                     e.preventDefault();
                     that._maximize();
                 });
@@ -78,14 +78,14 @@
                     e.preventDefault();
                     that._changeContent($(this));
                 });
-                this.modal.find('.cms-modal-close, .cms-modal-cancel').bind(this.click, function (e) {
+                this.modal.find('.cms-modal-close, .cms-modal-cancel').on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
                 });
 
                 // stopper events
-                $(document).bind('mouseup.cms', function (e) {
+                this.body.on('mouseup.cms', function (e) {
                     that._endMove(e);
                     that._endResize(e);
                 });
@@ -242,7 +242,7 @@
                 });
 
                 // add esc close event
-                $(document).bind('keydown.cms', function (e) {
+                this.body.on('keydown.cms', function (e) {
                     if (e.keyCode === 27) {
                         that.close();
                     }
@@ -354,7 +354,7 @@
                         'margin': 0
                     });
                     // bind resize event
-                    $(window).bind('resize.cms.modal', function () {
+                    $(window).on('resize.cms.modal', function () {
                         container.css({
                             'width': $(window).width(),
                             'height': $(window).height() - 60 - debug
@@ -371,7 +371,7 @@
                     this.maximized = false;
                     trigger.removeClass('cms-modal-maximize-active');
 
-                    $(window).unbind('resize.cms.modal');
+                    $(window).off('resize.cms.modal');
 
                     // reattach css
                     this.modal.css(this.modal.data('css'));
@@ -399,7 +399,7 @@
 
                 this.modal.find('.cms-modal-shim').show();
 
-                $(document).bind('mousemove.cms', function (e) {
+                this.body.on('mousemove.cms', function (e) {
                     var left = position.left - (initial.pageX - e.pageX);
                     var top = position.top - (initial.pageY - e.pageY);
 
@@ -413,7 +413,7 @@
             _endMove: function () {
                 this.modal.find('.cms-modal-shim').hide();
 
-                $(document).unbind('mousemove.cms');
+                this.body.off('mousemove.cms');
             },
 
             _startResize: function (initial) {
@@ -431,7 +431,7 @@
 
                 this.modal.find('.cms-modal-shim').show();
 
-                $(document).bind('mousemove.cms', function (e) {
+                this.body.on('mousemove.cms', function (e) {
                     var mvX = initial.pageX - e.pageX;
                     var mvY = initial.pageY - e.pageY;
 
@@ -459,7 +459,7 @@
             _endResize: function () {
                 this.modal.find('.cms-modal-shim').hide();
 
-                $(document).unbind('mousemove.cms');
+                this.body.off('mousemove.cms');
             },
 
             _setBreadcrumb: function (breadcrumb) {
@@ -539,7 +539,7 @@
 
                     // create the element and attach events
                     var el = $('<div class="' + cls + ' ' + item.attr('class') + '">' + title + '</div>');
-                    el.bind(that.click, function () {
+                    el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
                         }
@@ -567,7 +567,7 @@
 
                 // manually add cancel button at the end
                 var cancel = $('<div class="cms-btn">' + that.config.lang.cancel + '</div>');
-                cancel.bind(that.click, function () {
+                cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();
                 });
@@ -596,7 +596,7 @@
                 holder.find('iframe').css('visibility', 'hidden');
 
                 // attach load event for iframe to prevent flicker effects
-                iframe.bind('load', function () {
+                iframe.on('load', function () {
                     // check if iframe can be accessed
                     try {
                         iframe.contents();
@@ -660,7 +660,7 @@
                         iframe.data('ready', true);
 
                         // attach close event
-                        contents.find('body').bind('keydown.cms', function (e) {
+                        contents.find('body').on('keydown.cms', function (e) {
                             if (e.keyCode === 27) {
                                 that.close();
                             }
