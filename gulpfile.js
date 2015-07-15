@@ -13,6 +13,8 @@ var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
 var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -33,13 +35,48 @@ var PROJECT_PATTERNS = {
     js: [
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
-        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js'
+        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
+        '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}'
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'
+    ]
+};
+
+/*
+ * Object keys are filenames of bundles that will be compiled
+ * from array of paths that are the value.
+ */
+var JS_BUNDLES = {
+    'bundle.admin.base.min.js': [
+        PROJECT_PATH.js + '/libs/jquery.min.js',
+        PROJECT_PATH.js + '/libs/class.min.js',
+        PROJECT_PATH.js + '/modules/cms.base.js'
+    ],
+    'bundle.admin.changeform.min.js': [
+        PROJECT_PATH.js + '/modules/cms.changeform.js'
+    ],
+    'bundle.admin.changelist.min.js': [
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/cms.changelist.js',
+        PROJECT_PATH.js + '/jstree/_lib/_all.js',
+        PROJECT_PATH.js + '/jstree/tree_component.js'
+    ],
+    'bundle.toolbar.min.js': [
+        PROJECT_PATH.js + '/libs/jquery.min.js',
+        PROJECT_PATH.js + '/libs/class.min.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
+        PROJECT_PATH.js + '/modules/cms.base.js',
+        PROJECT_PATH.js + '/modules/cms.modal.js',
+        PROJECT_PATH.js + '/modules/cms.sideframe.js',
+        PROJECT_PATH.js + '/modules/cms.clipboard.js',
+        PROJECT_PATH.js + '/modules/cms.plugins.js',
+        PROJECT_PATH.js + '/modules/cms.structureboard.js',
+        PROJECT_PATH.js + '/modules/cms.toolbar.js'
     ]
 };
 
@@ -95,9 +132,33 @@ gulp.task('lint:javascript', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
+Object.keys(JS_BUNDLES).forEach(function (bundleName) {
+    var bundleFiles = JS_BUNDLES[bundleName];
+
+    gulp.task('bundle:' + bundleName, function () {
+        return gulp.src(bundleFiles)
+            .pipe(gulpif(options.debug, sourcemaps.init()))
+            .pipe(uglify({
+                preserveComments: 'some'
+            }))
+            .pipe(concat(bundleName, {
+                newLine: '\n'
+            }))
+            .pipe(gulpif(options.debug, sourcemaps.write()))
+            .pipe(gulp.dest(PROJECT_PATH.js + '/dist/'));
+    });
+});
+gulp.task('bundle', Object.keys(JS_BUNDLES).map(function (bundleName) {
+    return 'bundle:' + bundleName;
+}));
+
 gulp.task('watch', function () {
     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
+    Object.keys(JS_BUNDLES).forEach(function (bundleName) {
+        var bundleFiles = JS_BUNDLES[bundleName];
+        gulp.watch(bundleFiles, ['bundle:' + bundleName]);
+    });
 });
 
-gulp.task('default', ['sass', 'lint', 'watch']);
+gulp.task('default', ['sass', 'lint', 'bundle', 'watch']);
