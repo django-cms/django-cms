@@ -107,6 +107,7 @@ if __name__ == '__main__':
             'cms.test_utils.project.objectpermissionsapp',
             'cms.test_utils.project.bunch_of_plugins',
             'cms.test_utils.project.extensionapp',
+            'cms.test_utils.project.mti_pluginapp',
             'reversion',
             'sekizai',
             'hvad',
