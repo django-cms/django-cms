@@ -30,11 +30,7 @@
                 this.config = CMS.config;
 
                 // elements
-                this.ui = {};
-                this.ui.modal = $('.cms-modal');
-                this.ui.body = $('html');
-                this.ui.window = $(window);
-                this.ui.toolbar = $('.cms-toolbar');
+                this._setupUI();
 
                 // states
                 this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
@@ -50,6 +46,27 @@
 
                 // ready modal
                 this.ui.modal.data('ready', true);
+            },
+
+            _setupUI: function setupUI() {
+                this.ui = {};
+                this.ui.modal = $('.cms-modal');
+                this.ui.body = $('html');
+                this.ui.window = $(window);
+                this.ui.toolbar = $('.cms-toolbar');
+
+                this.ui.minimizeButton = this.ui.modal.find('.cms-modal-collapse');
+                this.ui.maximizeButton = this.ui.modal.find('.cms-modal-maximize');
+                this.ui.title = this.ui.modal.find('.cms-modal-title');
+                this.ui.resize = this.ui.modal.find('.cms-modal-resize');
+                this.ui.breadcrumb = this.ui.modal.find('.cms-modal-breadcrumb');
+                this.ui.breadcrumbItems = this.ui.modal.find('.cms-modal-breadcrumb-items');
+                this.ui.closeAndCancel = this.ui.modal.find('.cms-modal-close, .cms-modal-cancel');
+                this.ui.modalButtons = this.ui.modal.find('.cms-modal-buttons');
+                this.ui.modalContents = this.ui.modal.find('.cms-modal-body, .cms-modal-foot');
+                this.ui.modalBody = this.ui.modal.find('.cms-modal-body');
+                this.ui.iframeHolder = this.ui.modal.find('.cms-modal-frame');
+                this.ui.shim = this.ui.modal.find('.cms-modal-shim');
             },
 
             // initial methods
