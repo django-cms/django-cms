@@ -15,7 +15,7 @@ from django.db.models import signals
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
-from django.utils.timezone import now as tz_now, make_aware, get_current_timezone
+from django.utils.timezone import now as tz_now
 
 from cms import constants
 from cms.admin.forms import AdvancedSettingsForm
