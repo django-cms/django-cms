@@ -3,6 +3,8 @@ import os
 
 import app_manage
 
+from cms.utils.compat import DJANGO_1_7
+
 gettext = lambda s: s
 
 
@@ -14,9 +16,65 @@ if __name__ == '__main__':
     PROJECT_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), 'cms', 'test_utils')
     )
+
+    dynamic_configs = {}
+
+    if DJANGO_1_7:
+        dynamic_configs.update(dict(
+            TEMPLATE_CONTEXT_PROCESSORS=[
+                "django.contrib.auth.context_processors.auth",
+                'django.contrib.messages.context_processors.messages',
+                "django.core.context_processors.i18n",
+                "django.core.context_processors.debug",
+                "django.core.context_processors.request",
+                "django.core.context_processors.media",
+                'django.core.context_processors.csrf',
+                "cms.context_processors.cms_settings",
+                "sekizai.context_processors.sekizai",
+                "django.core.context_processors.static",
+            ],
+            TEMPLATE_LOADERS=(
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'django.template.loaders.eggs.Loader',
+            ),
+            TEMPLATE_DIRS=[
+                os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
+            ],
+        ))
+    else:
+        dynamic_configs['TEMPLATES'] = [
+            {
+                'NAME': 'django',
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+                'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
+                'OPTIONS': {
+                    'context_processors': [
+                        "django.contrib.auth.context_processors.auth",
+                        'django.contrib.messages.context_processors.messages',
+                        "django.template.context_processors.i18n",
+                        "django.template.context_processors.debug",
+                        "django.template.context_processors.request",
+                        "django.template.context_processors.media",
+                        'django.template.context_processors.csrf',
+                        "cms.context_processors.cms_settings",
+                        "sekizai.context_processors.sekizai",
+                        "django.template.context_processors.static",
+                    ],
+                }
+            }
+        ]
+
     app_manage.main(
         ['cms', 'menus'],
         PROJECT_PATH=PROJECT_PATH,
+        CACHES={
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            }
+        },
+        SESSION_ENGINE="django.contrib.sessions.backends.cache",
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         TEMPLATE_DEBUG=True,
@@ -25,6 +83,11 @@ if __name__ == '__main__':
             env='DATABASE_URL',
             arg='--db-url',
             default='sqlite://localhost/local.sqlite'
+        ),
+        USE_TZ=app_manage.Config(
+            env='USE_TZ',
+            arg=app_manage.Flag('--use-tz'),
+            default=False,
         ),
         SITE_ID=1,
         USE_I18N=True,
@@ -36,26 +99,6 @@ if __name__ == '__main__':
         STATIC_URL='/static/',
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
-        TEMPLATE_LOADERS=(
-            'django.template.loaders.filesystem.Loader',
-            'django.template.loaders.app_directories.Loader',
-            'django.template.loaders.eggs.Loader',
-        ),
-        TEMPLATE_CONTEXT_PROCESSORS=[
-            "django.contrib.auth.context_processors.auth",
-            'django.contrib.messages.context_processors.messages',
-            "django.core.context_processors.i18n",
-            "django.core.context_processors.debug",
-            "django.core.context_processors.request",
-            "django.core.context_processors.media",
-            'django.core.context_processors.csrf',
-            "cms.context_processors.cms_settings",
-            "sekizai.context_processors.sekizai",
-            "django.core.context_processors.static",
-        ],
-        TEMPLATE_DIRS=[
-            os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
-        ],
         MIDDLEWARE_CLASSES=[
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
@@ -64,7 +107,6 @@ if __name__ == '__main__':
             'django.contrib.messages.middleware.MessageMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
             'cms.middleware.user.CurrentUserMiddleware',
@@ -240,7 +282,6 @@ if __name__ == '__main__':
         CMS_NAVIGATION_EXTENDERS=(
             ('cms.test_utils.project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
         ),
-        JUNIT_OUTPUT_DIR='.',
         ROOT_URLCONF='cms.test_utils.project.urls',
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
@@ -272,4 +313,5 @@ if __name__ == '__main__':
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
         },
         TEST_RUNNER='django.test.runner.DiscoverRunner',
+        **dynamic_configs
     )
