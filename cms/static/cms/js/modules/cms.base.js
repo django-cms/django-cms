@@ -53,7 +53,7 @@ $(document).ready(function () {
 						if(response === '' && !url) {
 							// cancel if response is empty
 							return false;
-						} else if(parent.location.pathname !== response) {
+						} else if(response !== '' && parent.location.pathname !== response) {
 							// api call to the backend to check if the current path is still the same
 							that.reloadBrowser(response);
 						} else if(url === 'REFRESH_PAGE') {

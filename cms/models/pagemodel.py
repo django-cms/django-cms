@@ -604,7 +604,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
-                # The target page now has a pk, so can be used as a target
+            # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
             # trigger home update
@@ -782,6 +782,11 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             return self.__class__.get_tree(self).filter(site_id=self.site_id)
         else:
             return self.__class__.get_tree(self).exclude(pk=self.pk).filter(site_id=self.site_id)
+
+    def get_published_languages(self):
+        if self.publisher_is_draft:
+            return self.get_languages()
+        return sorted([language for language in self.get_languages() if self.is_published(language)])
 
     def get_cached_ancestors(self):
         if not hasattr(self, "ancestors_ascending"):

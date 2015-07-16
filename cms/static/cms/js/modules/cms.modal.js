@@ -461,6 +461,16 @@ $(document).ready(function () {
 			}
 			// hide all submit-rows
 			iframe.contents().find('.submit-row').hide();
+			row.hide(); // hide submit-row
+			var form = iframe.contents().find('form');
+			//avoids conflict between the browser's form validation and Django's validation
+			form.submit(function () {
+				if (that.hideFrame) { //submit button was clicked
+					that.modal.find('.cms_modal-frame iframe').hide();
+					//page has been saved, run checkup
+					that.saved = true;
+				}
+			});
 			var buttons = row.find('input, a, button');
 			var render = $('<span />'); // seriously jquery...
 
@@ -495,19 +505,20 @@ $(document).ready(function () {
 				// create the element and attach events
 				var el = $('<div class="'+cls+' '+item.attr('class')+'">'+title+'</div>');
 					el.bind(that.click, function () {
-						if(item.is('input') || item.is('button')) item[0].click();
 						if(item.is('a')) that._loadContent(item.prop('href'), title);
 
 						// trigger only when blue action buttons are triggered
 						if(item.hasClass('default') || item.hasClass('deletelink')) {
- 							that.options.newPlugin = null;
- 							// reset onClose when delete is triggered
-							if(item.hasClass('deletelink')) that.options.onClose = null;
-							// hide iframe
-							that.modal.find('.cms_modal-frame iframe').hide();
-							// page has been saved or deleted, run checkup
-							that.saved = true;
+							that.options.newPlugin = null;
+							if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
+								that.modal.find('.cms_modal-frame iframe').hide();
+								// page has been saved or deleted, run checkup
+								that.saved = true;
+							} else { // submit button uses the form's submit event
+								that.hideFrame = true;
+							}
 						}
+						if(item.is('input') || item.is('button')) item[0].click();
 					});
 
 				// append element
@@ -584,7 +595,11 @@ $(document).ready(function () {
 				// when the window has been changed pressing the blue or red button, we need to run a reload check
 				// also check that no delete-confirmation is required
 				if(that.saved && !contents.find('.delete-confirmation').length) {
-					that.reloadBrowser(window.location.href, false, true);
+					if(that.options.onClose){
+						that.reloadBrowser(that.options.onClose, false, true);
+					} else {
+						that.reloadBrowser(window.location.href, false, true);
+					}
 				} else {
 					iframe.show();
 					// set title of not provided
