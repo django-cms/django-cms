@@ -19,7 +19,7 @@ from cms.cms_toolbar import PlaceholderToolbar
 from cms.models import Title, Page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
-from cms.tests.menu_utils import DumbPageLanguageUrl
+from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language

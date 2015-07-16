@@ -19,7 +19,6 @@ from django.utils import six
 from django.utils.translation import activate
 
 from cms import constants
-from cms.admin.forms import save_permissions
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC

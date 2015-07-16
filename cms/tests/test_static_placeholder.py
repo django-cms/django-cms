@@ -10,7 +10,7 @@ from django.utils.encoding import force_text
 from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
-from cms.tests.plugins import PluginsTestBaseCase
+from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.urlutils import admin_reverse
 
 

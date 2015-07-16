@@ -9,4 +9,5 @@ class AboveStaticAnalysisCodeTest(TestCase):
     def test_pyflakes(self):
         import cms
         import menus
-        self.assertEqual(pyflakes((cms, menus)), 0)
+        errors, message = pyflakes((cms, menus))
+        self.assertEqual(errors, 0, message)
