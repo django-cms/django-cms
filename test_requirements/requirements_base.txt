@@ -22,6 +22,6 @@ django-debug-toolbar
 -e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
 -e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
 -e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
-https://github.com/ojii/django-better-test/archive/956ee4d998325081cf30be0865f3dcc61cb5745c.zip#egg=django-better-test
+https://github.com/ojii/django-better-test/archive/48e807a50e2cf1d9a754370c68968142cd807f76.zip#egg=django-better-test
 https://github.com/ojii/django-app-manage/archive/a86c0ea5bca4c5d73f90c4c780ca3b16cd7fd31b.zip#egg=django-app-manage
 pyflakes
