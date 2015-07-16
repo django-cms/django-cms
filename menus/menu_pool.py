@@ -88,7 +88,9 @@ class MenuPool(object):
     def discover_menus(self):
         if self.discovered:
             return
+        # FIXME: Remove in 3.4
         load('menu')
+        load('cms_menus')
         from menus.modifiers import register
         register()
         self.discovered = True
@@ -157,6 +159,14 @@ class MenuPool(object):
         cache_keys.delete()
 
     def register_menu(self, menu_cls):
+        import os
+        import inspect
+        import warnings
+        source_file = os.path.basename(inspect.stack()[1][1])
+        if source_file == 'menu.py':
+            warnings.warn('menu.py filename is deprecated, '
+                          'and it will be removed in version 3.4; '
+                          'please rename it to cms_menus.py', DeprecationWarning)
         from menus.base import Menu
         assert issubclass(menu_cls, Menu)
         # If we should register a menu after we've already expanded the existing
@@ -171,6 +181,14 @@ class MenuPool(object):
         self.menus[menu_cls.__name__] = menu_cls
 
     def register_modifier(self, modifier_class):
+        import os
+        import inspect
+        import warnings
+        source_file = os.path.basename(inspect.stack()[1][1])
+        if source_file == 'menu.py':
+            warnings.warn('menu.py filename is deprecated, '
+                          'and it will be removed in version 3.4; '
+                          'please rename it to cms_menus.py', DeprecationWarning)
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
         if modifier_class not in self.modifiers:
