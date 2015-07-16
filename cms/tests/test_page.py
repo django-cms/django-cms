@@ -442,12 +442,20 @@ class PagesTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             change_user = str(superuser)
-            #some databases don't store microseconds, so move the start flag back by 1 second
+            # some databases don't store microseconds, so move the start flag
+            # back by 1 second
             before_change = tz_now()+datetime.timedelta(seconds=-1)
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
+            page = Page.objects.get(
+                title_set__slug=page_data['slug'],
+                publisher_is_draft=True
+            )
             self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
-            t = template.Template("{% load cms_tags %}{% page_attribute changed_by %} changed on {% page_attribute changed_date as page_change %}{{ page_change|date:'Y-m-d\TH:i:s' }}")
+            t = template.Template(
+                "{% load cms_tags %}{% page_attribute changed_by %} changed "
+                "on {% page_attribute changed_date as page_change %}"
+                "{{ page_change|date:'Y-m-d\TH:i:s' }}"
+            )
             req = HttpRequest()
             page.save()
             page.publish('en')
@@ -456,13 +464,20 @@ class PagesTestCase(CMSTestCase):
             req.REQUEST = {}
 
             actual_result = t.render(template.Context({"request": req}))
-            desired_result = "{0} changed on {1}".format(change_user, actual_result[-19:])
-            save_time = make_aware(datetime.datetime.strptime(actual_result[-19:], "%Y-%m-%dT%H:%M:%S"), get_current_timezone())
+            desired_result = "{0} changed on {1}".format(
+                change_user,
+                actual_result[-19:]
+            )
+            save_time = datetime.datetime.strptime(
+                actual_result[-19:],
+                "%Y-%m-%dT%H:%M:%S"
+            )
 
             self.assertEqual(actual_result, desired_result)
-            # direct time comparisons are flaky, so we just check if the page's changed_date is within the time range taken by this test
-            self.assertTrue(before_change <= save_time)
-            self.assertTrue(save_time <= after_change)
+            # direct time comparisons are flaky, so we just check if the
+            # page's changed_date is within the time range taken by this test
+            self.assertLessEqual(before_change, save_time)
+            self.assertLessEqual(save_time, after_change)
 
     def test_copy_page(self):
         """
