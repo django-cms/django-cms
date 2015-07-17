@@ -340,7 +340,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def _call_toolbar(self, func_name):
         with force_language(self.toolbar_language):
-            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
+            first = ('cms.cms_toolbars.BasicToolbar', 'cms.cms_toolbars.PlaceholderToolbar')
             for key in first:
                 toolbar = self.toolbars.get(key)
                 if not toolbar:

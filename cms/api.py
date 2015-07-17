@@ -23,8 +23,8 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import (PageUser, PagePermission,
-    GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS)
+from cms.models.permissionmodels import (PageUser, PagePermission, GlobalPagePermission,
+                                         ACCESS_PAGE_AND_DESCENDANTS)
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title

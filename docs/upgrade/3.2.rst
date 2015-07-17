@@ -1,0 +1,49 @@
+.. _upgrade-to-3.2:
+
+#################
+3.2 release notes
+#################
+
+In this release we have tried to maintain maximum backwards-compatibility, particularly for
+third-party applications, and endeavoured to identify and tidy loose ends in the system wherever
+possible.
+
+.. warning:: Upgrading from previous versions
+
+    3.2 introduces some changes that **require** action if you are upgrading
+    from a previous version. Please read :ref:`upgrade-guide-3.2` for a step-by-step guide to the
+    process of upgrading from 3.1 to 3.2.
+
+*****************
+What's new in 3.2
+*****************
+
+Renaming cms_app, cms_toolbar, menu modules
+===========================================
+
+``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` have been renamed to
+``cms_apps.py``, ``cms_toolbars.py`` and ``cms_menus.py`` for consistency.
+
+Old names are still supported but deprecated; support will be removed in 3.4.
+
+Action required
+---------------
+
+In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
+``cms_toolbar.py`` to ``cms_toolbar.py`` and ``menu.py`` to ``menus.py``.
+
+*****************************
+Backward incompatible changes
+*****************************
+
+* ``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` shipped in django CMS have been renamed
+  according to the new naming convention. If you import those modules, you will need to amend
+  your ``import`` statements appropriately.
+
+
+.. _upgrade-guide-3.2:
+
+*******************************
+Upgrading django CMS 3.1 to 3.2
+*******************************
+

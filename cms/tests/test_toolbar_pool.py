@@ -1,12 +1,12 @@
-from cms.utils.conf import get_cms_setting
-from cms import api
-from cms.test_utils.testcases import CMSTestCase
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.datastructures import SortedDict
 
+from cms import api
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
+from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import ToolbarPool, toolbar_pool
+from cms.utils.conf import get_cms_setting
 
 
 class TestToolbar(CMSToolbar):
@@ -53,7 +53,7 @@ class ToolbarPoolTests(CMSTestCase):
         pool = ToolbarPool()
         toolbars = toolbar_pool.toolbars
         toolbar_pool.clear()
-        with self.settings(CMS_TOOLBARS=['cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar']):
+        with self.settings(CMS_TOOLBARS=['cms.cms_toolbars.BasicToolbar', 'cms.cms_toolbars.PlaceholderToolbar']):
             toolbar_pool.register(TestToolbar)
             self.assertEqual(len(list(pool.get_toolbars().keys())), 2)
             api.create_page("home", "simple.html", "en", published=True)

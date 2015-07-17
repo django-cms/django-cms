@@ -9,7 +9,7 @@ django CMS pages.
 We do this with an **Apphook**, created using a :class:`CMSApp
 <cms.app_base.CMSApp>` subclass, which tells the CMS how to include that app.
 
-Apphooks live in a file called ``cms_app.py``, so create one in your Poll
+Apphooks live in a file called ``cms_apps.py``, so create one in your Poll
 application.
 
 This is the most basic example for a django CMS app:

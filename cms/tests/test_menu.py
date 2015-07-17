@@ -13,10 +13,10 @@ from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page
-from cms.menu import CMSMenu, get_visible_pages
+from cms.cms_menus import CMSMenu, get_visible_pages
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.project.sampleapp.menu import StaticMenu, StaticMenu2
+from cms.test_utils.project.sampleapp.cms_menus import StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
 from cms.test_utils.testcases import CMSTestCase

@@ -24,7 +24,7 @@ from menus.menu_pool import menu_pool
 
 
 APP_NAME = 'SampleApp'
-APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
+APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
 
 
 @override_settings(

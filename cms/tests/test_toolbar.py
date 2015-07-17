@@ -17,13 +17,10 @@ from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
 
 from cms.api import create_page, create_title, add_plugin
-from cms.cms_toolbar import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
-                             LANGUAGE_MENU_IDENTIFIER)
+from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
+                              LANGUAGE_MENU_IDENTIFIER)
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, UserSettings, PagePermission
-from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
-                               Break, SubMenu, AjaxItem)
-from cms.toolbar.toolbar import CMSToolbar
 from cms.test_utils.project.placeholderapp.models import (Example1, CharPksExample,
                                                           MultilingualExample1)
 from cms.test_utils.project.placeholderapp.views import (detail_view, detail_view_char,
@@ -33,6 +30,9 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
                                       ClearURLs)
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
+                               Break, SubMenu, AjaxItem)
+from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
