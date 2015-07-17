@@ -3,6 +3,9 @@
 //
 // Editing plugins in frontend
 
+.cms-modal-maximized {
+    overflow: hidden !important;
+}
 #cms-toolbar {
     .cms-modal {
         display: none;
@@ -15,22 +18,38 @@
         background: $modal-bgcolor;
         box-shadow: $modal-shadow;
         user-select: none;
-        transform: translateZ(0);
+        transform: scale(0) translateZ(0);
+        transition: transform 0.2s;
 
+        .cms-modal-maximized & {
+            right: 0;
+            bottom: 0;
+            width: auto !important;
+            height: auto !important;
+        }
+    }
+    .cms-modal-open {
+        /* display: block; */
+        transform: scale(1) translateZ(0);
     }
     .cms-modal-body {
-        position: relative;
+        position: absolute;
         z-index: z(modal, body);
-        width: 800px;
-        height: 400px;
+        left: 0;
+        top: $modal-header-height;
+        right: 0;
+        bottom: $modal-footer-height;
         border-top: 1px solid $gray-lighter;
         border-bottom: 1px solid $gray-lighter;
     }
     .cms-modal-foot {
-        position: relative;
+        position: absolute;
         clear: both;
         height: $modal-footer-height;
         background: $gray-lightest;
+        left: 0;
+        bottom: 0;
+        right: 0;
     }
     // this elements shows up on top of an iframe as soon as the dragging starts
     // so if you are moving the mouse really fast and mouse hovers over an iframe

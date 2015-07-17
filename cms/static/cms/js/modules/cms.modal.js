@@ -18,9 +18,10 @@
                 onClose: false,
                 minHeight: 400,
                 minWidth: 800,
-                modalDuration: 300,
+                modalDuration: 200,
                 newPlugin: false,
                 urls: {
+                    //FIXME wtf, async request for css is bad for perceived performance
                     css_modal: 'cms/css/cms.toolbar.modal.css'
                 }
             },
@@ -133,29 +134,30 @@
                 this.hideTooltip();
 
                 // reset breadcrumb
-                this.ui.breadcrumb.hide();
-                this.ui.breadcrumbItems.html('');
+                // this.ui.breadcrumb.hide();
+                // this.ui.breadcrumbItems.html('');
 
                 // empty buttons
-                this.ui.modalButtons.html('');
+                // this.ui.modalButtons.html('');
 
                 var contents = this.ui.modalContents;
                 contents.show();
 
                 this._loadContent(url, name);
 
-                // insure modal is not maximized
+                // ensure modal is not maximized
                 if (this.ui.modal.find('.cms-modal-collapsed').length) {
                     this._minimize();
                 }
 
-                // reset styles
-                this.ui.modal.css({
-                    'left': '50%',
-                    'top': '50%',
-                    'mergin-left': 0,
-                    'margin-right': 0
-                });
+                // // reset styles
+                // this.ui.modal.css({
+                //     'left': '50%',
+                //     'top': '50%',
+                //     'mergin-left': 0,
+                //     'margin-right': 0
+                // });
+
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
                 var heightOffset = 350; // adds margin top and bottom;
@@ -168,11 +170,11 @@
                 var height = (screenHeight >= this.options.minHeight + heightOffset) ?
                     screenHeight - heightOffset :
                     this.options.minHeight;
-                this.ui.modalBody.css({
-                    'width': width,
-                    'height': height
-                });
-                this.ui.modalBody.removeClass('cms-loader');
+                // this.ui.modalBody.css({
+                //     'width': width,
+                //     'height': height
+                // });
+                // this.ui.modalBody.removeClass('cms-loader');
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
                 // in case, the window is larger than the windows height, we trigger fullscreen mode
@@ -184,7 +186,11 @@
                 this._setBreadcrumb(breadcrumb);
 
                 // display modal
-                this._show(this.options.modalDuration);
+                this._show({
+                    width: width,
+                    height: height,
+                    duration: this.options.modalDuration
+                });
             },
 
             close: function () {
@@ -220,24 +226,49 @@
             },
 
             // private methods
-            _show: function (speed) {
+            /**
+             * _show animates the modal to given size
+             *
+             * @param opts
+             * @param opts.width Number width of the modal
+             * @param opts.height Number height of the modal
+             * @param opts.duration Number speed of opening, ms (not really used yet)
+             */
+            _show: function (opts) {
                 // we need to position the modal in the center
                 var that = this;
-                var width = this.ui.modal.width();
-                var height = this.ui.modal.height();
+                var width = opts.width;
+                var height = opts.height;
+                // make use of transitionDuration
+                var speed = opts.duration;
 
-                // animates and sets the modal
-                this.ui.modal.show().css({
-                    'width': 0,
-                    'height': 0,
-                    'margin-left': 0,
-                    'margin-top': 0
-                }).stop(true, true).animate({
+                // // animates and sets the modal
+                // this.ui.modal.show().css({
+                //     'width': 0,
+                //     'height': 0,
+                //     'margin-left': 0,
+                //     'margin-top': 0
+                // }).stop(true, true).animate({
+                //     'width': width,
+                //     'height': height,
+                //     'margin-left': -(width / 2),
+                //     'margin-top': -(height / 2)
+                // }, speed, );
+                this.ui.modal.css({
+                    'display': 'block',
                     'width': width,
                     'height': height,
+                    // FIXME animate translateX if possible instead of margin
                     'margin-left': -(width / 2),
                     'margin-top': -(height / 2)
-                }, speed, function () {
+                });
+                // setImmediate is required to go into the next frame
+                setTimeout(function () {
+                    that.ui.modal.addClass('cms-modal-open');
+                }, 0);
+
+                //FIXME listen to the transitionEnd event
+                setTimeout(function () {
                     $(this).removeAttr('style');
 
                     that.ui.modal.css({
@@ -246,7 +277,7 @@
                     });
 
                     // fade in modal window
-                    that.ui.modal.show();
+                    // that.ui.modal.show();
 
                     // hide loader
                     CMS.API.Toolbar._loader(false);
@@ -258,7 +289,7 @@
 
                     // changed locked status to allow other modals again
                     CMS.API.locked = false;
-                });
+                }, speed);
 
                 // add esc close event
                 this.ui.body.on('keydown.cms', function (e) {
@@ -271,8 +302,13 @@
                 this.ui.modal.focus();
             },
 
-            _hide: function (speed) {
-                this.ui.modal.fadeOut(speed);
+            _hide: function (duration) {
+                var that = this;
+                this.ui.modal.removeClass('cms-modal-open');
+                //FIXME listen to transitionEnd event
+                setTimeout(function () {
+                    that.ui.modal.css('display', 'none');
+                }, duration);
                 this.ui.iframeHolder.find('iframe').remove();
                 this.ui.modalBody.removeClass('cms-loader');
             },
@@ -339,9 +375,8 @@
             },
 
             _maximize: function () {
-                var that = this;
-                var debug = (this.config.debug) ? 5 : 0;
-                var container = this.ui.modalBody;
+                var debug = (this.config.debug) ? 5 : 0; //FIXME incorrect
+                var container = this.ui.modal;
                 var minimize = this.ui.minimizeButton;
                 var trigger = this.ui.maximizeButton;
                 var title = this.ui.title;
@@ -354,47 +389,49 @@
                 if (this.maximized === false) {
                     // maximize
                     this.maximized = true;
-                    trigger.addClass('cms-modal-maximize-active');
 
-                    this.ui.modal.data('css', {
-                        'left': this.ui.modal.css('left'),
-                        'top': this.ui.modal.css('top'),
-                        'margin-left': this.ui.modal.css('margin-left'),
-                        'margin-top': this.ui.modal.css('margin-top')
-                    });
-                    container.data('css', {
-                        'width': container.width(),
-                        'height': container.height()
-                    });
+                    container.data('css', this.ui.modal.css([
+                        'left', 'top', 'margin-left', 'margin-top',
+                        'width', 'height'
+                    ]));
+
+                    trigger.addClass('cms-modal-maximize-active');
+                    this.ui.body.addClass('cms-modal-maximized');
+
+                    // container.data('css', {
+                    //     'width': container.width(),
+                    //     'height': container.height()
+                    // });
 
                     // reset
-                    this.ui.modal.css({
+                    container.css({
                         'left': 0,
                         'top': debug,
                         'margin': 0
                     });
                     // bind resize event
-                    this.ui.window.on('resize.cms.modal', function () {
-                        container.css({
-                            width: that.ui.window.width(),
-                            height: that.ui.window.height() - 60 - debug
-                        });
-                    });
-                    this.ui.window.trigger('resize.cms.modal');
+                    // FIXME: just add a class :/
+                    // this.ui.window.on('resize.cms.modal', function () {
+                    //     container.css({
+                    //         width: that.ui.window.width(),
+                    //         height: that.ui.window.height() - debug
+                    //     });
+                    // });
+                    // this.ui.window.trigger('resize.cms.modal');
 
                     // ensure maximize element is hidden #3111
                     minimize.hide();
                     // set correct cursor when maximized #3111
                     title.css('cursor', 'default');
                 } else {
-                    // minimize
+                    // restore
                     this.maximized = false;
                     trigger.removeClass('cms-modal-maximize-active');
+                    this.ui.body.removeClass('cms-modal-maximized');
 
-                    this.ui.window.off('resize.cms.modal');
+                    // this.ui.window.off('resize.cms.modal');
 
                     // reattach css
-                    this.ui.modal.css(this.ui.modal.data('css'));
                     container.css(container.data('css'));
 
                     // ensure maximize element is shown #3111
@@ -443,7 +480,7 @@
                 }
                 // continue
                 var that = this;
-                var container = this.ui.modalBody;
+                var container = this.ui.modal;
                 var width = container.width();
                 var height = container.height();
                 var modalLeft = this.ui.modal.position().left;
@@ -614,6 +651,7 @@
 
                 // ensure previous iframe is hidden
                 holder.find('iframe').css('visibility', 'hidden');
+                that.ui.modalBody.addClass('cms-loader');
 
                 // attach load event for iframe to prevent flicker effects
                 iframe.on('load', function () {
@@ -695,10 +733,7 @@
                 });
 
                 // inject
-                setTimeout(function () {
-                    that.ui.modalBody.addClass('cms-loader');
-                    holder.html(iframe);
-                }, this.options.modalDuration);
+                holder.html(iframe);
             },
 
             _changeContent: function (el) {
