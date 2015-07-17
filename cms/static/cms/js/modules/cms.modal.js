@@ -21,7 +21,8 @@
                 modalDuration: 200,
                 newPlugin: false,
                 urls: {
-                    //FIXME wtf, async request for css is bad for perceived performance
+                    // FIXME async request for css is bad because of junk, maybe it's possible
+                    // to inject it in backend through a url param?
                     css_modal: 'cms/css/cms.toolbar.modal.css'
                 }
             },
@@ -212,21 +213,9 @@
                 var that = this;
                 var width = opts.width;
                 var height = opts.height;
-                // make use of transitionDuration
+                // TODO make use of transitionDuration
                 var speed = opts.duration;
 
-                // // animates and sets the modal
-                // this.ui.modal.show().css({
-                //     'width': 0,
-                //     'height': 0,
-                //     'margin-left': 0,
-                //     'margin-top': 0
-                // }).stop(true, true).animate({
-                //     'width': width,
-                //     'height': height,
-                //     'margin-left': -(width / 2),
-                //     'margin-top': -(height / 2)
-                // }, speed, );
                 this.ui.modal.css({
                     'display': 'block',
                     'width': width,
@@ -240,7 +229,7 @@
                     that.ui.modal.addClass('cms-modal-open');
                 }, 0);
 
-                //FIXME listen to the transitionEnd event
+                // FIXME listen to the transitionEnd event
                 setTimeout(function () {
                     $(this).removeAttr('style');
 
@@ -248,9 +237,6 @@
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)
                     });
-
-                    // fade in modal window
-                    // that.ui.modal.show();
 
                     // hide loader
                     CMS.API.Toolbar._loader(false);
