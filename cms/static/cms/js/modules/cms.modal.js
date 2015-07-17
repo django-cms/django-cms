@@ -298,7 +298,7 @@
 
                     // save initial state
                     this.ui.modal.data('css', this.ui.modal.css([
-                        'left', 'top', 'margin'
+                        'left', 'top', 'margin-left', 'margin-top'
                     ]));
 
                     // minimize
