@@ -140,8 +140,8 @@
                 // empty buttons
                 // this.ui.modalButtons.html('');
 
-                var contents = this.ui.modalContents;
-                contents.show();
+                // var contents = this.ui.modalContents;
+                // contents.show();
 
                 this._loadContent(url, name);
 
@@ -316,8 +316,6 @@
             _minimize: function () {
                 var trigger = this.ui.minimizeButton;
                 var maximize = this.ui.maximizeButton;
-                var contents = this.ui.modalContents;
-                var title = this.ui.title;
 
                 // cancel action if maximized
                 if (this.maximized) {
@@ -328,47 +326,36 @@
                     // ensure toolbar is shown
                     CMS.API.Toolbar.toggleToolbar(true);
 
+                    // save initial state
+                    this.ui.modal.data('css', this.ui.modal.css([
+                        'left', 'top', 'margin'
+                    ]));
+
                     // minimize
                     trigger.addClass('cms-modal-collapsed');
-                    contents.hide();
+                    this.ui.body.addClass('cms-modal-minimized');
 
-                    // save initial state
-                    this.ui.modal.data('css', {
-                        'left': this.ui.modal.css('left'),
-                        'top': this.ui.modal.css('top'),
-                        'margin': this.ui.modal.css('margin')
-                    });
-
+                    // contents.hide();
                     this.ui.modal.css({
                         'left': this.ui.toolbar.find('.cms-toolbar-left').outerWidth(true) + 50,
-                        'top': (this.config.debug) ? 6 : 1,
-                        'margin': 0
+                        'top': (this.config.debug) ? 6 : 1
                     });
-
-                    // enable scrolling
-                    this.ui.body.css('overflow', '');
 
                     // ensure maximize element is hidden #3111
                     maximize.hide();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'default');
 
                     this.minimized = true;
                 } else {
                     // minimize
                     trigger.removeClass('cms-modal-collapsed');
-                    contents.show();
+                    this.ui.body.removeClass('cms-modal-minimized');
+                    // contents.show();
 
                     // reattach css
                     this.ui.modal.css(this.ui.modal.data('css'));
 
-                    // disable scrolling
-                    this.ui.body.css('overflow', 'hidden');
-
                     // ensure maximize element is shown #3111
                     maximize.show();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'move');
 
                     this.minimized = false;
                 }
