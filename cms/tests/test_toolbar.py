@@ -30,7 +30,8 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
+                                      ClearURLs)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
@@ -92,8 +93,7 @@ class ToolbarTestBase(CMSTestCase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
-class ToolbarMiddlewareTest(ToolbarTestBase):
-
+class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertTrue(hasattr(request,'toolbar'))

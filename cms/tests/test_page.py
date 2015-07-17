@@ -30,7 +30,7 @@ from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.compat import skipIf
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
+from cms.test_utils.testcases import (CMSTestCase, ClearURLs, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_7
@@ -1281,7 +1281,7 @@ class PageAdminTest(PageAdminTestBase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.noadmin_urls')
-class NoAdminPageTests(CMSTestCase):
+class NoAdminPageTests(ClearURLs, CMSTestCase):
 
     def test_get_page_from_request_fakeadmin_nopage(self):
         noadmin_apps = [app for app in installed_apps() if app != 'django.contrib.admin']

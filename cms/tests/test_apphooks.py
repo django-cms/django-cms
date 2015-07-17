@@ -18,7 +18,7 @@ from cms.appresolver import applications_page_check, clear_app_resolvers, get_ap
 from cms.cms_toolbar import PlaceholderToolbar
 from cms.models import Title, Page
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, ClearURLs
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -32,7 +32,7 @@ NS_APP_NAME = 'NamespacedApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_app"
 
 
-class ApphooksTestCase(CMSTestCase):
+class ApphooksTestCase(ClearURLs, CMSTestCase):
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()
@@ -692,7 +692,7 @@ class ApphooksTestCase(CMSTestCase):
             apphook_pool.clear()
 
 
-class ApphooksPageLanguageUrlTestCase(CMSTestCase):
+class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
     settings_overrides = {'ROOT_URLCONF': 'cms.test_utils.project.second_urls_for_apphook_tests'}
 
     def setUp(self):
