@@ -2,9 +2,9 @@
 // #LOADER#
 #cms-toolbar {
     .cms-loader {
-        background: $color-window url("../img/loader.gif") no-repeat center center !important;
+        background: #efefef url("../img/loader.gif?1") no-repeat center center !important;
         @include print-and-retina() {
-            background-image: url("../img/loader@2x.gif") !important;
+            background-image: url("../img/loader@2x.gif?1") !important;
             background-size: 32px !important;
         }
     }
