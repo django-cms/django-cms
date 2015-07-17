@@ -80,7 +80,8 @@ def details(request, slug):
         current_language = get_language_code(get_language())
     # Check that the current page is available in the desired (current) language
     available_languages = []
-    page_languages = list(page.get_languages())
+    # this will return all languages in draft mode, and published only in live mode
+    page_languages = list(page.get_published_languages())
     if hasattr(request, 'user') and request.user.is_staff:
         user_languages = get_language_list()
     else:

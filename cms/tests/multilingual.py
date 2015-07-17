@@ -323,6 +323,54 @@ class MultilingualTestCase(CMSTestCase):
             response = self.client.get("/de/")
             self.assertEqual(response.status_code, 302)
 
+    def test_publish_status(self):
+        p1 = create_page("page", "nav_playground.html", "en", published=True)
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en',)))
+        self.assertEqual(set(public.get_published_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_published_languages()), set(('en',)))
+
+        p1 = create_title('de', 'page de', p1).page
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en',)))
+        self.assertEqual(set(public.get_published_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
+        p1.publish('de')
+        p1 = p1.reload()
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_published_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
+        p1.unpublish('de')
+        p1 = p1.reload()
+
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_published_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
+        p1.publish('de')
+        p1 = p1.reload()
+        p1.unpublish('en')
+        p1 = p1.reload()
+
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_published_languages()), set(('de',)))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
     def test_no_english_defined(self):
         with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
