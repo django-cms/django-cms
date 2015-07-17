@@ -56,7 +56,7 @@
                 this.ui.window = $(window);
                 this.ui.toolbar = $('.cms-toolbar');
 
-                this.ui.minimizeButton = this.ui.modal.find('.cms-modal-collapse');
+                this.ui.minimizeButton = this.ui.modal.find('.cms-modal-minimize');
                 this.ui.maximizeButton = this.ui.modal.find('.cms-modal-maximize');
                 this.ui.title = this.ui.modal.find('.cms-modal-title');
                 this.ui.resize = this.ui.modal.find('.cms-modal-resize');
@@ -64,7 +64,6 @@
                 this.ui.breadcrumbItems = this.ui.modal.find('.cms-modal-breadcrumb-items');
                 this.ui.closeAndCancel = this.ui.modal.find('.cms-modal-close, .cms-modal-cancel');
                 this.ui.modalButtons = this.ui.modal.find('.cms-modal-buttons');
-                this.ui.modalContents = this.ui.modal.find('.cms-modal-body, .cms-modal-foot');
                 this.ui.modalBody = this.ui.modal.find('.cms-modal-body');
                 this.ui.iframeHolder = this.ui.modal.find('.cms-modal-frame');
                 this.ui.shim = this.ui.modal.find('.cms-modal-shim');
@@ -122,7 +121,7 @@
                 }
 
                 // because a new instance is called, we have to ensure minimized state is removed #3620
-                if (this.ui.modal.is(':visible') && this.ui.modal.find('.cms-modal-collapsed').length) {
+                if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
                     this._minimize();
                 }
@@ -133,30 +132,7 @@
                 // hide tooltip
                 this.hideTooltip();
 
-                // reset breadcrumb
-                // this.ui.breadcrumb.hide();
-                // this.ui.breadcrumbItems.html('');
-
-                // empty buttons
-                // this.ui.modalButtons.html('');
-
-                // var contents = this.ui.modalContents;
-                // contents.show();
-
                 this._loadContent(url, name);
-
-                // ensure modal is not maximized
-                if (this.ui.modal.find('.cms-modal-collapsed').length) {
-                    this._minimize();
-                }
-
-                // // reset styles
-                // this.ui.modal.css({
-                //     'left': '50%',
-                //     'top': '50%',
-                //     'mergin-left': 0,
-                //     'margin-right': 0
-                // });
 
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
@@ -170,14 +146,11 @@
                 var height = (screenHeight >= this.options.minHeight + heightOffset) ?
                     screenHeight - heightOffset :
                     this.options.minHeight;
-                // this.ui.modalBody.css({
-                //     'width': width,
-                //     'height': height
-                // });
-                // this.ui.modalBody.removeClass('cms-loader');
+
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
-                // in case, the window is larger than the windows height, we trigger fullscreen mode
+
+                // in case, the modal is larger than the window, we trigger fullscreen mode
                 if (height >= screenHeight) {
                     this.triggerMaximized = true;
                 }
@@ -314,9 +287,6 @@
             },
 
             _minimize: function () {
-                var trigger = this.ui.minimizeButton;
-                var maximize = this.ui.maximizeButton;
-
                 // cancel action if maximized
                 if (this.maximized) {
                     return false;
@@ -332,30 +302,20 @@
                     ]));
 
                     // minimize
-                    trigger.addClass('cms-modal-collapsed');
                     this.ui.body.addClass('cms-modal-minimized');
 
-                    // contents.hide();
                     this.ui.modal.css({
                         'left': this.ui.toolbar.find('.cms-toolbar-left').outerWidth(true) + 50,
                         'top': (this.config.debug) ? 6 : 1
                     });
 
-                    // ensure maximize element is hidden #3111
-                    maximize.hide();
-
                     this.minimized = true;
                 } else {
                     // minimize
-                    trigger.removeClass('cms-modal-collapsed');
                     this.ui.body.removeClass('cms-modal-minimized');
-                    // contents.show();
 
                     // reattach css
                     this.ui.modal.css(this.ui.modal.data('css'));
-
-                    // ensure maximize element is shown #3111
-                    maximize.show();
 
                     this.minimized = false;
                 }
@@ -364,9 +324,7 @@
             _maximize: function () {
                 var debug = (this.config.debug) ? 5 : 0; //FIXME incorrect
                 var container = this.ui.modal;
-                var minimize = this.ui.minimizeButton;
                 var trigger = this.ui.maximizeButton;
-                var title = this.ui.title;
 
                 // cancel action when minimized
                 if (this.minimized) {
@@ -382,49 +340,21 @@
                         'width', 'height'
                     ]));
 
-                    trigger.addClass('cms-modal-maximize-active');
                     this.ui.body.addClass('cms-modal-maximized');
 
-                    // container.data('css', {
-                    //     'width': container.width(),
-                    //     'height': container.height()
-                    // });
-
-                    // reset
                     container.css({
                         'left': 0,
                         'top': debug,
                         'margin': 0
                     });
-                    // bind resize event
-                    // FIXME: just add a class :/
-                    // this.ui.window.on('resize.cms.modal', function () {
-                    //     container.css({
-                    //         width: that.ui.window.width(),
-                    //         height: that.ui.window.height() - debug
-                    //     });
-                    // });
-                    // this.ui.window.trigger('resize.cms.modal');
-
-                    // ensure maximize element is hidden #3111
-                    minimize.hide();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'default');
                 } else {
                     // restore
                     this.maximized = false;
                     trigger.removeClass('cms-modal-maximize-active');
                     this.ui.body.removeClass('cms-modal-maximized');
 
-                    // this.ui.window.off('resize.cms.modal');
-
                     // reattach css
                     container.css(container.data('css'));
-
-                    // ensure maximize element is shown #3111
-                    minimize.show();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'move');
                 }
             },
 
@@ -466,7 +396,6 @@
                     return false;
                 }
                 // continue
-                var that = this;
                 var container = this.ui.modal;
                 var width = container.width();
                 var height = container.height();
@@ -491,9 +420,7 @@
                     // set centered animation
                     container.css({
                         'width': width - (mvX * 2),
-                        'height': height - (mvY * 2)
-                    });
-                    that.ui.modal.css({
+                        'height': height - (mvY * 2),
                         'left': modalLeft + mvX,
                         'top': modalTop + mvY
                     });
