@@ -26,6 +26,11 @@
             bottom: 0;
             width: auto !important;
             height: auto !important;
+
+            .cms-modal-title {
+                // set correct cursor when maximized #3111
+                cursor: default;
+            }
         }
 
         .cms-modal-minimized & {
@@ -134,6 +139,7 @@
             color: $color-primary;
         }
         .cms-modal-maximized & {
+            // ensure minimize button is hidden #3111
             display: none;
         }
     }
