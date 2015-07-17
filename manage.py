@@ -3,7 +3,7 @@ import os
 
 import app_manage
 
-from cms.utils.compat import DJANGO_1_7
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 gettext = lambda s: s
 
@@ -16,6 +16,48 @@ if __name__ == '__main__':
     PROJECT_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), 'cms', 'test_utils')
     )
+
+    INSTALLED_APPS = [
+        'debug_toolbar',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'djangocms_admin_style',
+        'django.contrib.admin',
+        'django.contrib.sites',
+        'django.contrib.staticfiles',
+        'django.contrib.messages',
+        'treebeard',
+        'cms',
+        'menus',
+        'djangocms_text_ckeditor',
+        'djangocms_column',
+        'djangocms_picture',
+        'djangocms_file',
+        'djangocms_flash',
+        'djangocms_googlemap',
+        'djangocms_teaser',
+        'djangocms_video',
+        'djangocms_inherit',
+        'djangocms_style',
+        'djangocms_link',
+        'cms.test_utils.project.sampleapp',
+        'cms.test_utils.project.placeholderapp',
+        'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
+        'cms.test_utils.project.pluginapp.plugins.extra_context',
+        'cms.test_utils.project.pluginapp.plugins.meta',
+        'cms.test_utils.project.pluginapp.plugins.one_thing',
+        'cms.test_utils.project.fakemlng',
+        'cms.test_utils.project.fileapp',
+        'cms.test_utils.project.objectpermissionsapp',
+        'cms.test_utils.project.bunch_of_plugins',
+        'cms.test_utils.project.extensionapp',
+        'cms.test_utils.project.mti_pluginapp',
+        'reversion',
+        'sekizai',
+        'hvad',
+        'better_test',
+    ]
 
     dynamic_configs = {}
 
@@ -66,6 +108,65 @@ if __name__ == '__main__':
             }
         ]
 
+    if DJANGO_1_6:
+        # South overrides the test command, thus insert it before better_test
+        INSTALLED_APPS.insert(0, 'south')
+        dynamic_configs['SOUTH_MIGRATION_MODULES'] = {
+            'cms': 'cms.south_migrations',
+            'menus': 'menus.south_migrations',
+            'djangocms_column': 'djangocms_column.migrations',
+            'djangocms_file': 'djangocms_file.migrations',
+            'djangocms_flash': 'djangocms_flash.migrations',
+            'djangocms_googlemap': 'djangocms_googlemap.migrations',
+            'djangocms_inherit': 'djangocms_inherit.migrations',
+            'djangocms_link': 'djangocms_link.migrations',
+            'djangocms_picture': 'djangocms_picture.migrations',
+            'djangocms_style': 'djangocms_style.migrations',
+            'djangocms_teaser': 'djangocms_teaser.migrations',
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.south_migrations',
+            'djangocms_video': 'djangocms_video.migrations',
+            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.south_migrations',
+            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.south_migrations',
+            'fileapp': 'cms.test_utils.project.fileapp.south_migrations',
+            'placeholderapp': 'cms.test_utils.project.placeholderapp.south_migrations',
+            'sampleapp': 'cms.test_utils.project.sampleapp.south_migrations',
+            'emailuserapp': 'cms.test_utils.project.emailuserapp.south_migrations',
+            'customuserapp': 'cms.test_utils.project.customuserapp.south_migrations',
+            'fakemlng': 'cms.test_utils.project.fakemlng.south_migrations',
+            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.south_migrations',
+            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.south_migrations',
+            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.south_migrations',
+            'extensionapp': 'cms.test_utils.project.extensionapp.south_migrations',
+            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.south_migrations',
+            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.south_migrations',
+        }
+    else:
+        dynamic_configs['MIGRATION_MODULES'] = {
+            'djangocms_column': 'djangocms_column.migrations_django',
+            'djangocms_file': 'djangocms_file.migrations_django',
+            'djangocms_flash': 'djangocms_flash.migrations_django',
+            'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
+            'djangocms_inherit': 'djangocms_inherit.migrations_django',
+            'djangocms_link': 'djangocms_link.migrations_django',
+            'djangocms_picture': 'djangocms_picture.migrations_django',
+            'djangocms_style': 'djangocms_style.migrations_django',
+            'djangocms_teaser': 'djangocms_teaser.migrations_django',
+            'djangocms_video': 'djangocms_video.migrations_django',
+            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations',
+            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations',
+            'fileapp': 'cms.test_utils.project.fileapp.migrations',
+            'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations',
+            'sampleapp': 'cms.test_utils.project.sampleapp.migrations',
+            'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations',
+            'fakemlng': 'cms.test_utils.project.fakemlng.migrations',
+            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations',
+            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations',
+            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations',
+            'extensionapp': 'cms.test_utils.project.extensionapp.migrations',
+            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
+            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
+        }
+
     app_manage.main(
         ['cms', 'menus'],
         PROJECT_PATH=PROJECT_PATH,
@@ -114,47 +215,7 @@ if __name__ == '__main__':
             'cms.middleware.toolbar.ToolbarMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware',
         ],
-        INSTALLED_APPS=[
-            'debug_toolbar',
-            'django.contrib.auth',
-            'django.contrib.contenttypes',
-            'django.contrib.sessions',
-            'djangocms_admin_style',
-            'django.contrib.admin',
-            'django.contrib.sites',
-            'django.contrib.staticfiles',
-            'django.contrib.messages',
-            'treebeard',
-            'cms',
-            'menus',
-            'djangocms_text_ckeditor',
-            'djangocms_column',
-            'djangocms_picture',
-            'djangocms_file',
-            'djangocms_flash',
-            'djangocms_googlemap',
-            'djangocms_teaser',
-            'djangocms_video',
-            'djangocms_inherit',
-            'djangocms_style',
-            'djangocms_link',
-            'cms.test_utils.project.sampleapp',
-            'cms.test_utils.project.placeholderapp',
-            'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
-            'cms.test_utils.project.pluginapp.plugins.extra_context',
-            'cms.test_utils.project.pluginapp.plugins.meta',
-            'cms.test_utils.project.pluginapp.plugins.one_thing',
-            'cms.test_utils.project.fakemlng',
-            'cms.test_utils.project.fileapp',
-            'cms.test_utils.project.objectpermissionsapp',
-            'cms.test_utils.project.bunch_of_plugins',
-            'cms.test_utils.project.extensionapp',
-            'cms.test_utils.project.mti_pluginapp',
-            'reversion',
-            'sekizai',
-            'hvad',
-            'better_test',
-        ],
+        INSTALLED_APPS=INSTALLED_APPS,
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
         INTERNAL_IPS = ['127.0.0.1'],
         AUTHENTICATION_BACKENDS=(
@@ -279,39 +340,15 @@ if __name__ == '__main__':
         CMS_SITE_CHOICES_CACHE_KEY='CMS:site_choices',
         CMS_PAGE_CHOICES_CACHE_KEY='CMS:page_choices',
         SOUTH_TESTS_MIGRATE=False,
-        CMS_NAVIGATION_EXTENDERS=(
-            ('cms.test_utils.project.sampleapp.menu_extender.get_nodes', 'SampleApp Menu'),
-        ),
+        CMS_NAVIGATION_EXTENDERS=[
+            ('cms.test_utils.project.sampleapp.menu_extender.get_nodes',
+             'SampleApp Menu'),
+        ],
         ROOT_URLCONF='cms.test_utils.project.urls',
         PASSWORD_HASHERS=(
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ),
         ALLOWED_HOSTS=['localhost'],
-        MIGRATION_MODULES={
-            'djangocms_column': 'djangocms_column.migrations_django',
-            'djangocms_file': 'djangocms_file.migrations_django',
-            'djangocms_flash': 'djangocms_flash.migrations_django',
-            'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
-            'djangocms_inherit': 'djangocms_inherit.migrations_django',
-            'djangocms_link': 'djangocms_link.migrations_django',
-            'djangocms_picture': 'djangocms_picture.migrations_django',
-            'djangocms_style': 'djangocms_style.migrations_django',
-            'djangocms_teaser': 'djangocms_teaser.migrations_django',
-            'djangocms_video': 'djangocms_video.migrations_django',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations',
-            'fileapp': 'cms.test_utils.project.fileapp.migrations',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations',
-            'sampleapp': 'cms.test_utils.project.sampleapp.migrations',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations',
-            'fakemlng': 'cms.test_utils.project.fakemlng.migrations',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations',
-            'extensionapp': 'cms.test_utils.project.extensionapp.migrations',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
-            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
-        },
         TEST_RUNNER='django.test.runner.DiscoverRunner',
         **dynamic_configs
     )
