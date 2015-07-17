@@ -37,11 +37,8 @@ class ToolbarPool(object):
         self._discovered = False
 
     def register(self, toolbar):
-        import os
-        import inspect
         import warnings
-        source_file = os.path.basename(inspect.stack()[1][1])
-        if source_file == 'cms_toolbar.py':
+        if toolbar.__module__.split('.')[-1] == 'cms_toolbar':
             warnings.warn('cms_toolbar.py filename is deprecated, '
                           'and it will be removed in version 3.4; '
                           'please rename it to cms_toolbar.py', DeprecationWarning)
