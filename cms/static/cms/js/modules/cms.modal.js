@@ -54,7 +54,7 @@
                 this.ui.modal = $('.cms-modal');
                 this.ui.body = $('html');
                 this.ui.window = $(window);
-                this.ui.toolbar = $('.cms-toolbar');
+                this.ui.toolbarLeftPart = $('.cms-toolbar-left');
 
                 this.ui.minimizeButton = this.ui.modal.find('.cms-modal-minimize');
                 this.ui.maximizeButton = this.ui.modal.find('.cms-modal-maximize');
@@ -305,7 +305,7 @@
                     this.ui.body.addClass('cms-modal-minimized');
 
                     this.ui.modal.css({
-                        'left': this.ui.toolbar.find('.cms-toolbar-left').outerWidth(true) + 50,
+                        'left': this.ui.toolbarLeftPart.outerWidth(true) + 50,
                         'top': (this.config.debug) ? 6 : 1
                     });
 
