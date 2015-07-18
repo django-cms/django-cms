@@ -328,13 +328,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             title='test page',
             template='nav_playground.html',
             language=settings.LANGUAGES[0][0],
-            body=body
         )
         plugin_data = {
             'plugin_type': "TextPlugin",
             'plugin_language': settings.LANGUAGES[0][0],
             'placeholder_id': page.placeholders.get(slot="body").pk,
             'plugin_parent': '',
+            'body': body,
         }
         response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
         self.assertEqual(response.status_code, 200)

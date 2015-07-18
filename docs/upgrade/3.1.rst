@@ -326,3 +326,6 @@ Update the database
   thus apply migrations to update your database::
 
     python manage.py migrate
+
+
+.. _Django documentation: https://docs.djangoproject.com/en/1.8/ref/contrib/admin/#django.contrib.admin.ModelAdmin.has_add_permission
