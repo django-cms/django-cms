@@ -1219,33 +1219,6 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         self._test_plugin_action_requires_permissions('delete')
 
     def _test_plugin_action_requires_permissions(self, key):
-        example = self._create_example()
-        if key == 'change':
-            self._create_plugin()
-        normal_guy = self._testuser()
-        admin_instance = self.get_admin()
-        # check all combinations of plugin, app and object permission
-        for perms in itertools.product(*[[False, True]]*3):
-            self._set_perms(normal_guy, [Text, Example1, self.example_object], perms, key)
-            request = self._post_request(normal_guy)
-            if key == 'add':
-                request.GET = {
-                    'placeholder_id': example.placeholder_id,
-                    'plugin_type': 'TextPlugin',
-                    'plugin_language': 'en'
-                }
-                response = admin_instance.add_plugin(request)
-            elif key == 'change':
-                response = admin_instance.edit_plugin(request, self._plugin.id)
-            should_pass = perms[0] and (perms[1] or perms[2])
-            if should_pass:
-                if key == 'add':
-                    expected_status_code = HttpResponseRedirect.status_code
-                else:
-                    expected_status_code = HttpResponse.status_code
-            else:
-                expected_status_code = HttpResponseForbidden.status_code
-            self.assertEqual(response.status_code, expected_status_code)
         """
         checks all combinations of plugin, app and object permission for all
         available actions (add, delete, change)
