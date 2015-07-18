@@ -96,9 +96,9 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(CMSLiveTests, cls).tearDownClass()
         if cls.driver:
             cls.driver.quit()
-        super(CMSLiveTests, cls).tearDownClass()
 
     def tearDown(self):
         super(CMSLiveTests, self).tearDown()
