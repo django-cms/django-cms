@@ -137,7 +137,7 @@ In ``admin.py`` we need to define all fields we'd like to display:
 ``get_config_fields`` defines the fields that should be displayed. Any fields
 using the AppData forms need to be prefixed by ``config.``.
 
-Now lets create the apphook with appconfig support (``cms_app.py``):
+Now lets create the apphook with appconfig support (``cms_apps.py``):
 
 .. code-block:: python
 

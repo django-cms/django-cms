@@ -9,9 +9,9 @@ from django.http import Http404, HttpResponseRedirect
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page, add_plugin
+from cms.cms_menus import CMSMenu
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
-from cms.menu import CMSMenu
 from cms.models import Title, EmptyTitle
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)

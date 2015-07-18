@@ -4,9 +4,8 @@ Extending the Toolbar
 
 .. versionadded:: 3.0
 
-You can add and remove items to the toolbar. This allows you to integrate your
-application in the frontend editing mode of django CMS and provide your users
-with a streamlined editing experience.
+You can add and remove toolbar items. This allows you to integrate django CMS's frontend editing
+mode into your application, and provide your users with a streamlined editing experience.
 
 For the toolbar API reference, please refer to :ref:`toolbar-api-reference`.
 
@@ -20,34 +19,35 @@ There are two ways to control what gets shown in the toolbar.
 One is the :setting:`CMS_TOOLBARS`. This gives you full control over which
 classes are loaded, but requires that you specify them all manually.
 
-The other is to provide ``cms_toolbar.py`` files in your apps, which will be
-automatically loaded as long :setting:`CMS_TOOLBARS` is not set (or set to
+The other is to provide ``cms_toolbars.py`` files in your apps, which will be
+automatically loaded as long :setting:`CMS_TOOLBARS` is not set (or is set to
 ``None``).
 
-If you use the automated way, your ``cms_toolbar.py`` file should contain
-classes that extend from ``cms.toolbar_base.CMSToolbar`` and are registered using :meth:`cms.toolbar_pool.toolbar_pool.register`.
+If you use the automated way, your ``cms_toolbars.py`` file should contain
+classes that extend ``cms.toolbar_base.CMSToolbar`` and are registered using :meth:`cms.toolbar_pool.toolbar_pool.register`.
 The register function can be used as a decorator.
 
-These have four attributes:
-* toolbar (the toolbar object)
-* request (the current request)
-* is_current_app (a flag indicating whether the current request is handled by the same app as the function is in)
-* app_path (the name of the app used for the current request)
+These classes have four attributes:
+* ``toolbar`` (the toolbar object)
+* ``request`` (the current request)
+* ``is_current_app`` (a flag indicating whether the current request is handled by the same app as the function is in)
+* ``app_path`` (the name of the app used for the current request)
 
-These classes must implement a ``populate`` or ``post_template_populate`` function. An optional ``request_hook`` function
-is available for overwrite as well.
+These classes must implement a ``populate`` or ``post_template_populate`` function. An optional
+``request_hook`` function is available for you to overwrite as well.
 
 * The populate functions will only be called if the current user is a staff user.
 * The ``populate`` function will be called before the template and plugins are rendered.
 * The ``post_template_populate`` function will be called after the template is rendered.
-* The ``request_hook`` function is called before the view and may return a response. This way you would be able to issue
-  redirects from a toolbar if needed
+* The ``request_hook`` function is called before the view and may return a response. This way you
+  can issue redirects from a toolbar if needed
 
-These classes can define an optional ``supported_apps`` attribute, specifying which applications the toolbar will work
-with.
-This is useful when the toolbar is defined in a different application from the views it's related to.
-to define the toolbar is local to (i.e.: for which the
-``supported_apps`` is a tuple of application dotted paths (e.g: ``supported_apps = ('whatever.path.app', 'another.path.app')``.
+These classes can define an optional ``supported_apps`` attribute, specifying which applications
+the toolbar will work with. This is useful when the toolbar is defined in a different application
+from the views it's related to.
+
+``supported_apps`` is a tuple of application dotted paths (e.g: ``supported_apps =
+('whatever.path.app', 'another.path.app')``.
 
 A simple example, registering a class that does nothing::
 
@@ -67,15 +67,20 @@ A simple example, registering a class that does nothing::
             pass
 
 
+.. note:: Up to version 3.1 the module was named ``cms_toolbar.py``. Please
+          update your existing modules to the new naming convention.
+          Support for the old name will be removed in version 3.4.
+
 .. warning::
 
-    As the toolbar passed to ``post_template_populate`` has been already populated with items from other applications,
-    it might contains different items that when processed by ``populate``.
+    As the toolbar passed to ``post_template_populate`` has been already populated with items from
+    other applications, it might contain different items when processed by ``populate``.
 
 .. tip::
 
-    You can change the toolbar or add items inside a plugin render method (context['request'].toolbar) or inside a view
-    (request.toolbar)
+    You can change the toolbar or add items inside a plugin render method
+    (``context['request'].toolbar``) or inside a view (``request.toolbar``)
+
 
 ************
 Adding items
@@ -85,8 +90,7 @@ Items can be added through the various :ref:`APIs <toolbar-api-reference>`
 exposed by the toolbar and its items.
 
 To add a :class:`cms.toolbar.items.Menu` to the toolbar, use
-:meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu` which will either add a menu if
-it doesn't exist, or create it.
+:meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu`.
 
 Then, to add a link to your changelist that will open in the sideframe, use the
 :meth:`cms.toolbar.items.ToolbarMixin.add_sideframe_item` method on the menu
@@ -125,7 +129,7 @@ menus::
     from django.utils.translation import ugettext_lazy as _
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar.items import Break
-    from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+    from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
     from cms.toolbar_base import CMSToolbar
 
     @toolbar_pool.register
@@ -142,18 +146,18 @@ menus::
 
 If you wish to simply detect the presence of a menu without actually creating
 it, you can use :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`, which will
-return the menu if it is present, or, if not, will return `None`.
+return the menu if it is present, or, if not, will return ``None``.
 
 
 *****************************
 Modifying an existing toolbar
 *****************************
 
-If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) you can do this by
-extending the original one, and modifying the appropriate attribute.
+If you need to modify an existing toolbar (say to change the ``supported_apps`` attribute) you can
+do this by extending the original one, and modifying the appropriate attribute.
 
-If :setting:`CMS_TOOLBARS` is used to register the toolbars, add your own toolbar instead of the original one, otherwise
-unregister the original and register your own::
+If :setting:`CMS_TOOLBARS` is used to register the toolbars, add your own toolbar instead of the
+original one, otherwise unregister the original and register your own::
 
 
     from cms.toolbar_pool import toolbar_pool
@@ -174,8 +178,8 @@ alphabetically. This can be challenging due to the non-obvious manner in which
 your apps will be loaded into Django and is further complicated when you add new
 applications over time.
 
-To aide developers, django-cms exposes a :meth:`cms.toolbar.items.ToolbarMixin.get_alphabetical_insert_position`
-method, which, if used consistently can produce alphabetized sub-menus, even
+To aid developers, django-cms exposes a :meth:`cms.toolbar.items.ToolbarMixin.get_alphabetical_insert_position`
+method, which, if used consistently, can produce alphabetised sub-menus, even
 when they come from multiple applications.
 
 An example is shown here for an 'Offices' app, which allows handy access to
@@ -186,7 +190,7 @@ certain admin functions for managing office locations in a project::
     from cms.toolbar_base import CMSToolbar
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar.items import Break, SubMenu
-    from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+    from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 
     @toolbar_pool.register
     class OfficesToolbar(CMSToolbar):
@@ -288,15 +292,18 @@ selected poll and its sub-methods::
 .. _url_changes:
 
 ---------------------
-Detecting url changes
+Detecting URL changes
 ---------------------
 
-Sometimes toolbar entries allow that you change the url of the current object displayed in the website. For example you are
-inside a blog entry and the toolbar allows to edit the blog slug or url. The toolbar will watch the
-``django.contrib.admin.models.LogEntry`` model and detect if you create or edit an object in the admin via modal or sideframe view.
-After the modal or sideframe closes it will redirect to the new url of the object.
+Sometimes toolbar entries allow you to change the URL of the current object displayed in the
+website.
 
-To set this behavior manually you can set the ``request.toolbar.set_object()`` function on which you can set the current object.
+For example, suppose you are viewing a blog entry, and the toolbar allows the blog slug or URL to
+be edited. The toolbar will watch the ``django.contrib.admin.models.LogEntry`` model and detect if
+you create or edit an object in the admin via modal or sideframe view. After the modal or sideframe
+closes it will redirect to the new url of the object.
+
+To set this behaviour manually you can set the ``request.toolbar.set_object()`` function on which you can set the current object.
 
 Example::
 
@@ -308,8 +315,8 @@ Example::
 
 
 
-If you want to watch for object creation or editing of models and redirect after they have been added or changed add a
-``watch_models`` attribute to your toolbar.
+If you want to watch for object creation or editing of models and redirect after they have been
+added or changed add a ``watch_models`` attribute to your toolbar.
 
 Example::
 
@@ -320,20 +327,20 @@ Example::
         def populate(self):
             ...
 
-After you add this every change to an instance of ``Poll`` via sideframe or modal window will trigger a redirect to
-the URL of the poll instance that was edited, according to the toolbar status: if in *draft* mode
-the ``get_draft_url()`` is returned (or ``get_absolute_url()`` if the former does not exists),
-if in *live* mode and the method exists ``get_public_url()`` is returned;
+After you add this every change to an instance of ``Poll`` via sideframe or modal window will
+trigger a redirect to the URL of the poll instance that was edited, according to the toolbar
+status: if in *draft* mode the ``get_draft_url()`` is returned (or ``get_absolute_url()`` if the
+former does not exists), if in *live* mode and the method exists ``get_public_url()`` is returned.
 
 
 ********
 Frontend
 ********
 
-The toolbar adds a class ``cms-ready`` to the **html** tag when ready. Additionally we add ``cms-toolbar-expanded`` when
-the toolbar is visible (expanded).
+The toolbar adds a class ``cms-ready`` to the **html** tag when ready. Additionally we add
+``cms-toolbar-expanded`` when the toolbar is visible (expanded).
 
 The toolbar also fires a JavaScript event called **cms-ready** on the document.
-You can listen to this event using jQuery:
+You can listen to this event using jQuery::
 
-``CMS.$(document).on('cms-ready', function () { ... });``
+    CMS.$(document).on('cms-ready', function () { ... });

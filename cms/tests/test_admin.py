@@ -47,9 +47,9 @@ class AdminTestsBase(CMSTestCase):
         return site._registry[Page]
 
     def _get_guys(self, admin_only=False, use_global_permissions=True):
-        admiN_user = self.get_superuser()
+        admin_user = self.get_superuser()
         if admin_only:
-            return admiN_user
+            return admin_user
         USERNAME = 'test'
 
         if get_user_model().USERNAME_FIELD == 'email':
@@ -74,7 +74,7 @@ class AdminTestsBase(CMSTestCase):
                 can_move_page=True,
             )
             gpp.sites = Site.objects.all()
-        return admiN_user, normal_guy
+        return admin_user, normal_guy
 
 
 class AdminTestCase(AdminTestsBase):
@@ -320,8 +320,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 407)):
-                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_delete_diff_language(self):
@@ -337,8 +336,7 @@ class AdminTestCase(AdminTestsBase):
         page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            with self.assertNumQueries(FuzzyInt(300, 394)):
-                response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_search_fields(self):
@@ -1610,20 +1608,22 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            with self.assertNumQueries(FuzzyInt(40, 66)):
-                output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
+            output = force_text(
+                self.client.get(
+                    '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+                ).content
+            )
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(Placeholder.objects.all().count(), 9)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            with self.assertNumQueries(FuzzyInt(40, 72)):
-                output = force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
+            output = force_text(
+                self.client.get(
+                    '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+                ).content
+            )
             self.assertIn('<b>Test</b>', output)
-        with self.assertNumQueries(FuzzyInt(18, 45)):
-            force_text(self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')).content)
-        with self.assertNumQueries(FuzzyInt(11, 29)):
-            force_text(self.client.get('/en/').content)
 
     def test_tree_view_queries(self):
         from django.core.cache import cache

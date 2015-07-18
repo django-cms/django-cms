@@ -9,7 +9,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, clear_url_caches
 from django.template.context import Context, RequestContext
 from django.test import testcases
 from django.test.client import RequestFactory
@@ -396,9 +396,22 @@ class BaseCMSTestCase(object):
             template_obj = Template(template)
             return template_obj.render(RequestContext(request, context))
 
+
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
     pass
 
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
+
+
+class ClearURLs(object):
+    @classmethod
+    def setUpClass(cls):
+        clear_url_caches()
+        super(ClearURLs, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(ClearURLs, cls).tearDownClass()
+        clear_url_caches()

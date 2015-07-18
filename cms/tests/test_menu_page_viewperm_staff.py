@@ -4,7 +4,7 @@ from __future__ import with_statement
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 
-from cms.tests.menu_page_viewperm import ViewPermissionTests
+from cms.tests.test_menu_page_viewperm import ViewPermissionTests
 
 __all__ = [
     'ViewPermissionComplexMenuStaffNodeTests',

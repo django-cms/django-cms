@@ -17,9 +17,9 @@ from django.test.utils import override_settings
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
 from cms.admin.forms import save_permissions
+from cms.cms_menus import get_visible_pages
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.management.commands.subcommands.moderator import log
-from cms.menu import get_visible_pages
 from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          ACCESS_PAGE_AND_DESCENDANTS,

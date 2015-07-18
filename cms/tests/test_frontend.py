@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
 import datetime
 import os
+import sys
 import time
 
 from django.contrib.auth import get_user_model
@@ -28,7 +28,7 @@ from cms.appresolver import clear_app_resolvers
 from cms.apphook_pool import apphook_pool
 from cms.exceptions import AppAlreadyRegistered
 from cms.models import CMSPlugin, Page
-from cms.test_utils.project.placeholderapp.cms_app import Example1App
+from cms.test_utils.project.placeholderapp.cms_apps import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.compat import DJANGO_1_6
