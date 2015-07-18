@@ -10,9 +10,6 @@ from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.http import HttpResponse
-from django.http import HttpResponseForbidden
-from django.http import HttpResponseRedirect
 from django.template import TemplateSyntaxError, Template
 from django.template.context import Context, RequestContext
 from django.template.loader import get_template
