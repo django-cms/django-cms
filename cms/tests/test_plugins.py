@@ -276,47 +276,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertTrue('/edit-plugin/%s/'% column.pk, text_breadcrumbs[1]['url'])
         self.assertTrue('/edit-plugin/%s/'% text_plugin.pk, text_breadcrumbs[2]['url'])
 
-    def test_add_cancel_plugin(self):
-        """
-        Test that you can cancel a new plugin before editing and
-        that the plugin is removed.
-        """
-        # add a new text plugin
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.all()[0]
-        plugin_data = {
-            'plugin_type': "TextPlugin",
-            'plugin_language': settings.LANGUAGES[0][0],
-            'placeholder_id': page.placeholders.get(slot="body").pk,
-            'plugin_parent': '',
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEqual(response.status_code, 200)
-        pk = CMSPlugin.objects.all()[0].pk
-        expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
-            "breadcrumb": [
-                {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
-                    "title": "Text"
-                }
-            ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
-        }
-        output = json.loads(response.content.decode('utf8'))
-        self.assertEqual(output, expected)
-        # now click cancel instead of editing
-        response = self.client.get(output['url'])
-        self.assertEqual(response.status_code, 200)
-        data = {
-            "body": "Hello World",
-            "_cancel": True,
-        }
-        response = self.client.post(output['url'], data)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(0, Text.objects.count())
-
     def test_extract_images_from_text(self):
         img_path = os.path.join(os.path.dirname(__file__), 'data', 'image.jpg')
         with open(img_path, 'rb') as fobj:
@@ -329,33 +288,13 @@ class PluginsTestCase(PluginsTestBaseCase):
             template='nav_playground.html',
             language=settings.LANGUAGES[0][0],
         )
-        plugin_data = {
-            'plugin_type': "TextPlugin",
-            'plugin_language': settings.LANGUAGES[0][0],
-            'placeholder_id': page.placeholders.get(slot="body").pk,
-            'plugin_parent': '',
-            'body': body,
-        }
-        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-        self.assertEqual(response.status_code, 200)
-        # now edit the plugin
-        edit_url = URL_CMS_PLUGIN_EDIT + "%s/" % CMSPlugin.objects.all()[0].pk
-        response = self.client.get(edit_url)
-        self.assertEqual(response.status_code, 200)
-        img_path = os.path.join(os.path.dirname(__file__), 'data', 'image.jpg')
-        with open(img_path, 'rb') as fobj:
-            img_data = base64.b64encode(fobj.read()).decode('utf-8')
-        body = """<p>
-            <img alt='' src='data:image/jpeg;base64,{data}' />
-        </p>""".format(data=img_data)
-        data = {
-            "body": body
-        }
-        response = self.client.post(edit_url, data)
-        self.assertEqual(response.status_code, 200)
-
-        txt = Text.objects.all()[0]
-        self.assertTrue('id="plugin_obj_%s"' % (txt.pk + 1) in txt.body)
+        plugin = api.add_plugin(
+            page.placeholders.get(slot="body"),
+            plugin_type='TextPlugin',
+            language=settings.LANGUAGES[0][0],
+            body=body,
+        )
+        self.assertEqual(plugin.get_children().count(), 1)
 
     def test_add_text_plugin_empty_tag(self):
         """
