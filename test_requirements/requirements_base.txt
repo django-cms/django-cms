@@ -13,7 +13,6 @@ dj-database-url
 selenium
 django-debug-toolbar
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
--e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file

@@ -2,4 +2,5 @@
 django>=1.6,<1.7
 South==1.0.2
 django-reversion<1.8.3
+-e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
