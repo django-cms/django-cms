@@ -3,14 +3,18 @@ import datetime
 import os
 import sys
 import time
+from urllib.parse import urlparse
+from cms.test_utils.util.mock import AttributeObject
+from django.conf import settings
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
 from django.utils import unittest
+from django.utils.importlib import import_module
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -33,6 +37,34 @@ if DJANGO_1_6:
     from django.test import LiveServerTestCase as StaticLiveServerTestCase
 else:
     from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+
+
+class FastLogin(object):
+    def _fastlogin(self, **credentials):
+        session = import_module(settings.SESSION_ENGINE).SessionStore()
+        session.save()
+        request = AttributeObject(session=session, META={})
+        user = authenticate(**credentials)
+        login(request, user)
+        session.save()
+
+        # We need to "warm up" the webdriver as we can only set cookies on the
+        # current domain
+        self.driver.get(self.live_server_url)
+        # While we don't care about the page fully loading, Django will freak
+        # out if we 'abort' this request, so we wait patiently for it to finish
+        self.wait_page_loaded()
+        self.driver.add_cookie({
+            'name': settings.SESSION_COOKIE_NAME,
+            'value': session.session_key,
+            'path': '/',
+            'domain': urlparse(self.live_server_url).hostname
+        })
+        self.driver.get('{0}/?{1}'.format(
+            self.live_server_url,
+            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        ))
+        self.wait_page_loaded()
 
 
 class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
@@ -159,7 +191,6 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
 
 
 class ToolbarBasicTests(CMSLiveTests):
-
     def setUp(self):
         self.user = self.get_superuser()
         Site.objects.create(domain='example.org', name='example.org')
@@ -271,8 +302,7 @@ class ToolbarBasicTests(CMSLiveTests):
     },
     SITE_ID=1,
 )
-class PlaceholderBasicTests(CMSLiveTests):
-
+class PlaceholderBasicTests(FastLogin, CMSLiveTests):
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
 
@@ -292,18 +322,9 @@ class PlaceholderBasicTests(CMSLiveTests):
         super(PlaceholderBasicTests, self).setUp()
 
     def _login(self):
-        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
-        password_input.submit()
-        self.wait_page_loaded()
-
-        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
+        username = getattr(self.user, get_user_model().USERNAME_FIELD)
+        password = username
+        self._fastlogin(username=username, password=password)
 
     def test_copy_from_language(self):
         self._login()
@@ -406,8 +427,7 @@ class PlaceholderBasicTests(CMSLiveTests):
     SITE_ID=1,
     CMS_PERMISSION=False,
 )
-class StaticPlaceholderPermissionTests(CMSLiveTests):
-
+class StaticPlaceholderPermissionTests(FastLogin, CMSLiveTests):
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
 
@@ -423,20 +443,9 @@ class StaticPlaceholderPermissionTests(CMSLiveTests):
         super(StaticPlaceholderPermissionTests, self).setUp()
 
     def test_static_placeholders_permissions(self):
-
-        # login
-        url = '%s/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-        self.driver.get(url)
-
-        self.assertRaises(NoSuchElementException, self.driver.find_element_by_class_name, 'cms-toolbar-item-logout')
-        username_input = self.driver.find_element_by_id("id_cms-username")
-        username_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
-        password_input = self.driver.find_element_by_id("id_cms-password")
-        password_input.send_keys(getattr(self.user, get_user_model().USERNAME_FIELD))
-        password_input.submit()
-        self.wait_page_loaded()
-
-        self.assertTrue(self.driver.find_element_by_class_name('cms-toolbar-item-navigation'))
+        username = getattr(self.user, get_user_model().USERNAME_FIELD)
+        password = username
+        self._fastlogin(username=username, password=password)
 
         pk = Placeholder.objects.filter(slot='logo').order_by('id')[0].pk
         placeholder_name = 'cms-placeholder-%s' % pk
