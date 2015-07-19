@@ -486,6 +486,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if commit:
             if not self.depth:
                 if self.parent_id:
+                    self.depth = self.parent.depth + 1
                     self.parent.add_child(instance=self)
                 else:
                     self.add_root(instance=self)
