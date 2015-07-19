@@ -310,7 +310,6 @@
             _maximize: function () {
                 var debug = (this.config.debug) ? 5 : 0; //FIXME incorrect
                 var container = this.ui.modal;
-                var trigger = this.ui.maximizeButton;
 
                 // cancel action when minimized
                 if (this.minimized) {
@@ -336,7 +335,6 @@
                 } else {
                     // restore
                     this.maximized = false;
-                    trigger.removeClass('cms-modal-maximize-active');
                     this.ui.body.removeClass('cms-modal-maximized');
 
                     // reattach css
