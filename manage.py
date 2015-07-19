@@ -8,6 +8,51 @@ from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 gettext = lambda s: s
 
 
+DJANGO_MIGRATION_MODULES = {
+    'djangocms_column': 'djangocms_column.migrations_django',
+    'djangocms_file': 'djangocms_file.migrations_django',
+    'djangocms_flash': 'djangocms_flash.migrations_django',
+    'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
+    'djangocms_inherit': 'djangocms_inherit.migrations_django',
+    'djangocms_link': 'djangocms_link.migrations_django',
+    'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+    'djangocms_picture': 'djangocms_picture.migrations_django',
+    'djangocms_style': 'djangocms_style.migrations_django',
+    'djangocms_teaser': 'djangocms_teaser.migrations_django',
+    'djangocms_video': 'djangocms_video.migrations_django',
+    'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations',
+    'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations',
+    'fileapp': 'cms.test_utils.project.fileapp.migrations',
+    'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations',
+    'sampleapp': 'cms.test_utils.project.sampleapp.migrations',
+    'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations',
+    'fakemlng': 'cms.test_utils.project.fakemlng.migrations',
+    'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations',
+    'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations',
+    'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations',
+    'extensionapp': 'cms.test_utils.project.extensionapp.migrations',
+    'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
+    'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
+}
+
+
+class DisableMigrations(object):
+    def __contains__(self, _):
+        return True
+
+    def __getitem__(self, _):
+        return "notmigrations"
+
+
+class DjangoMigrationsFlag(app_manage.Config):
+    def get_value(self, argv, environ):
+        value = super(DjangoMigrationsFlag, self).get_value(argv, environ)
+        if value:
+            return DJANGO_MIGRATION_MODULES
+        else:
+            return DisableMigrations()
+
+
 if __name__ == '__main__':
     os.environ.setdefault(
         'DJANGO_LIVE_TEST_SERVER_ADDRESS',
@@ -123,7 +168,7 @@ if __name__ == '__main__':
             'djangocms_picture': 'djangocms_picture.migrations',
             'djangocms_style': 'djangocms_style.migrations',
             'djangocms_teaser': 'djangocms_teaser.migrations',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.south_migrations',
+            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations',
             'djangocms_video': 'djangocms_video.migrations',
             'meta': 'cms.test_utils.project.pluginapp.plugins.meta.south_migrations',
             'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.south_migrations',
@@ -141,31 +186,10 @@ if __name__ == '__main__':
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.south_migrations',
         }
     else:
-        dynamic_configs['MIGRATION_MODULES'] = {
-            'djangocms_column': 'djangocms_column.migrations_django',
-            'djangocms_file': 'djangocms_file.migrations_django',
-            'djangocms_flash': 'djangocms_flash.migrations_django',
-            'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
-            'djangocms_inherit': 'djangocms_inherit.migrations_django',
-            'djangocms_link': 'djangocms_link.migrations_django',
-            'djangocms_picture': 'djangocms_picture.migrations_django',
-            'djangocms_style': 'djangocms_style.migrations_django',
-            'djangocms_teaser': 'djangocms_teaser.migrations_django',
-            'djangocms_video': 'djangocms_video.migrations_django',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations',
-            'fileapp': 'cms.test_utils.project.fileapp.migrations',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations',
-            'sampleapp': 'cms.test_utils.project.sampleapp.migrations',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations',
-            'fakemlng': 'cms.test_utils.project.fakemlng.migrations',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations',
-            'extensionapp': 'cms.test_utils.project.extensionapp.migrations',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
-            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
-        }
+        dynamic_configs['MIGRATION_MODULES'] = DjangoMigrationsFlag(
+            arg=app_manage.Flag('--migrate'),
+            default=False,
+        )
 
     app_manage.main(
         ['cms', 'menus'],
@@ -217,7 +241,7 @@ if __name__ == '__main__':
         ],
         INSTALLED_APPS=INSTALLED_APPS,
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
-        INTERNAL_IPS = ['127.0.0.1'],
+        INTERNAL_IPS=['127.0.0.1'],
         AUTHENTICATION_BACKENDS=(
             'django.contrib.auth.backends.ModelBackend',
             'cms.test_utils.project.objectpermissionsapp.backends.ObjectPermissionBackend',
@@ -339,7 +363,10 @@ if __name__ == '__main__':
         CMS_PLUGIN_CONTEXT_PROCESSORS=(),
         CMS_SITE_CHOICES_CACHE_KEY='CMS:site_choices',
         CMS_PAGE_CHOICES_CACHE_KEY='CMS:page_choices',
-        SOUTH_TESTS_MIGRATE=False,
+        SOUTH_TESTS_MIGRATE=app_manage.Config(
+            arg=app_manage.Flag('--migrate'),
+            default=False,
+        ),
         CMS_NAVIGATION_EXTENDERS=[
             ('cms.test_utils.project.sampleapp.menu_extender.get_nodes',
              'SampleApp Menu'),

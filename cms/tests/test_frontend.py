@@ -45,7 +45,7 @@ else:
 
 
 class FastLogin(object):
-    def _fastlogin(self, **credentials):
+    def _fastlogin(self, next_url=None, **credentials):
         session = import_module(settings.SESSION_ENGINE).SessionStore()
         session.save()
         request = AttributeObject(session=session, META={})
@@ -65,10 +65,12 @@ class FastLogin(object):
             'path': '/',
             'domain': urlparse(self.live_server_url).hostname
         })
-        self.driver.get('{0}/?{1}'.format(
-            self.live_server_url,
-            get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
+        if next_url is None:
+            next_url = '{0}/?{1}'.format(
+                self.live_server_url,
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            )
+        self.driver.get(next_url)
         self.wait_page_loaded()
 
 
@@ -548,13 +550,32 @@ class StaticPlaceholderPermissionTests(FastLogin, CMSLiveTests):
         )
 
 
-class AddPluginTest(CMSLiveTests):
+class AddPluginTest(FastLogin, CMSLiveTests):
     def test_add_style_plugin(self):
         page = create_page('Home', 'simple.html', 'en', published=True)
 
         placeholder_id = page.placeholders.all()[0].pk
 
-        self._login()
+        user_model = get_user_model()
+        username = 'admin@example.com'
+        password = 'admin'
+        user_instance, _ = user_model.objects.get_or_create(
+            **{user_model.USERNAME_FIELD: username}
+        )
+        user_instance.set_password(password)
+        user_instance.is_superuser = True
+        user_instance.is_active = True
+        user_instance.is_staff = True
+        user_instance.save()
+
+        self._fastlogin(
+            username=username,
+            password=password,
+            next_url='{base}/?{flag}'.format(
+                base=self.live_server_url,
+                flag=get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            )
+        )
 
         # click structure mode
         self.driver.find_element_by_css_selector('a[href="?build"]').click()
@@ -562,9 +583,10 @@ class AddPluginTest(CMSLiveTests):
 
         # open the "add plugin menu"
         placeholder_bar = self.driver.find_element_by_css_selector(
-            'div.cms_dragbar-{0} div'.format(placeholder_id)
+            'div.cms-dragbar-{0} div'.format(placeholder_id)
         )
         placeholder_bar.click()
+
         # click the Style Plugin
         placeholder_bar.find_element_by_css_selector(
             'a[href="StylePlugin"]'
@@ -573,7 +595,7 @@ class AddPluginTest(CMSLiveTests):
 
         # switch to the edit window iframe
         iframe = self.driver.find_element_by_css_selector(
-            'div.cms_modal-frame iframe'
+            'div.cms-modal-frame iframe'
         )
         self.driver.switch_to.frame(iframe)
 
@@ -606,11 +628,30 @@ class AddPluginTest(CMSLiveTests):
 
         page.publish('en')
 
-        self._login()
+        user_model = get_user_model()
+        username = 'admin@example.com'
+        password = 'admin'
+        user_instance, _ = user_model.objects.get_or_create(
+            **{user_model.USERNAME_FIELD: username}
+        )
+        user_instance.set_password(password)
+        user_instance.is_superuser = True
+        user_instance.is_active = True
+        user_instance.is_staff = True
+        user_instance.save()
+
+        self._fastlogin(
+            username=username,
+            password=password,
+            next_url='{base}/?{flag}'.format(
+                base=self.live_server_url,
+                flag=get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            )
+        )
 
         # Double click plugin
         plugin_element = self.driver.find_element_by_css_selector(
-            'div.cms_plugin-{0}'.format(text_plugin.pk)
+            'div.cms-plugin-{0}'.format(text_plugin.pk)
         )
 
         chain = ActionChains(self.driver)
@@ -622,7 +663,7 @@ class AddPluginTest(CMSLiveTests):
 
         # Switch to iframe
         iframe = self.driver.find_element_by_css_selector(
-            'div.cms_modal-frame iframe'
+            'div.cms-modal-frame iframe'
         )
         self.driver.switch_to.frame(iframe)
 
@@ -673,7 +714,7 @@ class AddPluginTest(CMSLiveTests):
         # back to actual page
         self.driver.switch_to.parent_frame()
         save_button = self.driver.find_element_by_css_selector(
-            'div.cms_btn-action.default'
+            'div.cms-btn-action.default'
         )
         save_button.click()
 
@@ -686,7 +727,7 @@ class AddPluginTest(CMSLiveTests):
         self.assertEqual(link_plugin.parent_id, text_plugin.pk)
 
         paragraph = self.driver.find_element_by_css_selector(
-            'div.cms_plugin-{0} p'.format(text_plugin.pk)
+            'div.cms-plugin-{0} p'.format(text_plugin.pk)
         )
 
         self.assertIn('Example', paragraph.text)
