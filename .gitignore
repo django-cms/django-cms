@@ -44,3 +44,4 @@ share/
 cms/static/cms/compass_app_log.txt
 cms/static/cms/node_modules
 !cms/static/cms/js/dist
+node_modules/
