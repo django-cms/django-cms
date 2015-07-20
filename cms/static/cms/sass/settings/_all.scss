@@ -130,13 +130,13 @@ $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
-$modal-header-height: 28px;
-$modal-footer-height: 32px;
+$modal-header-height: 36px;
+$modal-footer-height: 36px;
 
-$modal-header-button-icon-size: 8px;
-$modal-header-button-area-size: 20px;
+$modal-header-button-icon-size: 10px;
+$modal-header-button-area-size: 30px;
 
-$modal-breadcrumb-title-width: 36px;
+$modal-breadcrumb-title-width: 40px;
 $modal-breadcrumb-padding-vertical: $padding-normal;
 $modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
 $modal-breadcrumb-hover-color: $black;
@@ -145,8 +145,10 @@ $modal-breadcrumb-hover-bgcolor: $white;
 $modal-button-font-size: 12px;
 $modal-button-padding: 2px $padding-normal;
 $modal-button-space: 5px;
+$modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
 
-$modal-resize-size: 20px;
+
+$modal-resize-size: 30px;
 
 $modal-content-padding: 10px;
 $modal-content-module-padding: 10px;
