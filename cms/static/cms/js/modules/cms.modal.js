@@ -286,8 +286,7 @@
                     this.ui.body.addClass('cms-modal-minimized');
 
                     this.ui.modal.css({
-                        'left': this.ui.toolbarLeftPart.outerWidth(true) + 50,
-                        'top': (this.config.debug) ? 6 : 1
+                        'left': this.ui.toolbarLeftPart.outerWidth(true) + 50
                     });
 
                     this.minimized = true;
@@ -303,7 +302,6 @@
             },
 
             _maximize: function () {
-                var debug = (this.config.debug) ? 5 : 0; //FIXME incorrect
                 var container = this.ui.modal;
 
                 // cancel action when minimized
@@ -321,12 +319,6 @@
                     ]));
 
                     this.ui.body.addClass('cms-modal-maximized');
-
-                    container.css({
-                        'left': 0,
-                        'top': debug,
-                        'margin': 0
-                    });
                 } else {
                     // restore
                     this.maximized = false;
