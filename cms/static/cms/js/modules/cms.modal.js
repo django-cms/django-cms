@@ -19,12 +19,7 @@
                 minHeight: 400,
                 minWidth: 800,
                 modalDuration: 200,
-                newPlugin: false,
-                urls: {
-                    // FIXME async request for css is bad because of junk, maybe it's possible
-                    // to inject it in backend through a url param?
-                    css_modal: 'cms/css/cms.toolbar.modal.css'
-                }
+                newPlugin: false
             },
 
             initialize: function (options) {
@@ -532,12 +527,29 @@
                 this.ui.modalButtons.html(render);
             },
 
-            _loadContent: function (url, name) {
-                var that = this;
-
+            /**
+             * _prepareUrl adds `?modal=1` get param to the url, which is then got by the backend
+             * and additional "modal" stylesheet is then inserted into a template that is loaded
+             * inside of an iframe
+             *
+             * @param url String
+             */
+            _prepareUrl: function (url) {
+                if (url.indexOf('?') === -1) {
+                    url += '?modal=1';
+                } else {
+                    url += '&modal=1';
+                }
                 // FIXME: A better fix is needed for '&' being interpreted as the
                 // start of en entity by jQuery. See #3404
                 url = url.replace('&', '&amp;');
+                return url;
+            },
+
+            _loadContent: function (url, name) {
+                var that = this;
+                url = this._prepareUrl(url);
+
                 // now refresh the content
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 iframe.css('visibility', 'hidden');
@@ -577,13 +589,6 @@
                         that.close();
                         return false;
                     }
-
-                    // after iframe is loaded append css
-                    contents.find('head').append(
-                        $('<link rel="stylesheet" type="text/css" href="' +
-                          that.config.urls.static +
-                          that.options.urls.css_modal + '" />')
-                    );
 
                     // adding django hacks
                     contents.find('.viewsitelink').attr('target', '_top');
