@@ -6,11 +6,9 @@ import warnings
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render_to_response
 
 from cms.utils import get_language_list
-from cms.utils.urlutils import admin_reverse
 from cms.utils.compat.dj import force_unicode
 from cms.exceptions import PluginLimitReached
 from cms.models import Placeholder
@@ -297,7 +295,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         an admin site directly and the add_view is accessed via frontend
         editing.
         """
-        return HttpResponseRedirect(admin_reverse('index'))
+        return render_to_response('admin/cms/plugin/close_modal.html')
 
     def save_model(self, request, obj, form, change):
         """
