@@ -5,6 +5,9 @@
 
 .cms-modal-maximized {
     overflow: hidden !important;
+    .cms-toolbar-debug .cms-modal {
+        top: $toolbar-debug-height !important;
+    }
 }
 #cms-toolbar {
     .cms-modal {
@@ -24,6 +27,9 @@
         .cms-modal-maximized & {
             right: 0;
             bottom: 0;
+            left: 0 !important;
+            border-radius: 0;
+            margin: 0 !important;
             width: auto !important;
             height: auto !important;
 
@@ -63,6 +69,7 @@
     }
     .cms-modal-foot {
         position: absolute;
+        overflow: hidden;
         clear: both;
         height: $modal-footer-height;
         background: $gray-lightest;
@@ -192,7 +199,7 @@
             line-height: $modal-footer-height - 2 * $modal-breadcrumb-padding-vertical;
             padding: $modal-breadcrumb-padding-vertical
                 $modal-breadcrumb-padding-horizontal
-                $modal-breadcrumb-padding-horizontal
+                $modal-breadcrumb-padding-vertical
                 1.5 * $modal-breadcrumb-padding-horizontal;
         }
         a:first-child {
