@@ -19,12 +19,7 @@
                 minHeight: 400,
                 minWidth: 800,
                 modalDuration: 200,
-                newPlugin: false,
-                urls: {
-                    // FIXME async request for css is bad because of junk, maybe it's possible
-                    // to inject it in backend through a url param?
-                    css_modal: 'cms/css/cms.toolbar.modal.css'
-                }
+                newPlugin: false
             },
 
             initialize: function (options) {
@@ -220,7 +215,7 @@
                     'display': 'block',
                     'width': width,
                     'height': height,
-                    // FIXME animate translateX if possible instead of margin
+                    // TODO animate translateX if possible instead of margin
                     'margin-left': -(width / 2),
                     'margin-top': -(height / 2)
                 });
@@ -229,10 +224,7 @@
                     that.ui.modal.addClass('cms-modal-open');
                 }, 0);
 
-                // FIXME listen to the transitionEnd event
-                setTimeout(function () {
-                    $(this).removeAttr('style');
-
+                this.ui.modal.one('cmsTransitionEnd', function () {
                     that.ui.modal.css({
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)
@@ -248,7 +240,7 @@
 
                     // changed locked status to allow other modals again
                     CMS.API.locked = false;
-                }, speed);
+                }).emulateTransitionEnd(speed);
 
                 // add esc close event
                 this.ui.body.on('keydown.cms', function (e) {
@@ -263,13 +255,15 @@
 
             _hide: function (duration) {
                 var that = this;
-                this.ui.modal.removeClass('cms-modal-open');
-                //FIXME listen to transitionEnd event
-                setTimeout(function () {
+
+                that.ui.modal.removeClass('cms-modal-open');
+
+                that.ui.modal.one('cmsTransitionEnd', function () {
                     that.ui.modal.css('display', 'none');
-                }, duration);
-                this.ui.iframeHolder.find('iframe').remove();
-                this.ui.modalBody.removeClass('cms-loader');
+                }).emulateTransitionEnd(duration);
+
+                that.ui.iframeHolder.find('iframe').remove();
+                that.ui.modalBody.removeClass('cms-loader');
             },
 
             _minimize: function () {
@@ -291,8 +285,7 @@
                     this.ui.body.addClass('cms-modal-minimized');
 
                     this.ui.modal.css({
-                        'left': this.ui.toolbarLeftPart.outerWidth(true) + 50,
-                        'top': (this.config.debug) ? 6 : 1
+                        'left': this.ui.toolbarLeftPart.outerWidth(true) + 50
                     });
 
                     this.minimized = true;
@@ -308,7 +301,6 @@
             },
 
             _maximize: function () {
-                var debug = (this.config.debug) ? 5 : 0; //FIXME incorrect
                 var container = this.ui.modal;
 
                 // cancel action when minimized
@@ -326,12 +318,6 @@
                     ]));
 
                     this.ui.body.addClass('cms-modal-maximized');
-
-                    container.css({
-                        'left': 0,
-                        'top': debug,
-                        'margin': 0
-                    });
                 } else {
                     // restore
                     this.maximized = false;
@@ -533,12 +519,29 @@
                 this.ui.modalButtons.html(render);
             },
 
-            _loadContent: function (url, name) {
-                var that = this;
-
+            /**
+             * _prepareUrl adds `?modal=1` get param to the url, which is then got by the backend
+             * and additional "modal" stylesheet is then inserted into a template that is loaded
+             * inside of an iframe
+             *
+             * @param url String
+             */
+            _prepareUrl: function (url) {
+                if (url.indexOf('?') === -1) {
+                    url += '?modal=1';
+                } else {
+                    url += '&modal=1';
+                }
                 // FIXME: A better fix is needed for '&' being interpreted as the
                 // start of en entity by jQuery. See #3404
                 url = url.replace('&', '&amp;');
+                return url;
+            },
+
+            _loadContent: function (url, name) {
+                var that = this;
+                url = this._prepareUrl(url);
+
                 // now refresh the content
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 iframe.css('visibility', 'hidden');
@@ -578,13 +581,6 @@
                         that.close();
                         return false;
                     }
-
-                    // after iframe is loaded append css
-                    contents.find('head').append(
-                        $('<link rel="stylesheet" type="text/css" href="' +
-                          that.config.urls.static +
-                          that.options.urls.css_modal + '" />')
-                    );
 
                     // adding django hacks
                     contents.find('.viewsitelink').attr('target', '_top');
