@@ -46,23 +46,24 @@
             },
 
             _setupUI: function setupUI() {
-                this.ui = {};
-                this.ui.modal = $('.cms-modal');
-                this.ui.body = $('html');
-                this.ui.window = $(window);
-                this.ui.toolbarLeftPart = $('.cms-toolbar-left');
-
-                this.ui.minimizeButton = this.ui.modal.find('.cms-modal-minimize');
-                this.ui.maximizeButton = this.ui.modal.find('.cms-modal-maximize');
-                this.ui.title = this.ui.modal.find('.cms-modal-title');
-                this.ui.resize = this.ui.modal.find('.cms-modal-resize');
-                this.ui.breadcrumb = this.ui.modal.find('.cms-modal-breadcrumb');
-                this.ui.breadcrumbItems = this.ui.modal.find('.cms-modal-breadcrumb-items');
-                this.ui.closeAndCancel = this.ui.modal.find('.cms-modal-close, .cms-modal-cancel');
-                this.ui.modalButtons = this.ui.modal.find('.cms-modal-buttons');
-                this.ui.modalBody = this.ui.modal.find('.cms-modal-body');
-                this.ui.iframeHolder = this.ui.modal.find('.cms-modal-frame');
-                this.ui.shim = this.ui.modal.find('.cms-modal-shim');
+                var modal = $('.cms-modal');
+                this.ui = {
+                    modal: modal,
+                    body: $('html'),
+                    window: $(window),
+                    toolbarLeftPart: $('.cms-toolbar-left'),
+                    minimizeButton: modal.find('.cms-modal-minimize'),
+                    maximizeButton: modal.find('.cms-modal-maximize'),
+                    title: modal.find('.cms-modal-title'),
+                    resize: modal.find('.cms-modal-resize'),
+                    breadcrumb: modal.find('.cms-modal-breadcrumb'),
+                    breadcrumbItems: modal.find('.cms-modal-breadcrumb-items'),
+                    closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
+                    modalButtons: modal.find('.cms-modal-buttons'),
+                    modalBody: modal.find('.cms-modal-body'),
+                    iframeHolder: modal.find('.cms-modal-frame'),
+                    shim: modal.find('.cms-modal-shim')
+                };
             },
 
             // initial methods
