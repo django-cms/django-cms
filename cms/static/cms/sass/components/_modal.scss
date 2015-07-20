@@ -3,12 +3,6 @@
 //
 // Editing plugins in frontend
 
-.cms-modal-maximized {
-    overflow: hidden !important;
-    .cms-toolbar-debug .cms-modal {
-        top: $toolbar-debug-height !important;
-    }
-}
 #cms-toolbar {
     .cms-modal {
         display: none;
@@ -27,6 +21,7 @@
         .cms-modal-maximized & {
             right: 0;
             bottom: 0;
+            top: 0 !important;
             left: 0 !important;
             border-radius: 0;
             margin: 0 !important;
@@ -42,6 +37,7 @@
         .cms-modal-minimized & {
             width: auto !important;
             height: auto !important;
+            top: 1px !important;
             margin: 0 !important;
 
             .cms-modal-body,
@@ -277,5 +273,17 @@
             padding: $modal-button-padding;
             cursor: pointer;
         }
+    }
+}
+
+.cms-modal-maximized {
+    overflow: hidden !important;
+    #cms-toolbar.cms-toolbar-debug .cms-modal {
+        top: $toolbar-debug-height !important;
+    }
+}
+.cms-modal-minimized {
+    #cms-toolbar.cms-toolbar-debug .cms-modal {
+        top: $toolbar-debug-height + 1px !important;
     }
 }
