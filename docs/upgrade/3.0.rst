@@ -469,6 +469,10 @@ To finish up, please update your database::
     python manage.py syncdb
     python manage.py migrate  (answer yes if your prompted to delete stale content types)
 
+Finally, your existing pages will be unpublished, so publish them with the ``publisher`` command::
+
+    python manage.py cms publisher_publish
+
 That's it!
 
 ********************
