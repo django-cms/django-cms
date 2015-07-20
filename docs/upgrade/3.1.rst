@@ -65,7 +65,7 @@ django CMS are advised to update their own applications so that they install it 
 Dropped support for Django 1.4 and 1.5
 ======================================
 
-Starting from version 3.1, django CMS runs on Django 1.6 and 1.7.
+Starting from version 3.1, django CMS runs on Django 1.6 (specifically, 1.6.9 and later) and 1.7.
 
 Action required
 ---------------

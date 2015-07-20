@@ -351,6 +351,14 @@ it becomes::
 If your plugins have relational fields of both kinds, you may of course need
 to use *both* the copying techniques described above.
 
+Relations *between* plugins
+---------------------------
+
+It is much harder to manage the copying of relations when they are from one plugin to another.
+
+See the GitHub issue `copy_relations() does not work for relations between cmsplugins #4143
+<https://github.com/divio/django-cms/issues/4143>`_ for more details.
+
 ********
 Advanced
 ********
@@ -456,7 +464,7 @@ A **good** example:
 
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myjsfile.js"></script>{% endaddtoblock %}
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myotherfile.js"></script>{% endaddtoblock %}
-    {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}myplugin/css/astylesheet.css"></script>{% endaddtoblock %}
+    {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}myplugin/css/astylesheet.css">{% endaddtoblock %}
     {% addtoblock "js" %}
     <script type="text/javascript">
         $(document).ready(function(){
