@@ -5,15 +5,15 @@ from django.template import Template
 
 from cms.api import create_page
 from cms.models import Page
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, ClearURLs
 from cms.templatetags.cms_admin import preview_link
 from cms.utils.i18n import force_language
+from django.test import override_settings
 from menus.base import NavigationNode
 
 
-class NonRootCase(CMSTestCase):
-    urls = 'cms.test_utils.project.nonroot_urls'
-
+@override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
+class NonRootCase(ClearURLs, CMSTestCase):
     def setUp(self):
         u = self._create_user("test", True, True)
 
