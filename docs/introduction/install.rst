@@ -4,6 +4,12 @@ Installing django CMS
 
 We'll get started by setting up our environment.
 
+************
+Requirements
+************
+
+django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+
 ************************
 Your working environment
 ************************
@@ -13,7 +19,7 @@ installed and that you have some basic familiarity with it.
 
 
 Create and activate a virtual env
-*********************************
+=================================
 
 ::
 
@@ -25,7 +31,7 @@ Note that if you're using Windows, to activate the virtualenv you'll need::
     env\Scripts\activate
 
 Use the django CMS installer
-****************************
+============================
 
 The `django CMS installer <https://github.com/nephila/djangocms-installer>`_ is
 a helpful script that takes care of setting up a new project.
@@ -85,7 +91,7 @@ default, they're highlighted below:
 Create a Django admin user when invited.
 
 Start up the runserver
-**********************
+======================
 
 ::
 
