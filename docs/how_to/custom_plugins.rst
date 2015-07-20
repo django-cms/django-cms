@@ -351,6 +351,14 @@ it becomes::
 If your plugins have relational fields of both kinds, you may of course need
 to use *both* the copying techniques described above.
 
+Relations *between* plugins
+---------------------------
+
+It is much harder to manage the copying of relations when they are from one plugin to another.
+
+See the GitHub issue `copy_relations() does not work for relations between cmsplugins #4143
+<https://github.com/divio/django-cms/issues/4143>`_ for more details.
+
 ********
 Advanced
 ********
