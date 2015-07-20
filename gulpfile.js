@@ -1,3 +1,4 @@
+// jshint node: true
 'use strict';
 
 // #####################################################################################################################
@@ -139,7 +140,11 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
         return gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
             .pipe(uglify({
-                preserveComments: 'some'
+                preserveComments: 'some',
+                compress: {
+                    drop_console: !options.debug,
+                    drop_debugger: !options.debug
+                }
             }))
             .pipe(concat(bundleName, {
                 newLine: '\n'
