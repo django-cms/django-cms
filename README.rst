@@ -94,8 +94,9 @@ to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 Commercial support
 ******************
 
-This project is backed by `Divio <https://divio.ch>`_. If you need help
-implementing or hosting django CMS, please contact us: sales@divio.ch.
+This project is backed by `Divio <http://divio.ch/en/commercial-support/>`_.
+If you need help implementing or hosting django CMS, please contact us:
+sales@divio.ch.
 
 *******
 Credits
