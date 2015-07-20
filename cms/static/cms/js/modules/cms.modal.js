@@ -35,7 +35,7 @@
                 this._setupUI();
 
                 // states
-                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
+                this.click = 'click.cms';
                 this.maximized = false;
                 this.minimized = false;
                 this.triggerMaximized = false;
@@ -79,14 +79,14 @@
                     e.preventDefault();
                     that._minimize();
                 });
-                this.ui.title.on('mousedown.cms', function (e) {
+                this.ui.title.on('pointerdown.cms', function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
                 this.ui.title.on('dblclick.cms', function () {
                     that._maximize();
                 });
-                this.ui.resize.on('mousedown.cms', function (e) {
+                this.ui.resize.on('pointerdown.cms', function (e) {
                     e.preventDefault();
                     that._startResize(e);
                 });
@@ -105,7 +105,7 @@
                 });
 
                 // stopper events
-                this.ui.body.on('mouseup.cms', function (e) {
+                this.ui.body.on('pointerup.cms pointercancel.cms', function (e) {
                     that._endMove(e);
                     that._endResize(e);
                 });
@@ -357,9 +357,9 @@
 
                 this.ui.shim.show();
 
-                this.ui.body.on('mousemove.cms', function (e) {
-                    var left = position.left - (initial.pageX - e.pageX);
-                    var top = position.top - (initial.pageY - e.pageY);
+                this.ui.body.attr('touch-action', 'none').on('pointermove.cms', function (e) {
+                    var left = position.left - (initial.originalEvent.pageX - e.originalEvent.pageX);
+                    var top = position.top - (initial.originalEvent.pageY - e.originalEvent.pageY);
 
                     that.ui.modal.css({
                         'left': left,
@@ -371,7 +371,7 @@
             _endMove: function () {
                 this.ui.shim.hide();
 
-                this.ui.body.off('mousemove.cms');
+                this.ui.body.off('pointermove.cms').removeAttr('touch-action');
             },
 
             _startResize: function (initial) {
@@ -388,16 +388,17 @@
 
                 this.ui.shim.show();
 
-                this.ui.body.on('mousemove.cms', function (e) {
-                    var mvX = initial.pageX - e.pageX;
-                    var mvY = initial.pageY - e.pageY;
+                this.ui.body.attr('touch-action', 'none').on('pointermove.cms', function (e) {
+                    var mvX = initial.originalEvent.pageX - e.originalEvent.pageX;
+                    var mvY = initial.originalEvent.pageY - e.originalEvent.pageY;
 
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
-                    var max = 680;
+                    var wmax = 680;
+                    var hmax = 100;
 
                     // add some limits
-                    if (w <= max || h <= 100) {
+                    if (w <= wmax || h <= hmax) {
                         return false;
                     }
 
@@ -414,7 +415,7 @@
             _endResize: function () {
                 this.ui.shim.hide();
 
-                this.ui.body.off('mousemove.cms');
+                this.ui.body.off('pointermove.cms').removeAttr('touch-action');
             },
 
             _setBreadcrumb: function (breadcrumb) {

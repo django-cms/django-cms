@@ -37,7 +37,7 @@
                 this.screenBlock = this.container.find('.cms-screenblock');
 
                 // states
-                this.click = 'click.cms';
+                this.click = 'pointerup.cms';
                 this.timer = function () {};
                 this.lockToolbar = false;
 
@@ -110,7 +110,7 @@
                 var that = this;
 
                 // attach event to the trigger handler
-                this.toolbarTrigger.bind(this.click, function (e) {
+                this.toolbarTrigger.on(this.click, function (e) {
                     e.preventDefault();
                     that.toggleToolbar();
                 });

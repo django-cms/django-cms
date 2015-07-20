@@ -1,7 +1,7 @@
 {% load i18n l10n %}
 
 {% language request.toolbar.toolbar_language %}
-<div id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr">
+<div touch-action="none" id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr">
 
     {# debug, tooltip #}
     <div class="cms-debug-bar"></div>
@@ -58,9 +58,9 @@
     {# end: addons #}
 
     {# start: modal #}
-    <div class="cms-modal">
-        <div class="cms-modal-head">
-            <span class="cms-modal-title">&nbsp;</span>
+    <div class="cms-modal" touch-action="none">
+        <div class="cms-modal-head" touch-action="none">
+            <span class="cms-modal-title" touch-action="none">&nbsp;</span>
             <span class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
             <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
             <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
