@@ -72,6 +72,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
         PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
         PROJECT_PATH.js + '/modules/cms.base.js',
+        PROJECT_PATH.js + '/modules/jquery.transition.js',
         PROJECT_PATH.js + '/modules/cms.modal.js',
         PROJECT_PATH.js + '/modules/cms.sideframe.js',
         PROJECT_PATH.js + '/modules/cms.clipboard.js',

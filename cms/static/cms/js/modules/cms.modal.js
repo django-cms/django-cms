@@ -215,7 +215,7 @@
                     'display': 'block',
                     'width': width,
                     'height': height,
-                    // FIXME animate translateX if possible instead of margin
+                    // TODO animate translateX if possible instead of margin
                     'margin-left': -(width / 2),
                     'margin-top': -(height / 2)
                 });
@@ -224,10 +224,7 @@
                     that.ui.modal.addClass('cms-modal-open');
                 }, 0);
 
-                // FIXME listen to the transitionEnd event
-                setTimeout(function () {
-                    $(this).removeAttr('style');
-
+                this.ui.modal.one('cmsTransitionEnd', function () {
                     that.ui.modal.css({
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)
@@ -243,7 +240,7 @@
 
                     // changed locked status to allow other modals again
                     CMS.API.locked = false;
-                }, speed);
+                }).emulateTransitionEnd(speed);
 
                 // add esc close event
                 this.ui.body.on('keydown.cms', function (e) {
@@ -258,13 +255,15 @@
 
             _hide: function (duration) {
                 var that = this;
-                this.ui.modal.removeClass('cms-modal-open');
-                //FIXME listen to transitionEnd event
-                setTimeout(function () {
+
+                that.ui.modal.removeClass('cms-modal-open');
+
+                that.ui.modal.one('cmsTransitionEnd', function () {
                     that.ui.modal.css('display', 'none');
-                }, duration);
-                this.ui.iframeHolder.find('iframe').remove();
-                this.ui.modalBody.removeClass('cms-loader');
+                }).emulateTransitionEnd(duration);
+
+                that.ui.iframeHolder.find('iframe').remove();
+                that.ui.modalBody.removeClass('cms-loader');
             },
 
             _minimize: function () {
