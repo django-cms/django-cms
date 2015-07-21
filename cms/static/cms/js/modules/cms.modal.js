@@ -5,7 +5,7 @@
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
-    $(document).ready(function () {
+    $(function () {
         /*!
          * Modal
          * Controls a cms specific modal
@@ -15,14 +15,11 @@
             implement: [CMS.API.Helpers],
 
             options: {
-                'onClose': false,
-                'minHeight': 400,
-                'minWidth': 800,
-                'modalDuration': 300,
-                'newPlugin': false,
-                'urls': {
-                    'css_modal': 'cms/css/cms.toolbar.modal.css'
-                }
+                onClose: false,
+                minHeight: 400,
+                minWidth: 800,
+                modalDuration: 200,
+                newPlugin: false
             },
 
             initialize: function (options) {
@@ -30,9 +27,7 @@
                 this.config = CMS.config;
 
                 // elements
-                this.body = $('html');
-                this.modal = $('.cms-modal');
-                this.toolbar = $('.cms-toolbar');
+                this._setupUI();
 
                 // states
                 this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
@@ -42,12 +37,33 @@
                 this.saved = false;
 
                 // if the modal is initialized the first time, set the events
-                if (!this.modal.data('ready')) {
+                if (!this.ui.modal.data('ready')) {
                     this._events();
                 }
 
                 // ready modal
-                this.modal.data('ready', true);
+                this.ui.modal.data('ready', true);
+            },
+
+            _setupUI: function setupUI() {
+                var modal = $('.cms-modal');
+                this.ui = {
+                    modal: modal,
+                    body: $('html'),
+                    window: $(window),
+                    toolbarLeftPart: $('.cms-toolbar-left'),
+                    minimizeButton: modal.find('.cms-modal-minimize'),
+                    maximizeButton: modal.find('.cms-modal-maximize'),
+                    title: modal.find('.cms-modal-title'),
+                    resize: modal.find('.cms-modal-resize'),
+                    breadcrumb: modal.find('.cms-modal-breadcrumb'),
+                    breadcrumbItems: modal.find('.cms-modal-breadcrumb-items'),
+                    closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
+                    modalButtons: modal.find('.cms-modal-buttons'),
+                    modalBody: modal.find('.cms-modal-body'),
+                    iframeHolder: modal.find('.cms-modal-frame'),
+                    shim: modal.find('.cms-modal-shim')
+                };
             },
 
             // initial methods
@@ -55,37 +71,37 @@
                 var that = this;
 
                 // attach events to window
-                this.modal.find('.cms-modal-collapse').bind(this.click, function (e) {
+                this.ui.minimizeButton.on(this.click, function (e) {
                     e.preventDefault();
                     that._minimize();
                 });
-                this.modal.find('.cms-modal-title').bind('mousedown.cms', function (e) {
+                this.ui.title.on('mousedown.cms', function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
-                this.modal.find('.cms-modal-title').bind('dblclick.cms', function () {
+                this.ui.title.on('dblclick.cms', function () {
                     that._maximize();
                 });
-                this.modal.find('.cms-modal-resize').bind('mousedown.cms', function (e) {
+                this.ui.resize.on('mousedown.cms', function (e) {
                     e.preventDefault();
                     that._startResize(e);
                 });
-                this.modal.find('.cms-modal-maximize').bind(this.click, function (e) {
+                this.ui.maximizeButton.on(this.click, function (e) {
                     e.preventDefault();
                     that._maximize();
                 });
-                this.modal.find('.cms-modal-breadcrumb-items').on(this.click, 'a', function (e) {
+                this.ui.breadcrumbItems.on(this.click, 'a', function (e) {
                     e.preventDefault();
                     that._changeContent($(this));
                 });
-                this.modal.find('.cms-modal-close, .cms-modal-cancel').bind(this.click, function (e) {
+                this.ui.closeAndCancel.on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
                 });
 
                 // stopper events
-                $(document).bind('mouseup.cms', function (e) {
+                this.ui.body.on('mouseup.cms', function (e) {
                     that._endMove(e);
                     that._endResize(e);
                 });
@@ -102,7 +118,7 @@
                 }
 
                 // because a new instance is called, we have to ensure minimized state is removed #3620
-                if (this.modal.is(':visible') && this.modal.find('.cms-modal-collapsed').length) {
+                if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
                     this._minimize();
                 }
@@ -113,35 +129,13 @@
                 // hide tooltip
                 this.hideTooltip();
 
-                // reset breadcrumb
-                this.modal.find('.cms-modal-breadcrumb').hide();
-                this.modal.find('.cms-modal-breadcrumb-items').html('');
-
-                // empty buttons
-                this.modal.find('.cms-modal-buttons').html('');
-
-                var contents = this.modal.find('.cms-modal-body, .cms-modal-foot');
-                contents.show();
-
                 this._loadContent(url, name);
 
-                // insure modal is not maximized
-                if (this.modal.find('.cms-modal-collapsed').length) {
-                    this._minimize();
-                }
-
-                // reset styles
-                this.modal.css({
-                    'left': '50%',
-                    'top': '50%',
-                    'mergin-left': 0,
-                    'margin-right': 0
-                });
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
                 var heightOffset = 350; // adds margin top and bottom;
-                var screenWidth = $(window).width(); // it has to be the height of the window not computer screen
-                var screenHeight = $(window).height(); // it has to be the height of the window and not computer screen
+                var screenWidth = this.ui.window.width();
+                var screenHeight = this.ui.window.height();
 
                 var width = (screenWidth >= this.options.minWidth + widthOffset) ?
                     screenWidth - widthOffset :
@@ -149,14 +143,11 @@
                 var height = (screenHeight >= this.options.minHeight + heightOffset) ?
                     screenHeight - heightOffset :
                     this.options.minHeight;
-                this.modal.find('.cms-modal-body').css({
-                    'width': width,
-                    'height': height
-                });
-                this.modal.find('.cms-modal-body').removeClass('cms-loader');
-                this.modal.find('.cms-modal-maximize').removeClass('cms-modal-maximize-active');
+
+                this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
-                // in case, the window is larger than the windows height, we trigger fullscreen mode
+
+                // in case, the modal is larger than the window, we trigger fullscreen mode
                 if (height >= screenHeight) {
                     this.triggerMaximized = true;
                 }
@@ -165,7 +156,11 @@
                 this._setBreadcrumb(breadcrumb);
 
                 // display modal
-                this._show(this.options.modalDuration);
+                this._show({
+                    width: width,
+                    height: height,
+                    duration: this.options.modalDuration
+                });
             },
 
             close: function () {
@@ -201,33 +196,40 @@
             },
 
             // private methods
-            _show: function (speed) {
+            /**
+             * _show animates the modal to given size
+             *
+             * @param opts
+             * @param opts.width Number width of the modal
+             * @param opts.height Number height of the modal
+             * @param opts.duration Number speed of opening, ms (not really used yet)
+             */
+            _show: function (opts) {
                 // we need to position the modal in the center
                 var that = this;
-                var width = this.modal.width();
-                var height = this.modal.height();
+                var width = opts.width;
+                var height = opts.height;
+                // TODO make use of transitionDuration
+                var speed = opts.duration;
 
-                // animates and sets the modal
-                this.modal.show().css({
-                    'width': 0,
-                    'height': 0,
-                    'margin-left': 0,
-                    'margin-top': 0
-                }).stop(true, true).animate({
+                this.ui.modal.css({
+                    'display': 'block',
                     'width': width,
                     'height': height,
+                    // TODO animate translateX if possible instead of margin
                     'margin-left': -(width / 2),
                     'margin-top': -(height / 2)
-                }, speed, function () {
-                    $(this).removeAttr('style');
+                });
+                // setImmediate is required to go into the next frame
+                setTimeout(function () {
+                    that.ui.modal.addClass('cms-modal-open');
+                }, 0);
 
-                    that.modal.css({
+                this.ui.modal.one('cmsTransitionEnd', function () {
+                    that.ui.modal.css({
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)
                     });
-
-                    // fade in modal window
-                    that.modal.show();
 
                     // hide loader
                     CMS.API.Toolbar._loader(false);
@@ -239,31 +241,33 @@
 
                     // changed locked status to allow other modals again
                     CMS.API.locked = false;
-                });
+                }).emulateTransitionEnd(speed);
 
                 // add esc close event
-                $(document).bind('keydown.cms', function (e) {
+                this.ui.body.on('keydown.cms', function (e) {
                     if (e.keyCode === 27) {
                         that.close();
                     }
                 });
 
                 // set focus to modal
-                this.modal.focus();
+                this.ui.modal.focus();
             },
 
-            _hide: function (speed) {
-                this.modal.fadeOut(speed);
-                this.modal.find('.cms-modal-frame iframe').remove();
-                this.modal.find('.cms-modal-body').removeClass('cms-loader');
+            _hide: function (duration) {
+                var that = this;
+
+                that.ui.modal.removeClass('cms-modal-open');
+
+                that.ui.modal.one('cmsTransitionEnd', function () {
+                    that.ui.modal.css('display', 'none');
+                }).emulateTransitionEnd(duration);
+
+                that.ui.iframeHolder.find('iframe').remove();
+                that.ui.modalBody.removeClass('cms-loader');
             },
 
             _minimize: function () {
-                var trigger = this.modal.find('.cms-modal-collapse');
-                var maximize = this.modal.find('.cms-modal-maximize');
-                var contents = this.modal.find('.cms-modal-body, .cms-modal-foot');
-                var title = this.modal.find('.cms-modal-title');
-
                 // cancel action if maximized
                 if (this.maximized) {
                     return false;
@@ -273,58 +277,32 @@
                     // ensure toolbar is shown
                     CMS.API.Toolbar.toggleToolbar(true);
 
-                    // minimize
-                    trigger.addClass('cms-modal-collapsed');
-                    contents.hide();
-
                     // save initial state
-                    this.modal.data('css', {
-                        'left': this.modal.css('left'),
-                        'top': this.modal.css('top'),
-                        'margin': this.modal.css('margin')
+                    this.ui.modal.data('css', this.ui.modal.css([
+                        'left', 'top', 'margin-left', 'margin-top'
+                    ]));
+
+                    // minimize
+                    this.ui.body.addClass('cms-modal-minimized');
+
+                    this.ui.modal.css({
+                        'left': this.ui.toolbarLeftPart.outerWidth(true) + 50
                     });
-
-                    this.modal.css({
-                        'left': this.toolbar.find('.cms-toolbar-left').outerWidth(true) + 50,
-                        'top': (this.config.debug) ? 6 : 1,
-                        'margin': 0
-                    });
-
-                    // enable scrolling
-                    this.body.css('overflow', '');
-
-                    // ensure maximize element is hidden #3111
-                    maximize.hide();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'default');
 
                     this.minimized = true;
                 } else {
                     // minimize
-                    trigger.removeClass('cms-modal-collapsed');
-                    contents.show();
+                    this.ui.body.removeClass('cms-modal-minimized');
 
                     // reattach css
-                    this.modal.css(this.modal.data('css'));
-
-                    // disable scrolling
-                    this.body.css('overflow', 'hidden');
-
-                    // ensure maximize element is shown #3111
-                    maximize.show();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'move');
+                    this.ui.modal.css(this.ui.modal.data('css'));
 
                     this.minimized = false;
                 }
             },
 
             _maximize: function () {
-                var debug = (this.config.debug) ? 5 : 0;
-                var container = this.modal.find('.cms-modal-body');
-                var minimize = this.modal.find('.cms-modal-collapse');
-                var trigger = this.modal.find('.cms-modal-maximize');
-                var title = this.modal.find('.cms-modal-title');
+                var container = this.ui.modal;
 
                 // cancel action when minimized
                 if (this.minimized) {
@@ -334,53 +312,20 @@
                 if (this.maximized === false) {
                     // maximize
                     this.maximized = true;
-                    trigger.addClass('cms-modal-maximize-active');
 
-                    this.modal.data('css', {
-                        'left': this.modal.css('left'),
-                        'top': this.modal.css('top'),
-                        'margin-left': this.modal.css('margin-left'),
-                        'margin-top': this.modal.css('margin-top')
-                    });
-                    container.data('css', {
-                        'width': container.width(),
-                        'height': container.height()
-                    });
+                    container.data('css', this.ui.modal.css([
+                        'left', 'top', 'margin-left', 'margin-top',
+                        'width', 'height'
+                    ]));
 
-                    // reset
-                    this.modal.css({
-                        'left': 0,
-                        'top': debug,
-                        'margin': 0
-                    });
-                    // bind resize event
-                    $(window).bind('resize.cms.modal', function () {
-                        container.css({
-                            'width': $(window).width(),
-                            'height': $(window).height() - 60 - debug
-                        });
-                    });
-                    $(window).trigger('resize.cms.modal');
-
-                    // ensure maximize element is hidden #3111
-                    minimize.hide();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'default');
+                    this.ui.body.addClass('cms-modal-maximized');
                 } else {
-                    // minimize
+                    // restore
                     this.maximized = false;
-                    trigger.removeClass('cms-modal-maximize-active');
-
-                    $(window).unbind('resize.cms.modal');
+                    this.ui.body.removeClass('cms-modal-maximized');
 
                     // reattach css
-                    this.modal.css(this.modal.data('css'));
                     container.css(container.data('css'));
-
-                    // ensure maximize element is shown #3111
-                    minimize.show();
-                    // set correct cursor when maximized #3111
-                    title.css('cursor', 'move');
                 }
             },
 
@@ -395,15 +340,15 @@
                 }
 
                 var that = this;
-                var position = that.modal.position();
+                var position = that.ui.modal.position();
 
-                this.modal.find('.cms-modal-shim').show();
+                this.ui.shim.show();
 
-                $(document).bind('mousemove.cms', function (e) {
+                this.ui.body.on('mousemove.cms', function (e) {
                     var left = position.left - (initial.pageX - e.pageX);
                     var top = position.top - (initial.pageY - e.pageY);
 
-                    that.modal.css({
+                    that.ui.modal.css({
                         'left': left,
                         'top': top
                     });
@@ -411,9 +356,9 @@
             },
 
             _endMove: function () {
-                this.modal.find('.cms-modal-shim').hide();
+                this.ui.shim.hide();
 
-                $(document).unbind('mousemove.cms');
+                this.ui.body.off('mousemove.cms');
             },
 
             _startResize: function (initial) {
@@ -422,16 +367,15 @@
                     return false;
                 }
                 // continue
-                var that = this;
-                var container = this.modal.find('.cms-modal-body');
+                var container = this.ui.modal;
                 var width = container.width();
                 var height = container.height();
-                var modalLeft = this.modal.position().left;
-                var modalTop = this.modal.position().top;
+                var modalLeft = this.ui.modal.position().left;
+                var modalTop = this.ui.modal.position().top;
 
-                this.modal.find('.cms-modal-shim').show();
+                this.ui.shim.show();
 
-                $(document).bind('mousemove.cms', function (e) {
+                this.ui.body.on('mousemove.cms', function (e) {
                     var mvX = initial.pageX - e.pageX;
                     var mvY = initial.pageY - e.pageY;
 
@@ -447,9 +391,7 @@
                     // set centered animation
                     container.css({
                         'width': width - (mvX * 2),
-                        'height': height - (mvY * 2)
-                    });
-                    that.modal.css({
+                        'height': height - (mvY * 2),
                         'left': modalLeft + mvX,
                         'top': modalTop + mvY
                     });
@@ -457,13 +399,13 @@
             },
 
             _endResize: function () {
-                this.modal.find('.cms-modal-shim').hide();
+                this.ui.shim.hide();
 
-                $(document).unbind('mousemove.cms');
+                this.ui.body.off('mousemove.cms');
             },
 
             _setBreadcrumb: function (breadcrumb) {
-                var bread = this.modal.find('.cms-modal-breadcrumb');
+                var bread = this.ui.breadcrumb;
                 var crumb = '';
 
                 // cancel if there is no breadcrumb)
@@ -483,7 +425,7 @@
                 });
 
                 // attach elements
-                bread.find('.cms-modal-breadcrumb-items').html(crumb);
+                this.ui.breadcrumbItems.html(crumb);
 
                 // show breadcrumb
                 bread.show();
@@ -539,7 +481,7 @@
 
                     // create the element and attach events
                     var el = $('<div class="' + cls + ' ' + item.attr('class') + '">' + title + '</div>');
-                    el.bind(that.click, function () {
+                    el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
                         }
@@ -555,7 +497,7 @@
                                 that.options.onClose = null;
                             }
                             // hide iframe
-                            that.modal.find('.cms-modal-frame iframe').hide();
+                            that.ui.iframeHolder.find('iframe').hide();
                             // page has been saved or deleted, run checkup
                             that.saved = true;
                         }
@@ -567,36 +509,54 @@
 
                 // manually add cancel button at the end
                 var cancel = $('<div class="cms-btn">' + that.config.lang.cancel + '</div>');
-                cancel.bind(that.click, function () {
+                cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();
                 });
                 render.append(cancel);
 
                 // render buttons
-                this.modal.find('.cms-modal-buttons').html(render);
+                this.ui.modalButtons.html(render);
+            },
+
+            /**
+             * _prepareUrl adds `?modal=1` get param to the url, which is then got by the backend
+             * and additional "modal" stylesheet is then inserted into a template that is loaded
+             * inside of an iframe
+             *
+             * @param url String
+             */
+            _prepareUrl: function (url) {
+                if (url.indexOf('?') === -1) {
+                    url += '?modal=1';
+                } else {
+                    url += '&modal=1';
+                }
+                // FIXME: A better fix is needed for '&' being interpreted as the
+                // start of en entity by jQuery. See #3404
+                url = url.replace('&', '&amp;');
+                return url;
             },
 
             _loadContent: function (url, name) {
                 var that = this;
+                url = this._prepareUrl(url);
 
-                // FIXME: A better fix is needed for '&' being interpreted as the
-                // start of en entity by jQuery. See #3404
-                url = url.replace('&', '&amp;');
                 // now refresh the content
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 iframe.css('visibility', 'hidden');
-                var holder = this.modal.find('.cms-modal-frame');
+                var holder = this.ui.iframeHolder;
 
                 // set correct title
-                var title = this.modal.find('.cms-modal-title');
+                var title = this.ui.title;
                 title.html(name || '&nbsp;');
 
                 // ensure previous iframe is hidden
                 holder.find('iframe').css('visibility', 'hidden');
+                that.ui.modalBody.addClass('cms-loader');
 
                 // attach load event for iframe to prevent flicker effects
-                iframe.bind('load', function () {
+                iframe.on('load', function () {
                     // check if iframe can be accessed
                     try {
                         iframe.contents();
@@ -621,13 +581,6 @@
                         that.close();
                         return false;
                     }
-
-                    // after iframe is loaded append css
-                    contents.find('head').append(
-                        $('<link rel="stylesheet" type="text/css" href="' +
-                          that.config.urls.static +
-                          that.options.urls.css_modal + '" />')
-                    );
 
                     // adding django hacks
                     contents.find('.viewsitelink').attr('target', '_top');
@@ -660,7 +613,7 @@
                         iframe.data('ready', true);
 
                         // attach close event
-                        contents.find('body').bind('keydown.cms', function (e) {
+                        contents.find('body').on('keydown.cms', function (e) {
                             if (e.keyCode === 27) {
                                 that.close();
                             }
@@ -675,10 +628,7 @@
                 });
 
                 // inject
-                setTimeout(function () {
-                    that.modal.find('.cms-modal-body').addClass('cms-loader');
-                    holder.html(iframe);
-                }, this.options.modalDuration);
+                holder.html(iframe);
             },
 
             _changeContent: function (el) {
@@ -694,7 +644,7 @@
                 this._loadContent(el.attr('href'));
 
                 // update title
-                this.modal.find('.cms-modal-title').text(el.text());
+                this.ui.title.text(el.text());
             }
 
         });
