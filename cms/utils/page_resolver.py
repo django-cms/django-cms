@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.db.models import Q
+from django.utils import timezone
 from cms.utils.moderator import use_draft
 import re
 
@@ -116,6 +118,15 @@ def get_page_from_request(request, use_path=None):
     page = get_page_from_path(path, preview, draft)
     if draft and page and not page.has_change_permission(request):
         page = get_page_from_path(path, preview, draft=False)
+
+    # For public pages we check if any parent is hidden due to published dates
+    # In this case the selected page is not reachable
+    if page and not draft:
+        ancestors = page.get_ancestors().filter(
+            Q(publication_date__gt=timezone.now()) | Q(publication_end_date__lt=timezone.now()),
+        )
+        if ancestors.exists():
+            page = None
 
     request._current_page_cache = page
     return page
