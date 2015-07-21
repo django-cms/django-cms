@@ -32,7 +32,7 @@ setup(
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
     install_requires=[
-        'Django>=1.6,<1.9',
+        'Django>=1.6.9,<1.9',
         'django-classy-tags>=0.5',
         'html5lib>=0.90,!=0.9999,!=0.99999',
         'django-treebeard==3.0',
