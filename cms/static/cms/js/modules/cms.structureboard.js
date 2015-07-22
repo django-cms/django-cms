@@ -37,7 +37,7 @@
                 this.clipboard = $('.cms-clipboard');
 
                 // states
-                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
+                this.click = 'click.cms';
                 this.timer = function () {};
                 this.interval = function () {};
                 this.state = false;
