@@ -486,7 +486,7 @@
                     (e.type === 'pointerenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
                 });
 
-                nav.find('a').bind(that.click, function (e) {
+                nav.find('a').bind('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
