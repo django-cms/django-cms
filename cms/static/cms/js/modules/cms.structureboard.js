@@ -423,8 +423,8 @@
                     // nestedSortable
                     listType: 'div.cms-draggables',
                     doNotClear: true,
-                    //'disableNestingClass': 'cms-draggable-disabled',
-                    //'errorClass': 'cms-draggable-disallowed',
+                    disableNestingClass: 'cms-draggable-disabled',
+                    errorClass: 'cms-draggable-disallowed',
                     //'hoveringClass': 'cms-draggable-hover',
                     // methods
                     start: function (e, ui) {
