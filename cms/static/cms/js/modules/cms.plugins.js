@@ -460,7 +460,7 @@
                     child.append(plugin);
                 } else if (placeholder.length) {
                     // we also need to cover the case if we move the plugin to an empty placeholder
-                    plugin.append($('.cms-plugin-' + this._getId(placeholder)));
+                    plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
                 } else {
                     // if we did not found a match, reload
                     CMS.API.Helpers.reloadBrowser();
