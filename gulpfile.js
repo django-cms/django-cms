@@ -141,13 +141,9 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
     gulp.task('bundle:' + bundleName, function () {
         return gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
-            .pipe(uglify({
-                preserveComments: 'some',
-                compress: {
-                    drop_console: !options.debug,
-                    drop_debugger: !options.debug
-                }
-            }))
+            .pipe(gulpif(!options.debug, uglify({
+                preserveComments: 'some'
+            })))
             .pipe(concat(bundleName, {
                 newLine: '\n'
             }))
