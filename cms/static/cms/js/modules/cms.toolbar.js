@@ -165,7 +165,7 @@
                     });
 
                     // attach hover
-                    lists.find('li').bind('pointerenter pointerleave', function () {
+                    lists.find('li').bind('pointerover pointerout', function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
