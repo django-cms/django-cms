@@ -6,6 +6,18 @@
     // CMS.$ will be passed for $
     'use strict';
     $(document).ready(function () {
+        var emptyDropZones = $('.cms-dragbar-empty-wrapper');
+        function actualizeEmptyPlaceholders() {
+            emptyDropZones.each(function () {
+                var wrapper = $(this);
+                if (wrapper.next().children().not('.cms-is-dragging').length) {
+                    wrapper.hide();
+                } else {
+                    wrapper.show();
+                }
+            });
+        }
+
         /*!
          * StructureBoard
          * handles drag & drop, mode switching and
@@ -48,6 +60,7 @@
 
                 // setup events
                 this._events();
+                actualizeEmptyPlaceholders();
             },
 
             // initial methods
@@ -412,7 +425,6 @@
                     tolerance: 'pointer',
                     toleranceElement: '> div',
                     dropOnEmpty: true,
-                    forcePlaceholderSize: true,
                     helper: 'clone',
                     appendTo: '.cms-structure-content',
                     cursor: 'move',
@@ -427,10 +439,13 @@
                     errorClass: 'cms-draggable-disallowed',
                     //'hoveringClass': 'cms-draggable-hover',
                     // methods
+                    over: function () {
+                        actualizeEmptyPlaceholders();
+                    },
                     start: function (e, ui) {
                         that.dragging = true;
                         // show empty
-                        $('.cms-dragbar-empty-wrapper').show();
+                        actualizeEmptyPlaceholders();
                         // ensure all menus are closed
                         $('.cms-dragitem .cms-submenu').hide();
                         // remove classes from empty dropzones
@@ -453,7 +468,6 @@
                     stop: function (event, ui) {
                         that.dragging = false;
                         // hide empty
-                        $('.cms-dragbar-empty-wrapper').hide();
                         ui.item.removeClass('cms-is-dragging');
 
                         // cancel if isAllowed returns false
@@ -490,6 +504,7 @@
                         $('.cms-structure-content').css({
                             'overflow': ''
                         });
+                        actualizeEmptyPlaceholders();
                     },
                     isAllowed: function (placeholder, placeholderParent, originalItem) {
                         // cancel if action is excecuted
