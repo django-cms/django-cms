@@ -446,8 +446,7 @@
                         });
                         // add overflow hidden to body
                         $('.cms-structure-content').css({
-                            'height': $(document).height(),
-                            'overflow': 'hidden'
+                            'overflow-x': 'hidden'
                         });
                     },
 
@@ -489,7 +488,6 @@
 
                         // add overflow hidden to body
                         $('.cms-structure-content').css({
-                            'height': '',
                             'overflow': ''
                         });
                     },
