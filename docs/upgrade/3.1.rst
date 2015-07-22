@@ -67,6 +67,14 @@ Dropped support for Django 1.4 and 1.5
 
 Starting from version 3.1, django CMS runs on Django 1.6 (specifically, 1.6.9 and later) and 1.7.
 
+.. warning:: Django security support
+
+    Django 1.6 support is provided as an interim measure only. In accordance with the `Django
+    Project's security policies <https://docs.djangoproject.com/en/dev/internals/security/>`_, 1.6
+    no longer receives security updates from the Django Project team. Projects running on Django
+    1.6 have known vulnerabilities, so you are advised to upgrade your installation to 1.7 or 1.8
+    as soon as possible.
+
 Action required
 ---------------
 
