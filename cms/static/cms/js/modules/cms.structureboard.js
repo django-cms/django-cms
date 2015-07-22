@@ -436,7 +436,8 @@
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
                         // fixes placeholder height
-                        ui.placeholder.height(ui.item.height());
+                        ui.item.addClass('cms-is-dragging');
+                        ui.placeholder.css('height', ui.helper.css('height'));
                         // show placeholder without entries
                         $('.cms-draggables').each(function () {
                             if ($(this).children().length === 0) {
@@ -454,6 +455,7 @@
                         that.dragging = false;
                         // hide empty
                         $('.cms-dragbar-empty-wrapper').hide();
+                        ui.item.removeClass('cms-is-dragging');
 
                         // cancel if isAllowed returns false
                         if (!that.state) {
