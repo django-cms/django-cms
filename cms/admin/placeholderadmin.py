@@ -9,8 +9,13 @@ from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
-from django.http import HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseRedirect,
+)
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.template.defaultfilters import force_escape, escapejs
@@ -26,8 +31,12 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import copy_plugins, permissions, get_language_from_request
-from cms.utils import get_cms_setting
+from cms.utils import (
+    copy_plugins,
+    get_cms_setting,
+    get_language_from_request,
+    permissions,
+)
 from cms.utils.compat import DJANGO_1_4
 from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_language_list
