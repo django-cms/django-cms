@@ -826,6 +826,7 @@
             },
 
             _expandAll: function (el) {
+                var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
                 // cancel if there are no items
                 if (!items.length) {
@@ -833,7 +834,7 @@
                 }
                 items.each(function () {
                     if (!$(this).hasClass('cms-dragitem-expanded')) {
-                        $(this).trigger('click.cms');
+                        $(this).trigger(that.click);
                     }
                 });
 
@@ -846,10 +847,11 @@
             },
 
             _collapseAll: function (el) {
+                var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
                 items.each(function () {
                     if ($(this).hasClass('cms-dragitem-expanded')) {
-                        $(this).trigger('click.cms');
+                        $(this).trigger(that.click);
                     }
                 });
 
