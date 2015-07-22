@@ -1,39 +1,39 @@
 # -*- coding: utf-8 -*-
-from cms.models.placeholderpluginmodel import PlaceholderReference
-from cms.utils.urlutils import admin_reverse
-from django.contrib.admin.helpers import AdminForm
-from django.utils.decorators import method_decorator
+
 import json
-
-from django.views.decorators.clickjacking import xframe_options_sameorigin
-from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
-from cms.exceptions import PluginLimitReached
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
-from cms.utils import get_cms_setting
-from cms.utils.compat.dj import force_unicode
-from cms.utils.plugins import requires_reload, has_reached_plugin_limit
-from django.contrib.admin import ModelAdmin
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
-from django.template.defaultfilters import force_escape, escapejs
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from django.views.decorators.http import require_POST
 import warnings
-from django.template.response import TemplateResponse
 
+from django.conf import settings
+from django.contrib.admin import ModelAdmin
+from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
+from django.template.defaultfilters import force_escape, escapejs
+from django.template.response import TemplateResponse
+from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.decorators.http import require_POST
 
+from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
+from cms.exceptions import PluginLimitReached
+from cms.models.placeholdermodel import Placeholder
+from cms.models.placeholderpluginmodel import PlaceholderReference
+from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_pool import plugin_pool
 from cms.utils import copy_plugins, permissions, get_language_from_request
+from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_4
+from cms.utils.compat.dj import force_unicode
 from cms.utils.i18n import get_language_list
+from cms.utils.plugins import requires_reload, has_reached_plugin_limit
 from cms.utils.transaction import wrap_transaction
+from cms.utils.urlutils import admin_reverse
 
 
 class FrontendEditableAdminMixin(object):
@@ -370,9 +370,11 @@ class PlaceholderAdminMixin(object):
         except Placeholder.DoesNotExist:
             pass
         if request.method == "POST":
-            # set the continue flag, otherwise will plugin_admin make redirect to list
-            # view, which actually doesn't exists
-            request.POST['_continue'] = True
+            # set the continue flag, otherwise plugin_admin will make redirect
+            # to list view, which actually doesn't exists
+            mutable_post = request.POST.copy()
+            mutable_post['_continue'] = True
+            request.POST = mutable_post
         if request.POST.get("_cancel", False):
             # cancel button was clicked
             context = {
