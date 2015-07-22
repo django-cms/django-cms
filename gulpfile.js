@@ -71,6 +71,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.touchpunch.js',
         PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
         PROJECT_PATH.js + '/modules/cms.base.js',
         PROJECT_PATH.js + '/modules/jquery.transition.js',
