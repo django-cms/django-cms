@@ -37,7 +37,7 @@
                 this.screenBlock = this.container.find('.cms-screenblock');
 
                 // states
-                this.click = 'pointerup.cms';
+                this.click = 'click.cms';
                 this.timer = function () {};
                 this.lockToolbar = false;
 
@@ -165,7 +165,7 @@
                     });
 
                     // attach hover
-                    lists.find('li').bind('mouseenter mouseleave', function () {
+                    lists.find('li').bind('pointerenter pointerleave', function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -174,7 +174,7 @@
                         // do not attach hover effect if disabled
                         // cancel event if element has already hover class
                         if (el.hasClass(disabled) || el.hasClass(hover)) {
-                            return false;
+                            return true;
                         }
 
                         // reset
