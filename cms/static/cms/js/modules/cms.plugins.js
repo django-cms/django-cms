@@ -602,7 +602,7 @@
                     });
 
                     // show scrollHint for FF on OSX
-                    if (nav[0].scrollHeight > 245) {
+                    if (dropdown[0].scrollHeight > dropdown.height()) {
                         scrollHint.show();
                     }
 
