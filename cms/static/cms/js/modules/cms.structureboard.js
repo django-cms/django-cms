@@ -6,6 +6,18 @@
     // CMS.$ will be passed for $
     'use strict';
     $(document).ready(function () {
+        var emptyDropZones = $('.cms-dragbar-empty-wrapper');
+        function actualizeEmptyPlaceholders() {
+            emptyDropZones.each(function () {
+                var wrapper = $(this);
+                if (wrapper.next().children().not('.cms-is-dragging').length) {
+                    wrapper.hide();
+                } else {
+                    wrapper.show();
+                }
+            });
+        }
+
         /*!
          * StructureBoard
          * handles drag & drop, mode switching and
@@ -37,7 +49,7 @@
                 this.clipboard = $('.cms-clipboard');
 
                 // states
-                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
+                this.click = 'click.cms';
                 this.timer = function () {};
                 this.interval = function () {};
                 this.state = false;
@@ -48,6 +60,7 @@
 
                 // setup events
                 this._events();
+                actualizeEmptyPlaceholders();
             },
 
             // initial methods
@@ -412,7 +425,6 @@
                     tolerance: 'pointer',
                     toleranceElement: '> div',
                     dropOnEmpty: true,
-                    forcePlaceholderSize: true,
                     helper: 'clone',
                     appendTo: '.cms-structure-content',
                     cursor: 'move',
@@ -423,20 +435,24 @@
                     // nestedSortable
                     listType: 'div.cms-draggables',
                     doNotClear: true,
-                    //'disableNestingClass': 'cms-draggable-disabled',
-                    //'errorClass': 'cms-draggable-disallowed',
+                    disableNestingClass: 'cms-draggable-disabled',
+                    errorClass: 'cms-draggable-disallowed',
                     //'hoveringClass': 'cms-draggable-hover',
                     // methods
+                    over: function () {
+                        actualizeEmptyPlaceholders();
+                    },
                     start: function (e, ui) {
                         that.dragging = true;
                         // show empty
-                        $('.cms-dragbar-empty-wrapper').show();
+                        actualizeEmptyPlaceholders();
                         // ensure all menus are closed
                         $('.cms-dragitem .cms-submenu').hide();
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
                         // fixes placeholder height
-                        ui.placeholder.height(ui.item.height());
+                        ui.item.addClass('cms-is-dragging');
+                        ui.placeholder.css('height', ui.helper.css('height'));
                         // show placeholder without entries
                         $('.cms-draggables').each(function () {
                             if ($(this).children().length === 0) {
@@ -445,15 +461,14 @@
                         });
                         // add overflow hidden to body
                         $('.cms-structure-content').css({
-                            'height': $(document).height(),
-                            'overflow': 'hidden'
+                            'overflow-x': 'hidden'
                         });
                     },
 
                     stop: function (event, ui) {
                         that.dragging = false;
                         // hide empty
-                        $('.cms-dragbar-empty-wrapper').hide();
+                        ui.item.removeClass('cms-is-dragging');
 
                         // cancel if isAllowed returns false
                         if (!that.state) {
@@ -487,9 +502,9 @@
 
                         // add overflow hidden to body
                         $('.cms-structure-content').css({
-                            'height': '',
                             'overflow': ''
                         });
+                        actualizeEmptyPlaceholders();
                     },
                     isAllowed: function (placeholder, placeholderParent, originalItem) {
                         // cancel if action is excecuted

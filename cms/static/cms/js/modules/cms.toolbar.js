@@ -110,7 +110,7 @@
                 var that = this;
 
                 // attach event to the trigger handler
-                this.toolbarTrigger.bind(this.click, function (e) {
+                this.toolbarTrigger.on(this.click, function (e) {
                     e.preventDefault();
                     that.toggleToolbar();
                 });
@@ -165,7 +165,7 @@
                     });
 
                     // attach hover
-                    lists.find('li').bind('mouseenter mouseleave', function () {
+                    lists.find('li').bind('pointerover pointerout', function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -174,7 +174,7 @@
                         // do not attach hover effect if disabled
                         // cancel event if element has already hover class
                         if (el.hasClass(disabled) || el.hasClass(hover)) {
-                            return false;
+                            return true;
                         }
 
                         // reset

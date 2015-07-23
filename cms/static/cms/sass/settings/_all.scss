@@ -27,7 +27,7 @@ $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transpare
 
 //##############################################################################
 // BASE Variables
-$font-size-normal: 13px;
+$font-size-normal: 14px;
 $line-height-normal: 20px;
 
 $border-radius-base: 3px;
@@ -130,13 +130,13 @@ $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
-$modal-header-height: 28px;
-$modal-footer-height: 32px;
+$modal-header-height: 36px;
+$modal-footer-height: 36px;
 
-$modal-header-button-icon-size: 8px;
-$modal-header-button-area-size: 20px;
+$modal-header-button-icon-size: 10px;
+$modal-header-button-area-size: 30px;
 
-$modal-breadcrumb-title-width: 36px;
+$modal-breadcrumb-title-width: 40px;
 $modal-breadcrumb-padding-vertical: $padding-normal;
 $modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
 $modal-breadcrumb-hover-color: $black;
@@ -145,8 +145,10 @@ $modal-breadcrumb-hover-bgcolor: $white;
 $modal-button-font-size: 12px;
 $modal-button-padding: 2px $padding-normal;
 $modal-button-space: 5px;
+$modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
 
-$modal-resize-size: 20px;
+
+$modal-resize-size: 30px;
 
 $modal-content-padding: 10px;
 $modal-content-module-padding: 10px;
@@ -178,10 +180,10 @@ $clipboard-button-icon-size: 12px;
 // Structureboard
 $structure-bgcolor: rgba($white, 0.95);
 
-$structure-dragarea-space: $padding-normal / 2;
+$structure-dragarea-space: $padding-normal / 2 + 3px;
 $structure-dragarea-padding: $structure-dragarea-space;
 
-$structure-dragbar-height: 16px;
+$structure-dragbar-height: 20px;
 $structure-dragbar-color: $white;
 $structure-dragbar-text-shadow: 0 1px 0 $black;
 $structure-dragbar-icon-space: $structure-dragbar-height;
@@ -193,7 +195,7 @@ $structure-draggable-odd-child-bgcolor: $gray-lightest;
 $structure-draggable-even-child-bgcolor: $white;
 
 $structure-dragitem-icon-size: 10px;
-$structure-dragitem-height: $line-height-normal;
+$structure-dragitem-height: 26px;
 
 //##############################################################################
 // Structureboard
@@ -201,13 +203,13 @@ $submenu-icon-area-size: $structure-dragitem-height;
 $submenu-icon-size: 16px;
 $submenu-icon-color: $white;
 
-$submenu-item-font-size: $font-size-normal - 1px;
-$submenu-item-height: $line-height-normal + 2px;
-$submenu-item-padding-horizontal: 8px;
+$submenu-item-font-size: $font-size-normal;
+$submenu-item-height: $line-height-normal + 6px;
+$submenu-item-padding-horizontal: 10px;
 $submenu-item-color: $black;
 $submenu-item-hover-color: $white;
 
-$submenu-dropdown-width: 140px;
+$submenu-dropdown-width: 180px;
 $submenu-dropdown-height: 10 * $submenu-item-height + 2px;
 $submenu-dropdown-bgcolor: $white;
 
@@ -230,9 +232,10 @@ $tooltip-second-line-color: $white;
 
 //##############################################################################
 // Toolbar
-$toolbar-height: 30px;
+$toolbar-height: 45px;
 $toolbar-shadow: 0 0 5px rgba($black, 0.2);
-$toolbar-left-space: 10px;
+$toolbar-left-space: 15px;
+$toolbar-border: $gray-lighter;
 
 $toolbar-debug-height: 5px;
 $toolbar-debug-bgsize: 10px 10px;
@@ -246,7 +249,7 @@ $toolbar-trigger-icon-size: 10px;
 $toolbar-trigger-loader-size: 20px;
 
 $toolbar-right-hide-breakpoint: 800px;
-$toolbar-right-space: 20px;
+$toolbar-right-space: 15px;
 
 $toolbar-menu-item-padding: 0 ($line-height-normal / 2); // has to be 0 $value;;
 $toolbar-menu-item-color: $black;
@@ -260,12 +263,12 @@ $toolbar-dropdown-bgcolor: $white;
 $toolbar-dropdown-border-radius: $border-radius-base + 1px;
 
 $toolbar-dropdown-min-width: 180px;
-$toolbar-dropdown-item-height: 24px;
+$toolbar-dropdown-item-height: 30px;
 $toolbar-dropdown-item-padding: 0 10px 0 15px; // has to be 0 $value;
 $toolbar-dropdown-item-icon-size: 10px;
 
-$toolbar-button-height: 22px;
-$toolbar-button-font-size: 11px;
+$toolbar-button-height: 30px;
+$toolbar-button-font-size: 13px;
 $toolbar-button-padding-horizontal: 12px;
 $toolbar-button-border-radius: $border-radius-base;
 

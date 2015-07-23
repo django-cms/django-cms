@@ -45,7 +45,7 @@
                 this.timer = function () {};
                 this.timeout = 250;
                 this.focused = false;
-                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
+                this.click = 'pointerup.cms';
 
                 // bind data element to the container
                 this.container.data('settings', this.options);
@@ -103,11 +103,11 @@
                 });
 
                 // adds edit tooltip
-                this.container.bind('mouseover.cms mouseout.cms', function (e) {
+                this.container.bind('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'mouseover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
                 });
 
                 // adds listener for all plugin updates
@@ -147,7 +147,7 @@
                 this._setSubnav(draggable.find('> .cms-dragitem .cms-submenu'));
 
                 // adds event for hiding the subnav
-                draggable.bind('mouseenter mouseleave mouseover', function (e) {
+                draggable.bind('pointerenter pointerleave pointerover', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -155,10 +155,10 @@
                         return false;
                     }
 
-                    if (e.type === 'mouseenter' || e.type === 'mouseover') {
+                    if (e.type === 'pointerenter' || e.type === 'pointerover') {
                         $(this).data('active', true);
                     }
-                    if (e.type === 'mouseleave') {
+                    if (e.type === 'pointerleave') {
                         $(this).data('active', false);
                         submenus.hide();
                     }
@@ -172,7 +172,7 @@
                 });
 
                 // adds event for showing the subnav
-                dragitem.bind('mouseenter', function (e) {
+                dragitem.bind('pointerover.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -203,11 +203,11 @@
                 });
 
                 // adds edit tooltip
-                this.container.bind('mouseover.cms mouseout.cms', function (e) {
+                this.container.bind('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'mouseover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
                 });
             },
 
@@ -460,7 +460,7 @@
                     child.append(plugin);
                 } else if (placeholder.length) {
                     // we also need to cover the case if we move the plugin to an empty placeholder
-                    plugin.append($('.cms-plugin-' + this._getId(placeholder)));
+                    plugin.insertAfter($('.cms-placeholder-' + this._getId(placeholder)));
                 } else {
                     // if we did not found a match, reload
                     CMS.API.Helpers.reloadBrowser();
@@ -480,13 +480,13 @@
             _setSubnav: function (nav) {
                 var that = this;
 
-                nav.bind('mouseenter mouseleave tap.cms', function (e) {
+                nav.bind('pointerenter pointerleave tap.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    (e.type === 'mouseenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
+                    (e.type === 'pointerenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
                 });
 
-                nav.find('a').bind('click.cms tap.cms', function (e) {
+                nav.find('a').bind('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -542,7 +542,7 @@
                     }
                 });
 
-                nav.find('input').bind('keyup keydown focus blur click', function (e) {
+                nav.find('input').bind('keyup keydown focus blur pointerup', function (e) {
                     if (e.type === 'focus') {
                         that.focused = true;
                     }
@@ -763,7 +763,7 @@
                             }
                             items.each(function () {
                                 if ($(this).hasClass('cms-dragitem-expanded')) {
-                                    $(this).trigger('click.cms');
+                                    $(this).trigger(that.click);
                                 }
                             });
                         }
@@ -778,7 +778,7 @@
                             }
                             items.each(function () {
                                 if (!$(this).hasClass('cms-dragitem-expanded')) {
-                                    $(this).trigger('click.cms');
+                                    $(this).trigger(that.click);
                                 }
                             });
                         }
@@ -826,6 +826,7 @@
             },
 
             _expandAll: function (el) {
+                var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
                 // cancel if there are no items
                 if (!items.length) {
@@ -833,7 +834,7 @@
                 }
                 items.each(function () {
                     if (!$(this).hasClass('cms-dragitem-expanded')) {
-                        $(this).trigger('click.cms');
+                        $(this).trigger(that.click);
                     }
                 });
 
@@ -846,10 +847,11 @@
             },
 
             _collapseAll: function (el) {
+                var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
                 items.each(function () {
                     if ($(this).hasClass('cms-dragitem-expanded')) {
-                        $(this).trigger('click.cms');
+                        $(this).trigger(that.click);
                     }
                 });
 

@@ -15,7 +15,7 @@
         z-index: z(toolbar, base);
         width: 100%;
         height: $toolbar-height;
-        border-bottom: 1px solid $gray !important;
+        border-bottom: 1px solid $toolbar-border !important;
         background-color: $white;
         background-image: linear-gradient($gradient-toolbar);
         box-shadow: $toolbar-shadow;
@@ -393,8 +393,8 @@
         top: 0;
         right: 0;
         z-index: z(toolbar-trigger);
-        border-bottom: 1px solid $gray;
-        border-left: 1px solid $gray;
+        border-bottom: 1px solid $toolbar-border;
+        border-left: 1px solid $toolbar-border;
 
         a {
             display: block;
