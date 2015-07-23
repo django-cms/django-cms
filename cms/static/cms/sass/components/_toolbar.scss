@@ -328,6 +328,7 @@
             font-size: $login-form-input-font-size - 1px;
             text-transform: uppercase;
             height: $login-form-input-height - 2px;
+            line-height: $login-form-input-height - 2px;
             padding: 0px $login-form-submit-padding-horizontal;
         }
 

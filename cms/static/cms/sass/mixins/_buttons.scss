@@ -3,7 +3,7 @@
     @if($important == true) {
         @return !important;
     } @else {
-        @return ;
+        @return;
     }
 }
 @mixin button-variant($color, $background, $border, $important: false) {
