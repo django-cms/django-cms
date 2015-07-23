@@ -88,8 +88,8 @@ class PlaceholderToolbar(CMSToolbar):
         if self.request.user.has_perm("cms.use_structure"):
             switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                     extra_classes=extra_classes)
-            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
-            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
+            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=False)
+            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
 
 
 @toolbar_pool.register
