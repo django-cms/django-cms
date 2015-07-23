@@ -6,6 +6,7 @@
 //##################################################################################################################
 // #IMPORT SETTINGS#
 @import "settings/all";
+@import "mixins/all";
 
 //##################################################################################################################
 // #SIDEFRAME#
@@ -38,24 +39,13 @@
     padding: 10px 10px 5px !important;
 }
 .submit-row input.default,
-.object-tools .addlink {
+.object-tools .addlink,
+.object-tools .addlink:visited {
     font-weight: 200 !important;
     margin-bottom: 5px !important;
     padding: 5px 12px !important;
 
-    border: 1px solid adjust-hue($color-primary, 15deg) !important;
-    background-image: linear-gradient($btn-action-bggradient) !important;
-    box-shadow: inset lighten($color-primary, 20%) 0 1px 0;
-    &:hover,
-    &:active,
-    &:focus {
-        background: adjust-hue($color-primary, 15deg) !important;
-        box-shadow: none !important;
-    }
-    &:active,
-    &:focus {
-        background: darken(adjust-hue($color-primary, 15deg), 10%) !important;
-    }
+    @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, true);
 }
 
 .object-tools .recoverlink,
@@ -63,6 +53,9 @@
     font-weight: 200 !important;
     margin-bottom: 5px !important;
     padding: 5px 12px !important;
-    border: 1px solid $gray-lighter !important;
-    box-shadow: none !important;
+    @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
+}
+
+#changelist-search input[type="submit"] {
+    @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, true);
 }

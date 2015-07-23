@@ -7,7 +7,7 @@ $speed-base: 200ms;
 $white: #fff;
 $black: #000;
 
-$color-primary: #0eaaec;
+$color-primary: #57bcf0;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
@@ -101,27 +101,24 @@ $z-layers: (
 //##############################################################################
 // #BUTTONS
 $btn-border-radius-base: $border-radius-base;
-$btn-default-shadow: inset 0 1px 0 rgba($white, 0.5);
+$btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
 
 $btn-default-color: $gray;
-$btn-default-bgcolor: $gray-lighter;
-$btn-default-bggradient: to bottom, $gray-lightest, $gray-lighter;
+$btn-default-bgcolor: $white;
 $btn-default-border: $gray-lighter;
 
 $btn-action-color: $white;
-$btn-action-bgcolor: adjust-hue($color-primary, 15deg);
-$btn-action-bggradient: to bottom, adjust-hue($color-primary, 5deg), adjust-hue($color-primary, 15deg);
-$btn-action-border: adjust-hue($color-primary, 15deg);
+$btn-action-bgcolor: $color-primary;
+$btn-action-border: $color-primary;
 
 $btn-caution-color: $white;
 $btn-caution-bgcolor: adjust-hue($color-danger, 15deg);
-$btn-caution-bggradient: to bottom, adjust-hue($color-danger, 5deg), adjust-hue($color-danger, 15deg);
 $btn-caution-border: adjust-hue($color-danger, 15deg);
 
 $btn-active-color: $white;
 $btn-active-bgcolor: $gray-darker;
-$btn-active-bggradient: to bottom, $gray, $gray-darkest;
 $btn-active-border: $gray-darkest;
+
 
 //##############################################################################
 // Modal
@@ -232,7 +229,7 @@ $tooltip-second-line-color: $white;
 
 //##############################################################################
 // Toolbar
-$toolbar-height: 45px;
+$toolbar-height: 46px; // has to be even number
 $toolbar-shadow: 0 0 5px rgba($black, 0.2);
 $toolbar-left-space: 15px;
 $toolbar-border: $gray-lighter;
@@ -254,8 +251,7 @@ $toolbar-right-space: 15px;
 $toolbar-menu-item-padding: 0 ($line-height-normal / 2); // has to be 0 $value;;
 $toolbar-menu-item-color: $black;
 $toolbar-menu-item-hover-color: $white;
-$toolbar-menu-item-hover-bgcolor: adjust-hue($color-primary, 15deg);
-$toolbar-menu-item-hover-bggradient: $btn-action-bggradient;
+$toolbar-menu-item-hover-bgcolor: $color-primary;
 
 $toolbar-dropdown-padding: 3px 0;
 $toolbar-dropdown-shadow: 0 1px 1px rgba($black, 0.4);
@@ -292,7 +288,7 @@ $screenblock-inner-position: 300px;
 $login-form-input-font-size: $font-size-normal;
 $login-form-input-color: $gray;
 $login-form-input-width: 100px;
-$login-form-input-height: 23px;
+$login-form-input-height: 28px;
 $login-form-input-padding-horizontal: 5px;
 $login-form-input-border: lighten($gray, 45%);
 $login-form-input-border-radius: $border-radius-base;

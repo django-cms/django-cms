@@ -2,91 +2,14 @@
 // #BUTTONS#
 #cms-toolbar {
     .cms-btn {
-        color: $btn-default-color;
-        border: 1px solid $btn-default-border;
-        border-radius: $btn-border-radius-base;
-        background-color: $btn-default-bgcolor;
-        background-image: linear-gradient($btn-default-bggradient);
-        box-shadow: $btn-default-shadow;
-        &:hover,
-        &:active,
-        &:focus {
-            border: 1px solid $btn-default-border;
-            background: $btn-default-bgcolor;
-            box-shadow: none;
-        }
-        &:active,
-        &:focus {
-            border: 1px solid darken($btn-default-border, 10%);
-            background: darken($btn-default-bgcolor, 10%);
-        }
-    }
-
-    .cms-btn-disabled {
-        border-top: 1px solid darken($btn-default-border, 10%);
-        border-right: 1px solid darken($btn-default-border, 10%);
-        background: $btn-default-bgcolor;
-        box-shadow: inset 0 1px 0 $btn-default-border;
-        &:hover,
-        &:active,
-        &:focus {
-            background: $btn-default-bgcolor;
-        }
-    }
-
-    .cms-btn-active {
-        color: $btn-active-color;
-        border: 1px solid $btn-active-border;
-        border-bottom: none;
-        background-color: $btn-active-bgcolor;
-        background-image: linear-gradient($btn-active-bggradient);
-        box-shadow: $btn-default-shadow;
-        &:hover,
-        &:active,
-        &:focus {
-            background: $btn-active-bgcolor;
-            border: 1px solid $btn-active-border;
-            border-bottom: none;
-        }
-        &:active,
-        &:focus {
-            background: darken($btn-active-bgcolor, 10%);
-        }
+        @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, false);
     }
 
     .cms-btn-action {
-        color: $btn-action-color;
-        border: 1px solid $btn-action-border;
-        background-color: $btn-action-bgcolor;
-        background-image: linear-gradient($btn-action-bggradient);
-        box-shadow: $btn-default-shadow;
-        &:hover,
-        &:active,
-        &:focus {
-            border: 1px solid $btn-action-border;
-            background: $btn-action-bgcolor;
-        }
-        &:active,
-        &:focus {
-            background: darken($btn-action-bgcolor, 10%);
-        }
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, false);
     }
     .cms-btn-caution {
-        color: $btn-caution-color;
-        border: 1px solid $btn-caution-border;
-        background-color: $btn-caution-bgcolor;
-        background-image: linear-gradient($btn-caution-bggradient);
-        box-shadow: $btn-default-shadow;
-        &:hover,
-        &:active,
-        &:focus {
-            border: 1px solid $btn-caution-border;
-            background: $btn-caution-bgcolor
-        }
-        &:active,
-        &:focus {
-            background: darken($btn-caution-bgcolor, 10%);
-        }
+        @include button-variant($btn-caution-color, $btn-caution-bgcolor, $btn-caution-border, false);
     }
     .cms-btn-publish {
         display: none;

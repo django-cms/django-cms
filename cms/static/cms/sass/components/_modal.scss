@@ -269,6 +269,7 @@
         background: $color-window;
         div {
             display: inline-block;
+            float: right;
             font-size: $modal-button-font-size;
             margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
             padding: $modal-button-padding;
