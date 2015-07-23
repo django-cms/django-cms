@@ -28,7 +28,7 @@
 
                 // elements
                 this.body = $('html');
-                this.toolbar = this.container.find('.cms-toolbar').hide();
+                this.toolbar = this.container.find('.cms-toolbar');
                 this.toolbarTrigger = this.container.find('.cms-toolbar-trigger');
                 this.navigations = this.container.find('.cms-toolbar-item-navigation');
                 this.buttons = this.container.find('.cms-toolbar-item-buttons');
@@ -402,14 +402,14 @@
 
             // private methods
             _showToolbar: function (speed, init) {
+                this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
-                this.toolbar.slideDown(speed);
+                // this.toolbar.slideDown(speed);
                 // animate html
-                this.body.animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed, function () {
-                    $(this).addClass('cms-toolbar-expanded');
-                });
+                this.body.addClass('cms-toolbar-expanded');
+                this.body.animate({ 'margin-top': (this.config.debug) ? 51 : 46 }, speed, 'linear');
                 // set messages top to toolbar height
-                this.messages.css('top', 31);
+                this.messages.css('top', 47);
                 // set new settings
                 this.settings.toolbar = 'expanded';
                 if (!init) {
@@ -418,16 +418,17 @@
             },
 
             _hideToolbar: function (speed, init) {
+                this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 // cancel if sideframe is active
                 if (this.lockToolbar) {
                     return false;
                 }
 
                 this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
-                this.toolbar.slideUp(speed);
+                // this.toolbar.slideUp(speed);
                 // animate html
-                this.body.removeClass('cms-toolbar-expanded')
-                    .animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+                this.body.removeClass('cms-toolbar-expanded');
+                this.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
                 // set messages top to 0
                 this.messages.css('top', 0);
                 // set new settings
