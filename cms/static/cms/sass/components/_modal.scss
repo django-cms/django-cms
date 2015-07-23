@@ -168,7 +168,9 @@
         height: $modal-resize-size;
         cursor: nw-resize;
         span {
-            margin: 6px 0 0 6px;
+            position: absolute;
+            bottom: $modal-button-margin;
+            right: $modal-button-margin;
         }
     }
 
@@ -266,7 +268,6 @@
         padding: 0 $modal-resize-size 0 $padding-normal;
         background: $color-window;
         div {
-            $modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
             display: inline-block;
             font-size: $modal-button-font-size;
             margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
