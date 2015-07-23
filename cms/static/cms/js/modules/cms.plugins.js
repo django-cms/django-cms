@@ -421,7 +421,10 @@
                 });
 
                 // show publish button
-                $('.cms-btn-publish').addClass('cms-btn-publish-active').parent().show();
+                $('.cms-btn-publish')
+                    .addClass('cms-btn-publish-active')
+                    .removeClass('cms-btn-disabled')
+                    .parent().show();
 
                 // enable revert to live
                 $('.cms-toolbar-revert').removeClass('cms-toolbar-item-navigation-disabled');
