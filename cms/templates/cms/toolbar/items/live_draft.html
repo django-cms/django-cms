@@ -5,7 +5,7 @@
         {% trans "Save as draft" %}
     </a>
     {% else %}
-    <a class="cms-btn cms-btn-active cms-btn-switch-edit" href="{{ request.toolbar.get_object_draft_url }}?{{ request.toolbar.edit_mode_url_on }}">
+    <a class="cms-btn cms-btn-action cms-btn-switch-edit" href="{{ request.toolbar.get_object_draft_url }}?{{ request.toolbar.edit_mode_url_on }}">
         {% trans "Edit" %}
     </a>
     {% endif %}
