@@ -157,23 +157,6 @@ $dialog-border-radius: $border-radius-normal;
 $dialog-shadow: $modal-shadow;
 
 //##############################################################################
-// Sideframe
-$sideframe-buttons-position-top: 50px;
-$sideframe-border-width: 2px;
-$sideframe-resize-knob-size: 6px 50px;
-$sideframe-button-area-size: 20px;
-$sideframe-button-icon-size: 8px;
-$sideframe-button-space: 2px;
-
-//##############################################################################
-// Clipboard
-
-// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
-$clipboard-buttons-position-top: 130px;
-$clipboard-button-area-size: 20px;
-$clipboard-button-icon-size: 12px;
-
-//##############################################################################
 // Structureboard
 $structure-bgcolor: rgba($white, 0.95);
 
@@ -295,3 +278,21 @@ $login-form-input-border-radius: $border-radius-base;
 
 $login-form-submit-color: $white;
 $login-form-submit-padding-horizontal: 15px;
+
+//##############################################################################
+// Sideframe
+$sideframe-buttons-position-top: $toolbar-height + 20px;
+$sideframe-border-width: 2px;
+$sideframe-resize-knob-size: 6px 50px;
+$sideframe-button-area-size: 20px;
+$sideframe-button-icon-size: 8px;
+$sideframe-button-space: 2px;
+
+//##############################################################################
+// Clipboard
+
+// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
+$clipboard-buttons-position-top: $sideframe-buttons-position-top + 3.5 * $sideframe-button-area-size + 20px;
+$clipboard-button-area-size: 20px;
+$clipboard-button-icon-size: 12px;
+
