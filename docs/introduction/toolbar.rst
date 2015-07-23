@@ -14,11 +14,11 @@ There are two ways to control what gets shown in the toolbar.
 One is the ``CMS_TOOLBARS`` setting. This gives you full control over which
 classes are loaded, but requires that you specify them all manually.
 
-The other is to provide ``cms_toolbar.py`` files in your apps, which will be
+The other is to provide ``cms_toolbars.py`` files in your apps, which will be
 automatically loaded as long ``CMS_TOOLBARS`` is not set (or set to `None`).
 We'll work with this second method.
 
-Create a new ``cms_toolbar.py`` file in your Polls application (NOTE: *not* in
+Create a new ``cms_toolbars.py`` file in your Polls application (NOTE: *not* in
 the Polls Plugin application we were working with in the previous tutorial):
 
 .. code-block:: python
@@ -27,7 +27,7 @@ the Polls Plugin application we were working with in the previous tutorial):
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar_base import CMSToolbar
     from cms.utils.urlutils import admin_reverse
-    from poll.models import Poll
+    from polls.models import Poll
 
 
     @toolbar_pool.register
@@ -69,7 +69,7 @@ The ``populate()`` method:
 * adds a menu item to add a now poll as a modal window
 
 
-Your ``cms_toolbar.py`` file should contain classes that extend
+Your ``cms_toolbars.py`` file should contain classes that extend
 ``cms.toolbar_base.CMSToolbar`` and are registered using
 ``cms.toolbar_pool.toolbar_pool.register()``. The register function can be used
 as a decorator.
@@ -91,7 +91,7 @@ method will only be called if the current user is a staff user.
 ``supported_apps`` is a list of app names that should be considered as
 ``is_current_app``. Usually you don't need to set ``supported_apps``, but in
 our case we need it so ``is_current_app`` can be detected properly (because the
-views for the poll app are in ``polls`` and our ``cms_toolbar.py`` is in the
+views for the poll app are in ``polls`` and our ``cms_toolbars.py`` is in the
 ``polls_plugin`` app).
 
 There's a lot more to django CMS toolbar classes than this - see

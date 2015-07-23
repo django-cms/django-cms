@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-from cms.cms_toolbar import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
+from django.utils.translation import ugettext_lazy as _
+
+from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK
 from cms.toolbar.items import Break
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
-from django.utils.translation import ugettext_lazy as _
+
 from .models import Example1, CharPksExample
 
 SAMPLEAPP_BREAK = 'Example1 App Break'

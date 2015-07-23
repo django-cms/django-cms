@@ -538,6 +538,14 @@ This will render to:
 In the block the ``my_model`` is aliased as ``instance`` and every attribute and
 method is available; also templatetags and filters are available in the block.
 
+.. warning::
+
+    If the ``{% render_model_block %}`` contains templatetags or template code that rely on or
+    manipulate context data that the ``{% render_model_block %}`` also makes use of, you may
+    experience some unexpected effects. Unless you are sure that such conflicts will not occur
+    it is advised to keep the code within a ``{% render_model_block %}`` as simple and short as
+    possible.
+
 **Arguments:**
 
 * ``instance``: instance of your model in the template

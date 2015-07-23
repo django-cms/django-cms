@@ -4,6 +4,12 @@ Installing django CMS
 
 We'll get started by setting up our environment.
 
+************
+Requirements
+************
+
+django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+
 ************************
 Your working environment
 ************************
@@ -13,7 +19,7 @@ installed and that you have some basic familiarity with it.
 
 
 Create and activate a virtual env
-*********************************
+=================================
 
 ::
 
@@ -25,7 +31,7 @@ Note that if you're using Windows, to activate the virtualenv you'll need::
     env\Scripts\activate
 
 Use the django CMS installer
-****************************
+============================
 
 The `django CMS installer <https://github.com/nephila/djangocms-installer>`_ is
 a helpful script that takes care of setting up a new project.
@@ -43,7 +49,7 @@ Create a new directory to work in, and cd into it::
 
 Run it to create a new Django project called ``mysite``::
 
-    djangocms -p -f . mysite
+    djangocms -f -p . mysite
 
 .. note::
    The ``-f`` flag tells the installer to install and configure Django Filer, a useful application
@@ -69,6 +75,14 @@ For the purposes of this tutorial, it's recommended that you answer the
 installer's questions as follows - where our suggestions differ from the
 default, they're highlighted below:
 
+.. warning:: Django security support
+
+    Django 1.6 support is provided as an interim measure only. In accordance with the `Django
+    Project's security policies <https://docs.djangoproject.com/en/dev/internals/security/>`_, 1.6
+    no longer receives security updates from the Django Project team. Projects running on Django
+    1.6 have known vulnerabilities, so don't choose to install this version unless you have a
+    particular need to.
+
 * Database configuration (in URL format): sqlite://localhost/project.db
 * django CMS version: stable
 * Django version: stable
@@ -85,7 +99,7 @@ default, they're highlighted below:
 Create a Django admin user when invited.
 
 Start up the runserver
-**********************
+======================
 
 ::
 
