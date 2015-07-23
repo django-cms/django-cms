@@ -116,9 +116,6 @@
         padding-top: 0;
         padding-bottom: 0;
     }
-    .cms-dragbar-empty-wrapper {
-        /* display: none; */
-    }
 
     //###########################################################
     // #DRAGITEM#
@@ -129,7 +126,6 @@
     }
     .cms-draggables .cms-draggables {
         display: none;
-        /* min-height: 25px; */
         padding-left: $structure-draggable-inner-padding;
     }
 

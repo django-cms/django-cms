@@ -381,11 +381,11 @@
 
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
-                    var wmax = 680;
-                    var hmax = 100;
+                    var wMax = 680;
+                    var hMax = 100;
 
                     // add some limits
-                    if (w <= wmax || h <= hmax) {
+                    if (w <= wMax || h <= hMax) {
                         return false;
                     }
 
