@@ -75,6 +75,14 @@ For the purposes of this tutorial, it's recommended that you answer the
 installer's questions as follows - where our suggestions differ from the
 default, they're highlighted below:
 
+.. warning:: Django security support
+
+    Django 1.6 support is provided as an interim measure only. In accordance with the `Django
+    Project's security policies <https://docs.djangoproject.com/en/dev/internals/security/>`_, 1.6
+    no longer receives security updates from the Django Project team. Projects running on Django
+    1.6 have known vulnerabilities, so don't choose to install this version unless you have a
+    particular need to.
+
 * Database configuration (in URL format): sqlite://localhost/project.db
 * django CMS version: stable
 * Django version: stable

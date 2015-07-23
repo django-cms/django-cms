@@ -5,5 +5,5 @@
     {% csrf_token %}
     <label{% if request.toolbar.login_form.username.errors %} class="cms-error"{% endif %}><span>{% trans "Username" %}</span> {{ request.toolbar.login_form.username }}</label>
     <label{% if request.toolbar.login_form.password.errors or request.toolbar.login_form.non_field_errors or cms_toolbar_login_error %} class="cms-error"{% endif %}><span>{% trans "Password" %}</span> {{ request.toolbar.login_form.password }}</label>
-    <label><input type="submit" value="Login" /></label>
+    <label><input class="cms-btn cms-btn-action" type="submit" value="Login" /></label>
 </form>

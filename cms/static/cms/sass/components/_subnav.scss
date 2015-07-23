@@ -76,8 +76,7 @@
             &:hover,
             &:focus {
                 color: $submenu-item-hover-color;
-                background: adjust-hue($color-primary, 15deg);
-                background: linear-gradient($btn-action-bggradient);
+                background: $color-primary;
             }
             &:first-child {
                 border-top: none;
