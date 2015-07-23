@@ -9,9 +9,18 @@ class ListApphooksCommand(NoArgsCommand):
 
     help = 'Lists all apphooks in pages'
     def handle_noargs(self, **options):
-        urls = Page.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
-        for url in urls:
-            self.stdout.write(u'%s\n' % url)
+        urls = list(Page.objects.exclude(application_urls='').exclude(
+            application_urls__isnull=True).values_list("application_urls", "publisher_is_draft"))
+        apphooks = {}
+        for apphook, is_draft in urls:
+            state = 'draft' if is_draft else 'published'
+            if apphook in apphooks:
+                apphooks[apphook].append(state)
+            else:
+                apphooks[apphook] = [state]
+        for apphook, states in apphooks.items():
+            states.sort()
+            self.stdout.write(u'%s (%s)\n' % (apphook, '/'.join(states)))
 
 def plugin_report():
     # structure of report:
