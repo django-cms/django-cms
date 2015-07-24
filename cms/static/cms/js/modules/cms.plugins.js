@@ -567,7 +567,7 @@
                 parents.css('z-index', 999);
 
                 // show subnav
-                nav.siblings('.cms-submenu-quicksearch').show().find('input').focus();
+                nav.siblings('.cms-submenu-quicksearch').show().find('input');
 
                 // set visible states
                 nav.siblings('.cms-submenu-dropdown').show().on('scroll', function () {
