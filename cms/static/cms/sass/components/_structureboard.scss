@@ -4,7 +4,6 @@
     display: none;
     position: fixed;
     top: 0;
-    right: 0;
     z-index: z(structure, base);
     width: 100%;
     height: 100%;
@@ -41,9 +40,9 @@
         position: absolute;
         box-sizing: border-box;
         margin: 0 0 $structure-dragarea-space;
-        padding: $structure-dragarea-padding
-            $structure-dragarea-padding
-            $structure-dragarea-padding;
+        padding: $structure-dragbar-padding
+            $structure-dragbar-padding-horizontal
+            $structure-dragbar-padding;
         border-radius: $border-radius-base;
         background: $gray-darker;
     }
@@ -139,7 +138,7 @@
         margin: $structure-draggable-space 0 0;
         margin-left: 0 !important;
         // differences are fine-tuning
-        padding: $structure-dragarea-padding;
+        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
         border-radius: $border-radius-base;
         list-style-type: none;
 
@@ -170,19 +169,16 @@
 
         // menu overwrites
         .cms-submenu {
-            display: none;
             &:before {
                 color: $gray-darker;
             }
         }
         .cms-submenu-dropdown {
             top: $structure-dragitem-height + $structure-dragarea-padding;
-            right: -$structure-dragarea-padding;
         }
         .cms-submenu-quicksearch {
             $quicksearch-height: $structure-dragitem-height + $structure-draggable-space + $structure-dragarea-padding;
             top: 50%;
-            right: -$structure-dragarea-padding;
             height: $quicksearch-height;
             margin-top: -($quicksearch-height / 2);
             border-left: 1px dotted $gray-lighter;
@@ -318,9 +314,6 @@
 }
 
 // hide elements when dragging
-.ui-sortable-helper.cms-draggable .cms-switcher {
-    display: none !important;
-}
 .ui-sortable-helper.cms-draggable .cms-submenu {
     display: none !important;
 }

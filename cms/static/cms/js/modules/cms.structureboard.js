@@ -447,18 +447,15 @@
                         // show empty
                         actualizeEmptyPlaceholders();
                         // ensure all menus are closed
-                        $('.cms-dragitem .cms-submenu').hide();
+                        // FIXME find a better way to expose submenus so we can properly call
+                        // _hideSubnav
+                        $('.cms-submenu').removeClass('cms-btn-active');
+                        $('.cms-submenu-quicksearch, .cms-submenu-dropdown').hide();
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
                         // fixes placeholder height
                         ui.item.addClass('cms-is-dragging');
                         ui.placeholder.css('height', ui.helper.css('height'));
-                        // show placeholder without entries
-                        $('.cms-draggables').each(function () {
-                            if ($(this).children().length === 0) {
-                                $(this).show();
-                            }
-                        });
                         // add overflow hidden to body
                         $('.cms-structure-content').css({
                             'overflow-x': 'hidden'
@@ -466,6 +463,7 @@
                     },
 
                     stop: function (event, ui) {
+                        // TODO prevent everything if nothing really changed
                         that.dragging = false;
                         // hide empty
                         ui.item.removeClass('cms-is-dragging');

@@ -140,45 +140,9 @@
                 // variables for dragitems
                 var draggable = $('.cms-draggable-' + this.options.plugin_id);
                 var dragitem = draggable.find('> .cms-dragitem');
-                var submenu = draggable.find('.cms-submenu:eq(0)');
-                var submenus = $('.cms-draggables').find('.cms-submenu');
 
                 // attach event to the plugin menu
                 this._setSubnav(draggable.find('> .cms-dragitem .cms-submenu'));
-
-                // adds event for hiding the subnav
-                draggable.bind('pointerenter pointerleave pointerover', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (that.focused) {
-                        return false;
-                    }
-
-                    if (e.type === 'pointerenter' || e.type === 'pointerover') {
-                        $(this).data('active', true);
-                    }
-                    if (e.type === 'pointerleave') {
-                        $(this).data('active', false);
-                        submenus.hide();
-                    }
-
-                    // add timeout to determine if we should hide the element
-                    setTimeout(function () {
-                        if (!$(e.currentTarget).data('active')) {
-                            $(e.currentTarget).find('.cms-submenu:eq(0)').hide();
-                        }
-                    }, 100);
-                });
-
-                // adds event for showing the subnav
-                dragitem.bind('pointerover.cms', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    submenus.hide();
-                    submenu.show();
-                });
 
                 // adds double click to edit
                 dragitem.bind('dblclick', function (e) {
@@ -483,13 +447,22 @@
             _setSubnav: function (nav) {
                 var that = this;
 
-                nav.bind('pointerenter pointerleave tap.cms', function (e) {
+                nav.bind('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    (e.type === 'pointerenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
+                    var trigger = $(this);
+                    trigger.hasClass('cms-btn-active') ?
+                        that._hideSubnav(trigger) : that._showSubnav(trigger);
                 });
 
-                nav.find('a').bind('click.cms', function (e) {
+                nav.siblings('.cms-submenu-dropdown').on('mousedown mousemove mouseup', function (e) {
+                    e.stopPropagation();
+                }).on('touchstart', function (e) {
+                    // required for scrolling on mobile
+                    e.stopPropagation();
+                });
+
+                nav.siblings('.cms-submenu-dropdown').find('a').bind('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -545,13 +518,10 @@
                     }
                 });
 
-                nav.find('input').bind('keyup keydown focus blur pointerup', function (e) {
+                nav.siblings('.cms-submenu-quicksearch')
+                    .find('input').on('keyup keydown focus pointerup', function (e) {
                     if (e.type === 'focus') {
                         that.focused = true;
-                    }
-                    if (e.type === 'blur' && !that.traverse) {
-                        that.focused = false;
-                        that._hideSubnav(nav);
                     }
                     if (e.type === 'keyup') {
                         clearTimeout(that.timer);
@@ -563,55 +533,56 @@
                 });
 
                 // set data attributes for original top positioning
-                nav.find('.cms-submenu-dropdown').each(function () {
+                nav.siblings('.cms-submenu-dropdown').each(function () {
                     $(this).data('top', $(this).css('top'));
                 });
 
                 // prevent propagnation
-                nav.bind(this.click, function (e) {
+                nav.on(this.click + ' dblclick', function (e) {
                     e.stopPropagation();
+                });
+                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click, function (e) {
+                    e.stopPropagation();
+                });
+
+                $(document).add('.cms-submenu').not(nav).on(this.click, function () {
+                    that._hideSubnav(nav);
                 });
             },
 
             _showSubnav: function (nav) {
                 var that = this;
-                var dropdown = nav.find('.cms-submenu-dropdown');
+                var dropdown = nav.siblings('.cms-submenu-dropdown');
                 var offset = parseInt(dropdown.data('top'));
+                nav.addClass('cms-btn-active');
 
-                // clearing
-                clearTimeout(this.timer);
+                // reset z indexes
+                var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
+                var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
 
-                // add small delay before showing submenu
-                this.timer = setTimeout(function () {
-                    // reset z indexes
-                    var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
-                    var scrollHint = nav.find('.cms-submenu-scroll-hint');
+                reset.css('z-index', 0);
 
-                    reset.css('z-index', 0);
+                var parents = nav.parentsUntil('.cms-dragarea');
+                parents.css('z-index', 999);
 
-                    var parents = nav.parentsUntil('.cms-dragarea');
-                    parents.css('z-index', 999);
+                // show subnav
+                nav.siblings('.cms-submenu-quicksearch').show().find('input').focus();
 
-                    // show subnav
-                    nav.find('.cms-submenu-quicksearch').show();
+                // set visible states
+                nav.siblings('.cms-submenu-dropdown').show().on('scroll', function () {
+                    scrollHint.fadeOut(100);
+                    $(this).off('scroll');
+                });
 
-                    // set visible states
-                    nav.find('> .cms-submenu-dropdown').show().on('scroll', function () {
-                        scrollHint.fadeOut(100);
-                        $(this).off('scroll');
-                    });
-
-                    // show scrollHint for FF on OSX
-                    if (nav[0].scrollHeight > 245) {
-                        scrollHint.show();
-                    }
-
-                }, 100);
+                // show scrollHint for FF on OSX
+                if (dropdown[0].scrollHeight > dropdown.height()) {
+                    scrollHint.show();
+                }
 
                 // add key events
                 $(document).unbind('keydown.cms');
                 $(document).bind('keydown.cms', function (e) {
-                    var anchors = nav.find('.cms-submenu-item:visible a');
+                    var anchors = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
                     // bind arrow down and tab keys
@@ -638,7 +609,7 @@
                     // hide subnav when hitting enter or escape
                     if (e.keyCode === 13 || e.keyCode === 27) {
                         that.traverse = false;
-                        nav.find('input').blur();
+                        nav.siblings('.cms-submenu-quicksearch').find('input').blur();
                         that._hideSubnav(nav);
                     }
                 });
@@ -659,33 +630,23 @@
             },
 
             _hideSubnav: function (nav) {
-                clearTimeout(this.timer);
-
-                var that = this;
-                // cancel if quicksearch is focues
-                if (this.focused) {
-                    return false;
-                }
+                nav.removeClass('cms-btn-active');
 
                 // set correct active state
                 nav.closest('.cms-draggable').data('active', false);
 
-                this.timer = setTimeout(function () {
-                    // set visible states
-                    nav.find('> .cms-submenu-dropdown').hide();
-                    nav.find('.cms-submenu-quicksearch').hide();
-                    // reset search
-                    nav.find('input').val('');
-                    that._searchSubnav(nav, '');
-                }, this.timeout);
+                nav.siblings('.cms-submenu-dropdown').hide();
+                nav.siblings('.cms-submenu-quicksearch').hide();
+                // reset search
+                nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
 
                 // reset relativity
                 $('.cms-dragbar').css('position', '');
             },
 
             _searchSubnav: function (nav, value) {
-                var items = nav.find('.cms-submenu-item');
-                var titles = nav.find('.cms-submenu-item-title');
+                var items = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item');
+                var titles = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item-title');
 
                 // cancel if value is zero
                 if (value === '') {
@@ -718,13 +679,13 @@
                 });
 
                 // if there is no element visible, show only first categoriy
-                nav.find('.cms-submenu-dropdown').show();
+                nav.siblings('.cms-submenu-dropdown').show();
                 if (items.add(titles).filter(':visible').length <= 0) {
-                    nav.find('.cms-submenu-dropdown').hide();
+                    nav.siblings('.cms-submenu-dropdown').hide();
                 }
 
                 // hide scrollHint
-                nav.find('.cms-submenu-scroll-hint').hide();
+                nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-scroll-hint').hide();
             },
 
             _collapsables: function () {

@@ -8,12 +8,15 @@
         cursor: pointer;
         right: 0px;
         width: $submenu-icon-area-size;
-        height: 100%;
+        height: $submenu-icon-area-size;
+        top: 50%;
+        margin-top: -($submenu-icon-area-size / 2);
         &:before {
             @extend %icon;
             position: absolute;
-            right: 0;
+            left: 50%;
             top: 50%;
+            margin-left: -($submenu-icon-size / 2);
             margin-top: -($submenu-icon-size / 2);
             font-size: $submenu-icon-size;
             color: $submenu-icon-color;
@@ -37,13 +40,15 @@
         display: none;
         position: absolute;
         top: $structure-dragbar-height + $structure-dragarea-space;
-        right: 0;
-        overflow: auto;
+        right: $submenu-icon-area-size;
         z-index: z(structure, content, dropdown);
         min-width: $submenu-dropdown-width;
         max-height: $submenu-dropdown-height;
         border: 1px solid $gray-lighter;
         background: $submenu-dropdown-bgcolor;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        transform: translateZ(0);
 
         // force scrollbars on subnav menu
         // not yet working on firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=77790
@@ -101,7 +106,7 @@
         display: none;
         position: absolute;
         top: 50%;
-        right: -$structure-dragarea-padding;
+        right: $submenu-icon-area-size;
         z-index: z(structure, content, quicksearch);
         text-align: right;
         height: $quicksearch-height;

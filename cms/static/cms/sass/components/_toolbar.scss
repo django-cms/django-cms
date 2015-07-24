@@ -8,7 +8,10 @@
     width: 100%;
 
     .cms-toolbar {
-        display: none;
+        margin-top: -$toolbar-height;
+        .cms-toolbar-expanded & {
+            margin-top: 0px;
+        }
         position: fixed;
         top: 0;
         left: 0;
@@ -375,7 +378,7 @@
         a {
             display: block;
             width: $toolbar-trigger-width;
-            height: $toolbar-trigger-height - 1px;
+            height: $toolbar-trigger-height;
             text-align: center;
             border-top: 1px solid $white;
             border-left: 1px solid $white;

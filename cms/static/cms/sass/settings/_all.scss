@@ -157,36 +157,22 @@ $dialog-border-radius: $border-radius-normal;
 $dialog-shadow: $modal-shadow;
 
 //##############################################################################
-// Sideframe
-$sideframe-buttons-position-top: 50px;
-$sideframe-border-width: 2px;
-$sideframe-resize-knob-size: 6px 50px;
-$sideframe-button-area-size: 20px;
-$sideframe-button-icon-size: 8px;
-$sideframe-button-space: 2px;
-
-//##############################################################################
-// Clipboard
-
-// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
-$clipboard-buttons-position-top: 130px;
-$clipboard-button-area-size: 20px;
-$clipboard-button-icon-size: 12px;
-
-//##############################################################################
 // Structureboard
 $structure-bgcolor: rgba($white, 0.95);
 
-$structure-dragarea-space: $padding-normal / 2 + 3px;
-$structure-dragarea-padding: $structure-dragarea-space;
-
-$structure-dragbar-height: 20px;
+$structure-dragbar-height: 24px;
 $structure-dragbar-color: $white;
 $structure-dragbar-text-shadow: 0 1px 0 $black;
 $structure-dragbar-icon-space: $structure-dragbar-height;
 $structure-dragbar-icon-size: 10px;
+$structure-dragbar-padding: 8px;
+$structure-dragbar-padding-horizontal: 8px;
 
-$structure-draggable-inner-padding: 6px;
+$structure-dragarea-space: 8px;
+$structure-dragarea-padding: 8px;
+$structure-dragarea-padding-horizontal: 8px;
+
+$structure-draggable-inner-padding: 7px;
 $structure-draggable-space: $structure-dragarea-space;
 $structure-draggable-odd-child-bgcolor: $gray-lightest;
 $structure-draggable-even-child-bgcolor: $white;
@@ -196,7 +182,7 @@ $structure-dragitem-height: 26px;
 
 //##############################################################################
 // Structureboard
-$submenu-icon-area-size: $structure-dragitem-height;
+$submenu-icon-area-size: 30px;
 $submenu-icon-size: 16px;
 $submenu-icon-color: $white;
 
@@ -295,3 +281,22 @@ $login-form-input-border-radius: $border-radius-base;
 
 $login-form-submit-color: $white;
 $login-form-submit-padding-horizontal: 15px;
+
+//##############################################################################
+// Sideframe
+$sideframe-buttons-position-top: $toolbar-height + 20px;
+$sideframe-border-width: 2px;
+$sideframe-resize-knob-size: 6px 50px;
+$sideframe-button-area-size: 20px;
+$sideframe-button-icon-size: 8px;
+$sideframe-button-space: 2px;
+
+//##############################################################################
+// Clipboard
+
+// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
+$clipboard-buttons-position-top: $sideframe-buttons-position-top +
+    3.5 * $sideframe-button-area-size + 20px;
+$clipboard-button-area-size: 20px;
+$clipboard-button-icon-size: 12px;
+
