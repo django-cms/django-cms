@@ -284,11 +284,11 @@ $login-form-submit-padding-horizontal: 15px;
 
 //##############################################################################
 // Sideframe
-$sideframe-buttons-position-top: $toolbar-height + 20px;
+$sideframe-buttons-position-top: $toolbar-height + 40px;
 $sideframe-border-width: 2px;
-$sideframe-resize-knob-size: 6px 50px;
-$sideframe-button-area-size: 20px;
-$sideframe-button-icon-size: 8px;
+$sideframe-resize-knob-size: 12px 50px;
+$sideframe-button-area-size: 30px;
+$sideframe-button-icon-size: 10px;
 $sideframe-button-space: 2px;
 
 //##############################################################################
@@ -297,6 +297,6 @@ $sideframe-button-space: 2px;
 // it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
 $clipboard-buttons-position-top: $sideframe-buttons-position-top +
     3.5 * $sideframe-button-area-size + 20px;
-$clipboard-button-area-size: 20px;
+$clipboard-button-area-size: 30px;
 $clipboard-button-icon-size: 12px;
 
