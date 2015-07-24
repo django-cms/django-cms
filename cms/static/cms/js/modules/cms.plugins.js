@@ -470,6 +470,7 @@
                     CMS.API.Toolbar._loader(true);
 
                     var el = $(this);
+                    that._hideSubnav(nav);
 
                     // set switch for subnav entries
                     switch (el.attr('data-rel')) {
