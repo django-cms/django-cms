@@ -1032,11 +1032,11 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
             with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 request = self.get_post_request(post_data)
                 request.GET = get_data
-                response = admin_instance.add_plugin(request) # first
-                self.assertEqual(response.status_code, 302)
-                response = admin_instance.add_plugin(request) # second
-                self.assertEqual(response.status_code, 302)
-                response = admin_instance.add_plugin(request) # third
+                response = admin_instance.add_plugin(request)  # first
+                self.assertEqual(response.status_code, 200)
+                response = admin_instance.add_plugin(request)  # second
+                self.assertEqual(response.status_code, 200)
+                response = admin_instance.add_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
@@ -1051,11 +1051,15 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                request.GET = request.POST
-                response = admin_instance.add_plugin(request) # first
+                request = self.get_post_request({
+                    'body': 'test'
+                })
+                request.GET = data
+                response = admin_instance.add_plugin(request)  # first
+                # Note: TextPlugin returns 302 instead of 200 on successful
+                # add_view call.
                 self.assertEqual(response.status_code, 302)
-                response = admin_instance.add_plugin(request) # second
+                response = admin_instance.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")

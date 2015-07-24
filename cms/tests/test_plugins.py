@@ -1293,7 +1293,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             "sections": self.section_pks
         }
         response = self.client.post(add_url, data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(ArticlePluginModel.objects.count(), 1)
         plugin = ArticlePluginModel.objects.all()[0]
         self.assertEqual(self.section_count, plugin.sections.count())
@@ -1321,7 +1321,8 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'placeholder_id': placeholder.pk,
         })
         response = self.client.post(add_url, data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'admin/cms/plugin/close_modal.html')
 
         # there should be only 1 plugin
         self.assertEqual(1, CMSPlugin.objects.all().count())
@@ -1599,7 +1600,7 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
             'beta': 'BETA'
         }
         response = self.client.post(add_url, data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(TestPluginBetaModel.objects.count(), 1)
         plugin_model = TestPluginBetaModel.objects.all()[0]
         self.assertEqual("ALPHA", plugin_model.alpha)

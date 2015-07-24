@@ -295,7 +295,9 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         an admin site directly and the add_view is accessed via frontend
         editing.
         """
-        return render_to_response('admin/cms/plugin/close_modal.html')
+        return render_to_response(
+            'admin/cms/plugin/close_modal.html', {'is_popup': True}
+        )
 
     def save_model(self, request, obj, form, change):
         """
