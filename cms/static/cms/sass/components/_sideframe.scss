@@ -62,7 +62,7 @@
         height: nth($sideframe-resize-knob-size, 2);
         margin-top: -(nth($sideframe-resize-knob-size, 2) / 2);
         margin-left: -(nth($sideframe-resize-knob-size, 1) / 2);
-        border-radius: $border-radius-base;
+        border-radius: nth($sideframe-resize-knob-size, 1) / 2;
         background: $gray-darker;
     }
 

@@ -15,10 +15,10 @@
             implement: [CMS.API.Helpers],
 
             options: {
-                'onClose': false,
-                'sideframeDuration': 300,
-                'sideframeWidth': 320,
-                'urls': {
+                onClose: false,
+                sideframeDuration: 300,
+                sideframeWidth: 320,
+                urls: {
                     'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
                 }
             },
@@ -79,13 +79,13 @@
                     that.settings = that.setSettings(that.settings);
                 });
 
-                this.sideframe.find('.cms-sideframe-resize').bind('mousedown', function (e) {
+                this.sideframe.find('.cms-sideframe-resize').bind('pointerdown.cms.sideframe', function (e) {
                     e.preventDefault();
                     that._startResize();
                 });
 
                 // stopper events
-                $(document).bind('mouseup.cms', function () {
+                $('html').bind('pointerup.cms.sideframe', function () {
                     that._stopResize();
                 });
             },
@@ -233,11 +233,11 @@
                         this.body.animate({ 'margin-left': width }, 0);
                         // reset width if larger than available space
                         if (width >= $(window).width()) {
-                            this.sideframe.animate({ 'width': $(window).width() - 20 }, 0);
-                            this.body.animate({ 'margin-left': $(window).width() - 20 }, 0);
+                            this.sideframe.animate({ 'width': $(window).width() - 30 }, 0);
+                            this.body.animate({ 'margin-left': $(window).width() - 30 }, 0);
                         }
                     }
-                    this.sideframe.find('.cms-sideframe-btn').css('right', -20);
+                    this.sideframe.find('.cms-sideframe-btn').css('right', -30);
                 }
 
                 // lock toolbar, set timeout to make sure CMS.API is ready
@@ -306,25 +306,25 @@
 
             _startResize: function () {
                 var that = this;
-                var outerOffset = 20;
+                var outerOffset = 30;
                 var timer = function () {};
                 // this prevents the iframe from being focusable
                 this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
                 this._minimize(true);
 
-                $(document).bind('mousemove.cms', function (e) {
-                    if (e.clientX <= 320) {
-                        e.clientX = 320;
+                $('html').attr('touch-action', 'none').bind('pointermove.cms.sideframe', function (e) {
+                    if (e.originalEvent.clientX <= 320) {
+                        e.originalEvent.clientX = 320;
                     }
-                    if (e.clientX >= $(window).width() - outerOffset) {
-                        e.clientX = $(window).width() - outerOffset;
+                    if (e.originalEvent.clientX >= $(window).width() - outerOffset) {
+                        e.originalEvent.clientX = $(window).width() - outerOffset;
                     }
 
-                    that.sideframe.css('width', e.clientX);
-                    that.body.css('margin-left', e.clientX);
+                    that.sideframe.css('width', e.originalEvent.clientX);
+                    that.body.css('margin-left', e.originalEvent.clientX);
 
                     // update settings
-                    that.settings.sideframe.position = e.clientX;
+                    that.settings.sideframe.position = e.originalEvent.clientX;
 
                     // trigger the resize event
                     $(window).trigger('resize.sideframe');
@@ -339,8 +339,9 @@
 
             _stopResize: function () {
                 this.sideframe.find('.cms-sideframe-shim').css('z-index', 1);
+                $(window).trigger('resize.sideframe');
 
-                $(document).unbind('mousemove.cms');
+                $('html').removeAttr('touch-action').unbind('pointermove.cms.sideframe');
             },
 
             _url: function (url, params) {
