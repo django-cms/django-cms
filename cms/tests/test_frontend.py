@@ -492,7 +492,7 @@ class StaticPlaceholderPermissionTests(FastLogin, CMSLiveTests):
 
         self.base_url = self.live_server_url
 
-        self.placeholder_name = 'cms_placeholder-5'
+        self.placeholder_name = 'cms-placeholder-5'
 
         self.username = 'testuser'
 
@@ -519,7 +519,7 @@ class StaticPlaceholderPermissionTests(FastLogin, CMSLiveTests):
         self.wait_page_loaded()
 
         self.assertTrue(self.driver.find_element_by_class_name(
-            'cms_toolbar-item-navigation'
+            'cms-toolbar-item-navigation'
         ))
 
         # test static placeholder permission (content of static placeholders
