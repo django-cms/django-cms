@@ -72,6 +72,7 @@
         left: 0;
         bottom: 0;
         right: 0;
+        z-index: z(modal, footer);
     }
     // this elements shows up on top of an iframe as soon as the dragging starts
     // so if you are moving the mouse really fast and mouse hovers over an iframe
