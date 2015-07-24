@@ -295,7 +295,8 @@ $sideframe-button-space: 2px;
 // Clipboard
 
 // it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
-$clipboard-buttons-position-top: $sideframe-buttons-position-top + 3.5 * $sideframe-button-area-size + 20px;
+$clipboard-buttons-position-top: $sideframe-buttons-position-top +
+    3.5 * $sideframe-button-area-size + 20px;
 $clipboard-button-area-size: 20px;
 $clipboard-button-icon-size: 12px;
 

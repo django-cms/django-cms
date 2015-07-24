@@ -404,7 +404,6 @@
             _showToolbar: function (speed, init) {
                 this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
-                // this.toolbar.slideDown(speed);
                 // animate html
                 this.body.addClass('cms-toolbar-expanded');
                 this.body.animate({ 'margin-top': (this.config.debug) ? 51 : 46 }, speed, 'linear');

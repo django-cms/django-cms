@@ -8,9 +8,7 @@
     width: 100%;
 
     .cms-toolbar {
-        /* display: none; */
         margin-top: -$toolbar-height;
-        /* transition: margin-top 0.2s; */
         .cms-toolbar-expanded & {
             margin-top: 0px;
         }
