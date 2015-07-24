@@ -4,17 +4,17 @@
 <div class="cms-dragbar cms-dragbar-{{ placeholder.pk|unlocalize }}">
     {% language request.toolbar.toolbar_language %}
     <div class="cms-submenu">
-        <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
-        <div class="cms-submenu-dropdown">
-            <div class="cms-submenu-item cms-submenu-item-title"><span>{% trans "Settings" %}</span></div>
-            <div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
-            {% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
-                <div class="cms-submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
-            {% endif %}{% endfor %}
-            <div class="cms-submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
-            {% extra_menu_items placeholder %}
-            {% plugin_child_classes placeholder %}
-        </div>
+    </div>
+    <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
+    <div class="cms-submenu-dropdown" touch-action="pan-y">
+        <div class="cms-submenu-item cms-submenu-item-title"><span>{% trans "Settings" %}</span></div>
+        <div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
+        {% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
+            <div class="cms-submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
+        {% endif %}{% endfor %}
+        <div class="cms-submenu-item"><a data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
+        {% extra_menu_items placeholder %}
+        {% plugin_child_classes placeholder %}
     </div>
     {% endlanguage %}
 
