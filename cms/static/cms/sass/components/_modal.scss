@@ -90,8 +90,15 @@
         z-index: z(modal, frame);
         width: 100%;
         height: 100%;
+        // forces things on touch devices like iPad
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
     }
     .cms-modal-frame iframe {
+        display: block;
+        // starting from iOS 4.something iframe size is forced
+        // to be equal to it's contents height, so these are not really
+        // respected
         width: 100%;
         height: 100%;
     }
