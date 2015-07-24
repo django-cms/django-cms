@@ -718,7 +718,17 @@ class AddPluginTest(FastLogin, CMSLiveTests):
         )
         save_button.click()
 
-        self.wait_page_loaded()
+        def no_more_iframe(driver):
+            try:
+                driver.find_element_by_css_selector(
+                    'div.cms-modal-frame iframe'
+                )
+            except NoSuchElementException:
+                return True
+            else:
+                return False
+
+        self.wait_until(no_more_iframe, 30)
 
         self.assertEqual(Link.objects.count(), 1)
         link_plugin = Link.objects.get()
