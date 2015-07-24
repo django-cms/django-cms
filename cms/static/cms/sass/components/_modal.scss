@@ -15,22 +15,63 @@
         background: $modal-bgcolor;
         box-shadow: $modal-shadow;
         user-select: none;
-        transform: translateZ(0);
+        transform: scale(0) translateZ(0);
+        transition: transform 0.2s;
 
+        .cms-modal-maximized & {
+            right: 0;
+            bottom: 0;
+            top: 0 !important;
+            left: 0 !important;
+            border-radius: 0;
+            margin: 0 !important;
+            width: auto !important;
+            height: auto !important;
+
+            .cms-modal-title {
+                // set correct cursor when maximized #3111
+                cursor: default;
+            }
+        }
+
+        .cms-modal-minimized & {
+            width: auto !important;
+            height: auto !important;
+            top: 1px !important;
+            margin: 0 !important;
+
+            .cms-modal-body,
+            .cms-modal-foot {
+                display: none;
+            }
+            .cms-modal-title {
+                // set correct cursor when maximized #3111
+                cursor: default;
+            }
+        }
+    }
+    .cms-modal-open {
+        transform: scale(1) translateZ(0);
     }
     .cms-modal-body {
-        position: relative;
+        position: absolute;
         z-index: z(modal, body);
-        width: 800px;
-        height: 400px;
+        left: 0;
+        top: $modal-header-height;
+        right: 0;
+        bottom: $modal-footer-height;
         border-top: 1px solid $gray-lighter;
         border-bottom: 1px solid $gray-lighter;
     }
     .cms-modal-foot {
-        position: relative;
+        position: absolute;
+        overflow: hidden;
         clear: both;
         height: $modal-footer-height;
         background: $gray-lightest;
+        left: 0;
+        bottom: 0;
+        right: 0;
     }
     // this elements shows up on top of an iframe as soon as the dragging starts
     // so if you are moving the mouse really fast and mouse hovers over an iframe
@@ -70,7 +111,7 @@
         background: $gray-lightest;
     }
 
-    .cms-modal-collapse,
+    .cms-modal-minimize,
     .cms-modal-close,
     .cms-modal-maximize {
         display: block;
@@ -94,18 +135,26 @@
             color: $color-primary;
         }
     }
-    .cms-modal-collapse {
+    .cms-modal-minimize {
         right: 2 * $modal-header-button-area-size + $padding-base;
+        .cms-modal-minimized & {
+            @include icon(plus);
+            color: $color-primary;
+        }
+        .cms-modal-maximized & {
+            // ensure minimize button is hidden #3111
+            display: none;
+        }
     }
     .cms-modal-maximize {
         right: $modal-header-button-area-size + $padding-base;
-    }
-    .cms-modal-collapsed {
-        @include icon(plus);
-        color: $color-primary;
-    }
-    .cms-modal-maximize-active {
-        color: $color-primary;
+        // ensure maximize element is hidden #3111
+        .cms-modal-minimized & {
+            display: none;
+        }
+        .cms-modal-maximized & {
+            color: $color-primary;
+        }
     }
 
     .cms-modal-resize {
@@ -146,7 +195,7 @@
             line-height: $modal-footer-height - 2 * $modal-breadcrumb-padding-vertical;
             padding: $modal-breadcrumb-padding-vertical
                 $modal-breadcrumb-padding-horizontal
-                $modal-breadcrumb-padding-horizontal
+                $modal-breadcrumb-padding-vertical
                 1.5 * $modal-breadcrumb-padding-horizontal;
         }
         a:first-child {
@@ -224,5 +273,17 @@
             padding: $modal-button-padding;
             cursor: pointer;
         }
+    }
+}
+
+.cms-modal-maximized {
+    overflow: hidden !important;
+    #cms-toolbar.cms-toolbar-debug .cms-modal {
+        top: $toolbar-debug-height !important;
+    }
+}
+.cms-modal-minimized {
+    #cms-toolbar.cms-toolbar-debug .cms-modal {
+        top: $toolbar-debug-height + 1px !important;
     }
 }

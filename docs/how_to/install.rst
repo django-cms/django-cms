@@ -22,7 +22,7 @@ Requirements
 ************
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
-* `Django`_ 1.6.x, 1.7.x, 1.8.x
+* `Django`_ 1.6.9 or later, 1.7.x, 1.8.x
 * `South`_ 1.0.1 or higher (Only required up to Django 1.6)
 * `django-classy-tags`_ 0.6.2 or higher
 * `django-treebeard`_ 3.0
