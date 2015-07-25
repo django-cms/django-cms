@@ -72,6 +72,7 @@
         left: 0;
         bottom: 0;
         right: 0;
+        z-index: z(modal, footer);
     }
     // this elements shows up on top of an iframe as soon as the dragging starts
     // so if you are moving the mouse really fast and mouse hovers over an iframe
@@ -90,8 +91,15 @@
         z-index: z(modal, frame);
         width: 100%;
         height: 100%;
+        // forces things on touch devices like iPad
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
     }
     .cms-modal-frame iframe {
+        display: block;
+        // starting from iOS 4.something iframe size is forced
+        // to be equal to it's contents height, so these are not really
+        // respected
         width: 100%;
         height: 100%;
     }
