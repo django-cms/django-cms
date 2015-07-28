@@ -152,6 +152,9 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
         password_input.submit()
         self.wait_page_loaded()
 
+    def chain(self):
+        return ActionChains(self.driver)
+
     def wait_until(self, callback, timeout=10):
         """
         Helper function that blocks the execution of the tests until the
@@ -397,7 +400,7 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
 
-        hov = ActionChains(self.driver).move_to_element(submenu)
+        hov = self.chain().move_to_element(submenu)
         hov.perform()
 
         submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
@@ -420,58 +423,66 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
-        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        build_button.click()
+        # switch to structure mode
+        self.driver.find_element_by_css_selector(
+            '.cms-toolbar-item-cms-mode-switcher a[href="?{flag}"]'.format(
+                flag=get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+            )
+        ).click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
-
-        hov = ActionChains(self.driver).move_to_element(cms_draggable)
-        hov.perform()
-
+        # open the plugin submenu
+        cms_draggable = self.driver.find_element_by_css_selector(
+            '.cms-draggable:nth-child(1)'
+        )
+        self.chain().move_to_element(cms_draggable).perform()
         submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
+        self.chain().move_to_element(submenu).perform()
 
-        hov = ActionChains(self.driver).move_to_element(submenu)
-        hov.perform()
-
-        copy = submenu.find_element_by_css_selector('a[data-rel="copy"]')
-        copy.click()
-
-        time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
-
-        WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
-
-        hov = ActionChains(self.driver).move_to_element(clipboard)
-        hov.perform()
-
-        # necessary sleeps for making a "real" drag and drop, that works with the clipboard
-
-        time.sleep(0.1)
+        # click copy and wait for clipboard to be available
+        submenu.find_element_by_css_selector('a[data-rel="copy"]').click()
+        self.wait_until(
+            lambda driver: driver.find_element_by_css_selector(
+                '.cms-clipboard'
+            )
+        )
 
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
-        drag = ActionChains(self.driver).click_and_hold(
-            clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
+        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
+        self.wait_until(
+            lambda _: clipboard.is_displayed()
+        )
+        draggable = clipboard.find_element_by_css_selector(
+            '.cms-draggable:nth-child(1)'
+        )
+        dropzone = self.driver.find_element_by_css_selector('.cms-dragarea-1')
+
+        # Move cursor to clipboard and wait for clipboard to open
+        self.chain().move_to_element(clipboard).perform()
+        self.wait_until(
+            lambda _: draggable.value_of_css_property(
+                'margin-left'
+            ) == '0px'
         )
 
-        drag.perform()
+        # click and hold the plugin in the clipboard, wait for the drag'n'drop
+        # to kick in
+        def _dragging(_):
+            # slightly move the cursor until drag'n'drop mode kicks in
+            self.chain().move_by_offset(1, 1).perform()
+            return not draggable.is_displayed()
+        self.chain().click_and_hold(draggable).perform()
+        self.wait_until(_dragging)
 
-        time.sleep(0.1)
+        # move to the drop zone and release
+        self.chain().move_to_element(dropzone).release().perform()
 
-        drag = ActionChains(self.driver).move_to_element(
-            self.driver.find_element_by_css_selector('.cms-dragarea-1')
+        # wait for dropzone to be gone, aka the drag'n'drop to be done
+        self.wait_until(
+            lambda driver: not driver.find_element_by_css_selector(
+                '.cms-droppable'
+            ).is_displayed()
         )
-        drag.perform()
-
-        time.sleep(0.2)
-
-        drag = ActionChains(self.driver).move_by_offset(
-            0, 10
-        ).release()
-
-        drag.perform()
-
-        time.sleep(0.5)
 
         self.assertEqual(CMSPlugin.objects.count(), 3)
 
@@ -654,7 +665,7 @@ class AddPluginTest(FastLogin, CMSLiveTests):
             'div.cms-plugin-{0}'.format(text_plugin.pk)
         )
 
-        chain = ActionChains(self.driver)
+        chain = self.chain()
         chain.double_click(plugin_element)
         chain.perform()
 
