@@ -453,6 +453,11 @@
                         $('.cms-submenu-quicksearch, .cms-submenu-dropdown').hide();
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
+                        $('.cms-draggables').each(function () {
+                            if ($(this).children().length === 0) {
+                                $(this).show();
+                            }
+                        });
                         // fixes placeholder height
                         ui.item.addClass('cms-is-dragging');
                         ui.placeholder.css('height', ui.helper.css('height'));
