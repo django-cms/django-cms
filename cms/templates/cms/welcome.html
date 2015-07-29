@@ -44,17 +44,24 @@
 <div class="wrapper">
     <div class="inner">
         <h1 class="logo">Installation successful!</h1>
-        <p>Switch to <a href="/?{{ request.toolbar.edit_mode_url_on }}">edit mode</a>,<br />log in and start <a href="{% cms_admin_url "cms_page_add" %}?title=Home" id="add-page">adding pages</a>.</p>
-        <p class="buttons">
-            <a href="//docs.django-cms.org/" class="btn" target="_blank">Documentation</a>
-            <a href="//www.django-cms.org/" class="btn" target="_blank">Support</a>
-        </p>
+        {% block body %}
+          {% if config_errors %}
+            {% for error in config_errors %}
+              {{ error }}
+            {%  endfor %}
+          {% else %}
+            <form method="POST">{% csrf_token %}
+              {{ form.as_p }}
+              <button>Create Page</button>
+            </form>
+          {% endif %}
         <p class="footnote">
             If you don't see the django CMS logo at the top, make sure you linked the <code>static/cms</code> folder to your static files.</p>
         <p class="footnote">
             You're seeing this message because you have <code>DEBUG = True</code> in your
             django settings file and haven't added any pages yet.
         </p>
+        {% endblock %}
     </div>
 </div>
 {% render_block "js" %}
