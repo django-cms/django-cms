@@ -43,6 +43,8 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cms', '0009_merge'),
+        # fix issue when performing migrations on an empty database
+        ('contenttypes', '0002_remove_content_type_name'),
     ]
 
     operations = [
