@@ -155,8 +155,9 @@ class MenuPool(object):
         else:
             cache_keys = CacheKey.objects.get_keys(site_id, language)
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
-        cache.delete_many(to_be_deleted)
-        cache_keys.delete()
+        if to_be_deleted:
+            cache.delete_many(to_be_deleted)
+            cache_keys.delete()
 
     def register_menu(self, menu_cls):
         import os
