@@ -51,9 +51,8 @@ class PagePermissionInlineAdmin(TabularInline):
         # can see only permissions for users which are under him in tree
 
         # here an exception can be thrown
-        model = self.model
         try:
-            qs = model.objects.subordinate_to_user(request.user)
+            qs = self.model.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)
         except NoPermissionsException:
             return self.objects.get_empty_query_set()
@@ -114,8 +113,7 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         Returns a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.
         """
-        model = self.model
-        qs = model.objects.subordinate_to_user(request.user)
+        qs = self.model.objects.subordinate_to_user(request.user)
         return qs.filter(can_view=True)
 
 
