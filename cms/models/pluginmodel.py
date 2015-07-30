@@ -319,7 +319,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.language = target_language
             plugin_instance.parent = new_plugin.parent
             plugin_instance.depth = new_plugin.depth
-            plugin_instance.position = new_plugin.position
             plugin_instance.path = new_plugin.path
             plugin_instance.numchild = new_plugin.numchild
             plugin_instance._no_reorder = True
