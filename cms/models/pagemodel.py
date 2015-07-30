@@ -791,7 +791,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
 
     def get_cached_ancestors(self):
         if not hasattr(self, "ancestors_ascending"):
-            self.ancestors_ascending = list(self.get_ancestors())
+            self.ancestors_ascending = list(reversed(self.get_ancestors()))
         return self.ancestors_ascending
 
     def get_cached_descendants(self):

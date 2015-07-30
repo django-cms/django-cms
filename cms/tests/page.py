@@ -1002,6 +1002,32 @@ class PagesTestCase(CMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
 
+    def test_page_ancestors_order(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        page2 = create_page('test page 2', 'nav_playground.html', 'en',
+                            published=True, parent=page1)
+
+        page3 = create_page('test page 3', 'nav_playground.html', 'en',
+                            published=True, parent=page2)
+
+        page6 = create_page('test page 3', 'nav_playground.html', 'en',
+                            published=True, parent=page3)
+
+        page4 = create_page('test page 4', 'nav_playground.html', 'en',
+                            published=True)
+
+        page5 = create_page('test page 5', 'nav_playground.html', 'en',
+                            published=True, parent=page4)
+
+        self.assertListEqual(page1.get_cached_ancestors(), [])
+        self.assertListEqual(page2.get_cached_ancestors(), [page1])
+        self.assertListEqual(page3.get_cached_ancestors(), [page2, page1])
+        self.assertListEqual(page6.get_cached_ancestors(), [page3, page2, page1])
+        self.assertListEqual(page4.get_cached_ancestors(), [])
+        self.assertListEqual(page5.get_cached_ancestors(), [page4])
+
     def test_page_overwrite_urls(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
