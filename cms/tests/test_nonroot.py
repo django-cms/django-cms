@@ -8,7 +8,7 @@ from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase, ClearURLs
 from cms.templatetags.cms_admin import preview_link
 from cms.utils.i18n import force_language
-from django.test import override_settings
+from django.test.utils import override_settings
 from menus.base import NavigationNode
 
 
