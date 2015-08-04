@@ -879,7 +879,7 @@ function tree_component () {
                         .listen("pointerup", "li", function (e) {
                             e.stopPropagation();
                         })
-                        .listen("pointerup", 'a.title', function (e) {
+                        .listen("pointerup", "a.title", function (e) {
                             if (!_this._drag) {
                                 e.stopPropagation();
                             }
