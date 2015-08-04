@@ -94,7 +94,7 @@ $row-height: 41px;
         display: inline-block;
         width: 10px;
         height: 10px;
-        margin: 0 0 0 4px;
+        margin: 0 3px;
         padding: 0;
         background-position: 0 0;
     }
@@ -173,22 +173,15 @@ $row-height: 41px;
         height: $row-height !important;
         overflow: visible !important;
         border-top: 1px solid $color-border !important;
-        background-color: white;
-    }
-    li.open > .cont {
         border-bottom: 1px solid $color-border !important;
+        background-color: white;
+        margin-top: -1px;
     }
     li.open ul .cont {
         height: $row-height !important;
-        border-top: none !important;
-        border-bottom: 1px solid $color-border !important;
     }
-    li.moveable > div {
-        border-bottom: none !important;
-    }
-    li.last.leaf .cont,
-    li.last.closed .cont {
-        border-bottom: none !important;
+    .tree-default {
+        padding-top: 1px;
     }
     .tree-default .col-navigation,
     .tree-default .col-published {
@@ -197,13 +190,6 @@ $row-height: 41px;
     // add additional border to separate categories
     li.open ul {
         margin-left: 0;
-        border-bottom: 1px solid $color-border !important;
-    }
-    li.open.last ul {
-        border-bottom: none !important;
-    }
-    li.open ul.last {
-        border-bottom: none !important;
     }
 
     li .col1 > div {
@@ -224,7 +210,6 @@ $row-height: 41px;
     }
     li .col1 .title,
     li .col1 .success {
-        /* float: left; */
         display: block;
         line-height: $row-height;
         height: $row-height;
@@ -236,14 +221,13 @@ $row-height: 41px;
         float: left;
         font-size: 14px;
         line-height: 27px;
-        margin-right: 10px;
     }
     li .move-target-container a:hover {
         text-decoration: none;
     }
     li .move-target {
         display: inline-block;
-        padding: 2px 8px;
+        padding: 7px 8px;
         border-left: 1px solid $color-border-medium;
     }
     li .move-target:first-child {

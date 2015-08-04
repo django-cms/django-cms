@@ -6,6 +6,7 @@
     'use strict';
     // CMS.$ will be passed for $
     $(document).ready(function () {
+
         /*!
          * TreeManager
          * Handles treeview
@@ -130,7 +131,7 @@
                 var langFadeDuration = 200;
 
                 // show the tooltip
-                tree.delegate(langTrigger, 'mouseenter', function () {
+                tree.delegate(langTrigger, 'pointerover', function () {
                     var el = $(this).closest('.col-language').find('.language-tooltip');
                     var anchors = el.find('a');
                     var span = $(this);
@@ -167,7 +168,7 @@
                     }, langDelay);
                 });
                 // hide the tooltip when leaving the area
-                tree.delegate(langTrigger, 'mouseleave', function () {
+                tree.delegate(langTrigger, 'pointerout', function () {
                     // clear timer
                     clearTimeout(langTimer);
                     // hide all elements
@@ -176,11 +177,11 @@
                     }, langDelay * 2);
                 });
                 // reset hiding when entering the tooltip itself
-                tree.delegate(langTooltips, 'mouseover', function () {
+                tree.delegate(langTooltips, 'pointerover', function () {
                     // clear timer
                     clearTimeout(langTimer);
                 });
-                tree.delegate(langTooltips, 'mouseleave', function () {
+                tree.delegate(langTooltips, 'pointerout', function () {
                     // hide all elements
                     langTimer = setTimeout(function () {
                         $(langTooltips).fadeOut(langFadeDuration);
@@ -211,7 +212,8 @@
 
             setupUIHacks: function () {
                 // enables tab click on title entry to open in new window
-                $('.tree').delegate('.col1 .title', 'click', function (e) {
+                $('.tree').on('click', '.col1 .title', function (e) {
+                    console.log('click from changelist');
                     if (!e.metaKey) {
                         window.top.location.href = $(this).attr('href');
                     } else {
@@ -300,7 +302,8 @@
                             animation: 0,
                             hover_mode: true,
                             //theme_path: script_url_path() + '/../jstree/themes/',
-                            a_class: 'title'
+                            a_class: 'title',
+                            context: false
                         },
                         cookies : {
                             prefix: 'djangocms_nodes'
@@ -440,8 +443,9 @@
 
 
                 // let's start event delegation
-                $('#changelist li').click(function (e) {
+                $('#changelist li').on('click', function (e) {
                     // I want a link to check the class
+                    console.log(e.target);
                     if (e.target.tagName === 'IMG' || e.target.tagName === 'SPAN') {
                         window.target = e.target.parentNode;
                     } else {
@@ -819,7 +823,7 @@
                     if (!cont.is(':visible')) {
                         return;
                     }
-                    var col1 = cont.children('div.col1');
+                    var col1 = cont.children('div.col1').find('.title span');
                     var col2 = cont.children('div.col2');
                     var col1_width = col1.outerWidth(true);
                     var col2_width = col2.outerWidth(true);
