@@ -213,7 +213,6 @@
             setupUIHacks: function () {
                 // enables tab click on title entry to open in new window
                 $('.tree').on('click', '.col1 .title', function (e) {
-                    console.log('click from changelist');
                     if (!e.metaKey) {
                         window.top.location.href = $(this).attr('href');
                     } else {
@@ -445,7 +444,6 @@
                 // let's start event delegation
                 $('#changelist li').on('click', function (e) {
                     // I want a link to check the class
-                    console.log(e.target);
                     if (e.target.tagName === 'IMG' || e.target.tagName === 'SPAN') {
                         window.target = e.target.parentNode;
                     } else {
