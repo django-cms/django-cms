@@ -54,6 +54,7 @@ var PROJECT_PATTERNS = {
 var JS_BUNDLES = {
     'bundle.admin.base.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
+        PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/modules/cms.base.js'
     ],
