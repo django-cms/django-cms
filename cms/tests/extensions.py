@@ -2,7 +2,7 @@ from cms.utils.urlutils import admin_reverse
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
-from cms.api import create_page
+from cms.api import create_page, create_title
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
@@ -220,7 +220,8 @@ class ExtensionAdminTestCase(AdminTestsBase):
         self.page = create_page(
             'My Extension Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
-        self.page_title = self.page.get_title_obj()
+        self.page_title = self.page.get_title_obj('en')
+        create_title('de', 'de title', self.page)
         self.page_extension = MyPageExtension.objects.create(
             extended_object=self.page,
             extra="page extension text")
