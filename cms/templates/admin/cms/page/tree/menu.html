@@ -1,6 +1,6 @@
 {% load cms_admin i18n %}
 
-<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf{% endif %}{% if has_move_page_permission %} moveable{% endif %}"{% if metadata %} mdata="{{ metadata }}{% endif %}" rel="{% ifequal page.level 0 %}topnode{% else %}node{% endifequal %}">
+<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf{% endif %}{% if has_move_page_permission %} moveable{% endif %}"{% if metadata %} mdata="{{ metadata }}{% endif %}" rel="{% if page.level == 0 %}topnode{% else %}node{% endif %}">
     {% include "admin/cms/page/tree/menu_item.html" %}
     {% with page.childrens as children %}
     {% if children %}
