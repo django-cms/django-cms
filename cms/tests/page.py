@@ -923,6 +923,30 @@ class PagesTestCase(CMSTestCase):
         page = get_page_from_request(request)
         self.assertEqual(page, None)
 
+    def test_ancestor_expired(self):
+        yesterday = tz_now() - datetime.timedelta(days=1)
+        tomorrow = tz_now() + datetime.timedelta(days=1)
+        root = create_page("root", "nav_playground.html", "en", slug="root",
+                           published=True)
+        page_past = create_page("past", "nav_playground.html", "en", slug="past",
+                                publication_end_date=yesterday,
+                                published=True, parent=root)
+        page_test = create_page("test", "nav_playground.html", "en", slug="test",
+                                published=True, parent=page_past)
+        page_future = create_page("future", "nav_playground.html", "en", slug="future",
+                                  publication_date=tomorrow,
+                                  published=True, parent=root)
+        page_test_2 = create_page("test", "nav_playground.html", "en", slug="test",
+                                  published=True, parent=page_future)
+
+        request = self.get_request(page_test.get_absolute_url())
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+
+        request = self.get_request(page_test_2.get_absolute_url())
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+
     def test_page_already_expired(self):
         """
         Test that a page which has a end date in the past gives a 404, not a

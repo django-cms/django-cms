@@ -242,6 +242,52 @@ class ExtensionAdminTestCase(AdminTestsBase):
             site=self.site, created_by=self.admin)
         self.page_title_without_extension = self.page_without_extension.get_title_obj()
 
+    def test_duplicate_extensions(self):
+        with self.login_user_context(self.admin):
+            # create page copy
+            page_data = {
+                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
+                'site': 1, 'language': 'en'
+            }
+            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(MyPageExtension.objects.all().count(), 1)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 1)
+            self.client.post(
+                "/en/admin/cms/page/add/"
+                "?position=first-child&copy_target=%s&language=en" % self.page.pk,
+                data=page_data)
+            # Check that page and its extensions have been copied
+            self.assertEqual(Page.objects.all().count(), 3)
+            self.assertEqual(MyPageExtension.objects.all().count(), 2)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 2)
+
+    def test_page_type_extensions(self):
+        with self.login_user_context(self.admin):
+            self.client.get(
+                "%s?copy_target=%s&language=%s" % (
+                    admin_reverse("cms_page_add_page_type"), self.page.pk, 'en'
+                )
+            )
+            page_types = Page.objects.get(reverse_id='page_types')
+
+            # create page copy
+            page_data = {
+                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
+                'site': 1, 'language': 'en'
+            }
+            self.assertEqual(Page.objects.all().count(), 3)
+            self.assertEqual(MyPageExtension.objects.all().count(), 1)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 1)
+            self.client.post(
+                "/en/admin/cms/page/add/"
+                "?target=%s&position=first-child&add_page_type=1"
+                "&copy_target=%s&language=en" % (page_types.pk, self.page.pk),
+                data=page_data)
+            # Check that new page type has extensions from source page
+            self.assertEqual(Page.objects.all().count(), 4)
+            self.assertEqual(MyPageExtension.objects.all().count(), 2)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 2)
+
     def test_admin_page_extension(self):
         with self.login_user_context(self.admin):
             # add a new extension

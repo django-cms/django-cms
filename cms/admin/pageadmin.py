@@ -168,6 +168,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Move the page in the tree if necessary and save every placeholder
         Content object.
         """
+        from cms.extensions import extension_pool
+
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
 
@@ -221,6 +223,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 obj = obj.move(target, pos=position)
         page_type_id = form.cleaned_data.get('page_type')
         copy_target_id = request.GET.get('copy_target')
+        copy_target = None
         if copy_target_id or page_type_id:
             if page_type_id:
                 copy_target_id = page_type_id
@@ -232,7 +235,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj.save()
             for lang in copy_target.languages.split(','):
                 copy_target._copy_contents(obj, lang)
-        if not 'permission' in request.path_info:
+        if 'permission' not in request.path_info:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
@@ -240,6 +243,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 form,
                 language,
             )
+        if copy_target:
+            extension_pool.copy_extensions(copy_target, obj)
         # is it home? publish it right away
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)
