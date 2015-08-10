@@ -23,13 +23,13 @@
                             {% else %}{% trans "(global)" %}
                             {% endif %}
                         {% else %}
-                            {% ifequal permission.page_id page.id %}
+                            {% if permission.page_id == page.id %}
                                 {% trans "(current)" %}
                             {% else %}
                                 {% if meta.1 %}<a href="{% cms_admin_url 'cms_page_change' permission.page.id %}">{{ permission.page }}</a>
                                 {% else %}{{ permission.page }}
                                 {% endif %}
-                            {% endifequal %}
+                            {% endif %}
                         {% endif %}
                     </td>
                     <td class="user">{{ permission.user|default_if_none:"-" }}</td>
