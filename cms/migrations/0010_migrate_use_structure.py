@@ -8,8 +8,7 @@ from django.db import models, migrations
 
 
 def forwards(apps, schema_editor):
-    user_app_str, user_model_str = settings.AUTH_USER_MODEL.split('.', 1)
-    user_model = apps.get_model(user_app_str, user_model_str)
+    user_model = apps.get_model(settings.AUTH_USER_MODEL)
     ph_model = apps.get_model('cms', 'Placeholder')
     page_model = apps.get_model('cms', 'Page')
     try:
@@ -29,8 +28,7 @@ def forwards(apps, schema_editor):
 
 
 def backwards(apps, schema_editor):
-    user_app_str, user_model_str = settings.AUTH_USER_MODEL.split('.', 1)
-    user_model = apps.get_model(user_app_str, user_model_str)
+    user_model = apps.get_model(settings.AUTH_USER_MODEL)
     ph_model = apps.get_model('cms', 'Placeholder')
     ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
     permission, _ = Permission.objects.get_or_create(
