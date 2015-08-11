@@ -4,6 +4,7 @@ import copy
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.shortcuts import render_to_response
 from django.template import Template, TemplateSyntaxError
 from django.test.utils import override_settings
 from django.utils.translation import activate
@@ -194,6 +195,12 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
         nodes = context["children"]
         # default nephew limit, P2 and P9 in the nodes list
         self.assertEqual(len(nodes), 2)
+
+    def test_show_submenu_inside_inherited_block_with_super_display(self):
+        context = self.get_context(path=self.get_page(1).get_absolute_url())
+        response = render_to_response('tests/dolly/two.html', context)
+        self.assertTrue(b'<h2>Magic Pony is the best !</h2>' in response.content)
+        self.assertTrue(b'<h3>Magic Pony is the best !</h3>' in response.content)
 
 
 class FixturesMenuTests(MenusFixture, BaseMenuTest):
