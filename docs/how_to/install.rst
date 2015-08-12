@@ -396,6 +396,7 @@ You need to add the django CMS middlewares to your :setting:`django:MIDDLEWARE_C
 at the right position::
 
     MIDDLEWARE_CLASSES = (
+        'cms.middleware.utils.ApphookReloadMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -407,6 +408,10 @@ at the right position::
         'cms.middleware.toolbar.ToolbarMiddleware',
         'cms.middleware.language.LanguageCookieMiddleware',
     )
+
+Notice that django CMS v3.2 introduces a new middleware:
+``cms.middleware.utils.ApphookReloadMiddleware``. This should be placed very
+near the top of your middleware classes tuple/list.
 
 You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
