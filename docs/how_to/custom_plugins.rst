@@ -73,8 +73,8 @@ A note about :class:`cms.plugin_base.CMSPluginBase`
 :class:`cms.plugin_base.CMSPluginBase` is actually a subclass of
 :class:`django.contrib.admin.options.ModelAdmin`.
 
-A CMSPlugin's :meth:`render` method is analogous to a ModelAdmin's
-:meth:`get_context` method.
+A CMSPlugin's :meth:`render` method serves as sort of a :meth:`get_context`
+method to ModelAdmin (if it had one).
 
 Because :class:`CMSPluginBase` subclasses `ModelAdmin` several important
 `ModelAdmin` options are also available to CMS plugin developers. These options
