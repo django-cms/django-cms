@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals, with_statement
+from __future__ import with_statement
 
 from contextlib import contextmanager
 
@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.models import UrlconfRevision
-from cms.signals import cms_urls_need_reloading
+from cms.signals import urls_need_reloading
 from cms.test_utils.testcases import CMSTestCase
 
 APP_NAME = 'SampleApp'
@@ -39,7 +39,7 @@ def signal_tester(signal):
 
 class SignalTests(TestCase):
     def test_urls_need_reloading_signal_create(self):
-        with signal_tester(cms_urls_need_reloading) as env:
+        with signal_tester(urls_need_reloading) as env:
             self.client.get('/')
             self.assertEqual(env.call_count, 0)
             create_page(
@@ -54,7 +54,7 @@ class SignalTests(TestCase):
             self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_delete(self):
-        with signal_tester(cms_urls_need_reloading) as env:
+        with signal_tester(urls_need_reloading) as env:
             self.client.get('/')
             self.assertEqual(env.call_count, 0)
             page = create_page(
@@ -70,7 +70,7 @@ class SignalTests(TestCase):
             self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_change_slug(self):
-        with signal_tester(cms_urls_need_reloading) as env:
+        with signal_tester(urls_need_reloading) as env:
             self.assertEqual(env.call_count, 0)
             page = create_page(
                 "apphooked-page",

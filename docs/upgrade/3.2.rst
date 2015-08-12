@@ -42,13 +42,6 @@ other changes in the CMS for version 3.2 provides automatic reloading of URLs
 when changes to an apphook are made. This is tested to work in many types of
 production environments, but may not work in some others.
 
-.. warning:: Change to signal name
-
-    From version 3.2, the signal used to signal when URLs need to be reloaded
-    has changed to ``cms_urls_need_reloading`` from ``urls_need_reloading`` in
-    earlier versions.
-
-
 *****************************
 Backward incompatible changes
 *****************************

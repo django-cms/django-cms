@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from cms.signals.apphook import debug_server_restart
+
+from cms.signals.apphook import debug_server_restart, trigger_server_restart
 from cms.signals.page import pre_save_page, post_save_page, pre_delete_page, post_delete_page, post_moved_page
 from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
 from cms.signals.placeholder import pre_delete_placeholder_ref, post_delete_placeholder_ref
@@ -8,7 +9,7 @@ from cms.signals.reversion_signals import post_revision
 from cms.signals.title import pre_save_title, post_save_title, pre_delete_title, post_delete_title
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
-from cms.utils.apphook_reload import mark_urlconf_as_changed
+
 from django.db.models import signals
 from django.dispatch import Signal
 
@@ -27,18 +28,15 @@ post_publish = Signal(providing_args=["instance", "language"])
 post_unpublish = Signal(providing_args=["instance", "language"])
 
 # fired if a public page with an apphook is added or changed
-cms_urls_need_reloading = Signal(providing_args=[])
+urls_need_reloading = Signal(providing_args=[])
 
 ################### apphook reloading ###################
 
 if settings.DEBUG:
-    cms_urls_need_reloading.connect(debug_server_restart)
+    urls_need_reloading.connect(debug_server_restart)
 
 
-def trigger_server_restart(**kwargs):
-    mark_urlconf_as_changed()
-
-cms_urls_need_reloading.connect(
+urls_need_reloading.connect(
     trigger_server_restart,
     dispatch_uid='aldryn-apphook-reload-handle-urls-need-reloading'
 )
