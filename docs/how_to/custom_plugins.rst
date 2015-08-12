@@ -80,40 +80,40 @@ Because :class:`CMSPluginBase` subclasses `ModelAdmin` several important
 `ModelAdmin` options are also available to CMS plugin developers. These options
 are often used:
 
-* `exclude`,
-* `fields`,
-* `fieldsets`,
-* `form`,
-* `formfield_overrides`,
-* `inlines`,
-* `radio_fields`,
-* `raw_id_fields`,
-* `readonly_fields`.
+* `exclude`
+* `fields`
+* `fieldsets`
+* `form`
+* `formfield_overrides`
+* `inlines`
+* `radio_fields`
+* `raw_id_fields`
+* `readonly_fields`
 
 Please note, however, that not all `ModelAdmin` options are effective in a CMS
 plugin. In particular, any options that are used exclusively by the
 `ModelAdmin`'s `changelist` will have no effect. These and other notable options
 that are ignored by the CMS are:
 
-* `actions`,
-* `actions_on_top`,
-* `actions_on_bottom`,
-* `actions_selection_counter`,
-* `date_hierarchy`,
-* `list_display`,
-* `list_display_links`,
-* `list_editable`,
-* `list_filter`,
-* `list_max_show_all`,
-* `list_per_page`,
-* `ordering`,
-* `paginator`,
-* `preserve_fields`,
-* `save_as`,
-* `save_on_top`,
-* `search_fields`,
-* `show_full_result_count`,
-* `view_on_site`.
+* `actions`
+* `actions_on_top`
+* `actions_on_bottom`
+* `actions_selection_counter`
+* `date_hierarchy`
+* `list_display`
+* `list_display_links`
+* `list_editable`
+* `list_filter`
+* `list_max_show_all`
+* `list_per_page`
+* `ordering`
+* `paginator`
+* `preserve_fields`
+* `save_as`
+* `save_on_top`
+* `search_fields`
+* `show_full_result_count`
+* `view_on_site`
 
 
 An aside on models and configuration
