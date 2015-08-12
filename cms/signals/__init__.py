@@ -8,6 +8,7 @@ from cms.signals.reversion_signals import post_revision
 from cms.signals.title import pre_save_title, post_save_title, pre_delete_title, post_delete_title
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
+from cms.utils.apphook_reload import mark_urlconf_as_changed
 from django.db.models import signals
 from django.dispatch import Signal
 
@@ -26,10 +27,21 @@ post_publish = Signal(providing_args=["instance", "language"])
 post_unpublish = Signal(providing_args=["instance", "language"])
 
 # fired if a public page with an apphook is added or changed
-urls_need_reloading = Signal(providing_args=[])
+cms_urls_need_reloading = Signal(providing_args=[])
+
+################### apphook reloading ###################
 
 if settings.DEBUG:
-    urls_need_reloading.connect(debug_server_restart)
+    cms_urls_need_reloading.connect(debug_server_restart)
+
+
+def trigger_server_restart(**kwargs):
+    mark_urlconf_as_changed()
+
+cms_urls_need_reloading.connect(
+    trigger_server_restart,
+    dispatch_uid='aldryn-apphook-reload-handle-urls-need-reloading'
+)
 
 ######################### plugins #######################
 
