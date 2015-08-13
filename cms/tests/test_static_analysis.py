@@ -1,8 +1,9 @@
-from unittest import TestCase
+from django.test import testcases
+
 from cms.test_utils.util.static_analysis import pyflakes
 
 
-class AboveStaticAnalysisCodeTest(TestCase):
+class AboveStaticAnalysisCodeTest(testcases.TestCase):
     """
     Name is pretty lame, but ensure it's executed before every other test
     """
