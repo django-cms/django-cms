@@ -84,7 +84,7 @@ $(document).ready(function () {
     <div id="site-selector">{% trans "Pages on:" %}
         <select id="site-select" name="site__exact">
             {% for site in cl.sites %}
-            <option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>
+            <option {% if site.pk == cl.current_site.pk %}selected {% endif %}value="{{ site.pk }}">{{ site.name }}</option>
             {% endfor %}
         </select>
         <input type="hidden" id="site-copy" name="copy" />
