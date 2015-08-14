@@ -24,7 +24,7 @@ except ImportError:
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
-    username = forms.CharField(label=_("Username"), max_length=100)
+    username = forms.CharField(max_length=100)
 
     def __init__(self, *args, **kwargs):
         kwargs['prefix'] = kwargs.get('prefix', 'cms')
