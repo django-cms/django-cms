@@ -15,7 +15,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.translation import ugettext_lazy as _
 
 try:
     from collections import OrderedDict
