@@ -417,5 +417,5 @@ if DJANGO_1_6:
             super(ClearURLs, cls).tearDownClass()
             clear_url_caches()
 else:
-    class ClearURLS(object):
+    class ClearURLs(object):
         pass
