@@ -8,7 +8,6 @@ from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 
-from django import forms
 from django.conf import settings
 from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
