@@ -128,6 +128,7 @@ if __name__ == '__main__':
             TEMPLATE_DIRS=[
                 os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
             ],
+            TEMPLATE_DEBUG=True
         ))
     else:
         dynamic_configs['TEMPLATES'] = [
@@ -149,6 +150,7 @@ if __name__ == '__main__':
                         "sekizai.context_processors.sekizai",
                         "django.template.context_processors.static",
                     ],
+                    'debug': True,
                 }
             }
         ]
@@ -202,7 +204,6 @@ if __name__ == '__main__':
         SESSION_ENGINE="django.contrib.sessions.backends.cache",
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
-        TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES=app_manage.DatabaseConfig(
             env='DATABASE_URL',

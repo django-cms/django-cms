@@ -2,6 +2,7 @@
 import json
 import sys
 import warnings
+from cms.utils.compat import DJANGO_1_6
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -404,14 +405,17 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
 
+if DJANGO_1_6:
+    class ClearURLs(object):
+        @classmethod
+        def setUpClass(cls):
+            clear_url_caches()
+            super(ClearURLs, cls).setUpClass()
 
-class ClearURLs(object):
-    @classmethod
-    def setUpClass(cls):
-        clear_url_caches()
-        super(ClearURLs, cls).setUpClass()
-
-    @classmethod
-    def tearDownClass(cls):
-        super(ClearURLs, cls).tearDownClass()
-        clear_url_caches()
+        @classmethod
+        def tearDownClass(cls):
+            super(ClearURLs, cls).tearDownClass()
+            clear_url_caches()
+else:
+    class ClearURLs(object):
+        pass

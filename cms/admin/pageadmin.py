@@ -191,7 +191,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             saved_obj.save(no_signals=True)
         else:
             if 'history' in request.path_info:
-                old_obj = Page.objects.get(pk=obj.pk)
+                old_obj = self.model.objects.get(pk=obj.pk)
                 obj.depth = old_obj.depth
                 obj.parent_id = old_obj.parent_id
                 obj.path = old_obj.path
@@ -221,10 +221,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if copy_target_id or page_type_id:
             if page_type_id:
                 copy_target_id = page_type_id
-            copy_target = Page.objects.get(pk=copy_target_id)
+            copy_target = self.model.objects.get(pk=copy_target_id)
             if not copy_target.has_view_permission(request):
                 raise PermissionDenied()
-            obj = Page.objects.get(pk=obj.pk) #mptt reload
+            obj = self.model.objects.get(pk=obj.pk) #mptt reload
             copy_target._copy_attributes(obj, clean=True)
             obj.save()
             for lang in copy_target.languages.split(','):
@@ -325,7 +325,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     if position == 'last-child' or position == 'first-child':
                         form.base_fields['parent'].initial = request.GET.get('target', None)
                     else:
-                        sibling = Page.objects.get(pk=target)
+                        sibling = self.model.objects.get(pk=target)
                         form.base_fields['parent'].initial = sibling.parent_id
                 else:
                     form.base_fields['parent'].initial = request.GET.get('target', None)
@@ -335,7 +335,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return form
 
     def advanced(self, request, object_id):
-        page = get_object_or_404(Page, pk=object_id)
+        page = get_object_or_404(self.model, pk=object_id)
         if not page.has_advanced_settings_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
@@ -344,7 +344,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return self.change_view(request, object_id, extra_context={'publishing_dates': True, 'title': _("Publishing dates")})
 
     def permissions(self, request, object_id):
-        page = get_object_or_404(Page, pk=object_id)
+        page = get_object_or_404(self.model, pk=object_id)
         if not page.has_change_permissions_permission(request):
             raise PermissionDenied("No permission for editing advanced settings")
         return self.change_view(request, object_id, extra_context={'show_permissions': True, 'title': _("Change Permissions")})
@@ -771,7 +771,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
 
-        page = get_object_or_404(Page, pk=object_id)
+        page = get_object_or_404(self.model, pk=object_id)
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
@@ -790,7 +790,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not is_installed('reversion'):
             return HttpResponseBadRequest('django reversion not installed')
 
-        page = get_object_or_404(Page, pk=object_id)
+        page = get_object_or_404(self.model, pk=object_id)
         if not page.publisher_is_draft:
             page = page.publisher_draft
         if not page.has_change_permission(request):
@@ -807,7 +807,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @require_POST
     @create_revision()
     def change_template(self, request, object_id):
-        page = get_object_or_404(Page, pk=object_id)
+        page = get_object_or_404(self.model, pk=object_id)
         if not page.has_change_permission(request):
             return HttpResponseForbidden(force_text(_("You do not have permission to change the template")))
 
@@ -854,7 +854,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
 
     def get_permissions(self, request, page_id):
-        page = get_object_or_404(Page, id=page_id)
+        page = get_object_or_404(self.model, id=page_id)
 
         can_change_list = Page.permissions.get_change_id_list(request.user, page.site_id)
 
@@ -1051,7 +1051,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Publish or unpublish a language of a page
         """
         site = Site.objects.get_current()
-        page = get_object_or_404(Page, pk=page_id)
+        page = get_object_or_404(self.model, pk=page_id)
         if not page.has_publish_permission(request):
             return HttpResponseForbidden(force_text(_("You do not have permission to unpublish this page")))
         if not page.publisher_public_id:
@@ -1083,7 +1083,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @require_POST
     @transaction.atomic
     def revert_page(self, request, page_id, language):
-        page = get_object_or_404(Page, id=page_id)
+        page = get_object_or_404(self.model, id=page_id)
         # ensure user has permissions to publish this page
         if not page.has_change_permission(request):
             return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
@@ -1218,7 +1218,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     def preview_page(self, request, object_id, language):
         """Redirecting preview function based on draft_id
         """
-        page = get_object_or_404(Page, id=object_id)
+        page = get_object_or_404(self.model, id=object_id)
         attrs = "?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         attrs += "&language=" + language
         with force_language(language):
@@ -1234,7 +1234,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         Switch the in_navigation of a page
         """
-        page = get_object_or_404(Page, pk=page_id)
+        page = get_object_or_404(self.model, pk=page_id)
         if page.has_change_permission(request):
             page.toggle_in_navigation()
             language = request.GET.get('language') or get_language_from_request(request)
@@ -1249,7 +1249,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
-        page = get_object_or_404(Page, pk=page_id)
+        page = get_object_or_404(self.model, pk=page_id)
         return admin_utils.render_admin_menu_item(request, page,
                                                   template="admin/cms/page/tree/lazy_menu.html", language=language)
 
@@ -1258,7 +1258,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         language = request.GET.get('language') or get_language()
         target = request.GET.get('copy_target')
 
-        type_root, created = Page.objects.get_or_create(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site=site,
+        type_root, created = self.model.objects.get_or_create(reverse_id=PAGE_TYPES_ID, publisher_is_draft=True, site=site,
                                                         defaults={'in_navigation': False})
         type_title, created = Title.objects.get_or_create(page=type_root, language=language, slug=PAGE_TYPES_ID,
                                                           defaults={'title': _('Page Types')})
@@ -1396,7 +1396,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             query_term = request.GET.get('q','').strip('/')
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
-            matching_published_pages = Page.objects.published().public().filter(
+            matching_published_pages = self.model.objects.published().public().filter(
                 Q(title_set__title__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__path__icontains=query_term, title_set__language=language_code)
                 | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
