@@ -41,7 +41,7 @@ Other than this, end users should not notice any changes.
 
 .. note:: User feedback required
 
-    We require as much feedback as possible about the performance of django-treebeard in this 
+    We require as much feedback as possible about the performance of django-treebeard in this
     release. Please let us know your experiences with it, especially if you encounter any problems.
 
 .. note:: Backward incompatible change
@@ -51,6 +51,11 @@ Other than this, end users should not notice any changes.
     low-level interfaces of the page or plugins tree, please see the `django-treebeard
     documentation <https://tabo.pe/projects/django-treebeard/docs/2.0/>`_ for information
     on how to use equivalent calls in ``django-treebeard``.
+
+.. note:: Handling plugin data migrations
+
+    Please check :ref:`plugin-datamigrations-3.1` for information on how to create
+    migrations compatible with django CMS 3.0 and 3.1
 
 
 Action required
@@ -140,7 +145,7 @@ queries that are generated, in order to make it faster.
 
 .. note:: User feedback required
 
-    We require as much feedback as possible about the performance of this feature in this 
+    We require as much feedback as possible about the performance of this feature in this
     release. Please let us know your experiences with it, especially if you encounter any problems.
 
 Toolbar API extension
