@@ -1,7 +1,7 @@
 ##########
 django CMS
 ##########
-.. image:: https://travis-ci.org/divio/django-cms.svg?branch=support%2F3.0.x
+.. image:: https://travis-ci.org/divio/django-cms.svg?branch=develop
     :target: http://travis-ci.org/divio/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
@@ -19,6 +19,9 @@ Open source enterprise content management system based on the django framework.
 
 .. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
    It's the branch for features that will go into the next django CMS feature release.
+
+   For fixes for 3.1.x releases, please work on **support/3.0.x** which contains
+   the next patch release for 3.1.x series.
 
    For fixes for 3.0.x releases, please work on **support/3.0.x** which contains
    the next patch release for 3.0.x series.
