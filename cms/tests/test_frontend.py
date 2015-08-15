@@ -2,7 +2,6 @@
 import datetime
 import os
 import sys
-import time
 from urllib.parse import urlparse
 from cms.test_utils.util.mock import AttributeObject
 from django.conf import settings
