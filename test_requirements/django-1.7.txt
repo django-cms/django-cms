@@ -2,6 +2,6 @@
 django>=1.7,<1.8
 django-reversion>=1.8,<1.9
 -e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
-https://github.com/KristianOellegaard/django-hvad/archive/master.zip
+django-hvad>=1.1
 django-classy-tags>=0.5
 django-sekizai>=0.7
