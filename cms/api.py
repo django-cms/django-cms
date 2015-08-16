@@ -13,7 +13,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
-from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
 from django.utils.translation import activate
@@ -35,6 +34,7 @@ from cms.utils import copy_plugins
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.permissions import _thread_locals, current_user, has_page_change_permission
+from cms.utils.urlify import urlify
 from menus.menu_pool import menu_pool
 
 
@@ -54,7 +54,7 @@ def _generate_valid_slug(source, parent, language):
     else:
         qs = Title.objects.filter(language=language, page__parent__isnull=True)
     used = list(qs.values_list('slug', flat=True))
-    baseslug = slugify(source)
+    baseslug = urlify(source)
     slug = baseslug
     i = 1
     if used:

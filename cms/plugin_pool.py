@@ -4,7 +4,6 @@ from operator import attrgetter
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, include
 from django.db.models import signals
-from django.template.defaultfilters import slugify
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.translation import get_language, deactivate_all, activate
@@ -13,10 +12,11 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
+from cms.utils.compat.dj import is_installed
 from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register, normalize_name
 from cms.utils.placeholder import get_placeholder_conf
-from cms.utils.compat.dj import is_installed
+from cms.utils.urlify import urlify
 
 
 class PluginPool(object):
@@ -197,7 +197,7 @@ class PluginPool(object):
             url_patterns = []
             for plugin in self.get_all_plugins():
                 p = plugin()
-                slug = slugify(force_text(normalize_name(p.__class__.__name__)))
+                slug = urlify(force_text(normalize_name(p.__class__.__name__)))
                 url_patterns += [
                     url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
                 ]
