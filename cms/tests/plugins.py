@@ -16,6 +16,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from cms import api
@@ -1287,6 +1288,51 @@ class PluginsTestCase(PluginsTestBaseCase):
             render_plugin = False
             name = "Test Plugin"
         self.assertIsNotNone(DecoratorTestPlugin)
+
+    @override_settings(CMS_LANGUAGES={
+        'default': {
+            'public': True,
+            'hide_untranslated': True,
+            'redirect_on_fallback': False,
+        },
+        1: [
+            {
+                'code': 'de',
+                'name': 'de',
+                'fallbacks': [],
+            },
+            {
+                'code': 'en',
+                'name': 'en',
+                'fallbacks': [],
+                'public': True,
+            },
+        ],
+    })
+    def test_page_field_lists_pages_with_same_language(self):
+        """
+        Test that the PageField only lists pages in the same language as the
+        current page if hide_untranslated is set to true.
+        """
+        page_data = [self.get_new_page_data() for __ in range(0, 3)]
+        page_data[0]['language'] = 'de'
+        page_data[0]['title'] = 'DE page 1'
+        page_data[1]['language'] = 'de'
+        page_data[1]['title'] = 'DE page 2'
+        for page in page_data:
+            self.client.post(URL_CMS_PAGE_ADD, page)
+        page = Page.objects.all()[0]
+        plugin_data = {
+            'plugin_type': "PageFieldTestPlugin",
+            'plugin_language': 'de',
+            'placeholder_id': page.placeholders.get(slot="body").pk,
+            'plugin_parent': '',
+        }
+        response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
+        url = json.loads(response.content)['url']
+        response = self.client.get(url)
+        self.assertIn('DE page 1', response.content)
+        self.assertIn('DE page 2', response.content)
 
 
 class FileSystemPluginTests(PluginsTestBaseCase):

@@ -12,11 +12,13 @@ from cms.models.pagemodel import Page
 
 
 class SuperLazyIterator(object):
-    def __init__(self, func):
+    def __init__(self, func, func_args=None, func_kwargs=None):
         self.func = func
+        self.func_args = func_args or []
+        self.func_kwargs = func_kwargs or {}
 
     def __iter__(self):
-        return iter(self.func())
+        return iter(self.func(*self.func_args, **self.func_kwargs))
 
 
 class LazyChoiceField(forms.ChoiceField):
@@ -36,18 +38,20 @@ class PageSelectFormField(forms.MultiValueField):
 
     def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
                  required=True, widget=None, to_field_name=None, limit_choices_to=None,
-                  *args, **kwargs):
+                 language=None, *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
         site_choices = SuperLazyIterator(get_site_choices)
-        page_choices = SuperLazyIterator(get_page_choices)
+        page_choices = SuperLazyIterator(get_page_choices,
+                                         func_kwargs={'lang': language})
         self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
         fields = (
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
+        kwargs['widget'] = self.widget(site_choices, page_choices)
         super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
