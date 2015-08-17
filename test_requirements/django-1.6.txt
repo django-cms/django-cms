@@ -2,6 +2,6 @@
 django>=1.6,<1.7
 South==1.0.2
 django-reversion<1.8.3
-https://github.com/KristianOellegaard/django-hvad/archive/master.zip#egg=hvad
+https://github.com/KristianOellegaard/django-hvad/archive/ec82b2a8e144ffa6f6349f0dbd0e688c84b77af0.zip#egg=django-hvad
 django-classy-tags>=0.5
 django-sekizai>=0.7

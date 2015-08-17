@@ -1702,6 +1702,7 @@ class BrokenPluginTests(TestCase):
             plugin_pool.discovered = False
             self.assertRaises(ImportError, plugin_pool.discover_plugins)
 
+
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):
         from cms.test_utils.project.mti_pluginapp.models import TestPluginBetaModel
