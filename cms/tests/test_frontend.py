@@ -3,10 +3,12 @@ import datetime
 import os
 import sys
 import time
-from urllib.parse import urlparse
-from cms.test_utils.util.mock import AttributeObject
-from django.conf import settings
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
 
+from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -30,6 +32,7 @@ from cms.models import CMSPlugin, Page, Placeholder
 from cms.test_utils.project.placeholderapp.cms_apps import Example1App
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.mock import AttributeObject
 from cms.utils.compat import DJANGO_1_6
 from cms.utils.conf import get_cms_setting
 
