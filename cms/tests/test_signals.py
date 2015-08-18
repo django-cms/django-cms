@@ -12,9 +12,9 @@ from django.test.utils import override_settings
 from cms.api import create_page
 from cms.models import UrlconfRevision
 from cms.signals import urls_need_reloading
+from cms.test_utils.project.sampleapp.cms_apps import SampleApp
+from cms.test_utils.util.context_managers import apphooks
 from cms.test_utils.testcases import CMSTestCase
-
-APP_NAME = 'SampleApp'
 
 
 class SignalTester(object):
@@ -39,55 +39,58 @@ def signal_tester(signal):
 
 class SignalTests(TestCase):
     def test_urls_need_reloading_signal_create(self):
-        with signal_tester(urls_need_reloading) as env:
-            self.client.get('/')
-            self.assertEqual(env.call_count, 0)
-            create_page(
-                "apphooked-page",
-                "nav_playground.html",
-                "en",
-                published=True,
-                apphook="SampleApp",
-                apphook_namespace="test"
-            )
-            self.client.get('/')
-            self.assertEqual(env.call_count, 1)
+        with apphooks(SampleApp):
+            with signal_tester(urls_need_reloading) as env:
+                self.client.get('/')
+                self.assertEqual(env.call_count, 0)
+                create_page(
+                    "apphooked-page",
+                    "nav_playground.html",
+                    "en",
+                    published=True,
+                    apphook="SampleApp",
+                    apphook_namespace="test"
+                )
+                self.client.get('/')
+                self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_delete(self):
-        with signal_tester(urls_need_reloading) as env:
-            self.client.get('/')
-            self.assertEqual(env.call_count, 0)
-            page = create_page(
-                "apphooked-page",
-                "nav_playground.html",
-                "en",
-                published=True,
-                apphook="SampleApp",
-                apphook_namespace="test"
-            )
-            page.delete()
-            self.client.get('/')
-            self.assertEqual(env.call_count, 1)
+        with apphooks(SampleApp):
+            with signal_tester(urls_need_reloading) as env:
+                self.client.get('/')
+                self.assertEqual(env.call_count, 0)
+                page = create_page(
+                    "apphooked-page",
+                    "nav_playground.html",
+                    "en",
+                    published=True,
+                    apphook="SampleApp",
+                    apphook_namespace="test"
+                )
+                page.delete()
+                self.client.get('/')
+                self.assertEqual(env.call_count, 1)
 
     def test_urls_need_reloading_signal_change_slug(self):
-        with signal_tester(urls_need_reloading) as env:
-            self.assertEqual(env.call_count, 0)
-            page = create_page(
-                "apphooked-page",
-                "nav_playground.html",
-                "en",
-                published=True,
-                apphook="SampleApp",
-                apphook_namespace="test"
-            )
-            self.client.get('/')
-            self.assertEqual(env.call_count, 1)
-            title = page.title_set.get(language="en")
-            title.slug += 'test'
-            title.save()
-            page.publish('en')
-            self.client.get('/')
-            self.assertEqual(env.call_count, 2)
+        with apphooks(SampleApp):
+            with signal_tester(urls_need_reloading) as env:
+                self.assertEqual(env.call_count, 0)
+                page = create_page(
+                    "apphooked-page",
+                    "nav_playground.html",
+                    "en",
+                    published=True,
+                    apphook="SampleApp",
+                    apphook_namespace="test"
+                )
+                self.client.get('/')
+                self.assertEqual(env.call_count, 1)
+                title = page.title_set.get(language="en")
+                title.slug += 'test'
+                title.save()
+                page.publish('en')
+                self.client.get('/')
+                self.assertEqual(env.call_count, 2)
 
 
 @override_settings(

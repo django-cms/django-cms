@@ -1,10 +1,8 @@
-//##################################################################################################################
-// #PLUGINS#
+/*##################################################|*/
+/* #CMS# */
 /* global CMS */
-
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
     $(document).ready(function () {
         /*!
          * Plugins
@@ -42,7 +40,8 @@
 
                 // states
                 this.csrf = CMS.config.csrf;
-                this.timer = function () {};
+                this.timer = function () {
+                };
                 this.timeout = 250;
                 this.focused = false;
                 this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
@@ -75,17 +74,10 @@
                 // register the subnav on the placeholder
                 this._setSubnav(dragbar.find('.cms-submenu'));
 
-                var settings = CMS.settings;
-                settings.dragbars = settings.dragbars || [];
-
                 // enable expanding/collapsing globally within the placeholder
                 dragbar.find(title).bind(this.click, function () {
                     ($(this).hasClass(expanded)) ? that._collapseAll($(this)) : that._expandAll($(this));
                 });
-
-                if ($.inArray(this.options.placeholder_id, settings.dragbars) !== -1) {
-                    dragbar.find(title).addClass(expanded);
-                }
             },
 
             _setPlugin: function () {
@@ -187,8 +179,8 @@
                     that.editPlugin(
                         that.options.urls.edit_plugin,
                         that.options.plugin_name,
-                        that.options.plugin_breadcrumb
-                    );
+                        that.options.plugin_breadcrumb)
+                    ;
                 });
             },
 
@@ -213,37 +205,21 @@
 
             // public methods
             addPlugin: function (type, name, parent) {
-                // cancel request if already in progress
-                if (CMS.API.locked) {
-                    return false;
-                }
-                CMS.API.locked = true;
-
-                var that = this;
-                var data = {
+                var params = {
                     'placeholder_id': this.options.placeholder_id,
                     'plugin_type': type,
-                    'plugin_parent': parent || '',
-                    'plugin_language': this.options.plugin_language,
-                    'csrfmiddlewaretoken': this.csrf
+                    'plugin_language': this.options.plugin_language
                 };
-
-                $.ajax({
-                    'type': 'POST',
-                    'url': this.options.urls.add_plugin,
-                    'data': data,
-                    'success': function (data) {
-                        CMS.API.locked = false;
-                        that.newPlugin = data;
-                        that.editPlugin(data.url, name, data.breadcrumb);
-                    },
-                    'error': function (jqXHR) {
-                        CMS.API.locked = false;
-                        var msg = CMS.config.lang.error;
-                        // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
-                    }
+                if (parent) {
+                    params.plugin_parent = parent;
+                }
+                var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
+                var modal = new CMS.Modal({
+                    'newPlugin': this.newPlugin || false,
+                    'onClose': this.options.onClose || false,
+                    'redirectOnClose': this.options.redirectOnClose || false
                 });
+                modal.open(url, name);
             },
 
             editPlugin: function (url, name, breadcrumb) {
@@ -297,7 +273,9 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that._showError(
+                            msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText
+                        );
                     }
                 };
 
@@ -387,20 +365,20 @@
 
                 // gather the data for ajax request
                 var data = {
-                    placeholder_id: placeholder_id,
-                    plugin_id: options.plugin_id,
-                    plugin_parent: plugin_parent || '',
+                    'placeholder_id': placeholder_id,
+                    'plugin_id': options.plugin_id,
+                    'plugin_parent': plugin_parent || '',
                     // this is a hack: when moving to different languages use the global language
-                    plugin_language: options.page_language,
-                    plugin_order: plugin_order,
-                    csrfmiddlewaretoken: this.csrf
+                    'plugin_language': options.page_language,
+                    'plugin_order': plugin_order,
+                    'csrfmiddlewaretoken': this.csrf
                 };
 
                 $.ajax({
-                    type: 'POST',
-                    url: options.urls.move_plugin,
-                    data: data,
-                    success: function (response) {
+                    'type': 'POST',
+                    'url': options.urls.move_plugin,
+                    'data': data,
+                    'success': function (response) {
                         // if response is reload
                         if (response.reload) {
                             CMS.API.Helpers.reloadBrowser();
@@ -409,10 +387,10 @@
                         // enable actions again
                         CMS.API.locked = false;
 
-                        // TODO: show only if (response.status)
+                        // TODO: show only if(response.status)
                         that._showSuccess(dragitem);
                     },
-                    error: function (jqXHR) {
+                    'error': function (jqXHR) {
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
@@ -422,9 +400,6 @@
 
                 // show publish button
                 $('.cms-btn-publish').addClass('cms-btn-publish-active').parent().show();
-
-                // enable revert to live
-                $('.cms-toolbar-revert').removeClass('cms-toolbar-item-navigation-disabled');
             },
 
             deletePlugin: function (url, name, breadcrumb) {
@@ -467,16 +442,6 @@
                 }
             },
 
-            editPluginPostAjax: function (caller, toolbar, response) {
-                if (typeof toolbar === 'undefined' || typeof response === 'undefined') {
-                    return function (toolbar, response) {
-                        var that = caller;
-                        that.editPlugin(response.url, that.options.plugin_name, response.breadcrumb);
-                    };
-                }
-                this.editPlugin(response.url, this.options.plugin_name, response.breadcrumb);
-            },
-
             _setSubnav: function (nav) {
                 var that = this;
 
@@ -486,7 +451,7 @@
                     (e.type === 'mouseenter') ? that._showSubnav($(this)) : that._hideSubnav($(this));
                 });
 
-                nav.find('a').bind('click.cms tap.cms', function (e) {
+                nav.find('a').bind(this.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -502,15 +467,6 @@
                                 el.attr('href').replace('#', ''),
                                 el.text(),
                                 that._getId(el.closest('.cms-draggable'))
-                            );
-                            break;
-                        case 'ajax_add':
-                            CMS.API.Toolbar.openAjax(
-                                el.attr('href'),
-                                JSON.stringify(el.data('post')),
-                                el.data('text'),
-                                that.editPluginPostAjax(that),
-                                el.data('on-success')
                             );
                             break;
                         case 'edit':
@@ -599,7 +555,7 @@
                     });
 
                     // show scrollHint for FF on OSX
-                    if (nav[0].scrollHeight > 245) {
+                    if (nav[0].scrollHeight > 230) {
                         scrollHint.show();
                     }
 
@@ -622,8 +578,8 @@
                         }
                     }
 
-                    // bind arrow up and shift+tab keys
-                    if (e.keyCode === 38 || (e.keyCode === 9 && e.shiftKey)) {
+                    // bind arrow up keys
+                    if (e.keyCode === 38) {
                         e.preventDefault();
                         if (anchors.is(':focus')) {
                             anchors.eq(index - 1).focus();
@@ -641,8 +597,10 @@
                 });
 
                 // calculate subnav bounds
-                if ($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10 &&
-                    nav.offset().top - dropdown.height() >= 0) {
+                var dd_height = dropdown.height();
+                var n_offset = nav.offset().top;
+                var w_height_scroll = $(window).height() + $(window).scrollTop();
+                if (w_height_scroll - n_offset - dd_height <= 10 && n_offset - dd_height >= 0) {
                     dropdown.css('top', 'auto');
                     dropdown.css('bottom', offset);
                     // if parent is within a plugin, add additional offset
@@ -747,7 +705,6 @@
                 draggable.find('> .cms-dragitem-collapsable').bind(this.click, function () {
                     var el = $(this);
                     var id = that._getId($(this).parent());
-                    var items;
 
                     var settings = CMS.settings;
                     settings.states = settings.states || [];
@@ -756,36 +713,10 @@
                     if (el.hasClass('cms-dragitem-expanded')) {
                         settings.states.splice($.inArray(id, settings.states), 1);
                         el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
-                        if ($(document).data('expandmode')) {
-                            items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
-                            if (!items.length) {
-                                return false;
-                            }
-                            items.each(function () {
-                                if ($(this).hasClass('cms-dragitem-expanded')) {
-                                    $(this).trigger('click.cms');
-                                }
-                            });
-                        }
-
                     } else {
                         settings.states.push(id);
                         el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
-                        if ($(document).data('expandmode')) {
-                            items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
-                            if (!items.length) {
-                                return false;
-                            }
-                            items.each(function () {
-                                if (!$(this).hasClass('cms-dragitem-expanded')) {
-                                    $(this).trigger('click.cms');
-                                }
-                            });
-                        }
                     }
-
-                    // make sure structurboard gets updated after expanding
-                    $(window).trigger('resize.sideframe');
 
                     // save settings
                     CMS.API.Toolbar.setSettings(settings);
@@ -838,11 +769,6 @@
                 });
 
                 el.addClass('cms-dragbar-title-expanded');
-
-                var settings = CMS.settings;
-                settings.dragbars = settings.dragbars || [];
-                settings.dragbars.push(this.options.placeholder_id);
-                CMS.API.Toolbar.setSettings(settings);
             },
 
             _collapseAll: function (el) {
@@ -854,11 +780,6 @@
                 });
 
                 el.removeClass('cms-dragbar-title-expanded');
-
-                var settings = CMS.settings;
-                settings.dragbars = settings.dragbars || [];
-                settings.dragbars.splice($.inArray(this.options.placeholder_id, settings.states), 1);
-                CMS.API.Toolbar.setSettings(settings);
             },
 
             _getId: function (el) {
@@ -880,11 +801,7 @@
                 tpl.fadeOut(function () {
                     $(this).remove();
                 });
-                // make sure structurboard gets updated after success
-                $(window).trigger('resize.sideframe');
             }
-
         });
-
     });
 })(CMS.$);

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import json
+from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 
@@ -1024,17 +1025,26 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         text_plugin_en = add_plugin(page_one_ph_one, u"TextPlugin", u"en", body=u"Hello World")
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            # now move the parent text plugin to another placeholder
             post_data = {
+                'name': 'test',
+                'url': 'http://www.example.org/'
+            }
+            get_data = {
                 'placeholder_id': page_one_ph_one.id,
                 'plugin_type': 'LinkPlugin',
                 'plugin_language': 'en',
                 'plugin_parent': text_plugin_en.pk,
 
             }
-            add_url = URL_CMS_ADD_PLUGIN % page_one.pk
+            add_url = URL_CMS_ADD_PLUGIN % page_one.pk + '?' + urlencode(
+                get_data
+            )
             response = self.client.post(add_url, post_data)
             self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(
+                response,
+                'admin/cms/plugin/close_modal.html'
+            )
         link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)
         self.assertEqual(link_plugin.parent_id, text_plugin_en.pk)
         self.assertEqual(link_plugin.path, '00010001')

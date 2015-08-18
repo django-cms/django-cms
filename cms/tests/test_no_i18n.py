@@ -2,6 +2,7 @@
 from django.contrib.auth import get_user_model
 from django.core.urlresolvers import clear_url_caches
 from django.template import Template
+from django.utils.http import urlencode
 from django.test.utils import override_settings
 from djangocms_text_ckeditor.models import Text
 
@@ -116,20 +117,23 @@ class TestNoI18N(CMSTestCase):
         self.client.login(username=getattr(self.super_user, get_user_model().USERNAME_FIELD),
                           password=getattr(self.super_user, get_user_model().USERNAME_FIELD))
 
-        response = self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
+        self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
         page = Page.objects.all()[0]
-        response = self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
+        self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
         page = Page.objects.all()[0]
 
-        plugin_data = {
+        get_params = {
             'plugin_type': "TextPlugin",
             'plugin_language': "en-us",
             'placeholder_id': page.placeholders.get(slot="body").pk,
         }
-        response = self.client.post(URL_CMS_PLUGIN_ADD[3:], plugin_data)
-        self.assertEqual(response.status_code, 200)
-        created_plugin_id = int(response.content.decode('utf8').split("/edit-plugin/")[1].split("/")[0])
-        self.assertEqual(created_plugin_id, CMSPlugin.objects.all()[0].pk)
+        data = {}
+        add_url = URL_CMS_PLUGIN_ADD[3:] + '?' + urlencode(
+            get_params
+        )
+        response = self.client.post(add_url, data)
+        self.assertEqual(response.status_code, 302)
+        created_plugin_id = CMSPlugin.objects.all()[0].pk
         # now edit the plugin
         edit_url = "%s%s/" % (URL_CMS_PLUGIN_EDIT[3:], created_plugin_id)
         response = self.client.get(edit_url)
