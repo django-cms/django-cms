@@ -790,6 +790,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return sorted([language for language in self.get_languages() if self.is_published(language)])
 
     def get_cached_ancestors(self):
+        # Unlike MPTT, Treebeard returns this in parent->child order, so you will have to reverse
+        # this list to have the same behavior as before
         if not hasattr(self, "ancestors_ascending"):
             self.ancestors_ascending = list(self.get_ancestors())
         return self.ancestors_ascending
