@@ -7,6 +7,15 @@ from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 gettext = lambda s: s
 
+__doc__ = """django CMS development helper script.
+
+Executes the standard ``manage.py`` command in the django CMS test environment, over the standard
+Django options it accepts further configuration:
+
+* To use a different database, set the DATABASE_URL environment variable to a
+  dj-database-url compatible value
+* The AUTH_USER_MODEL environment variable can be used to change the user model to a custom one'
+"""
 
 if __name__ == '__main__':
     os.environ.setdefault(
@@ -168,6 +177,11 @@ if __name__ == '__main__':
             'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
         }
+
+    if os.environ.get('AUTH_USER_MODEL', False):
+        custom_user_app = 'cms.test_utils.project.' + os.environ.get('AUTH_USER_MODEL', False).split('.')[0]
+        INSTALLED_APPS.insert(INSTALLED_APPS.index('cms'), custom_user_app)
+        dynamic_configs['AUTH_USER_MODEL'] = os.environ.get('AUTH_USER_MODEL', False)
 
     app_manage.main(
         ['cms', 'menus'],
