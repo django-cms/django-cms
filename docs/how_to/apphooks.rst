@@ -319,17 +319,16 @@ As mentioned above, whenever you:
 * change the slug of a page containing an Apphook
 * change the slug of a page with a descendant with an Apphook
 
-you have to restart your server to reload the URL caches. To allow you to automate this process,
-django CMS provides a signal :obj:`cms.signals.urls_need_reloading` which you can listen to, to
-detect when your server needs restarting. (When you using the Django runserver a restart should not
-be required.)
+The CMS the server will reload its URL caches. It does this by listening for
+the signal: :obj:`cms.signals.urls_need_reloading`.
 
 .. warning::
 
-    This signal does not actually do anything itself. For automated server restarting you need to
-    implement logic in your project that gets executed whenever this signal is fired. Because there
-    are many ways of deploying Django applications, there is no way we can provide a generic
-    solution for this problem that will always work.
+    This signal does not actually do anything itself. For automated server
+    restarting you need to implement logic in your project that gets executed
+    whenever this signal is fired. Because there are many ways of deploying
+    Django applications, there is no way we can provide a generic solution for
+    this problem that will always work.
 
 .. warning::
 

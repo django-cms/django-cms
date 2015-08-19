@@ -155,8 +155,8 @@ class RenderingTestCase(CMSTestCase):
         self.assertEqual(r, u'|' + self.test_data['text_main'] + u'|' + self.test_data['text_sub'] + u'|')
 
     @override_settings(
-        CMS_PLUGIN_PROCESSORS=('cms.tests.rendering.sample_plugin_processor',),
-        CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.rendering.sample_plugin_context_processor',),
+        CMS_PLUGIN_PROCESSORS=('cms.tests.test_rendering.sample_plugin_processor',),
+        CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.test_rendering.sample_plugin_context_processor',),
     )
     def test_processors(self):
         """

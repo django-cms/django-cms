@@ -437,3 +437,8 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - Fix placeholder cache invalidation under some circumstances
 - Update translations
+
+
+=== 3.2.0 (2015-xx-xx) ===
+
+- Pulls Aldryn Apphook Reload into core.

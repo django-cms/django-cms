@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
@@ -24,16 +23,14 @@ class ApphookPool(object):
         self.discovered = False
 
     def register(self, app=None, discovering_apps=False):
-        import os
-        import inspect
-        source_file = os.path.basename(inspect.stack()[1][1])
-        if source_file == 'cms_app.py':
-            warnings.warn('cms_app.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
-                          'please rename it to cms_apps.py', DeprecationWarning)
         # allow use as a decorator
         if app is None:
             return lambda app: self.register(app, discovering_apps)
+
+        if app.__module__.split('.')[-1] == 'cms_app':
+            warnings.warn('cms_app.py filename is deprecated, '
+                          'and it will be removed in version 3.4; '
+                          'please rename it to cms_apps.py', DeprecationWarning)
 
         if self.apphooks and not discovering_apps:
             return app
