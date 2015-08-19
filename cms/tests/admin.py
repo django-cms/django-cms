@@ -628,7 +628,7 @@ class AdminTestCase(AdminTestsBase):
         create_title("es-mx", es_title, page, slug="es_pagina")
 
         url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
-        url_pat = '<a href="{0}/{1}/preview/"[^>]*>{2}</a>'
+        url_pat = '<a href="{0}/{1}/preview/"[^>]*><span>{2}</span></a>'
 
         with self.login_user_context(admin_guy):
             # Check the EN version of the tree...

@@ -3,10 +3,10 @@
     <div class="col1">
         {% if has_change_permission %}
             {% language preview_language %}
-            <a href="{{ page.id }}/{{ preview_language }}/preview/" target="_parent" class="title" lang="{{ preview_language }}" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}>{{ page.get_admin_tree_title }}</a>
+            <a href="{{ page.id }}/{{ preview_language }}/preview/" target="_parent" class="title" lang="{{ preview_language }}" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}><span>{{ page.get_admin_tree_title }}</span></a>
             {% endlanguage %}
         {% else %}
-            <span class="title" lang="{{ preview_language }}">{{ page.get_admin_tree_title }}</span>
+            <span class="title" lang="{{ preview_language }}"><span>{{ page.get_admin_tree_title }}</span></span>
         {% endif %}
     </div>
     <div class="col2">
