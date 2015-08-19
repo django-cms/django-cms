@@ -129,9 +129,11 @@
                 var langTimer = function () {};
                 var langDelay = 100;
                 var langFadeDuration = 200;
+                // workaround for the publishing tooltip on touch devices
+                var touchUsedNode;
 
                 // show the tooltip
-                tree.delegate(langTrigger, 'pointerover', function () {
+                tree.delegate(langTrigger, 'pointerover touchstart', function (e) {
                     var el = $(this).closest('.col-language').find('.language-tooltip');
                     var anchors = el.find('a');
                     var span = $(this);
@@ -140,7 +142,7 @@
                     clearTimeout(langTimer);
 
                     // cancel if tooltip already visible
-                    if (el.is(':visible')) {
+                    if (el.is(':visible') && !touchUsedNode) {
                         return false;
                     }
 
@@ -162,6 +164,14 @@
                     // hide all elements
                     $(langTooltips).fadeOut(langDelay);
 
+                    if (e.type === 'touchstart') {
+                        e.preventDefault();
+                        touchUsedNode = touchUsedNode === e.target ? false : e.target;
+                        if (touchUsedNode) {
+                            return;
+                        }
+                    }
+
                     // use a timeout to display the tooltip
                     langTimer = setTimeout(function () {
                         el.stop(true, true).fadeIn(langFadeDuration);
@@ -169,6 +179,9 @@
                 });
                 // hide the tooltip when leaving the area
                 tree.delegate(langTrigger, 'pointerout', function () {
+                    if (touchUsedNode) {
+                        return;
+                    }
                     // clear timer
                     clearTimeout(langTimer);
                     // hide all elements
