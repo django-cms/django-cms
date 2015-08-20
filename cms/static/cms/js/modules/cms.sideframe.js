@@ -85,6 +85,7 @@
                 });
 
                 // stopper events
+                // FIXME should not be here forever, only when needed
                 $('html').bind('pointerup.cms.sideframe', function () {
                     that._stopResize();
                 });
