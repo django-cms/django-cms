@@ -415,13 +415,19 @@
 
             // private methods
             _showToolbar: function (speed, init) {
-                this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
+                var debugHeight = $('.cms-debug-bar').height() || 0;
+                var toolbarHeight = $('.cms-toolbar').height();
+
+                this.toolbar.css({
+                    'transition': 'margin-top ' + speed + 'ms',
+                    'margin-top': 0
+                });
                 this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
                 // animate html
                 this.body.addClass('cms-toolbar-expanded');
-                this.body.animate({ 'margin-top': (this.config.debug) ? 51 : 46 }, speed, 'linear');
+                this.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
                 // set messages top to toolbar height
-                this.messages.css('top', 47);
+                this.messages.css('top', toolbarHeight + 1);
                 // set new settings
                 this.settings.toolbar = 'expanded';
                 if (!init) {
@@ -430,6 +436,7 @@
             },
 
             _hideToolbar: function (speed, init) {
+                var toolbarHeight = $('.cms-toolbar').height();
                 this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 // cancel if sideframe is active
                 if (this.lockToolbar) {
@@ -437,6 +444,7 @@
                 }
 
                 this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+                this.toolbar.css('margin-top', -toolbarHeight);
                 // this.toolbar.slideUp(speed);
                 // animate html
                 this.body.removeClass('cms-toolbar-expanded');
