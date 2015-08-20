@@ -53,6 +53,17 @@ class DjangoMigrationsFlag(app_manage.Config):
             return DisableMigrations()
 
 
+def install_auth_user_model(settings, value):
+    if value is None:
+        return
+    custom_user_app = 'cms.test_utils.project.' + value.split('.')[0]
+    settings['INSTALLED_APPS'].insert(
+        settings['INSTALLED_APPS'].index('cms'),
+        custom_user_app
+    )
+    settings['AUTH_USER_MODEL'] = value
+
+
 if __name__ == '__main__':
     os.environ.setdefault(
         'DJANGO_LIVE_TEST_SERVER_ADDRESS',
@@ -195,6 +206,14 @@ if __name__ == '__main__':
 
     app_manage.main(
         ['cms', 'menus'],
+        app_manage.Argument(
+            config=app_manage.Config(
+                arg='--auth-user-model',
+                env='AUTH_USER_MODEL',
+                default=None,
+            ),
+            callback=install_auth_user_model
+        ),
         PROJECT_PATH=PROJECT_PATH,
         CACHES={
             'default': {
