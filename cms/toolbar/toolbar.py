@@ -8,14 +8,12 @@ from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 
-from django import forms
 from django.conf import settings
 from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.translation import ugettext_lazy as _
 
 try:
     from collections import OrderedDict
@@ -24,7 +22,6 @@ except ImportError:
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
-    username = forms.CharField(label=_("Username"), max_length=100)
 
     def __init__(self, *args, **kwargs):
         kwargs['prefix'] = kwargs.get('prefix', 'cms')
