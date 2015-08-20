@@ -1,11 +1,6 @@
 from __future__ import with_statement
 from cms.utils.urlutils import admin_reverse
 
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from djangocms_text_ckeditor.models import Text
