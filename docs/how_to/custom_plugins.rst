@@ -70,9 +70,48 @@ And so to build your plugin, you'll make it from:
 A note about :class:`cms.plugin_base.CMSPluginBase`
 ===================================================
 
-:class:`cms.plugin_base.CMSPluginBase` is actually a subclass of :class:`django.contrib.admin.options.ModelAdmin`.
+:class:`cms.plugin_base.CMSPluginBase` is actually a subclass of
+:class:`django.contrib.admin.options.ModelAdmin`.
 
-It is its :meth:`render` method that is the plugin's **view** function.
+Because :class:`CMSPluginBase` subclasses ``ModelAdmin`` several important
+``ModelAdmin`` options are also available to CMS plugin developers. These
+options are often used:
+
+* ``exclude``
+* ``fields``
+* ``fieldsets``
+* ``form``
+* ``formfield_overrides``
+* ``inlines``
+* ``radio_fields``
+* ``raw_id_fields``
+* ``readonly_fields``
+
+Please note, however, that not all ``ModelAdmin`` options are effective in a CMS
+plugin. In particular, any options that are used exclusively by the
+``ModelAdmin``'s ``changelist`` will have no effect. These and other notable options
+that are ignored by the CMS are:
+
+* ``actions``
+* ``actions_on_top``
+* ``actions_on_bottom``
+* ``actions_selection_counter``
+* ``date_hierarchy``
+* ``list_display``
+* ``list_display_links``
+* ``list_editable``
+* ``list_filter``
+* ``list_max_show_all``
+* ``list_per_page``
+* ``ordering``
+* ``paginator``
+* ``preserve_fields``
+* ``save_as``
+* ``save_on_top``
+* ``search_fields``
+* ``show_full_result_count``
+* ``view_on_site``
+
 
 An aside on models and configuration
 ====================================
@@ -351,6 +390,14 @@ it becomes::
 If your plugins have relational fields of both kinds, you may of course need
 to use *both* the copying techniques described above.
 
+Relations *between* plugins
+---------------------------
+
+It is much harder to manage the copying of relations when they are from one plugin to another.
+
+See the GitHub issue `copy_relations() does not work for relations between cmsplugins #4143
+<https://github.com/divio/django-cms/issues/4143>`_ for more details.
+
 ********
 Advanced
 ********
@@ -456,7 +503,7 @@ A **good** example:
 
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myjsfile.js"></script>{% endaddtoblock %}
     {% addtoblock "js" %}<script type="text/javascript" src="{{ MEDIA_URL }}myplugin/js/myotherfile.js"></script>{% endaddtoblock %}
-    {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}myplugin/css/astylesheet.css"></script>{% endaddtoblock %}
+    {% addtoblock "css" %}<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}myplugin/css/astylesheet.css">{% endaddtoblock %}
     {% addtoblock "js" %}
     <script type="text/javascript">
         $(document).ready(function(){

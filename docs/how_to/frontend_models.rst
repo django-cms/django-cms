@@ -24,7 +24,7 @@ hint on hover. Double-clicking opens a pop-up window containing the changeform f
 
     This feature is only partially compatible with django-hvad: using
     ``render_model`` with hvad-translated fields (say
-    {% render_model object 'translated_field' %} return error if the
+    ``{% render_model object 'translated_field' %}`` returns an error if the
     hvad-enabled object does not exists in the current language.
     As a workaround ``render_model_icon`` can be used instead.
 
@@ -36,14 +36,12 @@ Templatetags
 
 This feature relies on four templatetags sharing common code:
 
-* :ttag:`render_model`
-* :ttag:`render_model_icon`
-* :ttag:`render_model_add`
-* :ttag:`render_model_block`
+* :ttag:`render_model` (for editing a specific field)
+* :ttag:`render_model_block` (for editing any of the fields in a defined block)
+* :ttag:`render_model_icon` (for editing a field represented by another value, such as an image)
+* :ttag:`render_model_add` (for adding an instance of the specified model)
 
-Look at the tag-specific page for a detailed reference; in the examples
-below ``render_model`` is assumed.
-
+Look at the tag-specific page for more detailed reference and discussion of limitations and caveats.
 
 ****************
 Page titles edit

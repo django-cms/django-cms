@@ -428,7 +428,9 @@ Upgrading from 2.4
     There are reports that upgrading the CMS from 2.4 to 3.0 may fail if
     Django Debug Toolbar is installed. Please remove/disable Django Debug
     Toolbar and other non-essential apps before attempting to upgrade, then
-    once complete, re-enable them.
+    once complete, re-enable them following the `"Explicit setup"
+    <http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup>`_
+    instructions.
 
 If you want to upgrade from version 2.4 to 3.0, there's a few things you need to do.
 Start of by updating the cms' package::
@@ -468,6 +470,10 @@ To finish up, please update your database::
 
     python manage.py syncdb
     python manage.py migrate  (answer yes if your prompted to delete stale content types)
+
+Finally, your existing pages will be unpublished, so publish them with the ``publisher`` command::
+
+    python manage.py cms publisher_publish
 
 That's it!
 

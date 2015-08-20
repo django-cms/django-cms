@@ -1,4 +1,10 @@
-from unittest import TestCase
+import sys
+
+if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+    from django.test.testcases import TestCase
+else:
+    from unittest import TestCase
+
 from cms.test_utils.util.static_analysis import pyflakes
 
 

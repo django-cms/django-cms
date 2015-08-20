@@ -693,8 +693,6 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
 
 
 class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
-    settings_overrides = {'ROOT_URLCONF': 'cms.test_utils.project.second_urls_for_apphook_tests'}
-
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()

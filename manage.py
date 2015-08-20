@@ -8,6 +8,17 @@ from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 gettext = lambda s: s
 
 
+def install_auth_user_model(settings, value):
+    if value is None:
+        return
+    custom_user_app = 'cms.test_utils.project.' + value.split('.')[0]
+    settings['INSTALLED_APPS'].insert(
+        settings['INSTALLED_APPS'].index('cms'),
+        custom_user_app
+    )
+    settings['AUTH_USER_MODEL'] = value
+
+
 if __name__ == '__main__':
     os.environ.setdefault(
         'DJANGO_LIVE_TEST_SERVER_ADDRESS',
@@ -83,6 +94,7 @@ if __name__ == '__main__':
             TEMPLATE_DIRS=[
                 os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
             ],
+            TEMPLATE_DEBUG=True
         ))
     else:
         dynamic_configs['TEMPLATES'] = [
@@ -104,6 +116,7 @@ if __name__ == '__main__':
                         "sekizai.context_processors.sekizai",
                         "django.template.context_processors.static",
                     ],
+                    'debug': True,
                 }
             }
         ]
@@ -169,6 +182,14 @@ if __name__ == '__main__':
 
     app_manage.main(
         ['cms', 'menus'],
+        app_manage.Argument(
+            config=app_manage.Config(
+                arg='--auth-user-model',
+                env='AUTH_USER_MODEL',
+                default=None,
+            ),
+            callback=install_auth_user_model
+        ),
         PROJECT_PATH=PROJECT_PATH,
         CACHES={
             'default': {
@@ -178,7 +199,6 @@ if __name__ == '__main__':
         SESSION_ENGINE="django.contrib.sessions.backends.cache",
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
-        TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES=app_manage.DatabaseConfig(
             env='DATABASE_URL',
