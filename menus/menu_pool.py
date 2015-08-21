@@ -160,11 +160,9 @@ class MenuPool(object):
             cache_keys.delete()
 
     def register_menu(self, menu_cls):
-        import os
-        import inspect
         import warnings
-        source_file = os.path.basename(inspect.stack()[1][1])
-        if source_file == 'menu.py':
+
+        if menu_cls.__module__.split('.')[-1] == 'menu':
             warnings.warn('menu.py filename is deprecated, '
                           'and it will be removed in version 3.4; '
                           'please rename it to cms_menus.py', DeprecationWarning)
