@@ -132,25 +132,21 @@
                 });
 
                 // keyboard handling
-                this.ui.doc.on('keydown', function (e) {
-                    // check if we have an important focus
-                    var fields = $('*:focus');
-                    if (e.keyCode === KEYS.SPACE && that.settings.mode === 'structure' && !fields.length) {
-                        // cancel if there is no structure / content switcher
-                        if (!that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
-                            return false;
+                // only if there is a structure / content switcher
+                if (that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                    this.ui.doc.on('keydown', function (e) {
+                        // check if we have an important focus
+                        var haveFocusedField = document.activeElement !== document.body;
+                        if (e.keyCode === KEYS.SPACE && !haveFocusedField) {
+                            e.preventDefault();
+                            if (that.settings.mode === 'structure') {
+                                that.hide();
+                            } else if (that.settings.mode === 'edit') {
+                                that.show();
+                            }
                         }
-                        e.preventDefault();
-                        that.hide();
-                    } else if (e.keyCode === KEYS.SPACE && that.settings.mode === 'edit' && !fields.length) {
-                        // cancel if there is no structure / content switcher
-                        if (!that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
-                            return false;
-                        }
-                        e.preventDefault();
-                        that.show();
-                    }
-                });
+                    });
+                }
             },
 
             // public methods
