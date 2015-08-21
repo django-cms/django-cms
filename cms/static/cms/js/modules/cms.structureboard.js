@@ -4,6 +4,14 @@
 
 (function ($) {
     'use strict';
+
+    // TODO move out to separate module CMS-276
+    var KEYS = {
+        SPACE: 32,
+        SHIFT: 16,
+        ESC: 27
+    };
+
     // CMS.$ will be passed for $
     $(function () {
         var emptyDropZones = $('.cms-dragbar-empty-wrapper');
@@ -118,28 +126,27 @@
                 $(document).on('keydown', function (e) {
                     // check if we have an important focus
                     var fields = $('*:focus');
-                    // 32 = space
-                    if (e.keyCode === 32 && that.settings.mode === 'structure' && !fields.length) {
+                    if (e.keyCode === KEYS.SPACE && that.settings.mode === 'structure' && !fields.length) {
                         // cancel if there is no structure / content switcher
                         if (!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
                             return false;
                         }
                         e.preventDefault();
                         that.hide();
-                    } else if (e.keyCode === 32 && that.settings.mode === 'edit' && !fields.length) {
+                    } else if (e.keyCode === KEYS.SPACE && that.settings.mode === 'edit' && !fields.length) {
                         // cancel if there is no structure / content switcher
                         if (!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
                             return false;
                         }
                         e.preventDefault();
                         that.show();
-                    } else if (e.keyCode === 16) {
+                    } else if (e.keyCode === KEYS.SHIFT) {
                         $(this).data('expandmode', true);
                     }
                 });
 
                 $(document).on('keyup', function (e) {
-                    if (e.keyCode === 16) {
+                    if (e.keyCode === KEYS.SHIFT) {
                         $(this).data('expandmode', false);
                     }
                 });
@@ -513,7 +520,7 @@
 
                 // attach escape event to cancel dragging
                 $(document).on('keyup.cms', function (e, cancel) {
-                    if (e.keyCode === 27 || cancel) {
+                    if (e.keyCode === KEYS.ESC || cancel) {
                         that.state = false;
                         that.sortables.sortable('cancel');
                     }
