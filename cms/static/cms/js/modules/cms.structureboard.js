@@ -135,7 +135,6 @@
                 this.ui.doc.on('keydown', function (e) {
                     // check if we have an important focus
                     var fields = $('*:focus');
-                    console.log(fields);
                     if (e.keyCode === KEYS.SPACE && that.settings.mode === 'structure' && !fields.length) {
                         // cancel if there is no structure / content switcher
                         if (!that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
@@ -150,17 +149,8 @@
                         }
                         e.preventDefault();
                         that.show();
-                    } else if (e.keyCode === KEYS.SHIFT) {
-                        $(this).data('expandmode', true);
                     }
                 });
-
-                this.ui.doc.on('keyup', function (e) {
-                    if (e.keyCode === KEYS.SHIFT) {
-                        $(this).data('expandmode', false);
-                    }
-                });
-
             },
 
             // public methods
