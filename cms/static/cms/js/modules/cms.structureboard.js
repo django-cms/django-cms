@@ -65,8 +65,6 @@
 
             // initial methods
             _setup: function () {
-                var that = this;
-
                 // cancel if there are no dragareas
                 if (!this.dragareas.length) {
                     return false;
@@ -79,9 +77,7 @@
 
                 // setup toolbar mode
                 if (this.settings.mode === 'structure') {
-                    setTimeout(function () {
-                        that.show(true);
-                    }, 100);
+                    this.show(true);
                 }
 
                 // check if modes should be visible
