@@ -21,7 +21,7 @@ class PageUserAdmin(admin_class, GenericCmsPermissionAdmin):
     form = PageUserForm
     add_form = PageUserForm
     model = PageUser
-    
+
     def queryset(self, request):
         qs = super(PageUserAdmin, self).queryset(request)
         try:
@@ -30,15 +30,15 @@ class PageUserAdmin(admin_class, GenericCmsPermissionAdmin):
         except NoPermissionsException:
             return self.model.objects.get_empty_query_set()
 
-    
+
 class PageUserGroupAdmin(admin.ModelAdmin, GenericCmsPermissionAdmin):
     form = PageUserGroupForm
     list_display = ('name', 'created_by')
-    
+
     fieldsets = [
         (None, {'fields': ('name',)}),
     ]
-    
+
     def get_fieldsets(self, request, obj=None):
         return self.update_permission_fieldsets(request, obj)
 
