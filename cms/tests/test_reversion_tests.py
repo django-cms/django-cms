@@ -4,6 +4,7 @@ import shutil
 from os.path import join
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+from django.utils.http import urlencode
 
 from djangocms_text_ckeditor.models import Text
 from django.conf import settings
@@ -50,17 +51,18 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             page = Page.objects.all()[0]
             placeholderpk = page.placeholders.get(slot="body").pk
-            plugin_data = {
+            post_data = {}
+            get_data = {
                 'plugin_type': "TextPlugin",
                 'plugin_language': settings.LANGUAGES[0][0],
                 'placeholder_id': placeholderpk,
-                'plugin_parent': '',
             }
-            response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-            self.assertEqual(response.status_code, 200)
+            add_url = URL_CMS_PLUGIN_ADD + '?' + urlencode(get_data)
+            response = self.client.post(add_url, post_data)
+            self.assertEqual(response.status_code, 302)
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[
-                0] + "/"
+            pk = CMSPlugin.objects.all()[0].pk
+            edit_url = URL_CMS_PLUGIN_EDIT + str(pk) + "/"
             response = self.client.get(edit_url)
             self.assertEqual(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -88,10 +90,10 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Page.objects.all().count(), 2)
             self.assertEqual(Title.objects.all().count(), 2)
             self.assertEqual(CMSPlugin.objects.all().count(), 2)
-            self.assertEqual(Revision.objects.all().count(), 5)
+            self.assertEqual(Revision.objects.all().count(), 4)
 
             ctype = ContentType.objects.get_for_model(Page)
-            revision = Revision.objects.all()[2]
+            revision = Revision.objects.all()[1]
             version = Version.objects.get(content_type=ctype, revision=revision)
             page = Page.objects.all()[0]
 
@@ -112,7 +114,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             # test that CMSPlugin subclasses are reverted
             self.assertEqual(Text.objects.all().count(), 2)
             self.assertEqual(Text.objects.get(pk=self.txt.pk).body, "Hello World")
-            self.assertEqual(Revision.objects.all().count(), 6)
+            self.assertEqual(Revision.objects.all().count(), 5)
 
     def test_undo_redo(self):
         """
@@ -122,7 +124,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(Page.objects.all().count(), 2)
             self.assertEqual(Title.objects.all().count(), 2)
             self.assertEqual(CMSPlugin.objects.all().count(), 2)
-            self.assertEqual(Revision.objects.all().count(), 5)
+            self.assertEqual(Revision.objects.all().count(), 4)
             self.assertEqual(Placeholder.objects.count(), 5)
 
             ctype = ContentType.objects.get_for_model(Page)
@@ -149,17 +151,18 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(page.revision_id, 0)
             self.assertEqual(2, CMSPlugin.objects.all().count())
             placeholderpk = page.placeholders.filter(slot="body")[0].pk
-            plugin_data = {
+            post_data = {}
+            get_data = {
                 'plugin_type': "TextPlugin",
                 'plugin_language': settings.LANGUAGES[0][0],
                 'placeholder_id': placeholderpk,
-                'plugin_parent': '',
             }
-            response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
-            self.assertEqual(response.status_code, 200)
+            add_url = URL_CMS_PLUGIN_ADD + '?' + urlencode(get_data)
+            response = self.client.post(add_url, post_data)
+            self.assertEqual(response.status_code, 302)
+            pk = CMSPlugin.objects.all()[2].pk
             # now edit the plugin
-            edit_url = URL_CMS_PLUGIN_EDIT + response.content.decode('utf8').split("edit-plugin/")[1].split("/")[
-                0] + "/"
+            edit_url = URL_CMS_PLUGIN_EDIT + str(pk) + "/"
             response = self.client.get(edit_url)
             self.assertEqual(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
@@ -205,9 +208,9 @@ class ReversionTestCase(TransactionCMSTestCase):
         Test that you can recover a page
         """
         with self.login_user_context(self.user):
-            self.assertEqual(Revision.objects.all().count(), 5)
+            self.assertEqual(Revision.objects.all().count(), 4)
             ctype = ContentType.objects.get_for_model(Page)
-            revision = Revision.objects.all()[4]
+            revision = Revision.objects.all()[3]
             version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
             self.assertEqual(Page.objects.all().count(), 2)
@@ -281,7 +284,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             with self.settings(CMS_MAX_PAGE_PUBLISH_REVERSIONS=2, CMS_MAX_PAGE_HISTORY_REVERSIONS=2):
                 page = Page.objects.all()[0]
                 page_pk = page.pk
-                self.assertEqual(Revision.objects.all().count(), 5)
+                self.assertEqual(Revision.objects.all().count(), 4)
                 for x in range(10):
                     publish_url = URL_CMS_PAGE + "%s/en/publish/" % page_pk
                     response = self.client.post(publish_url)

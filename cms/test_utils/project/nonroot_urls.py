@@ -15,7 +15,11 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns('',
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^content/', include('cms.urls', app_name=get_cms_setting('APP_NAME'))),
+    url(r'^content/', include(
+        'cms.urls',
+        app_name=get_cms_setting('APP_NAME'),
+        namespace=get_cms_setting('APP_NAME')
+    )),
 )
 
 

@@ -65,7 +65,7 @@ class CacheTestCase(CMSTestCase):
         ]
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
-            with self.assertNumQueries(FuzzyInt(13, 17)):
+            with self.assertNumQueries(FuzzyInt(13, 21)):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')

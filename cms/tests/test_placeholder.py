@@ -1018,20 +1018,25 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
     def test_global_limit(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
-        data = {
+        get_data = {
             'plugin_type': 'LinkPlugin',
             'placeholder_id': placeholder.pk,
             'plugin_language': 'en',
         }
+        post_data = {
+            'name': 'test',
+            'url': 'http://www.example.org/'
+        }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request) # first
+            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                request = self.get_post_request(post_data)
+                request.GET = get_data
+                response = admin_instance.add_plugin(request)  # first
                 self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request) # second
+                response = admin_instance.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request) # third
+                response = admin_instance.add_plugin(request)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
@@ -1046,10 +1051,15 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request) # first
-                self.assertEqual(response.status_code, 200)
-                response = admin_instance.add_plugin(request) # second
+                request = self.get_post_request({
+                    'body': 'test'
+                })
+                request.GET = data
+                response = admin_instance.add_plugin(request)  # first
+                # Note: TextPlugin returns 302 instead of 200 on successful
+                # add_view call.
+                self.assertEqual(response.status_code, 302)
+                response = admin_instance.add_plugin(request)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
@@ -1124,25 +1134,22 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
     def test_edit_plugin_and_cancel(self):
         placeholder = self.get_placeholder()
         admin_instance = self.get_admin()
-        data = {
-            'plugin_type': 'TextPlugin',
-            'placeholder_id': placeholder.pk,
-            'plugin_language': 'en',
-        }
         superuser = self.get_superuser()
         with UserLoginContext(self, superuser):
-            with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
-                request = self.get_post_request(data)
-                response = admin_instance.add_plugin(request)
-                self.assertEqual(response.status_code, 200)
-                plugin_id = int(str(response.content).split('edit-plugin/')[1].split("/")[0])
+            with override_settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
+                plugin = add_plugin(
+                    placeholder=placeholder,
+                    plugin_type='TextPlugin',
+                    language='en',
+                    body='Test'
+                )
                 data = {
                     'body': 'Hello World',
                 }
                 request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin_id)
+                response = admin_instance.edit_plugin(request, plugin.pk)
                 self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin_id)
+                text_plugin = Text.objects.get(pk=plugin.pk)
                 self.assertEqual('Hello World', text_plugin.body)
 
                 # edit again, but this time press cancel
@@ -1151,9 +1158,9 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                     '_cancel': True,
                 }
                 request = self.get_post_request(data)
-                response = admin_instance.edit_plugin(request, plugin_id)
+                response = admin_instance.edit_plugin(request, plugin.pk)
                 self.assertEqual(response.status_code, 200)
-                text_plugin = Text.objects.get(pk=plugin_id)
+                text_plugin = Text.objects.get(pk=plugin.pk)
                 self.assertEqual('Hello World', text_plugin.body)
 
 
@@ -1176,6 +1183,7 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         ex.save()
         self._placeholder = ex.placeholder
         self.example_object = ex
+        return ex
 
     def _create_plugin(self):
         self._plugin = add_plugin(self._placeholder, 'TextPlugin', 'en')
