@@ -44,17 +44,7 @@
                 this.settings = CMS.settings;
 
                 // elements
-                this.container = $('.cms-structure');
-                this.toolbar = $('#cms-toolbar');
-                this.sortables = $('.cms-draggables'); // use global scope
-                this.plugins = $('.cms-plugin');
-                this.render_model = $('.cms-render-model');
-                this.placeholders = $('.cms-placeholder');
-                this.dragitems = $('.cms-draggable');
-                this.dragareas = $('.cms-dragarea');
-                this.dropareas = $('.cms-droppable');
-                this.dimmer = this.container.find('.cms-structure-dimmer');
-                this.clipboard = $('.cms-clipboard');
+                this._setupUI();
 
                 // states
                 this.click = 'click.cms';
@@ -71,15 +61,34 @@
                 actualizeEmptyPlaceholders();
             },
 
+            _setupUI: function setupUI() {
+                var container = $('.cms-structure');
+                this.ui = {
+                    container: container,
+                    doc: $(document),
+                    window: $(window),
+                    toolbar: $('#cms-toolbar'),
+                    sortables: $('.cms-draggables'), // global scope to include clipboard
+                    plugins: $('.cms-plugin'),
+                    render_model: $('.cms-render-model'),
+                    placeholders: $('.cms-placeholder'),
+                    dragitems: $('.cms-draggable'),
+                    dragareas: $('.cms-dragarea'),
+                    dropareas: $('.cms-droppable'),
+                    dimmer: container.find('.cms-structure-dimmer'),
+                    clipboard: $('.cms-clipboard')
+                };
+            },
+
             // initial methods
             _setup: function () {
                 // cancel if there are no dragareas
-                if (!this.dragareas.length) {
+                if (!this.ui.dragareas.length) {
                     return false;
                 }
 
                 // cancel if there is no structure / content switcher
-                if (!this.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                if (!this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
                     return false;
                 }
 
@@ -89,8 +98,8 @@
                 }
 
                 // check if modes should be visible
-                if (this.placeholders.length) {
-                    this.toolbar.find('.cms-toolbar-item-cms-mode-switcher').show();
+                if (this.ui.placeholders.length) {
+                    this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').show();
                 }
 
                 // add drag & drop functionality
@@ -99,7 +108,7 @@
 
             _events: function () {
                 var that = this;
-                var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
+                var modes = this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
 
                 // show edit mode
                 modes.eq(1).on(this.click, function (e) {
@@ -123,19 +132,20 @@
                 });
 
                 // keyboard handling
-                $(document).on('keydown', function (e) {
+                this.ui.doc.on('keydown', function (e) {
                     // check if we have an important focus
                     var fields = $('*:focus');
+                    console.log(fields);
                     if (e.keyCode === KEYS.SPACE && that.settings.mode === 'structure' && !fields.length) {
                         // cancel if there is no structure / content switcher
-                        if (!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                        if (!that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
                             return false;
                         }
                         e.preventDefault();
                         that.hide();
                     } else if (e.keyCode === KEYS.SPACE && that.settings.mode === 'edit' && !fields.length) {
                         // cancel if there is no structure / content switcher
-                        if (!that.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                        if (!that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
                             return false;
                         }
                         e.preventDefault();
@@ -145,7 +155,7 @@
                     }
                 });
 
-                $(document).on('keyup', function (e) {
+                this.ui.doc.on('keyup', function (e) {
                     if (e.keyCode === KEYS.SHIFT) {
                         $(this).data('expandmode', false);
                     }
@@ -161,11 +171,11 @@
                 }
 
                 // set active item
-                var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
+                var modes = this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
 
                 // show clipboard
-                this.clipboard.css('opacity', 1).fadeIn(this.options.speed);
+                this.ui.clipboard.css('opacity', 1).fadeIn(this.options.speed);
 
                 // apply new settings
                 this.settings.mode = 'structure';
@@ -174,7 +184,7 @@
                 }
 
                 // ensure all elements are visible
-                this.dragareas.show();
+                this.ui.dragareas.show();
 
                 // show canvas
                 this._showBoard();
@@ -187,14 +197,14 @@
                 }
 
                 // set active item
-                var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
+                var modes = this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
                 modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
 
                 // hide clipboard if in edit mode
-                this.container.find('.cms-clipboard').hide();
+                this.ui.container.find('.cms-clipboard').hide();
 
                 // hide clipboard
-                this.clipboard.hide();
+                this.ui.clipboard.hide();
 
                 this.settings.mode = 'edit';
                 if (!init) {
@@ -240,8 +250,8 @@
 
             setActive: function (id, state) {
                 // resets
-                this.dragitems.removeClass('cms-draggable-selected');
-                this.plugins.removeClass('cms-plugin-active');
+                this.ui.dragitems.removeClass('cms-draggable-selected');
+                this.ui.plugins.removeClass('cms-plugin-active');
 
                 // only reset if no id is provided
                 if (id === false) {
@@ -258,10 +268,10 @@
                     this._showBoard();
 
                     // show clipboard
-                    this.clipboard.show().css('opacity', 0.2);
+                    this.ui.clipboard.show().css('opacity', 0.2);
 
                     // prevent default visibility
-                    this.dragareas.css('opacity', 0.2);
+                    this.ui.dragareas.css('opacity', 0.2);
 
                     // show single placeholder
                     dragitem.closest('.cms-dragarea').show().css('opacity', 1);
@@ -286,12 +296,12 @@
                 var timer = function () {};
 
                 // show container
-                this.container.show();
-                this.dimmer.fadeIn(100);
-                this.dragareas.css('opacity', 1);
+                this.ui.container.show();
+                this.ui.dimmer.fadeIn(100);
+                this.ui.dragareas.css('opacity', 1);
 
                 // add dimmer close
-                this.dimmer.on('mousedown mouseup', function (e) {
+                this.ui.dimmer.on('mousedown mouseup', function (e) {
                     // cancel on rightclick
                     if (e.which === 3 || e.button === 2) {
                         return false;
@@ -307,8 +317,8 @@
                     }
                 });
 
-                this.plugins.not(this.render_model).hide();
-                this.placeholders.show();
+                this.ui.plugins.not(this.ui.render_model).hide();
+                this.ui.placeholders.show();
 
                 // attach event
                 if (CMS.config.simpleStructureBoard) {
@@ -326,7 +336,7 @@
                     // now lets get the first instance and add some padding
                     areas.filter('.cms-dragarea-static').eq(0).css('margin-top', '50px');
                 } else {
-                    $(window).on('resize.sideframe', function () {
+                    this.ui.window.on('resize.sideframe', function () {
                         that._resizeBoard();
                     }).trigger('resize.sideframe');
                 }
@@ -334,18 +344,18 @@
 
             _hideBoard: function () {
                 // hide elements
-                this.container.hide();
-                this.plugins.show();
-                this.placeholders.hide();
-                this.dimmer.hide();
+                this.ui.container.hide();
+                this.ui.plugins.show();
+                this.ui.placeholders.hide();
+                this.ui.dimmer.hide();
 
                 // detach event
-                $(window).off('resize.sideframe');
+                this.ui.window.off('resize.sideframe');
 
                 // clear interval
                 clearInterval(this.interval);
 
-                $(window).trigger('structureboard_hidden.sideframe');
+                this.ui.window.trigger('structureboard_hidden.sideframe');
             },
 
             _resizeBoard: function () {
@@ -356,7 +366,7 @@
                 var areaParentOffset = null;
 
                 // start calculating
-                this.placeholders.each(function (index, item) {
+                this.ui.placeholders.each(function (index, item) {
                     item = $(item);
                     id = item.data('settings').placeholder_id;
                     area = $('.cms-dragarea-' + id);
@@ -384,11 +394,11 @@
                 var dropzone = null;
                 var timer = function () {};
 
-                this.sortables.nestedSortable({
+                this.ui.sortables.nestedSortable({
                     items: '.cms-draggable',
                     handle: '.cms-dragitem',
                     placeholder: 'cms-droppable',
-                    connectWith: this.sortables,
+                    connectWith: this.ui.sortables,
                     tolerance: 'pointer',
                     toleranceElement: '> div',
                     dropOnEmpty: true,
@@ -519,15 +529,15 @@
                 });
 
                 // attach escape event to cancel dragging
-                $(document).on('keyup.cms', function (e, cancel) {
+                this.ui.doc.on('keyup.cms', function (e, cancel) {
                     if (e.keyCode === KEYS.ESC || cancel) {
                         that.state = false;
-                        that.sortables.sortable('cancel');
+                        that.ui.sortables.sortable('cancel');
                     }
                 });
 
                 // define droppable helpers
-                this.dropareas.droppable({
+                this.ui.dropareas.droppable({
                     greedy: true,
                     accept: '.cms-draggable',
                     tolerance: 'pointer',
