@@ -3,9 +3,9 @@
 /* global CMS */
 
 (function ($) {
-    // CMS.$ will be passed for $
     'use strict';
-    $(document).ready(function () {
+    // CMS.$ will be passed for $
+    $(function () {
         var emptyDropZones = $('.cms-dragbar-empty-wrapper');
         function actualizeEmptyPlaceholders() {
             emptyDropZones.each(function () {
@@ -31,12 +31,12 @@
             },
 
             initialize: function (options) {
-                this.container = $('.cms-structure');
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
                 this.settings = CMS.settings;
 
                 // elements
+                this.container = $('.cms-structure');
                 this.toolbar = $('#cms-toolbar');
                 this.sortables = $('.cms-draggables'); // use global scope
                 this.plugins = $('.cms-plugin');
@@ -100,7 +100,7 @@
                 var modes = this.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
 
                 // show edit mode
-                modes.eq(1).bind(this.click, function (e) {
+                modes.eq(1).on(this.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
                     if (that.settings.mode === 'edit') {
@@ -110,7 +110,7 @@
                     that.hide();
                 });
                 // show structure mode
-                modes.eq(0).bind(this.click, function (e) {
+                modes.eq(0).on(this.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
                     if (that.settings.mode === 'structure') {
@@ -121,7 +121,7 @@
                 });
 
                 // keyboard handling
-                $(document).bind('keydown', function (e) {
+                $(document).on('keydown', function (e) {
                     // check if we have an important focus
                     var fields = $('*:focus');
                     // 32 = space
@@ -144,7 +144,7 @@
                     }
                 });
 
-                $(document).bind('keyup', function (e) {
+                $(document).on('keyup', function (e) {
                     if (e.keyCode === 16) {
                         $(this).data('expandmode', false);
                     }
@@ -285,7 +285,7 @@
                 var timer = function () {};
 
                 // unbind click event if already initialized
-                elements.find('a').bind(this.click, function (e) {
+                elements.find('a').on(this.click, function (e) {
                     e.preventDefault();
 
                     // increment
@@ -324,7 +324,7 @@
                 this.dragareas.css('opacity', 1);
 
                 // add dimmer close
-                this.dimmer.bind('mousedown mouseup', function (e) {
+                this.dimmer.on('mousedown mouseup', function (e) {
                     // cancel on rightclick
                     if (e.which === 3 || e.button === 2) {
                         return false;
@@ -359,7 +359,7 @@
                     // now lets get the first instance and add some padding
                     areas.filter('.cms-dragarea-static').eq(0).css('margin-top', '50px');
                 } else {
-                    $(window).bind('resize.sideframe', function () {
+                    $(window).on('resize.sideframe', function () {
                         that._resizeBoard();
                     }).trigger('resize.sideframe');
                 }
@@ -373,7 +373,7 @@
                 this.dimmer.hide();
 
                 // detach event
-                $(window).unbind('resize.sideframe');
+                $(window).off('resize.sideframe');
 
                 // clear interval
                 clearInterval(this.interval);
@@ -552,7 +552,7 @@
                 });
 
                 // attach escape event to cancel dragging
-                $(document).bind('keyup.cms', function (e, cancel) {
+                $(document).on('keyup.cms', function (e, cancel) {
                     if (e.keyCode === 27 || cancel) {
                         that.state = false;
                         that.sortables.sortable('cancel');
