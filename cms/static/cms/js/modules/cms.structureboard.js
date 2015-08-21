@@ -87,8 +87,6 @@
 
                 // add drag & drop functionality
                 this._drag();
-                // prevent click events to detect double click
-                // this.preventEvents(this.plugins);
             },
 
             _events: function () {
@@ -273,40 +271,6 @@
                 // set new classes
                 dragitem.addClass('cms-draggable-selected');
                 plugin.addClass('cms-plugin-active');
-            },
-
-            preventEvents: function (elements) {
-                var clicks = 0;
-                var delay = 500;
-                var timer = function () {};
-
-                // unbind click event if already initialized
-                elements.find('a').on(this.click, function (e) {
-                    e.preventDefault();
-
-                    // increment
-                    clicks++;
-
-                    // single click
-                    if (clicks === 1) {
-                        timer = setTimeout(function () {
-                            clicks = 0;
-                            // cancel if link contains a hash
-                            if ($(e.currentTarget).attr('href').indexOf('#') === 0) {
-                                return false;
-                            }
-                            // we need to redirect to the default behaviours
-                            // all events will be lost in edit mode, use '#' if href should not be triggered
-                            window.location.href = $(e.currentTarget).attr('href');
-                        }, delay);
-                    }
-
-                    // double click
-                    if (clicks === 2) {
-                        clearTimeout(timer);
-                        clicks = 0;
-                    }
-                });
             },
 
             // private methods
