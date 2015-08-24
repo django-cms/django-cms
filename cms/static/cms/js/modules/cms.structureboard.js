@@ -243,74 +243,14 @@
                 return array;
             },
 
-            setActive: function (id, state) {
-                // resets
-                this.ui.dragitems.removeClass('cms-draggable-selected');
-                this.ui.plugins.removeClass('cms-plugin-active');
-
-                // only reset if no id is provided
-                if (id === false) {
-                    return false;
-                }
-
-                // attach active class to current element
-                var dragitem = $('.cms-draggable-' + id);
-                var plugin = $('.cms-plugin-' + id);
-
-                // if we switch from content to edit, show only a single plcaeholder
-                if (state) {
-                    // quick show
-                    this._showBoard();
-
-                    // show clipboard
-                    this.ui.clipboard.show().css('opacity', 0.2);
-
-                    // prevent default visibility
-                    this.ui.dragareas.css('opacity', 0.2);
-
-                    // show single placeholder
-                    dragitem.closest('.cms-dragarea').show().css('opacity', 1);
-
-                // otherwise hide and reset the board
-                } else {
-                    this.hide();
-                }
-
-                // collapse all previous elements
-                var collapsed = dragitem.parentsUntil('.cms-dragarea').siblings().not('.cms-dragitem-expanded');
-                collapsed.trigger(this.click);
-
-                // set new classes
-                dragitem.addClass('cms-draggable-selected');
-                plugin.addClass('cms-plugin-active');
-            },
-
             // private methods
             _showBoard: function () {
                 var that = this;
-                var timer = function () {};
 
                 // show container
                 this.ui.container.show();
                 this.ui.dimmer.fadeIn(100);
                 this.ui.dragareas.css('opacity', 1);
-
-                // add dimmer close
-                this.ui.dimmer.on('mousedown mouseup', function (e) {
-                    // cancel on rightclick
-                    if (e.which === 3 || e.button === 2) {
-                        return false;
-                    }
-                    // proceed
-                    clearTimeout(timer);
-                    timer = setTimeout(function () {
-                        that.hide();
-                    }, 500);
-
-                    if (e.type === 'mouseup') {
-                        clearTimeout(timer);
-                    }
-                });
 
                 this.ui.plugins.not(this.ui.render_model).hide();
                 this.ui.placeholders.show();
