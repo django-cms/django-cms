@@ -12,9 +12,7 @@
     // CMS.$ will be passed for $
     $(document).ready(function () {
         $(document).on('keydown', function (e) {
-            console.log('keydown');
             if (e.keyCode === KEYS.SHIFT) {
-                console.log('shift');
                 $(this).data('expandmode', true);
             }
         }).on('keyup', function (e) {
