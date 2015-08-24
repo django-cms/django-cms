@@ -1198,7 +1198,7 @@ class PagesTestCase(CMSTestCase):
             xframe_options=Page.X_FRAME_OPTIONS_DENY
         )
 
-        page = create_page(
+        child1 = create_page(
             title='subpage',
             template='nav_playground.html',
             language='en',
@@ -1208,8 +1208,36 @@ class PagesTestCase(CMSTestCase):
             xframe_options=Page.X_FRAME_OPTIONS_INHERIT
         )
 
-        resp = self.client.get(page.get_absolute_url('en'))
+        child2 = create_page(
+            title='subpage',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='subpage',
+            parent=child1,
+            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+        )
+        child3 = create_page(
+            title='subpage',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='subpage',
+            parent=child2,
+            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+        )
+
+        resp = self.client.get(parent.get_absolute_url('en'))
         self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+
+        resp = self.client.get(child1.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+
+        resp = self.client.get(child2.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), None)
+
+        resp = self.client.get(child3.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), None)
 
     def test_top_level_page_inherited_xframe_options_are_applied(self):
         with self.settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + ['django.middleware.clickjacking.XFrameOptionsMiddleware']):
