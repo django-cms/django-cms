@@ -66,6 +66,7 @@
                 var toolbar = $('#cms-toolbar');
                 this.ui = {
                     container: container,
+                    content: $('.cms-structure-content'),
                     doc: $(document),
                     window: $(window),
                     toolbar: toolbar,
@@ -257,7 +258,7 @@
 
                 // attach event
                 if (CMS.config.simpleStructureBoard) {
-                    var content = $('.cms-structure-content');
+                    var content = this.ui.content;
                     var areas = content.find('.cms-dragarea');
                     // set correct css attributes for the new mode
                     content.addClass('cms-structure-content-simple');
@@ -368,7 +369,9 @@
                         $('.cms-submenu-quicksearch, .cms-submenu-dropdown').hide();
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
-                        $('.cms-draggables').each(function () {
+                        // keep in mind that caching cms-draggables query only works
+                        // as long as we don't create them on the fly
+                        that.ui.sortables.each(function () {
                             if ($(this).children().length === 0) {
                                 $(this).show();
                             }
@@ -377,7 +380,7 @@
                         ui.item.addClass('cms-is-dragging');
                         ui.placeholder.css('height', ui.helper.css('height'));
                         // add overflow hidden to body
-                        $('.cms-structure-content').css({
+                        that.ui.content.css({
                             'overflow-x': 'hidden'
                         });
                     },
@@ -412,14 +415,14 @@
                         }
 
                         // reset placeholder without entries
-                        $('.cms-draggables').each(function () {
+                        that.ui.sortables.each(function () {
                             if ($(this).children().length === 0) {
                                 $(this).hide();
                             }
                         });
 
                         // add overflow hidden to body
-                        $('.cms-structure-content').css({
+                        that.ui.content.css({
                             'overflow': ''
                         });
                         actualizeEmptyPlaceholders();
