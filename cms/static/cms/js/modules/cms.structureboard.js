@@ -63,11 +63,12 @@
 
             _setupUI: function setupUI() {
                 var container = $('.cms-structure');
+                var toolbar = $('#cms-toolbar');
                 this.ui = {
                     container: container,
                     doc: $(document),
                     window: $(window),
-                    toolbar: $('#cms-toolbar'),
+                    toolbar: toolbar,
                     sortables: $('.cms-draggables'), // global scope to include clipboard
                     plugins: $('.cms-plugin'),
                     render_model: $('.cms-render-model'),
@@ -76,7 +77,9 @@
                     dragareas: $('.cms-dragarea'),
                     dropareas: $('.cms-droppable'),
                     dimmer: container.find('.cms-structure-dimmer'),
-                    clipboard: $('.cms-clipboard')
+                    clipboard: $('.cms-clipboard'),
+                    toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
+                    toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
                 };
             },
 
@@ -88,7 +91,7 @@
                 }
 
                 // cancel if there is no structure / content switcher
-                if (!this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
+                if (!this.ui.toolbarModeSwitcher.length) {
                     return false;
                 }
 
@@ -99,7 +102,7 @@
 
                 // check if modes should be visible
                 if (this.ui.placeholders.length) {
-                    this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').show();
+                    this.ui.toolbarModeSwitcher.show();
                 }
 
                 // add drag & drop functionality
@@ -108,10 +111,10 @@
 
             _events: function () {
                 var that = this;
-                var modes = this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
+                var modes = that.ui.toolbarModeLinks;
 
                 // show edit mode
-                modes.eq(1).on(this.click, function (e) {
+                modes.eq(1).on(that.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
                     if (that.settings.mode === 'edit') {
@@ -121,7 +124,7 @@
                     that.hide();
                 });
                 // show structure mode
-                modes.eq(0).on(this.click, function (e) {
+                modes.eq(0).on(that.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
                     if (that.settings.mode === 'structure') {
@@ -133,8 +136,8 @@
 
                 // keyboard handling
                 // only if there is a structure / content switcher
-                if (that.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher').length) {
-                    this.ui.doc.on('keydown', function (e) {
+                if (that.ui.toolbarModeSwitcher.length) {
+                    that.ui.doc.on('keydown', function (e) {
                         // check if we have an important focus
                         var haveFocusedField = document.activeElement !== document.body;
                         if (e.keyCode === KEYS.SPACE && !haveFocusedField) {
@@ -157,7 +160,7 @@
                 }
 
                 // set active item
-                var modes = this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
+                var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
 
                 // show clipboard
@@ -183,7 +186,7 @@
                 }
 
                 // set active item
-                var modes = this.ui.toolbar.find('.cms-toolbar-item-cms-mode-switcher a');
+                var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
 
                 // hide clipboard if in edit mode
@@ -201,6 +204,12 @@
                 this._hideBoard();
             },
 
+            /**
+             * gets the id of the element
+             *
+             * @param el jQuery element to get id from
+             * @return String
+             */
             getId: function (el) {
                 // cancel if no element is defined
                 if (el === undefined || el === null || el.length <= 0) {
@@ -344,6 +353,9 @@
                 this.ui.window.trigger('structureboard_hidden.sideframe');
             },
 
+            /*
+             * @deprecated as of CMS 3.2
+             */
             _resizeBoard: function () {
                 // calculate placeholder position
                 var id = null;
