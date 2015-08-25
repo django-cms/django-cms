@@ -348,7 +348,6 @@
                 var dropped = false;
                 var droparea = null;
                 var dropzone = null;
-                var timer = function () {};
 
                 this.ui.sortables.nestedSortable({
                     items: '.cms-draggable',
@@ -505,25 +504,21 @@
                     hoverClass: 'cms-draggable-hover-allowed',
                     over: function (event) {
                         dropzone = $('.cms-placeholder-' + that.getId($(event.target).parent().prev()));
-                        timer = setInterval(function () {
-                            // reset other empty placeholders
-                            $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
-                            if (that.state) {
-                                $(event.target).removeClass('cms-draggable-disallowed');
-                            } else {
-                                $(event.target).addClass('cms-draggable-disallowed');
-                            }
-                        }, 10);
+                        // reset other empty placeholders
+                        $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
+                        if (that.state) {
+                            $(event.target).removeClass('cms-draggable-disallowed');
+                        } else {
+                            $(event.target).addClass('cms-draggable-disallowed');
+                        }
                     },
                     out: function (event) {
                         dropzone = null;
                         $(event.target).removeClass('cms-draggable-disallowed');
-                        clearInterval(timer);
                     },
                     drop: function (event) {
                         dropped = true;
                         droparea = $(event.target).parent().nextAll('.cms-draggables').first();
-                        clearInterval(timer);
                     }
                 });
             }
