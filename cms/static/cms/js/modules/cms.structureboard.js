@@ -279,6 +279,7 @@
                     // now lets get the first instance and add some padding
                     areas.filter('.cms-dragarea-static').eq(0).css('margin-top', '50px');
                 } else {
+                    this.ui.container.addClass('cms-structure-dynamic');
                     this.ui.window.on('resize.sideframe', function () {
                         that._resizeBoard();
                     }).trigger('resize.sideframe');
@@ -299,6 +300,9 @@
                 clearInterval(this.interval);
 
                 this.ui.window.trigger('structureboard_hidden.sideframe');
+                if (!CMS.config.simpleStructureBoard) {
+                    this.ui.container.height(this.ui.doc.outerHeight());
+                }
             },
 
             /*
@@ -310,6 +314,12 @@
                 var area = null;
                 var min = null;
                 var areaParentOffset = null;
+                var that = this;
+
+                // have to delay since height changes when toggling modes
+                setTimeout(function () {
+                    that.ui.container.height(that.ui.doc.outerHeight());
+                }, 0);
 
                 // start calculating
                 this.ui.placeholders.each(function (index, item) {
