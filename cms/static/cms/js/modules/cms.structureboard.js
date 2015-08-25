@@ -389,8 +389,9 @@
                         // keep in mind that caching cms-draggables query only works
                         // as long as we don't create them on the fly
                         that.ui.sortables.each(function () {
-                            if ($(this).children().length === 0) {
-                                $(this).show();
+                            var element = $(this);
+                            if (element.children().length === 0) {
+                                element.show();
                             }
                         });
                         // fixes placeholder height
@@ -433,8 +434,9 @@
 
                         // reset placeholder without entries
                         that.ui.sortables.each(function () {
-                            if ($(this).children().length === 0) {
-                                $(this).hide();
+                            var element = $(this);
+                            if (element.children().length === 0) {
+                                element.hide();
                             }
                         });
 
