@@ -107,7 +107,7 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
             render = template.render(rctx)
-        with self.assertNumQueries(FuzzyInt(14, 18)):
+        with self.assertNumQueries(FuzzyInt(14, 20)):
             response = self.client.get('/en/')
             resp1 = response.content.decode('utf8').split("$$$")[1]
 
@@ -233,7 +233,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 20)):
+            with self.assertNumQueries(FuzzyInt(1, 23)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
