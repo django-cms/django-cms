@@ -86,6 +86,7 @@
 
             // initial methods
             _setup: function () {
+                var that = this;
                 // cancel if there are no dragareas
                 if (!this.ui.dragareas.length) {
                     return false;
@@ -98,7 +99,13 @@
 
                 // setup toolbar mode
                 if (this.settings.mode === 'structure') {
-                    this.show(true);
+                    // FIXME this setTimeout is needed because
+                    // plugins are initialized after all the scripts are processed
+                    // which should be fixed btw. _resizeBoard wants plugins to be initialized,
+                    // otherwise throws errors
+                    setTimeout(function () {
+                        that.show(true);
+                    }, 0);
                 }
 
                 // check if modes should be visible
