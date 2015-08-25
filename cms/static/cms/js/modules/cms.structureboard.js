@@ -172,7 +172,7 @@
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
 
                 // show clipboard
-                this.ui.clipboard.css('opacity', 1).fadeIn(this.options.speed);
+                this.ui.clipboard.fadeIn(this.options.speed);
 
                 // apply new settings
                 this.settings.mode = 'structure';
@@ -257,7 +257,7 @@
 
                 // show container
                 this.ui.container.show();
-                this.ui.dimmer.fadeIn(100);
+                this.ui.dimmer.show();
                 this.ui.dragareas.css('opacity', 1);
 
                 this.ui.plugins.not(this.ui.render_model).hide();
