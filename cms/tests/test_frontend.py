@@ -342,9 +342,7 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         build_button.click()
 
         submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
-
-        hov = ActionChains(self.driver).move_to_element(submenu)
-        hov.perform()
+        submenu.click()
 
         submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
@@ -375,11 +373,9 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         hov.perform()
 
         submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
+        submenu.click()
 
-        hov = ActionChains(self.driver).move_to_element(submenu)
-        hov.perform()
-
-        copy = submenu.find_element_by_css_selector('a[data-rel="copy"]')
+        copy = cms_draggable.find_element_by_css_selector('.cms-submenu-dropdown a[data-rel="copy"]')
         copy.click()
 
         time.sleep(0.2)
