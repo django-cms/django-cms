@@ -74,7 +74,7 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
     driver = None
     @classmethod
     def setUpClass(cls):
-        if os.environ.get('SELENIUM', '') != '':
+        if os.environ.get('SELENIUM', '1') == '0':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         super(CMSLiveTests, cls).setUpClass()
