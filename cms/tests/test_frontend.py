@@ -352,8 +352,8 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
                 get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             )
         )
-        self.wait_page_loaded()
-
+        sys.stderr.write(self.driver.current_url() + "\n")
+        sys.stderr.write("<SOURCE>" + self.driver.page_source() + "</SOURCE>\n")
         build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         self.wait_loaded_selector(build_button_selector)
         build_button = self.driver.find_element_by_css_selector(build_button_selector)
