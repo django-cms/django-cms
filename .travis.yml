@@ -12,20 +12,30 @@ env:
   global:
     - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
   matrix:
-    - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
-    - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.7 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
-    - DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
-    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+#    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+#    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1
+#    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+#    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
+    - DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+#    - DJANGO=1.7 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
+#    - DJANGO=1.7 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+#    - DJANGO=1.7 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
+    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+#    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+#    - DJANGO=1.6 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0
+#    - DJANGO=1.6 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+#    - DJANGO=1.6 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0
+
+before_install:
+  - "export DISPLAY=:99.0"
+  # xvfb is started in this way to ensure the screen size is 1280x1024x8
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x8"
+
+install:
+  - pip install -r "test_requirements/django-$DJANGO.txt"
+  - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
+  - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
 
 before_script:
   - pip freeze
@@ -37,17 +47,7 @@ before_script:
     -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
     fi"
 
-before_install:
-  - "export DISPLAY=:99.0"
-  # xvfb is started in this way to ensure the screen size is 1280x1024x8
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/cucumber_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x8"
-
-install:
-  - pip install -r "test_requirements/django-$DJANGO.txt"
-  - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
-  - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
-
-script: coverage run --rcfile=.coverage.rc manage.py test
+script: coverage run --rcfile=.coverage.rc manage.py test -v3 cms.tests.test_frontend.PlaceholderBasicTests
 
 after_success: coverallscustomuserapp.User --config_file=.coverage.rc
 
