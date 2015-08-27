@@ -78,11 +78,14 @@
                 }
 
                 // setup toolbar mode
-                if (this.settings.mode === 'structure') {
-                    setTimeout(function () {
+                setTimeout(function () {
+                    if (that.settings.mode === 'structure') {
                         that.show(true);
-                    }, 100);
-                }
+                    } else {
+                        // triggering hide here to switch proper classnames on switcher
+                        that.hide(true);
+                    }
+                }, 100);
 
                 // check if modes should be visible
                 if (this.placeholders.length) {
