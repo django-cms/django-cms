@@ -98,15 +98,18 @@
                 }
 
                 // setup toolbar mode
-                if (this.settings.mode === 'structure') {
-                    // FIXME this setTimeout is needed because
-                    // plugins are initialized after all the scripts are processed
-                    // which should be fixed btw. _resizeBoard wants plugins to be initialized,
-                    // otherwise throws errors
-                    setTimeout(function () {
+                // FIXME this setTimeout is needed because
+                // plugins are initialized after all the scripts are processed
+                // which should be fixed btw. _resizeBoard wants plugins to be initialized,
+                // otherwise throws errors
+                setTimeout(function () {
+                    if (that.settings.mode === 'structure') {
                         that.show(true);
-                    }, 0);
-                }
+                    } else {
+                        // triggering hide here to switch proper classnames on switcher
+                        that.hide(true);
+                    }
+                }, 0);
 
                 // check if modes should be visible
                 if (this.ui.placeholders.length) {
@@ -350,7 +353,7 @@
                 var dropzone = null;
 
                 this.ui.sortables.nestedSortable({
-                    items: '.cms-draggable',
+                    items: '.cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                     handle: '.cms-dragitem',
                     placeholder: 'cms-droppable',
                     connectWith: this.ui.sortables,
