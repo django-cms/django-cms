@@ -68,7 +68,6 @@ class FastLogin(object):
 
         # We need to "warm up" the webdriver as we can only set cookies on the
         # current domain
-        sys.stderr.write('[URL: ' + self.live_server_url + "]\n")
         self.driver.get(self.live_server_url)
         # While we don't care about the page fully loading, Django will freak
         # out if we 'abort' this request, so we wait patiently for it to finish
@@ -87,18 +86,19 @@ class FastLogin(object):
 
 
 class CMSLiveTests(LiveServerTestCase, CMSTestCase):
+    MAX_WAIT = 15
     driver = None
+
     @classmethod
     def setUpClass(cls):
-        sys.stderr.write("ENTER setUpClass\n")
         if os.environ.get('SELENIUM', '1') == '0':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         super(CMSLiveTests, cls).setUpClass()
         cache.clear()
         cls.driver = webdriver.Firefox()
-        cls.driver.implicitly_wait(30)
-        cls.driver.set_page_load_timeout(30)
+        cls.driver.implicitly_wait(cls.MAX_WAIT)
+        cls.driver.set_page_load_timeout(cls.MAX_WAIT)
         cls.driver.set_window_size(1120, 700)
         cls.accept_next_alert = True
 
@@ -122,7 +122,7 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
         """
         WebDriverWait(self.driver, timeout).until(callback)
 
-    def wait_loaded_tag(self, tag_name, timeout=10):
+    def wait_loaded_tag(self, tag_name, timeout=15):
         """
         Helper function that blocks until the element with the given tag name
         is found on the page.
@@ -131,6 +131,14 @@ class CMSLiveTests(LiveServerTestCase, CMSTestCase):
             lambda driver: driver.find_element_by_tag_name(tag_name),
             timeout
         )
+
+    def wait_loaded_selector(self, selector):
+        """
+        Blocks until a selector is present.
+        """
+        WebDriverWait(self.driver, self.MAX_WAIT).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, selector)))
 
     def wait_page_loaded(self):
         """
@@ -311,7 +319,6 @@ class ToolbarBasicTests(CMSLiveTests):
     SITE_ID=1,
 )
 class PlaceholderBasicTests(FastLogin, CMSLiveTests):
-    MAX_WAIT = 30
 
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
@@ -343,23 +350,32 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
 
         build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        self.wait_loaded_selector(build_button_selector)
         build_button = self.driver.find_element_by_css_selector(build_button_selector)
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
-        WebDriverWait(self.driver, self.MAX_WAIT).until(lambda driver: cms_draggable.is_displayed())
+        cms_draggable_selector = '.cms-draggable:nth-child(1)'
+        self.wait_loaded_selector(cms_draggable_selector)
+        cms_draggable = self.driver.find_element_by_css_selector(cms_draggable_selector)
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
+        submenu_selector = '.cms-submenu'
+        submenu = cms_draggable.find_element_by_css_selector(submenu_selector)
+        WebDriverWait(
+            self.driver,
+            self.MAX_WAIT).until(lambda driver: submenu.is_displayed())
         submenu.click()
 
-        copy = cms_draggable.find_element_by_css_selector('.cms-submenu-dropdown a[data-rel="copy"]')
+        copy_selector = '.cms-submenu-dropdown a[data-rel="copy"]'
+        self.wait_loaded_selector(copy_selector)
+        copy = cms_draggable.find_element_by_css_selector(copy_selector)
         copy.click()
 
-        time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
+        clipboard_selector = '.cms-clipboard'
+        self.wait_loaded_selector(clipboard_selector)
+        clipboard = self.driver.find_element_by_css_selector(clipboard_selector)
 
         WebDriverWait(self.driver, self.MAX_WAIT).until(lambda driver: clipboard.is_displayed())
 
@@ -406,23 +422,25 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         self._login()
         self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self._login()
+        self.wait_page_loaded()
+
         build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        self.wait_loaded_selector(build_button_selector)
         build_button = self.driver.find_element_by_css_selector(build_button_selector)
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
-        WebDriverWait(self.driver, self.MAX_WAIT).until(lambda driver: submenu.is_displayed())
+        submenu_selector = '.cms-dragbar .cms-submenu'
+        self.wait_loaded_selector(submenu_selector)
+        submenu = self.driver.find_element_by_css_selector(submenu_selector)
         submenu.click()
 
         submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        self.wait_loaded_selector(submenu_link_selector)
         copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
-        WebDriverWait(self.driver, self.MAX_WAIT).until(lambda driver: copy_from_english.is_displayed())
         copy_from_english.click()
 
         # Done, check if the text plugin was copied and it is only one
-
-        WebDriverWait(self.driver, self.MAX_WAIT).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
+        self.wait_loaded_selector('.cms-draggable:nth-child(1)')
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)

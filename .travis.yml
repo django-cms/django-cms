@@ -47,7 +47,7 @@ before_script:
     -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;';
     fi"
 
-script: coverage run --rcfile=.coverage.rc manage.py test -v3 cms.tests.test_frontend.PlaceholderBasicTests
+script: coverage run --rcfile=.coverage.rc manage.py test -v3 cms.tests.test_frontend.PlaceholderBasicTests.test_copy_to_from_clipboard
 
 after_success: coverallscustomuserapp.User --config_file=.coverage.rc
 
