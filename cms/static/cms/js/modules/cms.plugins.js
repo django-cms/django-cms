@@ -4,8 +4,23 @@
 
 (function ($) {
     'use strict';
+
+    // TODO move out to separate module CMS-276
+    var KEYS = {
+        SHIFT: 16
+    };
     // CMS.$ will be passed for $
     $(document).ready(function () {
+        $(document).on('keydown', function (e) {
+            if (e.keyCode === KEYS.SHIFT) {
+                $(this).data('expandmode', true);
+            }
+        }).on('keyup', function (e) {
+            if (e.keyCode === KEYS.SHIFT) {
+                $(this).data('expandmode', false);
+            }
+        });
+
         /*!
          * Plugins
          * for created plugins or generics (static content)
