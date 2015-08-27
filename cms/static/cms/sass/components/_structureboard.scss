@@ -28,8 +28,14 @@
         z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
+        user-select: none;
     }
 
+}
+
+#cms-toolbar .cms-structure-dynamic {
+    position: absolute;
+    overflow: hidden;
 }
 
 #cms-toolbar .cms-structure {
