@@ -418,7 +418,7 @@
                 var timer = function () {};
 
                 this.sortables.nestedSortable({
-                    items: '.cms-draggable',
+                    items: '.cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                     handle: '.cms-dragitem',
                     placeholder: 'cms-droppable',
                     connectWith: this.sortables,
