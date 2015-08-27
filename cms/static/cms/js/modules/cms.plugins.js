@@ -689,6 +689,63 @@
                 nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-scroll-hint').hide();
             },
 
+            /**
+             * Toggles collapsable item
+             *
+             * @method toggleCollapsable
+             * @private
+             * @param el jQuery element to toggle
+             */
+            _toggleCollapsable: function toggleCollapsable(el) {
+                var that = this;
+                var id = that._getId($(this).parent());
+                var draggable = $('.cms-draggable-' + this.options.plugin_id);
+                var items;
+
+                var settings = CMS.settings;
+                settings.states = settings.states || [];
+
+                // collapsable function and save states
+                if (el.hasClass('cms-dragitem-expanded')) {
+                    settings.states.splice($.inArray(id, settings.states), 1);
+                    el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
+                    if ($(document).data('expandmode')) {
+                        items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
+                        if (!items.length) {
+                            return false;
+                        }
+                        items.each(function () {
+                            var item = $(this);
+                            if (item.hasClass('cms-dragitem-expanded')) {
+                                that._toggleCollapsable(item);
+                            }
+                        });
+                    }
+
+                } else {
+                    settings.states.push(id);
+                    el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
+                    if ($(document).data('expandmode')) {
+                        items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
+                        if (!items.length) {
+                            return false;
+                        }
+                        items.each(function () {
+                            var item = $(this);
+                            if (!item.hasClass('cms-dragitem-expanded')) {
+                                that._toggleCollapsable(item);
+                            }
+                        });
+                    }
+                }
+
+                // make sure structurboard gets updated after expanding
+                $(window).trigger('resize.sideframe');
+
+                // save settings
+                CMS.API.Toolbar.setSettings(settings);
+            },
+
             _collapsables: function () {
                 // one time setup
                 var that = this;
@@ -711,50 +768,9 @@
                 // attach events to draggable
                 draggable.find('> .cms-dragitem-collapsable').bind(this.click, function () {
                     var el = $(this);
-                    var id = that._getId($(this).parent());
-                    var items;
-
-                    var settings = CMS.settings;
-                    settings.states = settings.states || [];
-
-                    // collapsable function and save states
-                    if (el.hasClass('cms-dragitem-expanded')) {
-                        settings.states.splice($.inArray(id, settings.states), 1);
-                        el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
-                        if ($(document).data('expandmode')) {
-                            items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
-                            if (!items.length) {
-                                return false;
-                            }
-                            items.each(function () {
-                                if ($(this).hasClass('cms-dragitem-expanded')) {
-                                    $(this).trigger(that.click);
-                                }
-                            });
-                        }
-
-                    } else {
-                        settings.states.push(id);
-                        el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
-                        if ($(document).data('expandmode')) {
-                            items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
-                            if (!items.length) {
-                                return false;
-                            }
-                            items.each(function () {
-                                if (!$(this).hasClass('cms-dragitem-expanded')) {
-                                    $(this).trigger(that.click);
-                                }
-                            });
-                        }
-                    }
-
-                    // make sure structurboard gets updated after expanding
-                    $(window).trigger('resize.sideframe');
-
-                    // save settings
-                    CMS.API.Toolbar.setSettings(settings);
+                    that._toggleCollapsable(el);
                 });
+
                 // adds double click event
                 draggable.bind('dblclick', function (e) {
                     e.stopPropagation();
@@ -798,8 +814,9 @@
                     return false;
                 }
                 items.each(function () {
-                    if (!$(this).hasClass('cms-dragitem-expanded')) {
-                        $(this).trigger(that.click);
+                    var item = $(this);
+                    if (!item.hasClass('cms-dragitem-expanded')) {
+                        that._toggleCollapsable(item);
                     }
                 });
 
@@ -815,8 +832,9 @@
                 var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
                 items.each(function () {
-                    if ($(this).hasClass('cms-dragitem-expanded')) {
-                        $(this).trigger(that.click);
+                    var item = $(this);
+                    if (item.hasClass('cms-dragitem-expanded')) {
+                        that._toggleCollapsable(item);
                     }
                 });
 
