@@ -4,13 +4,25 @@
 
 (function ($) {
     'use strict';
+
+    // TODO move out to separate module CMS-276
+    var KEYS = {
+        SHIFT: 16
+    };
     // CMS.$ will be passed for $
     $(document).ready(function () {
-
         $(document).on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
             CMS.Plugin.prototype._hideSubnav();
+        }).on('keydown', function (e) {
+            if (e.keyCode === KEYS.SHIFT) {
+                $(this).data('expandmode', true);
+            }
+        }).on('keyup', function (e) {
+            if (e.keyCode === KEYS.SHIFT) {
+                $(this).data('expandmode', false);
+            }
         });
 
         /*!
