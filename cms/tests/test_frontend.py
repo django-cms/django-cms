@@ -68,6 +68,7 @@ class FastLogin(object):
 
         # We need to "warm up" the webdriver as we can only set cookies on the
         # current domain
+        sys.stderr.write('[URL: ' + self.live_server_url + "]\n")
         self.driver.get(self.live_server_url)
         # While we don't care about the page fully loading, Django will freak
         # out if we 'abort' this request, so we wait patiently for it to finish
