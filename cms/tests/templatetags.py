@@ -4,12 +4,10 @@ import os
 from classytags.tests import DummyParser, DummyTokens
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest
 from django.template import RequestContext, Context
 from django.test import RequestFactory, TestCase
 from django.template.base import Template
@@ -149,7 +147,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
         with self.settings(SEND_BROKEN_LINK_EMAILS=False, DEBUG=False,
-                              MANAGERS=[("Jenkins", "tests@django-cms.org")]):
+                           MANAGERS=[("Jenkins", "tests@django-cms.org")]):
             request = self.get_request('/')
             page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
             self.assertEqual(page, None)
@@ -164,22 +162,14 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         Verify ``show_placeholder`` correctly handles being given an
         invalid identifier.
         """
-        User = get_user_model()
 
         with self.settings(DEBUG=True):
-            request = HttpRequest()
-            request.REQUEST = {}
-            request.session = {}
-            request.user = User()
+            context = self.get_context('/')
 
-            self.assertRaises(Placeholder.DoesNotExist,
-                              _show_placeholder_for_page,
-                              RequestContext(request),
-                              'does_not_exist',
-                              'myreverseid')
+            self.assertRaises(Placeholder.DoesNotExist, _show_placeholder_for_page,
+                              context, 'does_not_exist', 'myreverseid')
         with self.settings(DEBUG=False):
-            content = _show_placeholder_for_page(RequestContext(request),
-                                                 'does_not_exist', 'myreverseid')
+            content = _show_placeholder_for_page(context, 'does_not_exist', 'myreverseid')
             self.assertEqual(content['content'], '')
 
     def test_untranslated_language_url(self):
