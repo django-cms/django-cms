@@ -110,22 +110,23 @@
                 var that = this;
 
                 // attach event to the trigger handler
-                this.toolbarTrigger.on(this.click, function (e) {
+                this.toolbarTrigger.on('pointerup.cms', function (e) {
                     e.preventDefault();
                     that.toggleToolbar();
                 });
 
                 // attach event to the navigation elements
                 this.navigations.each(function () {
-                    var item = $(this);
-                    var lists = item.find('li');
+                    var navigation = $(this);
+                    var lists = navigation.find('li');
                     var root = 'cms-toolbar-item-navigation';
                     var hover = 'cms-toolbar-item-navigation-hover';
                     var disabled = 'cms-toolbar-item-navigation-disabled';
                     var children = 'cms-toolbar-item-navigation-children';
+                    var isTouchingTopLevelMenu = false;
 
                     // remove events from first level
-                    item.find('a').bind(that.click, function (e) {
+                    navigation.find('a').on(that.click, function (e) {
                         e.preventDefault();
                         if ($(this).attr('href') !== '' &&
                            $(this).attr('href') !== '#' &&
@@ -135,37 +136,46 @@
                             reset();
                             return false;
                         }
+                    }).on('touchstart.cms', function () {
+                        isTouchingTopLevelMenu = true;
                     });
 
                     // handle click states
                     lists.bind(that.click, function (e) {
+                        e.preventDefault();
                         e.stopPropagation();
                         var el = $(this);
 
-                        // close if el is first item
-                        if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
+                        // close if el does not have children
+                        if (!el.hasClass(children)) {
                             reset();
+                        }
+                        if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
                             return false;
                         } else {
-                            reset();
                             el.addClass(hover);
                         }
 
                         // activate hover selection
-                        item.find('> li').bind('mouseenter', function () {
-                            // cancel if item is already active
-                            if ($(this).hasClass(hover)) {
-                                return false;
-                            }
-                            $(this).trigger(that.click);
-                        });
+                        if (!isTouchingTopLevelMenu) {
+                            // we only set the handler for mouseover when not touching because
+                            // the mouseover actually is triggered on touch devices :/
+                            navigation.find('> li').on('mouseenter.cms', function () {
+                                // cancel if item is already active
+                                if ($(this).hasClass(hover)) {
+                                    return false;
+                                }
+                                $(this).trigger(that.click);
+                            });
+                        }
 
+                        isTouchingTopLevelMenu = false;
                         // create the document event
                         $(document).bind(that.click, reset);
                     });
 
                     // attach hover
-                    lists.find('li').bind('pointerover pointerout', function () {
+                    lists.find('li').on('pointerover pointerout', function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -194,10 +204,13 @@
 
                         // Remove stale submenus
                         el.siblings().find('> ul').hide();
+                    }).on('click', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
                     });
 
                     // fix leave event
-                    lists.find('> ul').bind('mouseleave', function () {
+                    lists.find('> ul').bind('pointerleave', function () {
                         lists.find('li').removeClass(hover);
                     });
 
@@ -205,7 +218,7 @@
                     function reset() {
                         lists.removeClass(hover);
                         lists.find('ul ul').hide();
-                        item.find('> li').unbind('mouseenter');
+                        navigation.find('> li').unbind('mouseenter.cms');
                         $(document).unbind(that.click);
                     }
                 });
@@ -402,13 +415,19 @@
 
             // private methods
             _showToolbar: function (speed, init) {
-                this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
+                var debugHeight = $('.cms-debug-bar').height() || 0;
+                var toolbarHeight = $('.cms-toolbar').height();
+
+                this.toolbar.css({
+                    'transition': 'margin-top ' + speed + 'ms',
+                    'margin-top': 0
+                });
                 this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
                 // animate html
                 this.body.addClass('cms-toolbar-expanded');
-                this.body.animate({ 'margin-top': (this.config.debug) ? 51 : 46 }, speed, 'linear');
+                this.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
                 // set messages top to toolbar height
-                this.messages.css('top', 47);
+                this.messages.css('top', toolbarHeight + 1);
                 // set new settings
                 this.settings.toolbar = 'expanded';
                 if (!init) {
@@ -417,6 +436,7 @@
             },
 
             _hideToolbar: function (speed, init) {
+                var toolbarHeight = $('.cms-toolbar').height();
                 this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 // cancel if sideframe is active
                 if (this.lockToolbar) {
@@ -424,6 +444,7 @@
                 }
 
                 this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+                this.toolbar.css('margin-top', -toolbarHeight);
                 // this.toolbar.slideUp(speed);
                 // animate html
                 this.body.removeClass('cms-toolbar-expanded');
