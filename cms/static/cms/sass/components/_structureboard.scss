@@ -302,12 +302,32 @@
     }
 
     // hide arrow when adding plugin-in-plugin within disabled item
-    .cms-draggable-disabled > .cms-dragitem-collapsable {
-        padding-left: 0;
-        background: none !important;
-    }
-    .cms-draggable-disabled .cms-draggables {
-        display: none !important;
+    .cms-draggable-disabled {
+        .cms-submenu {
+            display: none;
+        }
+
+        .cms-draggable:hover {
+            border-color: $gray-lighter;
+        }
+
+        > .cms-dragitem-collapsable {
+            padding-left: 0;
+            &:hover {
+                border-color: $gray-light;
+            }
+            &:before {
+                display: none;
+            }
+            .cms-submenu {
+                display: block;
+            }
+        }
+
+        .cms-draggables,
+        .cms-droppable {
+            display: none !important;
+        }
     }
 
     // end of dragarea
