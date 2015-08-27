@@ -399,15 +399,13 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         self.assertEqual(len(plugins), 2)
 
     def test_copy_from_language(self):
-        self._login()
-        self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-
         # check if there are no plugins in italian version of the page
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 0)
 
-        body = self.driver.find_element_by_css_selector('body')
-        sys.stderr.write("<BODY>" + body.get_attribute('innerHTML') + "</BODY>\n")
+        self._login()
+        self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self._login()
         build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         build_button = self.driver.find_element_by_css_selector(build_button_selector)
         build_button.click()
