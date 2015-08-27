@@ -319,6 +319,9 @@
             &:before {
                 display: none;
             }
+        }
+        > .cms-dragitem-collapsable,
+        > .cms-dragitem {
             .cms-submenu {
                 display: block;
             }
