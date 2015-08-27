@@ -6,6 +6,13 @@
     'use strict';
     // CMS.$ will be passed for $
     $(document).ready(function () {
+
+        $(document).on('pointerup.cms', function () {
+            // call it as a static method, because otherwise we trigger it the amount of times
+            // CMS.Plugin is instantiated, which does not make much sense
+            CMS.Plugin.prototype._hideSubnav();
+        });
+
         /*!
          * Plugins
          * for created plugins or generics (static content)
@@ -451,8 +458,12 @@
                     e.preventDefault();
                     e.stopPropagation();
                     var trigger = $(this);
-                    trigger.hasClass('cms-btn-active') ?
-                        that._hideSubnav(trigger) : that._showSubnav(trigger);
+                    if (trigger.hasClass('cms-btn-active')) {
+                        that._hideSubnav(trigger);
+                    } else {
+                        that._hideSubnav();
+                        that._showSubnav(trigger);
+                    }
                 });
 
                 nav.siblings('.cms-submenu-dropdown').on('mousedown mousemove mouseup', function (e) {
@@ -545,10 +556,6 @@
                 nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click, function (e) {
                     e.stopPropagation();
                 });
-
-                $(document).add('.cms-submenu').not(nav).on(this.click, function () {
-                    that._hideSubnav(nav);
-                });
             },
 
             _showSubnav: function (nav) {
@@ -630,7 +637,17 @@
                 }
             },
 
+            /**
+             * hides the opened navigation
+             *
+             * @static
+             * @param [nav] jQuery element representing the subnav trigger
+             */
             _hideSubnav: function (nav) {
+                nav = nav || $('.cms-submenu.cms-btn-active');
+                if (!nav.length) {
+                    return;
+                }
                 nav.removeClass('cms-btn-active');
 
                 // set correct active state
