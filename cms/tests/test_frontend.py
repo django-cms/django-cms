@@ -347,8 +347,12 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 1)
 
         self._login()
-        sys.stderr.write(str(self.driver.get_cookies()))
-        self.driver.get('%s/en/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.driver.get('%s/en/?%s' % (
+                self.live_server_url,
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            )
+        )
+        self.wait_page_loaded()
 
         build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         self.wait_loaded_selector(build_button_selector)
