@@ -19,12 +19,12 @@ msgstr ""
 
 #: admin/dialog/forms.py:10
 msgid "Copy permissions"
-msgstr ""
+msgstr "Sao quyền"
 
 #: admin/forms.py:66 admin/forms.py:162 admin/forms.py:205 cms_toolbar.py:182
 #: models/settingmodels.py:11
 msgid "Language"
-msgstr ""
+msgstr "Ngôn ngữ"
 
 #: admin/forms.py:67 admin/forms.py:163 admin/forms.py:206
 msgid "The current language of the content fields."
@@ -32,15 +32,15 @@ msgstr ""
 
 #: admin/forms.py:68
 msgid "Page type"
-msgstr ""
+msgstr "Loại trang"
 
 #: admin/forms.py:69
 msgid "Title"
-msgstr ""
+msgstr "Tiêu đề"
 
 #: admin/forms.py:70
 msgid "The default title"
-msgstr ""
+msgstr "Tiêu đề mặc định"
 
 #: admin/forms.py:71
 msgid "Slug"
@@ -48,44 +48,44 @@ msgstr ""
 
 #: admin/forms.py:72
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "Phần tiêu đề được sử dụng trong URL"
 
 #: admin/forms.py:73
 msgid "Menu Title"
-msgstr ""
+msgstr "Tiêu đề Menu"
 
 #: admin/forms.py:74
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Ghi đè lên những gì được hiển thị trong menu"
 
 #: admin/forms.py:75
 msgid "Page Title"
-msgstr ""
+msgstr "Tiêu đề trang"
 
 #: admin/forms.py:76
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Ghi đè lên những gì được hiển thị ở phía trên cùng của trình duyệt của bạn hoặc trong các dấu trang"
 
 #: admin/forms.py:78
 msgid "Description meta tag"
-msgstr ""
+msgstr "Mô tả tag meta"
 
 #: admin/forms.py:80
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "Một đoạn miêu tả của trang được sử dụng cho công cụ tìm kiếm"
 
 #: admin/forms.py:129
 msgid "Another page with this slug already exists"
-msgstr ""
+msgstr "Một trang khác với slug tương tự đã tồn tại"
 
 #: admin/forms.py:157
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Slug không được để trống"
 
 #: admin/forms.py:185
 msgid "Application"
-msgstr ""
+msgstr "Ứng dụng"
 
 #: admin/forms.py:187
 msgid "Hook application to this page."
