@@ -937,11 +937,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 site = Site.objects.get(pk=site)
             except (ObjectDoesNotExist, AssertionError):
                 return HttpResponse("error")
-                #context.update({'error': _('Page could not been moved.')})
             else:
                 try:
+                    permissions = request.GET.get('copy_permissions', False)
+                    if not permissions:
+                        permissions = request.POST.get('copy_permissions', False)
                     kwargs = {
-                        'copy_permissions': request.REQUEST.get('copy_permissions', False),
+                        'copy_permissions': permissions,
                     }
                     page.copy_page(target, site, position, **kwargs)
                     return jsonify_request(HttpResponse("ok"))
@@ -999,7 +1001,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page, publish=True)
             helpers.make_revision_with_plugins(page, request.user, PUBLISH_COMMENT)
             # create a new publish reversion
-        if 'node' in request.REQUEST:
+        if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
 
@@ -1100,7 +1102,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         messages.info(request, _('The page "%s" was successfully reverted.') % page)
 
-        if 'node' in request.REQUEST:
+        if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
             return admin_utils.render_admin_menu_item(request, page)
 
@@ -1298,8 +1300,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             else:
                 obj = None
         if not obj:
-            pk = request.REQUEST.get('pk')
-            full_model = request.REQUEST.get('model')
+            pk = request.GET.get('pk', False) or request.POST.get('pk', False)
+            full_model = request.GET.get('model') or request.POST.get('model', False)
             if pk and full_model:
                 app_label, model = full_model.split('.')
                 if pk and app_label:
