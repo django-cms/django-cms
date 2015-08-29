@@ -26,7 +26,7 @@ def get_cache_permission_version():
     version = cache.get(get_cache_permission_version_key())
     if version is None:
         version = 1
-    return version
+    return int(version)
 
 
 def get_permission_cache(user, key):

@@ -3,7 +3,10 @@ from __future__ import with_statement
 
 from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
-from django.contrib.admin.util import unquote
+try:
+    from django.contrib.admin.utils import unquote
+except ImportError:
+    from django.contrib.admin.util import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site

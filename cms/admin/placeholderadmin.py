@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
 import json
-from cms.utils.compat import DJANGO_1_7
 
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib.admin.helpers import AdminForm
-from django.contrib.admin.util import get_deleted_objects
+try:
+    from django.contrib.admin.utils import get_deleted_objects
+except ImportError:
+    from django.contrib.admin.util import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
-from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseNotFound,
-                         HttpResponseForbidden, HttpResponseRedirect)
-from django.shortcuts import render, get_object_or_404
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseRedirect,
+)
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import force_escape, escapejs
 from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
@@ -25,9 +32,19 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import copy_plugins, permissions, get_language_from_request, get_cms_setting
+from cms.utils import (
+    copy_plugins,
+    get_cms_setting,
+    get_language_from_request,
+    permissions,
+)
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.i18n import get_language_list
-from cms.utils.plugins import requires_reload, has_reached_plugin_limit, reorder_plugins
+from cms.utils.plugins import (
+    requires_reload,
+    has_reached_plugin_limit,
+    reorder_plugins
+)
 from cms.utils.urlutils import admin_reverse
 
 
@@ -344,9 +361,11 @@ class PlaceholderAdminMixin(object):
         except Placeholder.DoesNotExist:
             pass
         if request.method == "POST":
-            # set the continue flag, otherwise will plugin_admin make redirect to list
-            # view, which actually doesn't exists
-            request.POST['_continue'] = True
+            # set the continue flag, otherwise plugin_admin will make redirect
+            # to list view, which actually doesn't exists
+            mutable_post = request.POST.copy()
+            mutable_post['_continue'] = True
+            request.POST = mutable_post
         if request.POST.get("_cancel", False):
             # cancel button was clicked
             context = {
@@ -470,7 +489,7 @@ class PlaceholderAdminMixin(object):
         else:
             deleted_objects, __, perms_needed, protected = get_deleted_objects(
                 [plugin], opts, request.user, self.admin_site, using)
-            
+
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied(_("You do not have permission to delete this plugin"))
