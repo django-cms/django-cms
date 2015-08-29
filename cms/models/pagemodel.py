@@ -986,8 +986,13 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 template = self.template
             else:
                 try:
-                    template = self.get_ancestors().exclude(
-                        template=constants.TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
+                    template = list(
+                        reversed(
+                            self.get_ancestors().exclude(
+                                template=constants.TEMPLATE_INHERITANCE_MAGIC
+                            ).values_list('template', flat=True)
+                        )
+                    )[0]
                 except IndexError:
                     pass
         if not template:
@@ -1255,20 +1260,22 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = get_xframe_cache(self)
         if xframe_options is None:
-            ancestors = self.get_ancestors()
+            xframe_options = self.xframe_options
+            if not xframe_options or xframe_options == self.X_FRAME_OPTIONS_INHERIT:
+                ancestors = self.get_ancestors()
 
-            # Ignore those pages which just inherit their value
-            ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+                # Ignore those pages which just inherit their value
+                ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
 
-            # Now just give me the clickjacking setting (not anything else)
-            xframe_options = list(ancestors.values_list('xframe_options', flat=True))
-            if self.xframe_options != self.X_FRAME_OPTIONS_INHERIT:
-                xframe_options.append(self.xframe_options)
-            if len(xframe_options) <= 0:
-                # No ancestors were found
-                return None
+                # Now just give me the clickjacking setting (not anything else)
+                xframe_options = list(reversed(ancestors.values_list('xframe_options', flat=True)))
+                if self.xframe_options != self.X_FRAME_OPTIONS_INHERIT:
+                    xframe_options.append(self.xframe_options)
+                if len(xframe_options) <= 0:
+                    # No ancestors were found
+                    return None
 
-            xframe_options = xframe_options[0]
+                xframe_options = xframe_options[0]
             set_xframe_cache(self, xframe_options)
 
         return xframe_options
