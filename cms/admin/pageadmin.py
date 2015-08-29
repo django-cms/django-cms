@@ -233,7 +233,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             obj = obj.reload()
             copy_target._copy_attributes(obj, clean=True)
             obj.save()
-            for lang in copy_target.languages.split(','):
+            for lang in copy_target.get_languages():
                 copy_target._copy_contents(obj, lang)
         if 'permission' not in request.path_info:
             language = form.cleaned_data['language']
