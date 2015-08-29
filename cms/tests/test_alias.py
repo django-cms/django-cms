@@ -34,9 +34,9 @@ class AliasTestCase(CMSTestCase):
         self.assertEqual(context['content'], "I'm the first")
 
     def test_move_and_delete_plugin_alias(self):
-        '''
+        """
         Test moving the plugin from the clipboard to a placeholder.
-        '''
+        """
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
                                   slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
