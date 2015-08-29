@@ -45,7 +45,6 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.utils.plugins import get_plugins, assign_plugins
 from cms.utils import get_language_from_request, get_site_id
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.moderator import use_draft
@@ -216,7 +215,7 @@ def get_placeholder_content(context, request, current_page, name, inherit, defau
     # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
     # there for possible enhancements
     if inherit and not edit_mode:
-        pages = chain([current_page], current_page.get_cached_ancestors())
+        pages = chain([current_page], list(reversed(current_page.get_cached_ancestors())))
     for page in pages:
         placeholder = _get_placeholder(current_page, page, context, name)
         if placeholder is None:
@@ -557,10 +556,7 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
     """
     validate_placeholder_name(placeholder_name)
 
-    if DJANGO_1_7:
-        request = context.get('request', False)
-    else:
-        request = context.request
+    request = context.get('request', False)
 
     site_id = get_site_id(site)
 

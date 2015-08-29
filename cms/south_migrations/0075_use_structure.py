@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection
+from django.db import models
 from django.db.transaction import set_autocommit
-from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
-from django.db import models
+
+try:
+    from django.contrib.auth import get_user_model
+except ImportError: # django < 1.5
+    from django.contrib.auth.models import User
+else:
+    User = get_user_model()
+
+
+user_orm_label = '%s.%s' % (User._meta.app_label, User._meta.object_name)
+user_model_label = '%s.%s' % (User._meta.app_label, User._meta.model_name)
+user_ptr_name = '%s_ptr' % User._meta.object_name.lower()
 
 
 class Migration(DataMigration):
@@ -17,13 +28,14 @@ class Migration(DataMigration):
             set_autocommit(True)
         ph_model = orm['cms.Placeholder']
         page_model = orm['cms.Page']
+        user_model = orm[settings.AUTH_USER_MODEL]
         try:
             ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
             page_ctype = ContentType.objects.get(app_label=page_model._meta.app_label, model=page_model._meta.model_name)
             permission, _ = Permission.objects.get_or_create(
                 codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
             page_permission = Permission.objects.get(codename='change_page', content_type=page_ctype)
-            for user in get_user_model().objects.filter(is_superuser=False, is_staff=True):
+            for user in user_model.objects.filter(is_superuser=False, is_staff=True):
                 if user.has_perm("cms.change_page"):
                     user.user_permissions.add(permission)
             for group in Group.objects.all():
@@ -35,10 +47,11 @@ class Migration(DataMigration):
 
     def backwards(self, orm):
         ph_model = orm['cms.Placeholder']
+        user_model = orm[settings.AUTH_USER_MODEL]
         ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
         permission, _ = Permission.objects.get_or_create(
             codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
-        for user in get_user_model().objects.filter(is_superuser=False, is_staff=True):
+        for user in user_model.objects.filter(is_superuser=False, is_staff=True):
             if user.has_perm("cms.use_structure"):
                 user.user_permissions.remove(permission)
         for group in Group.objects.all():
@@ -60,8 +73,8 @@ class Migration(DataMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
-        u'auth.user': {
-            'Meta': {'object_name': 'User'},
+        user_model_label: {
+            'Meta': {'object_name': User.__name__, 'db_table': "'%s'" % User._meta.db_table},
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
@@ -110,7 +123,7 @@ class Migration(DataMigration):
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'sites': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['sites.Site']", 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s']" % user_orm_label, 'null': 'True', 'blank': 'True'})
         },
         'cms.page': {
             'Meta': {'ordering': "('path',)", 'unique_together': "(('publisher_is_draft', 'site', 'application_namespace'), ('reverse_id', 'site', 'publisher_is_draft'))", 'object_name': 'Page'},
@@ -157,16 +170,16 @@ class Migration(DataMigration):
             'group': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.Group']", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'page': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Page']", 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['%s']" % user_orm_label, 'null': 'True', 'blank': 'True'})
         },
         'cms.pageuser': {
-            'Meta': {'object_name': 'PageUser', '_ormbases': [u'auth.User']},
-            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_users'", 'to': u"orm['auth.User']"}),
-            u'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
+            'Meta': {'object_name': 'PageUser', '_ormbases': [user_orm_label]},
+            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_users'", 'to': u"orm['%s']" % user_orm_label}),
+            u'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['%s']" % user_orm_label, 'unique': 'True', 'primary_key': 'True'})
         },
         'cms.pageusergroup': {
             'Meta': {'object_name': 'PageUserGroup', '_ormbases': [u'auth.Group']},
-            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_usergroups'", 'to': u"orm['auth.User']"}),
+            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_usergroups'", 'to': u"orm['%s']" % user_orm_label}),
             u'group_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['auth.Group']", 'unique': 'True', 'primary_key': 'True'})
         },
         'cms.placeholder': {
@@ -216,7 +229,7 @@ class Migration(DataMigration):
             'clipboard': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['cms.Placeholder']", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'djangocms_usersettings'", 'unique': 'True', 'to': u"orm['auth.User']"})
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'djangocms_usersettings'", 'unique': 'True', 'to': u"orm['%s']" % user_orm_label})
         },
         u'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},

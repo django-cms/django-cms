@@ -11,8 +11,12 @@ refer to http://django-load.readthedocs.org/en/latest/index.html.
 """
 import imp
 import traceback # changed
+try:
+    from importlib import import_module
+except ImportError:
+    # Python < 2.7
+    from django.utils.importlib import import_module
 
-from django.utils.importlib import import_module
 from django.utils.six.moves import filter, map
 
 from .compat.dj import installed_apps

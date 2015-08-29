@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from cms.forms.fields import PageSelectFormField
-from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
@@ -16,11 +15,12 @@ class PlaceholderField(models.ForeignKey):
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()
-        if 'to' in kwargs:
-            del(kwargs['to'])
         kwargs.update({'null': True})  # always allow Null
         kwargs.update({'editable': False}) # never allow edits in admin
-        super(PlaceholderField, self).__init__('cms.Placeholder', **kwargs)
+        # We hard-code the `to` argument for ForeignKey.__init__
+        # since a PlaceholderField can only be a ForeignKey to a Placeholder
+        kwargs['to'] = 'cms.Placeholder'
+        super(PlaceholderField, self).__init__(**kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(PlaceholderField, self).deconstruct()
@@ -80,12 +80,11 @@ class PlaceholderField(models.ForeignKey):
 
 class PageField(models.ForeignKey):
     default_form_class = PageSelectFormField
-    default_model_class = Page
 
     def __init__(self, **kwargs):
         # We hard-code the `to` argument for ForeignKey.__init__
         # since a PageField can only be a ForeignKey to a Page
-        kwargs['to'] = self.default_model_class
+        kwargs['to'] = 'cms.Page'
         super(PageField, self).__init__(**kwargs)
 
     def formfield(self, **kwargs):
