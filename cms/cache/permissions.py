@@ -15,13 +15,16 @@ def get_cache_key(user, key):
     return "%s:permission:%s:%s" % (
         get_cms_setting('CACHE_PREFIX'), username, key)
 
+
 def get_cache_version_key():
     return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'),)
 
+
 def get_cache_version():
     from django.core.cache import cache
-    version = cache.get(get_cache_version_key())
-    if version is None:
+    try:
+        version = int(cache.get(get_cache_version_key()))
+    except Exception:
         version = 1
     return version
 
