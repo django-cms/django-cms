@@ -89,7 +89,7 @@ class ExtensionPool(object):
 
     def copy_extensions(self, source_page, target_page, languages=None):
         if not languages:
-            languages = source_page.get_languages()
+            languages = target_page.get_languages()
         if self.page_extensions:
             self._copy_page_extensions(source_page, target_page, None, clone=True)
             self._remove_orphaned_page_extensions()
