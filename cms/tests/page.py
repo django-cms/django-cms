@@ -798,11 +798,15 @@ class PagesTestCase(CMSTestCase):
         """
         parent = create_page("parent", "nav_playground.html", "en")
         child = create_page("child", "nav_playground.html", "en", parent=parent)
-        grand_child = create_page("child", "nav_playground.html", "en", parent=child)
+        grand_child = create_page("grand child", "nav_playground.html", "en", parent=child)
+        child2 = create_page("child2", "col_two.html", "en", parent=parent)
+        grand_child2 = create_page("grand child2", "nav_playground.html", "en", parent=child2)
         child.template = constants.TEMPLATE_INHERITANCE_MAGIC
         grand_child.template = constants.TEMPLATE_INHERITANCE_MAGIC
         child.save()
         grand_child.save()
+        grand_child2.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child2.save()
 
         # kill template cache
         delattr(grand_child, '_template_cache')
@@ -814,11 +818,22 @@ class PagesTestCase(CMSTestCase):
         with self.assertNumQueries(0):
             grand_child.get_template()
 
+        # kill template cache
+        delattr(grand_child2, '_template_cache')
+        with self.assertNumQueries(1):
+            self.assertEqual(child2.template, 'col_two.html')
+            self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
+
+        # test template cache
+        with self.assertNumQueries(0):
+            grand_child2.get_template()
+
         parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
         parent.save()
         self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
+
 
     def test_delete_with_plugins(self):
         """
