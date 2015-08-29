@@ -1525,7 +1525,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 
 class PluginsMetaOptionsTests(TestCase):
-    ''' TestCase set for ensuring that bugs like #992 are caught '''
+    """ TestCase set for ensuring that bugs like #992 are caught """
 
     # these plugins are inlined because, due to the nature of the #992
     # ticket, we cannot actually import a single file with all the
@@ -1533,7 +1533,7 @@ class PluginsMetaOptionsTests(TestCase):
     # error with splitted occurs.
 
     def test_meta_options_as_defaults(self):
-        ''' handling when a CMSPlugin meta options are computed defaults '''
+        """ handling when a CMSPlugin meta options are computed defaults """
         # this plugin relies on the base CMSPlugin and Model classes to
         # decide what the app_label and db_table should be
 
@@ -1542,7 +1542,7 @@ class PluginsMetaOptionsTests(TestCase):
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_as_declared_defaults(self):
-        ''' handling when a CMSPlugin meta options are declared as per defaults '''
+        """ handling when a CMSPlugin meta options are declared as per defaults """
         # here, we declare the db_table and app_label explicitly, but to the same
         # values as would be computed, thus making sure it's not a problem to
         # supply options.
@@ -1552,21 +1552,21 @@ class PluginsMetaOptionsTests(TestCase):
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_app_label(self):
-        ''' make sure customised meta options on CMSPlugins don't break things '''
+        """ make sure customised meta options on CMSPlugins don't break things """
 
         plugin = TestPlugin3.model
         self.assertEqual(plugin._meta.db_table, 'one_thing_testpluginmodel3')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
     def test_meta_options_custom_db_table(self):
-        ''' make sure custom database table names are OK. '''
+        """ make sure custom database table names are OK. """
 
         plugin = TestPlugin4.model
         self.assertEqual(plugin._meta.db_table, 'or_another_4')
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_both(self):
-        ''' We should be able to customise app_label and db_table together '''
+        """ We should be able to customise app_label and db_table together """
 
         plugin = TestPlugin5.model
         self.assertEqual(plugin._meta.db_table, 'or_another_5')

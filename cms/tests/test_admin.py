@@ -610,10 +610,10 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(response.status_code, 404)
 
     def test_tree_displays_in_correct_language(self):
-        '''
+        """
         Test to prove and protect that the page titles in the tree are
         displayed in the currently set language.
-        '''
+        """
         admin_guy, normal_guy = self._get_guys(use_global_permissions=False)
         site = Site.objects.get(pk=1)
 
@@ -1511,7 +1511,7 @@ class AdminFormsTests(AdminTestsBase):
 
 
     def test_reverse_id_error_location(self):
-        ''' Test moving the reverse_id validation error to a field specific one '''
+        """ Test moving the reverse_id validation error to a field specific one """
 
         # this is the Reverse ID we'll re-use to break things.
         dupe_id = 'p1'

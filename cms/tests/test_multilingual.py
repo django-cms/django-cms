@@ -256,10 +256,10 @@ class MultilingualTestCase(CMSTestCase):
             self.assertRaises(Http404, details, request, '')
 
     def test_detail_view_fallback_language(self):
-        '''
+        """
         Ask for a page in elvish (doesn't exist), and assert that it fallsback
         to English
-        '''
+        """
         page = create_page("page1", "nav_playground.html", "en")
         with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={

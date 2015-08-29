@@ -62,7 +62,7 @@ class PluginModelBase(ModelBase):
 
 @python_2_unicode_compatible
 class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
-    '''
+    """
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
 
@@ -72,7 +72,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     1. Subclasses of CMSPlugin *cannot be further subclassed*
     2. Subclasses of CMSPlugin cannot define a "text" field.
 
-    '''
+    """
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
     position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
@@ -135,7 +135,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return plugin_class(plugin_class.model, admin)
 
     def get_plugin_instance(self, admin=None):
-        '''
+        """
         Given a plugin instance (usually as a CMSPluginBase), this method
         returns a tuple containing:
 
@@ -145,7 +145,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
             plugin   - the associated plugin class instance (subclass
                        of CMSPlugin)
-        '''
+        """
         plugin = self.get_plugin_class_instance(admin)
         if hasattr(self, "_inst"):
             return self._inst, plugin

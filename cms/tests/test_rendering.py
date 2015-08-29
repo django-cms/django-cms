@@ -262,7 +262,7 @@ class RenderingTestCase(CMSTestCase):
 
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
 
-        t = '''{% extends "base.html" %}
+        t = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
@@ -270,7 +270,7 @@ class RenderingTestCase(CMSTestCase):
 <h2>{% render_placeholder ex1.placeholder as tempvar %}</h2>
 <h3>{{ tempvar }}</h3>
 {% endblock content %}
-'''
+"""
         r = self.render(t, self.test_page, {'ex1': ex1})
         self.assertIn(
             '<h1>%s</h1>' % render_placeholder_body,
@@ -298,7 +298,7 @@ class RenderingTestCase(CMSTestCase):
 
         add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
 
-        t = '''{% extends "base.html" %}
+        t = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
@@ -306,7 +306,7 @@ class RenderingTestCase(CMSTestCase):
 <h2>{% render_uncached_placeholder ex1.placeholder as tempvar %}</h2>
 <h3>{{ tempvar }}</h3>
 {% endblock content %}
-'''
+"""
         r = self.render(t, self.test_page, {'ex1': ex1})
         self.assertIn(
             '<h1>%s</h1>' % render_uncached_placeholder_body,
