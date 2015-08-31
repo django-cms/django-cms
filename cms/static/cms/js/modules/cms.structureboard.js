@@ -48,8 +48,6 @@
 
                 // states
                 this.click = 'click.cms';
-                this.timer = function () {};
-                this.interval = function () {};
                 this.state = false;
                 this.dragging = false;
 
@@ -298,9 +296,6 @@
 
                 // detach event
                 this.ui.window.off('resize.sideframe');
-
-                // clear interval
-                clearInterval(this.interval);
 
                 this.ui.window.trigger('structureboard_hidden.sideframe');
                 if (!CMS.config.simpleStructureBoard) {
