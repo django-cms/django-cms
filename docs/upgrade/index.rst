@@ -15,6 +15,7 @@ makes changes to your database.
     3.1.2
     3.1.1
     3.1
+    3.0.15
     3.0.14
     3.0.13
     3.0.12
