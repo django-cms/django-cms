@@ -10,6 +10,7 @@ var _$ = window.$ || undefined;
 <script src="{% static "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript"></script>
 {% language request.toolbar.toolbar_language %}
 <script>
+CMS._plugins = [];
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
@@ -62,6 +63,10 @@ $(document).ready(function () {
         'Toolbar': new CMS.Toolbar(),
         'Clipboard': new CMS.Clipboard(),
         'StructureBoard': new CMS.StructureBoard()
+    });
+
+    $.each(CMS._plugins, function (index, args) {
+        new CMS.Plugin(args[0], args[1])
     });
 });
 })(CMS.$);

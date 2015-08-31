@@ -6,21 +6,16 @@
 
 {% endspaceless %}{% addtoblock "js" %}
 <script>
-(function($) {
-// CMS.$ will be passed for $
-$(document).ready(function () {
-    new CMS.Plugin('cms-placeholder-{{ placeholder.pk|unlocalize }}', {
-        'type': 'placeholder',
-        'page_language': '{{ LANGUAGE_CODE }}',
-        'placeholder_id': '{{ placeholder.pk|unlocalize }}',
-        'plugin_language': '{{ language }}',
-        'plugin_restriction': [{% for module in allowed_plugins %}"{{ module}}"{% if not forloop.last %}, {% endif %}{% endfor %}],
-        'urls': { {% language request.toolbar.toolbar_language %}
-            'add_plugin': '{{ placeholder.get_add_url }}',
-            'copy_plugin': '{{ placeholder.get_copy_url }}'
-        } {% endlanguage %}
-    });
-});
-})(CMS.$);
+CMS._plugins.push(['cms-placeholder-{{ placeholder.pk|unlocalize }}', {
+    'type': 'placeholder',
+    'page_language': '{{ LANGUAGE_CODE }}',
+    'placeholder_id': '{{ placeholder.pk|unlocalize }}',
+    'plugin_language': '{{ language }}',
+    'plugin_restriction': [{% for module in allowed_plugins %}"{{ module}}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    'urls': { {% language request.toolbar.toolbar_language %}
+        'add_plugin': '{{ placeholder.get_add_url }}',
+        'copy_plugin': '{{ placeholder.get_copy_url }}'
+    } {% endlanguage %}
+}]);
 </script>
 {% endaddtoblock %}
