@@ -10,18 +10,20 @@
         SHIFT: 16
     };
     // CMS.$ will be passed for $
-    $(document).ready(function () {
-        $(document).on('pointerup.cms', function () {
+    $(function () {
+        var doc = $(document);
+        doc.on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
+            // TODO make it really static
             CMS.Plugin.prototype._hideSubnav();
         }).on('keydown', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
-                $(this).data('expandmode', true);
+                doc.data('expandmode', true);
             }
         }).on('keyup', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
-                $(this).data('expandmode', false);
+                doc.data('expandmode', false);
             }
         });
 
@@ -34,30 +36,28 @@
             implement: [CMS.API.Helpers],
 
             options: {
-                'type': '', // bar, plugin or generic
-                'placeholder_id': null,
-                'plugin_type': '',
-                'plugin_id': null,
-                'plugin_language': '',
-                'plugin_parent': null,
-                'plugin_order': null,
-                'plugin_breadcrumb': [],
-                'plugin_restriction': [],
-                'urls': {
-                    'add_plugin': '',
-                    'edit_plugin': '',
-                    'move_plugin': '',
-                    'copy_plugin': '',
-                    'delete_plugin': ''
+                type: '', // bar, plugin or generic
+                placeholder_id: null,
+                plugin_type: '',
+                plugin_id: null,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                urls: {
+                    add_plugin: '',
+                    edit_plugin: '',
+                    move_plugin: '',
+                    copy_plugin: '',
+                    delete_plugin: ''
                 }
             },
 
             initialize: function (container, options) {
-                this.container = $('.' + container);
                 this.options = $.extend(true, {}, this.options, options);
 
-                // elements
-                this.body = $(document);
+                this._setupUI(container);
 
                 // states
                 this.csrf = CMS.config.csrf;
@@ -67,7 +67,7 @@
                 this.click = 'pointerup.cms';
 
                 // bind data element to the container
-                this.container.data('settings', this.options);
+                this.ui.container.data('settings', this.options);
 
                 // determine type of plugin
                 switch (this.options.type) {
@@ -82,6 +82,11 @@
                     default: // handler for static content
                         this._setGeneric();
                 }
+            },
+
+            _setupUI: function setupUI(container) {
+                this.ui = {};
+                this.ui.container = $('.' + container);
             },
 
             // initial methods
@@ -111,7 +116,7 @@
                 var that = this;
 
                 // adds double click to edit
-                this.container.bind('dblclick', function (e) {
+                this.ui.container.bind('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -122,7 +127,7 @@
                 });
 
                 // adds edit tooltip
-                this.container.bind('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.bind('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -130,12 +135,12 @@
                 });
 
                 // adds listener for all plugin updates
-                this.container.bind('cms.plugins.update', function (e) {
+                this.ui.container.bind('cms.plugins.update', function (e) {
                     e.stopPropagation();
                     that.movePlugin();
                 });
                 // adds listener for copy/paste updates
-                this.container.bind('cms.plugin.update', function (e) {
+                this.ui.container.bind('cms.plugin.update', function (e) {
                     e.stopPropagation();
 
                     var el = $(e.delegateTarget);
@@ -179,14 +184,14 @@
                 var that = this;
 
                 // adds double click to edit
-                this.container.bind('dblclick', function (e) {
+                this.ui.container.bind('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
                 });
 
                 // adds edit tooltip
-                this.container.bind('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.bind('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -600,8 +605,8 @@
                 }
 
                 // add key events
-                $(document).unbind('keydown.cms');
-                $(document).bind('keydown.cms', function (e) {
+                doc.unbind('keydown.cms');
+                doc.bind('keydown.cms', function (e) {
                     var anchors = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
@@ -738,7 +743,7 @@
                 if (el.hasClass('cms-dragitem-expanded')) {
                     settings.states.splice($.inArray(id, settings.states), 1);
                     el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
-                    if ($(document).data('expandmode')) {
+                    if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                         if (!items.length) {
                             return false;
@@ -754,7 +759,7 @@
                 } else {
                     settings.states.push(id);
                     el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
-                    if ($(document).data('expandmode')) {
+                    if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                         if (!items.length) {
                             return false;
@@ -782,7 +787,7 @@
                 var draggable = $('.cms-draggable-' + this.options.plugin_id);
 
                 // check which button should be shown for collapsemenu
-                this.container.each(function (index, item) {
+                this.ui.container.each(function (index, item) {
                     var els = $(item).find('.cms-dragitem-collapsable');
                     var open = els.filter('.cms-dragitem-expanded');
                     if (els.length === open.length && (els.length + open.length !== 0)) {
