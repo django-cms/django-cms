@@ -93,6 +93,8 @@
             _setupUI: function setupUI(container) {
                 this.ui = {};
                 this.ui.container = $('.' + container);
+                this.ui.publish = $('.cms-btn-publish');
+                this.ui.revert = $('.cms-toolbar-revert');
             },
 
             // initial methods
@@ -415,21 +417,21 @@
                 });
 
                 // show publish button
-                $('.cms-btn-publish')
+                this.ui.publish
                     .addClass('cms-btn-publish-active')
                     .removeClass('cms-btn-disabled')
                     .parent().show();
 
                 // enable revert to live
-                $('.cms-toolbar-revert').removeClass('cms-toolbar-item-navigation-disabled');
+                this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');
             },
 
             deletePlugin: function (url, name, breadcrumb) {
                 // trigger modal window
                 var modal = new CMS.Modal({
-                    'newPlugin': this.newPlugin || false,
-                    'onClose': this.options.onClose || false,
-                    'redirectOnClose': this.options.redirectOnClose || false
+                    newPlugin: this.newPlugin || false,
+                    onClose: this.options.onClose || false,
+                    redirectOnClose: this.options.redirectOnClose || false
                 });
                 modal.open(url, name, breadcrumb);
             },
