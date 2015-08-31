@@ -348,12 +348,14 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         self._login()
         print("### HERE BE THE COOKIES ###", self.driver.get_cookies())
-        ret = self.driver.get('%s/en/?%s' % (
+        print("### HERE BE THE SESSION ID ###", self.driver.sessionId)
+        self.driver.get('%s/en/?%s' % (
                 self.live_server_url,
                 get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             )
         )
-        print("### HERE BE THE SESSION ID ###", ret['sessionId'])
+        print("### HERE BE THE COOKIES 2 ###", self.driver.get_cookies())
+        print("### HERE BE THE SESSION ID 2 ###", self.driver.sessionId)
         sys.stderr.write(self.driver.current_url + "\n")
         sys.stderr.write("<SOURCE>" + self.driver.page_source + "</SOURCE>\n")
         build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
