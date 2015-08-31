@@ -128,8 +128,10 @@ Writing tests
 *************
 
 Contributing tests is widely regarded as a very prestigious contribution (you're
-making everybody's future work much easier by doing so). Good karma for you.
-Cookie points. Maybe even a beer if we meet in person :)
+making everybody's future work much easier by doing so). We'll always accept contributions of
+test without code, but not code without test - which should give you an idea of how important
+tests are.
+
 
 What we need
 ============
