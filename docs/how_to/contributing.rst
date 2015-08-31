@@ -1,84 +1,92 @@
-..  _tutorial_contributing:
+..  _contributing_patch:
 
-============
-Contributing
-============
+####################
+Contributing a patch
+####################
 
-.. note:: The topics of this chapter is covered in more details into the :ref:`contributing` and
-          :ref:`testing` sections of the documentation
+.. note:: For more background on the material covered in this how-to section, see the
+   :ref:`contributing-code` and :ref:`testing` sections of the documentation.
 
-django CMS is an open source and open project which welcomes anyone who want to provide its
-contribution at any level of knowledge.
+django CMS is an open project, and welcomes the participation of anyone who would like to
+contribute, whatever their any level of knowledge.
 
-You can contribute code, :ref:`documentation <contributing-documentation>` and
-:ref:`translations <contributing-translations>`.
+As well as code, we welcome contributions to django CMS's :ref:`documentation
+<contributing-documentation>` and :ref:`translations <contributing-translations>`.
+
+.. note::
+   Feel free to dive into coding for django CMS in whichever way suits you. However, you need to be
+   aware of the :ref:`guidelines <contributing-code>` and :ref:`policies <management>` for
+   django CMS project development. Adhering to them will make much easier for the core developers
+   to validate and accept your contribution.
+
 
 .. _start-contributing:
 
-**************************
-Starting contributing code
-**************************
+**********
+The basics
+**********
 
-Before actually coding anything, please read the :ref:`guidelines <contributing-code>` and the
-:ref:`policies <management>` regulating the django CMS project development. Adhering to them
-will make much easier for the core developers to validate and accept your contribution.
+The basic workflow for a code contribution will typically run as follows:
 
-The basic step to contribute are:
-
-#. fork `django CMS project <https://github.com/divio/django-cms>`_  repostory on github
-#. clone your fork on your local computer::
+#. Fork the `django CMS project <https://github.com/divio/django-cms>`_ GitHub repository to your
+   own GitHub account
+#. Clone your fork locally::
 
     git clone git@github.com:YOUR_USERNAME/django-cms.git
 
-#. create a virtualenv::
+#. Create a virtualenv::
 
     virtualenv cms-develop
     source cms-develop/bin/activate
 
-#. install the dependencies::
+#. Install its dependencies::
 
     cd django-cms
     pip install -r test_requirements/django-1.7.txt
 
-   or whichever Django version you target
+   Replace ``1.7`` with whichever version of Django you want to work with.
 
-#. code you contribution
-#. run the tests::
+#. Create a new branch for your work::
+
+    git checkout -b my_fix
+
+#. Edit the django CMS codebase to implement the fix or feature.
+#. Run the test suite::
 
     python develop.py test
 
-#. commit and push your code into a feature branch::
+#. Commit and push your code::
 
-    git checkout -b my_fix
     git commit
     git push origin my_fix
 
-#. open a pull request on github
+#. Open a pull request on GitHub.
+
 
 .. _target-branches:
 
 Target branches
 ===============
 
-At one point in time django CMS project will have at least two active branches:
+The django CMS project will always have at least two active branches:
 
-* latest ``support/version.x`` which you sholud target if you submit bugfixes for ``version.x``
-* ``develop`` for new features and bugfixes for latest version if a corresponding
-  ``support/version.y`` does not exists (yet)
+* ``support/version.x`` which you should target if you're submitting a bugfix for ``version.x``
+* ``develop`` for new features and bugfixes for the next release
 
 
 *******************
 How to write a test
 *******************
 
-django CMS test suite contains a mix of unit tests, functional tests, regression tests and
+The django CMS test suite contains a mix of unit tests, functional tests, regression tests and
 integration tests.
 
 Depending on your contribution, you will write a mix of them.
 
-Let's start with something simple.
+Let's start with something simple. We'll assume you have set up your environment correctly as
+`described above <start-contributing>`_.
 
-Let's say you want to test the behavior of ``CMSPluginBase.render`` method:
+Let's say you want to test the behavior of the ``CMSPluginBase.render`` method:
 
 .. code-block:: python
 
@@ -91,8 +99,8 @@ Let's say you want to test the behavior of ``CMSPluginBase.render`` method:
             context['placeholder'] = placeholder
             return context
 
-Writing a unit test for it will require us to test whether the return context object contains the
-declared attributes with the correct values.
+Writing a unit test for it will require us to test whether the returned ``context`` object contains
+the declared attributes with the correct values.
 
 We will start with a new class in an existing django CMS test module (``cms.tests.plugins`` in
 this case):
@@ -102,13 +110,13 @@ this case):
     class SimplePluginTestCase(CMSTestCase):
         pass
 
-Let's try to run it (given you've setup correctly your environment as in `start-contributing`_:
+Let's try to run it:
 
 .. code-block:: bash
 
     python develop.py test cms.SimplePluginTestCase
 
-This will call the new test case class only and it's hany when creating new tests and iterating
+This will call the new test case class only and it's handy when creating new tests and iterating
 quickly throught the steps. A full test run (``python develop.py test``) is required before opening
 a pull request.
 
@@ -121,7 +129,7 @@ This is the output you'll get::
 
     OK
 
-Which is correct as we have no test in our test case. Let's add and (empty) one:
+Which is correct as we have no test in our test case. Let's add an empty one:
 
 .. code-block:: python
 
@@ -130,7 +138,7 @@ Which is correct as we have no test in our test case. Let's add and (empty) one:
         def test_render_method(self):
             pass
 
-Running the test command again will return a sighltly different output::
+Running the test command again will return a slightly different output::
 
     Creating test database for alias 'default'...
     .
@@ -173,7 +181,7 @@ and run it::
 
     OK
 
-Output is quite similar than the previous run, only the longer execution time gives us a hint that
+The output is quite similar to the previous run, but the longer execution time gives us a hint that
 this test is actually doing something.
 
 Let's quickly check the test code.
@@ -186,34 +194,34 @@ the instance argument can be ``None``.
 #. Get the placeholder by filtering the placeholders of the page instance on the expected
    placeholder name
 #. Create a context instance by using the provided super class method
-#. Call the render method on a CMSPluginBase instance; being stateless, it's easy to call
+#. Call the render method on a ``CMSPluginBase`` instance; being stateless, it's easy to call
    ``render`` of a bare instance of the ``CMSPluginBase`` class, which helps in tests
 #. Assert a few things the method must provide on the returned context instance
 
-As you see, even a simple test like this assumes and uses many feature of the test utils provided
-by django CMS. Before attempting to write a test, take your time to explore the content of
+As you see, even a simple test like this assumes and uses many feature of the test utilities
+provided by django CMS. Before attempting to write a test, take your time to explore the content of
 ``cms.test_utils`` package and check the shipped templates, example applications and, most of all,
-the base testcases defined in ``cms.test_utils.testscases`` which provide *a lot* of useful
-methods to prepare the environment for our tests or to create useful test data.
+the base testcases defined in ``cms.test_utils.testscases`` which provide *a lot* of useful methods
+to prepare the environment for our tests or to create useful test data.
 
 ********************
 Submitting your code
 ********************
 
 After the code and the tests are ready and packed in commits, you must submit it for review and
-merge in the django CMS github project.
+merge in the django CMS GitHub project.
 
-As stated above, always create a feature branch for your code, being it a fix or a new feature;
-then you can create a Pull Request from your branch to the :ref:`target branch<target-branches>`
-on django CMS.
+As noted above, always create a new branch for your code, be it a fix or a new feature, before
+committing changes, then create your pull request from your branch to the :ref:`target
+branch <target-branches>` on django CMS.
 
 
 Acceptance criteria
 ===================
 
-Matching this criteria from the very beginning will help the core developers to be able
-to review your submission more quickly and efficiently and will greatly help your code
-to be merged in.
+Matching these criteria from the very beginning will help the core developers to be able
+to review your submission more quickly and efficiently and will increase the chances of making a
+successful pull request.
 
 Features
 --------
@@ -223,7 +231,7 @@ To be accepted, proposed features should have *at least*:
  * natural language documentation in the ``docs`` folder describing the feature, its usage and
    potentially backward incompatibilities.
  * inline documentation (comments and docstrings) in the critical areas of the code explaining
-   the behavior
+   the behaviour
  * appropriate test coverage
  * Python 2/3 compatibility
  * South and Django migrations (where applicable)
@@ -236,11 +244,11 @@ Bugs
 To be accepted, proposed bug fixes should have *at least*:
 
  * inline documentation (comments and docstrings) in the critical areas of the code explaining
-   the behavior
+   the behaviour
  * at least 1 regression test that demonstrates the issue and the fix
  * Python 2/3 compatibility
  * South and Django migrations (where applicable)
 
 The pull request description must briefly describe the bug and the steps for its solution; in case
-the bug has been opened elsewhere, it must be linked in the Pull Request description, describing
+the bug has been opened elsewhere, it must be linked in the pull request description, describing
 the fix.
