@@ -7,8 +7,14 @@
 
     // TODO move out to separate module CMS-276
     var KEYS = {
-        SHIFT: 16
+        SHIFT: 16,
+        TAB: 9,
+        UP: 38,
+        DOWN: 40,
+        ENTER: 13,
+        ESC: 27
     };
+
     // CMS.$ will be passed for $
     $(function () {
         var doc = $(document);
@@ -611,7 +617,7 @@
                     var index = anchors.index(anchors.filter(':focus'));
 
                     // bind arrow down and tab keys
-                    if (e.keyCode === 40 || e.keyCode === 9) {
+                    if (e.keyCode === KEYS.DOWN || e.keyCode === KEYS.TAB) {
                         that.traverse = true;
                         e.preventDefault();
                         if (index >= 0 && index < anchors.length - 1) {
@@ -622,7 +628,7 @@
                     }
 
                     // bind arrow up and shift+tab keys
-                    if (e.keyCode === 38 || (e.keyCode === 9 && e.shiftKey)) {
+                    if (e.keyCode === KEYS.UP || (e.keyCode === KEYS.TAB && e.shiftKey)) {
                         e.preventDefault();
                         if (anchors.is(':focus')) {
                             anchors.eq(index - 1).focus();
@@ -632,7 +638,7 @@
                     }
 
                     // hide subnav when hitting enter or escape
-                    if (e.keyCode === 13 || e.keyCode === 27) {
+                    if (e.keyCode === KEYS.ENTER || e.keyCode === KEYS.ESC) {
                         that.traverse = false;
                         nav.siblings('.cms-submenu-quicksearch').find('input').blur();
                         that._hideSubnav(nav);
