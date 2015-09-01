@@ -22,12 +22,12 @@
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
             // TODO make it really static
-            CMS.Plugin.prototype._hideSubnav();
-        }).on('keydown', function (e) {
+            CMS.Plugin._hideSubnav();
+        }).on('keydown.cms', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
                 doc.data('expandmode', true);
             }
-        }).on('keyup', function (e) {
+        }).on('keyup.cms', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
                 doc.data('expandmode', false);
             }
@@ -91,11 +91,17 @@
             },
 
             _setupUI: function setupUI(container) {
-                this.ui = {};
-                this.ui.container = $('.' + container);
-                this.ui.publish = $('.cms-btn-publish');
-                this.ui.window = $(window);
-                this.ui.revert = $('.cms-toolbar-revert');
+                container = $('.' + container);
+                this.ui = {
+                    container: container,
+                    publish: $('.cms-btn-publish'),
+                    window: $(window),
+                    revert: $('.cms-toolbar-revert'),
+                    dragbar: null,
+                    draggable: null,
+                    submenu: null,
+                    dropdown: null
+                };
             },
 
             // initial methods
@@ -103,21 +109,26 @@
                 var that = this;
                 var title = '.cms-dragbar-title';
                 var expanded = 'cms-dragbar-title-expanded';
-                var dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
+                this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
+                this.ui.submenu = this.ui.dragbar.find('.cms-submenu');
 
                 // register the subnav on the placeholder
-                this._setSubnav(dragbar.find('.cms-submenu'));
+                this._setSubnav(this.ui.submenu);
 
-                var settings = CMS.settings;
-                settings.dragbars = settings.dragbars || [];
+                CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
                 // enable expanding/collapsing globally within the placeholder
-                dragbar.find(title).on(this.click, function () {
-                    ($(this).hasClass(expanded)) ? that._collapseAll($(this)) : that._expandAll($(this));
+                this.ui.dragbar.find(title).on(this.click, function () {
+                    var titleElement = $(this);
+                    if (titleElement.hasClass(expanded)) {
+                        that._collapseAll(titleElement);
+                    } else {
+                        that._expandAll(titleElement);
+                    }
                 });
 
-                if ($.inArray(this.options.placeholder_id, settings.dragbars) !== -1) {
-                    dragbar.find(title).addClass(expanded);
+                if ($.inArray(this.options.placeholder_id, CMS.settings.dragbars) !== -1) {
+                    this.ui.dragbar.find(title).addClass(expanded);
                 }
             },
 
@@ -171,14 +182,15 @@
                 });
 
                 // variables for dragitems
-                var draggable = $('.cms-draggable-' + this.options.plugin_id);
-                var dragitem = draggable.find('> .cms-dragitem');
+                this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
+                this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
+                this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
                 // attach event to the plugin menu
-                this._setSubnav(draggable.find('> .cms-dragitem .cms-submenu'));
+                this._setSubnav(this.ui.submenu);
 
                 // adds double click to edit
-                dragitem.on('dblclick', function (e) {
+                this.ui.dragitem.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -204,7 +216,11 @@
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    if (e.type === 'pointerover') {
+                        that.showTooltip(name, id);
+                    } else {
+                        that.hideTooltip();
+                    }
                 });
             },
 
@@ -246,9 +262,9 @@
             editPlugin: function (url, name, breadcrumb) {
                 // trigger modal window
                 var modal = new CMS.Modal({
-                    'newPlugin': this.newPlugin || false,
-                    'onClose': this.options.onClose || false,
-                    'redirectOnClose': this.options.redirectOnClose || false
+                    newPlugin: this.newPlugin || false,
+                    onClose: this.options.onClose || false,
+                    redirectOnClose: this.options.redirectOnClose || false
                 });
                 modal.open(url, name, breadcrumb);
             },
@@ -479,8 +495,13 @@
 
             _setSubnav: function (nav) {
                 var that = this;
+                this.ui.dropdown = nav.siblings('.cms-submenu-dropdown');
+                var dropdown = this.ui.dropdown;
 
-                nav.on('click', function (e) {
+                // set data attributes for original top positioning
+                dropdown.data('top', dropdown.css('top'));
+
+                nav.on(this.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var trigger = $(this);
@@ -492,14 +513,14 @@
                     }
                 });
 
-                nav.siblings('.cms-submenu-dropdown').on('mousedown mousemove mouseup', function (e) {
+                dropdown.on('mousedown mousemove mouseup', function (e) {
                     e.stopPropagation();
                 }).on('touchstart', function (e) {
                     // required for scrolling on mobile
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-dropdown').find('a').on('click.cms', function (e) {
+                dropdown.find('a').on('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -570,24 +591,19 @@
                     }
                 });
 
-                // set data attributes for original top positioning
-                nav.siblings('.cms-submenu-dropdown').each(function () {
-                    $(this).data('top', $(this).css('top'));
-                });
-
                 // prevent propagnation
                 nav.on(this.click + ' dblclick', function (e) {
                     e.stopPropagation();
                 });
+
                 nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click, function (e) {
                     e.stopPropagation();
                 });
             },
 
             _showSubnav: function (nav) {
-                var that = this;
-                var dropdown = nav.siblings('.cms-submenu-dropdown');
-                var offset = parseInt(dropdown.data('top'));
+                var dropdown = this.ui.dropdown;
+                var offset = parseInt(dropdown.data('top'), 10);
                 nav.addClass('cms-btn-active');
 
                 // reset z indexes
@@ -603,9 +619,9 @@
                 nav.siblings('.cms-submenu-quicksearch').show().find('input');
 
                 // set visible states
-                nav.siblings('.cms-submenu-dropdown').show().on('scroll', function () {
+                dropdown.show().on('scroll.cms', function () {
                     scrollHint.fadeOut(100);
-                    $(this).off('scroll');
+                    dropdown.off('scroll.cms');
                 });
 
                 // show scrollHint for FF on OSX
@@ -614,14 +630,14 @@
                 }
 
                 // add key events
+                // TODO can also be one simple event handler, not necessary to off/on all the time
                 doc.off('keydown.cms');
                 doc.on('keydown.cms', function (e) {
-                    var anchors = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item:visible a');
+                    var anchors = dropdown.find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
                     // bind arrow down and tab keys
                     if (e.keyCode === KEYS.DOWN || e.keyCode === KEYS.TAB) {
-                        that.traverse = true;
                         e.preventDefault();
                         if (index >= 0 && index < anchors.length - 1) {
                             anchors.eq(index + 1).focus();
@@ -642,7 +658,6 @@
 
                     // hide subnav when hitting enter or escape
                     if (e.keyCode === KEYS.ENTER || e.keyCode === KEYS.ESC) {
-                        that.traverse = false;
                         nav.siblings('.cms-submenu-quicksearch').find('input').blur();
                         CMS.Plugin._hideSubnav(nav);
                     }
@@ -717,7 +732,7 @@
             _toggleCollapsable: function toggleCollapsable(el) {
                 var that = this;
                 var id = that._getId(el.parent());
-                var draggable = $('.cms-draggable-' + this.options.plugin_id);
+                var draggable = this.ui.draggable;
                 var items;
 
                 var settings = CMS.settings;
@@ -767,8 +782,7 @@
             _collapsables: function () {
                 // one time setup
                 var that = this;
-                var settings = CMS.settings;
-                var draggable = $('.cms-draggable-' + this.options.plugin_id);
+                this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
 
                 // check which button should be shown for collapsemenu
                 this.ui.container.each(function (index, item) {
@@ -779,18 +793,18 @@
                     }
                 });
                 // cancel here if its not a draggable
-                if (!draggable.length) {
+                if (!this.ui.draggable.length) {
                     return false;
                 }
 
                 // attach events to draggable
-                draggable.find('> .cms-dragitem-collapsable').on(this.click, function () {
+                this.ui.draggable.find('> .cms-dragitem-collapsable').on(this.click, function () {
                     var el = $(this);
                     that._toggleCollapsable(el);
                 });
 
                 // adds double click event
-                draggable.on('dblclick', function (e) {
+                this.ui.draggable.on('dblclick', function (e) {
                     e.stopPropagation();
                     $('.cms-plugin-' + that._getId($(this))).trigger('dblclick');
                 });
@@ -800,15 +814,15 @@
                     return false;
                 }
 
-                // removing dublicate entries
-                var sortedArr = settings.states.sort();
+                // removing duplicate entries
+                var sortedArr = CMS.settings.states.sort();
                 var filteredArray = [];
                 for (var i = 0; i < sortedArr.length; i++) {
                     if (sortedArr[i] !== sortedArr[i + 1]) {
                         filteredArray.push(sortedArr[i]);
                     }
                 }
-                settings.states = filteredArray;
+                CMS.settings.states = filteredArray;
 
                 // loop through the items
                 $.each(CMS.settings.states, function (index, id) {
