@@ -741,7 +741,7 @@
              */
             _toggleCollapsable: function toggleCollapsable(el) {
                 var that = this;
-                var id = that._getId($(this).parent());
+                var id = that._getId(el.parent());
                 var draggable = $('.cms-draggable-' + this.options.plugin_id);
                 var items;
 
