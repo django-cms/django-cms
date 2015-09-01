@@ -49,7 +49,7 @@ install:
 
 script: coverage run --rcfile=.coverage.rc manage.py test
 
-after_success: coveralls --config_file=.coverage.rc
+after_success: coveralls --config_file=.coverage.rc --coveralls_yaml=.coveralls.yml
 
 notifications:
   irc:
