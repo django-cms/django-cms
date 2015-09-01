@@ -485,9 +485,9 @@
                     e.stopPropagation();
                     var trigger = $(this);
                     if (trigger.hasClass('cms-btn-active')) {
-                        that._hideSubnav(trigger);
+                        CMS.Plugin._hideSubnav(trigger);
                     } else {
-                        that._hideSubnav();
+                        CMS.Plugin._hideSubnav();
                         that._showSubnav(trigger);
                     }
                 });
@@ -507,7 +507,7 @@
                     CMS.API.Toolbar._loader(true);
 
                     var el = $(this);
-                    that._hideSubnav(nav);
+                    CMS.Plugin._hideSubnav(nav);
 
                     // set switch for subnav entries
                     switch (el.attr('data-rel')) {
@@ -644,7 +644,7 @@
                     if (e.keyCode === KEYS.ENTER || e.keyCode === KEYS.ESC) {
                         that.traverse = false;
                         nav.siblings('.cms-submenu-quicksearch').find('input').blur();
-                        that._hideSubnav(nav);
+                        CMS.Plugin._hideSubnav(nav);
                     }
                 });
 
@@ -661,31 +661,6 @@
                     dropdown.css('top', offset);
                     dropdown.css('bottom', 'auto');
                 }
-            },
-
-            /**
-             * hides the opened navigation
-             *
-             * @static
-             * @param [nav] jQuery element representing the subnav trigger
-             */
-            _hideSubnav: function (nav) {
-                nav = nav || $('.cms-submenu.cms-btn-active');
-                if (!nav.length) {
-                    return;
-                }
-                nav.removeClass('cms-btn-active');
-
-                // set correct active state
-                nav.closest('.cms-draggable').data('active', false);
-
-                nav.siblings('.cms-submenu-dropdown').hide();
-                nav.siblings('.cms-submenu-quicksearch').hide();
-                // reset search
-                nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
-
-                // reset relativity
-                $('.cms-dragbar').css('position', '');
             },
 
             _searchSubnav: function (nav, value) {
@@ -911,8 +886,32 @@
                 // make sure structurboard gets updated after success
                 this.ui.window.trigger('resize.sideframe');
             }
-
         });
 
+        /**
+         * hides the opened navigation
+         *
+         * @static
+         * @param [nav] jQuery element representing the subnav trigger
+         */
+        CMS.Plugin._hideSubnav = function (nav) {
+            nav = nav || $('.cms-submenu.cms-btn-active');
+            if (!nav.length) {
+                return;
+            }
+            nav.removeClass('cms-btn-active');
+
+            // set correct active state
+            nav.closest('.cms-draggable').data('active', false);
+
+            nav.siblings('.cms-submenu-dropdown').hide();
+            nav.siblings('.cms-submenu-quicksearch').hide();
+            // reset search
+            nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
+
+            // reset relativity
+            $('.cms-dragbar').css('position', '');
+        };
     });
+
 })(CMS.$);
