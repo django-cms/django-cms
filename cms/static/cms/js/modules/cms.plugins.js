@@ -94,6 +94,7 @@
                 this.ui = {};
                 this.ui.container = $('.' + container);
                 this.ui.publish = $('.cms-btn-publish');
+                this.ui.window = $(window);
                 this.ui.revert = $('.cms-toolbar-revert');
             },
 
@@ -648,7 +649,7 @@
                 });
 
                 // calculate subnav bounds
-                if ($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10 &&
+                if (this.ui.window.height() + this.ui.window.scrollTop() - nav.offset().top - dropdown.height() <= 10 &&
                     nav.offset().top - dropdown.height() >= 0) {
                     dropdown.css('top', 'auto');
                     dropdown.css('bottom', offset);
@@ -782,7 +783,7 @@
                 }
 
                 // make sure structurboard gets updated after expanding
-                $(window).trigger('resize.sideframe');
+                this.ui.window.trigger('resize.sideframe');
 
                 // save settings
                 CMS.API.Toolbar.setSettings(settings);
@@ -908,7 +909,7 @@
                     $(this).remove();
                 });
                 // make sure structurboard gets updated after success
-                $(window).trigger('resize.sideframe');
+                this.ui.window.trigger('resize.sideframe');
             }
 
         });
