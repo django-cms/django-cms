@@ -111,7 +111,7 @@
                 settings.dragbars = settings.dragbars || [];
 
                 // enable expanding/collapsing globally within the placeholder
-                dragbar.find(title).bind(this.click, function () {
+                dragbar.find(title).on(this.click, function () {
                     ($(this).hasClass(expanded)) ? that._collapseAll($(this)) : that._expandAll($(this));
                 });
 
@@ -124,7 +124,7 @@
                 var that = this;
 
                 // adds double click to edit
-                this.ui.container.bind('dblclick', function (e) {
+                this.ui.container.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -135,7 +135,7 @@
                 });
 
                 // adds edit tooltip
-                this.ui.container.bind('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.on('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -143,12 +143,12 @@
                 });
 
                 // adds listener for all plugin updates
-                this.ui.container.bind('cms.plugins.update', function (e) {
+                this.ui.container.on('cms.plugins.update', function (e) {
                     e.stopPropagation();
                     that.movePlugin();
                 });
                 // adds listener for copy/paste updates
-                this.ui.container.bind('cms.plugin.update', function (e) {
+                this.ui.container.on('cms.plugin.update', function (e) {
                     e.stopPropagation();
 
                     var el = $(e.delegateTarget);
@@ -177,7 +177,7 @@
                 this._setSubnav(draggable.find('> .cms-dragitem .cms-submenu'));
 
                 // adds double click to edit
-                dragitem.bind('dblclick', function (e) {
+                dragitem.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -192,14 +192,14 @@
                 var that = this;
 
                 // adds double click to edit
-                this.ui.container.bind('dblclick', function (e) {
+                this.ui.container.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
                 });
 
                 // adds edit tooltip
-                this.ui.container.bind('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.on('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -479,7 +479,7 @@
             _setSubnav: function (nav) {
                 var that = this;
 
-                nav.bind('click', function (e) {
+                nav.on('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var trigger = $(this);
@@ -498,7 +498,7 @@
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-dropdown').find('a').bind('click.cms', function (e) {
+                nav.siblings('.cms-submenu-dropdown').find('a').on('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -613,8 +613,8 @@
                 }
 
                 // add key events
-                doc.unbind('keydown.cms');
-                doc.bind('keydown.cms', function (e) {
+                doc.off('keydown.cms');
+                doc.on('keydown.cms', function (e) {
                     var anchors = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
@@ -808,13 +808,13 @@
                 }
 
                 // attach events to draggable
-                draggable.find('> .cms-dragitem-collapsable').bind(this.click, function () {
+                draggable.find('> .cms-dragitem-collapsable').on(this.click, function () {
                     var el = $(this);
                     that._toggleCollapsable(el);
                 });
 
                 // adds double click event
-                draggable.bind('dblclick', function (e) {
+                draggable.on('dblclick', function (e) {
                     e.stopPropagation();
                     $('.cms-plugin-' + that._getId($(this))).trigger('dblclick');
                 });
