@@ -377,10 +377,7 @@
                         // show empty
                         actualizeEmptyPlaceholders();
                         // ensure all menus are closed
-                        // FIXME find a better way to expose submenus so we can properly call
-                        // _hideSubnav
-                        $('.cms-submenu').removeClass('cms-btn-active');
-                        $('.cms-submenu-quicksearch, .cms-submenu-dropdown').hide();
+                        CMS.Plugin._hideSubnav();
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
                         // keep in mind that caching cms-draggables query only works
