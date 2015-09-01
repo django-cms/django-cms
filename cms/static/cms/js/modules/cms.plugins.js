@@ -69,7 +69,6 @@
                 this.csrf = CMS.config.csrf;
                 this.timer = function () {};
                 this.timeout = 250;
-                this.focused = false;
                 this.click = 'pointerup.cms';
 
                 // bind data element to the container
@@ -577,18 +576,12 @@
                     }
                 });
 
-                nav.siblings('.cms-submenu-quicksearch')
-                    .find('input').on('keyup keydown focus pointerup', function (e) {
-                    if (e.type === 'focus') {
-                        that.focused = true;
-                    }
-                    if (e.type === 'keyup') {
-                        clearTimeout(that.timer);
-                        // keybound is not required
-                        that.timer = setTimeout(function () {
-                            that._searchSubnav(nav, $(e.currentTarget).val());
-                        }, 100);
-                    }
+                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
+                    clearTimeout(that.timer);
+                    // keybound is not required
+                    that.timer = setTimeout(function () {
+                        that._searchSubnav(nav, $(e.currentTarget).val());
+                    }, 100);
                 });
 
                 // prevent propagnation
@@ -630,9 +623,8 @@
                 }
 
                 // add key events
-                // TODO can also be one simple event handler, not necessary to off/on all the time
-                doc.off('keydown.cms');
-                doc.on('keydown.cms', function (e) {
+                doc.off('keydown.cms.traverse');
+                doc.on('keydown.cms.traverse', function (e) {
                     var anchors = dropdown.find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
@@ -664,17 +656,17 @@
                 });
 
                 // calculate subnav bounds
-                if (this.ui.window.height() + this.ui.window.scrollTop() - nav.offset().top - dropdown.height() <= 10 &&
-                    nav.offset().top - dropdown.height() >= 0) {
-                    dropdown.css('top', 'auto');
-                    dropdown.css('bottom', offset);
-                    // if parent is within a plugin, add additional offset
-                    if (dropdown.closest('.cms-draggable').length) {
-                        dropdown.css('bottom', offset - 1);
-                    }
+                if (this.ui.window.height() + this.ui.window.scrollTop() -
+                    dropdown.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
+                    dropdown.css({
+                        top: 'auto',
+                        bottom: offset
+                    });
                 } else {
-                    dropdown.css('top', offset);
-                    dropdown.css('bottom', 'auto');
+                    dropdown.css({
+                        top: offset,
+                        bottom: 'auto'
+                    });
                 }
             },
 
@@ -705,10 +697,11 @@
 
                 // always display title of a category
                 items.filter(':visible').each(function (index, item) {
-                    if ($(item).prev().hasClass('cms-submenu-item-title')) {
-                        $(item).prev().show();
+                    item = $(item);
+                    if (item.prev().hasClass('cms-submenu-item-title')) {
+                        item.prev().show();
                     } else {
-                        $(item).prevUntil('.cms-submenu-item-title').last().prev().show();
+                        item.prevUntil('.cms-submenu-item-title').last().prev().show();
                     }
                 });
 
