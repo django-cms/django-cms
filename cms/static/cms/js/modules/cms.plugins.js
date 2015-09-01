@@ -217,23 +217,23 @@
 
                 var that = this;
                 var data = {
-                    'placeholder_id': this.options.placeholder_id,
-                    'plugin_type': type,
-                    'plugin_parent': parent || '',
-                    'plugin_language': this.options.plugin_language,
-                    'csrfmiddlewaretoken': this.csrf
+                    placeholder_id: this.options.placeholder_id,
+                    plugin_type: type,
+                    plugin_parent: parent || '',
+                    plugin_language: this.options.plugin_language,
+                    csrfmiddlewaretoken: this.csrf
                 };
 
                 $.ajax({
-                    'type': 'POST',
-                    'url': this.options.urls.add_plugin,
-                    'data': data,
-                    'success': function (data) {
+                    type: 'POST',
+                    url: this.options.urls.add_plugin,
+                    data: data,
+                    success: function (data) {
                         CMS.API.locked = false;
                         that.newPlugin = data;
                         that.editPlugin(data.url, name, data.breadcrumb);
                     },
-                    'error': function (jqXHR) {
+                    error: function (jqXHR) {
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
@@ -272,24 +272,24 @@
                 }
 
                 var data = {
-                    'source_placeholder_id': options.placeholder_id,
-                    'source_plugin_id': options.plugin_id || '',
-                    'source_language': source_language,
-                    'target_plugin_id': options.parent || '',
-                    'target_placeholder_id': options.target || CMS.config.clipboard.id,
-                    'target_language': options.page_language || source_language,
-                    'csrfmiddlewaretoken': this.csrf
+                    source_placeholder_id: options.placeholder_id,
+                    source_plugin_id: options.plugin_id || '',
+                    source_language: source_language,
+                    target_plugin_id: options.parent || '',
+                    target_placeholder_id: options.target || CMS.config.clipboard.id,
+                    target_language: options.page_language || source_language,
+                    csrfmiddlewaretoken: this.csrf
                 };
                 var request = {
-                    'type': 'POST',
-                    'url': options.urls.copy_plugin,
-                    'data': data,
-                    'success': function () {
+                    type: 'POST',
+                    url: options.urls.copy_plugin,
+                    data: data,
+                    success: function () {
                         CMS.API.Toolbar.openMessage(CMS.config.lang.success);
                         // reload
                         CMS.API.Helpers.reloadBrowser();
                     },
-                    'error': function (jqXHR) {
+                    error: function (jqXHR) {
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
@@ -316,12 +316,12 @@
 
                 var that = this;
                 var data = {
-                    'placeholder_id': CMS.config.clipboard.id,
-                    'plugin_id': this.options.plugin_id,
-                    'plugin_parent': '',
-                    'plugin_language': this.options.page_language,
-                    'plugin_order': [this.options.plugin_id],
-                    'csrfmiddlewaretoken': this.csrf
+                    placeholder_id: CMS.config.clipboard.id,
+                    plugin_id: this.options.plugin_id,
+                    plugin_parent: '',
+                    plugin_language: this.options.page_language,
+                    plugin_order: [this.options.plugin_id],
+                    csrfmiddlewaretoken: this.csrf
                 };
 
                 // ensure clipboard is cleaned
@@ -334,15 +334,15 @@
 
                     // move plugin
                     $.ajax({
-                        'type': 'POST',
-                        'url': that.options.urls.move_plugin,
-                        'data': data,
-                        'success': function () {
+                        type: 'POST',
+                        url: that.options.urls.move_plugin,
+                        data: data,
+                        success: function () {
                             CMS.API.Toolbar.openMessage(CMS.config.lang.success);
                             // if response is reload
                             CMS.API.Helpers.reloadBrowser();
                         },
-                        'error': function (jqXHR) {
+                        error: function (jqXHR) {
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
