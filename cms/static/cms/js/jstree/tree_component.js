@@ -45,7 +45,7 @@ function tree_component () {
             return tree_component.inst[tree_component.focused];
         }
         tree_component.mousedown = function(event) {
-            $('html').attr('touch-action', 'none');
+            $('html').attr('data-touch-action', 'none');
             var _this = tree_component.focusInst();
             if(!_this) return;
 
@@ -64,7 +64,7 @@ function tree_component () {
             return true;
         };
         tree_component.mouseup = function(event) {
-            $('html').removeAttr('touch-action');
+            $('html').removeAttr('data-touch-action');
             var _this = tree_component.focusInst();
             if(!_this) return;
 

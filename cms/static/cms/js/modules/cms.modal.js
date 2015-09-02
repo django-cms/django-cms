@@ -344,7 +344,7 @@
 
                 this.ui.shim.show();
 
-                this.ui.body.attr('touch-action', 'none').on('pointermove.cms', function (e) {
+                this.ui.body.attr('data-touch-action', 'none').on('pointermove.cms', function (e) {
                     var left = position.left - (initial.originalEvent.pageX - e.originalEvent.pageX);
                     var top = position.top - (initial.originalEvent.pageY - e.originalEvent.pageY);
 
@@ -358,7 +358,7 @@
             _endMove: function () {
                 this.ui.shim.hide();
 
-                this.ui.body.off('pointermove.cms').removeAttr('touch-action');
+                this.ui.body.off('pointermove.cms').removeAttr('data-touch-action');
             },
 
             _startResize: function (initial) {
@@ -375,7 +375,7 @@
 
                 this.ui.shim.show();
 
-                this.ui.body.attr('touch-action', 'none').on('pointermove.cms', function (e) {
+                this.ui.body.attr('data-touch-action', 'none').on('pointermove.cms', function (e) {
                     var mvX = initial.originalEvent.pageX - e.originalEvent.pageX;
                     var mvY = initial.originalEvent.pageY - e.originalEvent.pageY;
 
@@ -402,7 +402,7 @@
             _endResize: function () {
                 this.ui.shim.hide();
 
-                this.ui.body.off('pointermove.cms').removeAttr('touch-action');
+                this.ui.body.off('pointermove.cms').removeAttr('data-touch-action');
             },
 
             _setBreadcrumb: function (breadcrumb) {
