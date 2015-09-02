@@ -313,7 +313,7 @@
                 this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
                 this._minimize(true);
 
-                $('html').attr('touch-action', 'none').bind('pointermove.cms.sideframe', function (e) {
+                $('html').attr('data-touch-action', 'none').bind('pointermove.cms.sideframe', function (e) {
                     if (e.originalEvent.clientX <= 320) {
                         e.originalEvent.clientX = 320;
                     }
@@ -342,7 +342,7 @@
                 this.sideframe.find('.cms-sideframe-shim').css('z-index', 1);
                 $(window).trigger('resize.sideframe');
 
-                $('html').removeAttr('touch-action').unbind('pointermove.cms.sideframe');
+                $('html').removeAttr('data-touch-action').unbind('pointermove.cms.sideframe');
             },
 
             _url: function (url, params) {
