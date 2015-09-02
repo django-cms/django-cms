@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
-from cms.api import create_page
+from cms.api import create_page, create_title
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
@@ -15,7 +15,7 @@ from cms.models import Page
 from cms.test_utils.project.extensionapp.models import (MyPageExtension,
                                                         MyTitleExtension)
 from cms.test_utils.testcases import CMSTestCase as TestCase
-from cms.tests import AdminTestsBase
+from cms.tests.test_admin import AdminTestsBase
 
 
 class ExtensionsTestCase(TestCase):
@@ -229,7 +229,8 @@ class ExtensionAdminTestCase(AdminTestsBase):
         self.page = create_page(
             'My Extension Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
-        self.page_title = self.page.get_title_obj()
+        self.page_title = self.page.get_title_obj('en')
+        create_title('de', 'de title', self.page)
         self.page_extension = MyPageExtension.objects.create(
             extended_object=self.page,
             extra="page extension text")
@@ -241,6 +242,52 @@ class ExtensionAdminTestCase(AdminTestsBase):
             'A Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
         self.page_title_without_extension = self.page_without_extension.get_title_obj()
+
+    def test_duplicate_extensions(self):
+        with self.login_user_context(self.admin):
+            # create page copy
+            page_data = {
+                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
+                'site': 1, 'language': 'en'
+            }
+            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(MyPageExtension.objects.all().count(), 1)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 1)
+            self.client.post(
+                "/en/admin/cms/page/add/"
+                "?position=first-child&copy_target=%s&language=en" % self.page.pk,
+                data=page_data)
+            # Check that page and its extensions have been copied
+            self.assertEqual(Page.objects.all().count(), 3)
+            self.assertEqual(MyPageExtension.objects.all().count(), 2)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 2)
+
+    def test_page_type_extensions(self):
+        with self.login_user_context(self.admin):
+            self.client.get(
+                "%s?copy_target=%s&language=%s" % (
+                    admin_reverse("cms_page_add_page_type"), self.page.pk, 'en'
+                )
+            )
+            page_types = Page.objects.get(reverse_id='page_types')
+
+            # create page copy
+            page_data = {
+                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
+                'site': 1, 'language': 'en'
+            }
+            self.assertEqual(Page.objects.all().count(), 3)
+            self.assertEqual(MyPageExtension.objects.all().count(), 1)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 1)
+            self.client.post(
+                "/en/admin/cms/page/add/"
+                "?target=%s&position=first-child&add_page_type=1"
+                "&copy_target=%s&language=en" % (page_types.pk, self.page.pk),
+                data=page_data)
+            # Check that new page type has extensions from source page
+            self.assertEqual(Page.objects.all().count(), 4)
+            self.assertEqual(MyPageExtension.objects.all().count(), 2)
+            self.assertEqual(MyTitleExtension.objects.all().count(), 2)
 
     def test_admin_page_extension(self):
         with self.login_user_context(self.admin):

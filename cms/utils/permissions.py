@@ -11,7 +11,6 @@ from django.db.models import Q
 from cms.exceptions import NoPermissionsException
 from cms.models import (Page, PagePermission, GlobalPagePermission,
                         MASK_PAGE, MASK_CHILDREN, MASK_DESCENDANTS)
-from cms.plugin_pool import plugin_pool
 from cms.utils.conf import get_cms_setting
 
 
@@ -420,6 +419,7 @@ def has_plugin_permission(user, plugin_type, permission_type):
     the action defined in permission_type
     permission_type should be 'add', 'change' or 'delete'.
     """
+    from cms.plugin_pool import plugin_pool
     plugin_class = plugin_pool.get_plugin(plugin_type)
     plugin_model = plugin_class.model
     plugin_opts = plugin_model._meta

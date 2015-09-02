@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db.models.query import QuerySet
 
+
 class PublisherQuerySet(QuerySet):
     """Added publisher specific filters to queryset.
     """

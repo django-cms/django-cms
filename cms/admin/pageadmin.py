@@ -12,7 +12,10 @@ from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
-from django.contrib.admin.util import get_deleted_objects
+try:
+    from django.contrib.admin.utils import get_deleted_objects
+except ImportError:
+    from django.contrib.admin.util import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site, get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
@@ -165,6 +168,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Move the page in the tree if necessary and save every placeholder
         Content object.
         """
+        from cms.extensions import extension_pool
+
         target = request.GET.get('target', None)
         position = request.GET.get('position', None)
 
@@ -218,18 +223,19 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 obj = obj.move(target, pos=position)
         page_type_id = form.cleaned_data.get('page_type')
         copy_target_id = request.GET.get('copy_target')
+        copy_target = None
         if copy_target_id or page_type_id:
             if page_type_id:
                 copy_target_id = page_type_id
             copy_target = self.model.objects.get(pk=copy_target_id)
             if not copy_target.has_view_permission(request):
                 raise PermissionDenied()
-            obj = self.model.objects.get(pk=obj.pk) #mptt reload
+            obj = obj.reload()
             copy_target._copy_attributes(obj, clean=True)
             obj.save()
-            for lang in copy_target.languages.split(','):
+            for lang in copy_target.get_languages():
                 copy_target._copy_contents(obj, lang)
-        if not 'permission' in request.path_info:
+        if 'permission' not in request.path_info:
             language = form.cleaned_data['language']
             Title.objects.set_or_create(
                 request,
@@ -237,6 +243,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 form,
                 language,
             )
+        if copy_target:
+            extension_pool.copy_extensions(copy_target, obj)
         # is it home? publish it right away
         if new and Page.objects.filter(site_id=obj.site_id).count() == 1:
             obj.publish(language)

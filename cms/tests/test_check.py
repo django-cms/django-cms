@@ -125,7 +125,6 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             'django.contrib.messages.middleware.MessageMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
             'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.doc.XViewMiddleware',
             'django.middleware.common.CommonMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',

@@ -486,6 +486,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         if commit:
             if not self.depth:
                 if self.parent_id:
+                    self.depth = self.parent.depth + 1
                     self.parent.add_child(instance=self)
                 else:
                     self.add_root(instance=self)
@@ -604,7 +605,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             published = public_page.parent_id is None or public_page.parent.is_published(language)
             if not public_page.pk:
                 public_page.save()
-                # The target page now has a pk, so can be used as a target
+            # The target page now has a pk, so can be used as a target
             self._copy_titles(public_page, language, published)
             self._copy_contents(public_page, language)
             # trigger home update
@@ -783,7 +784,14 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         else:
             return self.__class__.get_tree(self).exclude(pk=self.pk).filter(site_id=self.site_id)
 
+    def get_published_languages(self):
+        if self.publisher_is_draft:
+            return self.get_languages()
+        return sorted([language for language in self.get_languages() if self.is_published(language)])
+
     def get_cached_ancestors(self):
+        # Unlike MPTT, Treebeard returns this in parent->child order, so you will have to reverse
+        # this list to have the same behavior as before
         if not hasattr(self, "ancestors_ascending"):
             self.ancestors_ascending = list(self.get_ancestors())
         return self.ancestors_ascending
@@ -978,8 +986,13 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 template = self.template
             else:
                 try:
-                    template = self.get_ancestors().exclude(
-                        template=constants.TEMPLATE_INHERITANCE_MAGIC).values_list('template', flat=True)[0]
+                    template = list(
+                        reversed(
+                            self.get_ancestors().exclude(
+                                template=constants.TEMPLATE_INHERITANCE_MAGIC
+                            ).values_list('template', flat=True)
+                        )
+                    )[0]
                 except IndexError:
                     pass
         if not template:
@@ -1247,20 +1260,22 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = get_xframe_cache(self)
         if xframe_options is None:
-            ancestors = self.get_ancestors()
+            xframe_options = self.xframe_options
+            if not xframe_options or xframe_options == self.X_FRAME_OPTIONS_INHERIT:
+                ancestors = self.get_ancestors()
 
-            # Ignore those pages which just inherit their value
-            ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
+                # Ignore those pages which just inherit their value
+                ancestors = ancestors.exclude(xframe_options=self.X_FRAME_OPTIONS_INHERIT)
 
-            # Now just give me the clickjacking setting (not anything else)
-            xframe_options = list(ancestors.values_list('xframe_options', flat=True))
-            if self.xframe_options != self.X_FRAME_OPTIONS_INHERIT:
-                xframe_options.append(self.xframe_options)
-            if len(xframe_options) <= 0:
-                # No ancestors were found
-                return None
+                # Now just give me the clickjacking setting (not anything else)
+                xframe_options = list(reversed(ancestors.values_list('xframe_options', flat=True)))
+                if self.xframe_options != self.X_FRAME_OPTIONS_INHERIT:
+                    xframe_options.append(self.xframe_options)
+                if len(xframe_options) <= 0:
+                    # No ancestors were found
+                    return None
 
-            xframe_options = xframe_options[0]
+                xframe_options = xframe_options[0]
             set_xframe_cache(self, xframe_options)
 
         return xframe_options

@@ -27,7 +27,8 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
+                                      ClearURLs)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
@@ -92,33 +93,37 @@ class ToolbarTestBase(CMSTestCase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
-class ToolbarMiddlewareTest(ToolbarTestBase):
-
+class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
+    @override_settings(CMS_APP_NAME=None)
+    @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
+    @override_settings(CMS_APP_NAME=None)
+    @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_cms_urls(self):
-        page = create_page('foo','col_two.html','en',published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_APP_NAME='cms')
+    @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_hide_toolbar_in_non_cms_urls_toolbar_hide_unsetted(self):
         request = self.get_page_request(None, self.get_anon(), '/')
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_APP_NAME='cms')
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_hide_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
-        self.assertFalse(hasattr(request,'toolbar'))
+        self.assertFalse(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_APP_NAME='cms')
     def test_app_setted_show_toolbar_in_cms_urls(self):
-        page = create_page('foo','col_two.html','en',published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
-        self.assertTrue(hasattr(request,'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
 
 @override_settings(CMS_PERMISSION=False)
