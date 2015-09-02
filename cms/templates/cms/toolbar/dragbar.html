@@ -18,7 +18,14 @@
     </div>
     {% endlanguage %}
 
-    <div class="cms-dragbar-title">{{ placeholder.get_label }}</div>
+    <div class="cms-dragbar-title">
+        {{ placeholder.get_label }}
+        {% if placeholder.is_static %}<span class="cms-hover-tooltip" tabindex="-1" data-tooltip="{% trans 'This is a static placeholder' %}"><span class="cms-icon cms-icon-pin cms-dragarea-static-icon"></span></span>{% endif %}
+        <span class="cms-dragbar-toggler">
+            <a href="#" class="cms-dragbar-expand-all">{% trans "Expand all" %}</a>
+            <a href="#" class="cms-dragbar-collapse-all">{% trans "Collapse all" %}</a>
+        </span>
+    </div>
 </div>
 
 <div class="cms-dragbar-empty-wrapper">

@@ -301,3 +301,11 @@ $clipboard-buttons-position-top: $sideframe-buttons-position-top +
 $clipboard-button-area-size: 30px;
 $clipboard-button-icon-size: 12px;
 
+//##############################################################################
+// Tooltip
+
+$cms-hover-tooltip-width: 160px;
+$cms-hover-tooltip-arrow-height: 6px;
+$cms-hover-tooltip-bgcolor: rgba($black, 0.8);
+$cms-hover-tooltip-padding: 6px 8px;
+
