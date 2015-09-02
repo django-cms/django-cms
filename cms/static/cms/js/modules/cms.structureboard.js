@@ -14,14 +14,14 @@
 
     // CMS.$ will be passed for $
     $(function () {
-        var emptyDropZones = $('.cms-dragbar-empty-wrapper');
+        var placeholders = $('.cms-dragarea:not(.cms-clipboard-containers)');
         function actualizeEmptyPlaceholders() {
-            emptyDropZones.each(function () {
-                var wrapper = $(this);
-                if (wrapper.next().children().not('.cms-is-dragging').length) {
-                    wrapper.hide();
+            placeholders.each(function () {
+                var placeholder = $(this);
+                if (placeholder.find('> .cms-draggables').children().not('.cms-is-dragging').length) {
+                    placeholder.removeClass('cms-dragarea-empty');
                 } else {
-                    wrapper.show();
+                    placeholder.addClass('cms-dragarea-empty');
                 }
             });
         }
