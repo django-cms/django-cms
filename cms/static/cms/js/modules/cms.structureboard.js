@@ -48,8 +48,6 @@
 
                 // states
                 this.click = 'click.cms';
-                this.timer = function () {};
-                this.interval = function () {};
                 this.state = false;
                 this.dragging = false;
 
@@ -299,9 +297,6 @@
                 // detach event
                 this.ui.window.off('resize.sideframe');
 
-                // clear interval
-                clearInterval(this.interval);
-
                 this.ui.window.trigger('structureboard_hidden.sideframe');
                 if (!CMS.config.simpleStructureBoard) {
                     this.ui.container.height(this.ui.doc.outerHeight());
@@ -382,10 +377,7 @@
                         // show empty
                         actualizeEmptyPlaceholders();
                         // ensure all menus are closed
-                        // FIXME find a better way to expose submenus so we can properly call
-                        // _hideSubnav
-                        $('.cms-submenu').removeClass('cms-btn-active');
-                        $('.cms-submenu-quicksearch, .cms-submenu-dropdown').hide();
+                        CMS.Plugin._hideSubnav();
                         // remove classes from empty dropzones
                         $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
                         // keep in mind that caching cms-draggables query only works

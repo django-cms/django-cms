@@ -7,21 +7,29 @@
 
     // TODO move out to separate module CMS-276
     var KEYS = {
-        SHIFT: 16
+        SHIFT: 16,
+        TAB: 9,
+        UP: 38,
+        DOWN: 40,
+        ENTER: 13,
+        ESC: 27
     };
+
     // CMS.$ will be passed for $
-    $(document).ready(function () {
-        $(document).on('pointerup.cms', function () {
+    $(function () {
+        var doc = $(document);
+        doc.on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
-            CMS.Plugin.prototype._hideSubnav();
-        }).on('keydown', function (e) {
+            // TODO make it really static
+            CMS.Plugin._hideSubnav();
+        }).on('keydown.cms', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
-                $(this).data('expandmode', true);
+                doc.data('expandmode', true);
             }
-        }).on('keyup', function (e) {
+        }).on('keyup.cms', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
-                $(this).data('expandmode', false);
+                doc.data('expandmode', false);
             }
         });
 
@@ -34,40 +42,37 @@
             implement: [CMS.API.Helpers],
 
             options: {
-                'type': '', // bar, plugin or generic
-                'placeholder_id': null,
-                'plugin_type': '',
-                'plugin_id': null,
-                'plugin_language': '',
-                'plugin_parent': null,
-                'plugin_order': null,
-                'plugin_breadcrumb': [],
-                'plugin_restriction': [],
-                'urls': {
-                    'add_plugin': '',
-                    'edit_plugin': '',
-                    'move_plugin': '',
-                    'copy_plugin': '',
-                    'delete_plugin': ''
+                type: '', // bar, plugin or generic
+                placeholder_id: null,
+                plugin_type: '',
+                plugin_id: null,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                urls: {
+                    add_plugin: '',
+                    edit_plugin: '',
+                    move_plugin: '',
+                    copy_plugin: '',
+                    delete_plugin: ''
                 }
             },
 
             initialize: function (container, options) {
-                this.container = $('.' + container);
                 this.options = $.extend(true, {}, this.options, options);
 
-                // elements
-                this.body = $(document);
+                this._setupUI(container);
 
                 // states
                 this.csrf = CMS.config.csrf;
                 this.timer = function () {};
                 this.timeout = 250;
-                this.focused = false;
                 this.click = 'pointerup.cms';
 
                 // bind data element to the container
-                this.container.data('settings', this.options);
+                this.ui.container.data('settings', this.options);
 
                 // determine type of plugin
                 switch (this.options.type) {
@@ -84,26 +89,45 @@
                 }
             },
 
+            _setupUI: function setupUI(container) {
+                container = $('.' + container);
+                this.ui = {
+                    container: container,
+                    publish: $('.cms-btn-publish'),
+                    window: $(window),
+                    revert: $('.cms-toolbar-revert'),
+                    dragbar: null,
+                    draggable: null,
+                    submenu: null,
+                    dropdown: null
+                };
+            },
+
             // initial methods
             _setPlaceholder: function () {
                 var that = this;
                 var title = '.cms-dragbar-title';
                 var expanded = 'cms-dragbar-title-expanded';
-                var dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
+                this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
+                this.ui.submenu = this.ui.dragbar.find('.cms-submenu');
 
                 // register the subnav on the placeholder
-                this._setSubnav(dragbar.find('.cms-submenu'));
+                this._setSubnav(this.ui.submenu);
 
-                var settings = CMS.settings;
-                settings.dragbars = settings.dragbars || [];
+                CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
                 // enable expanding/collapsing globally within the placeholder
-                dragbar.find(title).bind(this.click, function () {
-                    ($(this).hasClass(expanded)) ? that._collapseAll($(this)) : that._expandAll($(this));
+                this.ui.dragbar.find(title).on(this.click, function () {
+                    var titleElement = $(this);
+                    if (titleElement.hasClass(expanded)) {
+                        that._collapseAll(titleElement);
+                    } else {
+                        that._expandAll(titleElement);
+                    }
                 });
 
-                if ($.inArray(this.options.placeholder_id, settings.dragbars) !== -1) {
-                    dragbar.find(title).addClass(expanded);
+                if ($.inArray(this.options.placeholder_id, CMS.settings.dragbars) !== -1) {
+                    this.ui.dragbar.find(title).addClass(expanded);
                 }
             },
 
@@ -111,7 +135,7 @@
                 var that = this;
 
                 // adds double click to edit
-                this.container.bind('dblclick', function (e) {
+                this.ui.container.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -122,7 +146,7 @@
                 });
 
                 // adds edit tooltip
-                this.container.bind('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.on('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -130,12 +154,12 @@
                 });
 
                 // adds listener for all plugin updates
-                this.container.bind('cms.plugins.update', function (e) {
+                this.ui.container.on('cms.plugins.update', function (e) {
                     e.stopPropagation();
                     that.movePlugin();
                 });
                 // adds listener for copy/paste updates
-                this.container.bind('cms.plugin.update', function (e) {
+                this.ui.container.on('cms.plugin.update', function (e) {
                     e.stopPropagation();
 
                     var el = $(e.delegateTarget);
@@ -157,14 +181,15 @@
                 });
 
                 // variables for dragitems
-                var draggable = $('.cms-draggable-' + this.options.plugin_id);
-                var dragitem = draggable.find('> .cms-dragitem');
+                this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
+                this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
+                this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
                 // attach event to the plugin menu
-                this._setSubnav(draggable.find('> .cms-dragitem .cms-submenu'));
+                this._setSubnav(this.ui.submenu);
 
                 // adds double click to edit
-                dragitem.bind('dblclick', function (e) {
+                this.ui.dragitem.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -179,18 +204,22 @@
                 var that = this;
 
                 // adds double click to edit
-                this.container.bind('dblclick', function (e) {
+                this.ui.container.on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
                 });
 
                 // adds edit tooltip
-                this.container.bind('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.on('pointerover.cms pointerout.cms', function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    if (e.type === 'pointerover') {
+                        that.showTooltip(name, id);
+                    } else {
+                        that.hideTooltip();
+                    }
                 });
             },
 
@@ -204,23 +233,23 @@
 
                 var that = this;
                 var data = {
-                    'placeholder_id': this.options.placeholder_id,
-                    'plugin_type': type,
-                    'plugin_parent': parent || '',
-                    'plugin_language': this.options.plugin_language,
-                    'csrfmiddlewaretoken': this.csrf
+                    placeholder_id: this.options.placeholder_id,
+                    plugin_type: type,
+                    plugin_parent: parent || '',
+                    plugin_language: this.options.plugin_language,
+                    csrfmiddlewaretoken: this.csrf
                 };
 
                 $.ajax({
-                    'type': 'POST',
-                    'url': this.options.urls.add_plugin,
-                    'data': data,
-                    'success': function (data) {
+                    type: 'POST',
+                    url: this.options.urls.add_plugin,
+                    data: data,
+                    success: function (data) {
                         CMS.API.locked = false;
                         that.newPlugin = data;
                         that.editPlugin(data.url, name, data.breadcrumb);
                     },
-                    'error': function (jqXHR) {
+                    error: function (jqXHR) {
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
@@ -232,9 +261,9 @@
             editPlugin: function (url, name, breadcrumb) {
                 // trigger modal window
                 var modal = new CMS.Modal({
-                    'newPlugin': this.newPlugin || false,
-                    'onClose': this.options.onClose || false,
-                    'redirectOnClose': this.options.redirectOnClose || false
+                    newPlugin: this.newPlugin || false,
+                    onClose: this.options.onClose || false,
+                    redirectOnClose: this.options.redirectOnClose || false
                 });
                 modal.open(url, name, breadcrumb);
             },
@@ -259,24 +288,24 @@
                 }
 
                 var data = {
-                    'source_placeholder_id': options.placeholder_id,
-                    'source_plugin_id': options.plugin_id || '',
-                    'source_language': source_language,
-                    'target_plugin_id': options.parent || '',
-                    'target_placeholder_id': options.target || CMS.config.clipboard.id,
-                    'target_language': options.page_language || source_language,
-                    'csrfmiddlewaretoken': this.csrf
+                    source_placeholder_id: options.placeholder_id,
+                    source_plugin_id: options.plugin_id || '',
+                    source_language: source_language,
+                    target_plugin_id: options.parent || '',
+                    target_placeholder_id: options.target || CMS.config.clipboard.id,
+                    target_language: options.page_language || source_language,
+                    csrfmiddlewaretoken: this.csrf
                 };
                 var request = {
-                    'type': 'POST',
-                    'url': options.urls.copy_plugin,
-                    'data': data,
-                    'success': function () {
+                    type: 'POST',
+                    url: options.urls.copy_plugin,
+                    data: data,
+                    success: function () {
                         CMS.API.Toolbar.openMessage(CMS.config.lang.success);
                         // reload
                         CMS.API.Helpers.reloadBrowser();
                     },
-                    'error': function (jqXHR) {
+                    error: function (jqXHR) {
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
@@ -303,12 +332,12 @@
 
                 var that = this;
                 var data = {
-                    'placeholder_id': CMS.config.clipboard.id,
-                    'plugin_id': this.options.plugin_id,
-                    'plugin_parent': '',
-                    'plugin_language': this.options.page_language,
-                    'plugin_order': [this.options.plugin_id],
-                    'csrfmiddlewaretoken': this.csrf
+                    placeholder_id: CMS.config.clipboard.id,
+                    plugin_id: this.options.plugin_id,
+                    plugin_parent: '',
+                    plugin_language: this.options.page_language,
+                    plugin_order: [this.options.plugin_id],
+                    csrfmiddlewaretoken: this.csrf
                 };
 
                 // ensure clipboard is cleaned
@@ -321,15 +350,15 @@
 
                     // move plugin
                     $.ajax({
-                        'type': 'POST',
-                        'url': that.options.urls.move_plugin,
-                        'data': data,
-                        'success': function () {
+                        type: 'POST',
+                        url: that.options.urls.move_plugin,
+                        data: data,
+                        success: function () {
                             CMS.API.Toolbar.openMessage(CMS.config.lang.success);
                             // if response is reload
                             CMS.API.Helpers.reloadBrowser();
                         },
-                        'error': function (jqXHR) {
+                        error: function (jqXHR) {
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
@@ -404,21 +433,21 @@
                 });
 
                 // show publish button
-                $('.cms-btn-publish')
+                this.ui.publish
                     .addClass('cms-btn-publish-active')
                     .removeClass('cms-btn-disabled')
                     .parent().show();
 
                 // enable revert to live
-                $('.cms-toolbar-revert').removeClass('cms-toolbar-item-navigation-disabled');
+                this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');
             },
 
             deletePlugin: function (url, name, breadcrumb) {
                 // trigger modal window
                 var modal = new CMS.Modal({
-                    'newPlugin': this.newPlugin || false,
-                    'onClose': this.options.onClose || false,
-                    'redirectOnClose': this.options.redirectOnClose || false
+                    newPlugin: this.newPlugin || false,
+                    onClose: this.options.onClose || false,
+                    redirectOnClose: this.options.redirectOnClose || false
                 });
                 modal.open(url, name, breadcrumb);
             },
@@ -465,27 +494,32 @@
 
             _setSubnav: function (nav) {
                 var that = this;
+                this.ui.dropdown = nav.siblings('.cms-submenu-dropdown');
+                var dropdown = this.ui.dropdown;
 
-                nav.bind('click', function (e) {
+                // set data attributes for original top positioning
+                dropdown.data('top', dropdown.css('top'));
+
+                nav.on(this.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var trigger = $(this);
                     if (trigger.hasClass('cms-btn-active')) {
-                        that._hideSubnav(trigger);
+                        CMS.Plugin._hideSubnav(trigger);
                     } else {
-                        that._hideSubnav();
+                        CMS.Plugin._hideSubnav();
                         that._showSubnav(trigger);
                     }
                 });
 
-                nav.siblings('.cms-submenu-dropdown').on('mousedown mousemove mouseup', function (e) {
+                dropdown.on('mousedown mousemove mouseup', function (e) {
                     e.stopPropagation();
                 }).on('touchstart', function (e) {
                     // required for scrolling on mobile
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-dropdown').find('a').bind('click.cms', function (e) {
+                dropdown.find('a').on('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -493,7 +527,7 @@
                     CMS.API.Toolbar._loader(true);
 
                     var el = $(this);
-                    that._hideSubnav(nav);
+                    CMS.Plugin._hideSubnav(nav);
 
                     // set switch for subnav entries
                     switch (el.attr('data-rel')) {
@@ -542,38 +576,27 @@
                     }
                 });
 
-                nav.siblings('.cms-submenu-quicksearch')
-                    .find('input').on('keyup keydown focus pointerup', function (e) {
-                    if (e.type === 'focus') {
-                        that.focused = true;
-                    }
-                    if (e.type === 'keyup') {
-                        clearTimeout(that.timer);
-                        // keybound is not required
-                        that.timer = setTimeout(function () {
-                            that._searchSubnav(nav, $(e.currentTarget).val());
-                        }, 100);
-                    }
-                });
-
-                // set data attributes for original top positioning
-                nav.siblings('.cms-submenu-dropdown').each(function () {
-                    $(this).data('top', $(this).css('top'));
+                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
+                    clearTimeout(that.timer);
+                    // keybound is not required
+                    that.timer = setTimeout(function () {
+                        that._searchSubnav(nav, $(e.currentTarget).val());
+                    }, 100);
                 });
 
                 // prevent propagnation
                 nav.on(this.click + ' dblclick', function (e) {
                     e.stopPropagation();
                 });
+
                 nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click, function (e) {
                     e.stopPropagation();
                 });
             },
 
             _showSubnav: function (nav) {
-                var that = this;
-                var dropdown = nav.siblings('.cms-submenu-dropdown');
-                var offset = parseInt(dropdown.data('top'));
+                var dropdown = this.ui.dropdown;
+                var offset = parseInt(dropdown.data('top'), 10);
                 nav.addClass('cms-btn-active');
 
                 // reset z indexes
@@ -589,9 +612,9 @@
                 nav.siblings('.cms-submenu-quicksearch').show().find('input');
 
                 // set visible states
-                nav.siblings('.cms-submenu-dropdown').show().on('scroll', function () {
+                dropdown.show().on('scroll.cms', function () {
                     scrollHint.fadeOut(100);
-                    $(this).off('scroll');
+                    dropdown.off('scroll.cms');
                 });
 
                 // show scrollHint for FF on OSX
@@ -600,14 +623,13 @@
                 }
 
                 // add key events
-                $(document).unbind('keydown.cms');
-                $(document).bind('keydown.cms', function (e) {
-                    var anchors = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item:visible a');
+                doc.off('keydown.cms.traverse');
+                doc.on('keydown.cms.traverse', function (e) {
+                    var anchors = dropdown.find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
                     // bind arrow down and tab keys
-                    if (e.keyCode === 40 || e.keyCode === 9) {
-                        that.traverse = true;
+                    if (e.keyCode === KEYS.DOWN || e.keyCode === KEYS.TAB) {
                         e.preventDefault();
                         if (index >= 0 && index < anchors.length - 1) {
                             anchors.eq(index + 1).focus();
@@ -617,7 +639,7 @@
                     }
 
                     // bind arrow up and shift+tab keys
-                    if (e.keyCode === 38 || (e.keyCode === 9 && e.shiftKey)) {
+                    if (e.keyCode === KEYS.UP || (e.keyCode === KEYS.TAB && e.shiftKey)) {
                         e.preventDefault();
                         if (anchors.is(':focus')) {
                             anchors.eq(index - 1).focus();
@@ -627,51 +649,25 @@
                     }
 
                     // hide subnav when hitting enter or escape
-                    if (e.keyCode === 13 || e.keyCode === 27) {
-                        that.traverse = false;
+                    if (e.keyCode === KEYS.ENTER || e.keyCode === KEYS.ESC) {
                         nav.siblings('.cms-submenu-quicksearch').find('input').blur();
-                        that._hideSubnav(nav);
+                        CMS.Plugin._hideSubnav(nav);
                     }
                 });
 
                 // calculate subnav bounds
-                if ($(window).height() + $(window).scrollTop() - nav.offset().top - dropdown.height() <= 10 &&
-                    nav.offset().top - dropdown.height() >= 0) {
-                    dropdown.css('top', 'auto');
-                    dropdown.css('bottom', offset);
-                    // if parent is within a plugin, add additional offset
-                    if (dropdown.closest('.cms-draggable').length) {
-                        dropdown.css('bottom', offset - 1);
-                    }
+                if (this.ui.window.height() + this.ui.window.scrollTop() -
+                    dropdown.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
+                    dropdown.css({
+                        top: 'auto',
+                        bottom: offset
+                    });
                 } else {
-                    dropdown.css('top', offset);
-                    dropdown.css('bottom', 'auto');
+                    dropdown.css({
+                        top: offset,
+                        bottom: 'auto'
+                    });
                 }
-            },
-
-            /**
-             * hides the opened navigation
-             *
-             * @static
-             * @param [nav] jQuery element representing the subnav trigger
-             */
-            _hideSubnav: function (nav) {
-                nav = nav || $('.cms-submenu.cms-btn-active');
-                if (!nav.length) {
-                    return;
-                }
-                nav.removeClass('cms-btn-active');
-
-                // set correct active state
-                nav.closest('.cms-draggable').data('active', false);
-
-                nav.siblings('.cms-submenu-dropdown').hide();
-                nav.siblings('.cms-submenu-quicksearch').hide();
-                // reset search
-                nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
-
-                // reset relativity
-                $('.cms-dragbar').css('position', '');
             },
 
             _searchSubnav: function (nav, value) {
@@ -701,10 +697,11 @@
 
                 // always display title of a category
                 items.filter(':visible').each(function (index, item) {
-                    if ($(item).prev().hasClass('cms-submenu-item-title')) {
-                        $(item).prev().show();
+                    item = $(item);
+                    if (item.prev().hasClass('cms-submenu-item-title')) {
+                        item.prev().show();
                     } else {
-                        $(item).prevUntil('.cms-submenu-item-title').last().prev().show();
+                        item.prevUntil('.cms-submenu-item-title').last().prev().show();
                     }
                 });
 
@@ -727,8 +724,8 @@
              */
             _toggleCollapsable: function toggleCollapsable(el) {
                 var that = this;
-                var id = that._getId($(this).parent());
-                var draggable = $('.cms-draggable-' + this.options.plugin_id);
+                var id = that._getId(el.parent());
+                var draggable = this.ui.draggable;
                 var items;
 
                 var settings = CMS.settings;
@@ -738,7 +735,7 @@
                 if (el.hasClass('cms-dragitem-expanded')) {
                     settings.states.splice($.inArray(id, settings.states), 1);
                     el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
-                    if ($(document).data('expandmode')) {
+                    if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                         if (!items.length) {
                             return false;
@@ -754,7 +751,7 @@
                 } else {
                     settings.states.push(id);
                     el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
-                    if ($(document).data('expandmode')) {
+                    if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                         if (!items.length) {
                             return false;
@@ -769,7 +766,7 @@
                 }
 
                 // make sure structurboard gets updated after expanding
-                $(window).trigger('resize.sideframe');
+                this.ui.window.trigger('resize.sideframe');
 
                 // save settings
                 CMS.API.Toolbar.setSettings(settings);
@@ -778,11 +775,10 @@
             _collapsables: function () {
                 // one time setup
                 var that = this;
-                var settings = CMS.settings;
-                var draggable = $('.cms-draggable-' + this.options.plugin_id);
+                this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
 
                 // check which button should be shown for collapsemenu
-                this.container.each(function (index, item) {
+                this.ui.container.each(function (index, item) {
                     var els = $(item).find('.cms-dragitem-collapsable');
                     var open = els.filter('.cms-dragitem-expanded');
                     if (els.length === open.length && (els.length + open.length !== 0)) {
@@ -790,18 +786,18 @@
                     }
                 });
                 // cancel here if its not a draggable
-                if (!draggable.length) {
+                if (!this.ui.draggable.length) {
                     return false;
                 }
 
                 // attach events to draggable
-                draggable.find('> .cms-dragitem-collapsable').bind(this.click, function () {
+                this.ui.draggable.find('> .cms-dragitem-collapsable').on(this.click, function () {
                     var el = $(this);
                     that._toggleCollapsable(el);
                 });
 
                 // adds double click event
-                draggable.bind('dblclick', function (e) {
+                this.ui.draggable.on('dblclick', function (e) {
                     e.stopPropagation();
                     $('.cms-plugin-' + that._getId($(this))).trigger('dblclick');
                 });
@@ -811,15 +807,15 @@
                     return false;
                 }
 
-                // removing dublicate entries
-                var sortedArr = settings.states.sort();
+                // removing duplicate entries
+                var sortedArr = CMS.settings.states.sort();
                 var filteredArray = [];
                 for (var i = 0; i < sortedArr.length; i++) {
                     if (sortedArr[i] !== sortedArr[i + 1]) {
                         filteredArray.push(sortedArr[i]);
                     }
                 }
-                settings.states = filteredArray;
+                CMS.settings.states = filteredArray;
 
                 // loop through the items
                 $.each(CMS.settings.states, function (index, id) {
@@ -895,10 +891,34 @@
                     $(this).remove();
                 });
                 // make sure structurboard gets updated after success
-                $(window).trigger('resize.sideframe');
+                this.ui.window.trigger('resize.sideframe');
             }
-
         });
 
+        /**
+         * hides the opened navigation
+         *
+         * @static
+         * @param [nav] jQuery element representing the subnav trigger
+         */
+        CMS.Plugin._hideSubnav = function (nav) {
+            nav = nav || $('.cms-submenu.cms-btn-active');
+            if (!nav.length) {
+                return;
+            }
+            nav.removeClass('cms-btn-active');
+
+            // set correct active state
+            nav.closest('.cms-draggable').data('active', false);
+
+            nav.siblings('.cms-submenu-dropdown').hide();
+            nav.siblings('.cms-submenu-quicksearch').hide();
+            // reset search
+            nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
+
+            // reset relativity
+            $('.cms-dragbar').css('position', '');
+        };
     });
+
 })(CMS.$);
