@@ -657,7 +657,7 @@
 
                 // calculate subnav bounds
                 if (this.ui.window.height() + this.ui.window.scrollTop() -
-                    dropdown.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
+                    nav.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
                     dropdown.css({
                         top: 'auto',
                         bottom: offset
