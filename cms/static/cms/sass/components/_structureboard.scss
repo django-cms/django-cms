@@ -49,13 +49,18 @@
         padding: $structure-dragbar-padding
             $structure-dragbar-padding-horizontal
             $structure-dragbar-padding;
-        border-radius: $border-radius-base;
-        background: $gray-darker;
     }
+
     .cms-dragarea-static {
-        background-color: $gray-darker;
-        background-image: linear-gradient($gradient-striped-light);
-        background-size: 10px 10px;
+        .cms-dragbar {
+            .cms-dragbar-title {
+                color: $gray;
+            }
+        }
+        .cms-dragarea-static-icon {
+            position: relative;
+            top: 2px;
+        }
     }
 
     // subclasses for the simple structure borad without absolute positioning
