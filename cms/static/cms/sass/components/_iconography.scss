@@ -63,17 +63,20 @@
     @if $filename == pencil {
         $char: "E00C";
     }
-    @if $filename == plus {
+    @if $filename == pin {
         $char: "E00D";
     }
-    @if $filename == scissors {
+    @if $filename == plus {
         $char: "E00E";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E00F";
     }
-    @if $filename == window {
+    @if $filename == search {
         $char: "E010";
+    }
+    @if $filename == window {
+        $char: "E011";
     }
 
     @return $char;
@@ -139,6 +142,10 @@
 
 .cms-icon-pencil {
     @include icon(pencil);
+}
+
+.cms-icon-pin {
+    @include icon(pin);
 }
 
 .cms-icon-plus {
