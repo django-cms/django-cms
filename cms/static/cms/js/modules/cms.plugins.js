@@ -106,10 +106,11 @@
             // initial methods
             _setPlaceholder: function () {
                 var that = this;
-                var title = '.cms-dragbar-title';
-                var expanded = 'cms-dragbar-title-expanded';
                 this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
                 this.ui.submenu = this.ui.dragbar.find('.cms-submenu');
+                var title = this.ui.dragbar.find('.cms-dragbar-title');
+                var togglerLinks = this.ui.dragbar.find('.cms-dragbar-toggler a');
+                var expanded = 'cms-dragbar-title-expanded';
 
                 // register the subnav on the placeholder
                 this._setSubnav(this.ui.submenu);
@@ -117,17 +118,17 @@
                 CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
                 // enable expanding/collapsing globally within the placeholder
-                this.ui.dragbar.find(title).on(this.click, function () {
-                    var titleElement = $(this);
-                    if (titleElement.hasClass(expanded)) {
-                        that._collapseAll(titleElement);
+                togglerLinks.on('click', function (e) {
+                    e.preventDefault();
+                    if (title.hasClass(expanded)) {
+                        that._collapseAll(title);
                     } else {
-                        that._expandAll(titleElement);
+                        that._expandAll(title);
                     }
                 });
 
                 if ($.inArray(this.options.placeholder_id, CMS.settings.dragbars) !== -1) {
-                    this.ui.dragbar.find(title).addClass(expanded);
+                    title.addClass(expanded);
                 }
             },
 

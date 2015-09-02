@@ -28,6 +28,7 @@ $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transpare
 //##############################################################################
 // BASE Variables
 $font-size-normal: 14px;
+$font-size-large: 18px;
 $line-height-normal: 20px;
 
 $border-radius-base: 3px;
@@ -159,11 +160,10 @@ $dialog-shadow: $modal-shadow;
 
 //##############################################################################
 // Structureboard
-$structure-bgcolor: rgba($white, 0.95);
+$structure-bgcolor: #f0f0f0;
 
 $structure-dragbar-height: 24px;
-$structure-dragbar-color: $white;
-$structure-dragbar-text-shadow: 0 1px 0 $black;
+$structure-dragbar-color: $black;
 $structure-dragbar-icon-space: $structure-dragbar-height;
 $structure-dragbar-icon-size: 10px;
 $structure-dragbar-padding: 8px;
@@ -185,7 +185,7 @@ $structure-dragitem-height: 26px;
 // Structureboard
 $submenu-icon-area-size: 30px;
 $submenu-icon-size: 16px;
-$submenu-icon-color: $white;
+$submenu-icon-color: $gray;
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
