@@ -4,7 +4,11 @@ from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import importlib
+try:
+    import importlib
+except ImportError:
+    # Python < 2.7
+    from django.utils import importlib
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
