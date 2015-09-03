@@ -7,14 +7,14 @@
     /* Base styles for the entire tooltip */
     .cms-hover-tooltip:before,
     .cms-hover-tooltip:after {
-        position: absolute;
         visibility: hidden;
+        position: absolute;
+        pointer-events: none;
         opacity: 0;
         transition: opacity 0.2s ease-in-out,
-                    visibility 0.2s ease-in-out,
-                    transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24);
+            visibility 0.2s ease-in-out,
+            transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24);
         transform: translate3d(0, 0, 0);
-        pointer-events: none;
     }
 
     /* Show the entire tooltip on hover and focus */
@@ -32,24 +32,24 @@
 
     /* Base styles for the tooltip's directional arrow */
     .cms-hover-tooltip:before {
+        content: "";
         z-index: 2;
         border: $cms-hover-tooltip-arrow-height solid transparent;
         background: transparent;
-        content: "";
     }
 
     /* Base styles for the tooltip's content area */
     .cms-hover-tooltip:after {
-        z-index: 1;
-        padding: $cms-hover-tooltip-padding;
-        width: $cms-hover-tooltip-width;
-        font-weight: normal;
-        text-align: center;
-        background-color: $cms-hover-tooltip-bgcolor;
-        color: $white !important;
         content: attr(data-tooltip);
+        z-index: 1;
+        color: $white !important;
         font-size: $font-size-normal - 2px;
+        font-weight: normal;
         line-height: 1.2;
+        text-align: center;
+        width: $cms-hover-tooltip-width;
+        padding: $cms-hover-tooltip-padding;
+        background-color: $cms-hover-tooltip-bgcolor;
     }
 
     .cms-hover-tooltip:before,
@@ -59,8 +59,8 @@
     }
 
     .cms-hover-tooltip:before {
-        margin-left: -$cms-hover-tooltip-arrow-height;
         margin-bottom: -$cms-hover-tooltip-arrow-height * 2;
+        margin-left: -$cms-hover-tooltip-arrow-height;
         border-top-color: $cms-hover-tooltip-bgcolor;
     }
 
@@ -74,5 +74,4 @@
     .cms-hover-tooltip:focus:after {
         transform: translateY(-$cms-hover-tooltip-arrow-height * 2);
     }
-
 }
