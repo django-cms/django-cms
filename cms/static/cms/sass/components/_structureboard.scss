@@ -49,13 +49,18 @@
         padding: $structure-dragbar-padding
             $structure-dragbar-padding-horizontal
             $structure-dragbar-padding;
-        border-radius: $border-radius-base;
-        background: $gray-darker;
     }
+
     .cms-dragarea-static {
-        background-color: $gray-darker;
-        background-image: linear-gradient($gradient-striped-light);
-        background-size: 10px 10px;
+        .cms-dragbar {
+            .cms-dragbar-title {
+                color: $gray;
+            }
+        }
+        .cms-dragarea-static-icon {
+            position: relative;
+            top: 2px;
+        }
     }
 
     // subclasses for the simple structure borad without absolute positioning
@@ -80,37 +85,56 @@
         font-size: $font-size-normal;
         line-height: $line-height-normal;
         border-radius: $border-radius-base;
+        padding-left: $border-radius-normal + 2px;
 
         .cms-dragbar-title {
-            @include icon(arrow-wide);
             position: relative;
-            cursor: pointer;
             color: $structure-dragbar-color;
-            font-size: $font-size-normal - 1px;
-            font-weight: 500;
+            font-size: $font-size-normal;
+            font-weight: bold;
             line-height: $structure-dragbar-height + 1px;
-            text-transform: uppercase;
-            text-shadow: $structure-dragbar-text-shadow;
             height: $structure-dragbar-height;
-            padding: 0 0 0 $structure-dragbar-icon-space;
             margin-right: $submenu-icon-area-size;
-
-            &:before {
-                @extend %icon;
-                position: absolute;
-                top: ($structure-dragbar-height - $structure-dragbar-icon-size) / 2;
-                left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2;
-                font-size: $structure-dragbar-icon-size;
-                color: $gray-light;
-                transform: rotate(180deg);
-            }
-            &:hover:before {
-                color: $white;
+        }
+        .cms-dragbar-toggler {
+            margin-left: 30px;
+            font-weight: normal;
+            cursor: pointer;
+            text-transform: uppercase;
+            a {
+                font-size: $font-size-normal - 2px !important;
+                color: $color-primary !important;
+                &:hover {
+                    color: darken($color-primary, 10%) !important;
+                }
             }
         }
-        .cms-dragbar-title-expanded:before {
-            transform: rotate(-90deg);
-            left: ($structure-dragbar-icon-space - $structure-dragbar-icon-size) / 2 - 1px;
+        .cms-dragbar-collapse-all {
+            display: none;
+        }
+        .cms-dragbar-expand-all {
+            display: inline;
+        }
+        .cms-dragbar-title-expanded {
+            .cms-dragbar-collapse-all {
+                display: inline;
+            }
+            .cms-dragbar-expand-all {
+                display: none;
+            }
+        }
+
+    }
+
+    .cms-dragbar-empty-wrapper {
+        display: none !important;
+    }
+    .cms-dragarea-empty {
+        .cms-dragbar-empty-wrapper {
+            display: block !important;
+        }
+        .cms-dragbar-toggler {
+            display: none;
         }
     }
 
@@ -174,11 +198,6 @@
         }
 
         // menu overwrites
-        .cms-submenu {
-            &:before {
-                color: $gray-darker;
-            }
-        }
         .cms-submenu-dropdown {
             top: $structure-dragitem-height + $structure-dragarea-padding;
         }

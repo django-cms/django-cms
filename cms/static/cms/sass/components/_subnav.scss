@@ -112,7 +112,6 @@
         height: $quicksearch-height;
         margin-top: -($quicksearch-height / 2);
         border-radius: $border-radius-base + 1px;
-        background: $gray-darker;
 
         &:before {
             @extend %icon;
@@ -121,7 +120,7 @@
             top: 50%;
             margin-top: -($submenu-quicksearch-icon-size / 2);
             font-size: $submenu-quicksearch-icon-size;
-            color: white;
+            color: $gray-light;
         }
     }
     .cms-submenu-quicksearch label {

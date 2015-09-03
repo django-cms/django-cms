@@ -1,0 +1,311 @@
+// ##################################################################################################################
+// #SETTINGS#
+
+$speed-base: 200ms;
+
+// #COLORS#
+$white: #fff;
+$black: #000;
+
+$color-primary: #57bcf0;
+$color-success: #693;
+$color-danger: #f00;
+$color-warning: #c93;
+$color-window: #fcfcfc;
+
+// #COLORS gray
+$gray:            lighten($black, 40%); // #666;
+$gray-lightest:   lighten($gray, 58%); // #fafafa
+$gray-lighter:    lighten($gray, 50%); // #e5e5e5
+$gray-light:      lighten($gray, 25%); // #a6a6a6
+$gray-darker:     darken($gray, 13%); // #454545
+$gray-darkest:    darken($gray, 20%); // #333
+
+$gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
+$gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
+$gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transparent 50%, rgba($white, .8) 50%, rgba($white, .8) 75%, transparent 75%, transparent;
+
+//##############################################################################
+// BASE Variables
+$font-size-normal: 14px;
+$font-size-large: 18px;
+$line-height-normal: 20px;
+
+$border-radius-base: 3px;
+$border-radius-normal: 5px;
+
+$padding-base: 3px;
+$padding-normal: 10px;
+$padding-large: 20px;
+
+//##############################################################################
+// z-index map
+// the map is built from highest to lowest as it appears on screen
+$z-layers: (
+    "debug":            99999999,
+    "modal": (
+        "base":         999999,
+        "footer":       11,
+        "body":         10,
+        "frame":        10,
+        "shim":         20,
+        "breadcrumb": (
+            "base":           100,
+            "trianglebehind": 1,
+            "trianglefront":  2,
+            "title":          3
+        ),
+        "buttons":      101,
+        "resize":       102,
+    ),
+    "messages":         999999,
+    "toolbar-trigger":  999999,
+    "toolbar": (
+        "base":         999999,
+        "left":         10,
+        "right":        10,
+    ),
+    "clipboard": (
+        "base":         99999,
+        "containers":   99,
+        "draggable":    99,
+        "triggers":     999,
+    ),
+    "sideframe": (
+        "base":         99999,
+        "buttons":      40,
+        "resize":       30,
+        // shim-while-resizing: 20
+        "frame":        10,
+        "shim":         1,
+    ),
+    "structure": (
+        "base":         9999,
+        "content": (
+            "base":     100,
+            "dragbar":  9999,
+            "draggable": 99,
+            // special case as parent z-index is changed in js
+            "quicksearch": 1000,
+            "dropdown":    999,
+        ),
+        "dimmer":       10,
+    ),
+    "screenblock":      100,
+    // sideframe > sideframe-frame > iframe >
+    "dialog":           99999,
+    "base":             9999999,
+    "default":          1,
+    "below":            -1,
+);
+
+
+//##############################################################################
+// #BUTTONS
+$btn-border-radius-base: $border-radius-base;
+$btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
+
+$btn-default-color: $gray;
+$btn-default-bgcolor: $white;
+$btn-default-border: $gray-lighter;
+
+$btn-action-color: $white;
+$btn-action-bgcolor: $color-primary;
+$btn-action-border: $color-primary;
+
+$btn-caution-color: $white;
+$btn-caution-bgcolor: adjust-hue($color-danger, 15deg);
+$btn-caution-border: adjust-hue($color-danger, 15deg);
+
+$btn-active-color: $white;
+$btn-active-bgcolor: $gray-darker;
+$btn-active-border: $gray-darkest;
+
+
+//##############################################################################
+// Modal
+$modal-header-title-font-size: $font-size-normal;
+$modal-shadow: 0 0 20px rgba($black, .5);
+$modal-bgcolor: $white;
+$modal-border-radius: $border-radius-normal;
+
+$modal-header-height: 36px;
+$modal-footer-height: 36px;
+
+$modal-header-button-icon-size: 10px;
+$modal-header-button-area-size: 30px;
+
+$modal-breadcrumb-title-width: 40px;
+$modal-breadcrumb-padding-vertical: $padding-normal;
+$modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
+$modal-breadcrumb-hover-color: $black;
+$modal-breadcrumb-hover-bgcolor: $white;
+
+$modal-button-font-size: 12px;
+$modal-button-padding: 2px $padding-normal;
+$modal-button-space: 5px;
+$modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
+
+
+$modal-resize-size: 30px;
+
+$modal-content-padding: 10px;
+$modal-content-module-padding: 10px;
+
+//##############################################################################
+// Dialog
+$dialog-width: 500px;
+$dialog-border-radius: $border-radius-normal;
+$dialog-shadow: $modal-shadow;
+
+//##############################################################################
+// Structureboard
+$structure-bgcolor: #f0f0f0;
+
+$structure-dragbar-height: 24px;
+$structure-dragbar-color: $black;
+$structure-dragbar-icon-space: $structure-dragbar-height;
+$structure-dragbar-icon-size: 10px;
+$structure-dragbar-padding: 8px;
+$structure-dragbar-padding-horizontal: 8px;
+
+$structure-dragarea-space: 8px;
+$structure-dragarea-padding: 8px;
+$structure-dragarea-padding-horizontal: 8px;
+
+$structure-draggable-inner-padding: 7px;
+$structure-draggable-space: $structure-dragarea-space;
+$structure-draggable-odd-child-bgcolor: $gray-lightest;
+$structure-draggable-even-child-bgcolor: $white;
+
+$structure-dragitem-icon-size: 10px;
+$structure-dragitem-height: 26px;
+
+//##############################################################################
+// Structureboard
+$submenu-icon-area-size: 30px;
+$submenu-icon-size: 16px;
+$submenu-icon-color: $gray;
+
+$submenu-item-font-size: $font-size-normal;
+$submenu-item-height: $line-height-normal + 6px;
+$submenu-item-padding-horizontal: 10px;
+$submenu-item-color: $black;
+$submenu-item-hover-color: $white;
+
+$submenu-dropdown-width: 180px;
+$submenu-dropdown-height: 10 * $submenu-item-height + 2px;
+$submenu-dropdown-bgcolor: $white;
+
+$submenu-quicksearch-icon-size: 14px;
+$submenu-quicksearch-padding: $structure-dragarea-padding * 2 + $submenu-quicksearch-icon-size;
+$submenu-quicksearch-input-width: $submenu-dropdown-width - $submenu-quicksearch-padding;
+$submenu-quicksearch-input-font-size: $font-size-normal - 1px;
+$submenu-quicksearch-input-line-height: $submenu-quicksearch-input-font-size;
+
+
+//##############################################################################
+// Tooltip
+$tooltip-font-size: $font-size-normal - 2px;
+$tooltip-padding: 5px 7px;
+$tooltip-line-height: $tooltip-font-size + 2 * nth($tooltip-padding, 1);
+$tooltip-icon-area-size: 22px;
+$tooltip-icon-size: 14px;
+$tooltip-first-line-color: $gray-lighter;
+$tooltip-second-line-color: $white;
+
+//##############################################################################
+// Toolbar
+$toolbar-height: 46px; // has to be even number
+$toolbar-shadow: 0 0 5px rgba($black, 0.2);
+$toolbar-left-space: 15px;
+$toolbar-border: $gray-lighter;
+
+$toolbar-debug-height: 5px;
+$toolbar-debug-bgsize: 10px 10px;
+$toolbar-debug-bgcolor: #fcd200;
+
+$toolbar-logo-height: 21px;
+
+$toolbar-trigger-width: $toolbar-height;
+$toolbar-trigger-height: $toolbar-height;
+$toolbar-trigger-icon-size: 10px;
+$toolbar-trigger-loader-size: 20px;
+
+$toolbar-right-hide-breakpoint: 800px;
+$toolbar-right-space: 15px;
+
+$toolbar-menu-item-padding: 0 ($line-height-normal / 2); // has to be 0 $value;;
+$toolbar-menu-item-color: $black;
+$toolbar-menu-item-hover-color: $white;
+$toolbar-menu-item-hover-bgcolor: $color-primary;
+
+$toolbar-dropdown-padding: 3px 0;
+$toolbar-dropdown-shadow: 0 1px 1px rgba($black, 0.4);
+$toolbar-dropdown-bgcolor: $white;
+$toolbar-dropdown-border-radius: $border-radius-base + 1px;
+
+$toolbar-dropdown-min-width: 180px;
+$toolbar-dropdown-item-height: 30px;
+$toolbar-dropdown-item-padding: 0 10px 0 15px; // has to be 0 $value;
+$toolbar-dropdown-item-icon-size: 10px;
+
+$toolbar-button-height: 30px;
+$toolbar-button-font-size: 13px;
+$toolbar-button-padding-horizontal: 12px;
+$toolbar-button-border-radius: $border-radius-base;
+
+//##############################################################################
+// Toolbar messages + screenblock + login form
+$messages-width: 300px;
+$messages-padding: 6px 10px 8px;
+$messages-color: $white;
+$messages-font-size: 12px;
+$messages-line-height: 16px;
+$messages-border-radius: $border-radius-base;
+$messages-bgcolor: $black;
+$messages-font-weight: 200;
+$messages-close-area-size: 20px;
+$messages-close-icon-size: 10px;
+
+$screenblock-color: $white;
+$screenblock-bgcolor: $black;
+$screenblock-inner-position: 300px;
+
+$login-form-input-font-size: $font-size-normal;
+$login-form-input-color: $gray;
+$login-form-input-width: 100px;
+$login-form-input-height: 28px;
+$login-form-input-padding-horizontal: 5px;
+$login-form-input-border: lighten($gray, 45%);
+$login-form-input-border-radius: $border-radius-base;
+
+$login-form-submit-color: $white;
+$login-form-submit-padding-horizontal: 15px;
+
+//##############################################################################
+// Sideframe
+$sideframe-buttons-position-top: $toolbar-height + 40px;
+$sideframe-border-width: 2px;
+$sideframe-resize-knob-size: 12px 50px;
+$sideframe-button-area-size: 30px;
+$sideframe-button-icon-size: 10px;
+$sideframe-button-space: 2px;
+
+//##############################################################################
+// Clipboard
+
+// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
+$clipboard-buttons-position-top: $sideframe-buttons-position-top +
+    3.5 * $sideframe-button-area-size + 20px;
+$clipboard-button-area-size: 30px;
+$clipboard-button-icon-size: 12px;
+
+//##############################################################################
+// Tooltip
+
+$cms-hover-tooltip-width: 160px;
+$cms-hover-tooltip-arrow-height: 6px;
+$cms-hover-tooltip-bgcolor: rgba($black, 0.8);
+$cms-hover-tooltip-padding: 6px 8px;
+
