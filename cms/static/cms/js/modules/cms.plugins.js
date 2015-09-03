@@ -522,6 +522,9 @@ $(document).ready(function () {
 			var dropdown = nav.find('.cms_submenu-dropdown');
 			var offset = parseInt(dropdown.data('top'));
 
+			//fix issue #4407
+			nav.parents('.cms_draggable').data( 'menustate', 1).trigger('cms.structureboard.menustate.change');
+
 			// clearing
 			clearTimeout(this.timer);
 
@@ -603,6 +606,9 @@ $(document).ready(function () {
 			var that = this;
 			// cancel if quicksearch is focues
 			if(this.focused) return false;
+
+			//fix issue #4407
+			nav.parents('.cms_draggable').data( 'menustate', 0 ).trigger('cms.structureboard.menustate.change');
 
 			// set correct active state
 			nav.closest('.cms_draggable').data('active', false);

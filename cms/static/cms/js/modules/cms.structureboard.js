@@ -112,6 +112,12 @@ $(document).ready(function () {
 				}
 			});
 
+			//fix issue #4407
+			$('.cms-toolbar-expanded .cms_dragarea .cms_draggables .cms_draggable').bind('cms.structureboard.menustate.change', function(e){
+				var drag    = $(this);
+				(drag.data( 'menustate') > 0) ? that.sortDisable() : that.sortEnable();
+			});
+
 			$(document).bind('keyup', function (e) {
 				if(e.keyCode === 16) {
 					$(this).data('expandmode', false);
@@ -344,6 +350,16 @@ $(document).ready(function () {
 					'width': item.width() + min
 				});
 			});
+		},
+
+		//fix issue #4407
+		sortDisable: function() {
+			var that = this;
+			that.sortables.sortable('disable');
+		},
+		sortEnable: function() {
+			var that = this;
+			that.sortables.sortable('enable');
 		},
 
 		_drag: function () {
