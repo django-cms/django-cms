@@ -5,13 +5,6 @@
 (function ($) {
     'use strict';
 
-    // TODO move out to separate module CMS-276
-    var KEYS = {
-        SPACE: 32,
-        SHIFT: 16,
-        ESC: 27
-    };
-
     // CMS.$ will be passed for $
     $(function () {
         var placeholders = $('.cms-dragarea:not(.cms-clipboard-containers)');
@@ -149,7 +142,7 @@
                     that.ui.doc.on('keydown', function (e) {
                         // check if we have an important focus
                         var haveFocusedField = document.activeElement !== document.body;
-                        if (e.keyCode === KEYS.SPACE && !haveFocusedField) {
+                        if (e.keyCode === CMS.KEYS.SPACE && !haveFocusedField) {
                             e.preventDefault();
                             if (that.settings.mode === 'structure') {
                                 that.hide();
@@ -484,7 +477,7 @@
 
                 // attach escape event to cancel dragging
                 this.ui.doc.on('keyup.cms', function (e, cancel) {
-                    if (e.keyCode === KEYS.ESC || cancel) {
+                    if (e.keyCode === CMS.KEYS.ESC || cancel) {
                         that.state = false;
                         that.ui.sortables.sortable('cancel');
                     }

@@ -19,7 +19,15 @@ window.Class = window.Class || undefined;
 var CMS = {
     $: (typeof window.jQuery === 'function') ? window.jQuery : undefined,
     Class: (typeof window.Class === 'function') ? window.Class : undefined,
-    API: {}
+    API: {},
+    KEYS: {
+        SHIFT: 16,
+        TAB: 9,
+        UP: 38,
+        DOWN: 40,
+        ENTER: 13,
+        ESC: 27
+    }
 };
 
 //##################################################################################################################

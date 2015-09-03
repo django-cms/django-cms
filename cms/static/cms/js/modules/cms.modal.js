@@ -245,7 +245,7 @@
 
                 // add esc close event
                 this.ui.body.on('keydown.cms', function (e) {
-                    if (e.keyCode === 27) {
+                    if (e.keyCode === CMS.KEYS.ESC) {
                         that.close();
                     }
                 });
@@ -615,7 +615,7 @@
 
                         // attach close event
                         contents.find('body').on('keydown.cms', function (e) {
-                            if (e.keyCode === 27) {
+                            if (e.keyCode === CMS.KEYS.ESC) {
                                 that.close();
                             }
                         });
