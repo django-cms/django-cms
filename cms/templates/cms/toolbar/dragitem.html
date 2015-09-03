@@ -5,10 +5,10 @@
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if disabled_child %}
-        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
-            data-tooltip="{% trans "This plugin cannot be moved or edited outside of it's parent" %}">
-            <span class="cms-icon cms-icon-lock"></span>
-        </span>
+            <span class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
+                data-tooltip="{% trans "This plugin cannot be moved or edited outside of it's parent" %}">
+                <span class="cms-icon cms-icon-lock"></span>
+            </span>
         {% endif %}
         <div class="cms-submenu cms-btn">
         </div>
