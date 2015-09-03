@@ -51,32 +51,35 @@
     @if $filename == loader {
         $char: "E008";
     }
-    @if $filename == logo {
+    @if $filename == lock {
         $char: "E009";
     }
-    @if $filename == menu {
+    @if $filename == logo {
         $char: "E00A";
     }
-    @if $filename == minus {
+    @if $filename == menu {
         $char: "E00B";
     }
-    @if $filename == pencil {
+    @if $filename == minus {
         $char: "E00C";
     }
-    @if $filename == pin {
+    @if $filename == pencil {
         $char: "E00D";
     }
-    @if $filename == plus {
+    @if $filename == pin {
         $char: "E00E";
     }
-    @if $filename == scissors {
+    @if $filename == plus {
         $char: "E00F";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E010";
     }
-    @if $filename == window {
+    @if $filename == search {
         $char: "E011";
+    }
+    @if $filename == window {
+        $char: "E012";
     }
 
     @return $char;
@@ -126,6 +129,10 @@
 
 .cms-icon-loader {
     @include icon(loader);
+}
+
+.cms-icon-lock {
+    @include icon(lock);
 }
 
 .cms-icon-logo {
