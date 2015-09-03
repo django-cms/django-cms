@@ -46,9 +46,7 @@
         position: absolute;
         box-sizing: border-box;
         margin: 0 0 $structure-dragarea-space;
-        padding: $structure-dragbar-padding
-            $structure-dragbar-padding-horizontal
-            $structure-dragbar-padding;
+        padding: $structure-dragbar-padding $structure-dragbar-padding-horizontal;
     }
 
     .cms-dragarea-static {
@@ -167,8 +165,7 @@
         z-index: z(structure, content, draggable);
         margin: $structure-draggable-space 0 0;
         margin-left: 0 !important;
-        // differences are fine-tuning
-        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
+        padding: 0;
         border-radius: $border-radius-base;
         list-style-type: none;
 
@@ -178,7 +175,6 @@
             z-index: z(structure, content, draggable);
             white-space: nowrap;
             border-color: $gray-lighter;
-            background: $structure-draggable-even-child-bgcolor;
             &:hover {
                 border-color: $gray-light;
             }
@@ -186,29 +182,19 @@
         .cms-draggable .cms-draggable {
             margin-top: $structure-draggable-space;
         }
-        .cms-draggable .cms-draggable,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background-color: $structure-draggable-odd-child-bgcolor;
-        }
-        .cms-draggable .cms-draggable .cms-draggable,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable {
-            background-color: $structure-draggable-even-child-bgcolor;
-        }
 
         // menu overwrites
         .cms-submenu-dropdown {
-            top: $structure-dragitem-height + $structure-dragarea-padding;
+            top: $structure-dragitem-height + $structure-dragarea-padding * 2;
         }
         .cms-submenu-quicksearch {
-            $quicksearch-height: $structure-dragitem-height + $structure-draggable-space + $structure-dragarea-padding;
+            $quicksearch-height: $structure-dragitem-height + $structure-dragarea-padding * 2;
             top: 50%;
             height: $quicksearch-height;
             margin-top: -($quicksearch-height / 2);
             border-left: 1px dotted $gray-lighter;
             border-radius: 0;
-            background: $gray-lightest;
+            background: $white;
             &:before {
                 color: $gray-darker;
             }
@@ -216,17 +202,6 @@
         .cms-submenu-quicksearch input {
             color: $black;
             margin-top: 1px;
-        }
-
-        .cms-draggable .cms-submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $structure-draggable-even-child-bgcolor;
-        }
-        .cms-draggable .cms-draggable .cms-submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch,
-        .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-draggable .cms-submenu-quicksearch {
-            background-color: $structure-draggable-odd-child-bgcolor;
         }
 
         .cms-dragitem {
@@ -244,8 +219,7 @@
     .cms-draggable {
         z-index: z(structure, content, draggable) + 1;
         color: $black;
-        border: 1px solid $gray-lightest;
-        background: $gray-lightest;
+        transform: translateZ(0);
     }
     .cms-droppable {
         color: darken($gray-lighter, 15%);
@@ -253,15 +227,27 @@
         border-radius: $border-radius-base;
         line-height: $structure-dragitem-height;
         min-height: $structure-dragitem-height;
+        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
     }
 
     .cms-dragitem {
         position: relative;
         cursor: move;
+        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
+        background: $white;
+        border-radius: $border-radius-normal;
+        @if ($structure-dragarea-use-background == 1) {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABCCAAAAAB73glBAAAAAnRSTlMAAHaTzTgAAAAeSURBVHgBY7gCBgxAAGHRRoAKYOi5dNSloy4ddSkA3VChcDH0cxcAAAAASUVORK5CYII=');
+            background-repeat: no-repeat;
+            background-position: 10px 50%;
+            background-size: 8px 33px;
+        }
+        &:hover {
+            box-shadow: 0px 0px 0px 1px $color-primary;
+        }
     }
-    .cms-dragitem-collapsable,
-    .cms-dragitem-expanded {
-        padding-left: $structure-dragbar-icon-space;
+    .cms-dragitem-collapsable {
+        padding-left: $structure-dragitem-icon-space;
         cursor: pointer;
     }
     .cms-dragitem-collapsable {
@@ -269,14 +255,13 @@
         &:before {
             @extend %icon;
             position: absolute;
-            left: ($structure-dragbar-icon-space - $structure-dragitem-icon-size) / 2;
-            top: ($structure-dragitem-height - $structure-dragitem-icon-size) / 2;
+            left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
+            margin-left: $structure-dragarea-padding-horizontal - 10px;
+            top: 50%;
+            margin-top: -$structure-dragitem-icon-size/2;
             font-size: $structure-dragitem-icon-size;
-            color: $gray-darker;
+            color: $gray-light;
             transform: rotate(180deg);
-        }
-        &:hover:before {
-            color: $black;
         }
     }
     .cms-dragitem-expanded:before {
@@ -332,12 +317,8 @@
             display: none;
         }
 
-        .cms-draggable:hover {
-            border-color: $gray-lighter;
-        }
-
         > .cms-dragitem-collapsable {
-            padding-left: 0;
+            padding-left: $structure-dragarea-padding-horizontal;
             &:hover {
                 border-color: $gray-light;
             }
@@ -352,9 +333,37 @@
             }
         }
 
+        .cms-draggable {
+            margin-left: $structure-draggable-inner-padding !important;
+            .cms-dragitem {
+                background-image: none;
+                &:hover {
+                    box-shadow: none;
+                }
+            }
+        }
+
         .cms-draggables,
         .cms-droppable {
             display: none !important;
+        }
+    }
+    .cms-plugin-disabled  {
+        position: absolute;
+        right: $submenu-right;
+        width: $submenu-icon-area-size;
+        height: $submenu-icon-area-size;
+        top: 50%;
+        margin-top: -($submenu-icon-area-size / 2);
+        .cms-icon {
+            $submenu-icon-size: 20px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -($submenu-icon-size / 2);
+            margin-top: -($submenu-icon-size / 2);
+            font-size: $submenu-icon-size;
+            color: $submenu-icon-color;
         }
     }
 

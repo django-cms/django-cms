@@ -164,22 +164,26 @@ $structure-bgcolor: #f0f0f0;
 
 $structure-dragbar-height: 24px;
 $structure-dragbar-color: $black;
-$structure-dragbar-icon-space: $structure-dragbar-height;
-$structure-dragbar-icon-size: 10px;
 $structure-dragbar-padding: 8px;
 $structure-dragbar-padding-horizontal: 8px;
 
-$structure-dragarea-space: 8px;
+$structure-dragarea-space: 4px;
 $structure-dragarea-padding: 8px;
 $structure-dragarea-padding-horizontal: 8px;
+$structure-dragarea-use-background: 1;
+@if ($structure-dragarea-use-background == 1) {
+    $structure-dragarea-padding-horizontal: 28px;
+}
 
-$structure-draggable-inner-padding: 7px;
+$structure-draggable-inner-padding: 22px;
 $structure-draggable-space: $structure-dragarea-space;
 $structure-draggable-odd-child-bgcolor: $gray-lightest;
 $structure-draggable-even-child-bgcolor: $white;
 
 $structure-dragitem-icon-size: 10px;
 $structure-dragitem-height: 26px;
+$structure-dragitem-icon-space: 22px + $structure-dragarea-padding-horizontal;
+$structure-dragitem-icon-size: 12px;
 
 //##############################################################################
 // Structureboard
