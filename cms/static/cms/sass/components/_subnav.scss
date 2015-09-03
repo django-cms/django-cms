@@ -6,7 +6,8 @@
         display: block;
         position: absolute;
         cursor: pointer;
-        right: 0px;
+        border: none;
+        right: $submenu-right;
         width: $submenu-icon-area-size;
         height: $submenu-icon-area-size;
         top: 50%;
@@ -40,7 +41,7 @@
         display: none;
         position: absolute;
         top: $structure-dragbar-height + $structure-dragarea-space;
-        right: $submenu-icon-area-size;
+        right: $submenu-icon-area-size + $submenu-right;
         z-index: z(structure, content, dropdown);
         min-width: $submenu-dropdown-width;
         max-height: $submenu-dropdown-height;
@@ -106,7 +107,7 @@
         display: none;
         position: absolute;
         top: 50%;
-        right: $submenu-icon-area-size;
+        right: $submenu-icon-area-size + $submenu-right;
         z-index: z(structure, content, quicksearch);
         text-align: right;
         height: $quicksearch-height;

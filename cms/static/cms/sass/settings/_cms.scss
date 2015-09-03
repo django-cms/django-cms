@@ -185,7 +185,8 @@ $structure-dragitem-height: 26px;
 // Structureboard
 $submenu-icon-area-size: 30px;
 $submenu-icon-size: 16px;
-$submenu-icon-color: $gray;
+$submenu-icon-color: $gray-light;
+$submenu-right: ($structure-dragarea-padding * 2 + $structure-dragitem-height - $submenu-icon-area-size) / 2;
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
