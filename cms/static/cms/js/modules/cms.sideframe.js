@@ -17,9 +17,9 @@
             options: {
                 onClose: false,
                 sideframeDuration: 300,
-                sideframeWidth: 320,
+                sideframeWidth: 0.8, // matches 80% of window width
                 urls: {
-                    'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
+                    css_sideframe: 'cms/css/cms.toolbar.sideframe.css'
                 }
             },
 
@@ -30,7 +30,7 @@
 
                 // elements
                 this.sideframe = $('.cms-sideframe');
-                this.body = $('html');
+                this.dimmer = this.sideframe.find('.cms-sideframe-dimmer');
 
                 // states
                 this.click = 'click.cms';
@@ -52,31 +52,6 @@
                 // attach close event
                 this.sideframe.find('.cms-sideframe-close').bind(this.click, function () {
                     that.close(true);
-                });
-
-                // attach hide event
-                this.sideframe.find('.cms-sideframe-hide').bind(this.click, function () {
-                    if ($(this).hasClass('cms-sideframe-hidden')) {
-                        that.settings.sideframe.hidden = false;
-                        that._show(that.settings.sideframe.position || that.options.sideframeWidth, true);
-                    } else {
-                        that.settings.sideframe.hidden = true;
-                        that._hide();
-                    }
-                    that.settings = that.setSettings(that.settings);
-                });
-
-                // attach maximize event
-                this.sideframe.find('.cms-sideframe-maximize').bind(this.click, function () {
-                    if ($(this).hasClass('cms-sideframe-minimize')) {
-                        that.settings.sideframe.maximized = false;
-                        that._minimize();
-                    } else {
-                        that.settings.sideframe.maximized = true;
-                        that.settings.sideframe.hidden = false;
-                        that._maximize();
-                    }
-                    that.settings = that.setSettings(that.settings);
                 });
 
                 this.sideframe.find('.cms-sideframe-resize').bind('pointerdown.cms.sideframe', function (e) {
@@ -106,6 +81,9 @@
                     holder.html(iframe);
                 }
 
+                // show dimmer even before iframe is loaded
+                this.dimmer.show();
+
                 // push required params if defined
                 // only apply params on tree view
                 if (url.indexOf(CMS.config.request.tree) >= 0) {
@@ -121,7 +99,8 @@
 
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 iframe.hide();
-                var width = this.settings.sideframe.position || this.options.sideframeWidth;
+
+                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
 
                 // attach load event to iframe
                 iframe.bind('load', function () {
@@ -187,17 +166,15 @@
             close: function () {
                 this._hide(true);
 
+                // hide dimmer immediately
+                this.dimmer.hide();
+
                 // remove url in settings
                 this.settings.sideframe = {
-                    'url': null,
-                    'hidden': false,
-                    'maximized': false,
-                    'width': this.options.sideframeWidth
+                    url: null,
+                    hidden: false,
+                    width: this.options.sideframeWidth
                 };
-
-                // resets
-                this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
-                this.sideframe.find('.cms-sideframe-hide').show();
 
                 // update settings
                 this.settings = this.setSettings(this.settings);
@@ -208,10 +185,6 @@
 
             // private methods
             _show: function (width, animate) {
-                // add class
-                this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden');
-
-                // make sure the close / hide / maximize controls appear, regardless of hidden / maximized state
                 this.sideframe.show();
 
                 // check if sideframe should be hidden
@@ -219,26 +192,21 @@
                     this._hide();
                 }
 
-                // check if sideframe should be maximized
-                if (this.settings.sideframe.maximized) {
-                    this._maximize();
-                }
-
                 // otherwise do normal behaviour
-                if (!this.settings.sideframe.hidden && !this.settings.sideframe.maximized) {
-                    if (animate) {
-                        this.sideframe.animate({ 'width': width }, this.options.sideframeDuration);
-                        this.body.animate({ 'margin-left': width }, this.options.sideframeDuration);
-                    } else {
-                        this.sideframe.animate({ 'width': width }, 0);
-                        this.body.animate({ 'margin-left': width }, 0);
-                        // reset width if larger than available space
-                        if (width >= $(window).width()) {
-                            this.sideframe.animate({ 'width': $(window).width() - 30 }, 0);
-                            this.body.animate({ 'margin-left': $(window).width() - 30 }, 0);
-                        }
+                if (animate) {
+                    this.sideframe.animate({
+                        width: width,
+                        overflow: 'visible'
+                    }, this.options.sideframeDuration);
+                } else {
+                    this.sideframe.css('width', width);
+                    // reset width if larger than available space
+                    if (width >= $(window).width()) {
+                        this.sideframe.animate({
+                            width: $(window).width() - 30,
+                            overflow: 'visible'
+                        }, 0);
                     }
-                    this.sideframe.find('.cms-sideframe-btn').css('right', -30);
                 }
 
                 // lock toolbar, set timeout to make sure CMS.API is ready
@@ -249,9 +217,6 @@
             },
 
             _hide: function (close) {
-                // add class
-                this.sideframe.find('.cms-sideframe-hide').addClass('cms-sideframe-hidden');
-
                 var duration = this.options.sideframeDuration;
                 // remove the iframe
                 if (close && this.sideframe.width() <= 0) {
@@ -260,12 +225,11 @@
                 if (close) {
                     this.sideframe.find('iframe').remove();
                 }
-                this.sideframe.animate({ 'width': 0 }, duration, function () {
+                this.sideframe.animate({ width: 0 }, duration, function () {
                     if (close) {
                         $(this).hide();
                     }
                 });
-                this.body.animate({ 'margin-left': 0 }, duration);
                 this.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
 
                 // lock toolbar, set timeout to make sure CMS.API is ready
@@ -274,44 +238,12 @@
                 }, 100);
             },
 
-            _minimize: function (noPositionReset) {
-                this.sideframe.find('.cms-sideframe-maximize').removeClass('cms-sideframe-minimize');
-                this.sideframe.find('.cms-sideframe-hide').show();
-
-                // reset to first state
-                if (!noPositionReset) {
-                    this._show(this.settings.sideframe.position || this.options.sideframeWidth, true);
-                }
-
-                // remove event
-                $(window).unbind('resize.cms.sideframe');
-            },
-
-            _maximize: function () {
-                var that = this;
-
-                this.sideframe.find('.cms-sideframe-maximize').addClass('cms-sideframe-minimize');
-                this.sideframe.find('.cms-sideframe-hide').hide();
-
-                this.sideframe.find('.cms-sideframe-hide').removeClass('cms-sideframe-hidden').hide();
-                // do custom animation
-                this.sideframe.animate({ 'width': $(window).width() }, 0);
-                this.body.animate({ 'margin-left': 0 }, 0);
-                // invert icon position
-                this.sideframe.find('.cms-sideframe-btn').css('right', -2);
-                // attach resize event
-                $(window).bind('resize.cms.sideframe', function () {
-                    that.sideframe.css('width', $(window).width());
-                });
-            },
-
             _startResize: function () {
                 var that = this;
                 var outerOffset = 30;
                 var timer = function () {};
                 // this prevents the iframe from being focusable
                 this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
-                this._minimize(true);
 
                 $('html').attr('data-touch-action', 'none').bind('pointermove.cms.sideframe', function (e) {
                     if (e.originalEvent.clientX <= 320) {
@@ -322,7 +254,6 @@
                     }
 
                     that.sideframe.css('width', e.originalEvent.clientX);
-                    that.body.css('margin-left', e.originalEvent.clientX);
 
                     // update settings
                     that.settings.sideframe.position = e.originalEvent.clientX;
@@ -364,11 +295,17 @@
 
                 // loop through the available params
                 $.each(urlParams, function (index, param) {
-                    arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+                    arr.push({
+                        param: param.split('=')[0],
+                        value: param.split('=')[1]
+                    });
                 });
                 // loop through the new params
                 $.each(params, function (index, param) {
-                    arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+                    arr.push({
+                        param: param.split('=')[0],
+                        value: param.split('=')[1]
+                    });
                 });
 
                 // merge manually because jquery...

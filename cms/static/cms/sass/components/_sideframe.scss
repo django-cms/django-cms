@@ -37,12 +37,13 @@
     .cms-sideframe-resize {
         position: absolute;
         top: 0;
-        right: -$sideframe-border-width;
+        right: 0;
         z-index: z(sideframe, resize);
-        width: $sideframe-border-width;
+        width: $sideframe-resize-width;
         height: 100%;
         cursor: col-resize;
-        background: $gray-darker;
+        background: transparent;
+        box-shadow: $sideframe-box-shadow;
     }
     // when resizing the sideframe shime get's z-index between frame
     // and resize in order for mouse events not to trigger on iframe, same as
@@ -56,41 +57,21 @@
         height: 100%;
         background: transparent;
     }
-    .cms-sideframe-knob {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: nth($sideframe-resize-knob-size, 1);
-        height: nth($sideframe-resize-knob-size, 2);
-        margin-top: -(nth($sideframe-resize-knob-size, 2) / 2);
-        margin-left: -(nth($sideframe-resize-knob-size, 1) / 2);
-        border-radius: nth($sideframe-resize-knob-size, 1) / 2;
-        background: $gray-darker;
-    }
-
-    .cms-sideframe-btn {
+    .cms-sideframe-close {
         position: absolute;
         top: $sideframe-buttons-position-top;
-        right: -$sideframe-button-area-size;
+        right: $sideframe-buttons-position-right;
         z-index: z(sideframe, buttons);
-    }
-    .cms-sideframe-close,
-    .cms-sideframe-hide,
-    .cms-sideframe-maximize {
-        position: relative;
         cursor: pointer;
         font-size: $sideframe-button-icon-size;
-        color: $gray-lighter;
+        color: $gray-light;
         text-align: center;
         width: $sideframe-button-area-size;
         height: $sideframe-button-area-size;
         margin-bottom: $sideframe-button-space;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        background: $gray-darker;
 
         &:hover {
-            color: $white;
-            background-color: $gray-darkest;
+            color: $gray-darkest;
         }
 
         span {
@@ -102,21 +83,16 @@
         }
     }
 
-    .cms-sideframe-hide {
-        font-size: $sideframe-button-icon-size * 1.25;
-        height: $sideframe-button-area-size * 1.5;
-        span {
-            margin-top: -(($sideframe-button-icon-size * 1.25) / 2);
-            margin-left: -(($sideframe-button-icon-size * 1.25) / 2);
-        }
-    }
-
-    .cms-sideframe-hidden span {
-        color: $color-primary;
-        transform: rotate(180deg);
-    }
-
-    .cms-sideframe-minimize span {
-        color: $color-primary;
+    .cms-sideframe-dimmer {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: z(sideframe, dimmer);
+        width: 100%;
+        height: 100%;
+        background: $sideframe-dimmer;
     }
 }
