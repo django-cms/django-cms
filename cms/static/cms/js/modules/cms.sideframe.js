@@ -19,7 +19,7 @@
                 sideframeDuration: 300,
                 sideframeWidth: 0.8, // matches 80% of window width
                 urls: {
-                    'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
+                    css_sideframe: 'cms/css/cms.toolbar.sideframe.css'
                 }
             },
 
@@ -171,9 +171,9 @@
 
                 // remove url in settings
                 this.settings.sideframe = {
-                    'url': null,
-                    'hidden': false,
-                    'width': this.options.sideframeWidth
+                    url: null,
+                    hidden: false,
+                    width: this.options.sideframeWidth
                 };
 
                 // update settings
@@ -195,16 +195,16 @@
                 // otherwise do normal behaviour
                 if (animate) {
                     this.sideframe.animate({
-                        'width': width,
-                        'overflow': 'visible'
+                        width: width,
+                        overflow: 'visible'
                     }, this.options.sideframeDuration);
                 } else {
-                    this.sideframe.animate({ 'width': width }, 0);
+                    this.sideframe.css('width', width);
                     // reset width if larger than available space
                     if (width >= $(window).width()) {
                         this.sideframe.animate({
-                            'width': $(window).width() - 30,
-                            'overflow': 'visible'
+                            width: $(window).width() - 30,
+                            overflow: 'visible'
                         }, 0);
                     }
                 }
@@ -225,7 +225,7 @@
                 if (close) {
                     this.sideframe.find('iframe').remove();
                 }
-                this.sideframe.animate({ 'width': 0 }, duration, function () {
+                this.sideframe.animate({ width: 0 }, duration, function () {
                     if (close) {
                         $(this).hide();
                     }
@@ -295,11 +295,17 @@
 
                 // loop through the available params
                 $.each(urlParams, function (index, param) {
-                    arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+                    arr.push({
+                        param: param.split('=')[0],
+                        value: param.split('=')[1]
+                    });
                 });
                 // loop through the new params
                 $.each(params, function (index, param) {
-                    arr.push({ 'param': param.split('=')[0], 'value': param.split('=')[1] });
+                    arr.push({
+                        param: param.split('=')[0],
+                        value: param.split('=')[1]
+                    });
                 });
 
                 // merge manually because jquery...
