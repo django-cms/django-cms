@@ -24,7 +24,7 @@ What's new in 3.1
 Switch from MPTT to MP
 ======================
 
-Since django CMS 2.0 we have relied on MPTT (Modified Preorder Tree Traversal) for efficiently
+Since django CMS 2.0 we have relied on MPTT (Modified Pre-order Tree Traversal) for efficiently
 handling tree structures in the database.
 
 In 3.1, `Django MPTT <https://github.com/django-mptt/django-mptt>`_ has been replaced by
@@ -34,7 +34,7 @@ reliability.
 Over the years MPTT has proved not to be fast enough for big tree operations (>1000 pages); tree
 corruption, because of transactional errors, has also been a problem.
 
-django-treebeard uses MP (Materialized Path). MP is more efficient and has more error resistance
+django-treebeard uses MP (Materialised Path). MP is more efficient and has more error resistance
 then MPTT. It should make working with and using django CMS better - faster and reliable.
 
 Other than this, end users should not notice any changes.
@@ -112,7 +112,7 @@ migration path from `MIGRATION_MODULES
 Plugins migrations moving process
 =================================
 
-Core plugins are being changeed to follow the new convention for the migration modules, starting
+Core plugins are being changed to follow the new convention for the migration modules, starting
 with **djangocms_text_ckeditor** 2.5 released together with django CMS 3.1.
 
 Action required
@@ -183,13 +183,13 @@ Placeholder language fallback default to True
 ``language_fallback`` in :setting:`CMS_PLACEHOLDER_CONF` is ``True`` by default.
 
 
-New templatetags
-================
+New template tags
+=================
 
 ``render_model_add_block``
 --------------------------
 
-The family of :ref:`render_model <render_model_templatetags>` templatetags that allow Django
+The family of :ref:`render_model <render_model_templatetags>` template tags that allow Django
 developers to make any Django model editable in the frontend has been extended with
 :ttag:`render_model_add_block`, which can offer arbitrary markup as the *Edit* icon (rather than
 just an image as previously).
@@ -251,7 +251,7 @@ Settings update
   the new migration layout.
 * If migrating from Django 1.6 and below to Django 1.7, remove ``south`` from ``installed_apps``.
 * Eventually set ``language_fallback`` to ``False`` in :setting:`CMS_PLACEHOLDER_CONF` if you do
-  not want language fallback behavior for placeholders.
+  not want language fallback behaviour for placeholders.
 
 Update the database
 ===================

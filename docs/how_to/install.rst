@@ -134,10 +134,9 @@ Next, install the CMS:
 
 This will automatically install all of the `requirements`_ listed above.
 
-While you could install packages one at a time using `pip`_, we recommend
-using a `requirements.txt`_ file. The following is an example
-requirements.txt file that can be used with pip to install django CMS and
-its dependencies:
+While you could install packages one at a time using `pip`_, we recommend using a
+`requirements.txt`_ file. The following is an example file that can be used with pip to install
+django CMS and its dependencies:
 
 ::
 
@@ -167,7 +166,7 @@ its dependencies:
     those are not mandatory versions; refer to `requirements`_
     for any version-specific restrictions.
 
-If you are using PostgreSQL as your database, add the Python adapter to your
+If you are using PostgreSQL as your database, add the Python adaptor to your
 requirements file:
 
 ::
@@ -184,7 +183,7 @@ For MySQL you would instead add:
 
     While the django CMS is compatible with Python 3.3+, the ``mysql-python`` package is not.
 
-Before you install the Python adapters for your chosen database, you will need to first
+Before you install the Python adaptors for your chosen database, you will need to first
 install the appropriate headers and development libraries. See the platform specific notes below.
 
 .. _virtualenv: http://www.virtualenv.org
@@ -203,7 +202,7 @@ started:
     sudo aptitude install python-pip
     sudo pip install virtualenv
 
-Next, install the appropriate libraries to build the Python adapters
+Next, install the appropriate libraries to build the Python adaptors
 for your selected database. For PostgreSQL:
 
 .. code-block:: bash
@@ -238,7 +237,7 @@ generic package:
     brew install python
     pip install virtualenv
 
-Next, install the appropriate libraries to build the Python adapters
+Next, install the appropriate libraries to build the Python adaptors
 for your selected database. For PostgreSQL:
 
 .. code-block:: bash
@@ -252,7 +251,7 @@ For MySQL:
     brew install mysql
 
 .. note:: Homebrew does not set the databases to run automatically. The software
-          necessary for the Python adapters will be installed but if you wish to
+          necessary for the Python adaptors will be installed but if you wish to
           run the database server locally, follow the Homebrew instructions shown
           in the terminal output after installing.
 
@@ -330,7 +329,7 @@ well as its dependencies and other highly recommended applications/libraries::
     'treebeard',  # utilities for implementing a tree
     'menus',  # helper for model independent hierarchical website navigation
     'south',  # Only needed for Django < 1.7
-    'sekizai',  # for javascript and css management
+    'sekizai',  # for JavaScript and CSS management
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
 
@@ -455,7 +454,7 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
 
 Point your :setting:`django:STATIC_ROOT` to where the static files should live
-(that is, your images, CSS files, Javascript files, etc.)::
+(that is, your images, CSS files, JavaScript files, etc.)::
 
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
     STATIC_URL = "/static/"
@@ -503,7 +502,7 @@ translations. Since these are numerous, we'll limit it to English for now::
     ]
 
 Finally, set up the :setting:`django:DATABASES` part of the file to reflect your
-database deployment. If you just want to try out things locally, sqlite3 is the
+database deployment. If you just want to try out things locally, SQLite3 is the
 easiest database to set up, however it should not be used in production. If you
 still wish to use it for now, this is what your :setting:`django:DATABASES`
 setting should look like::
@@ -544,8 +543,8 @@ Please check each plugin configuration option to see how to configure Django 1.7
 URL configuration
 =================
 
-You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
-urlpatterns. We suggest starting with the following
+You need to include the ``'cms.urls'`` ``urlpatterns`` **at the end** of your
+``urlpatterns``. We suggest starting with the following
 ``~/workspace/myproject/myproject/urls.py``::
 
     from django.conf import settings
@@ -583,8 +582,8 @@ already be in your settings file.
 
 Now, on with the actual template files!
 
-Fire up your favorite editor and create a file called ``base.html`` in a folder called ``templates``
-in your myproject directory.
+Fire up your favourite editor and create a file called ``base.html`` in a folder called
+``templates`` in your ``myproject`` directory.
 
 Here is a simple example for a base template called ``base.html``:
 
@@ -634,7 +633,7 @@ like "template_2_content".
 Static files handling with sekizai
 ----------------------------------
 
-The django CMS handles media files (css stylesheets and javascript files)
+The django CMS handles media files (CSS stylesheets and JavaScript files)
 required by CMS plugins using `django-sekizai`_. This requires you to define at
 least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
 so using the ``render_block`` template tag from the ``sekizai_tags`` template
@@ -706,7 +705,7 @@ as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
 Log in with the user you created during the database setup.
 
 If this is your first django CMS project, read through the `tutorial`_ for a
-walkthrough of the main features of django CMS.
+walk-through of the main features of django CMS.
 
 For more information on using django CMS for managing web content, see
 :doc:`/user/index`.

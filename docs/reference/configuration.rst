@@ -22,21 +22,24 @@ Custom User Requirements
 
 .. setting:: AUTH_USER_MODEL
 
-When using a custom user model (i.e. the AUTH_USER_MODEL Django setting), there are a few requirements that must be met.
+When using a custom user model (i.e. the ``AUTH_USER_MODEL`` Django setting), there are a few
+requirements that must be met.
 
-DjangoCMS expects a user model with at minimum the following fields: email, password, is_active, is_staff, and is_superuser.
-Additionally, it should inherit from AbstractBaseUser and PermissionsMixin (or AbstractUser), and must define one field as
-the USERNAME_FIELD (see Django documentation for more details) and define a get_fullname() method.
+django CMS expects a user model with at minimum the following fields: ``email``, ``password``,
+``is_active``, ``is_staff``, and ``is_superuser``. Additionally, it should inherit from
+``AbstractBaseUser`` and ``PermissionsMixin`` (or ``AbstractUser``), and must define one field as
+the ``USERNAME_FIELD`` (see Django documentation for more details) and define a ``get_fullname()``
+method.
 
-The models must also be editable via django admin and have an admin class registered.
+The models must also be editable via Django's admin and have an admin class registered.
 
-Additionally, the application in which the model is defined **must** be loaded before `cms` in `INSTALLED_APPS`.
+Additionally, the application in which the model is defined **must** be loaded before ``cms`` in ``INSTALLED_APPS``.
 
 .. note::
 
-    In most cases, it is better to create a UserProfile model with a one to one relationship to
-    auth.User rather than creating a custom user model. Custom user models are only necessary if
-    you intended to alter the default behavior of the User model, not simply extend it.
+    In most cases, it is better to create a ``UserProfile`` model with a one to one relationship to
+    ``auth.User`` rather than creating a custom user model. Custom user models are only necessary if
+    you intended to alter the default behaviour of the User model, not simply extend it.
 
     Additionally, if you do intend to use a custom user model, it is generally advisable to do so
     only at the beginning of a project, before the database is created.
@@ -122,7 +125,7 @@ or set to a dictionary with `SITE_ID: template path` items::
 The provided directory is scanned and all templates in it are loaded as templates for
 django CMS.
 
-Template loaded and their names can be customized using the templates dir as a
+Template loaded and their names can be customised using the templates dir as a
 python module, by creating a ``__init__.py`` file in the templates directory.
 The file contains a single ``TEMPLATES`` dictionary with the list of templates
 as keys and template names as values::::
@@ -201,8 +204,8 @@ Example::
         },
     }
 
-You can combine template names and placeholder names to granularly define
-plugins, as shown above with ``base.html content``.
+You can combine template names and placeholder names to define
+plugins in a granular fashion, as shown above with ``base.html content``.
 
 ``plugins``
     A list of plugins that can be added to this placeholder. If not supplied,
@@ -217,7 +220,7 @@ plugins, as shown above with ``base.html content``.
 
 ``name``
     The name displayed in the Django admin. With the gettext stub, the name can
-    be internationalized.
+    be internationalised.
 
 ``limits``
     Limit the number of plugins that can be placed inside this placeholder.
@@ -240,21 +243,21 @@ plugins, as shown above with ``base.html content``.
 
     ``plugin_type``
         The plugin type to add to the placeholder
-        Example : 'TextPlugin'
+        Example : ``TextPlugin``
 
     ``values``
         Dictionary to use for the plugin creation.
         It depends on the ``plugin_type``. See the documentation of each
         plugin type to see which parameters are required and available.
-        Example for a Textplugin:
-        {'body':'<p>Lorem ipsum</p>'}
-        Example for a LinkPlugin :
-        {'name':'Django-CMS','url':'https://www.django-cms.org'}
+        Example for a text plugin:
+        ``{'body':'<p>Lorem ipsum</p>'}``
+        Example for a link plugin:
+        ``{'name':'Django-CMS','url':'https://www.django-cms.org'}``
 
     ``children``
-        It is a list of dictionnaries to configure default plugins
+        It is a list of dictionaries to configure default plugins
         to add as children for the current plugin (it must accepts children).
-        Each dictionary accepts same args than dictionnaries of
+        Each dictionary accepts same args than dictionaries of
         ``default_plugins`` : ``plugin_type``, ``values``, ``children``
         (yes, it is recursive).
 
@@ -312,14 +315,14 @@ plugins, as shown above with ``base.html content``.
     each plugin. If not supplied, all plugins can be selected.
 
 ``require_parent``
-    A boolean indication whether that plugin requires another plugin as parent or
+    A Boolean indication whether that plugin requires another plugin as parent or
     not.
 
 ``inherit``
     Placeholder name or template name + placeholder name which inherit. In the
-    example, the configuration for "base.html content" inherits from "content"
-    and just overwrite the "plugins" setting to allow TeaserPlugin, thus you
-    have not to duplicate your "content"'s configuration.
+    example, the configuration for ``base.html content`` inherits from ``content``
+    and just overwrites the ``plugins`` setting to allow ``TeaserPlugin``, thus you
+    have not to duplicate the configuration of ``content``.
 
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
@@ -437,10 +440,10 @@ On the first level you can set values for each ``SITE_ID``. In the example
 above we define two sites. The first site has 3 languages (English, German and
 French) and the second site has only Dutch.
 
-The ``default`` node defines default behavior for all languages. You can
+The ``default`` node defines default behaviour for all languages. You can
 overwrite the default settings with language-specific properties. For example
 we define ``hide_untranslated`` as ``False`` globally, but the English language
-overwrites this behavior.
+overwrites this behaviour.
 
 Every language node needs at least a ``code`` and a ``name`` property. ``code``
 is the ISO 2 code for the language, and ``name`` is the verbose name of the
@@ -448,7 +451,7 @@ language.
 
 .. note::
 
-    With a gettext() lambda function you can make language names translatable.
+    With a ``gettext()`` lambda function you can make language names translatable.
     To enable this add ``gettext = lambda s: s`` at the beginning of your
     settings file.
 
@@ -823,7 +826,7 @@ CMS_PLACEHOLDER_CACHE
 default
     ``True``
 
-Should the output of the various placeholder templatetags be cached?
+Should the output of the various placeholder template tags be cached?
 Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
 present the placeholders will not be cached.
 

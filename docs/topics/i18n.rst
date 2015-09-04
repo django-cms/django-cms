@@ -46,7 +46,7 @@ If a user comes back to a previously visited page, the language will be same sin
 
 By default if someone visits a page at `http://www.mysite.fr/` django determines the language as follow:
 
-- language in url
+- language in URL
 - language in session
 - language in cookie
 - language in from browser

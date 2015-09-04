@@ -123,7 +123,7 @@ Since 3.0.6 a simplified toolbar API is available to handle the more common case
             current_page_menu = self._setup_extension_toolbar()
             # if it's all ok
             if current_page_menu:
-                # retrieves the instance of the current extension (if any) and the toolbar item url
+                # retrieves the instance of the current extension (if any) and the toolbar item URL
                 page_extension, url = self.get_page_extension_admin()
                 if url:
                     # adds a toolbar item
@@ -149,7 +149,7 @@ Similarly for title extensions::
                 # create a sub menu
                 position = 0
                 sub_menu = self._get_sub_menu(current_page_menu, 'submenu_label', 'Submenu', position)
-                # retrieves the instances of the current title extension (if any) and the toolbar item url
+                # retrieves the instances of the current title extension (if any) and the toolbar item URL
                 urls = self.get_title_extension_admin()
                 # cycle through the title list
                 for title_extension, url in urls:
@@ -238,7 +238,7 @@ Using extensions in templates
 =============================
 
 To access a page extension in page templates you can simply access the
-approriate related_name field that is now available on the Page object.
+appropriate related_name field that is now available on the Page object.
 
 As per the normal related_name naming mechanism, the appropriate field to
 access is the same as your ``PageExtension`` model name, but lowercased. Assuming
@@ -306,8 +306,8 @@ which provides the following API:
 * :py:meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
   the environment and do the permission checking;
 * :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin`: for page extensions, retrieves the
-  correct admin url for the related toolbar item; returns the extension instance (or `None` if not exists)
-  and the admin url for the toolbar item;
+  correct admin URL for the related toolbar item; returns the extension instance (or `None` if not exists)
+  and the admin URL for the toolbar item;
 * :py:meth:`cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin`: for title extensions, retrieves the
-  correct admin url for the related toolbar item; returns a list of the extension instances
+  correct admin URL for the related toolbar item; returns a list of the extension instances
   (or `None` if not exists) and the admin urls for each title of the current page;

@@ -102,4 +102,4 @@ File Permissions
 ****************
 
 django CMS does not take care of and no responsibility for controlling access to files. Please make sure to use either
-a prebuilt solution (like `django-filer <https://github.com/stefanfoulis/django-filer>`_) or to roll your own.
+a pre-built solution (like `django-filer <https://github.com/stefanfoulis/django-filer>`_) or to roll your own.

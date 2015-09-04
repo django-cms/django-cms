@@ -2,13 +2,13 @@
 Apphooks
 ########
 
-An **Apphook** allows you to attach a Django application to a page. For example,
+An **apphook** allows you to attach a Django application to a page. For example,
 you might have a news application that you'd like integrated with django CMS. In
 this case, you can create a normal django CMS page without any content of its
 own, and attach the news application to the page; the news application's content
 will be delivered at the page's URL.
 
-To create an Apphook place a ``cms_apps.py`` in your application. And in it write
+To create an apphook place a ``cms_apps.py`` in your application. And in it write
 the following::
 
     from cms.app_base import CMSApp
@@ -33,18 +33,18 @@ a page and open the advanced settings tab. Select your new apphook under
 .. warning::
 
     Whenever you add or remove an apphook, change the slug of a page containing
-    an Apphook or the slug if a page which has a descendant with an Apphook, you
+    an apphook or the slug if a page which has a descendant with an apphook, you
     have to restart your server to re-load the URL caches.
 
-    An Apphook won't appear until it is published. Take note that this also
+    An apphook won't appear until it is published. Take note that this also
     means all parent pages must also be published.
 
 .. note::
 
-    If at some point you want to remove this Apphook after deleting the
+    If at some point you want to remove this apphook after deleting the
     ``cms_apps.py`` there is a cms management command called ``uninstall apphooks`` that
-    removes the specified Apphook(s) from all pages by name. eg. ``manage.py cms
-    uninstall apphooks MyApphook``. To find all names for uninstallable Apphooks
+    removes the specified apphook(s) from all pages by name. eg. ``manage.py cms
+    uninstall apphooks MyApphook``. To find all names for uninstallable apphooks
     there is a command for this as well ``manage.py cms list apphooks``.
 
 If you attached the app to a page with the url ``/hello/world/`` and the app has
@@ -58,14 +58,14 @@ a ``urls.py`` that looks like this::
     )
 
 The ``main_view`` should now be available at ``/hello/world/`` and the
-``sample_view`` has the url ``/hello/world/sublevel/``.
+``sample_view`` has the URL ``/hello/world/sublevel/``.
 
 
 .. note::
 
     CMS pages **below** the page to which the apphook is attached to, **can** be visible,
-    provided that the Apphook urlconf regexps are not too greedy. From a URL resolution
-    perspective, attaching an Apphook works in same way as inserting the Apphook urlconf
+    provided that the apphook urlconf regexps are not too greedy. From a URL resolution
+    perspective, attaching an apphook works in same way as inserting the apphook urlconf
     in the root urlconf at the same path as the page it's attached to.
 
 .. note::
@@ -141,7 +141,7 @@ We would now create a menu out of these categories::
 
     menu_pool.register_menu(CategoryMenu)
 
-If you add this menu now to your Apphook::
+If you add this menu now to your apphook::
 
     from myapp.menus import CategoryMenu
 
@@ -215,7 +215,7 @@ You can reverse namespaced apps similarly and it "knows" in which app instance i
 
     {% url myapp_namespace:app_main %}
 
-If you want to access the same url but in a different language use the language
+If you want to access the same URL but in a different language use the language
 template tag:
 
 .. code-block:: html+django
@@ -259,11 +259,11 @@ Or, if you are rendering a plugin, of the context instance::
 Apphook permissions
 *******************
 
-By default all Apphooks have the same permissions set as the page they are assigned to.
-So if you set login required on page the attached Apphook and all its urls have the same
+By default all apphooks have the same permissions set as the page they are assigned to.
+So if you set login required on page the attached apphook and all its urls have the same
 requirements.
 
-To disable this behavior set ``permissions = False`` on your apphook::
+To disable this behaviour set ``permissions = False`` on your apphook::
 
     class SampleApp(CMSApp):
         name = _("Sample App")
@@ -286,7 +286,7 @@ Here is a simple example::
 
 
 If you have your own permission check in your app, or just don't want to wrap some nested apps
-with CMS permission decorator, then use ``exclude_permissions`` property of the Apphook::
+with CMS permission decorator, then use ``exclude_permissions`` property of the apphook::
 
     class SampleApp(CMSApp):
         name = _("Sample App")
@@ -295,8 +295,8 @@ with CMS permission decorator, then use ``exclude_permissions`` property of the 
         exclude_permissions = ["some_nested_app"]
 
 
-For example, django-oscar_ Apphook integration needs to be used with ``exclude_permissions`` of the
-dashboard app, because it uses the `customizable access function`__. So, your Apphook in this case
+For example, django-oscar_ apphook integration needs to be used with ``exclude_permissions`` of the
+dashboard app, because it uses the `customisable access function`__. So, your apphook in this case
 will look like this::
 
     class OscarApp(CMSApp):
@@ -315,9 +315,9 @@ Automatically restart server on apphook changes
 
 As mentioned above, whenever you:
 
-* add or remove an Apphook
-* change the slug of a page containing an Apphook
-* change the slug of a page with a descendant with an Apphook
+* add or remove an apphook
+* change the slug of a page containing an apphook
+* change the slug of a page with a descendant with an apphook
 
 The CMS the server will reload its URL caches. It does this by listening for
 the signal: :obj:`cms.signals.urls_need_reloading`.

@@ -23,7 +23,7 @@ File
 
 Available on `GitHub (divio/djangocms-file) <http://github.com/divio/djangocms-file>`_ and on `PyPi (djangocms-file) <https://pypi.python.org/pypi/djangocms-file>`_.
 
-Allows you to upload a file. A filetype icon will be assigned based on the file
+Allows you to upload a file. A file-type icon will be assigned based on the file
 extension.
 
 Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
@@ -87,7 +87,7 @@ and on `PyPi (djangocms-googlemap) <https://pypi.python.org/pypi/djangocms-googl
 
 Displays a map of an address on your page.
 
-Both address and coordinates are supported to center the map; zoom level and
+Both address and coordinates are supported to centre the map; zoom level and
 route planner can be set when adding/editing plugin in the admin.
 
 .. versionadded:: 2.3.2
@@ -98,7 +98,7 @@ route planner can be set when adding/editing plugin in the admin.
     Zoom level is set via a select field which ensure only legal values are used.
 
 .. note:: Due to the above change, `level` field is now marked as `NOT NULL`,
-    and a datamigration has been introduced to modify existing googlemap plugin
+    and a data migration has been introduced to modify existing Googlemap plugin
     instance to set the default value if `level` if is `NULL`.
 
 Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
@@ -134,7 +134,7 @@ setting in your project's ``settings.py`` file::
     )
 
 There are several solutions for Python and Django out there to automatically
-resize your pictures, you can find some on `Django Packages`_ and compare them
+re-size your pictures, you can find some on `Django Packages`_ and compare them
 there.
 
 In your project template directory create a folder called ``djangocms_picture/plugins`` and
@@ -226,9 +226,9 @@ Video
 Available on `GitHub (divio/djangocms-video) <http://github.com/divio/djangocms-video>`_
 and on `PyPi (djangocms-video) <https://pypi.python.org/pypi/djangocms-video>`_.
 
-Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
+Plays Video Files or YouTube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 <http://github.com/FlashJunior/OSFlashVideoPlayer>`_. When uploading videos use either
-.flv files or h264 encoded video files.
+``.flv`` files or H264 encoded video files.
 
 Please install it using ``pip`` or similar and be sure you have the following in your project's
 :setting:`django:INSTALLED_APPS` setting::
@@ -239,8 +239,8 @@ Please install it using ``pip`` or similar and be sure you have the following in
         # ...
     )
 
-There are some settings you can set in your settings.py to overwrite some
-default behavior:
+There are some settings you can set in your ``settings.py`` to overwrite some
+default behaviour:
 
 * ``VIDEO_AUTOPLAY`` ((default: ``False``)
 * ``VIDEO_AUTOHIDE`` (default: ``False``)

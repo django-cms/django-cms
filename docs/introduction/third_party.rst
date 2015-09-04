@@ -46,7 +46,7 @@ thumbnail processor (easy-thumbnails) to be inserted in ``settings.py``:
     )
 
 aldryn-newsblog uses aldryn-boilerplates_ to provide multiple sets of templates
-and staticfiles for different css frameworks. We're using
+and static files for different CSS frameworks. We're using
 bootstrap3 in this tutorial, so lets choose `bootstrap3`.:
 
 .. code-block:: python
@@ -99,9 +99,9 @@ CMS page (let's call it 'Blog'), and add the blog application to it as you did
 for Polls in the previous tutorial step.
 In this case we also have to add an "Application configuration" (see the
 field right under the apphook field). You can configure some settings here,
-like the url format. It's also possible to add multiple instances of the
+like the URL format. It's also possible to add multiple instances of the
 application, if you like.
-The *Instance namespace* should be ``blog`` (this is used for reversing urls).
+The *Instance namespace* should be ``blog`` (this is used for reversing URLs).
 Choose ``Blog`` as the *Application title* and choose whatever *Permalink type*
 you prefer.
 
@@ -111,7 +111,7 @@ Publish the new page, and you should find the blog application at work there.
 
 
 You can add new blog posts using the admin, but also have a look at the
-toolbar. When you're within the urls of the blog, you should see an extra menu
+toolbar. When you're within the URLs of the blog, you should see an extra menu
 item called "Blog".
 You can now select "Blog" > "Add new article..." from it and add a new blog
 post directly from there.
