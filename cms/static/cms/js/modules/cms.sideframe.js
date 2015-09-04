@@ -17,7 +17,7 @@
             options: {
                 onClose: false,
                 sideframeDuration: 300,
-                sideframeWidth: 0.8, // matches 60% of window width
+                sideframeWidth: 0.8, // matches 80% of window width
                 urls: {
                     'css_sideframe': 'cms/css/cms.toolbar.sideframe.css'
                 }
