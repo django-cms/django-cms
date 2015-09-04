@@ -5,30 +5,19 @@
 (function ($) {
     'use strict';
 
-    // TODO move out to separate module CMS-276
-    var KEYS = {
-        SHIFT: 16,
-        TAB: 9,
-        UP: 38,
-        DOWN: 40,
-        ENTER: 13,
-        ESC: 27
-    };
-
     // CMS.$ will be passed for $
     $(function () {
         var doc = $(document);
         doc.on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
-            // TODO make it really static
             CMS.Plugin._hideSubnav();
         }).on('keydown.cms', function (e) {
-            if (e.keyCode === KEYS.SHIFT) {
+            if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', true);
             }
         }).on('keyup.cms', function (e) {
-            if (e.keyCode === KEYS.SHIFT) {
+            if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', false);
             }
         });
@@ -630,7 +619,7 @@
                     var index = anchors.index(anchors.filter(':focus'));
 
                     // bind arrow down and tab keys
-                    if (e.keyCode === KEYS.DOWN || e.keyCode === KEYS.TAB) {
+                    if (e.keyCode === CMS.KEYS.DOWN || e.keyCode === CMS.KEYS.TAB) {
                         e.preventDefault();
                         if (index >= 0 && index < anchors.length - 1) {
                             anchors.eq(index + 1).focus();
@@ -640,7 +629,7 @@
                     }
 
                     // bind arrow up and shift+tab keys
-                    if (e.keyCode === KEYS.UP || (e.keyCode === KEYS.TAB && e.shiftKey)) {
+                    if (e.keyCode === CMS.KEYS.UP || (e.keyCode === CMS.KEYS.TAB && e.shiftKey)) {
                         e.preventDefault();
                         if (anchors.is(':focus')) {
                             anchors.eq(index - 1).focus();
@@ -650,7 +639,7 @@
                     }
 
                     // hide subnav when hitting enter or escape
-                    if (e.keyCode === KEYS.ENTER || e.keyCode === KEYS.ESC) {
+                    if (e.keyCode === CMS.KEYS.ENTER || e.keyCode === CMS.KEYS.ESC) {
                         nav.siblings('.cms-submenu-quicksearch').find('input').blur();
                         CMS.Plugin._hideSubnav(nav);
                     }
