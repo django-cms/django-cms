@@ -7,7 +7,7 @@ $speed-base: 200ms;
 $white: #fff;
 $black: #000;
 
-$color-primary: #57bcf0;
+$color-primary: #52bdf3;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
@@ -164,28 +164,33 @@ $structure-bgcolor: #f0f0f0;
 
 $structure-dragbar-height: 24px;
 $structure-dragbar-color: $black;
-$structure-dragbar-icon-space: $structure-dragbar-height;
-$structure-dragbar-icon-size: 10px;
 $structure-dragbar-padding: 8px;
 $structure-dragbar-padding-horizontal: 8px;
 
-$structure-dragarea-space: 8px;
+$structure-dragarea-space: 4px;
 $structure-dragarea-padding: 8px;
 $structure-dragarea-padding-horizontal: 8px;
+$structure-dragarea-use-background: 1;
+@if ($structure-dragarea-use-background == 1) {
+    $structure-dragarea-padding-horizontal: 28px;
+}
 
-$structure-draggable-inner-padding: 7px;
+$structure-draggable-inner-padding: 22px;
 $structure-draggable-space: $structure-dragarea-space;
 $structure-draggable-odd-child-bgcolor: $gray-lightest;
 $structure-draggable-even-child-bgcolor: $white;
 
 $structure-dragitem-icon-size: 10px;
 $structure-dragitem-height: 26px;
+$structure-dragitem-icon-space: 22px + $structure-dragarea-padding-horizontal;
+$structure-dragitem-icon-size: 12px;
 
 //##############################################################################
 // Structureboard
 $submenu-icon-area-size: 30px;
 $submenu-icon-size: 16px;
-$submenu-icon-color: $gray;
+$submenu-icon-color: $gray-light;
+$submenu-right: ($structure-dragarea-padding * 2 + $structure-dragitem-height - $submenu-icon-area-size) / 2;
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
