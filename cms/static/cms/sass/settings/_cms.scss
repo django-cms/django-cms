@@ -58,10 +58,10 @@ $z-layers: (
         "buttons":      101,
         "resize":       102,
     ),
-    "messages":         999999,
-    "toolbar-trigger":  999999,
+    "messages":         9999999,
+    "toolbar-trigger":  9999999,
     "toolbar": (
-        "base":         999999,
+        "base":         9999999,
         "left":         10,
         "right":        10,
     ),
@@ -72,12 +72,13 @@ $z-layers: (
         "triggers":     999,
     ),
     "sideframe": (
-        "base":         99999,
+        "base":         999999,
         "buttons":      40,
         "resize":       30,
         // shim-while-resizing: 20
         "frame":        10,
-        "shim":         1,
+        "shim":         5,
+        "dimmer":       1,
     ),
     "structure": (
         "base":         9999,
@@ -290,12 +291,14 @@ $login-form-submit-padding-horizontal: 15px;
 
 //##############################################################################
 // Sideframe
-$sideframe-buttons-position-top: $toolbar-height + 40px;
-$sideframe-border-width: 2px;
-$sideframe-resize-knob-size: 12px 50px;
+$sideframe-buttons-position-top: $toolbar-height + 5px;
+$sideframe-buttons-position-right: 20px;
 $sideframe-button-area-size: 30px;
-$sideframe-button-icon-size: 10px;
+$sideframe-button-icon-size: 15px;
 $sideframe-button-space: 2px;
+$sideframe-resize-width: 15px;
+$sideframe-box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
+$sideframe-dimmer: rgba(0, 0, 0, 0.6);
 
 //##############################################################################
 // Clipboard
