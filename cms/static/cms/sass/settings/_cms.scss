@@ -169,7 +169,7 @@ $structure-dragbar-padding-horizontal: 8px;
 
 $structure-dragarea-space: 4px;
 $structure-dragarea-padding: 8px;
-$structure-dragarea-padding-horizontal: 8px;
+$structure-dragarea-padding-horizontal: 10px;
 $structure-dragarea-use-background: 1;
 @if ($structure-dragarea-use-background == 1) {
     $structure-dragarea-padding-horizontal: 28px;
