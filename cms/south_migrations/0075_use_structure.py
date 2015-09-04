@@ -34,7 +34,7 @@ class Migration(DataMigration):
             page_ctype = ContentType.objects.get(app_label=page_model._meta.app_label, model=page_model._meta.model_name)
             permission, __ = Permission.objects.get_or_create(
                 codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
-            page_permission, __ = Permission.objects.get(codename='change_page', content_type=page_ctype)
+            page_permission = Permission.objects.get(codename='change_page', content_type=page_ctype)
             for user in user_model.objects.filter(is_superuser=False, is_staff=True):
                 if user.user_permissions.filter(codename='change_page', content_type=page_ctype).exists():
                     user.user_permissions.add(permission.pk)
@@ -49,7 +49,7 @@ class Migration(DataMigration):
         ph_model = orm['cms.Placeholder']
         user_model = orm[settings.AUTH_USER_MODEL]
         ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
-        permission, _ = Permission.objects.get_or_create(
+        permission, ___ = Permission.objects.get_or_create(
             codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
         for user in user_model.objects.filter(is_superuser=False, is_staff=True):
             user.user_permissions.remove(permission)
