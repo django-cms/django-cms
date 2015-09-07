@@ -63,6 +63,7 @@
         border-top: 1px solid $gray-lighter;
         border-bottom: 1px solid $gray-lighter;
     }
+
     .cms-modal-foot {
         position: absolute;
         overflow: hidden;
@@ -181,87 +182,28 @@
         }
     }
 
+    // breadcrumb only shows for nested elements
     .cms-modal-breadcrumb {
-        display: none;
-        position: relative;
-        z-index: z(modal, breadcrumb, base);
-        width: 100%;
-        height: $modal-footer-height;
-
-        .cms-modal-breadcrumb-items {
-            position: absolute;
-            top: 0;
-            left: $modal-breadcrumb-title-width - 1px;
-            width: 9999px;
-            background: $color-window;
-        }
-
+        font-size: $font-size-normal;
+        line-height: $modal-breadcrumb-height;
+        padding: 0 $padding-large;
+        border-top: 1px solid $gray-lighter;
         a {
-            position: relative;
-            float: left;
-            color: $gray-light;
-            font-size: 12px;
-            line-height: $modal-footer-height - 2 * $modal-breadcrumb-padding-vertical;
-            padding: $modal-breadcrumb-padding-vertical
-                $modal-breadcrumb-padding-horizontal
-                $modal-breadcrumb-padding-vertical
-                1.5 * $modal-breadcrumb-padding-horizontal;
-        }
-        a:first-child {
-            padding-left: $modal-breadcrumb-padding-horizontal;
-        }
-        a:after,
-        a:before {
-            content: "";
-            display: block;
-            position: absolute;
-            left: 100%;
-            top: -1px;
-            width: 0;
-            height: 0;
-            border-top: ($modal-footer-height / 2 + 1px) solid transparent;
-            border-bottom: ($modal-footer-height / 2 + 1px) solid transparent;
-        }
-        a:after {
-            z-index: z(modal, breadcrumb, trianglefront);
-            border-left: ($modal-footer-height / 4) solid $color-window;
-        }
-        a:before {
-            z-index: z(modal, breadcrumb, trianglebehind);
-            margin-left: 1px;
-            border-left: ($modal-footer-height / 4) solid $gray-lighter;
-        }
-
-        // home icon
-        .cms-modal-breadcrumb-title {
-            position: relative;
-            z-index: z(modal, breadcrumb, title);
-            color: $gray-lighter;
-            font-size: $modal-footer-height / 2;
-            text-align: center;
-            width: $modal-breadcrumb-title-width;
-            height: $modal-footer-height;
-            border-right: 1px solid $gray-lighter;
-            &:before {
-                position: relative;
-                top: $modal-footer-height / 4;
-            }
-        }
-
-        a:hover {
-            color: $modal-breadcrumb-hover-color;
-            background: $modal-breadcrumb-hover-bgcolor;
-            &:after {
-                border-left-color: $modal-breadcrumb-hover-bgcolor;
-            }
-        }
-
-        // last entry highlight
-        .cms-modal-breadcrumb-last {
-            cursor: default;
             color: $color-primary;
             &:hover {
-                color: $color-primary;
+                color: darken($color-primary, 20%);
+            }
+            &:after {
+                content: "/";
+                color: $gray-lighter;
+                text-decoration: none;
+                padding: 0 $padding-normal;
+            }
+            &.active {
+                color: $gray-light;
+            }
+            &:last-child:after {
+                content: "";
             }
         }
     }
@@ -296,3 +238,8 @@
         top: $toolbar-debug-height + 1px !important;
     }
 }
+
+.cms-modal-has-breadcrumb .cms-modal-body {
+    top: $modal-header-height + $modal-breadcrumb-height !important;
+}
+

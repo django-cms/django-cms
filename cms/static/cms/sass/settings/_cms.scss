@@ -49,12 +49,7 @@ $z-layers: (
         "body":         10,
         "frame":        10,
         "shim":         20,
-        "breadcrumb": (
-            "base":           100,
-            "trianglebehind": 1,
-            "trianglefront":  2,
-            "title":          3
-        ),
+        "breadcrumb":   100,
         "buttons":      101,
         "resize":       102,
     ),
@@ -131,16 +126,19 @@ $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
 $modal-header-height: 50px;
+$modal-breadcrumb-height: 40px;
 $modal-footer-height: 36px;
 
 $modal-header-button-icon-size: 12px;
 $modal-header-button-area-size: 30px;
 
+/*
 $modal-breadcrumb-title-width: 40px;
 $modal-breadcrumb-padding-vertical: $padding-normal;
 $modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
 $modal-breadcrumb-hover-color: $black;
 $modal-breadcrumb-hover-bgcolor: $white;
+*/
 
 $modal-button-font-size: 12px;
 $modal-button-padding: 2px $padding-normal;

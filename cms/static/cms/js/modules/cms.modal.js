@@ -57,7 +57,6 @@
                     title: modal.find('.cms-modal-title'),
                     resize: modal.find('.cms-modal-resize'),
                     breadcrumb: modal.find('.cms-modal-breadcrumb'),
-                    breadcrumbItems: modal.find('.cms-modal-breadcrumb-items'),
                     closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
                     modalButtons: modal.find('.cms-modal-buttons'),
                     modalBody: modal.find('.cms-modal-body'),
@@ -90,7 +89,7 @@
                     e.preventDefault();
                     that._maximize();
                 });
-                this.ui.breadcrumbItems.on(this.click, 'a', function (e) {
+                this.ui.breadcrumb.on(this.click, 'a', function (e) {
                     e.preventDefault();
                     that._changeContent($(this));
                 });
@@ -409,6 +408,9 @@
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
+                // remove class from modal
+                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+
                 // cancel if there is no breadcrumb)
                 if (!breadcrumb || breadcrumb.length <= 0) {
                     return false;
@@ -417,16 +419,19 @@
                     return false;
                 }
 
+                // add class to modal
+                this.ui.modal.addClass('cms-modal-has-breadcrumb');
+
                 // load breadcrumb
                 $.each(breadcrumb, function (index, item) {
                     // check if the item is the last one
-                    var last = (index >= breadcrumb.length - 1) ? 'cms-modal-breadcrumb-last' : '';
+                    var last = (index >= breadcrumb.length - 1) ? 'active' : '';
                     // render breadcrumb
                     crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
                 });
 
                 // attach elements
-                this.ui.breadcrumbItems.html(crumb);
+                this.ui.breadcrumb.html(crumb);
 
                 // show breadcrumb
                 bread.show();
@@ -633,21 +638,21 @@
             },
 
             _changeContent: function (el) {
-                if (el.hasClass('cms-modal-breadcrumb-last')) {
+                if (el.hasClass('active')) {
                     return false;
                 }
 
                 var parents = el.parent().find('a');
-                parents.removeClass('cms-modal-breadcrumb-last');
+                parents.removeClass('active');
 
-                el.addClass('cms-modal-breadcrumb-last');
+                el.addClass('active');
+                console.log(el);
 
                 this._loadContent(el.attr('href'));
 
                 // update title
                 this.ui.title.text(el.text());
             }
-
         });
 
     });
