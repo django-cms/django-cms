@@ -41,12 +41,20 @@
             margin: 0 !important;
 
             .cms-modal-body,
+            .cms-modal-breadcrumb,
             .cms-modal-foot {
                 display: none;
             }
             .cms-modal-title {
                 // set correct cursor when maximized #3111
                 cursor: default;
+                padding-right: $modal-header-button-area-size * 3;
+            }
+            .cms-modal-title-suffix {
+                display: none;
+            }
+            .cms-modal-minimize {
+                right: $modal-header-button-area-size + $padding-base;
             }
         }
     }
@@ -116,7 +124,10 @@
         line-height: $modal-header-height;
         padding: 0 $padding-large;
         cursor: move;
-        background: $gray-lightest;
+        .cms-modal-title-suffix {
+            font-weight: normal;
+            padding-left: $padding-normal;
+        }
     }
 
     .cms-modal-minimize,

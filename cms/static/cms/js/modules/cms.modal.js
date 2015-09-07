@@ -55,6 +55,8 @@
                     minimizeButton: modal.find('.cms-modal-minimize'),
                     maximizeButton: modal.find('.cms-modal-maximize'),
                     title: modal.find('.cms-modal-title'),
+                    titlePrefix: modal.find('.cms-modal-title-prefix'),
+                    titleSuffix: modal.find('.cms-modal-title-suffix'),
                     resize: modal.find('.cms-modal-resize'),
                     breadcrumb: modal.find('.cms-modal-breadcrumb'),
                     closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
@@ -554,8 +556,10 @@
                 var holder = this.ui.iframeHolder;
 
                 // set correct title
-                var title = this.ui.title;
-                title.html(name || '&nbsp;');
+                var titlePrefix = this.ui.titlePrefix;
+                var titleSuffix = this.ui.titleSuffix;
+                titlePrefix.text(name || '');
+                titleSuffix.text('');
 
                 // ensure previous iframe is hidden
                 holder.find('iframe').css('visibility', 'hidden');
@@ -607,9 +611,15 @@
                         iframe.show();
                         // set title of not provided
                         var innerTitle = iframe.contents().find('#content h1:eq(0)');
-                        if (name === undefined) {
-                            title.html(innerTitle.text());
+
+                        // case when there is no prefix
+                        if (name === undefined && that.ui.titlePrefix.text() === '') {
+                            var bc = iframe.contents().find('.breadcrumbs').text().split('›');
+                            console.log(bc);
+                            that.ui.titlePrefix.text(bc[bc.length - 1]);
                         }
+
+                        titleSuffix.text(innerTitle.text());
                         innerTitle.remove();
 
                         // than show
@@ -646,12 +656,11 @@
                 parents.removeClass('active');
 
                 el.addClass('active');
-                console.log(el);
 
                 this._loadContent(el.attr('href'));
 
                 // update title
-                this.ui.title.text(el.text());
+                this.ui.titlePrefix.text(el.text());
             }
         });
 

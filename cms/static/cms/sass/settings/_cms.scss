@@ -44,7 +44,7 @@ $padding-large: 20px;
 $z-layers: (
     "debug":            99999999,
     "modal": (
-        "base":         999999,
+        "base":         9999999,
         "footer":       11,
         "body":         10,
         "frame":        10,
@@ -132,19 +132,10 @@ $modal-footer-height: 36px;
 $modal-header-button-icon-size: 12px;
 $modal-header-button-area-size: 30px;
 
-/*
-$modal-breadcrumb-title-width: 40px;
-$modal-breadcrumb-padding-vertical: $padding-normal;
-$modal-breadcrumb-padding-horizontal: $modal-footer-height / 2;
-$modal-breadcrumb-hover-color: $black;
-$modal-breadcrumb-hover-bgcolor: $white;
-*/
-
 $modal-button-font-size: 12px;
 $modal-button-padding: 2px $padding-normal;
 $modal-button-space: 5px;
 $modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
-
 
 $modal-resize-size: 30px;
 
