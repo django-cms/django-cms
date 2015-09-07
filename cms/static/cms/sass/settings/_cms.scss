@@ -127,17 +127,12 @@ $modal-border-radius: $border-radius-normal;
 
 $modal-header-height: 50px;
 $modal-breadcrumb-height: 40px;
-$modal-footer-height: 36px;
+$modal-footer-height: 50px;
 
 $modal-header-button-icon-size: 12px;
 $modal-header-button-area-size: 30px;
 
-$modal-button-font-size: 12px;
-$modal-button-padding: 2px $padding-normal;
-$modal-button-space: 5px;
-$modal-button-margin: ($modal-footer-height - $line-height-normal - 2 * (1px + nth($modal-button-padding, 1))) / 2;
-
-$modal-resize-size: 30px;
+$modal-resize-size: 25px;
 
 $modal-content-padding: 10px;
 $modal-content-module-padding: 10px;

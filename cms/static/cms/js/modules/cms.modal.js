@@ -488,7 +488,10 @@
                     }
 
                     // create the element and attach events
-                    var el = $('<div class="' + cls + ' ' + item.attr('class') + '">' + title + '</div>');
+                    var el = $('' +
+                        '<div class="cms-modal-item-buttons">' +
+                        '   <a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>' +
+                        '</div>');
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
@@ -516,7 +519,10 @@
                 });
 
                 // manually add cancel button at the end
-                var cancel = $('<div class="cms-btn">' + that.config.lang.cancel + '</div>');
+                var cancel = $('' +
+                    '<div class="cms-modal-item-buttons">' +
+                    '   <a href="#" class="cms-btn">' + that.config.lang.cancel + '</a>' +
+                    '</div>');
                 cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();

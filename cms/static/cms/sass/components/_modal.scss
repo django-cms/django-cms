@@ -77,7 +77,6 @@
         overflow: hidden;
         clear: both;
         height: $modal-footer-height;
-        background: $gray-lightest;
         left: 0;
         bottom: 0;
         right: 0;
@@ -188,8 +187,8 @@
         cursor: nw-resize;
         span {
             position: absolute;
-            bottom: $modal-button-margin;
-            right: $modal-button-margin;
+            bottom: 5px;
+            right: 5px;
         }
     }
 
@@ -221,20 +220,17 @@
 
     // buttons
     .cms-modal-buttons {
+        // see toolbar.scss
         position: absolute;
         top: 0;
         right: 0;
         z-index: z(modal, buttons);
         padding: 0 $modal-resize-size 0 $padding-normal;
-        background: $color-window;
-        div {
-            display: inline-block;
-            float: right;
-            font-size: $modal-button-font-size;
-            margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
-            padding: $modal-button-padding;
-            cursor: pointer;
-        }
+    }
+    .cms-modal-item-buttons {
+        @extend .cms-toolbar-item-buttons;
+        float: left;
+        margin: $padding-normal 0 $padding-normal $padding-normal;
     }
 }
 
