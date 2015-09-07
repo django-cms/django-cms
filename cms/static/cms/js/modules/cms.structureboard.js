@@ -383,7 +383,8 @@
                         });
                         // fixes placeholder height
                         ui.item.addClass('cms-is-dragging');
-                        ui.placeholder.css('height', ui.helper.css('height'));
+                        ui.helper.addClass('cms-draggable-is-dragging');
+                        {/* ui.placeholder.css('height', ui.helper.css('height')); */}
                         // add overflow hidden to body
                         that.ui.content.css({
                             'overflow-x': 'hidden'
