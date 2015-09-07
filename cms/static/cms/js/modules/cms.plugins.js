@@ -522,8 +522,8 @@ $(document).ready(function () {
 			var dropdown = nav.find('.cms_submenu-dropdown');
 			var offset = parseInt(dropdown.data('top'));
 
-			//fix issue #4407
-			nav.parents('.cms_draggable').data( 'menustate', 1).trigger('cms.structureboard.menustate.change');
+			// fix issue #4407
+			nav.parents('.cms_draggable').data('menustate', true).trigger('cms.structureboard.menustate.change');
 
 			// clearing
 			clearTimeout(this.timer);
@@ -608,7 +608,7 @@ $(document).ready(function () {
 			if(this.focused) return false;
 
 			//fix issue #4407
-			nav.parents('.cms_draggable').data( 'menustate', 0 ).trigger('cms.structureboard.menustate.change');
+			nav.parents('.cms_draggable').data('menustate', false).trigger('cms.structureboard.menustate.change');
 
 			// set correct active state
 			nav.closest('.cms_draggable').data('active', false);

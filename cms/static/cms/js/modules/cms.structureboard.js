@@ -113,9 +113,9 @@ $(document).ready(function () {
 			});
 
 			//fix issue #4407
-			$('.cms-toolbar-expanded .cms_dragarea .cms_draggables .cms_draggable').bind('cms.structureboard.menustate.change', function(e){
-				var drag    = $(this);
-				(drag.data( 'menustate') > 0) ? that.sortDisable() : that.sortEnable();
+			$('.cms_draggables .cms_draggable').on('cms.structureboard.menustate.change', function(e){
+				var drag = $(this);
+				drag.data('menustate') ? that.sortDisable() : that.sortEnable();
 			});
 
 			$(document).bind('keyup', function (e) {
@@ -352,14 +352,12 @@ $(document).ready(function () {
 			});
 		},
 
-		//fix issue #4407
+		// fix issue #4407
 		sortDisable: function() {
-			var that = this;
-			that.sortables.sortable('disable');
+			this.sortables.sortable('disable');
 		},
 		sortEnable: function() {
-			var that = this;
-			that.sortables.sortable('enable');
+			this.sortables.sortable('enable');
 		},
 
 		_drag: function () {
