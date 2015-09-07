@@ -62,7 +62,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/modules/cms.changeform.js'
     ],
     'bundle.admin.changelist.min.js': [
-        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.new.js',
         PROJECT_PATH.js + '/modules/cms.changelist.js',
         PROJECT_PATH.js + '/jstree/_lib/_all.js',
         PROJECT_PATH.js + '/jstree/tree_component.js'
@@ -71,7 +71,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
-        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.new.js',
         PROJECT_PATH.js + '/modules/jquery.ui.touchpunch.js',
         PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
         PROJECT_PATH.js + '/modules/cms.base.js',
