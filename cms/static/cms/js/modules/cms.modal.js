@@ -620,8 +620,8 @@
 
                         // case when there is no prefix
                         if (name === undefined && that.ui.titlePrefix.text() === '') {
-                            var bc = iframe.contents().find('.breadcrumbs').text().split('›');
-                            that.ui.titlePrefix.text(bc[bc.length - 1]);
+                            var bc = iframe.contents().find('.breadcrumbs').contents();
+                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace(' › ', ''));
                         }
 
                         titleSuffix.text(innerTitle.text());
