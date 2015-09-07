@@ -137,7 +137,7 @@
         font-size: $modal-header-button-icon-size;
         top: 50%;
         margin-top: -$modal-header-button-area-size / 2;
-        right: $padding-base;
+        right: $padding-normal;
         color: $gray-light;
         text-align: center;
         width: $modal-header-button-area-size;
@@ -154,7 +154,7 @@
         }
     }
     .cms-modal-minimize {
-        right: 2 * $modal-header-button-area-size + $padding-base;
+        right: 2 * $modal-header-button-area-size + $padding-normal;
         .cms-modal-minimized & {
             @include icon(plus);
             color: $color-primary;
@@ -165,7 +165,7 @@
         }
     }
     .cms-modal-maximize {
-        right: $modal-header-button-area-size + $padding-base;
+        right: $modal-header-button-area-size + $padding-normal;
         // ensure maximize element is hidden #3111
         .cms-modal-minimized & {
             display: none;
