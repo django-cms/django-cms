@@ -7,7 +7,7 @@ with a wide range and levels of skills and expertise. Every contribution,
 however small, is valued.
 
 As an open source project, anyone is welcome to contribute in whatever form
-they are able, which can include taking part in dicussions, filing bug reports,
+they are able, which can include taking part in discussions, filing bug reports,
 proposing improvements, contributing code or documentation, and testing the
 system - amongst others.
 
@@ -20,16 +20,22 @@ AG <https://divio.ch/>`_ of Zürich, Switzerland, by
 `Patrick Lauber <https://github.com/digi604/>`_, who led its development for
 several years.
 
-Divio remains thoroughly committed to django CMS both as a high-quality technical
-product and as a healthy open source project.
+django CMS represents Divio's vision for a general-purpose CMS platform able to meet its needs as a
+web agency with a large portfolio of different clients. This vision continues to guide the
+development of django CMS.
 
 Divio's role in steering the project's development is formalised in the
 :ref:`django CMS technical board <technical_board>`, whose members are drawn
 both from key staff at Divio and other members of the django CMS community.
 
-Divio hosts the `django CMS project website <http://django-cms.org>`_ and
-maintains overall control of the `django CMS repository
-<https://github.com/divio/django-cms>`_.
+Divio hosts the `django CMS project website <http://django-cms.org>`_ and maintains overall control
+of the `django CMS repository <https://github.com/divio/django-cms>`_. As the chief backer of
+django CMS, and in order to ensure a consistent and long-term approach to the project, Divio
+reserves the right of final say in any decisions concerning its development.
+
+Divio remains thoroughly committed to django CMS both as a high-quality technical
+product and as a healthy open source project.
+
 
 .. _core_developers:
 
