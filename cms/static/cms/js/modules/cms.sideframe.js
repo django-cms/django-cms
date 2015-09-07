@@ -57,7 +57,6 @@
                 this.sideframe.find('.cms-sideframe-resize').on(
                     'pointerdown.cms.sideframe contextmenu.cms.sideframe',
                     function (e) {
-                    console.log(e);
                     e.preventDefault();
                     that._startResize();
                 });

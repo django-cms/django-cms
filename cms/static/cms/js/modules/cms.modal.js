@@ -621,7 +621,6 @@
                         // case when there is no prefix
                         if (name === undefined && that.ui.titlePrefix.text() === '') {
                             var bc = iframe.contents().find('.breadcrumbs').text().split('›');
-                            console.log(bc);
                             that.ui.titlePrefix.text(bc[bc.length - 1]);
                         }
 
