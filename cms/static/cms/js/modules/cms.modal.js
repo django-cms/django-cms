@@ -134,7 +134,7 @@
 
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
-                var heightOffset = 350; // adds margin top and bottom;
+                var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
 
@@ -383,7 +383,7 @@
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
                     var wMax = 680;
-                    var hMax = 100;
+                    var hMax = 150;
 
                     // add some limits
                     if (w <= wMax || h <= hMax) {

@@ -228,9 +228,10 @@
         padding: 0 $modal-resize-size 0 $padding-normal;
     }
     .cms-modal-item-buttons {
+        $margin: ($toolbar-height - $toolbar-button-height) / 2;
         @extend .cms-toolbar-item-buttons;
         float: left;
-        margin: $padding-normal 0 $padding-normal $padding-normal;
+        margin-left: $margin;
     }
 }
 

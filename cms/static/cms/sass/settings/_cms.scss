@@ -125,9 +125,9 @@ $modal-shadow: 0 0 20px rgba($black, .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
-$modal-header-height: 50px;
-$modal-breadcrumb-height: 40px;
-$modal-footer-height: 50px;
+$modal-header-height: $toolbar-height;
+$modal-breadcrumb-height: $toolbar-height - 6px;
+$modal-footer-height: $toolbar-height;
 
 $modal-header-button-icon-size: 12px;
 $modal-header-button-area-size: 30px;
