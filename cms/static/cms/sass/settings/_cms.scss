@@ -1,4 +1,4 @@
-// ##################################################################################################################
+// #############################################################################
 // #SETTINGS#
 
 $speed-base: 200ms;
@@ -25,6 +25,7 @@ $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
 $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transparent 50%, rgba($white, .8) 50%, rgba($white, .8) 75%, transparent 75%, transparent;
 
+
 //##############################################################################
 // BASE Variables
 $font-size-normal: 14px;
@@ -37,6 +38,7 @@ $border-radius-normal: 5px;
 $padding-base: 3px;
 $padding-normal: 10px;
 $padding-large: 20px;
+
 
 //##############################################################################
 // z-index map
@@ -119,31 +121,6 @@ $btn-active-border: $gray-darkest;
 
 
 //##############################################################################
-// Modal
-$modal-header-title-font-size: $font-size-large;
-$modal-shadow: 0 0 20px rgba($black, .5);
-$modal-bgcolor: $white;
-$modal-border-radius: $border-radius-normal;
-
-$modal-header-height: $toolbar-height;
-$modal-breadcrumb-height: $toolbar-height - 6px;
-$modal-footer-height: $toolbar-height;
-
-$modal-header-button-icon-size: 12px;
-$modal-header-button-area-size: 30px;
-
-$modal-resize-size: 25px;
-
-$modal-content-padding: 10px;
-$modal-content-module-padding: 10px;
-
-//##############################################################################
-// Dialog
-$dialog-width: 500px;
-$dialog-border-radius: $border-radius-normal;
-$dialog-shadow: $modal-shadow;
-
-//##############################################################################
 // Structureboard
 $structure-bgcolor: #f0f0f0;
 
@@ -169,6 +146,7 @@ $structure-dragitem-icon-size: 10px;
 $structure-dragitem-height: 26px;
 $structure-dragitem-icon-space: 22px + $structure-dragarea-padding-horizontal;
 $structure-dragitem-icon-size: 12px;
+
 
 //##############################################################################
 // Structureboard
@@ -203,6 +181,7 @@ $tooltip-icon-area-size: 22px;
 $tooltip-icon-size: 14px;
 $tooltip-first-line-color: $gray-lighter;
 $tooltip-second-line-color: $white;
+
 
 //##############################################################################
 // Toolbar
@@ -245,6 +224,34 @@ $toolbar-button-font-size: 13px;
 $toolbar-button-padding-horizontal: 12px;
 $toolbar-button-border-radius: $border-radius-base;
 
+
+//##############################################################################
+// Modal
+$modal-header-title-font-size: $font-size-large;
+$modal-shadow: 0 0 20px rgba($black, .5);
+$modal-bgcolor: $white;
+$modal-border-radius: $border-radius-normal;
+
+$modal-header-height: $toolbar-height;
+$modal-breadcrumb-height: $toolbar-height - 6px;
+$modal-footer-height: $toolbar-height;
+
+$modal-header-button-icon-size: 12px;
+$modal-header-button-area-size: 30px;
+
+$modal-resize-size: 25px;
+
+$modal-content-padding: 10px;
+$modal-content-module-padding: 10px;
+
+
+//##############################################################################
+// Dialog
+$dialog-width: 500px;
+$dialog-border-radius: $border-radius-normal;
+$dialog-shadow: $modal-shadow;
+
+
 //##############################################################################
 // Toolbar messages + screenblock + login form
 $messages-width: 300px;
@@ -273,6 +280,7 @@ $login-form-input-border-radius: $border-radius-base;
 $login-form-submit-color: $white;
 $login-form-submit-padding-horizontal: 15px;
 
+
 //##############################################################################
 // Sideframe
 $sideframe-buttons-position-top: $toolbar-height + 5px;
@@ -284,6 +292,7 @@ $sideframe-resize-width: 15px;
 $sideframe-box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
 $sideframe-dimmer: rgba(0, 0, 0, 0.6);
 
+
 //##############################################################################
 // Clipboard
 
@@ -293,11 +302,10 @@ $clipboard-buttons-position-top: $sideframe-buttons-position-top +
 $clipboard-button-area-size: 30px;
 $clipboard-button-icon-size: 12px;
 
+
 //##############################################################################
 // Tooltip
-
 $cms-hover-tooltip-width: 160px;
 $cms-hover-tooltip-arrow-height: 6px;
 $cms-hover-tooltip-bgcolor: rgba($black, 0.8);
 $cms-hover-tooltip-padding: 6px 8px;
-

@@ -230,7 +230,7 @@
     .cms-modal-item-buttons {
         $margin: ($toolbar-height - $toolbar-button-height) / 2;
         @extend .cms-toolbar-item-buttons;
-        float: left;
+        float: right;
         margin-left: $margin;
     }
 }
