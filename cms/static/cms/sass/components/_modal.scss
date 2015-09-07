@@ -111,10 +111,9 @@
         display: block;
         color: $gray-darker;
         font-size: $modal-header-title-font-size;
-        line-height: $modal-header-height;
         font-weight: bold;
-        text-align: center;
-        padding: 0px ($modal-header-button-area-size * 3 + $padding-base + $padding-large);
+        line-height: $modal-header-height;
+        padding: 0 $padding-large;
         cursor: move;
         background: $gray-lightest;
     }
