@@ -75,14 +75,14 @@
                     e.preventDefault();
                     that._minimize();
                 });
-                this.ui.title.on('pointerdown.cms', function (e) {
+                this.ui.title.on('pointerdown.cms contextmenu.cms', function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
                 this.ui.title.on('dblclick.cms', function () {
                     that._maximize();
                 });
-                this.ui.resize.on('pointerdown.cms', function (e) {
+                this.ui.resize.on('pointerdown.cms contextmenu.cms', function (e) {
                     e.preventDefault();
                     that._startResize(e);
                 });
