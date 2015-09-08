@@ -1,11 +1,11 @@
-//##################################################################################################################
+//##############################################################################
 // #SIDEFRAME#
 /* global CMS */
 
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
-    $(document).ready(function () {
+    $(function () {
         /*!
          * Sideframe
          * Controls a cms specific sideframe
