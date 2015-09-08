@@ -45,7 +45,7 @@
                 this.ui.modal.data('ready', true);
             },
 
-            _setupUI: function setupUI() {
+            _setupUI: function () {
                 var modal = $('.cms-modal');
                 this.ui = {
                     modal: modal,
@@ -118,6 +118,19 @@
                     CMS.API.locked = true;
                 }
 
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    if (this._deletePlugin() === false) {
+                        // cancel open process when switching context
+                        return false;
+                    }
+                }
+
+                // new plugin will freeze the creation process
+                if (this.options.newPlugin) {
+                    CMS._newPlugin = this.options.newPlugin;
+                }
+
                 // because a new instance is called, we have to ensure minimized state is removed #3620
                 if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
@@ -166,16 +179,10 @@
 
             close: function () {
                 var that = this;
-                // handle remove option when plugin is new
-                if (this.options.newPlugin) {
-                    var data = this.options.newPlugin;
-                    var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                    var text = this.config.lang.confirm;
 
-                    // trigger an ajax request
-                    CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
-                        that._hide(100);
-                    });
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    this._deletePlugin(true);
                 } else {
                     this._hide(100);
                 }
@@ -502,7 +509,6 @@
 
                         // trigger only when blue action buttons are triggered
                         if (item.hasClass('default') || item.hasClass('deletelink')) {
-                            that.options.newPlugin = null;
                             // reset onClose when delete is triggered
                             if (item.hasClass('deletelink')) {
                                 that.options.onClose = null;
@@ -621,7 +627,7 @@
                         // case when there is no prefix
                         if (name === undefined && that.ui.titlePrefix.text() === '') {
                             var bc = iframe.contents().find('.breadcrumbs').contents();
-                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace(' › ', ''));
+                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
 
                         titleSuffix.text(innerTitle.text());
@@ -666,6 +672,31 @@
 
                 // update title
                 this.ui.titlePrefix.text(el.text());
+            },
+
+            /**
+             * _deletePlugin removes a plugin once created when clicking
+             * on delete or the close item. If we don't do this, an empty
+             * placeholder is generated
+             * https://github.com/divio/django-cms/pull/4381 will eventually
+             * provide a better solution
+             *
+             * @param hideAfter Boolean
+             */
+            _deletePlugin: function (hideAfter) {
+                var that = this;
+                var data = CMS._newPlugin;
+                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+                var text = this.config.lang.confirmEmpty.replace('{1}', '');
+                console.log(CMS._newPlugin);
+
+                // trigger an ajax request
+                return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
+                    CMS._newPlugin = false;
+                    if (hideAfter) {
+                        that._hide(100);
+                    }
+                });
             }
         });
 
