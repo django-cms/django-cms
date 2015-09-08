@@ -421,7 +421,7 @@
                 this.ui.modal.removeClass('cms-modal-has-breadcrumb');
 
                 // cancel if there is no breadcrumb)
-                if (!breadcrumb || breadcrumb.length <= 0) {
+                if (!breadcrumb || breadcrumb.length <= 1) {
                     return false;
                 }
                 if (!breadcrumb[0].title) {
