@@ -1165,12 +1165,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         toolbar plugin struct for those given parent Plugins
         """
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
+                                    dict(parent_classes=['GenericParentPlugin'], render_plugin=False,
+                                    text_editor_button_icon='fake.png'))
         GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
         KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {'render_plugin':False})
 
         expected_struct = {'module': u'Generic',
                             'name': u'Parent Classes Plugin',
+                            'icon': 'fake.png',
                             'value': 'ParentClassesPlugin'}
 
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
@@ -1197,6 +1199,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                                                     page)
         expected_struct = {'module': u'Generic',
                             'name': u'Generic Parent Plugin',
+                            'icon': '',
                             'value': 'GenericParentPlugin'}
         self.assertTrue(expected_struct in toolbar_struct)
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
