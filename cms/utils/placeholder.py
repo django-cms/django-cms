@@ -108,6 +108,7 @@ def get_toolbar_plugin_struct(plugins_list, slot, page, parent=None):
         names = get_placeholder_conf("plugin_labels", slot, template, default={})
         main_list.append({'value': plugin.value,
                           'name': force_text(names.get(plugin.value, plugin.name)),
+                          'icon': getattr(plugin, 'text_editor_button_icon', ''),
                           'module': force_text(modules.get(plugin.value, plugin.module))})
     return sorted(main_list, key=operator.itemgetter("module"))
 
