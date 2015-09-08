@@ -55,9 +55,10 @@
                     minimizeButton: modal.find('.cms-modal-minimize'),
                     maximizeButton: modal.find('.cms-modal-maximize'),
                     title: modal.find('.cms-modal-title'),
+                    titlePrefix: modal.find('.cms-modal-title-prefix'),
+                    titleSuffix: modal.find('.cms-modal-title-suffix'),
                     resize: modal.find('.cms-modal-resize'),
                     breadcrumb: modal.find('.cms-modal-breadcrumb'),
-                    breadcrumbItems: modal.find('.cms-modal-breadcrumb-items'),
                     closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
                     modalButtons: modal.find('.cms-modal-buttons'),
                     modalBody: modal.find('.cms-modal-body'),
@@ -75,14 +76,14 @@
                     e.preventDefault();
                     that._minimize();
                 });
-                this.ui.title.on('pointerdown.cms', function (e) {
+                this.ui.title.on('pointerdown.cms contextmenu.cms', function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
                 this.ui.title.on('dblclick.cms', function () {
                     that._maximize();
                 });
-                this.ui.resize.on('pointerdown.cms', function (e) {
+                this.ui.resize.on('pointerdown.cms contextmenu.cms', function (e) {
                     e.preventDefault();
                     that._startResize(e);
                 });
@@ -90,7 +91,7 @@
                     e.preventDefault();
                     that._maximize();
                 });
-                this.ui.breadcrumbItems.on(this.click, 'a', function (e) {
+                this.ui.breadcrumb.on(this.click, 'a', function (e) {
                     e.preventDefault();
                     that._changeContent($(this));
                 });
@@ -133,7 +134,7 @@
 
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
-                var heightOffset = 350; // adds margin top and bottom;
+                var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
 
@@ -382,7 +383,7 @@
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
                     var wMax = 680;
-                    var hMax = 100;
+                    var hMax = 150;
 
                     // add some limits
                     if (w <= wMax || h <= hMax) {
@@ -409,6 +410,9 @@
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
+                // remove class from modal
+                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+
                 // cancel if there is no breadcrumb)
                 if (!breadcrumb || breadcrumb.length <= 0) {
                     return false;
@@ -417,16 +421,19 @@
                     return false;
                 }
 
+                // add class to modal
+                this.ui.modal.addClass('cms-modal-has-breadcrumb');
+
                 // load breadcrumb
                 $.each(breadcrumb, function (index, item) {
                     // check if the item is the last one
-                    var last = (index >= breadcrumb.length - 1) ? 'cms-modal-breadcrumb-last' : '';
+                    var last = (index >= breadcrumb.length - 1) ? 'active' : '';
                     // render breadcrumb
                     crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
                 });
 
                 // attach elements
-                this.ui.breadcrumbItems.html(crumb);
+                this.ui.breadcrumb.html(crumb);
 
                 // show breadcrumb
                 bread.show();
@@ -481,7 +488,10 @@
                     }
 
                     // create the element and attach events
-                    var el = $('<div class="' + cls + ' ' + item.attr('class') + '">' + title + '</div>');
+                    var el = $('' +
+                        '<div class="cms-modal-item-buttons">' +
+                        '   <a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>' +
+                        '</div>');
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
@@ -509,7 +519,10 @@
                 });
 
                 // manually add cancel button at the end
-                var cancel = $('<div class="cms-btn">' + that.config.lang.cancel + '</div>');
+                var cancel = $('' +
+                    '<div class="cms-modal-item-buttons">' +
+                    '   <a href="#" class="cms-btn">' + that.config.lang.cancel + '</a>' +
+                    '</div>');
                 cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();
@@ -549,8 +562,10 @@
                 var holder = this.ui.iframeHolder;
 
                 // set correct title
-                var title = this.ui.title;
-                title.html(name || '&nbsp;');
+                var titlePrefix = this.ui.titlePrefix;
+                var titleSuffix = this.ui.titleSuffix;
+                titlePrefix.text(name || '');
+                titleSuffix.text('');
 
                 // ensure previous iframe is hidden
                 holder.find('iframe').css('visibility', 'hidden');
@@ -602,9 +617,14 @@
                         iframe.show();
                         // set title of not provided
                         var innerTitle = iframe.contents().find('#content h1:eq(0)');
-                        if (name === undefined) {
-                            title.html(innerTitle.text());
+
+                        // case when there is no prefix
+                        if (name === undefined && that.ui.titlePrefix.text() === '') {
+                            var bc = iframe.contents().find('.breadcrumbs').contents();
+                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace(' › ', ''));
                         }
+
+                        titleSuffix.text(innerTitle.text());
                         innerTitle.remove();
 
                         // than show
@@ -633,21 +653,20 @@
             },
 
             _changeContent: function (el) {
-                if (el.hasClass('cms-modal-breadcrumb-last')) {
+                if (el.hasClass('active')) {
                     return false;
                 }
 
                 var parents = el.parent().find('a');
-                parents.removeClass('cms-modal-breadcrumb-last');
+                parents.removeClass('active');
 
-                el.addClass('cms-modal-breadcrumb-last');
+                el.addClass('active');
 
                 this._loadContent(el.attr('href'));
 
                 // update title
-                this.ui.title.text(el.text());
+                this.ui.titlePrefix.text(el.text());
             }
-
         });
 
     });

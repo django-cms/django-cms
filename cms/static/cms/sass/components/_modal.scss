@@ -41,12 +41,20 @@
             margin: 0 !important;
 
             .cms-modal-body,
+            .cms-modal-breadcrumb,
             .cms-modal-foot {
                 display: none;
             }
             .cms-modal-title {
                 // set correct cursor when maximized #3111
                 cursor: default;
+                padding-right: $modal-header-button-area-size * 3;
+            }
+            .cms-modal-title-suffix {
+                display: none;
+            }
+            .cms-modal-minimize {
+                right: $modal-header-button-area-size + $padding-base;
             }
         }
     }
@@ -63,12 +71,12 @@
         border-top: 1px solid $gray-lighter;
         border-bottom: 1px solid $gray-lighter;
     }
+
     .cms-modal-foot {
         position: absolute;
         overflow: hidden;
         clear: both;
         height: $modal-footer-height;
-        background: $gray-lightest;
         left: 0;
         bottom: 0;
         right: 0;
@@ -111,12 +119,14 @@
         display: block;
         color: $gray-darker;
         font-size: $modal-header-title-font-size;
-        line-height: $modal-header-height;
         font-weight: bold;
-        text-align: center;
-        padding: 0px ($modal-header-button-area-size * 3 + $padding-base + $padding-large);
+        line-height: $modal-header-height;
+        padding: 0 $padding-large;
         cursor: move;
-        background: $gray-lightest;
+        .cms-modal-title-suffix {
+            font-weight: normal;
+            padding-left: $padding-normal;
+        }
     }
 
     .cms-modal-minimize,
@@ -127,7 +137,7 @@
         font-size: $modal-header-button-icon-size;
         top: 50%;
         margin-top: -$modal-header-button-area-size / 2;
-        right: $padding-base;
+        right: $padding-normal;
         color: $gray-light;
         text-align: center;
         width: $modal-header-button-area-size;
@@ -144,7 +154,7 @@
         }
     }
     .cms-modal-minimize {
-        right: 2 * $modal-header-button-area-size + $padding-base;
+        right: 2 * $modal-header-button-area-size + $padding-normal;
         .cms-modal-minimized & {
             @include icon(plus);
             color: $color-primary;
@@ -155,7 +165,7 @@
         }
     }
     .cms-modal-maximize {
-        right: $modal-header-button-area-size + $padding-base;
+        right: $modal-header-button-area-size + $padding-normal;
         // ensure maximize element is hidden #3111
         .cms-modal-minimized & {
             display: none;
@@ -177,92 +187,33 @@
         cursor: nw-resize;
         span {
             position: absolute;
-            bottom: $modal-button-margin;
-            right: $modal-button-margin;
+            bottom: 5px;
+            right: 5px;
         }
     }
 
+    // breadcrumb only shows for nested elements
     .cms-modal-breadcrumb {
-        display: none;
-        position: relative;
-        z-index: z(modal, breadcrumb, base);
-        width: 100%;
-        height: $modal-footer-height;
-
-        .cms-modal-breadcrumb-items {
-            position: absolute;
-            top: 0;
-            left: $modal-breadcrumb-title-width - 1px;
-            width: 9999px;
-            background: $color-window;
-        }
-
+        font-size: $font-size-normal;
+        line-height: $modal-breadcrumb-height;
+        padding: 0 $padding-large;
+        border-top: 1px solid $gray-lighter;
         a {
-            position: relative;
-            float: left;
-            color: $gray-light;
-            font-size: 12px;
-            line-height: $modal-footer-height - 2 * $modal-breadcrumb-padding-vertical;
-            padding: $modal-breadcrumb-padding-vertical
-                $modal-breadcrumb-padding-horizontal
-                $modal-breadcrumb-padding-vertical
-                1.5 * $modal-breadcrumb-padding-horizontal;
-        }
-        a:first-child {
-            padding-left: $modal-breadcrumb-padding-horizontal;
-        }
-        a:after,
-        a:before {
-            content: "";
-            display: block;
-            position: absolute;
-            left: 100%;
-            top: -1px;
-            width: 0;
-            height: 0;
-            border-top: ($modal-footer-height / 2 + 1px) solid transparent;
-            border-bottom: ($modal-footer-height / 2 + 1px) solid transparent;
-        }
-        a:after {
-            z-index: z(modal, breadcrumb, trianglefront);
-            border-left: ($modal-footer-height / 4) solid $color-window;
-        }
-        a:before {
-            z-index: z(modal, breadcrumb, trianglebehind);
-            margin-left: 1px;
-            border-left: ($modal-footer-height / 4) solid $gray-lighter;
-        }
-
-        // home icon
-        .cms-modal-breadcrumb-title {
-            position: relative;
-            z-index: z(modal, breadcrumb, title);
-            color: $gray-lighter;
-            font-size: $modal-footer-height / 2;
-            text-align: center;
-            width: $modal-breadcrumb-title-width;
-            height: $modal-footer-height;
-            border-right: 1px solid $gray-lighter;
-            &:before {
-                position: relative;
-                top: $modal-footer-height / 4;
-            }
-        }
-
-        a:hover {
-            color: $modal-breadcrumb-hover-color;
-            background: $modal-breadcrumb-hover-bgcolor;
-            &:after {
-                border-left-color: $modal-breadcrumb-hover-bgcolor;
-            }
-        }
-
-        // last entry highlight
-        .cms-modal-breadcrumb-last {
-            cursor: default;
             color: $color-primary;
             &:hover {
-                color: $color-primary;
+                color: darken($color-primary, 20%);
+            }
+            &:after {
+                content: "/";
+                color: $gray-lighter;
+                text-decoration: none;
+                padding: 0 $padding-normal;
+            }
+            &.active {
+                color: $gray-light;
+            }
+            &:last-child:after {
+                content: "";
             }
         }
     }
@@ -274,15 +225,12 @@
         right: 0;
         z-index: z(modal, buttons);
         padding: 0 $modal-resize-size 0 $padding-normal;
-        background: $color-window;
-        div {
-            display: inline-block;
-            float: right;
-            font-size: $modal-button-font-size;
-            margin: $modal-button-margin $modal-button-space $modal-button-margin 0;
-            padding: $modal-button-padding;
-            cursor: pointer;
-        }
+    }
+    .cms-modal-item-buttons {
+        $margin: ($toolbar-height - $toolbar-button-height) / 2;
+        @extend .cms-toolbar-item-buttons;
+        float: right;
+        margin-left: $margin;
     }
 }
 
@@ -297,3 +245,8 @@
         top: $toolbar-debug-height + 1px !important;
     }
 }
+
+.cms-modal-has-breadcrumb .cms-modal-body {
+    top: $modal-header-height + $modal-breadcrumb-height !important;
+}
+

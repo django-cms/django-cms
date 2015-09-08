@@ -54,7 +54,9 @@
                     that.close(true);
                 });
 
-                this.sideframe.find('.cms-sideframe-resize').bind('pointerdown.cms.sideframe', function (e) {
+                this.sideframe.find('.cms-sideframe-resize').on(
+                    'pointerdown.cms.sideframe contextmenu.cms.sideframe',
+                    function (e) {
                     e.preventDefault();
                     that._startResize();
                 });
