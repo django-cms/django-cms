@@ -6,7 +6,12 @@ python:
   - 2.7
   - 2.6
 
-sudo: required
+sudo: false
+
+addons:
+  apt:
+    packages:
+    - enchant
 
 env:
   global:
@@ -28,7 +33,6 @@ env:
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
 
 before_script:
-  - sudo apt-get install enchant
   - pip freeze
   - sh -c "if [ '$DATABASE_URL' = 'postgres://postgres@127.0.0.1/djangocms_test' ];
     then psql -c 'DROP DATABASE IF EXISTS djangocms_test;' -U postgres; fi"

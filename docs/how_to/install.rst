@@ -710,7 +710,7 @@ walk-through of the main features of django CMS.
 For more information on using django CMS for managing web content, see
 :doc:`/user/index`.
 
-To deploy your django CMS project on a production webserver, please refer to the
+To deploy your django CMS project on a production web server, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
 
 .. _official documentation: http://docs.djangoproject.com/en/stable/topics/templates/

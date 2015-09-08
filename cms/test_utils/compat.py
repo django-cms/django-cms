@@ -20,3 +20,8 @@ elif hasattr(djut, 'skipIf'):
     skipIf = djut.skipIf
 else:
     skipIf = _skipIf
+
+if hasattr(stdut, 'skipUnless'):
+    skipUnless = stdut.skipUnless
+elif hasattr(djut, 'skipUnless'):
+    skipUnless = djut.skipUnless

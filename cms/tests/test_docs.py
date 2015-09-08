@@ -4,9 +4,10 @@ from contextlib import contextmanager
 
 import os
 import socket
-
-from django.utils.six.moves import StringIO
 import sys
+
+import django
+from django.utils.six.moves import StringIO
 from sphinx.application import Sphinx
 
 try:
@@ -15,7 +16,7 @@ except ImportError:
     enchant = None
 
 import cms
-from cms.test_utils.compat import skipIf
+from cms.test_utils.compat import skipIf, skipUnless
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
 
@@ -70,9 +71,10 @@ class DocsTestCase(CMSTestCase):
 
     @skipIf(has_no_internet(), "No internet")
     @skipIf(enchant is None, "Enchant not installed")
-    @skipUnless(django.VERSION[:2] == (1,8) \
-            and sys.version_info[:2] == (3, 4) \
-            and os.environ.get('DATABASE_URL') == 'sqlite://localhost/:memory:')
+    @skipUnless(django.VERSION[:2] == (1, 8)
+                and sys.version_info[:2] == (3, 4)
+                and os.environ.get('DATABASE_URL') == 'sqlite://localhost/:memory:',
+                'Skipping for simplicity')
     def test_spelling(self):
         status = StringIO()
         with TemporaryDirectory() as OUT_DIR:
