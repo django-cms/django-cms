@@ -223,6 +223,7 @@
         position: absolute;
         top: 0;
         right: 0;
+        left: 0;
         z-index: z(modal, buttons);
         padding: 0 $modal-resize-size 0 $padding-normal;
     }
@@ -231,6 +232,9 @@
         @extend .cms-toolbar-item-buttons;
         float: right;
         margin-left: $margin;
+    }
+    .cms-modal-item-buttons-left {
+        float: left;
     }
 }
 

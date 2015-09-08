@@ -137,6 +137,9 @@
                     this._minimize();
                 }
 
+                // clear elements
+                this.ui.modalButtons.empty();
+
                 // show loader
                 CMS.API.Toolbar._loader(true);
 
@@ -449,24 +452,26 @@
             _setButtons: function (iframe) {
                 var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
                 var that = this;
+                var group = $('<div class="cms-modal-item-buttons"></div>');
+                var render = $('<div class="cms-modal-buttons-inner"></div>');
                 var row;
+                var tmp;
                 if (!djangoSuit) {
                     row = iframe.contents().find('.submit-row:eq(0)');
                 } else {
                     row = iframe.contents().find('.save-box:eq(0)');
                 }
+                var buttons = row.find('input, a, button');
+
                 // hide all submit-rows
                 iframe.contents().find('.submit-row').hide();
-                var buttons = row.find('input, a, button');
-                var render = $('<span />'); // seriously jquery...
 
                 // if there are no given buttons within the submit-row area
                 // scan deeper within the form itself
                 if (!buttons.length) {
                     row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
                     buttons = row.find('input[type="submit"], button[type="submit"]');
-                    buttons.addClass('deletelink')
-                        .hide();
+                    buttons.addClass('deletelink').hide();
                 }
                 // attach relation id
                 buttons.each(function (index, item) {
@@ -495,10 +500,7 @@
                     }
 
                     // create the element and attach events
-                    var el = $('' +
-                        '<div class="cms-modal-item-buttons">' +
-                        '   <a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>' +
-                        '</div>');
+                    var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
@@ -519,21 +521,26 @@
                             that.saved = true;
                         }
                     });
+                    el.wrap(group);
 
                     // append element
-                    render.append(el);
+                    render.append(el.parent());
                 });
 
                 // manually add cancel button at the end
-                var cancel = $('' +
-                    '<div class="cms-modal-item-buttons">' +
-                    '   <a href="#" class="cms-btn">' + that.config.lang.cancel + '</a>' +
-                    '</div>');
+                var cancel = $('<a href="#" class="cms-btn">' + that.config.lang.cancel + '</a>');
                 cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();
                 });
-                render.append(cancel);
+                cancel.wrap(group);
+                render.append(cancel.parent());
+
+                // prepare groups
+                render.find('.cms-btn-group').unwrap();
+                tmp = render.find('.cms-btn-group').clone(true, true);
+                render.find('.cms-btn-group').remove();
+                render.append(tmp.wrapAll(group.clone().addClass('cms-modal-item-buttons-left')).parent());
 
                 // render buttons
                 this.ui.modalButtons.html(render);
