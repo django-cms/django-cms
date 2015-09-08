@@ -687,7 +687,9 @@
                 var that = this;
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                var text = this.config.lang.confirmEmpty.replace('{1}', '');
+                var text = this.config.lang.confirmEmpty.replace(
+                    '{1}', CMS._newPlugin.breadcrumb[0].title
+                );
 
                 // trigger an ajax request
                 return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
