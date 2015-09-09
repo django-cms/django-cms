@@ -127,9 +127,14 @@
 
     }
 
-    .cms-dragbar-empty-wrapper {
-        display: none !important;
+    // #DRAGBAR/empty#
+    .cms-dragbar-empty {
+        font-size: $font-size-normal - 2px;
+        text-transform: uppercase;
+        padding-top: 0;
+        padding-bottom: 0;
     }
+
     .cms-dragarea-empty {
         .cms-dragbar-empty-wrapper {
             display: block !important;
@@ -137,14 +142,6 @@
         .cms-dragbar-toggler {
             display: none;
         }
-    }
-
-    // #DRAGBAR/empty#
-    .cms-dragbar-empty {
-        font-size: $font-size-normal - 2px;
-        text-transform: uppercase;
-        padding-top: 0;
-        padding-bottom: 0;
     }
 
     //###########################################################
@@ -156,8 +153,13 @@
         position: relative;
     }
     .cms-draggables .cms-draggables {
-        display: none;
         padding-left: $structure-draggable-inner-padding;
+    }
+    .cms-dragarea-empty .cms-draggables-root {
+        min-height: 46px;
+        border: 1px dashed darken($gray-lighter, 15%);
+        border-radius: $border-radius-base;
+        position: relative;
     }
 
     // #DRAGGABLES/general#
@@ -250,19 +252,41 @@
         transform: translateY(2px);
     }
 
-    .cms-dragarea-empty .cms-droppable {
-        transform: translateY(0) !important;
-        color: darken($gray-lighter, 15%);
-        height: auto;
-        box-shadow: none;
-        margin: 0;
-        border: 1px dashed darken($gray-lighter, 15%);
-        border-radius: $border-radius-base;
-        line-height: $structure-dragitem-height;
-        min-height: $structure-dragitem-height;
-        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
-        &:before {
-            display: none;
+    .cms-draggables-empty {
+        display: none;
+    }
+    .cms-dragarea-empty {
+        .cms-droppable {
+            transform: translateY(0) !important;
+            color: darken($gray-lighter, 15%);
+            height: auto;
+            box-shadow: none;
+            margin: 0;
+            background-color: mix(white, $color-primary, 90%);
+            border: 2px solid $color-primary;
+            border-radius: $border-radius-base;
+            line-height: $structure-dragitem-height;
+            position: absolute;
+            left: -1px;
+            top: -1px;
+            right: -1px;
+            bottom: -1px;
+            z-index: 1;
+            &:before {
+                display: none;
+            }
+        }
+        .cms-draggables-empty {
+            display: block;
+            line-height: 44px;
+            padding-left: 20px;
+            color: darken($gray-lighter, 15%);
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2;
         }
     }
 

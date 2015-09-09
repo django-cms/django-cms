@@ -11,7 +11,7 @@
         function actualizeEmptyPlaceholders() {
             placeholders.each(function () {
                 var placeholder = $(this);
-                if (placeholder.find('> .cms-draggables').children().length) {
+                if (placeholder.find('> .cms-draggables').children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
                     placeholder.removeClass('cms-dragarea-empty');
                 } else {
                     placeholder.addClass('cms-dragarea-empty');
@@ -80,7 +80,6 @@
                     placeholders: $('.cms-placeholder'),
                     dragitems: $('.cms-draggable'),
                     dragareas: $('.cms-dragarea'),
-                    dropareas: $('.cms-droppable'),
                     dimmer: container.find('.cms-structure-dimmer'),
                     clipboard: $('.cms-clipboard'),
                     toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
@@ -503,33 +502,6 @@
                     if (e.keyCode === CMS.KEYS.ESC || cancel) {
                         that.state = false;
                         that.ui.sortables.sortable('cancel');
-                    }
-                });
-
-                // define droppable helpers
-                this.ui.dropareas.droppable({
-                    greedy: true,
-                    accept: '.cms-draggable',
-                    tolerance: 'pointer',
-                    activeClass: 'cms-draggable-allowed',
-                    hoverClass: 'cms-draggable-hover-allowed',
-                    over: function (event) {
-                        dropzone = $('.cms-placeholder-' + that.getId($(event.target).parent().prev()));
-                        // reset other empty placeholders
-                        $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
-                        if (that.state) {
-                            $(event.target).removeClass('cms-draggable-disallowed');
-                        } else {
-                            $(event.target).addClass('cms-draggable-disallowed');
-                        }
-                    },
-                    out: function (event) {
-                        dropzone = null;
-                        $(event.target).removeClass('cms-draggable-disallowed');
-                    },
-                    drop: function (event) {
-                        dropped = true;
-                        droparea = $(event.target).parent().nextAll('.cms-draggables').first();
                     }
                 });
             }

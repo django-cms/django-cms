@@ -85,12 +85,13 @@
                 {% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
                 {# <div class="cms-dragitem cms-dragitem-1888"> #}
-                <div class="cms-draggables">
-                {% with placeholder.slot as slot %}
-                {% for plugin in placeholder.get_cached_plugins %}
-                    {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
-                {% endfor %}
-                {% endwith %}
+                <div class="cms-draggables cms-draggables-root">
+                    <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
+                    {% with placeholder.slot as slot %}
+                    {% for plugin in placeholder.get_cached_plugins %}
+                        {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+                    {% endfor %}
+                    {% endwith %}
                 </div>
                 {# </div> #}
             </div>
