@@ -19,6 +19,19 @@
             });
         }
 
+        function actualizePluginsCollapsibleStatus(els) {
+            els.each(function () {
+                var childList = $(this);
+                var pluginDragItem = childList.closest('.cms-draggable').find('.cms-dragitem');
+
+                if (childList.children().length) {
+                    pluginDragItem.addClass('cms-dragitem-collapsable');
+                } else {
+                    pluginDragItem.removeClass('cms-dragitem-collapsable');
+                }
+            });
+        }
+
         /*!
          * StructureBoard
          * handles drag & drop, mode switching and
@@ -339,6 +352,7 @@
                 var dropped = false;
                 var droparea = null;
                 var dropzone = null;
+                var originalPluginContainer;
 
                 this.ui.sortables.nestedSortable({
                     items: '.cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
@@ -367,6 +381,7 @@
                         actualizeEmptyPlaceholders();
                     },
                     start: function (e, ui) {
+                        originalPluginContainer = ui.item.closest('.cms-draggables');
                         that.dragging = true;
                         // show empty
                         actualizeEmptyPlaceholders();
@@ -400,6 +415,11 @@
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
 
                         // cancel if isAllowed returns false
+                        var newPluginContainer = ui.item.closest('.cms-draggables');
+                        if (!originalPluginContainer.is(newPluginContainer)) {
+                            actualizePluginsCollapsibleStatus(newPluginContainer.add(originalPluginContainer));
+                        }
+
                         if (!that.state) {
                             return false;
                         }
