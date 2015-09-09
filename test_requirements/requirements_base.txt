@@ -3,14 +3,13 @@ python-coveralls==2.5.0
 docopt==0.6.2
 unittest-xml-reporting==1.11.0
 Pillow==2.7.0
-html5lib>=0.90,<0.9999
+html5lib>=0.90,!=0.9999,!=0.99999
 django-treebeard==3.0
 argparse
 dj-database-url
 selenium
 django-debug-toolbar
 -e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
--e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file

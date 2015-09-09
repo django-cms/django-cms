@@ -54,7 +54,7 @@ install:
 
 script: coverage run --rcfile=.coverage.rc manage.py test
 
-after_success: coverallscustomuserapp.User --config_file=.coverage.rc
+after_success: coveralls --config_file=.coverage.rc
 
 notifications:
   irc:

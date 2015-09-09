@@ -52,6 +52,11 @@ Other than this, end users should not notice any changes.
     documentation <https://tabo.pe/projects/django-treebeard/docs/2.0/>`_ for information
     on how to use equivalent calls in ``django-treebeard``.
 
+.. note:: Handling plugin data migrations
+
+    Please check :ref:`plugin-datamigrations-3.1` for information on how to create
+    migrations compatible with django CMS 3.0 and 3.1
+
 
 Action required
 ---------------

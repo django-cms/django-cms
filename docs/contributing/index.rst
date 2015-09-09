@@ -37,6 +37,11 @@ You can also follow:
 * the `Travis Continuous Integration build reports <https://travis-ci.org/divio/django-cms>`_
 * the `@djangocms`_ Twitter account for general announcements
 
+You can also follow:
+
+* the `Travis Continuous Integration build reports <https://travis-ci.org/divio/django-cms>`_
+* the `@djangocms`_ Twitter account for general announcements
+
 You don't need to be an expert developer to make a valuable contribution - all
 you need is a little knowledge of the system, and a willingness to follow the
 contribution guidelines.

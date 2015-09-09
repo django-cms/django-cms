@@ -212,7 +212,7 @@ experience errors because the path environment is different at runtime. If
 your `cms_plugins` isn't loaded or accessible, try the following::
 
     $ python manage.py shell
-    >>> from django.utils.importlib import import_module
+    >>> from importlib import import_module
     >>> m = import_module("myapp.cms_plugins")
     >>> m.some_test_function()
 
@@ -802,3 +802,65 @@ Example::
                 alias.alias_placeholder = placeholder
             alias.save()
             return HttpResponse("ok")
+
+
+.. _plugin-datamigrations-3.1:
+
+Plugin data migrations
+======================
+
+Due to the migration from mptt to treebeard in version 3.1, the plugin model is different between
+the two versions. Schema migration are not affected as the migration systems (both South and
+Django) detects the different bases.
+
+Data migration are a different story, though.
+
+If your datamigration does something like:
+
+.. code-block:: django
+
+    MyPlugin = apps.get_model('my_app', 'MyPlugin')
+
+    for plugin in MyPlugin.objects.all():
+        ... do something ...
+
+You may end up with an error like
+``django.db.utils.OperationalError: (1054, "Unknown column 'cms_cmsplugin.level' in 'field list'")``
+because depending on the order the migrations are executed, the historical models may be out of
+sync with the applied database schema.
+
+To keep compatibility with 3.0 and 3.x you can force the datamigration to run before the django CMS
+migration that creates treebeard fields, by doing this the datamigration will always be executed
+on the "old" database schema and no conflict will exist.
+
+For South migrations add this:
+
+.. code-block:: django
+
+    from distutils.version import LooseVersion
+    import cms
+    USES_TREEBEARD = LooseVersion(cms.__version__) >= LooseVersion('3.1')
+
+    class Migration(DataMigration):
+
+        if USES_TREEBEARD:
+            needed_by = [
+                ('cms', '0070_auto__add_field_cmsplugin_path__add_field_cmsplugin_depth__add_field_c')
+            ]
+
+
+For Django migrations add this:
+
+.. code-block:: django
+
+    from distutils.version import LooseVersion
+    import cms
+    USES_TREEBEARD = LooseVersion(cms.__version__) >= LooseVersion('3.1')
+
+    class Migration(migrations.Migration):
+
+        if USES_TREEBEARD:
+            run_before = [
+                ('cms', '0004_auto_20140924_1038')
+            ]
+
