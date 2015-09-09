@@ -784,8 +784,11 @@
                 }
 
                 // attach events to draggable
-                this.ui.draggable.find('> .cms-dragitem-collapsable').on('click.cms', function () {
+                this.ui.draggable.find('> .cms-dragitem').on('click.cms', function () {
                     var el = $(this);
+                    if (!el.hasClass('cms-dragitem-collapsable')) {
+                        return;
+                    }
                     that._toggleCollapsable(el);
                 });
 
