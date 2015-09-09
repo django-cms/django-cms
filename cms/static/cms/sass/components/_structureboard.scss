@@ -7,7 +7,7 @@
     z-index: z(structure, base);
     width: 100%;
     height: 100%;
-    overflow-y: scroll;
+    overflow: hidden;
 
     .cms-structure-dimmer {
         display: none;
@@ -65,12 +65,13 @@
     .cms-structure-content-simple {
         padding: ($toolbar-height + 40px) 5%;
         position: relative;
-        height: auto;
+        height: 100%;
+        overflow: auto;
     }
     .cms-dragarea-simple {
         position: static;
         margin: 0 auto;
-        max-width: 980px;
+        max-width: 980px // FIXME;
     }
 
     //###########################################################
