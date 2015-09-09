@@ -100,7 +100,7 @@
     }
 
     .cms-submenu-quicksearch {
-        $quicksearch-height: $structure-dragbar-height + $structure-draggable-space + $structure-dragarea-padding;
+        $quicksearch-height: $structure-dragbar-height + $structure-draggable-space + $structure-dragarea-padding - 2px;
         @include icon(search);
         cursor: default;
         display: none;
@@ -129,7 +129,6 @@
     }
     .cms-submenu-quicksearch input {
         display: block;
-        color: white;
         font-size: $submenu-quicksearch-input-font-size;
         line-height: $submenu-quicksearch-input-line-height;
         text-align: right;
