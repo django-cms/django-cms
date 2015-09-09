@@ -223,7 +223,7 @@
         position: relative;
         transform: translateY(2px);
         box-shadow: 0 0 0 2px $color-primary;
-        z-index: 999999999999999;
+        z-index: z(structure, content, droppable);
         .cms-draggable + & {
             transform: translateY(-2px);
         }
