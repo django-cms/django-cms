@@ -501,6 +501,9 @@
                         that._showSubnav(trigger);
                     }
                 });
+                nav.on('click.cms', function (e) {
+                    e.stopPropagation();
+                });
 
                 dropdown.on('mousedown mousemove mouseup', function (e) {
                     e.stopPropagation();
@@ -781,7 +784,7 @@
                 }
 
                 // attach events to draggable
-                this.ui.draggable.find('> .cms-dragitem-collapsable').on(this.click, function () {
+                this.ui.draggable.find('> .cms-dragitem-collapsable').on('click.cms', function () {
                     var el = $(this);
                     that._toggleCollapsable(el);
                 });
