@@ -11,7 +11,7 @@
         function actualizeEmptyPlaceholders() {
             placeholders.each(function () {
                 var placeholder = $(this);
-                if (placeholder.find('> .cms-draggables').children().not('.cms-is-dragging').length) {
+                if (placeholder.find('> .cms-draggables').children().length) {
                     placeholder.removeClass('cms-dragarea-empty');
                 } else {
                     placeholder.addClass('cms-dragarea-empty');
@@ -385,7 +385,9 @@
                         // fixes placeholder height
                         ui.item.addClass('cms-is-dragging');
                         ui.helper.addClass('cms-draggable-is-dragging');
-                        {/* ui.placeholder.css('height', ui.helper.css('height')); */}
+                        if (ui.item.find('> .cms-draggables').children().length) {
+                            ui.helper.addClass('cms-draggable-stack');
+                        }
                         // add overflow hidden to body
                         that.ui.content.css({
                             'overflow-x': 'hidden'
@@ -395,8 +397,7 @@
                     stop: function (event, ui) {
                         // TODO prevent everything if nothing really changed
                         that.dragging = false;
-                        // hide empty
-                        ui.item.removeClass('cms-is-dragging');
+                        ui.item.removeClass('cms-is-dragging cms-draggable-stack');
 
                         // cancel if isAllowed returns false
                         if (!that.state) {
