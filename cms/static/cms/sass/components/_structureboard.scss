@@ -66,12 +66,13 @@
         padding: ($toolbar-height + 40px) 5%;
         position: relative;
         height: 100%;
-        overflow: auto;
+        overflow-y: scroll;
+        overflow-x: hidden;
     }
     .cms-dragarea-simple {
         position: static;
-        margin: 0 auto;
-        max-width: 980px // FIXME;
+        margin: 20px auto; // FIXME
+        max-width: 980px; // FIXME;
     }
 
     //###########################################################
