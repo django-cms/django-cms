@@ -234,13 +234,13 @@
         &:before {
             content: '';
             position: absolute;
-            left: -2px;
-            top: -6px;
+            left: -4px;
+            top: -8px;
             width: 0;
             height: 0;
-            border-left: 6px solid $color-primary;
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
+            border-left: 8px solid $color-primary;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
         }
     }
     .cms-draggables > .cms-droppable:first-child {
