@@ -168,6 +168,7 @@
         position: relative;
         top: 0;
         left: 0;
+        display: block !important; // fixes hide/show with jqueryui so the scroll doesn't jump
         /* z-index: z(structure, content, draggable); */
         /* margin: $structure-draggable-space 0 0; */
         margin-left: 0 !important;
