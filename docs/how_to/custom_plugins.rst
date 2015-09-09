@@ -306,7 +306,7 @@ clause.
     If you are using Python 2.x and overriding the ``__unicode__`` method of the
     model file, make sure to return its results as UTF8-string. Otherwise
     saving an instance of your plugin might fail with the frontend editor showing
-    an <Empty> plugin instance. To return in unicode use a return statement like
+    an <Empty> plugin instance. To return in Unicode use a return statement like
     ``return u'{0}'.format(self.guest_name)``.
 
 .. _handling-relations:
@@ -815,7 +815,7 @@ Django) detects the different bases.
 
 Data migration are a different story, though.
 
-If your datamigration does something like:
+If your data migration does something like:
 
 .. code-block:: django
 
@@ -829,8 +829,8 @@ You may end up with an error like
 because depending on the order the migrations are executed, the historical models may be out of
 sync with the applied database schema.
 
-To keep compatibility with 3.0 and 3.x you can force the datamigration to run before the django CMS
-migration that creates treebeard fields, by doing this the datamigration will always be executed
+To keep compatibility with 3.0 and 3.x you can force the data migration to run before the django CMS
+migration that creates treebeard fields, by doing this the data migration will always be executed
 on the "old" database schema and no conflict will exist.
 
 For South migrations add this:

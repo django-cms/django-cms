@@ -131,7 +131,7 @@ the German version then the language chooser will redirect to ``/``. The same
 goes for urls that are not handled by the cms and display a language chooser.
 
 ********************************************
-Automated slug generation unicode characters
+Automated slug generation Unicode characters
 ********************************************
 
 If your site has languages which use non-ASCII character sets, you might want

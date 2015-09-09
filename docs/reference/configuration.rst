@@ -532,7 +532,7 @@ Unicode support for automated slugs
 ===================================
 
 django CMS supports automated slug generation from page titles that contain
-unicode characters via the unihandecode.js project. To enable support for
+Unicode characters via the unihandecode.js project. To enable support for
 unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
 :setting:`CMS_UNIHANDECODE_VERSION` must be set.
 
