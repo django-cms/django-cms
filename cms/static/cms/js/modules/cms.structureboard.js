@@ -11,7 +11,8 @@
         function actualizeEmptyPlaceholders() {
             placeholders.each(function () {
                 var placeholder = $(this);
-                if (placeholder.find('> .cms-draggables').children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
+                if (placeholder
+                        .find('> .cms-draggables').children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
                     placeholder.removeClass('cms-dragarea-empty');
                 } else {
                     placeholder.addClass('cms-dragarea-empty');
