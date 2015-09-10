@@ -23,10 +23,10 @@
         function actualizePluginsCollapsibleStatus(els) {
             els.each(function () {
                 var childList = $(this);
-                var pluginDragItem = childList.closest('.cms-draggable').find('.cms-dragitem');
+                var pluginDragItem = childList.closest('.cms-draggable').find('> .cms-dragitem');
 
                 if (childList.children().length) {
-                    pluginDragItem.addClass('cms-dragitem-collapsable');
+                    pluginDragItem.addClass('cms-dragitem-collapsable cms-dragitem-expanded');
                 } else {
                     pluginDragItem.removeClass('cms-dragitem-collapsable');
                 }
