@@ -45,7 +45,7 @@
                 this.ui.modal.data('ready', true);
             },
 
-            _setupUI: function setupUI() {
+            _setupUI: function _setupUI() {
                 var modal = $('.cms-modal');
                 this.ui = {
                     modal: modal,
@@ -118,6 +118,19 @@
                     CMS.API.locked = true;
                 }
 
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    if (this._deletePlugin() === false) {
+                        // cancel open process when switching context
+                        return false;
+                    }
+                }
+
+                // new plugin will freeze the creation process
+                if (this.options.newPlugin) {
+                    CMS._newPlugin = this.options.newPlugin;
+                }
+
                 // because a new instance is called, we have to ensure minimized state is removed #3620
                 if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
@@ -166,16 +179,10 @@
 
             close: function () {
                 var that = this;
-                // handle remove option when plugin is new
-                if (this.options.newPlugin) {
-                    var data = this.options.newPlugin;
-                    var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                    var text = this.config.lang.confirm;
 
-                    // trigger an ajax request
-                    CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
-                        that._hide(100);
-                    });
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    this._deletePlugin({ hideAfter: true });
                 } else {
                     this._hide(100);
                 }
@@ -201,9 +208,9 @@
              * _show animates the modal to given size
              *
              * @param opts
-             * @param opts.width Number width of the modal
-             * @param opts.height Number height of the modal
-             * @param opts.duration Number speed of opening, ms (not really used yet)
+             * @param opts.width {Number} width of the modal
+             * @param opts.height {Number} height of the modal
+             * @param opts.duration {Number} speed of opening, ms (not really used yet)
              */
             _show: function (opts) {
                 // we need to position the modal in the center
@@ -414,7 +421,7 @@
                 this.ui.modal.removeClass('cms-modal-has-breadcrumb');
 
                 // cancel if there is no breadcrumb)
-                if (!breadcrumb || breadcrumb.length <= 0) {
+                if (!breadcrumb || breadcrumb.length <= 1) {
                     return false;
                 }
                 if (!breadcrumb[0].title) {
@@ -502,7 +509,6 @@
 
                         // trigger only when blue action buttons are triggered
                         if (item.hasClass('default') || item.hasClass('deletelink')) {
-                            that.options.newPlugin = null;
                             // reset onClose when delete is triggered
                             if (item.hasClass('deletelink')) {
                                 that.options.onClose = null;
@@ -538,7 +544,7 @@
              * and additional "modal" stylesheet is then inserted into a template that is loaded
              * inside of an iframe
              *
-             * @param url String
+             * @param url {String}
              */
             _prepareUrl: function (url) {
                 if (url.indexOf('?') === -1) {
@@ -621,7 +627,7 @@
                         // case when there is no prefix
                         if (name === undefined && that.ui.titlePrefix.text() === '') {
                             var bc = iframe.contents().find('.breadcrumbs').contents();
-                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace(' › ', ''));
+                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
 
                         titleSuffix.text(innerTitle.text());
@@ -666,6 +672,33 @@
 
                 // update title
                 this.ui.titlePrefix.text(el.text());
+            },
+
+            /**
+             * _deletePlugin removes a plugin once created when clicking
+             * on delete or the close item. If we don't do this, an empty
+             * placeholder is generated
+             * https://github.com/divio/django-cms/pull/4381 will eventually
+             * provide a better solution
+             *
+             * @param [opts] {Object} general objects element that holds settings
+             * @param [opts.hideAfter] {Object} hides the modal after the ajax requests succeeds
+             */
+            _deletePlugin: function (opts) {
+                var that = this;
+                var data = CMS._newPlugin;
+                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+                var text = this.config.lang.confirmEmpty.replace(
+                    '{1}', CMS._newPlugin.breadcrumb[0].title
+                );
+
+                // trigger an ajax request
+                return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
+                    CMS._newPlugin = false;
+                    if (opts && opts.hideAfter) {
+                        that._hide(100);
+                    }
+                });
             }
         });
 
