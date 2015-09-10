@@ -153,9 +153,16 @@
         list-style-type: none;
         position: relative;
     }
+    .cms-draggables.cms-hidden {
+        height: 0 !important;
+        overflow: hidden;
+    }
     .cms-draggables .cms-draggables {
         padding-left: $structure-draggable-inner-padding;
     }
+    /* .cms-dragitem-expanded + .cms-draggables { */
+    /*     display: block; */
+    /* } */
     .cms-dragarea-empty .cms-draggables-root {
         min-height: 46px;
         border: 1px dashed darken($gray-lighter, 15%);
