@@ -12,7 +12,8 @@
             placeholders.each(function () {
                 var placeholder = $(this);
                 if (placeholder
-                        .find('> .cms-draggables').children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
+                    .find('> .cms-draggables')
+                    .children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
                     placeholder.removeClass('cms-dragarea-empty');
                 } else {
                     placeholder.addClass('cms-dragarea-empty');
@@ -357,6 +358,7 @@
                     connectWith: '.cms-draggables:not(.cms-hidden)',
                     tolerance: 'pointer',
                     toleranceElement: '> div',
+                    distance: 10,
                     dropOnEmpty: true,
                     // cloning huge structure is a performance loss compared to cloning just a dragitem
                     helper: function createHelper(e, item) {

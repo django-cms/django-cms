@@ -575,7 +575,7 @@
                 });
 
                 // prevent propagnation
-                nav.on(this.click + ' click dblclick', function (e) {
+                nav.on(this.click + ' click.cms dblclick.cms', function (e) {
                     e.stopPropagation();
                 });
 
@@ -782,7 +782,7 @@
                 }
 
                 // attach events to draggable
-                this.ui.draggable.find('> .cms-dragitem').on('click.cms', function () {
+                this.ui.draggable.find('> .cms-dragitem').on('click.cms.plugin', function () {
                     var el = $(this);
                     if (!el.hasClass('cms-dragitem-collapsable')) {
                         return;
