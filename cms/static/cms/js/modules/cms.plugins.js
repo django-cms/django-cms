@@ -501,9 +501,6 @@
                         that._showSubnav(trigger);
                     }
                 });
-                nav.on('click.cms', function (e) {
-                    e.stopPropagation();
-                });
 
                 dropdown.on('mousedown mousemove mouseup', function (e) {
                     e.stopPropagation();
@@ -578,11 +575,12 @@
                 });
 
                 // prevent propagnation
-                nav.on(this.click + ' dblclick', function (e) {
+                nav.on(this.click + ' click dblclick', function (e) {
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click + ' click.cms dblclick.cms', function (e) {
+                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown')
+                    .on(this.click + ' click.cms dblclick.cms', function (e) {
                     e.stopPropagation();
                 });
             },
