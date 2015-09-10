@@ -285,7 +285,7 @@ new configuration:
     {% endif %}</h1>
 
 The only thing we changed there is that we use the template variable ``{{
-instance.guest_name }}`` instead of the hardcoded ``Guest`` string in the else
+instance.guest_name }}`` instead of the hard-coded ``Guest`` string in the else
 clause.
 
 .. warning::
@@ -306,7 +306,7 @@ clause.
     If you are using Python 2.x and overriding the ``__unicode__`` method of the
     model file, make sure to return its results as UTF8-string. Otherwise
     saving an instance of your plugin might fail with the frontend editor showing
-    an <Empty> plugin instance. To return in unicode use a return statement like
+    an <Empty> plugin instance. To return in Unicode use a return statement like
     ``return u'{0}'.format(self.guest_name)``.
 
 .. _handling-relations:
@@ -314,7 +314,7 @@ clause.
 Handling Relations
 ==================
 
-Everytime the page with your custom plugin is published the plugin is copied.
+Every time the page with your custom plugin is published the plugin is copied.
 So if your custom plugin has foreign key (to it, or from it) or many-to-many
 relations you are responsible for copying those related objects, if required,
 whenever the CMS copies the plugin - **it won't do it for you automatically**.
@@ -405,9 +405,9 @@ Advanced
 Inline Admin
 ============
 
-If you want to have the foreign key relation as a inline admin, you can create a admin.StackedInline class
-and put it in the Plugin to "inlines". Then you can use the inline Admin form for your foreign key references.
-inline admin::
+If you want to have the foreign key relation as a inline admin, you can create an
+``admin.StackedInline`` class and put it in the Plugin to "inlines". Then you can use the inline
+admin form for your foreign key references::
 
     class ItemInlineAdmin(admin.StackedInline):
         model = AssociatedItem
@@ -431,8 +431,8 @@ Plugin form
 ===========
 
 Since :class:`cms.plugin_base.CMSPluginBase` extends
-:class:`django.contrib.admin.options.ModelAdmin`, you can customize the form
-for your plugins just as you would customize your admin interfaces.
+:class:`django.contrib.admin.options.ModelAdmin`, you can customise the form
+for your plugins just as you would customise your admin interfaces.
 
 The template that the plugin editing mechanism uses is
 ``cms/templates/admin/cms/page/plugin/change_form.html``. You might need to
@@ -471,7 +471,7 @@ to override the ``{% block jquery %}``.
 Handling media
 ==============
 
-If your plugin depends on certain media files, javascript or stylesheets, you
+If your plugin depends on certain media files, JavaScript or stylesheets, you
 can include them from your plugin template using `django-sekizai`_. Your CMS
 templates are always enforced to have the ``css`` and ``js`` sekizai namespaces,
 therefore those should be used to include the respective files. For more
@@ -622,7 +622,7 @@ In your ``yourapp.cms_plugin_processors.py``::
             # Prepare that template's context:
             c = Context({
                 'content': rendered_content,
-                # Some plugin models might allow you to customize the colors,
+                # Some plugin models might allow you to customise the colors,
                 # for others, use default colors:
                 'background_color': instance.background_color if hasattr(instance, 'background_color') else 'lightyellow',
                 'border_color': instance.border_color if hasattr(instance, 'border_color') else 'lightblue',
@@ -815,7 +815,7 @@ Django) detects the different bases.
 
 Data migration are a different story, though.
 
-If your datamigration does something like:
+If your data migration does something like:
 
 .. code-block:: django
 
@@ -829,8 +829,8 @@ You may end up with an error like
 because depending on the order the migrations are executed, the historical models may be out of
 sync with the applied database schema.
 
-To keep compatibility with 3.0 and 3.x you can force the datamigration to run before the django CMS
-migration that creates treebeard fields, by doing this the datamigration will always be executed
+To keep compatibility with 3.0 and 3.x you can force the data migration to run before the django CMS
+migration that creates treebeard fields, by doing this the data migration will always be executed
 on the "old" database schema and no conflict will exist.
 
 For South migrations add this:

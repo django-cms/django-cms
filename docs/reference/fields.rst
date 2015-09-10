@@ -26,16 +26,16 @@ Form fields
 
     Behaves like a :class:`django.forms.models.ModelChoiceField` field for the
     :class:`cms.models.pagemodel.Page` model, but displays itself as a split
-    field with a select dropdown for the site and one for the page. It also
+    field with a select drop-down for the site and one for the page. It also
     indents the page names based on what level they're on, so that the page
-    select dropdown is easier to use. This takes the same arguments as
+    select drop-down is easier to use. This takes the same arguments as
     :class:`django.forms.models.ModelChoiceField`.
 
 .. py:class:: cms.forms.fields.PageSmartLinkField
 
     A field making use of :class:`cms.forms.widgets.PageSmartLinkWidget`.
     This field will offer you a list of matching internal pages as you type.
-    You can either pick one or enter an arbitrary url to create a non existing entry.
+    You can either pick one or enter an arbitrary URL to create a non existing entry.
     Takes a `placeholder_text` argument to define the text displayed inside the
     input before you type.
     The widget uses an ajax request to try to find pages match. It will try to find

@@ -16,12 +16,12 @@ Bug Fixes
 * Fix check for template instance in Django 1.8.x
 * Fix error in PageField for Django 1.8
 * Fix some Page tree bugs
-* Declare Django 1.6.9 dependency in setup.py
+* Declare Django 1.6.9 dependency in ``setup.py``
 * Make sure cache version returned is an int
 * Fix issue preventing migrations to run on a new database (django 1.8)
 * Fix get User model in 0010 migration
 * Fix support for unpublished language pages
-* Add documentation for plugins datamigration
+* Add documentation for plugins data migration
 * Fix getting request in _show_placeholder_for_page on Django 1.8
 * Fix template inheritance order
 * Fix xframe options inheritance order
@@ -30,7 +30,7 @@ Bug Fixes
 * Relax html5lib versions
 * Fix redirect when deleting a page
 * Correct South migration error
-* Correct validation on numeric fields in modal popups
+* Correct validation on numeric fields in modal pop-up dialogs
 * Exclude scssc from manifest
 * Remove unpublished pages from menu
 * Remove page from menu items for performance reason

@@ -70,8 +70,8 @@ Target branches
 
 The django CMS project will always have at least two active branches:
 
-* ``support/version.x`` which you should target if you're submitting a bugfix for ``version.x``
-* ``develop`` for new features and bugfixes for the next release
+* ``support/version.x`` which you should target if you're submitting a bug-fix for ``version.x``
+* ``develop`` for new features and bug-fixes for the next release
 
 
 *******************
@@ -86,7 +86,7 @@ Depending on your contribution, you will write a mix of them.
 Let's start with something simple. We'll assume you have set up your environment correctly as
 `described above <start-contributing>`_.
 
-Let's say you want to test the behavior of the ``CMSPluginBase.render`` method:
+Let's say you want to test the behaviour of the ``CMSPluginBase.render`` method:
 
 .. code-block:: python
 
@@ -117,7 +117,7 @@ Let's try to run it:
     python develop.py test cms.SimplePluginTestCase
 
 This will call the new test case class only and it's handy when creating new tests and iterating
-quickly throught the steps. A full test run (``python develop.py test``) is required before opening
+quickly through the steps. A full test run (``python develop.py test``) is required before opening
 a pull request.
 
 This is the output you'll get::
@@ -201,8 +201,8 @@ the instance argument can be ``None``.
 As you see, even a simple test like this assumes and uses many feature of the test utilities
 provided by django CMS. Before attempting to write a test, take your time to explore the content of
 ``cms.test_utils`` package and check the shipped templates, example applications and, most of all,
-the base testcases defined in ``cms.test_utils.testscases`` which provide *a lot* of useful methods
-to prepare the environment for our tests or to create useful test data.
+the base ``testcases`` defined in ``cms.test_utils.testscases`` which provide *a lot* of useful
+methods to prepare the environment for our tests or to create useful test data.
 
 ********************
 Submitting your code

@@ -42,7 +42,7 @@ Install it::
 
 This provides you with a new command, ``djangocms``.
 
-Create a new directory to work in, and cd into it::
+Create a new directory to work in, and ``cd`` into it::
 
     mkdir tutorial-project
     cd tutorial-project

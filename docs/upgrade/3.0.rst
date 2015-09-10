@@ -19,7 +19,7 @@ New Frontend Editing
 ====================
 
 django CMS 3.0 introduces a new frontend editing system as well as a
-customizable Django admin skin (`djangocms_admin_style`_).
+customisable Django admin skin (`djangocms_admin_style`_).
 
 In the new system, ``Placeholders`` and their plugins are no longer managed in
 the admin site, but only from the frontend.
@@ -90,7 +90,7 @@ Plugin fallback languages
 It's now possible to specify fallback languages for a placeholder if the placeholder
 is empty for the current language. This must be activated in
 :setting:`CMS_PLACEHOLDER_CONF` per placeholder. It defaults to ``False`` to
-maintain pre-3.0 behavior.
+maintain pre-3.0 behaviour.
 
 language_chooser
 ================
@@ -155,7 +155,7 @@ We removed the flash plugin (``cms.plugins.flash``). Its new location is at:
 Googlemap Plugin
 ----------------
 
-We removed the googlemap plugin (``cms.plugins.googlemap``).
+We removed the Googlemap plugin (``cms.plugins.googlemap``).
 Its new location is at:
 
 * https://github.com/divio/djangocms-googlemap
@@ -300,11 +300,11 @@ In addition to model level permissions, ``Placeholder`` now checks if a user
 has permissions on a specific object of that model. Details can be found here
 in :ref:`placeholder_object_permissions`.
 
-Placeholders are prefillable with default plugins
-=================================================
+Placeholders are pre-fillable with default plugins
+==================================================
 
 In CMS_PLACEHOLDER_CONF, for each placeholder configuration, you can specify
-via 'default_plugins' a list of plugins to automaticaly add to the
+via 'default_plugins' a list of plugins to automatically add to the
 placeholder if empty. See :ref:`default_plugins in CMS_PLACEHOLDER_CONF <placeholder_default_plugins>`.
 
 Custom modules and plugin labels in the toolbar UI
@@ -325,8 +325,8 @@ The command can be run with::
 
 Please read :ref:`cms-copy-lang-command` before using.
 
-Frontedit editor for Django models
-==================================
+Frontend editor for Django models
+=================================
 
 Frontend editor is available for any Django model; see
 :ref:`documentation<frontend-editable-fields>` for details.
@@ -344,8 +344,8 @@ The ``Page`` object used to have the default ``related_name`` (``page``) to the
     to access cms pages from a ``Site`` model instance: update it to use
     ``Site.djangocms_pages``
 
-Moved all templatetags to cms_tags
-==================================
+Moved all template tags to ``cms_tags``
+=======================================
 
 All template tags are now in the ``cms_tags`` namespace so to use any cms
 template tags you can just do:
@@ -354,21 +354,21 @@ template tags you can just do:
 
     {% load cms_tags %}
 
-Getter and setter for translatable plugin content
-=================================================
+``getter`` and ``setter`` for translatable plugin content
+=========================================================
 
 A plugin's translatable content can now be read and set through :meth:`get_translatable_content`
 and :meth:`set_translatable_content`. See :ref:`Custom Plugins <custom-plugins>` for more info.
 
-No more DB tablename magic for plugins
-======================================
+No more DB table-name magic for plugins
+=======================================
 
-Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We removed this behavior
+Since django CMS 2.0 plugins had their table names start with `cmsplugin_`. We removed this behaviour
 in 3.0 and will display a deprecation warning with the old and new table name. If your plugin uses
-south for migrations create a new empty schemamigration and rename the table by hand.
+south for migrations create a new empty schema migration and rename the table by hand.
 
 .. warning:: When working in the django shell or coding at low level, you **must**
-             trigger the backward compatible behavior (a.k.a. magical rename
+             trigger the backward compatible behaviour (a.k.a. magical rename
              checking), otherwise non migrated plugins will fail.
              To do this execute the following code::
 
@@ -381,13 +381,15 @@ south for migrations create a new empty schemamigration and rename the table by 
 Added support for custom user models
 ====================================
 
-Since Django 1.5 it has been possible to swap out the default User model for a custom user model.  This is now fully supported by DjangoCMS, and in addition a new option has been added to the test runner to allow specifying the user model to use for tests (e.g. --user=customuserapp.User)
+Since Django 1.5 it has been possible to swap out the default User model for a custom user model.
+This is now fully supported by DjangoCMS, and in addition a new option has been added to the test
+runner to allow specifying the user model to use for tests (e.g. ``--user=customuserapp.User``)
 
 Page caching
 ============
 
 Pages are now cached by default.
-You can disable this behavior with :setting:`CMS_PAGE_CACHE`
+You can disable this behaviour with :setting:`CMS_PAGE_CACHE`
 
 Placeholder caching
 ===================
@@ -449,8 +451,8 @@ Next, you need to make the following changes in your ``settings.py``
 
     * Replace ``cms.context_processors.media`` with ``cms.context_processors.cms_settings``
 
-Afterwards, install all your previously renamed ex-core plugins (djangocms-X). Here's a full list, but you probably
-don't need all of them::
+Afterwards, install all your previously renamed ex-core plugins (``djangocms-whatever``). Here's a
+full list, but you probably don't need all of them::
 
     pip install djangocms-file
     pip install djangocms-flash

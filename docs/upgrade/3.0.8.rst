@@ -13,14 +13,14 @@ What's new in 3.0.8
 Bug Fixes
 =========
 
-* Fix django-mptt version depenency to be PEP440 compatible
+* Fix django-mptt version dependency to be PEP440 compatible
 * Fix some Django 1.4 compatibility issues
 * Add toolbar sanity check
-* Fix behavior with CMSPluginBase.get_render_template()
+* Fix behaviour with CMSPluginBase.get_render_template()
 * Fix issue on django >= 1.6 with page form fields.
-* Resolve jQuery namespace issues in admin page tree and changeform
+* Resolve jQuery namespace issues in admin page tree and change form
 * Fix issues for PageField in Firefox/Safari
-* Fix some Python 3.4 compatibility issue when using proxy modles
+* Fix some Python 3.4 compatibility issue when using proxy modules
 * Fix corner case in plugin copy
 * Documentation fixes
 * Minor code cleanups

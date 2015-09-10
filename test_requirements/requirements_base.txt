@@ -2,7 +2,6 @@ coverage==3.7.1
 python-coveralls==2.5.0
 docopt==0.6.2
 unittest-xml-reporting==1.11.0
-sphinx
 Pillow==2.7.0
 html5lib>=0.90,!=0.9999,!=0.99999
 django-treebeard==3.0
@@ -23,4 +22,8 @@ django-debug-toolbar
 -e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
 https://github.com/ojii/django-better-test/archive/02d4fdc44101e4759d4d1531d7f9178a304cd3d3.zip#egg=django-better-test
 https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
+sphinx
+sphinxcontrib-spelling
 pyflakes
+pyenchant
+

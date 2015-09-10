@@ -1,8 +1,8 @@
 .. _contributing-documentation:
 
-**************************
+##########################
 Contributing documentation
-**************************
+##########################
 
 Perhaps considered "boring" by hard-core coders, documentation is sometimes even
 more important than code! This is what brings fresh blood to a project, and
@@ -10,6 +10,9 @@ serves as a reference for old timers. On top of this, documentation is the one
 area where less technical people can help most - you just need to write
 simple, unfussy English. Elegance of style is a secondary consideration, and
 your prose can be improved later if necessary.
+
+Contributions to the documentation earn the greatest respect from the
+core developers and the django CMS community.
 
 Documentation should be:
 
@@ -22,10 +25,6 @@ Documentation should be:
   you use, for example, even if they are "obvious" to you
 
 Merging documentation is pretty fast and painless.
-
-Also, contributing to the documentation will earn you great respect from the
-core developers. You get good karma just like a test contributor, but you get
-double cookie points. Seriously. You rock.
 
 Except for the tiniest of change, we recommend that you test them before
 submitting. Follow the same steps above to fork and clone the project locally.
@@ -40,12 +39,76 @@ Now you can ``cd`` into the ``django-cms/docs`` directory and build the document
     make html
     open build/html/index.html
 
-This allows you to review your changes in your local browser. After each
-change, be sure to rebuild the docs using ``make html``. If everything looks
-good, then it's time to push your changes to Github and open a pull request.
+This allows you to review your changes in your local browser.
 
+
+********
+Spelling
+********
+
+We use `sphinxcontrib-spelling <https://pypi.python.org/pypi/sphinxcontrib-spelling/>`_, which in
+turn uses `pyenchant <https://pypi.python.org/pypi/pyenchant/>`_ and `enchant
+<http://www.abisource.com/projects/enchant/>`_ to check the spelling of the documentation.
+
+You need to check your spelling before submitting documentation.
+
+
+Install the spelling software
+=============================
+
+Install ``sphinxcontrib-spelling`` and ``pyenchant`` in your virtualenv::
+
+    pip install sphinxcontrib-spelling
+    pip install pyenchant
+
+You will need to install ``enchant`` too, if it's not already installed. The easy way to check is
+to run ``make spelling`` from the ``docs`` directory. If it runs successfully, you don't need to do
+anything, but if not you will have to install ``enchant`` for your system. For example, on OS X::
+
+    brew install enchant
+
+or Debian Linux::
+
+    apt-get install enchant
+
+
+Check spelling
+==============
+
+``make spelling`` will report::
+
+    build finished with problems.
+    make: *** [spelling] Error 1
+
+if any errors are found, and misspelt words will be listed in ``build/spelling/output.txt``
+
+If no spelling errors have been detected, ``make spelling`` will report::
+
+    build succeeded.
+
+Words that are not in the built-in dictionary can be added to ``docs/spelling_wordlist``. **If**
+you are certain that a word is incorrectly flagged as misspelt, add it to the ``spelling_wordlist``
+document, in alphabetical order. **Please do not add new words unless you are sure they should be
+in there.**
+
+If you find technical terms are being flagged, please check that you have capitalised them
+correctly - ``javascript`` and ``css`` are **incorrect** spellings for example. Commands and
+special names (of classes, modules, etc) in double backticks - `````` - will mean that they are not
+caught by the spelling checker.
+
+
+*********************
+Making a pull request
+*********************
+
+Before you commit any changes, you need to check spellings with ``make spelling`` and rebuild the
+docs using ``make html``. If everything looks good, then it's time to push your changes to GitHub
+and open a pull request in the usual way.
+
+
+***********************
 Documentation structure
-=======================
+***********************
 
 Our documentation is divided into the following main sections:
 
@@ -62,11 +125,12 @@ Our documentation is divided into the following main sections:
   CMS
 
 
+********************
 Documentation markup
-====================
+********************
 
 Sections
---------
+========
 
 We mostly follow the Python documentation conventions for section marking::
 
@@ -90,8 +154,9 @@ We mostly follow the Python documentation conventions for section marking::
     sub-sub-sub-sub-heading
     """""""""""""""""""""""
 
+
 Inline markup
--------------
+=============
 
 * use backticks - `````` - for:
     * literals::
@@ -124,8 +189,10 @@ Inline markup
 
         Hit **Save as draft**.
 
+
+
 Rules for using technical words
--------------------------------
+===============================
 
 There should be one consistent way of rendering any technical word, depending on its context.
 Please follow these rules:
@@ -139,8 +206,9 @@ Please follow these rules:
   "``Placeholder`` methods can be overwritten as required" - when appropriate, link the term to
   further reference documentation as well as simply highlighting it.
 
+
 References
-----------
+==========
 
 Create::
 

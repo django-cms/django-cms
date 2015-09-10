@@ -60,7 +60,7 @@ We try to conform to `PEP8`_ as much as possible. A few highlights:
   are evil.
 - We try (loosely) to keep the line length at 79 characters. Generally the rule
   is "it should look good in a terminal-base editor" (eg vim), but we try not be
-  [Godwin's law] about it.
+  too inflexible about it.
 
 
 HTML, CSS and JavaScript
@@ -89,7 +89,7 @@ Or you can also run the watcher by just running ``gulp``.
 JS Bundling
 -----------
 
-Javascript files are split up for easier development, but in the end they are
+JavaScript files are split up for easier development, but in the end they are
 bundled together and minified to decrease amount of requests made and improve
 performance. In order to do that we use ``gulp`` task runner, where ``bundle``
 command is available. Configuration and list of dependencies for each bundle are
@@ -147,7 +147,7 @@ on change::
 
     gulp
 
-By default, sourcemaps are not included in the compiled files. In order to turn
+By default, source maps are not included in the compiled files. In order to turn
 them on while developing just add the ``--debug`` option::
 
 	gulp --debug
@@ -156,16 +156,16 @@ Icons
 =====
 
 We are using `gulp-iconfont <https://github.com/backflip/gulp-iconfont>`_ to
-generate icon webfonts into ``cms/static/cms/fonts/``. This also creates
+generate icon web fonts into ``cms/static/cms/fonts/``. This also creates
 ``_iconography.scss`` within ``cms/static/cms/sass/components`` which adds all
-the icon classes and ultimately compiles to css.
+the icon classes and ultimately compiles to CSS.
 
-In order to compile the webfont you need to run::
+In order to compile the web font you need to run::
 
     gulp icons
 
 This simply takes all SVGs within ``cms/static/cms/fonts/src`` and embeds them
-into the webfont. All classes will be automatically added to
+into the web font. All classes will be automatically added to
 ``_iconography.scss`` as previously mentioned.
 
 Additionally we created an SVG template within
