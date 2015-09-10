@@ -109,7 +109,7 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @param url {String} URL string
-             * @param animate {Number} Animation speed in ms
+             * @param [animate] {Number} Animation speed in ms
              */
             open: function open(url, animate) {
                 var language = 'language=' + CMS.config.request.language;
@@ -216,6 +216,8 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @module open
+             * @param width {Number} width that the iframes opens to
+             * @param animate {Number} Animation duration
              * @private
              */
             _show: function _show(width, animate) {
