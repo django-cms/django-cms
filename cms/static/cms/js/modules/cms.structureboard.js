@@ -400,6 +400,13 @@
                         if (ui.item.find('> .cms-draggables').children().length) {
                             ui.helper.addClass('cms-draggable-stack');
                         }
+
+                        // attach escape event to cancel dragging
+                        that.ui.doc.on('keyup.cms.interrupt', function (e, cancel) {
+                            if (e.keyCode === CMS.KEYS.ESC && that.dragging || cancel) {
+                                that.state = false;
+                                that.ui.sortables.sortable('cancel');
+                            }
                         });
                     },
 
@@ -407,6 +414,7 @@
                         // TODO prevent everything if nothing really changed
                         that.dragging = false;
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
+                        that.ui.doc.off('keyup.cms.interrupt');
 
                         // cancel if isAllowed returns false
                         var newPluginContainer = ui.item.closest('.cms-draggables');
@@ -482,14 +490,6 @@
                         that.state = (!bounds.length || $.inArray(type, bounds) !== -1) ? true : false;
 
                         return that.state;
-                    }
-                });
-
-                // attach escape event to cancel dragging
-                this.ui.doc.on('keyup.cms', function (e, cancel) {
-                    if (e.keyCode === CMS.KEYS.ESC || cancel) {
-                        that.state = false;
-                        that.ui.sortables.sortable('cancel');
                     }
                 });
             }
