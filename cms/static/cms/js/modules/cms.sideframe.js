@@ -52,6 +52,7 @@ var CMS = window.CMS || {};
                 this.pointerUp = 'pointerup.cms.sideframe pointercancel.cms.sideframe';
                 this.pointerMove = 'pointermove.cms.sideframe';
                 this.enforceReload = false;
+                this.settingsRefreshTimer = 600;
 
                 // if the modal is initialized the first time, set the events
                 if (!this.ui.sideframe.data('ready')) {
@@ -111,26 +112,23 @@ var CMS = window.CMS || {};
              * @param animate {Number} Animation speed in ms
              */
             open: function open(url, animate) {
-                // prepare iframe
-                var that = this;
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
-                var holder = this.ui.frame;
-                var initialized = false;
-
-                function insertHolder(iframe) {
-                    // show iframe after animation
-                    that.ui.frame.addClass('cms-loader');
-                    holder.html(iframe);
-                }
+                var params = [];
+                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
 
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();
+                this.ui.frame.addClass('cms-loader');
 
-                // push required params if defined
-                // only apply params on tree view
+                // show loader
+                if (CMS.API && CMS.API.Toolbar) {
+                    CMS.API.Toolbar._loader(true);
+                }
+
+                // we need to modify the url appropriately to pass
+                // language and page to the params
                 if (url.indexOf(CMS.config.request.tree) >= 0) {
-                    var params = [];
                     if (CMS.config.request.language) {
                         params.push(language);
                     }
@@ -140,14 +138,38 @@ var CMS = window.CMS || {};
                     url = this._url(url, params);
                 }
 
-                var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
-                iframe.hide();
+                // load the iframe
+                this._content(url);
 
-                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                // cancel animation if sideframe is already shown
+                if (this.ui.sideframe.is(':visible') && this.ui.sideframe.outerWidth() < width) {
+                    // The user has performed an action that requires the
+                    // sideframe to be shown, this intent outweighs any
+                    // previous intent to minimize the frame.
+                    this.settings.sideframe.hidden = false;
+                }
+
+                // show iframe
+                this._show(width, animate);
+            },
+
+            /**
+             * handles content replacement mechanisms
+             *
+             * @method _content
+             * @module open
+             * @private
+             */
+            _content: function _content(url) {
+                var that = this;
+                var initialized = false;
+                var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
+                var holder = this.ui.frame;
+                var contents;
 
                 // attach load event to iframe
-                iframe.on('load', function () {
-                    var contents = iframe.contents();
+                iframe.hide().on('load', function () {
+                    contents = iframe.contents();
 
                     // after iframe is loaded append css
                     contents.find('head').append(
@@ -155,6 +177,7 @@ var CMS = window.CMS || {};
                             that.config.urls.static +
                             that.options.urls.css_sideframe + '" />')
                     );
+
                     // remove loader
                     that.ui.frame.removeClass('cms-loader');
                     // than show
@@ -184,30 +207,12 @@ var CMS = window.CMS || {};
                     contents.find('.viewsitelink').attr('target', '_top');
                 });
 
-                // cancel animation if sideframe is already shown
-                if (this.ui.sideframe.is(':visible')) {
-                    // sideframe is already open
-                    insertHolder(iframe);
-                    // reanimate the frame
-                    if (this.ui.sideframe.outerWidth() < width) {
-                        // The user has performed an action that requires the
-                        // sideframe to be shown, this intent outweighs any
-                        // previous intent to minimize the frame.
-                        this.settings.sideframe.hidden = false;
-                        this._show(width, animate);
-                    }
-                } else {
-                    // load iframe after frame animation is done
-                    setTimeout(function () {
-                        insertHolder(iframe);
-                    }, this.options.sideframeDuration);
-                    // display the frame
-                    this._show(width, animate);
-                }
+                // inject iframe
+                holder.html(iframe);
             },
 
             /**
-             * helper function for open, handles internals
+             * animation helper for opening the sideframe
              *
              * @method _show
              * @module open
@@ -231,18 +236,20 @@ var CMS = window.CMS || {};
                     this.ui.sideframe.css('width', width);
                     // reset width if larger than available space
                     if (width >= $(window).width()) {
-                        this.ui.sideframe.animate({
+                        this.ui.sideframe.css({
                             width: $(window).width() - 30,
                             overflow: 'visible'
-                        }, 0);
+                        });
                     }
                 }
 
-                // lock toolbar, set timeout to make sure CMS.API is ready
-                setTimeout(function () {
+                // trigger API handlers
+                if (CMS.API && CMS.API.Toolbar) {
+                    // FIXME: initialization needs to be done after our libs are loaded
                     CMS.API.Toolbar._lock(true);
                     CMS.API.Toolbar._showToolbar(true);
-                }, 100);
+                    CMS.API.Toolbar._loader();
+                }
             },
 
             /**
@@ -251,52 +258,43 @@ var CMS = window.CMS || {};
              * @method close
              */
             close: function close() {
-                this._hide(true);
-
                 // hide dimmer immediately
                 this.ui.dimmer.hide();
 
-                // remove url in settings
+                // update settings
                 this.settings.sideframe = {
                     url: null,
                     hidden: false,
                     width: this.options.sideframeWidth
                 };
-
-                // update settings
                 this.settings = this.setSettings(this.settings);
 
-                // handle refresh option
+                // check for reloading
                 this.reloadBrowser(this.options.onClose, false, true);
+
+                // trigger hide animation
+                this._hide({ duration: 0 });
             },
 
             /**
-             * helper function for close, handles internals
+             * animation helper for closing the iframe
              *
-             * @method _show
-             * @module open
+             * @method _hide
+             * @module close
+             * @param opts
+             * @param opts.duration {Number} animation duration
              * @private
              */
-            _hide: function _hide(close) {
-                var duration = this.options.sideframeDuration;
-                // remove the iframe
-                if (close && this.ui.sideframe.width() <= 0) {
-                    duration = 0;
-                }
-                if (close) {
-                    this.ui.sideframe.find('iframe').remove();
-                }
+            _hide: function _hide(opts) {
+                var duration = opts.duration || this.options.sideframeDuration;
                 this.ui.sideframe.animate({ width: 0 }, duration, function () {
-                    if (close) {
-                        $(this).hide();
-                    }
+                    $(this).hide();
                 });
                 this.ui.frame.removeClass('cms-loader');
 
-                // lock toolbar, set timeout to make sure CMS.API is ready
-                setTimeout(function () {
+                if (CMS.API && CMS.API.Toolbar) {
                     CMS.API.Toolbar._lock(false);
-                }, 100);
+                }
             },
 
             /**
@@ -332,14 +330,11 @@ var CMS = window.CMS || {};
                     // update settings
                     that.settings.sideframe.position = e.originalEvent.clientX;
 
-                    // trigger the resize event
-                    $(window).trigger('resize.sideframe');
-
-                    // save position
+                    // save position into our settings
                     clearTimeout(timer);
                     timer = setTimeout(function () {
                         that.settings = that.setSettings(that.settings);
-                    }, 500);
+                    }, that.settingsRefreshTimer);
                 });
             },
 
@@ -355,7 +350,6 @@ var CMS = window.CMS || {};
                     .off(this.pointerUp)
                     .off(this.pointerMove)
                     .removeAttr('data-touch-action');
-                this.ui.window.trigger('resize.sideframe');
             },
 
             // FIXME: this should be replaced with a utility method
@@ -367,6 +361,7 @@ var CMS = window.CMS || {};
                 var urlArray = [];
                 var urlParams = [];
                 var origin = url;
+                var i;
 
                 // return url if there is no param
                 if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
@@ -393,7 +388,7 @@ var CMS = window.CMS || {};
 
                 // merge manually because jquery...
                 $.each(arr, function (index, item) {
-                    var i = $.inArray(item.param, keys);
+                    i = $.inArray(item.param, keys);
 
                     if (i === -1) {
                         keys.push(item.param);
