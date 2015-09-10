@@ -379,11 +379,6 @@
                     doNotClear: true,
                     disableNestingClass: 'cms-draggable-disabled',
                     errorClass: 'cms-draggable-disallowed',
-                    //'hoveringClass': 'cms-draggable-hover',
-                    // methods
-                    over: function () {
-                        actualizeEmptyPlaceholders();
-                    },
                     start: function (e, ui) {
                         originalPluginContainer = ui.item.closest('.cms-draggables');
                         that.dragging = true;
@@ -391,8 +386,6 @@
                         actualizeEmptyPlaceholders();
                         // ensure all menus are closed
                         CMS.Plugin._hideSubnav();
-                        // remove classes from empty dropzones
-                        $('.cms-dragbar-empty').removeClass('cms-draggable-disallowed');
                         // keep in mind that caching cms-draggables query only works
                         // as long as we don't create them on the fly
                         that.ui.sortables.each(function () {
@@ -407,9 +400,6 @@
                         if (ui.item.find('> .cms-draggables').children().length) {
                             ui.helper.addClass('cms-draggable-stack');
                         }
-                        // add overflow hidden to body
-                        that.ui.content.css({
-                            'overflow-x': 'hidden'
                         });
                     },
 
