@@ -349,16 +349,12 @@
 
             _drag: function () {
                 var that = this;
-                var dropped = false;
-                var droparea = null;
-                var dropzone = null;
                 var originalPluginContainer;
 
                 this.ui.sortables.nestedSortable({
                     items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                     placeholder: 'cms-droppable',
-                    cursorAt: { left: 10, top: 15 },
-                    connectWith: this.ui.sortables,
+                    connectWith: '.cms-draggables:not(.cms-hidden)',
                     tolerance: 'pointer',
                     toleranceElement: '> div',
                     dropOnEmpty: true,
@@ -370,10 +366,11 @@
                     },
                     appendTo: '.cms-structure-content',
                     cursor: 'move',
+                    cursorAt: { left: -15, top: -15 },
                     opacity: 1,
                     zIndex: 9999999,
                     delay: 100,
-                    refreshPositions: true,
+                    tabSize: 15,
                     // nestedSortable
                     listType: 'div.cms-draggables',
                     doNotClear: true,
@@ -414,18 +411,17 @@
                         that.dragging = false;
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                         that.ui.doc.off('keyup.cms.interrupt');
+                    },
 
+                    update: function (event, ui) {
                         // cancel if isAllowed returns false
-                        var newPluginContainer = ui.item.closest('.cms-draggables');
-                        if (!originalPluginContainer.is(newPluginContainer)) {
-                            actualizePluginsCollapsibleStatus(newPluginContainer.add(originalPluginContainer));
-                        }
-
                         if (!that.state) {
                             return false;
                         }
 
-                        // handle dropped event
+                        var newPluginContainer = ui.item.closest('.cms-draggables');
+                        if (!originalPluginContainer.is(newPluginContainer)) {
+                            actualizePluginsCollapsibleStatus(newPluginContainer.add(originalPluginContainer));
                         }
 
                         // we pass the id to the updater which checks within the backend the correct place
