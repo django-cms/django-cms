@@ -148,7 +148,7 @@ $structure-dragitem-icon-size: 10px;
 $structure-dragitem-height: 26px;
 $structure-dragitem-icon-space: 22px + $structure-dragarea-padding-horizontal;
 $structure-dragitem-icon-size: 12px;
-$structure-dragitem-fullheight: $structure-dragitem-height + 2 * $structure-dragarea-padding * 2;
+$structure-dragitem-fullheight: $structure-dragitem-height + 2 * $structure-dragarea-padding;
 
 
 //##############################################################################

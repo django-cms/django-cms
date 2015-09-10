@@ -297,6 +297,7 @@
         z-index: z(default);
         width: $structure-draggable-width-while-dragging !important;
         border-radius: 0;
+        height: $structure-dragitem-fullheight !important;
         .cms-dragitem {
             border-radius: 0;
             border: none;
