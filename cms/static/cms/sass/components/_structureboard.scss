@@ -71,8 +71,8 @@
     }
     .cms-dragarea-simple {
         position: static;
-        margin: 20px auto; // FIXME
-        max-width: 980px; // FIXME;
+        margin: $structure-dragarea-margin-vertical auto;
+        max-width: $structure-max-width;
     }
 
     //###########################################################
@@ -83,7 +83,6 @@
         position: relative;
         top: 0;
         left: 0;
-        /* z-index: z(structure, content, dragbar); */
         font-size: $font-size-normal;
         line-height: $line-height-normal;
         border-radius: $border-radius-base;
@@ -296,12 +295,12 @@
     .cms-draggable-is-dragging {
         transform: translateZ(0);
         z-index: z(default);
-        width: 200px !important;
+        width: $structure-draggable-width-while-dragging !important;
         border-radius: 0;
         .cms-dragitem {
             border-radius: 0;
             border: none;
-            padding-left: 20px; //FIXME
+            padding-left: $structure-dragarea-padding-horizontal;
             color: $white !important;
             white-space: nowrap;
             overflow: hidden;
@@ -326,7 +325,7 @@
     .cms-draggable-stack {
         box-shadow: 1px 1px 1px rgba($black ,0.2),
             4px 4px 0px 0px $color-primary;
-        height: 42px !important; //FIXME
+        height: $structure-dragitem-fullheight !important;
         overflow: hidden;
     }
 
