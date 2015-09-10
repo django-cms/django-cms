@@ -45,7 +45,7 @@
                 this.ui.modal.data('ready', true);
             },
 
-            _setupUI: function () {
+            _setupUI: function _setupUI() {
                 var modal = $('.cms-modal');
                 this.ui = {
                     modal: modal,
@@ -695,7 +695,7 @@
                 // trigger an ajax request
                 return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
                     CMS._newPlugin = false;
-                    if (opts.hideAfter) {
+                    if (opts && opts.hideAfter) {
                         that._hide(100);
                     }
                 });
