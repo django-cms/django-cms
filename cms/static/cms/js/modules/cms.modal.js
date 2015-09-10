@@ -182,7 +182,7 @@
 
                 // handle remove option when plugin is new
                 if (CMS._newPlugin) {
-                    this._deletePlugin(true);
+                    this._deletePlugin({ hideAfter: true });
                 } else {
                     this._hide(100);
                 }
@@ -208,9 +208,9 @@
              * _show animates the modal to given size
              *
              * @param opts
-             * @param opts.width Number width of the modal
-             * @param opts.height Number height of the modal
-             * @param opts.duration Number speed of opening, ms (not really used yet)
+             * @param opts.width {Number} width of the modal
+             * @param opts.height {Number} height of the modal
+             * @param opts.duration {Number} speed of opening, ms (not really used yet)
              */
             _show: function (opts) {
                 // we need to position the modal in the center
@@ -544,7 +544,7 @@
              * and additional "modal" stylesheet is then inserted into a template that is loaded
              * inside of an iframe
              *
-             * @param url String
+             * @param url {String}
              */
             _prepareUrl: function (url) {
                 if (url.indexOf('?') === -1) {
@@ -681,9 +681,10 @@
              * https://github.com/divio/django-cms/pull/4381 will eventually
              * provide a better solution
              *
-             * @param hideAfter Boolean
+             * @param [opts] {Object} general objects element that holds settings
+             * @param [opts.hideAfter] {Object} hides the modal after the ajax requests succeeds
              */
-            _deletePlugin: function (hideAfter) {
+            _deletePlugin: function (opts) {
                 var that = this;
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
@@ -694,7 +695,7 @@
                 // trigger an ajax request
                 return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
                     CMS._newPlugin = false;
-                    if (hideAfter) {
+                    if (opts.hideAfter) {
                         that._hide(100);
                     }
                 });
