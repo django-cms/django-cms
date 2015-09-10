@@ -363,7 +363,12 @@
                     tolerance: 'pointer',
                     toleranceElement: '> div',
                     dropOnEmpty: true,
-                    helper: 'clone',
+                    // cloning huge structure is a performance loss compared to cloning just a dragitem
+                    helper: function createHelper(e, item) {
+                        var clone = item.find('> .cms-dragitem').clone();
+                        clone.wrap('<div class="' + item[0].className + '"></div>');
+                        return clone.parent();
+                    },
                     appendTo: '.cms-structure-content',
                     cursor: 'move',
                     opacity: 1,
