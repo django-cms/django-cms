@@ -46,7 +46,7 @@
         position: absolute;
         box-sizing: border-box;
         margin: 0 0 $structure-dragarea-space;
-        padding: $structure-dragbar-padding $structure-dragbar-padding-horizontal;
+        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
     }
 
     .cms-dragarea-static {
@@ -154,15 +154,11 @@
         position: relative;
     }
     .cms-draggables.cms-hidden {
-        height: 0 !important;
-        overflow: hidden;
+        display: none !important;
     }
     .cms-draggables .cms-draggables {
         padding-left: $structure-draggable-inner-padding;
     }
-    /* .cms-dragitem-expanded + .cms-draggables { */
-    /*     display: block; */
-    /* } */
     .cms-dragarea-empty .cms-draggables-root {
         min-height: 46px;
         border: 1px dashed darken($gray-lighter, 15%);
@@ -176,8 +172,6 @@
         top: 0;
         left: 0;
         display: block !important; // fixes hide/show with jqueryui so the scroll doesn't jump
-        /* z-index: z(structure, content, draggable); */
-        /* margin: $structure-draggable-space 0 0; */
         margin-left: 0 !important;
         padding: 0;
         border-radius: $border-radius-base;
@@ -186,15 +180,11 @@
         // levels
         .cms-draggable {
             position: relative;
-            /* z-index: z(structure, content, draggable); */
             white-space: nowrap;
             border-color: $gray-lighter;
             &:hover {
                 border-color: $gray-light;
             }
-        }
-        .cms-draggable .cms-draggable {
-            /* margin-top: $structure-draggable-space; */
         }
 
         // menu overwrites
@@ -202,7 +192,7 @@
             top: $structure-dragitem-height + $structure-dragarea-padding * 2;
         }
         .cms-submenu-quicksearch {
-            $quicksearch-height: $structure-dragitem-height + $structure-dragarea-padding * 2;
+            $quicksearch-height: $structure-dragitem-height + $structure-dragarea-padding * 2 - 2px;
             top: 50%;
             height: $quicksearch-height;
             margin-top: -($quicksearch-height / 2);
@@ -329,6 +319,9 @@
                 display: inline;
             }
         }
+        &.cms-draggable-disabled > .cms-draggable {
+            display: none !important;
+        }
     }
     .cms-draggable-stack {
         box-shadow: 1px 1px 1px rgba($black ,0.2),
@@ -399,24 +392,27 @@
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-success, 40%);
-        border-color: lighten($color-success, 40%);
+        color: lighten($color-primary, 40%);
+        border-color: lighten($color-primary, 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
         color: $white;
-        background: rgba($color-success, 0.2);
+        background: rgba($color-primary, 0.2);
     }
     .cms-dragitem-success {
-        border: 1px solid lighten($color-success, 40%);
-        background: lighten($color-success, 40%);
+        border: 1px solid $color-primary;
+        background: mix(white, $color-primary, 80%);
     }
 
     .cms-draggable-disallowed,
     .cms-draggable-hover-disallowed {
         color: saturate($color-danger, 80%);
-        border: 1px dashed saturate($color-danger, 80%);
         background: rgba($color-danger, 0.1);
+        box-shadow: 0 0 0 2px saturate($color-danger, 80%);
+        &:before {
+            display: none;
+        }
     }
 
     // hide arrow when adding plugin-in-plugin within disabled item
@@ -427,9 +423,6 @@
 
         > .cms-dragitem-collapsable {
             padding-left: $structure-dragarea-padding-horizontal;
-            &:hover {
-                border-color: $gray-light;
-            }
             &:before {
                 display: none;
             }
