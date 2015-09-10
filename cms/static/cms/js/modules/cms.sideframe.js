@@ -1,11 +1,11 @@
-//##################################################################################################################
+//##############################################################################
 // #SIDEFRAME#
 /* global CMS */
 
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
-    $(document).ready(function () {
+    $(function () {
         /*!
          * Sideframe
          * Controls a cms specific sideframe
@@ -54,7 +54,9 @@
                     that.close(true);
                 });
 
-                this.sideframe.find('.cms-sideframe-resize').bind('pointerdown.cms.sideframe', function (e) {
+                this.sideframe.find('.cms-sideframe-resize').on(
+                    'pointerdown.cms.sideframe contextmenu.cms.sideframe',
+                    function (e) {
                     e.preventDefault();
                     that._startResize();
                 });
