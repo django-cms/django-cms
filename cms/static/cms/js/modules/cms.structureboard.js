@@ -355,8 +355,7 @@
                 var originalPluginContainer;
 
                 this.ui.sortables.nestedSortable({
-                    items: '.cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
-                    handle: '.cms-dragitem',
+                    items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                     placeholder: 'cms-droppable',
                     cursorAt: { left: 10, top: 15 },
                     connectWith: this.ui.sortables,
