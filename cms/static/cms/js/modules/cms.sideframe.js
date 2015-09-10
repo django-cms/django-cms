@@ -32,10 +32,7 @@ var CMS = window.CMS || {};
             options: {
                 onClose: false,
                 sideframeDuration: 300,
-                sideframeWidth: 0.8, // matches 80% of window width
-                urls: {
-                    css_sideframe: 'cms/css/cms.toolbar.sideframe.css'
-                }
+                sideframeWidth: 0.8 // matches 80% of window width
             },
 
             initialize: function initialize(options) {
@@ -114,8 +111,10 @@ var CMS = window.CMS || {};
             open: function open(url, animate) {
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
-                var params = [];
+                var params = ['sideframe=true'];
                 var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+
+                console.log('params: ', params);
 
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();
@@ -126,17 +125,26 @@ var CMS = window.CMS || {};
                     CMS.API.Toolbar._loader(true);
                 }
 
+                console.log('url before: ', url);
+
                 // we need to modify the url appropriately to pass
                 // language and page to the params
                 if (url.indexOf(CMS.config.request.tree) >= 0) {
                     if (CMS.config.request.language) {
+                        console.log('language: ', language);
                         params.push(language);
                     }
                     if (CMS.config.request.page_id) {
+                        console.log('page_id: ', page_id);
                         params.push(page_id);
                     }
-                    url = this._url(url, params);
                 }
+
+                console.log('url intermediate: ', url);
+
+                url = this._url(url, params);
+
+                console.log('url after: ', url);
 
                 // load the iframe
                 this._content(url);
@@ -170,13 +178,6 @@ var CMS = window.CMS || {};
                 // attach load event to iframe
                 iframe.hide().on('load', function () {
                     contents = iframe.contents();
-
-                    // after iframe is loaded append css
-                    contents.find('head').append(
-                        $('<link rel="stylesheet" type="text/css" href="' +
-                            that.config.urls.static +
-                            that.options.urls.css_sideframe + '" />')
-                    );
 
                     // remove loader
                     that.ui.frame.removeClass('cms-loader');
