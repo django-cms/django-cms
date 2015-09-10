@@ -388,9 +388,10 @@
                         that.ui.sortables.each(function () {
                             var element = $(this);
                             if (element.children().length === 0) {
-                                element.show();
+                                element.removeClass('cms-hidden');
                             }
                         });
+
                         // fixes placeholder height
                         ui.item.addClass('cms-is-dragging');
                         ui.helper.addClass('cms-draggable-is-dragging');
@@ -439,7 +440,7 @@
                         that.ui.sortables.each(function () {
                             var element = $(this);
                             if (element.children().length === 0) {
-                                element.hide();
+                                element.addClass('cms-hidden');
                             }
                         });
 
