@@ -85,7 +85,7 @@ $z-layers: (
         "content": (
             "base":     100,
             "dragbar":  9999,
-            "droppable": 100,
+            "droppable": 1000,
             "draggable": 99,
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
