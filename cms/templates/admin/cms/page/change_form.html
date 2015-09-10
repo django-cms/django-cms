@@ -4,6 +4,13 @@
 
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="../../">{% trans "Home" %}</a> &rsaquo;
+    <a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+</div>
+{% endblock %}
+
 {% block extrahead %}
 {{ block.super }}
 <script src="{% static "admin/js/urlify.js" %}" type="text/javascript"></script>

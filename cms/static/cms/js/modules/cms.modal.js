@@ -45,7 +45,7 @@
                 this.ui.modal.data('ready', true);
             },
 
-            _setupUI: function setupUI() {
+            _setupUI: function _setupUI() {
                 var modal = $('.cms-modal');
                 this.ui = {
                     modal: modal,
@@ -55,9 +55,10 @@
                     minimizeButton: modal.find('.cms-modal-minimize'),
                     maximizeButton: modal.find('.cms-modal-maximize'),
                     title: modal.find('.cms-modal-title'),
+                    titlePrefix: modal.find('.cms-modal-title-prefix'),
+                    titleSuffix: modal.find('.cms-modal-title-suffix'),
                     resize: modal.find('.cms-modal-resize'),
                     breadcrumb: modal.find('.cms-modal-breadcrumb'),
-                    breadcrumbItems: modal.find('.cms-modal-breadcrumb-items'),
                     closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
                     modalButtons: modal.find('.cms-modal-buttons'),
                     modalBody: modal.find('.cms-modal-body'),
@@ -75,14 +76,14 @@
                     e.preventDefault();
                     that._minimize();
                 });
-                this.ui.title.on('pointerdown.cms', function (e) {
+                this.ui.title.on('pointerdown.cms contextmenu.cms', function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
                 this.ui.title.on('dblclick.cms', function () {
                     that._maximize();
                 });
-                this.ui.resize.on('pointerdown.cms', function (e) {
+                this.ui.resize.on('pointerdown.cms contextmenu.cms', function (e) {
                     e.preventDefault();
                     that._startResize(e);
                 });
@@ -90,7 +91,7 @@
                     e.preventDefault();
                     that._maximize();
                 });
-                this.ui.breadcrumbItems.on(this.click, 'a', function (e) {
+                this.ui.breadcrumb.on(this.click, 'a', function (e) {
                     e.preventDefault();
                     that._changeContent($(this));
                 });
@@ -117,11 +118,27 @@
                     CMS.API.locked = true;
                 }
 
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    if (this._deletePlugin() === false) {
+                        // cancel open process when switching context
+                        return false;
+                    }
+                }
+
+                // new plugin will freeze the creation process
+                if (this.options.newPlugin) {
+                    CMS._newPlugin = this.options.newPlugin;
+                }
+
                 // because a new instance is called, we have to ensure minimized state is removed #3620
                 if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
                     this._minimize();
                 }
+
+                // clear elements
+                this.ui.modalButtons.empty();
 
                 // show loader
                 CMS.API.Toolbar._loader(true);
@@ -133,7 +150,7 @@
 
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
-                var heightOffset = 350; // adds margin top and bottom;
+                var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
 
@@ -165,16 +182,10 @@
 
             close: function () {
                 var that = this;
-                // handle remove option when plugin is new
-                if (this.options.newPlugin) {
-                    var data = this.options.newPlugin;
-                    var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                    var text = this.config.lang.confirm;
 
-                    // trigger an ajax request
-                    CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
-                        that._hide(100);
-                    });
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    this._deletePlugin({ hideAfter: true });
                 } else {
                     this._hide(100);
                 }
@@ -200,9 +211,9 @@
              * _show animates the modal to given size
              *
              * @param opts
-             * @param opts.width Number width of the modal
-             * @param opts.height Number height of the modal
-             * @param opts.duration Number speed of opening, ms (not really used yet)
+             * @param opts.width {Number} width of the modal
+             * @param opts.height {Number} height of the modal
+             * @param opts.duration {Number} speed of opening, ms (not really used yet)
              */
             _show: function (opts) {
                 // we need to position the modal in the center
@@ -382,7 +393,7 @@
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
                     var wMax = 680;
-                    var hMax = 100;
+                    var hMax = 150;
 
                     // add some limits
                     if (w <= wMax || h <= hMax) {
@@ -409,24 +420,30 @@
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
+                // remove class from modal
+                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+
                 // cancel if there is no breadcrumb)
-                if (!breadcrumb || breadcrumb.length <= 0) {
+                if (!breadcrumb || breadcrumb.length <= 1) {
                     return false;
                 }
                 if (!breadcrumb[0].title) {
                     return false;
                 }
 
+                // add class to modal
+                this.ui.modal.addClass('cms-modal-has-breadcrumb');
+
                 // load breadcrumb
                 $.each(breadcrumb, function (index, item) {
                     // check if the item is the last one
-                    var last = (index >= breadcrumb.length - 1) ? 'cms-modal-breadcrumb-last' : '';
+                    var last = (index >= breadcrumb.length - 1) ? 'active' : '';
                     // render breadcrumb
                     crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
                 });
 
                 // attach elements
-                this.ui.breadcrumbItems.html(crumb);
+                this.ui.breadcrumb.html(crumb);
 
                 // show breadcrumb
                 bread.show();
@@ -435,24 +452,26 @@
             _setButtons: function (iframe) {
                 var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
                 var that = this;
+                var group = $('<div class="cms-modal-item-buttons"></div>');
+                var render = $('<div class="cms-modal-buttons-inner"></div>');
                 var row;
+                var tmp;
                 if (!djangoSuit) {
                     row = iframe.contents().find('.submit-row:eq(0)');
                 } else {
                     row = iframe.contents().find('.save-box:eq(0)');
                 }
+                var buttons = row.find('input, a, button');
+
                 // hide all submit-rows
                 iframe.contents().find('.submit-row').hide();
-                var buttons = row.find('input, a, button');
-                var render = $('<span />'); // seriously jquery...
 
                 // if there are no given buttons within the submit-row area
                 // scan deeper within the form itself
                 if (!buttons.length) {
                     row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
                     buttons = row.find('input[type="submit"], button[type="submit"]');
-                    buttons.addClass('deletelink')
-                        .hide();
+                    buttons.addClass('deletelink').hide();
                 }
                 // attach relation id
                 buttons.each(function (index, item) {
@@ -481,7 +500,7 @@
                     }
 
                     // create the element and attach events
-                    var el = $('<div class="' + cls + ' ' + item.attr('class') + '">' + title + '</div>');
+                    var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
@@ -492,7 +511,6 @@
 
                         // trigger only when blue action buttons are triggered
                         if (item.hasClass('default') || item.hasClass('deletelink')) {
-                            that.options.newPlugin = null;
                             // reset onClose when delete is triggered
                             if (item.hasClass('deletelink')) {
                                 that.options.onClose = null;
@@ -503,18 +521,26 @@
                             that.saved = true;
                         }
                     });
+                    el.wrap(group);
 
                     // append element
-                    render.append(el);
+                    render.append(el.parent());
                 });
 
                 // manually add cancel button at the end
-                var cancel = $('<div class="cms-btn">' + that.config.lang.cancel + '</div>');
+                var cancel = $('<a href="#" class="cms-btn">' + that.config.lang.cancel + '</a>');
                 cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();
                 });
-                render.append(cancel);
+                cancel.wrap(group);
+                render.append(cancel.parent());
+
+                // prepare groups
+                render.find('.cms-btn-group').unwrap();
+                tmp = render.find('.cms-btn-group').clone(true, true);
+                render.find('.cms-btn-group').remove();
+                render.append(tmp.wrapAll(group.clone().addClass('cms-modal-item-buttons-left')).parent());
 
                 // render buttons
                 this.ui.modalButtons.html(render);
@@ -525,7 +551,7 @@
              * and additional "modal" stylesheet is then inserted into a template that is loaded
              * inside of an iframe
              *
-             * @param url String
+             * @param url {String}
              */
             _prepareUrl: function (url) {
                 if (url.indexOf('?') === -1) {
@@ -549,8 +575,10 @@
                 var holder = this.ui.iframeHolder;
 
                 // set correct title
-                var title = this.ui.title;
-                title.html(name || '&nbsp;');
+                var titlePrefix = this.ui.titlePrefix;
+                var titleSuffix = this.ui.titleSuffix;
+                titlePrefix.text(name || '');
+                titleSuffix.text('');
 
                 // ensure previous iframe is hidden
                 holder.find('iframe').css('visibility', 'hidden');
@@ -602,9 +630,14 @@
                         iframe.show();
                         // set title of not provided
                         var innerTitle = iframe.contents().find('#content h1:eq(0)');
-                        if (name === undefined) {
-                            title.html(innerTitle.text());
+
+                        // case when there is no prefix
+                        if (name === undefined && that.ui.titlePrefix.text() === '') {
+                            var bc = iframe.contents().find('.breadcrumbs').contents();
+                            that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
+
+                        titleSuffix.text(innerTitle.text());
                         innerTitle.remove();
 
                         // than show
@@ -633,21 +666,47 @@
             },
 
             _changeContent: function (el) {
-                if (el.hasClass('cms-modal-breadcrumb-last')) {
+                if (el.hasClass('active')) {
                     return false;
                 }
 
                 var parents = el.parent().find('a');
-                parents.removeClass('cms-modal-breadcrumb-last');
+                parents.removeClass('active');
 
-                el.addClass('cms-modal-breadcrumb-last');
+                el.addClass('active');
 
                 this._loadContent(el.attr('href'));
 
                 // update title
-                this.ui.title.text(el.text());
-            }
+                this.ui.titlePrefix.text(el.text());
+            },
 
+            /**
+             * _deletePlugin removes a plugin once created when clicking
+             * on delete or the close item. If we don't do this, an empty
+             * placeholder is generated
+             * https://github.com/divio/django-cms/pull/4381 will eventually
+             * provide a better solution
+             *
+             * @param [opts] {Object} general objects element that holds settings
+             * @param [opts.hideAfter] {Object} hides the modal after the ajax requests succeeds
+             */
+            _deletePlugin: function (opts) {
+                var that = this;
+                var data = CMS._newPlugin;
+                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+                var text = this.config.lang.confirmEmpty.replace(
+                    '{1}', CMS._newPlugin.breadcrumb[0].title
+                );
+
+                // trigger an ajax request
+                return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
+                    CMS._newPlugin = false;
+                    if (opts && opts.hideAfter) {
+                        that._hide(100);
+                    }
+                });
+            }
         });
 
     });
