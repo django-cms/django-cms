@@ -444,10 +444,6 @@
                             }
                         });
 
-                        // add overflow hidden to body
-                        that.ui.content.css({
-                            'overflow': ''
-                        });
                         actualizeEmptyPlaceholders();
                     },
                     isAllowed: function (placeholder, placeholderParent, originalItem) {
@@ -475,9 +471,6 @@
                         }
                         if (plugin.length) {
                             bounds = plugin.data('settings').plugin_restriction;
-                        }
-                        if (dropzone) {
-                            bounds = dropzone.data('settings').plugin_restriction;
                         }
 
                         // if parent has class disabled, dissalow drop
