@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
+try:
+    import importlib
+except ImportError:
+    # Python 2.6
+    from django.utils import importlib
+
 from django.conf import settings
-from django.utils import importlib
 from django.db import models
 
 

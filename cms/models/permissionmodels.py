@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.utils import importlib
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -18,6 +17,7 @@ from cms.utils.helpers import reversion_register
 user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)
 User = None
 if DJANGO_1_6:
+    from django.utils import importlib
     for app in settings.INSTALLED_APPS:
         if app.endswith(user_app_name):
             user_app_models = importlib.import_module(app + ".models")
