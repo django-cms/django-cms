@@ -158,6 +158,7 @@ var CMS = window.CMS || {};
              *
              * @method _content
              * @module open
+             * @param url {String} valid uri to pass on the iframe
              * @private
              */
             _content: function _content(url) {
@@ -363,7 +364,6 @@ var CMS = window.CMS || {};
                 var urlArray = [];
                 var urlParams = [];
                 var origin = url;
-                var i;
 
                 // return url if there is no param
                 if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
@@ -390,7 +390,7 @@ var CMS = window.CMS || {};
 
                 // merge manually because jquery...
                 $.each(arr, function (index, item) {
-                    i = $.inArray(item.param, keys);
+                    var i = $.inArray(item.param, keys);
 
                     if (i === -1) {
                         keys.push(item.param);
