@@ -463,7 +463,14 @@
                         // prepare variables for bound
                         var holderId = that.getId(placeholder.closest('.cms-dragarea'));
                         var holder = $('.cms-placeholder-' + holderId);
-                        var plugin = $('.cms-plugin-' + that.getId(placeholder.closest('.cms-draggable')));
+                        var plugin;
+                        if (placeholderParent && placeholderParent.length) {
+                            // placeholderParent is always latest, it maybe that
+                            // isAllowed is called _before_ placeholder is moved to a child plugin
+                            plugin = $('.cms-plugin-' + that.getId(placeholderParent.closest('.cms-draggable')));
+                        } else {
+                            plugin = $('.cms-plugin-' + that.getId(placeholder.closest('.cms-draggable')));
+                        }
 
                         // now set the correct bounds
                         if (holder.length) {
