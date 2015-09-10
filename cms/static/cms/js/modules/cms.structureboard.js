@@ -411,7 +411,6 @@
                     },
 
                     stop: function (event, ui) {
-                        // TODO prevent everything if nothing really changed
                         that.dragging = false;
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                         that.ui.doc.off('keyup.cms.interrupt');
@@ -427,13 +426,9 @@
                         }
 
                         // handle dropped event
-                        if (dropped) {
-                            droparea.prepend(ui.item);
-                            dropped = false;
                         }
 
                         // we pass the id to the updater which checks within the backend the correct place
-                        //var id = ui.item.attr('class').replace('cms-draggable cms-draggable-', '');
                         var id = that.getId(ui.item);
                         var plugin = $('.cms-plugin-' + id);
 
