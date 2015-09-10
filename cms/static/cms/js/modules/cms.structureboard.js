@@ -479,7 +479,7 @@
                         }
 
                         // if restrictions is still empty, proceed
-                        that.state = (bounds.length <= 0 || $.inArray(type, bounds) !== -1) ? true : false;
+                        that.state = (!bounds.length || $.inArray(type, bounds) !== -1) ? true : false;
 
                         return that.state;
                     }
