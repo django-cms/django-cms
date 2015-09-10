@@ -582,7 +582,7 @@
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click, function (e) {
+                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown').on(this.click + ' click.cms dblclick.cms', function (e) {
                     e.stopPropagation();
                 });
             },
