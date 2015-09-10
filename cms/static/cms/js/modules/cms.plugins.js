@@ -881,7 +881,7 @@
                 var tpl = $('<div class="cms-dragitem-success"></div>');
                 el.append(tpl);
                 // start animation
-                tpl.fadeOut(function () {
+                tpl.fadeOut(1000, function () {
                     $(this).remove();
                 });
                 // make sure structurboard gets updated after success
