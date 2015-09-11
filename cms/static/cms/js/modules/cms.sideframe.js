@@ -23,7 +23,7 @@ var CMS = window.CMS || {};
          *
          * @class Sideframe
          * @namespace CMS
-         * @requires CMS.API.Helpers
+         * @uses CMS.API.Helpers
          */
         CMS.Sideframe = new CMS.Class({
 
@@ -106,7 +106,7 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @param url {String} URL string
-             * @param animate {Number} Animation speed in ms
+             * @param [animate] {Number} Animation speed in ms
              */
             open: function open(url, animate) {
                 var language = 'language=' + CMS.config.request.language;
@@ -155,7 +155,7 @@ var CMS = window.CMS || {};
              * handles content replacement mechanisms
              *
              * @method _content
-             * @module open
+             * @param url {String} valid uri to pass on the iframe
              * @private
              */
             _content: function _content(url) {
@@ -209,7 +209,8 @@ var CMS = window.CMS || {};
              * animation helper for opening the sideframe
              *
              * @method _show
-             * @module open
+             * @param width {Number} width that the iframes opens to
+             * @param animate {Number} Animation duration
              * @private
              */
             _show: function _show(width, animate) {
@@ -274,13 +275,16 @@ var CMS = window.CMS || {};
              * animation helper for closing the iframe
              *
              * @method _hide
-             * @module close
              * @param opts
              * @param opts.duration {Number} animation duration
              * @private
              */
             _hide: function _hide(opts) {
-                var duration = opts.duration || this.options.sideframeDuration;
+                var duration = this.options.sideframeDuration;
+                if (opts && opts.duration) {
+                    duration = opts.duration;
+                }
+
                 this.ui.sideframe.animate({ width: 0 }, duration, function () {
                     $(this).hide();
                 });
@@ -355,7 +359,6 @@ var CMS = window.CMS || {};
                 var urlArray = [];
                 var urlParams = [];
                 var origin = url;
-                var i;
 
                 // return url if there is no param
                 if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
@@ -382,7 +385,7 @@ var CMS = window.CMS || {};
 
                 // merge manually because jquery...
                 $.each(arr, function (index, item) {
-                    i = $.inArray(item.param, keys);
+                    var i = $.inArray(item.param, keys);
 
                     if (i === -1) {
                         keys.push(item.param);
