@@ -1093,7 +1093,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_4="char_4", date_field=datetime.date(2012, 1, 1))
         ex1.save()
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_icon instance "char_1" %}
@@ -1189,7 +1189,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # This template does not render anything as content is saved in a
         # variable and never inserted in the page
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance as rendered_model %}
@@ -1212,7 +1212,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # This template does not render anything as content is saved in a
         # variable and inserted in the page afterwards
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance as rendered_model %}
@@ -1239,7 +1239,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         # This template is rendered directly
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance %}
@@ -1265,7 +1265,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         # Changelist check
         template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance 'changelist' %}
