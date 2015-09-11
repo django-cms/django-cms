@@ -554,11 +554,6 @@
              * @param url {String}
              */
             _prepareUrl: function (url) {
-                if (url.indexOf('?') === -1) {
-                    url += '?modal=1';
-                } else {
-                    url += '&modal=1';
-                }
                 // FIXME: A better fix is needed for '&' being interpreted as the
                 // start of en entity by jQuery. See #3404
                 url = url.replace('&', '&amp;');

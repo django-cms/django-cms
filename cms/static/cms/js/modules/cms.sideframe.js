@@ -111,7 +111,7 @@ var CMS = window.CMS || {};
             open: function open(url, animate) {
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
-                var params = ['sideframe=true'];
+                var params = [];
                 var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
 
                 // show dimmer even before iframe is loaded
