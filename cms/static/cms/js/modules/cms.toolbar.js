@@ -416,7 +416,7 @@
             // private methods
             _showToolbar: function (speed, init) {
                 var debugHeight = $('.cms-debug-bar').height() || 0;
-                var toolbarHeight = $('.cms-toolbar').height();
+                var toolbarHeight = $('.cms-toolbar').height() + 10;
 
                 this.toolbar.css({
                     'transition': 'margin-top ' + speed + 'ms',
@@ -436,7 +436,7 @@
             },
 
             _hideToolbar: function (speed, init) {
-                var toolbarHeight = $('.cms-toolbar').height();
+                var toolbarHeight = $('.cms-toolbar').height() + 10;
                 this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 // cancel if sideframe is active
                 if (this.lockToolbar) {
