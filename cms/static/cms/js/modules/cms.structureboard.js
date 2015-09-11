@@ -356,9 +356,8 @@
                     items: '> .cms-draggable:not(.cms-draggable-disabled .cms-draggable)',
                     placeholder: 'cms-droppable',
                     connectWith: '.cms-draggables:not(.cms-hidden)',
-                    tolerance: 'pointer',
+                    tolerance: 'intersect',
                     toleranceElement: '> div',
-                    distance: 10,
                     dropOnEmpty: true,
                     // cloning huge structure is a performance loss compared to cloning just a dragitem
                     helper: function createHelper(e, item) {
