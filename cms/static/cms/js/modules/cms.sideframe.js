@@ -164,13 +164,15 @@ var CMS = window.CMS || {};
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 var holder = this.ui.frame;
                 var contents;
+                var body;
 
                 // attach load event to iframe
                 iframe.hide().on('load', function () {
                     contents = iframe.contents();
+                    body = contents.find('body');
 
                     // inject css class
-                    contents.find('body').addClass('cms-admin cms-admin-sideframe');
+                    body.addClass('cms-admin cms-admin-sideframe');
 
                     // remove loader
                     that.ui.frame.removeClass('cms-loader');
@@ -187,7 +189,7 @@ var CMS = window.CMS || {};
                     that.settings = that.setSettings(that.settings);
 
                     // bind extra events
-                    contents.find('body').on(that.click, function () {
+                    body.on(that.click, function () {
                         $(document).trigger(that.click);
                     });
 

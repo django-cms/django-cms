@@ -547,15 +547,12 @@
             },
 
             /**
-             * _prepareUrl adds `?modal=1` get param to the url, which is then got by the backend
-             * and additional "modal" stylesheet is then inserted into a template that is loaded
-             * inside of an iframe
+             * start of en entity by jQuery. See #3404
              *
              * @param url {String}
              */
             _prepareUrl: function (url) {
                 // FIXME: A better fix is needed for '&' being interpreted as the
-                // start of en entity by jQuery. See #3404
                 url = url.replace('&', '&amp;');
                 return url;
             },
@@ -596,9 +593,10 @@
                     }
                     messages.remove();
                     var contents = iframe.contents();
+                    var body = contents.find('body');
 
                     // inject css class
-                    contents.find('body').addClass('cms-admin cms-admin-modal');
+                    body.addClass('cms-admin cms-admin-modal');
 
                     // determine if we should close the modal or reload
                     if (messages.length && that.enforceReload) {
@@ -645,12 +643,11 @@
                         iframe.data('ready', true);
 
                         // attach close event
-                        contents.find('body').on('keydown.cms', function (e) {
+                        body.on('keydown.cms', function (e) {
                             if (e.keyCode === CMS.KEYS.ESC) {
                                 that.close();
                             }
                         });
-                        contents.find('body').addClass('cms-modal-window');
 
                         // figure out if .object-tools is available
                         if (contents.find('.object-tools').length) {
