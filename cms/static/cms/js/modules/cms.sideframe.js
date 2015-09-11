@@ -32,10 +32,7 @@ var CMS = window.CMS || {};
             options: {
                 onClose: false,
                 sideframeDuration: 300,
-                sideframeWidth: 0.8, // matches 80% of window width
-                urls: {
-                    css_sideframe: 'cms/css/cms.toolbar.sideframe.css'
-                }
+                sideframeWidth: 0.8 // matches 80% of window width
             },
 
             initialize: function initialize(options) {
@@ -135,8 +132,9 @@ var CMS = window.CMS || {};
                     if (CMS.config.request.page_id) {
                         params.push(page_id);
                     }
-                    url = this._url(url, params);
                 }
+
+                url = this._url(url, params);
 
                 // load the iframe
                 this._content(url);
@@ -166,17 +164,15 @@ var CMS = window.CMS || {};
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 var holder = this.ui.frame;
                 var contents;
+                var body;
 
                 // attach load event to iframe
                 iframe.hide().on('load', function () {
                     contents = iframe.contents();
+                    body = contents.find('body');
 
-                    // after iframe is loaded append css
-                    contents.find('head').append(
-                        $('<link rel="stylesheet" type="text/css" href="' +
-                            that.config.urls.static +
-                            that.options.urls.css_sideframe + '" />')
-                    );
+                    // inject css class
+                    body.addClass('cms-admin cms-admin-sideframe');
 
                     // remove loader
                     that.ui.frame.removeClass('cms-loader');
@@ -189,11 +185,11 @@ var CMS = window.CMS || {};
                     }
 
                     // save url in settings
-                    that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
+                    that.settings.sideframe.url = iframe.prop('src');
                     that.settings = that.setSettings(that.settings);
 
                     // bind extra events
-                    contents.find('body').on(that.click, function () {
+                    body.on(that.click, function () {
                         $(document).trigger(that.click);
                     });
 
