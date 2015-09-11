@@ -8,7 +8,7 @@
     width: 100%;
 
     .cms-toolbar {
-        margin-top: -$toolbar-height;
+        margin-top: -$toolbar-height - 10px;
         .cms-toolbar-expanded & {
             margin-top: 0px;
         }

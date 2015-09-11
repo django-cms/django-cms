@@ -82,6 +82,7 @@ $z-layers: (
         "content": (
             "base":     100,
             "dragbar":  9999,
+            "droppable": 1000,
             "draggable": 99,
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
@@ -122,14 +123,16 @@ $btn-active-border: $gray-darkest;
 
 //##############################################################################
 // Structureboard
+$structure-max-width: 980px;
 $structure-bgcolor: #f0f0f0;
 
-$structure-dragbar-height: 24px;
+$structure-dragbar-height: 30px;
 $structure-dragbar-color: $black;
-$structure-dragbar-padding: 8px;
-$structure-dragbar-padding-horizontal: 8px;
+$structure-dragarea-padding: 8px;
+$structure-dragarea-padding-horizontal: 8px;
 
-$structure-dragarea-space: 4px;
+$structure-dragarea-margin-vertical: 20px;
+$structure-dragarea-space: 0px;
 $structure-dragarea-padding: 8px;
 $structure-dragarea-padding-horizontal: 10px;
 $structure-dragarea-use-background: 1;
@@ -137,15 +140,15 @@ $structure-dragarea-use-background: 1;
     $structure-dragarea-padding-horizontal: 28px;
 }
 
-$structure-draggable-inner-padding: 22px;
+$structure-draggable-inner-padding: 30px;
 $structure-draggable-space: $structure-dragarea-space;
-$structure-draggable-odd-child-bgcolor: $gray-lightest;
-$structure-draggable-even-child-bgcolor: $white;
+$structure-draggable-width-while-dragging: 200px;
 
 $structure-dragitem-icon-size: 10px;
 $structure-dragitem-height: 26px;
 $structure-dragitem-icon-space: 22px + $structure-dragarea-padding-horizontal;
 $structure-dragitem-icon-size: 12px;
+$structure-dragitem-fullheight: $structure-dragitem-height + 2 * $structure-dragarea-padding;
 
 
 //##############################################################################

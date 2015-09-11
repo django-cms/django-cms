@@ -28,7 +28,7 @@
 
     </div>
 
-    {% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables">{% endif %}
+    {% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables cms-hidden">{% endif %}
 
     {% if plugin.child_plugin_instances %}
         {% for child in plugin.child_plugin_instances %}
