@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.utils import importlib
+try:
+    import importlib
+except ImportError:
+    # Python < 2.7
+    from django.utils import importlib
 from django.db import models
 
 
@@ -8,7 +12,11 @@ from django.db import models
 if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
     # UserAdmin class
     user_app_name = settings.AUTH_USER_MODEL.split('.')[0]
-    app = models.get_app(user_app_name)
+    try:
+        from django.apps import apps
+        app = apps.get_app_config(user_app_name).models_module
+    except ImportError:
+        app = models.get_app(user_app_name)
 
     try:
         custom_admin = importlib.import_module(app.__name__[:-6] + "admin")
