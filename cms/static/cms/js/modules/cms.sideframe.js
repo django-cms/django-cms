@@ -114,8 +114,6 @@ var CMS = window.CMS || {};
                 var params = ['sideframe=true'];
                 var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
 
-                console.log('params: ', params);
-
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();
                 this.ui.frame.addClass('cms-loader');
@@ -125,26 +123,18 @@ var CMS = window.CMS || {};
                     CMS.API.Toolbar._loader(true);
                 }
 
-                console.log('url before: ', url);
-
                 // we need to modify the url appropriately to pass
                 // language and page to the params
                 if (url.indexOf(CMS.config.request.tree) >= 0) {
                     if (CMS.config.request.language) {
-                        console.log('language: ', language);
                         params.push(language);
                     }
                     if (CMS.config.request.page_id) {
-                        console.log('page_id: ', page_id);
                         params.push(page_id);
                     }
                 }
 
-                console.log('url intermediate: ', url);
-
                 url = this._url(url, params);
-
-                console.log('url after: ', url);
 
                 // load the iframe
                 this._content(url);
@@ -193,7 +183,7 @@ var CMS = window.CMS || {};
                     }
 
                     // save url in settings
-                    that.settings.sideframe.url = iframe.get(0).contentWindow.location.href;
+                    that.settings.sideframe.url = iframe.prop('src');
                     that.settings = that.setSettings(that.settings);
 
                     // bind extra events
