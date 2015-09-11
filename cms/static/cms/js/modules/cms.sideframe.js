@@ -179,6 +179,9 @@ var CMS = window.CMS || {};
                 iframe.hide().on('load', function () {
                     contents = iframe.contents();
 
+                    // inject css class
+                    contents.find('body').addClass('cms-admin cms-admin-sideframe');
+
                     // remove loader
                     that.ui.frame.removeClass('cms-loader');
                     // than show

@@ -602,6 +602,9 @@
                     messages.remove();
                     var contents = iframe.contents();
 
+                    // inject css class
+                    contents.find('body').addClass('cms-admin cms-admin-modal');
+
                     // determine if we should close the modal or reload
                     if (messages.length && that.enforceReload) {
                         that.reloadBrowser();
