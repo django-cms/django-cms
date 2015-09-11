@@ -1,14 +1,29 @@
-//##############################################################################
-// #SIDEFRAME#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// SIDEFRAME
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
+
+    // shorthand for jQuery(document).ready();
     $(function () {
-        /*!
-         * Sideframe
-         * Controls a cms specific sideframe
+        /**
+         * The sideframe is triggered via API calls from the backend either
+         * through the toolbar navigation or from plugins. The APIs only allow to
+         * open a url within the sideframe
+         *
+         * @class Sideframe
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Sideframe = new CMS.Class({
 
@@ -23,73 +38,97 @@
                 }
             },
 
-            initialize: function (options) {
+            initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
                 this.settings = CMS.settings;
 
                 // elements
-                this.sideframe = $('.cms-sideframe');
-                this.dimmer = this.sideframe.find('.cms-sideframe-dimmer');
+                this._setupUI();
 
-                // states
-                this.click = 'click.cms';
+                // states and event
+                this.click = 'click.cms.sideframe';
+                this.pointerDown = 'pointerdown.cms.sideframe contextmenu.cms.sideframe';
+                this.pointerUp = 'pointerup.cms.sideframe pointercancel.cms.sideframe';
+                this.pointerMove = 'pointermove.cms.sideframe';
                 this.enforceReload = false;
+                this.settingsRefreshTimer = 600;
 
                 // if the modal is initialized the first time, set the events
-                if (!this.sideframe.data('ready')) {
+                if (!this.ui.sideframe.data('ready')) {
                     this._events();
                 }
 
-                // ready sideframe
-                this.sideframe.data('ready', true);
+                // set a state to determine if we need to reinitialize this._events();
+                this.ui.sideframe.data('ready', true);
             },
 
-            // initial methods
-            _events: function () {
+            /**
+             * stores all jQuery referemces within this.ui
+             *
+             * @method _setupUI
+             * @private
+             */
+            _setupUI: function _setupUI() {
+                var sideframe = $('.cms-sideframe');
+                this.ui = {
+                    sideframe: sideframe,
+                    body: $('html'),
+                    window: $(window),
+                    dimmer: sideframe.find('.cms-sideframe-dimmer'),
+                    close: sideframe.find('.cms-sideframe-close'),
+                    resize: sideframe.find('.cms-sideframe-resize'),
+                    frame: sideframe.find('.cms-sideframe-frame'),
+                    shim: sideframe.find('.cms-sideframe-shim')
+                };
+            },
+
+            /**
+             * Handles all internal events such as closing and resizing
+             *
+             * @method _events
+             * @private
+             */
+            _events: function _events() {
                 var that = this;
 
-                // attach close event
-                this.sideframe.find('.cms-sideframe-close').bind(this.click, function () {
-                    that.close(true);
+                this.ui.close.on(this.click, function () {
+                    that.close();
                 });
 
-                this.sideframe.find('.cms-sideframe-resize').on(
-                    'pointerdown.cms.sideframe contextmenu.cms.sideframe',
-                    function (e) {
+                // the resize event attaches an off event to the body
+                // which is handled within _startResize()
+                this.ui.resize.on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startResize();
                 });
-
-                // stopper events
-                // FIXME should not be here forever, only when needed
-                $('html').bind('pointerup.cms.sideframe', function () {
-                    that._stopResize();
-                });
             },
 
-            // public methods
-            open: function (url, animate) {
-                // prepare iframe
-                var that = this;
+            /**
+             * opens a given url within a sideframe
+             *
+             * @method open
+             * @param url {String} URL string
+             * @param [animate] {Number} Animation speed in ms
+             */
+            open: function open(url, animate) {
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
-                var holder = this.sideframe.find('.cms-sideframe-frame');
-                var initialized = false;
-
-                function insertHolder(iframe) {
-                    // show iframe after animation
-                    that.sideframe.find('.cms-sideframe-frame').addClass('cms-loader');
-                    holder.html(iframe);
-                }
+                var params = [];
+                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
 
                 // show dimmer even before iframe is loaded
-                this.dimmer.show();
+                this.ui.dimmer.show();
+                this.ui.frame.addClass('cms-loader');
 
-                // push required params if defined
-                // only apply params on tree view
+                // show loader
+                if (CMS.API && CMS.API.Toolbar) {
+                    CMS.API.Toolbar._loader(true);
+                }
+
+                // we need to modify the url appropriately to pass
+                // language and page to the params
                 if (url.indexOf(CMS.config.request.tree) >= 0) {
-                    var params = [];
                     if (CMS.config.request.language) {
                         params.push(language);
                     }
@@ -99,14 +138,38 @@
                     url = this._url(url, params);
                 }
 
-                var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
-                iframe.hide();
+                // load the iframe
+                this._content(url);
 
-                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                // cancel animation if sideframe is already shown
+                if (this.ui.sideframe.is(':visible') && this.ui.sideframe.outerWidth() < width) {
+                    // The user has performed an action that requires the
+                    // sideframe to be shown, this intent outweighs any
+                    // previous intent to minimize the frame.
+                    this.settings.sideframe.hidden = false;
+                }
+
+                // show iframe
+                this._show(width, animate);
+            },
+
+            /**
+             * handles content replacement mechanisms
+             *
+             * @method _content
+             * @param url {String} valid uri to pass on the iframe
+             * @private
+             */
+            _content: function _content(url) {
+                var that = this;
+                var initialized = false;
+                var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
+                var holder = this.ui.frame;
+                var contents;
 
                 // attach load event to iframe
-                iframe.bind('load', function () {
-                    var contents = iframe.contents();
+                iframe.hide().on('load', function () {
+                    contents = iframe.contents();
 
                     // after iframe is loaded append css
                     contents.find('head').append(
@@ -114,8 +177,9 @@
                             that.config.urls.static +
                             that.options.urls.css_sideframe + '" />')
                     );
+
                     // remove loader
-                    that.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
+                    that.ui.frame.removeClass('cms-loader');
                     // than show
                     iframe.show();
 
@@ -129,7 +193,7 @@
                     that.settings = that.setSettings(that.settings);
 
                     // bind extra events
-                    contents.find('body').bind(that.click, function () {
+                    contents.find('body').on(that.click, function () {
                         $(document).trigger(that.click);
                     });
 
@@ -143,51 +207,20 @@
                     contents.find('.viewsitelink').attr('target', '_top');
                 });
 
-                // cancel animation if sideframe is already shown
-                if (this.sideframe.is(':visible')) {
-                    // sideframe is already open
-                    insertHolder(iframe);
-                    // reanimate the frame
-                    if (this.sideframe.outerWidth() < width) {
-                        // The user has performed an action that requires the
-                        // sideframe to be shown, this intent outweighs any
-                        // previous intent to minimize the frame.
-                        this.settings.sideframe.hidden = false;
-                        this._show(width, animate);
-                    }
-                } else {
-                    // load iframe after frame animation is done
-                    setTimeout(function () {
-                        insertHolder(iframe);
-                    }, this.options.sideframeDuration);
-                    // display the frame
-                    this._show(width, animate);
-                }
+                // inject iframe
+                holder.html(iframe);
             },
 
-            close: function () {
-                this._hide(true);
-
-                // hide dimmer immediately
-                this.dimmer.hide();
-
-                // remove url in settings
-                this.settings.sideframe = {
-                    url: null,
-                    hidden: false,
-                    width: this.options.sideframeWidth
-                };
-
-                // update settings
-                this.settings = this.setSettings(this.settings);
-
-                // handle refresh option
-                this.reloadBrowser(this.options.onClose, false, true);
-            },
-
-            // private methods
-            _show: function (width, animate) {
-                this.sideframe.show();
+            /**
+             * animation helper for opening the sideframe
+             *
+             * @method _show
+             * @param width {Number} width that the iframes opens to
+             * @param animate {Number} Animation duration
+             * @private
+             */
+            _show: function _show(width, animate) {
+                this.ui.sideframe.show();
 
                 // check if sideframe should be hidden
                 if (this.settings.sideframe.hidden) {
@@ -196,58 +229,99 @@
 
                 // otherwise do normal behaviour
                 if (animate) {
-                    this.sideframe.animate({
+                    this.ui.sideframe.animate({
                         width: width,
                         overflow: 'visible'
                     }, this.options.sideframeDuration);
                 } else {
-                    this.sideframe.css('width', width);
+                    this.ui.sideframe.css('width', width);
                     // reset width if larger than available space
                     if (width >= $(window).width()) {
-                        this.sideframe.animate({
+                        this.ui.sideframe.css({
                             width: $(window).width() - 30,
                             overflow: 'visible'
-                        }, 0);
+                        });
                     }
                 }
 
-                // lock toolbar, set timeout to make sure CMS.API is ready
-                setTimeout(function () {
+                // trigger API handlers
+                if (CMS.API && CMS.API.Toolbar) {
+                    // FIXME: initialization needs to be done after our libs are loaded
                     CMS.API.Toolbar._lock(true);
                     CMS.API.Toolbar._showToolbar(true);
-                }, 100);
+                    CMS.API.Toolbar._loader();
+                }
             },
 
-            _hide: function (close) {
+            /**
+             * closes the current instance
+             *
+             * @method close
+             */
+            close: function close() {
+                // hide dimmer immediately
+                this.ui.dimmer.hide();
+
+                // update settings
+                this.settings.sideframe = {
+                    url: null,
+                    hidden: false,
+                    width: this.options.sideframeWidth
+                };
+                this.settings = this.setSettings(this.settings);
+
+                // check for reloading
+                this.reloadBrowser(this.options.onClose, false, true);
+
+                // trigger hide animation
+                this._hide({ duration: 0 });
+            },
+
+            /**
+             * animation helper for closing the iframe
+             *
+             * @method _hide
+             * @param opts
+             * @param opts.duration {Number} animation duration
+             * @private
+             */
+            _hide: function _hide(opts) {
                 var duration = this.options.sideframeDuration;
-                // remove the iframe
-                if (close && this.sideframe.width() <= 0) {
-                    duration = 0;
+                if (opts && opts.duration) {
+                    duration = opts.duration;
                 }
-                if (close) {
-                    this.sideframe.find('iframe').remove();
-                }
-                this.sideframe.animate({ width: 0 }, duration, function () {
-                    if (close) {
-                        $(this).hide();
-                    }
-                });
-                this.sideframe.find('.cms-sideframe-frame').removeClass('cms-loader');
 
-                // lock toolbar, set timeout to make sure CMS.API is ready
-                setTimeout(function () {
+                this.ui.sideframe.animate({ width: 0 }, duration, function () {
+                    $(this).hide();
+                });
+                this.ui.frame.removeClass('cms-loader');
+
+                if (CMS.API && CMS.API.Toolbar) {
                     CMS.API.Toolbar._lock(false);
-                }, 100);
+                }
             },
 
-            _startResize: function () {
+            /**
+             * initiates the start resize event from _events
+             *
+             * @method _startResize
+             * @private
+             */
+            _startResize: function _startResize() {
                 var that = this;
                 var outerOffset = 30;
                 var timer = function () {};
-                // this prevents the iframe from being focusable
-                this.sideframe.find('.cms-sideframe-shim').css('z-index', 20);
 
-                $('html').attr('data-touch-action', 'none').bind('pointermove.cms.sideframe', function (e) {
+                // create event for stopping
+                this.ui.body.on(this.pointerUp, function (e) {
+                    e.preventDefault();
+                    that._stopResize();
+                });
+
+                // this prevents the iframe from being focusable
+                this.ui.shim.css('z-index', 20);
+
+                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
                     if (e.originalEvent.clientX <= 320) {
                         e.originalEvent.clientX = 320;
                     }
@@ -255,30 +329,35 @@
                         e.originalEvent.clientX = $(window).width() - outerOffset;
                     }
 
-                    that.sideframe.css('width', e.originalEvent.clientX);
+                    that.ui.sideframe.css('width', e.originalEvent.clientX);
 
                     // update settings
                     that.settings.sideframe.position = e.originalEvent.clientX;
 
-                    // trigger the resize event
-                    $(window).trigger('resize.sideframe');
-
-                    // save position
+                    // save position into our settings
                     clearTimeout(timer);
                     timer = setTimeout(function () {
                         that.settings = that.setSettings(that.settings);
-                    }, 500);
+                    }, that.settingsRefreshTimer);
                 });
             },
 
-            _stopResize: function () {
-                this.sideframe.find('.cms-sideframe-shim').css('z-index', 1);
-                $(window).trigger('resize.sideframe');
-
-                $('html').removeAttr('data-touch-action').unbind('pointermove.cms.sideframe');
+            /**
+             * initiates the stop resize event from _startResize
+             *
+             * @method _stopResize
+             * @private
+             */
+            _stopResize: function _stopResize() {
+                this.ui.shim.css('z-index', 1);
+                this.ui.body
+                    .off(this.pointerUp)
+                    .off(this.pointerMove)
+                    .removeAttr('data-touch-action');
             },
 
-            _url: function (url, params) {
+            // FIXME: this should be replaced with a utility method
+            _url: function _url(url, params) {
                 var arr = [];
                 var keys = [];
                 var values = [];
