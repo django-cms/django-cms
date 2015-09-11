@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
+import importlib
 from django.conf import settings
-from django.utils import importlib
 from django.db import models
 
 
