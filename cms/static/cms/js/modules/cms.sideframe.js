@@ -23,7 +23,7 @@ var CMS = window.CMS || {};
          *
          * @class Sideframe
          * @namespace CMS
-         * @requires CMS.API.Helpers
+         * @uses CMS.API.Helpers
          */
         CMS.Sideframe = new CMS.Class({
 
