@@ -91,7 +91,7 @@ class PageSelectWidget(MultiWidget):
             if id_:
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-        output.append(r'''<script type="text/javascript">
+        output.append(r"""<script type="text/javascript">
 (function($) {
     var handleSiteChange = function(site_name, selected_id) {
         $("#id_%(name)s_1 optgroup").remove();
@@ -120,7 +120,7 @@ class PageSelectWidget(MultiWidget):
         $("#add_id_%(name)s").hide();
     });
 })(django.jQuery);
-</script>''' % {'name': name})
+</script>""" % {'name': name})
         return mark_safe(self.format_output(output))
 
     def format_output(self, rendered_widgets):
@@ -145,7 +145,7 @@ class PageSmartLinkWidget(TextInput):
         final_attrs = self.build_attrs(attrs)
         id_ = final_attrs.get('id', None)
 
-        output = [r'''<script type="text/javascript">
+        output = [r"""<script type="text/javascript">
 (function($){
     $(function(){
         $("#%(element_id)s").select2({
@@ -183,7 +183,7 @@ class PageSmartLinkWidget(TextInput):
         });
     })
 })(CMS.$);
-</script>''' % {
+</script>""" % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,

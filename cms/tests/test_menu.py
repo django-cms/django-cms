@@ -578,7 +578,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
 class MenuTests(BaseMenuTest):
     def test_build_nodes_inner_for_worst_case_menu(self):
-        '''
+        """
             Tests the worst case scenario
 
             node5
@@ -586,7 +586,7 @@ class MenuTests(BaseMenuTest):
               node3
                node2
                 node1
-        '''
+        """
         node1 = NavigationNode('Test1', '/test1/', 1, 2)
         node2 = NavigationNode('Test2', '/test2/', 2, 3)
         node3 = NavigationNode('Test3', '/test3/', 3, 4)
@@ -613,16 +613,16 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(node5.children, [node4])
 
     def test_build_nodes_inner_for_circular_menu(self):
-        '''
+        """
         TODO:
             To properly handle this test we need to have a circular dependency
             detection system.
             Go nuts implementing it :)
-        '''
+        """
         pass
 
     def test_build_nodes_inner_for_broken_menu(self):
-        '''
+        """
             Tests a broken menu tree (non-existing parent)
 
             node5
@@ -632,7 +632,7 @@ class MenuTests(BaseMenuTest):
             <non-existant>
              node2
               node1
-        '''
+        """
         node1 = NavigationNode('Test1', '/test1/', 1, 2)
         node2 = NavigationNode('Test2', '/test2/', 2, 12)
         node3 = NavigationNode('Test3', '/test3/', 3, 4)

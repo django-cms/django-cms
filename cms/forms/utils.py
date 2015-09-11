@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save, post_delete
-from django.utils.datastructures import SortedDict
 from django.utils.safestring import mark_safe
 
 from cms.cache.choices import (clean_site_choices_cache, clean_page_choices_cache,
@@ -20,7 +23,7 @@ def update_site_and_page_choices(lang=None):
     title_queryset = (Title.objects.drafts()
                       .select_related('page', 'page__site')
                       .order_by('page__path'))
-    pages = defaultdict(SortedDict)
+    pages = defaultdict(OrderedDict)
     sites = {}
     for title in title_queryset:
         page = pages[title.page.site.pk].get(title.page.pk, {})

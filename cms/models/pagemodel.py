@@ -530,9 +530,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return self.get_title_obj(language, False, force_reload=force_reload).published
 
     def toggle_in_navigation(self, set_to=None):
-        '''
+        """
         Toggles (or sets) in_navigation and invalidates the cms page cache
-        '''
+        """
         old = self.in_navigation
         if set_to in [True, False]:
             self.in_navigation = set_to

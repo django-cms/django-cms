@@ -716,10 +716,10 @@ class ToolbarTests(ToolbarTestBase):
             return default
 
     def test_toolbar_logout(self):
-        '''
+        """
         Tests that the Logout menu item includes the user's full name, if the
         relevant fields were populated in auth.User, else the user's username.
-        '''
+        """
         superuser = self.get_superuser()
 
         # Ensure that some other test hasn't set the name fields
@@ -886,13 +886,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model fake "char_1" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -905,13 +905,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "char_1" as tempvar %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertNotContains(
@@ -932,7 +932,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         plugin = add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
 
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
@@ -940,7 +940,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 <h2>{% render_placeholder instance.placeholder as tempvar %}</h2>
 <h3>{{ tempvar }}</h3>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -981,13 +981,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "char_1" "" "" 'truncatewords:2' %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1002,13 +1002,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_3="char_3",
                        char_4="char_4", date_field=datetime.date(2012, 1, 1))
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
 
         response = detail_view(request, ex1.pk, template_string=template_text)
@@ -1018,13 +1018,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 'placeholderapp', 'example1', 'date_field', ex1.pk,
                 ex1.date_field.strftime("%Y-%m-%d")))
 
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "date_field" "" "" 'date:"Y m d"' %}</h1>
 {% endblock content %}
-'''
+"""
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
@@ -1039,13 +1039,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                        char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "char_1" "" "" 'truncatewords:2'  %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=False)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response,
@@ -1056,13 +1056,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 {% render_model_icon instance %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request('', user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1077,13 +1077,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 {% render_model_icon instance %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1097,8 +1097,8 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4", date_field=datetime.date(2012, 1, 1))
         ex1.save()
-        template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_icon instance "char_1" %}
@@ -1112,7 +1112,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
     {% endif %}
 {% endrender_model_block %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1129,13 +1129,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 {% render_model_add instance %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1149,13 +1149,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 {% render_model_add instance_class %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1169,13 +1169,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 {% render_model_add instance_class %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         view_func = ClassDetail.as_view(template_string=template_text)
         response = view_func(request, pk=ex1.pk, template_string=template_text)
@@ -1193,8 +1193,8 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         # This template does not render anything as content is saved in a
         # variable and never inserted in the page
-        template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance as rendered_model %}
@@ -1206,7 +1206,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
     {% endif %}
 {% endrender_model_block %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertNotContains(
@@ -1216,8 +1216,8 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         # This template does not render anything as content is saved in a
         # variable and inserted in the page afterwards
-        template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance as rendered_model %}
@@ -1230,7 +1230,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% endrender_model_block %}
 {{ rendered_model }}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         # Assertions on the content of the block tag
@@ -1243,8 +1243,8 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
 
         # This template is rendered directly
-        template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance %}
@@ -1256,7 +1256,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
     {% endif %}
 {% endrender_model_block %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         # Assertions on the content of the block tag
@@ -1269,15 +1269,15 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
 
         # Changelist check
-        template_text = '''{% extends "base.html" %}
-{% load cms_tags %}{% load url from future %}
+        template_text = """{% extends "base.html" %}
+{% load cms_tags %}
 
 {% block content %}
 {% render_model_block instance 'changelist' %}
     {{ instance }}
 {% endrender_model_block %}
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         # Assertions on the content of the block tag
@@ -1295,13 +1295,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "fake_field" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1310,13 +1310,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 'placeholderapp', 'example1', 'fake_field', ex1.pk))
 
         # no attribute
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1329,13 +1329,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1349,13 +1349,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "" "dynamic_url" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1367,13 +1367,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1385,13 +1385,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "" "static_admin_url" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         ex1.set_static_url(request)
         response = detail_view(request, ex1.pk, template_string=template_text)
@@ -1406,13 +1406,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" "char_1" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response,
@@ -1425,13 +1425,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" "char_2" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(response,
@@ -1446,13 +1446,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" "char_1,char_2" "en" "" "admin:placeholderapp_example1_edit_field" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1469,13 +1469,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance "callable_item" %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
@@ -1489,13 +1489,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
-        template_text = '''{% extends "base.html" %}
+        template_text = """{% extends "base.html" %}
 {% load cms_tags %}
 
 {% block content %}
 <h1>{% render_model instance item_name %}</h1>
 {% endblock content %}
-'''
+"""
         request = self.get_page_request(page, user, edit=True)
         response = detail_view(request, ex1.pk, template_string=template_text,
                                item_name="callable_item")

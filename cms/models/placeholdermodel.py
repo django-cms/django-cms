@@ -99,7 +99,7 @@ class Placeholder(models.Model):
         Generic method to check the permissions for a request for a given key,
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
-          * 'add' and 'change' permissions on placeholder need either on add or change 
+          * 'add' and 'change' permissions on placeholder need either on add or change
             permission on attached object to be granted.
           * 'delete' need either on add, change or delete
         """
@@ -142,9 +142,9 @@ class Placeholder(models.Model):
         return self._get_permission(request, 'delete')
 
     def render(self, context, width, lang=None, editable=True, use_cache=True):
-        '''
+        """
         Set editable = False to disable front-end rendering for this render.
-        '''
+        """
         from cms.plugin_rendering import render_placeholder
         if not 'request' in context:
             return '<!-- missing request -->'

@@ -24,10 +24,10 @@ logger = getLogger('menus')
 
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
-    '''
+    """
     This is an easier to test "inner loop" building the menu tree structure
     for one menu (one language, one site)
-    '''
+    """
     done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
 
@@ -147,9 +147,9 @@ class MenuPool(object):
         self.menus = expanded_menus
 
     def clear(self, site_id=None, language=None, all=False):
-        '''
+        """
         This invalidates the cache for a given menu (site_id and language)
-        '''
+        """
         if all:
             cache_keys = CacheKey.objects.get_keys()
         else:
