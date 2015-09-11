@@ -879,10 +879,11 @@
 
             _showSuccess: function (el) {
                 var tpl = $('<div class="cms-dragitem-success"></div>');
-                el.append(tpl);
+                el.addClass('cms-draggable-success').append(tpl);
                 // start animation
                 tpl.fadeOut(1000, function () {
                     $(this).remove();
+                    el.removeClass('cms-draggable-success');
                 });
                 // make sure structurboard gets updated after success
                 this.ui.window.trigger('resize.sideframe');
