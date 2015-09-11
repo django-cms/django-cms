@@ -14,6 +14,20 @@ gettext = lambda s: s
 urlpatterns = []
 
 
+def _detect_migration_layout(apps):
+    SOUTH_MODULES = {}
+    DJANGO_MODULES = {}
+
+    for module in apps:
+        try:
+            __import__('%s.migrations_django' % module)
+            DJANGO_MODULES[module] = '%s.migrations_django' % module
+            SOUTH_MODULES[module] = '%s.migrations' % module
+        except Exception:
+            pass
+    return DJANGO_MODULES, SOUTH_MODULES
+
+
 def configure(db_url, **extra):
     from django.conf import settings
     if six.PY3:
@@ -267,22 +281,19 @@ def configure(db_url, **extra):
     )
     from django.utils.functional import empty
 
+    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_flash', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
+               'djangocms_teaser', 'djangocms_video')
+
+    DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
+
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
+        defaults['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
     else:
         defaults['MIGRATION_MODULES'] = {
             'cms': 'cms.migrations_django',
             'menus': 'menus.migrations_django',
-            'djangocms_column': 'djangocms_column.migrations_django',
-            'djangocms_file': 'djangocms_file.migrations_django',
-            'djangocms_flash': 'djangocms_flash.migrations_django',
-            'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
-            'djangocms_inherit': 'djangocms_inherit.migrations_django',
-            'djangocms_link': 'djangocms_link.migrations_django',
-            'djangocms_picture': 'djangocms_picture.migrations_django',
-            'djangocms_style': 'djangocms_style.migrations_django',
-            'djangocms_teaser': 'djangocms_teaser.migrations_django',
-            'djangocms_video': 'djangocms_video.migrations_django',
             'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations_django',
             'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations_django',
             'fileapp': 'cms.test_utils.project.fileapp.migrations_django',
@@ -297,6 +308,9 @@ def configure(db_url, **extra):
             'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations_django',
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations_django',
         }
+        defaults['MIGRATION_MODULES'].update(DJANGO_MIGRATION_MODULES)
+    print(DJANGO_MIGRATION_MODULES)
+    print(SOUTH_MIGRATION_MODULES)
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
 
