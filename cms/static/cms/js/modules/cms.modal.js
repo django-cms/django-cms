@@ -547,7 +547,7 @@
             },
 
             /**
-             * start of en entity by jQuery. See #3404
+             * sanitise the ampersand within the url for #3404
              *
              * @param url {String}
              */
