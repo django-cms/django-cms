@@ -82,7 +82,6 @@
                     placeholders: $('.cms-placeholder'),
                     dragitems: $('.cms-draggable'),
                     dragareas: $('.cms-dragarea'),
-                    dimmer: container.find('.cms-structure-dimmer'),
                     clipboard: $('.cms-clipboard'),
                     toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
                     toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
@@ -265,7 +264,6 @@
 
                 // show container
                 this.ui.container.show();
-                this.ui.dimmer.show();
                 this.ui.dragareas.css('opacity', 1);
 
                 this.ui.plugins.not(this.ui.render_model).hide();
@@ -299,7 +297,6 @@
                 this.ui.container.hide();
                 this.ui.plugins.show();
                 this.ui.placeholders.hide();
-                this.ui.dimmer.hide();
 
                 // detach event
                 this.ui.window.off('resize.sideframe');
