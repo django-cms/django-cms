@@ -99,7 +99,7 @@ To add nodes to a menu a generator is required.
 
 There is one in cms for example, which examines the Pages in the database and adds them as nodes.
 
-These classses are subclasses of :py:class:`menus.base.Menu`. The one in cms is :py:class:`cms.menu.CMSMenu`.
+These classes are subclasses of :py:class:`menus.base.Menu`. The one in cms is :py:class:`cms.menu.CMSMenu`.
 
 In order to use a generator, its :py:meth:`get_nodes` method must be called.
 
@@ -116,12 +116,12 @@ In order to use a modifier, its :py:meth:`modify()` method must be called.
 
 Note that each Modifier's :py:meth:`modify()` method can be called *twice*, before and after the menu has been trimmed.
 
-For example when using the {% show_menu %} templatetag, it's called:
+For example when using the {% show_menu %} template tag, it's called:
 
 * first, by :py:meth:`menus.menu_pool.MenuPool.get_nodes()`, with the argument post_cut = False
-* later, by the templatetag, with the argument post_cut = True
+* later, by the template tag, with the argument post_cut = True
 
-This corresponds to the state of the nodes list before and after :py:meth:`menus.templatetags.menu_tags.cut_levels()`, which removes nodes from the menu according to the arguments provided by the templatetag.
+This corresponds to the state of the nodes list before and after :py:meth:`menus.templatetags.menu_tags.cut_levels()`, which removes nodes from the menu according to the arguments provided by the template tag.
 
 This is because some modification might be required on *all* nodes, and some might only be required on the subset of nodes left after cutting.
 
@@ -141,7 +141,7 @@ A NavigationNode has attributes such as URL, title, parent and children - as one
 Menu system logic
 *****************
 
-Let's look at an example using the {% show_menu %} templatetag. It will be different for other templatetags, and your applications might have their own menu classes. But this should help explain what's going on and what the menu system is doing.
+Let's look at an example using the {% show_menu %} template tag. It will be different for other template tags, and your applications might have their own menu classes. But this should help explain what's going on and what the menu system is doing.
 
 One thing to understand is that the system passes around a list of ``nodes``, doing various things to it.
 
@@ -149,11 +149,11 @@ Many of the methods below pass this list of nodes to the ones it calls, and retu
 
 Don't forget that show_menu recurses - so it will do *all* of the below for *each level* in the menu.
 
-* ``{% show_menu %}`` - the templatetag in the template
+* ``{% show_menu %}`` - the template tag in the template
     * :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()`
         * :py:meth:`menus.menu_pool.MenuPool.get_nodes()`
-            * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's cms_menus.py, and registers:
- 				* Menu classes, placing them in the self.menus dict
+            * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's ``cms_menus.py``, and registers:
+ 				* Menu classes, placing them in the ``self.menus`` dict
 				* Modifier classes, placing them in the self.modifiers list
             * :py:meth:`menus.menu_pool.MenuPool._build_nodes()`
                 * checks the cache to see if it should return cached nodes
@@ -173,7 +173,7 @@ Don't forget that show_menu recurses - so it will do *all* of the below for *eac
                         * :py:meth:`menus.modifiers.Level.mark_levels()` recurses over a node's descendants marking their levels
         * we're now back in :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()` again
         * if we have been provided a root_id, get rid of any nodes other than its descendants
-        * :py:meth:`menus.templatetags.menu_tags.cut_levels()` removes nodes from the menu according to the arguments provided by the templatetag
+        * :py:meth:`menus.templatetags.menu_tags.cut_levels()` removes nodes from the menu according to the arguments provided by the template tag
         * :py:meth:`menu_pool.MenuPool.apply_modifiers(post_cut = True)` loops over all the Modifiers again
             * :py:class:`cms.menu.NavExtender`
             * :py:class:`cms.menu.SoftRootCutter`

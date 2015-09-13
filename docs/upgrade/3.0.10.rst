@@ -8,15 +8,15 @@
 What's new in 3.0.10
 ********************
 
-* Improved Py3 compatibility
-* Improved the behavior when changing the operator's language
+* Improved Python 3 compatibility
+* Improved the behaviour when changing the operator's language
 * Numerous documentation updates
 
 Bug Fixes
 =========
 
 * Revert a change that caused an issue with saving plugins in some browsers
-* Fix an issue where urls were not refreshed when a page slug changes
+* Fix an issue where URLs were not refreshed when a page slug changes
 * Fix an issue with FR translations
 * Fixed an issue preventing the correct rendering of custom contextual menu items for plugins
 * Fixed an issue relating to recovering deleted pages

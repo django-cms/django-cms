@@ -253,7 +253,7 @@ class ContextTests(ClearURLs, CMSTestCase):
         # Number of queries when context processors is not enabled
         with self.settings(**override):
             # Baseline number of queries
-            with self.assertNumQueries(FuzzyInt(13, 19)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 20)) as context:
                 response = self.client.get("/en/page-2/")
                 num_queries_page = len(context.captured_queries)
         cache.clear()

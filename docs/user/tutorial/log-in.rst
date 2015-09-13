@@ -14,7 +14,7 @@ your site are responsible for creating and providing these credentials to you
 so consult them if you are unsure.
 
 Your site will likely have a dedicated login page but a quick way to trigger
-the login form from any page is to simply append ``?edit`` to the url.
+the login form from any page is to simply append ``?edit`` to the URL.
 Alternatively, hit *Switch to edit mode* on the default page).
 
 This will reveal the :ref:`django CMS toolbar <toolbar>`, with a login prompt

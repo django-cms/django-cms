@@ -61,7 +61,7 @@ Minor improvements
 * ``PageSelectWidget`` correctly orders pages again.
 * Fixed the file plugin which was sometimes causing invalid HTML (unclosed ``span`` tag).
 * Migration ordering for plugins improved.
-* Internationalized strings in JavaScript now get escaped.
+* Internationalised strings in JavaScript now get escaped.
 
 
 ******************************

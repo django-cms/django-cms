@@ -13,6 +13,20 @@ gettext = lambda s: s
 urlpatterns = []
 
 
+def _detect_migration_layout(apps):
+    SOUTH_MODULES = {}
+    DJANGO_MODULES = {}
+
+    for module in apps:
+        try:
+            __import__('%s.migrations_django' % module)
+            DJANGO_MODULES[module] = '%s.migrations_django' % module
+            SOUTH_MODULES[module] = '%s.migrations' % module
+        except Exception:
+            pass
+    return DJANGO_MODULES, SOUTH_MODULES
+
+
 def configure(db_url, **extra):
     from django.conf import settings
     if six.PY3:
@@ -296,64 +310,17 @@ def configure(db_url, **extra):
             }
         ]
 
+    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_flash', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
+               'djangocms_teaser', 'djangocms_video')
+
+    DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
+
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
-        defaults['SOUTH_MIGRATION_MODULES'] = {
-            'cms': 'cms.south_migrations',
-            'menus': 'menus.south_migrations',
-            'djangocms_column': 'djangocms_column.migrations',
-            'djangocms_file': 'djangocms_file.migrations',
-            'djangocms_flash': 'djangocms_flash.migrations',
-            'djangocms_googlemap': 'djangocms_googlemap.migrations',
-            'djangocms_inherit': 'djangocms_inherit.migrations',
-            'djangocms_link': 'djangocms_link.migrations',
-            'djangocms_picture': 'djangocms_picture.migrations',
-            'djangocms_style': 'djangocms_style.migrations',
-            'djangocms_teaser': 'djangocms_teaser.migrations',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.south_migrations',
-            'djangocms_video': 'djangocms_video.migrations',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.south_migrations',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.south_migrations',
-            'fileapp': 'cms.test_utils.project.fileapp.south_migrations',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.south_migrations',
-            'sampleapp': 'cms.test_utils.project.sampleapp.south_migrations',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.south_migrations',
-            'customuserapp': 'cms.test_utils.project.customuserapp.south_migrations',
-            'fakemlng': 'cms.test_utils.project.fakemlng.south_migrations',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.south_migrations',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.south_migrations',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.south_migrations',
-            'extensionapp': 'cms.test_utils.project.extensionapp.south_migrations',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.south_migrations',
-            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.south_migrations',
-        }
-        defaults['SOUTH_TESTS_MIGRATE'] = defaults.get('TESTS_MIGRATE', False)
+        defaults['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
     else:
-        defaults['MIGRATION_MODULES'] = {
-            'djangocms_column': 'djangocms_column.migrations_django',
-            'djangocms_file': 'djangocms_file.migrations_django',
-            'djangocms_flash': 'djangocms_flash.migrations_django',
-            'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
-            'djangocms_inherit': 'djangocms_inherit.migrations_django',
-            'djangocms_link': 'djangocms_link.migrations_django',
-            'djangocms_picture': 'djangocms_picture.migrations_django',
-            'djangocms_style': 'djangocms_style.migrations_django',
-            'djangocms_teaser': 'djangocms_teaser.migrations_django',
-            'djangocms_video': 'djangocms_video.migrations_django',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.migrations',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.migrations',
-            'fileapp': 'cms.test_utils.project.fileapp.migrations',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.migrations',
-            'sampleapp': 'cms.test_utils.project.sampleapp.migrations',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.migrations',
-            'fakemlng': 'cms.test_utils.project.fakemlng.migrations',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.migrations',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.migrations',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.migrations',
-            'extensionapp': 'cms.test_utils.project.extensionapp.migrations',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.migrations',
-            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations',
-        }
+        defaults['MIGRATION_MODULES'] = DJANGO_MIGRATION_MODULES
         if not defaults.get('TESTS_MIGRATE', False):
             # Disable migrations for Django 1.7+
             class DisableMigrations(object):

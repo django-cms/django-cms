@@ -25,15 +25,15 @@ Placeholders
 Placeholders are an easy way to define sections in an HTML template that will
 be filled with content from the database when the page is rendered. This
 content is edited using django CMS's frontend editing mechanism, using Django
-templatetags.
+template tags.
 
 You can see them in ``feature.html``: ``{% placeholder "feature" %}`` and ``{%
 placeholder "content" %}``.
 
 You'll also see ``{% load cms_tags %}`` in that file - ``cms_tags`` is the
-required templatetag library.
+required template tag library.
 
-If you're not already familiar with Django templatetags, you can find out more
+If you're not already familiar with Django template tags, you can find out more
 in the `Django documentation
 <https://docs.djangoproject.com/en/dev/topics/templates/>`_.
 
@@ -47,7 +47,7 @@ The content of the placeholders we've encountered so far is different for
 every page. Sometimes though you'll want to have a section on your website
 which should be the same on every single page, such as a footer block.
 
-You *could* hardcode your footer into the template, but it would be nicer to be
+You *could* hard-code your footer into the template, but it would be nicer to be
 able to manage it through the CMS. This is what **static placeholders** are for.
 
 Static placeholders are an easy way to display the same content on multiple

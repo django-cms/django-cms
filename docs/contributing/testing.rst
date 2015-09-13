@@ -24,6 +24,7 @@ So, you are going to have to include tests if you want to contribute. However,
 writing tests is not particularly difficult, and there are plenty of examples to
 crib from in the code to help you.
 
+
 *************
 Running tests
 *************
@@ -57,6 +58,7 @@ test suite require that you have Firefox installed.
 When you run tests against your own new code, don't forget that it's useful to
 repeat them for different versions of Python and Django.
 
+
 Problems running the tests
 ==========================
 
@@ -70,10 +72,11 @@ problems.
 
 If you can help *improve* the test suite, your input will be especially valuable.
 
+
 OS X users
 ----------
 
-In some versions of OS X, getttext needs to be installed so that it is
+In some versions of OS X, ``gettext`` needs to be installed so that it is
 available to Django. If you run the tests and find that various tests in
 ``cms.tests.frontend`` and ``cms.tests.reversion_tests.ReversionTestCase``
 raise errors, it's likely that you have this problem.
@@ -84,8 +87,8 @@ A solution is::
 
 (This requires the installation of `Homebrew <http://brew.sh>`_)
 
-ERROR: test_copy_to_from_clipboard (cms.tests.frontend.PlaceholderBasicTests)
------------------------------------------------------------------------------
+``ERROR: test_copy_to_from_clipboard (cms.tests.frontend.PlaceholderBasicTests)``
+---------------------------------------------------------------------------------
 
 You may find that a single frontend test raises an error. This sometimes happens, for some users,
 when the entire suite is run. To work around this you can invoke the test class on its own::
@@ -93,6 +96,7 @@ when the entire suite is run. To work around this you can invoke the test class 
     develop.py test cms.PlaceholderBasicTests
 
 and it should then run without errors.
+
 
 Advanced testing options
 ========================
@@ -109,12 +113,13 @@ Use ``--vanilla`` to bypass the advanced testing system and use the built-in
 Django test command.
 
 
-Using Xvfb for headless frontend testing
-----------------------------------------
+Using X virtual framebuffer for headless frontend testing
+---------------------------------------------------------
 
-On Linux systems with X you can use Xvfb (X virtual frame buffer) to run
-frontend tests headless (without the browser window actually showing). To do
-so, it's recommended to use the ``xvfb-run`` script to run tests.
+On Linux systems with X you can use `X virtual framebuffer
+<http://www.x.org/releases/X11R7.6/doc/man/man1/Xvfb.1.xhtml>`_ to run frontend tests headless
+(without the browser window actually showing). To do so, it's recommended to use the ``xvfb-run``
+script to run tests.
 
 .. important::
 
@@ -128,8 +133,10 @@ Writing tests
 *************
 
 Contributing tests is widely regarded as a very prestigious contribution (you're
-making everybody's future work much easier by doing so). Good karma for you.
-Cookie points. Maybe even a beer if we meet in person :)
+making everybody's future work much easier by doing so). We'll always accept contributions of
+test without code, but not code without test - which should give you an idea of how important
+tests are.
+
 
 What we need
 ============

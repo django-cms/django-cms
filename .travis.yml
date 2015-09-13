@@ -8,6 +8,11 @@ python:
 
 sudo: false
 
+addons:
+  apt:
+    packages:
+    - enchant
+
 env:
   global:
     - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
@@ -49,7 +54,7 @@ install:
 
 script: coverage run --rcfile=.coverage.rc manage.py test
 
-after_success: coverallscustomuserapp.User --config_file=.coverage.rc
+after_success: coveralls --config_file=.coverage.rc
 
 notifications:
   irc:

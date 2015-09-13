@@ -88,7 +88,7 @@ This allows integrating 3rd party apps without having to fork them. It would
 also be possible to add this code directly into the django-polls app to make it
 integrate out of the box.
 
-Create a new package at the project root called ``polls_plugin``:
+Create a new package at the project root called ``polls_plugin``::
 
     python manage.py startapp polls_plugin
 
@@ -134,7 +134,7 @@ In your poll application’s ``models.py`` add the following:
 The Plugin Class
 ================
 
-Now create a file ``cms_plugins.py`` in the same folder your models.py is in.
+Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is in.
 The plugin class is responsible for providing django CMS with the necessary
 information to render your plugin.
 

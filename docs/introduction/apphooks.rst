@@ -6,7 +6,7 @@ Right now, our django Polls app is statically hooked into the project's
 ``urls.py``. This is all right, but we can do more, by attaching applications to
 django CMS pages.
 
-We do this with an **Apphook**, created using a :class:`CMSApp
+We do this with an **apphook**, created using a :class:`CMSApp
 <cms.app_base.CMSApp>` subclass, which tells the CMS how to include that app.
 
 Apphooks live in a file called ``cms_apps.py``, so create one in your Poll
