@@ -1,6 +1,6 @@
 from django.conf import settings
 
-__all__ = ['is_installed', 'installed_apps']
+__all__ = ['is_installed', 'installed_apps', 'get_apps', 'get_app_paths']
 
 # import these directly from Django!
 from django.utils.encoding import (  # nopyflakes
@@ -16,6 +16,12 @@ try:  # pragma: no cover
     def installed_apps():
         return [app.name for app in apps.get_app_configs()]
 
+    def get_app_paths():
+        return [app.path for app in apps.get_app_configs()]
+
+    def get_apps():
+        return [app.models_module for app in apps.get_app_configs()]
+
 except ImportError:  # Django 1.6
 
     def is_installed(app_name):
@@ -23,6 +29,8 @@ except ImportError:  # Django 1.6
 
     def installed_apps():
         return settings.INSTALLED_APPS
+
+    from django.db.models.loading import get_app_paths, get_apps
 
 try:
     from django.utils.translation import LANGUAGE_SESSION_KEY

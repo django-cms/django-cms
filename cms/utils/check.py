@@ -5,7 +5,6 @@ import inspect
 from itertools import chain
 import os
 
-from django.db.models.loading import get_app_paths
 from django.conf import settings
 from django.template.base import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
@@ -16,7 +15,7 @@ from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
 from cms.utils.compat import DJANGO_1_7
-from cms.utils.compat.dj import is_installed
+from cms.utils.compat.dj import is_installed, get_app_paths
 
 
 SUCCESS = 1
