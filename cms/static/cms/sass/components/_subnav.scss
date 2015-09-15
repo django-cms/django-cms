@@ -20,6 +20,17 @@
             font-size: $submenu-icon-size;
             color: $submenu-icon-color;
         }
+
+        .cms-hover-tooltip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+    }
+    .cms-dragbar .cms-submenu-btn {
+        right: $submenu-right + 2px;
     }
     .cms-submenu {
         border: none;
