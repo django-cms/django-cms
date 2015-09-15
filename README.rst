@@ -105,7 +105,7 @@ Commercial support
 
 This project is backed by `Divio <http://divio.ch/en/commercial-support/>`_.
 If you need help implementing or hosting django CMS, please contact us:
-sales@divio.ch.
+sales@divio.com.
 
 *******
 Credits
