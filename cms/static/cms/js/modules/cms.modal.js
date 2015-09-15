@@ -112,19 +112,20 @@
              * opens the modal either in an iframe or renders markup
              *
              * @method open
-             * @param opts
+             * @param opts either opts.url or opts.html are required
              * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
              * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
              * @param [opts.title] {String} modal window main title (bold)
+             * @param [opts.subtitle] {String} modal window secondary title (normal)
              * @param [opts.url] {String} url to render iframe, takes precedence over opts.html
              */
             open: function open(opts) {
                 // setup internals
-                // TODO add subtitle handling
                 if (opts && opts.url || opts && opts.html) {
                     opts.breadcrumb = opts.breadcrumb || '';
                     opts.html = opts.html || '';
                     opts.title = opts.title || '';
+                    opts.subtitle = opts.subtitle || '';
                     opts.url = opts.url || '';
                 } else {
                     throw new Error('The arguments passed to "open" were invalid.');
@@ -198,7 +199,8 @@
                     // if url is not provided we go for html
                     this._loadMarkup({
                         html: opts.html,
-                        title: opts.title
+                        title: opts.title,
+                        subtitle: opts.subtitle
                     });
                 }
 
@@ -740,6 +742,7 @@
                 // set content
                 this.ui.frame.html(opts.html);
                 this.ui.titlePrefix.text(opts.title);
+                this.ui.titleSuffix.text(opts.subtitle);
 
                 this.ui.modal.trigger('cms.modal.html.loaded');
             },
