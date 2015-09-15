@@ -96,7 +96,7 @@
             _setPlaceholder: function () {
                 var that = this;
                 this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
-                this.ui.submenu = this.ui.dragbar.find('.cms-submenu');
+                this.ui.submenu = this.ui.dragbar.find('.cms-submenu-settings');
                 var title = this.ui.dragbar.find('.cms-dragbar-title');
                 var togglerLinks = this.ui.dragbar.find('.cms-dragbar-toggler a');
                 var expanded = 'cms-dragbar-title-expanded';
@@ -484,7 +484,7 @@
 
             _setSubnav: function (nav) {
                 var that = this;
-                this.ui.dropdown = nav.siblings('.cms-submenu-dropdown');
+                this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
                 var dropdown = this.ui.dropdown;
 
                 // set data attributes for original top positioning
@@ -689,8 +689,8 @@
             },
 
             _searchSubnav: function (nav, value) {
-                var items = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item');
-                var titles = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item-title');
+                var items = nav.siblings('.cms-submenu-dropdown-settings').find('.cms-submenu-item');
+                var titles = nav.siblings('.cms-submenu-dropdown-settings').find('.cms-submenu-item-title');
 
                 // cancel if value is zero
                 if (value === '') {
@@ -724,9 +724,9 @@
                 });
 
                 // if there is no element visible, show only first categoriy
-                nav.siblings('.cms-submenu-dropdown').show();
+                nav.siblings('.cms-submenu-dropdown-settings').show();
                 if (items.add(titles).filter(':visible').length <= 0) {
-                    nav.siblings('.cms-submenu-dropdown').hide();
+                    nav.siblings('.cms-submenu-dropdown-settings').hide();
                 }
 
                 // hide scrollHint
@@ -933,7 +933,7 @@
             // set correct active state
             nav.closest('.cms-draggable').data('active', false);
 
-            nav.siblings('.cms-submenu-dropdown').hide();
+            nav.siblings('.cms-submenu-dropdown-settings').hide();
             nav.siblings('.cms-submenu-quicksearch').hide();
             // reset search
             nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
