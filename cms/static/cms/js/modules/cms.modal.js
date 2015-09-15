@@ -118,16 +118,12 @@
              * @param [opts.title] {String} modal window main title (bold)
              * @param [opts.subtitle] {String} modal window secondary title (normal)
              * @param [opts.url] {String} url to render iframe, takes precedence over opts.html
+             * @param [opts.width] {Number} sets the width of the modal
+             * @param [opts.height] {Number} sets the height of the modal
              */
             open: function open(opts) {
                 // setup internals
-                if (opts && opts.url || opts && opts.html) {
-                    opts.breadcrumb = opts.breadcrumb || '';
-                    opts.html = opts.html || '';
-                    opts.title = opts.title || '';
-                    opts.subtitle = opts.subtitle || '';
-                    opts.url = opts.url || '';
-                } else {
+                if (!(opts && opts.url || opts && opts.html)) {
                     throw new Error('The arguments passed to "open" were invalid.');
                 }
 
@@ -172,13 +168,12 @@
                 var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
+                // screen width and height calculation
+                var screenWC = screenWidth >= (this.options.minWidth + widthOffset);
+                var screenHC = screenHeight >= (this.options.minHeight + heightOffset);
 
-                var width = (screenWidth >= this.options.minWidth + widthOffset) ?
-                    screenWidth - widthOffset :
-                    this.options.minWidth;
-                var height = (screenHeight >= this.options.minHeight + heightOffset) ?
-                    screenHeight - heightOffset :
-                    this.options.minHeight;
+                var width = screenWC ? screenWidth - widthOffset : this.options.minWidth;
+                var height = screenHC ? screenHeight - heightOffset : this.options.minHeight;
 
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
@@ -206,8 +201,8 @@
 
                 // display modal
                 this._show({
-                    width: width,
-                    height: height,
+                    width: opts.width || width,
+                    height: opts.height || height,
                     duration: this.options.modalDuration
                 });
             },
@@ -734,8 +729,7 @@
                 this.ui.titlePrefix.text(el.text());
             },
 
-            _loadMarkup: function (opts) {
-                // set classes
+            _loadMarkup: function (opts) {
                 this.ui.modal.removeClass('cms-modal-iframe');
                 this.ui.modal.addClass('cms-modal-content');
 
