@@ -236,6 +236,16 @@
     .cms-modal-item-buttons-left {
         float: left;
     }
+
+    // alter footer when html markup is loaded
+    .cms-modal-content {
+        .cms-modal-foot {
+            height: $modal-footer-height / 2;
+        }
+        .cms-modal-body {
+            bottom: $modal-footer-height / 2;
+        }
+    }
 }
 
 .cms-modal-maximized {
@@ -253,4 +263,3 @@
 .cms-modal-has-breadcrumb .cms-modal-body {
     top: $modal-header-height + $modal-breadcrumb-height !important;
 }
-
