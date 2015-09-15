@@ -62,7 +62,7 @@
                     closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
                     modalButtons: modal.find('.cms-modal-buttons'),
                     modalBody: modal.find('.cms-modal-body'),
-                    iframeHolder: modal.find('.cms-modal-frame'),
+                    frame: modal.find('.cms-modal-frame'),
                     shim: modal.find('.cms-modal-shim')
                 };
             },
@@ -93,7 +93,7 @@
                 });
                 this.ui.breadcrumb.on(this.click, 'a', function (e) {
                     e.preventDefault();
-                    that._changeContent($(this));
+                    that._changeIframe($(this));
                 });
                 this.ui.closeAndCancel.on(this.click, function (e) {
                     that.options.onClose = null;
@@ -108,8 +108,27 @@
                 });
             },
 
-            // public methods
-            open: function (url, name, breadcrumb) {
+            /**
+             * opens the modal either in an iframe or renders markup
+             *
+             * @method open
+             * @param opts
+             * @param opts.breadcrumb {Array} collection of breadcrumb items
+             * @param opts.html {String} html markup to render
+             * @param opts.name {String} modal window name
+             * @param opts.url {String} url to render iframe, takes presedence over opts.html
+             */
+            open: function open(opts) {
+                // setup internals
+                if (opts && opts.url || opts && opts.html) {
+                    opts.breadcrumb = opts.breadcrumb || '';
+                    opts.html = opts.html || '';
+                    opts.nam = opts.name || '';
+                    opts.url = opts.url || '';
+                } else {
+                    throw 'The arguments passed to "open" were invalid.';
+                }
+
                 // cancel if another lightbox is already being opened
                 if (CMS.API.locked) {
                     CMS.API.locked = false;
@@ -146,8 +165,6 @@
                 // hide tooltip
                 this.hideTooltip();
 
-                this._loadContent(url, name);
-
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
                 var heightOffset = 300; // adds margin top and bottom;
@@ -169,8 +186,20 @@
                     this.triggerMaximized = true;
                 }
 
-                // we need to render the breadcrumb
-                this._setBreadcrumb(breadcrumb);
+                // redirect to iframe rendering if url is provided
+                if (opts.url) {
+                    this._loadIframe({
+                        url: opts.url,
+                        name: opts.name,
+                        breadcrumb: opts.breadcrumb
+                    });
+                } else {
+                    // if url is not provided we go for html
+                    this._loadMarkup({
+                        html: opts.html,
+                        name: opts.name
+                    });
+                }
 
                 // display modal
                 this._show({
@@ -206,16 +235,16 @@
                 }, 300);
             },
 
-            // private methods
             /**
              * _show animates the modal to given size
              *
+             * @method _show
              * @param opts
              * @param opts.width {Number} width of the modal
              * @param opts.height {Number} height of the modal
              * @param opts.duration {Number} speed of opening, ms (not really used yet)
              */
-            _show: function (opts) {
+            _show: function _show(opts) {
                 // we need to position the modal in the center
                 var that = this;
                 var width = opts.width;
@@ -274,7 +303,7 @@
                     that.ui.modal.css('display', 'none');
                 }).emulateTransitionEnd(duration);
 
-                that.ui.iframeHolder.find('iframe').remove();
+                that.ui.frame.find('iframe').remove();
                 that.ui.modalBody.removeClass('cms-loader');
             },
 
@@ -420,8 +449,10 @@
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
-                // remove class from modal
-                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+                // remove class from modal when no breadcrumb is rendered
+                if (!this.ui.breadcrumb.find('a').length) {
+                    this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+                }
 
                 // cancel if there is no breadcrumb)
                 if (!breadcrumb || breadcrumb.length <= 1) {
@@ -506,7 +537,10 @@
                             item[0].click();
                         }
                         if (item.is('a')) {
-                            that._loadContent(item.prop('href'), title);
+                            that._loadIframe({
+                                url: item.prop('href'),
+                                name: title
+                            });
                         }
 
                         // trigger only when blue action buttons are triggered
@@ -516,7 +550,7 @@
                                 that.options.onClose = null;
                             }
                             // hide iframe
-                            that.ui.iframeHolder.find('iframe').hide();
+                            that.ui.frame.find('iframe').hide();
                             // page has been saved or deleted, run checkup
                             that.saved = true;
                         }
@@ -557,19 +591,38 @@
                 return url;
             },
 
-            _loadContent: function (url, name) {
+            /**
+             * load the iframe
+             *
+             * @method _loadIframe
+             * @param opts
+             * @param opts.breadcrumb {Array} collection of breadcrumb items
+             * @param opts.name {String} modal window name
+             * @param opts.url {String} url to render iframe, takes presedence over opts.html
+             */
+            _loadIframe: function _loadIframe(opts) {
                 var that = this;
-                url = this._prepareUrl(url);
+
+                opts.url = this._prepareUrl(opts.url);
+                opts.name = opts.name || '';
+                opts.breadcrumb = opts.breadcrumb || '';
+
+                // set classes
+                this.ui.modal.removeClass('cms-modal-content');
+                this.ui.modal.addClass('cms-modal-iframe');
+
+                // we need to render the breadcrumb
+                this._setBreadcrumb(opts.breadcrumb);
 
                 // now refresh the content
-                var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
+                var iframe = $('<iframe src="' + opts.url + '" class="" frameborder="0" />');
                 iframe.css('visibility', 'hidden');
-                var holder = this.ui.iframeHolder;
+                var holder = this.ui.frame;
 
                 // set correct title
                 var titlePrefix = this.ui.titlePrefix;
                 var titleSuffix = this.ui.titleSuffix;
-                titlePrefix.text(name || '');
+                titlePrefix.text(opts.name || '');
                 titleSuffix.text('');
 
                 // ensure previous iframe is hidden
@@ -628,7 +681,7 @@
                         var innerTitle = iframe.contents().find('#content h1:eq(0)');
 
                         // case when there is no prefix
-                        if (name === undefined && that.ui.titlePrefix.text() === '') {
+                        if (opts.name === undefined && that.ui.titlePrefix.text() === '') {
                             var bc = iframe.contents().find('.breadcrumbs').contents();
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
@@ -660,7 +713,7 @@
                 holder.html(iframe);
             },
 
-            _changeContent: function (el) {
+            _changeIframe: function (el) {
                 if (el.hasClass('active')) {
                     return false;
                 }
@@ -670,10 +723,24 @@
 
                 el.addClass('active');
 
-                this._loadContent(el.attr('href'));
+                this._loadIframe({
+                    url: el.attr('href')
+                });
 
                 // update title
                 this.ui.titlePrefix.text(el.text());
+            },
+
+            _loadMarkup: function (opts) {
+                // set classes
+                this.ui.modal.removeClass('cms-modal-iframe');
+                this.ui.modal.addClass('cms-modal-content');
+
+                // set content
+                this.ui.frame.html(opts.html);
+                this.ui.titlePrefix.text(opts.name);
+
+                this.ui.modal.trigger('cms.modal.html.loaded');
             },
 
             /**

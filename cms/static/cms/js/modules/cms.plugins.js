@@ -255,7 +255,11 @@
                     onClose: this.options.onClose || false,
                     redirectOnClose: this.options.redirectOnClose || false
                 });
-                modal.open(url, name, breadcrumb);
+                modal.open({
+                    url: url,
+                    name: name,
+                    breadcrumb: breadcrumb
+                });
             },
 
             copyPlugin: function (options, source_language) {
@@ -439,7 +443,11 @@
                     onClose: this.options.onClose || false,
                     redirectOnClose: this.options.redirectOnClose || false
                 });
-                modal.open(url, name, breadcrumb);
+                modal.open({
+                    url: url,
+                    name: name,
+                    breadcrumb: breadcrumb
+                });
             },
 
             // private methods

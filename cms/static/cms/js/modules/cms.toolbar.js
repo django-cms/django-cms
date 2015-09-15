@@ -509,7 +509,10 @@
                 switch (target) {
                     case 'modal':
                         var modal = new CMS.Modal({'onClose': el.data('on-close')});
-                        modal.open(el.attr('href'), el.data('name'));
+                        modal.open({
+                            url: el.attr('href'),
+                            name: el.data('name')
+                        });
                         break;
                     case 'message':
                         this.openMessage(el.data('text'));
