@@ -509,6 +509,45 @@
                     e.stopPropagation();
                 });
 
+                that._setupActions(nav);
+                that._setupQuickSearch(nav);
+
+                // prevent propagnation
+                nav.on(this.click + ' click.cms dblclick.cms', function (e) {
+                    e.stopPropagation();
+                });
+
+                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown-settings')
+                    .on(this.click + ' click.cms dblclick.cms', function (e) {
+                    e.stopPropagation();
+                });
+            },
+
+            /**
+             * sets up event handlers for quicksearching
+             * FIXME will be moved into a separate "add plugin" modal
+             *
+             * @param nav
+             */
+            _setupQuickSearch: function _setupQuickSearch(nav) {
+                var that = this;
+                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
+                    clearTimeout(that.timer);
+                    // keybound is not required
+                    that.timer = setTimeout(function () {
+                        that._searchSubnav(nav, $(e.currentTarget).val());
+                    }, 100);
+                });
+            },
+
+            /**
+             * Sets up click handlers for various plugin/placeholder items
+             * FIXME no need to go around nav, can be used directly in dragbar/dragitem
+             *
+             * @param nav jQuery
+             */
+            _setupActions: function _setupActions(nav) {
+                var that = this;
                 nav.parent().find('a').on('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -566,53 +605,10 @@
                     }
                 });
 
-                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
-                    clearTimeout(that.timer);
-                    // keybound is not required
-                    that.timer = setTimeout(function () {
-                        that._searchSubnav(nav, $(e.currentTarget).val());
-                    }, 100);
-                });
-
-                // prevent propagnation
-                nav.on(this.click + ' click.cms dblclick.cms', function (e) {
-                    e.stopPropagation();
-                });
-
-                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown')
-                    .on(this.click + ' click.cms dblclick.cms', function (e) {
-                    e.stopPropagation();
-                });
             },
 
-            _showSubnav: function (nav) {
+            _setupDropdownKeyboardTraversing: function _setupDropdownKeyboardTraversing(nav) {
                 var dropdown = this.ui.dropdown;
-                var offset = parseInt(dropdown.data('top'), 10);
-                nav.addClass('cms-btn-active');
-
-                // reset z indexes
-                var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
-                var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
-
-                reset.css('z-index', 0);
-
-                var parents = nav.parentsUntil('.cms-dragarea');
-                parents.css('z-index', 999);
-
-                // show subnav
-                nav.siblings('.cms-submenu-quicksearch').show().find('input');
-
-                // set visible states
-                dropdown.show().on('scroll.cms', function () {
-                    scrollHint.fadeOut(100);
-                    dropdown.off('scroll.cms');
-                });
-
-                // show scrollHint for FF on OSX
-                if (dropdown[0].scrollHeight > dropdown.height()) {
-                    scrollHint.show();
-                }
-
                 // add key events
                 doc.off('keydown.cms.traverse');
                 doc.on('keydown.cms.traverse', function (e) {
@@ -645,8 +641,39 @@
                         CMS.Plugin._hideSubnav(nav);
                     }
                 });
+            },
 
-                // calculate subnav bounds
+            _showSubnav: function (nav) {
+                var dropdown = this.ui.dropdown;
+                var offset = parseInt(dropdown.data('top'), 10);
+                nav.addClass('cms-btn-active');
+
+                // reset z indexes
+                var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
+                var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
+
+                reset.css('z-index', 0);
+
+                var parents = nav.parentsUntil('.cms-dragarea');
+                parents.css('z-index', 999);
+
+                // show subnav
+                nav.siblings('.cms-submenu-quicksearch').show().find('input');
+
+                // set visible states
+                dropdown.show().on('scroll.cms', function () {
+                    scrollHint.fadeOut(100);
+                    dropdown.off('scroll.cms');
+                });
+
+                // show scrollHint for FF on OSX
+                if (dropdown[0].scrollHeight > dropdown.height()) {
+                    scrollHint.show();
+                }
+
+                this._setupDropdownKeyboardTraversing(nav);
+
+                // calculate dropdown positioning
                 if (this.ui.window.height() + this.ui.window.scrollTop() -
                     nav.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
                     dropdown.css({
