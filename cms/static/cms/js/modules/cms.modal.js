@@ -113,20 +113,21 @@
              *
              * @method open
              * @param opts
-             * @param opts.breadcrumb {Array} collection of breadcrumb items
-             * @param opts.html {String} html markup to render
-             * @param opts.name {String} modal window name
-             * @param opts.url {String} url to render iframe, takes presedence over opts.html
+             * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
+             * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
+             * @param [opts.name] {String} modal window name
+             * @param [opts.url] {String} url to render iframe, takes precedence over opts.html
              */
             open: function open(opts) {
                 // setup internals
+                // TODO add subtitle handling
                 if (opts && opts.url || opts && opts.html) {
                     opts.breadcrumb = opts.breadcrumb || '';
                     opts.html = opts.html || '';
-                    opts.nam = opts.name || '';
+                    opts.name = opts.name || '';
                     opts.url = opts.url || '';
                 } else {
-                    throw 'The arguments passed to "open" were invalid.';
+                    throw new Error('The arguments passed to "open" were invalid.');
                 }
 
                 // cancel if another lightbox is already being opened
@@ -596,8 +597,8 @@
              *
              * @method _loadIframe
              * @param opts
-             * @param opts.breadcrumb {Array} collection of breadcrumb items
-             * @param opts.name {String} modal window name
+             * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
+             * @param [opts.name] {String} modal window name
              * @param opts.url {String} url to render iframe, takes presedence over opts.html
              */
             _loadIframe: function _loadIframe(opts) {
