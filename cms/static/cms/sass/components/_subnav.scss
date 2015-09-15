@@ -32,13 +32,17 @@
     .cms-dragbar .cms-submenu-btn {
         right: $submenu-right + 2px;
     }
-    .cms-submenu {
+    .cms-submenu-settings {
         border: none;
     }
 
     .cms-submenu-edit {
         @include icon(pencil);
         right: $submenu-right * 2 + $submenu-icon-area-size;
+    }
+    .cms-submenu-add {
+        @include icon(plus);
+        right: $submenu-right * 3 + $submenu-icon-area-size * 2;
     }
 
     .cms-submenu-lang {
