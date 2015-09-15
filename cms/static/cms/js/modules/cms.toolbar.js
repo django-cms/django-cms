@@ -511,7 +511,7 @@
                         var modal = new CMS.Modal({'onClose': el.data('on-close')});
                         modal.open({
                             url: el.attr('href'),
-                            name: el.data('name')
+                            title: el.data('name')
                         });
                         break;
                     case 'message':

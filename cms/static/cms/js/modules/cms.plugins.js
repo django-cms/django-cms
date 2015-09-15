@@ -257,7 +257,7 @@
                 });
                 modal.open({
                     url: url,
-                    name: name,
+                    title: name,
                     breadcrumb: breadcrumb
                 });
             },
@@ -445,7 +445,7 @@
                 });
                 modal.open({
                     url: url,
-                    name: name,
+                    title: name,
                     breadcrumb: breadcrumb
                 });
             },

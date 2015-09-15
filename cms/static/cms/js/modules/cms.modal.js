@@ -115,7 +115,7 @@
              * @param opts
              * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
              * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
-             * @param [opts.name] {String} modal window name
+             * @param [opts.title] {String} modal window main title (bold)
              * @param [opts.url] {String} url to render iframe, takes precedence over opts.html
              */
             open: function open(opts) {
@@ -124,7 +124,7 @@
                 if (opts && opts.url || opts && opts.html) {
                     opts.breadcrumb = opts.breadcrumb || '';
                     opts.html = opts.html || '';
-                    opts.name = opts.name || '';
+                    opts.title = opts.title || '';
                     opts.url = opts.url || '';
                 } else {
                     throw new Error('The arguments passed to "open" were invalid.');
@@ -191,14 +191,14 @@
                 if (opts.url) {
                     this._loadIframe({
                         url: opts.url,
-                        name: opts.name,
+                        title: opts.title,
                         breadcrumb: opts.breadcrumb
                     });
                 } else {
                     // if url is not provided we go for html
                     this._loadMarkup({
                         html: opts.html,
-                        name: opts.name
+                        title: opts.title
                     });
                 }
 
@@ -598,14 +598,14 @@
              * @method _loadIframe
              * @param opts
              * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
-             * @param [opts.name] {String} modal window name
+             * @param [opts.title] {String} modal window main title (bold)
              * @param opts.url {String} url to render iframe, takes presedence over opts.html
              */
             _loadIframe: function _loadIframe(opts) {
                 var that = this;
 
                 opts.url = this._prepareUrl(opts.url);
-                opts.name = opts.name || '';
+                opts.title = opts.title || '';
                 opts.breadcrumb = opts.breadcrumb || '';
 
                 // set classes
@@ -623,7 +623,7 @@
                 // set correct title
                 var titlePrefix = this.ui.titlePrefix;
                 var titleSuffix = this.ui.titleSuffix;
-                titlePrefix.text(opts.name || '');
+                titlePrefix.text(opts.title || '');
                 titleSuffix.text('');
 
                 // ensure previous iframe is hidden
@@ -682,7 +682,7 @@
                         var innerTitle = iframe.contents().find('#content h1:eq(0)');
 
                         // case when there is no prefix
-                        if (opts.name === undefined && that.ui.titlePrefix.text() === '') {
+                        if (opts.title === undefined && that.ui.titlePrefix.text() === '') {
                             var bc = iframe.contents().find('.breadcrumbs').contents();
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
@@ -739,7 +739,7 @@
 
                 // set content
                 this.ui.frame.html(opts.html);
-                this.ui.titlePrefix.text(opts.name);
+                this.ui.titlePrefix.text(opts.title);
 
                 this.ui.modal.trigger('cms.modal.html.loaded');
             },
