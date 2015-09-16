@@ -258,7 +258,7 @@
                 modal.open({
                     url: url,
                     title: name,
-                    breadcrumb: breadcrumb
+                    breadcrumbs: breadcrumb
                 });
             },
 
@@ -446,7 +446,7 @@
                 modal.open({
                     url: url,
                     title: name,
-                    breadcrumb: breadcrumb
+                    breadcrumbs: breadcrumb
                 });
             },
 

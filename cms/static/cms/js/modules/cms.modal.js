@@ -94,7 +94,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Handles all internal events such as maximize/minimize and resizing
+             * Handles all internal events such as maximize/minimize and resizing.
              *
              * @method _events
              * @private
@@ -143,7 +143,7 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @param opts either `opts.url` or `opts.html` are required
-             * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
+             * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
              * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
              * @param [opts.title] {String} modal window main title (bold)
              * @param [opts.subtitle] {String} modal window secondary title (normal)
@@ -218,7 +218,7 @@ var CMS = window.CMS || {};
                     this._loadIframe({
                         url: opts.url,
                         title: opts.title,
-                        breadcrumb: opts.breadcrumb
+                        breadcrumbs: opts.breadcrumbs
                     });
                 } else {
                     // if url is not provided we go for html
@@ -245,6 +245,7 @@ var CMS = window.CMS || {};
              * @param opts.width {Number} width of the modal
              * @param opts.height {Number} height of the modal
              * @param opts.duration {Number} speed of opening, ms (not really used yet)
+             * @private
              */
             _show: function _show(opts) {
                 // we need to position the modal in the center
@@ -334,7 +335,7 @@ var CMS = window.CMS || {};
              *
              * @method _hide
              * @param opts
-             * @param opts.duration {Number} animation duration
+             * @param [opts.duration=this.options.modalDuration] {Number} animation duration
              * @private
              */
             _hide: function _hide(opts) {
@@ -430,7 +431,7 @@ var CMS = window.CMS || {};
              * Initiates the start move event from `_events`.
              *
              * @method _startMove
-             * @param originEvent {Object} passes starting
+             * @param originEvent {Object} passes starting event
              * @private
              */
             _startMove: function _startMove(originEvent) {
@@ -482,7 +483,7 @@ var CMS = window.CMS || {};
              * Initiates the start resize event from `_events`.
              *
              * @method _startResize
-             * @param originEvent {Object} passes starting
+             * @param originEvent {Object} passes starting event
              * @private
              */
             _startResize: function _startResize(originEvent) {
@@ -547,49 +548,49 @@ var CMS = window.CMS || {};
              * Sets the breadcrumb inside the modal.
              *
              * @method _setBreadcrumb
-             * @param breadcrumb {Object} renderes breadcrumb on modal
+             * @param breadcrumbs {Object[]} renderes breadcrumb on modal
              * @private
              */
-            _setBreadcrumb: function _setBreadcrumb(breadcrumb) {
+            _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
-                // remove class from modal when no breadcrumb is rendered
+                // remove class from modal when no breadcrumbs is rendered
                 if (!this.ui.breadcrumb.find('a').length) {
-                    this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+                    this.ui.modal.removeClass('cms-modal-has-breadcrumbs');
                 }
 
-                // cancel if there is no breadcrumb)
-                if (!breadcrumb || breadcrumb.length <= 1) {
+                // cancel if there is no breadcrumbs)
+                if (!breadcrumbs || breadcrumbs.length <= 1) {
                     return false;
                 }
-                if (!breadcrumb[0].title) {
+                if (!breadcrumbs[0].title) {
                     return false;
                 }
 
                 // add class to modal
-                this.ui.modal.addClass('cms-modal-has-breadcrumb');
+                this.ui.modal.addClass('cms-modal-has-breadcrumbs');
 
-                // load breadcrumb
-                $.each(breadcrumb, function (index, item) {
+                // load breadcrumbs
+                $.each(breadcrumbs, function (index, item) {
                     // check if the item is the last one
-                    var last = (index >= breadcrumb.length - 1) ? 'active' : '';
-                    // render breadcrumb
+                    var last = (index >= breadcrumbs.length - 1) ? 'active' : '';
+                    // render breadcrumbs
                     crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
                 });
 
                 // attach elements
                 this.ui.breadcrumb.html(crumb);
 
-                // show breadcrumb
+                // show breadcrumbs
                 bread.show();
             },
 
             /**
-             *
+             * Sets the breadcrumb inside the modal.
              *
              * @method _setButtons
-             * @param iframe {jQuery} rendered iframe element
+             * @param iframe {jQuery} loaded iframe element
              * @private
              */
             _setButtons: function _setButtons(iframe) {
@@ -710,23 +711,23 @@ var CMS = window.CMS || {};
              *
              * @method _loadIframe
              * @param opts
-             * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
-             * @param [opts.title] {String} modal window main title (bold)
              * @param opts.url {String} url to render iframe, takes presedence over opts.html
+             * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
+             * @param [opts.title] {String} modal window main title (bold)
              */
             _loadIframe: function _loadIframe(opts) {
                 var that = this;
 
                 opts.url = this._prepareUrl(opts.url);
                 opts.title = opts.title || '';
-                opts.breadcrumb = opts.breadcrumb || '';
+                opts.breadcrumbs = opts.breadcrumbs || '';
 
                 // set classes
                 this.ui.modal.removeClass('cms-modal-content');
                 this.ui.modal.addClass('cms-modal-iframe');
 
                 // we need to render the breadcrumb
-                this._setBreadcrumb(opts.breadcrumb);
+                this._setBreadcrumb(opts.breadcrumbs);
 
                 // now refresh the content
                 var iframe = $('<iframe src="' + opts.url + '" class="" frameborder="0" />');
@@ -888,7 +889,7 @@ var CMS = window.CMS || {};
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
                 var text = this.config.lang.confirmEmpty.replace(
-                    '{1}', CMS._newPlugin.breadcrumb[0].title
+                    '{1}', CMS._newPlugin.breadcrumbs[0].title
                 );
 
                 // trigger an ajax request
