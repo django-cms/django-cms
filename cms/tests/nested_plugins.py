@@ -21,20 +21,6 @@ URL_CMS_ADD_PLUGIN = u'/en/admin/cms/page/%d/add-plugin/'
 
 class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
-
-    def assertSequenceNotEqual(self, seq1, seq2, msg=None):
-        """
-        Super-simple test that asserts that seq1 differs from seq2 in some way.
-        This is not as robust as assertSequenceEqual().
-        """
-        len1 = len(seq1)
-        len2 = len(seq2)
-        for i in xrange(min(len1, len2)):
-            if seq1[i] == seq2[i]:
-                continue
-        else:
-            self.fail(msg)
-
     def reorder_positions(self, plugin=None, parent=None):
 
         if parent:
