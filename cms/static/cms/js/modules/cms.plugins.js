@@ -534,6 +534,7 @@
              */
             _setAddPluginMenu: function _setAddPluginMenu(nav) {
                 var that = this;
+                // FIXME children -> plugins
                 var dropdown = nav.siblings('.cms-submenu-dropdown-children');
                 nav.on(this.click, function (e) {
                     e.preventDefault();
@@ -974,7 +975,10 @@
             nav.siblings('.cms-submenu-dropdown').hide();
             nav.siblings('.cms-submenu-quicksearch').hide();
             // reset search
-            nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
+            nav.siblings('.cms-submenu-quicksearch')
+                .find('input')
+                .val('')
+                .trigger('keyup.cms').blur();
 
             // reset relativity
             $('.cms-dragbar').css('position', '');
