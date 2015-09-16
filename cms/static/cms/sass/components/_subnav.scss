@@ -158,7 +158,8 @@
                 height: $cms-dropdown-item-height;
                 color: $gray-light;
                 padding-left: $cms-dropdown-item-icon-space;
-                &[data-rel] {
+                &[data-rel],
+                &[data-icon] {
                     &:before {
                         @extend %icon;
                         position: absolute;
@@ -191,12 +192,12 @@
             height: $cms-dropdown-arrow-side;
             margin-left: -($cms-dropdown-arrow-side / 2);
             transform: rotate(45deg);
-            background-color: white;
+            background-color: $submenu-dropdown-bgcolor;
             box-shadow: $cms-dropdown-shadow;
         }
 
         &::-webkit-scrollbar {
-            width: 0px;
+            width: 0;
         }
 
         &.cms-submenu-dropdown-top {
