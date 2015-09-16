@@ -69,18 +69,6 @@ $(document).ready(function () {
     $.each(CMS._plugins, function (index, args) {
         new CMS.Plugin(args[0], args[1])
     });
-
-    // debugging
-    setTimeout(function () {
-        var modal = new CMS.Modal();
-        modal.open({
-            html: $('.js-modal-test'),
-            title: 'Modal',
-            subtitle: 'Adding HTML Markup',
-            width: 940,
-            height: 325
-        });
-    }, 1000);
 });
 })(CMS.$);
 </script>
