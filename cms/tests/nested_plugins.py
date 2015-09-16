@@ -20,6 +20,20 @@ URL_CMS_ADD_PLUGIN = u'/en/admin/cms/page/%d/add-plugin/'
 
 class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
+
+    def assertSequenceNotEqual(self, seq1, seq2, msg=None):
+        """
+        Super-simple test that asserts that seq1 differs from seq2 in some way.
+        This is not as robust as assertSequenceEqual().
+        """
+        len1 = len(seq1)
+        len2 = len(seq2)
+        for i in xrange(min(len1, len2)):
+            if seq1[i] == seq2[i]:
+                continue
+        else:
+            self.fail(msg)
+
     def reorder_positions(self, plugin=None, parent=None):
 
         if parent:
@@ -133,8 +147,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
     def test_plugin_fix_tree(self):
         """
-        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the position
-        value to Null for all the plugins and then rebuild the tree.
+        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the
+        position value to Null for all the plugins and then rebuild the tree.
 
         The structure below isn't arbitrary, but has been designed to test
         various conditions, including:
@@ -229,6 +243,25 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
         new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
         self.assertSequenceEqual(original_plugins, new_plugins)
+
+        # Now, check to see if the correct order is restored, even if we
+        # re-arrange the plugins so that their natural «pk» order is different
+        # than their «position» order.
+
+
+        # Move the 2nd top-level plugin to the "left" or before the 1st.
+        plugin_5 = self.reload(plugin_5)
+        plugin_5.move(left, pos="left")
+        CMSPlugin.objects.update(position=None)
+        CMSPlugin.fix_tree()
+
+        # Now, they should NOT be in the original order at all. Are they?
+        new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
+        self.assertSequenceNotEqual(
+            original_plugins, new_plugins,
+            "Plugin order is in the original order, but should not be."
+        )
+
 
     def test_plugin_deep_nesting_and_copying(self):
         """
