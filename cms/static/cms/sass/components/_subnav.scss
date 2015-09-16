@@ -30,7 +30,12 @@
         }
     }
     .cms-dragbar .cms-submenu-btn {
-        right: $submenu-right + 2px;
+        margin-right: 2px;
+        background-color: transparent;
+        &:active,
+        &.cms-btn-active {
+            background-color: darken($btn-default-bgcolor, 10%);
+        }
     }
     .cms-submenu-settings {
         border: none;
