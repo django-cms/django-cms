@@ -186,6 +186,7 @@ var CMS = window.CMS || {};
 
                 // clear elements
                 this.ui.modalButtons.empty();
+                this.ui.breadcrumb.empty();
 
                 // show loader
                 CMS.API.Toolbar._loader(true);
@@ -341,6 +342,7 @@ var CMS = window.CMS || {};
             _hide: function _hide(opts) {
                 var that = this;
                 var duration = this.options.modalDuration;
+
                 if (opts && opts.duration) {
                     duration = opts.duration;
                 }
@@ -351,7 +353,7 @@ var CMS = window.CMS || {};
                     that.ui.modal.css('display', 'none');
                 }).emulateTransitionEnd(duration);
 
-                that.ui.frame.find('iframe').remove();
+                that.ui.frame.empty();
                 that.ui.modalBody.removeClass('cms-loader');
             },
 
@@ -557,7 +559,7 @@ var CMS = window.CMS || {};
 
                 // remove class from modal when no breadcrumbs is rendered
                 if (!this.ui.breadcrumb.find('a').length) {
-                    this.ui.modal.removeClass('cms-modal-has-breadcrumbs');
+                    this.ui.modal.removeClass('cms-modal-has-breadcrumb');
                 }
 
                 // cancel if there is no breadcrumbs)
@@ -569,7 +571,7 @@ var CMS = window.CMS || {};
                 }
 
                 // add class to modal
-                this.ui.modal.addClass('cms-modal-has-breadcrumbs');
+                this.ui.modal.addClass('cms-modal-has-breadcrumb');
 
                 // load breadcrumbs
                 $.each(breadcrumbs, function (index, item) {
@@ -587,7 +589,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Sets the breadcrumb inside the modal.
+             * Sets the buttons inside the modal.
              *
              * @method _setButtons
              * @param iframe {jQuery} loaded iframe element
@@ -889,7 +891,7 @@ var CMS = window.CMS || {};
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
                 var text = this.config.lang.confirmEmpty.replace(
-                    '{1}', CMS._newPlugin.breadcrumbs[0].title
+                    '{1}', CMS._newPlugin.breadcrumb[0].title
                 );
 
                 // trigger an ajax request
