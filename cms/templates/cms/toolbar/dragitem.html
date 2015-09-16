@@ -4,10 +4,12 @@
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
+            {% if not plugin.disable_child_plugins %}
             <span class="cms-submenu-btn cms-submenu-add cms-btn">
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}">
                 </span>
             </span>
+            {% endif %}
             <a class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit" href="#">
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}">
                 </span>
