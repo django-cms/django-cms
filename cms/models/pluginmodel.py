@@ -334,21 +334,24 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     @classmethod
     def fix_tree(cls, destructive=False):
         """
-        Fixes the plugin tree by first calling treebeard fix_tree and the recalculating
-        the correct position property for each plugin.
+        Fixes the plugin tree by first calling treebeard fix_tree and the
+        recalculating the correct position property for each plugin.
         """
         from cms.utils.plugins import reorder_plugins
 
         super(CMSPlugin, cls).fix_tree(destructive)
         for placeholder in Placeholder.objects.all():
             for language, __ in settings.LANGUAGES:
-                order = CMSPlugin.objects.filter(placeholder_id=placeholder.pk, language=language,
-                                                 parent_id__isnull=True
-                                                 ).values_list('pk', flat=True)
+                order = CMSPlugin.objects.filter(
+                        placeholder_id=placeholder.pk, language=language,
+                        parent_id__isnull=True
+                    ).values_list('pk', flat=True)
                 reorder_plugins(placeholder, None, language, order)
-                for plugin in CMSPlugin.objects.filter(placeholder_id=placeholder.pk,
-                                                       language=language).order_by('depth', 'path'):
-                    order = CMSPlugin.objects.filter(parent_id=plugin.pk).values_list('pk', flat=True)
+                for plugin in CMSPlugin.objects.filter(
+                        placeholder_id=placeholder.pk,
+                        language=language).order_by('depth', 'path'):
+                    order = CMSPlugin.objects.filter(
+                        parent_id=plugin.pk).values_list('pk', flat=True)
                     reorder_plugins(placeholder, plugin.pk, language, order)
 
     def post_copy(self, old_instance, new_old_ziplist):
