@@ -89,6 +89,7 @@
         border-radius: $border-radius-base;
 
         .cms-dragbar-title {
+            display: inline-block;
             position: relative;
             color: $structure-dragbar-color;
             font-size: $font-size-normal;
