@@ -44,11 +44,11 @@
 
     .cms-submenu-edit {
         @include icon(pencil);
-        right: $submenu-right * 2 + $submenu-icon-area-size;
+        right: $submenu-right * 3 + $submenu-icon-area-size * 2;
     }
     .cms-submenu-add {
         @include icon(plus);
-        right: $submenu-right * 3 + $submenu-icon-area-size * 2;
+        right: $submenu-right * 2 + $submenu-icon-area-size;
     }
     .cms-submenu-edit,
     .cms-submenu-add {
@@ -141,7 +141,7 @@
         bottom: $structure-dragbar-height + $structure-dragarea-space;
     }
     .cms-submenu-dropdown-children {
-        right: $submenu-icon-area-size * 3 + $submenu-right * 4;
+        right: $submenu-icon-area-size * 2 + $submenu-right * 3;
     }
 
     // TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
@@ -239,7 +239,7 @@
         display: none;
         position: absolute;
         top: 50%;
-        right: $submenu-icon-area-size * 3 + $submenu-right * 4;
+        right: $submenu-icon-area-size * 2 + $submenu-right * 3;
         z-index: z(structure, content, quicksearch);
         text-align: right;
         height: $quicksearch-height;
