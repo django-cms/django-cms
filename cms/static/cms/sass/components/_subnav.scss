@@ -150,7 +150,6 @@
         border: none;
         overflow: initial;
         box-shadow: $cms-dropdown-shadow;
-        z-index: 1;
         right: $submenu-right * 2 + $submenu-icon-area-size;
         .cms-submenu-item {
             a {
@@ -158,12 +157,12 @@
                 line-height: $cms-dropdown-item-height;
                 height: $cms-dropdown-item-height;
                 color: $gray-light;
-                padding-left: 40px;
+                padding-left: $cms-dropdown-item-icon-space;
                 &[data-rel] {
                     &:before {
                         @extend %icon;
                         position: absolute;
-                        left: 14px;
+                        left: $cms-dropdown-item-icon-position;
                         top: 0;
                         height: $cms-dropdown-item-height;
                         line-height: $cms-dropdown-item-height
@@ -188,9 +187,9 @@
             position: absolute;
             content: '';
             left: 100%;
-            width: 15px;
-            height: 15px;
-            margin-left: -10px;
+            width: $cms-dropdown-arrow-side;
+            height: $cms-dropdown-arrow-side;
+            margin-left: -($cms-dropdown-arrow-side / 2);
             transform: rotate(45deg);
             background-color: white;
             box-shadow: $cms-dropdown-shadow;
@@ -205,13 +204,13 @@
             // after new "add plugin" is in place
             top: 0 !important;
             &:before {
-                top: 14px !important;
+                top: $cms-dropdown-arrow-position !important;
             }
         }
         &.cms-submenu-dropdown-bottom {
             bottom: 0 !important;
             &:before {
-                bottom: 14px !important;
+                bottom: $cms-dropdown-arrow-position !important;
             }
         }
 
@@ -225,10 +224,11 @@
     }
     .cms-dragbar .cms-submenu-dropdown-settings {
         &.cms-submenu-dropdown-top:before {
-            top: 10px !important;
+            top: $cms-dropdown-arrow-position - 4px !important;
         }
         &.cms-submenu-dropdown-bottom:before {
-            bottom: 10px !important;
+            bottom: 12px !important;
+            bottom: $cms-dropdown-arrow-position - 4px !important;
         }
     }
 

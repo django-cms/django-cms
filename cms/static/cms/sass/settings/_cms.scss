@@ -317,3 +317,13 @@ $cms-hover-tooltip-width: 160px;
 $cms-hover-tooltip-arrow-height: 6px;
 $cms-hover-tooltip-bgcolor: rgba($black, 0.8);
 $cms-hover-tooltip-padding: 6px 8px;
+
+
+//##############################################################################
+// Dropdown
+$cms-dropdown-shadow: 0 0 10px rgba($black, 0.25);
+$cms-dropdown-item-height: 42px;
+$cms-dropdown-item-icon-space: 40px;
+$cms-dropdown-item-icon-position: 14px;
+$cms-dropdown-arrow-side: 10px;
+$cms-dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $cms-dropdown-arrow-side/2;
