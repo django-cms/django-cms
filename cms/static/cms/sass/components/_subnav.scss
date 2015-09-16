@@ -75,7 +75,6 @@
     .cms-submenu-dropdown {
         display: none;
         position: absolute;
-        top: $structure-dragbar-height + $structure-dragarea-space;
         right: $submenu-icon-area-size + $submenu-right;
         z-index: z(structure, content, dropdown);
         min-width: $submenu-dropdown-width;
@@ -133,6 +132,12 @@
         .cms-submenu-item:first-child span {
             border-top: none;
         }
+    }
+    .cms-submenu-dropdown-top {
+        top: $structure-dragbar-height + $structure-dragarea-space;
+    }
+    .cms-submenu-dropdown-bottom {
+        bottom: $structure-dragbar-height + $structure-dragarea-space;
     }
     .cms-submenu-dropdown-children {
         right: $submenu-icon-area-size * 3 + $submenu-right * 4;

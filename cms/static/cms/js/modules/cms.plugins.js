@@ -495,9 +495,6 @@
                 this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
                 var dropdown = this.ui.dropdown;
 
-                // set data attributes for original top positioning
-                dropdown.data('top', dropdown.css('top'));
-
                 nav.on(this.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -699,7 +696,6 @@
              */
             _showSubnav: function (nav, dropdown) {
                 dropdown = dropdown || this.ui.dropdown;
-                var offset = parseInt(dropdown.data('top'), 10);
                 nav.addClass('cms-btn-active');
 
                 // reset z indexes
@@ -724,15 +720,9 @@
                 // calculate dropdown positioning
                 if (this.ui.window.height() + this.ui.window.scrollTop() -
                     nav.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
-                    dropdown.css({
-                        top: 'auto',
-                        bottom: offset
-                    });
+                    dropdown.removeClass('cms-submenu-dropdown-top').addClass('cms-submenu-dropdown-bottom');
                 } else {
-                    dropdown.css({
-                        top: offset,
-                        bottom: 'auto'
-                    });
+                    dropdown.removeClass('cms-submenu-dropdown-bottom').addClass('cms-submenu-dropdown-top');
                 }
             },
 
