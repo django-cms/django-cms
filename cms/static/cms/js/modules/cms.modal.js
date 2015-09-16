@@ -329,6 +329,8 @@ var CMS = window.CMS || {};
                         that.maximize();
                     }
                 }, 300);
+
+                this.ui.modal.trigger('cms.modal.closed');
             },
 
             /**
@@ -828,6 +830,8 @@ var CMS = window.CMS || {};
 
                 // inject
                 holder.html(iframe);
+
+                this.ui.modal.trigger('cms.modal.loaded');
             },
 
             /**
@@ -873,7 +877,7 @@ var CMS = window.CMS || {};
                 this.ui.titlePrefix.text(opts.title);
                 this.ui.titleSuffix.text(opts.subtitle || '');
 
-                this.ui.modal.trigger('cms.modal.html.loaded');
+                this.ui.modal.trigger('cms.modal.loaded');
             },
 
             /**
