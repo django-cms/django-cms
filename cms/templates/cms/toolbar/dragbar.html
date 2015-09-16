@@ -11,9 +11,9 @@
     <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
     <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
         <div class="cms-dropdown-inner">
-            <div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
+            <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
             {% for language in placeholder.get_filled_languages %}{% if language.code != LANGUAGE_CODE %}
-                <div class="cms-submenu-item"><a data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
+                <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy-lang" data-language="{{ language.code }}" href="#">{% trans "Copy from" %} {% trans language.name %}</a></div>
             {% endif %}{% endfor %}
             <div class="cms-submenu-item"><a data-icon="bin" data-rel="modal" href="{{ placeholder.get_clear_url }}?language={{ LANGUAGE_CODE }}" data-name="{{ placeholder.get_label }}">{% trans "Empty all" %}</a></div>
             {% extra_menu_items placeholder %}
