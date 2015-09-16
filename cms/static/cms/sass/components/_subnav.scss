@@ -143,6 +143,97 @@
         right: $submenu-icon-area-size * 3 + $submenu-right * 4;
     }
 
+    // TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
+    .cms-submenu-dropdown-settings {
+        border-radius: $border-radius-normal;
+        border: none;
+        overflow: initial;
+        box-shadow: $cms-dropdown-shadow;
+        z-index: 1;
+        right: $submenu-right * 2 + $submenu-icon-area-size;
+        .cms-submenu-item {
+            a {
+                position: relative;
+                line-height: $cms-dropdown-item-height;
+                height: $cms-dropdown-item-height;
+                color: $gray-light;
+                padding-left: 40px;
+                &[data-rel] {
+                    &:before {
+                        @extend %icon;
+                        position: absolute;
+                        left: 14px;
+                        top: 0;
+                        height: $cms-dropdown-item-height;
+                        line-height: $cms-dropdown-item-height
+                    }
+                }
+                &[data-rel=copy] {
+                    @include icon(copy);
+                }
+                &[data-rel=cut] {
+                    @include icon(scissors);
+                }
+                &[data-icon=bin],
+                &[data-rel=delete] {
+                    @include icon(bin);
+                }
+                // this is not strictly correct, but we do not
+                // yet have an API to provide icons
+                &[href*=alias_plugin] {
+                    @include icon(alias);
+                }
+            }
+        }
+        &:before {
+            z-index: z(below);
+            position: absolute;
+            content: '';
+            left: 100%;
+            width: 15px;
+            height: 15px;
+            margin-left: -10px;
+            transform: rotate(45deg);
+            background-color: white;
+            box-shadow: $cms-dropdown-shadow;
+        }
+
+        &::-webkit-scrollbar {
+            width: 0px;
+        }
+
+        &.cms-submenu-dropdown-top {
+            // TODO importants can be removed
+            // after new "add plugin" is in place
+            top: 0 !important;
+            &:before {
+                top: 14px !important;
+            }
+        }
+        &.cms-submenu-dropdown-bottom {
+            bottom: 0 !important;
+            &:before {
+                bottom: 14px !important;
+            }
+        }
+
+        .cms-dropdown-inner {
+            z-index: 1;
+            background-color: white;
+            overflow: hidden;
+            border-radius: $border-radius-normal;
+        }
+
+    }
+    .cms-dragbar .cms-submenu-dropdown-settings {
+        &.cms-submenu-dropdown-top:before {
+            top: 10px !important;
+        }
+        &.cms-submenu-dropdown-bottom:before {
+            bottom: 10px !important;
+        }
+    }
+
     .cms-submenu-quicksearch {
         $quicksearch-height: $structure-dragbar-height + $structure-draggable-space + $structure-dragarea-padding - 2px;
         @include icon(search);
