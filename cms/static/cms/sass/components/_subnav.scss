@@ -169,18 +169,15 @@
                         line-height: $cms-dropdown-item-height
                     }
                 }
-                &[data-rel=copy] {
+                &[data-icon=copy] {
                     @include icon(copy);
                 }
-                &[data-rel=cut] {
+                &[data-icon=scissors] {
                     @include icon(scissors);
                 }
-                &[data-icon=bin],
-                &[data-rel=delete] {
+                &[data-icon=bin] {
                     @include icon(bin);
                 }
-                // this is not strictly correct, but we do not
-                // yet have an API to provide icons
                 &[href*=alias_plugin] {
                     @include icon(alias);
                 }
