@@ -49,6 +49,16 @@
         @include icon(plus);
         right: $submenu-right * 3 + $submenu-icon-area-size * 2;
     }
+    .cms-submenu-edit,
+    .cms-submenu-add {
+        &:before {
+            $icon-size: $submenu-icon-size - 3px;
+            font-size: $icon-size;
+            margin-left: -($icon-size / 2);
+            margin-top: -($icon-size / 2);
+            font-size: $icon-size;
+        }
+    }
 
     .cms-submenu-lang {
         position: absolute;
