@@ -1,14 +1,29 @@
-//##################################################################################################################
-// #MODAL#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// MODAL
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
+
+    // shorthand for jQuery(document).ready();
     $(function () {
-        /*!
-         * Modal
-         * Controls a cms specific modal
+        /**
+         * The modal is triggered via API calls from the backend either
+         * through the toolbar navigation or from plugins. The APIs allow to
+         * open content from a url (iframe) or inject html directly.
+         *
+         * @class Modal
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Modal = new CMS.Class({
 
@@ -22,15 +37,20 @@
                 newPlugin: false
             },
 
-            initialize: function (options) {
+            initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
+                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
 
-                // states
-                this.click = 'click.cms';
+                // states and events
+                this.click = 'click.cms.modal';
+                this.pointerDown = 'pointerdown.cms.modal contextmenu.cms.modal';
+                this.pointerUp = 'pointerup.cms.modal pointercancel.cms.modal';
+                this.pointerMove = 'pointermove.cms.modal';
+                this.doubleClick = 'dblclick.cms.modal';
                 this.maximized = false;
                 this.minimized = false;
                 this.triggerMaximized = false;
@@ -41,10 +61,16 @@
                     this._events();
                 }
 
-                // ready modal
+                // set a state to determine if we need to reinitialize this._events();
                 this.ui.modal.data('ready', true);
             },
 
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
             _setupUI: function _setupUI() {
                 var modal = $('.cms-modal');
                 this.ui = {
@@ -67,57 +93,61 @@
                 };
             },
 
-            // initial methods
-            _events: function () {
+            /**
+             * Handles all internal events such as maximize/minimize and resizing
+             *
+             * @method _events
+             * @private
+             */
+            _events: function _events() {
                 var that = this;
 
-                // attach events to window
+                // window behaviours
                 this.ui.minimizeButton.on(this.click, function (e) {
                     e.preventDefault();
-                    that._minimize();
-                });
-                this.ui.title.on('pointerdown.cms contextmenu.cms', function (e) {
-                    e.preventDefault();
-                    that._startMove(e);
-                });
-                this.ui.title.on('dblclick.cms', function () {
-                    that._maximize();
-                });
-                this.ui.resize.on('pointerdown.cms contextmenu.cms', function (e) {
-                    e.preventDefault();
-                    that._startResize(e);
+                    that.minimize();
                 });
                 this.ui.maximizeButton.on(this.click, function (e) {
                     e.preventDefault();
-                    that._maximize();
+                    that.maximize();
                 });
+
+                this.ui.title.on(this.pointerDown, function (e) {
+                    e.preventDefault();
+                    that._startMove(e);
+                });
+                this.ui.title.on(this.doubleClick, function () {
+                    that.maximize();
+                });
+
+                this.ui.resize.on(this.pointerDown, function (e) {
+                    e.preventDefault();
+                    that._startResize(e);
+                });
+
+                // elements within the window
                 this.ui.breadcrumb.on(this.click, 'a', function (e) {
                     e.preventDefault();
                     that._changeIframe($(this));
                 });
+
                 this.ui.closeAndCancel.on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
                 });
-
-                // stopper events
-                this.ui.body.on('pointerup.cms pointercancel.cms', function (e) {
-                    that._endMove(e);
-                    that._endResize(e);
-                });
             },
 
             /**
-             * opens the modal either in an iframe or renders markup
+             * Opens the modal either in an iframe or renders markup.
              *
              * @method open
-             * @param opts either opts.url or opts.html are required
+             * @param opts either `opts.url` or `opts.html` are required
              * @param [opts.breadcrumb] {Object[]} collection of breadcrumb items
              * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
              * @param [opts.title] {String} modal window main title (bold)
              * @param [opts.subtitle] {String} modal window secondary title (normal)
-             * @param [opts.url] {String} url to render iframe, takes precedence over opts.html
+             * @param [opts.url] {String} url to render iframe, takes precedence over `opts.html`
              * @param [opts.width] {Number} sets the width of the modal
              * @param [opts.height] {Number} sets the height of the modal
              */
@@ -151,7 +181,7 @@
                 // because a new instance is called, we have to ensure minimized state is removed #3620
                 if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
-                    this._minimize();
+                    this.minimize();
                 }
 
                 // clear elements
@@ -207,34 +237,8 @@
                 });
             },
 
-            close: function () {
-                var that = this;
-
-                // handle remove option when plugin is new
-                if (CMS._newPlugin) {
-                    this._deletePlugin({ hideAfter: true });
-                } else {
-                    this._hide(100);
-                }
-
-                // handle refresh option
-                if (this.options.onClose) {
-                    this.reloadBrowser(this.options.onClose, false, true);
-                }
-
-                // reset maximize or minimize states for #3111
-                setTimeout(function () {
-                    if (that.minimized) {
-                        that._minimize();
-                    }
-                    if (that.maximized) {
-                        that._maximize();
-                    }
-                }, 300);
-            },
-
             /**
-             * _show animates the modal to given size
+             * Animation helper for opening the sideframe.
              *
              * @method _show
              * @param opts
@@ -274,7 +278,7 @@
 
                     // check if we should maximize
                     if (that.triggerMaximized) {
-                        that._maximize();
+                        that.maximize();
                     }
 
                     // changed locked status to allow other modals again
@@ -292,8 +296,53 @@
                 this.ui.modal.focus();
             },
 
-            _hide: function (duration) {
+            /**
+             * Closes the current instance.
+             *
+             * @method close
+             */
+            close: function close() {
                 var that = this;
+
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    this._deletePlugin({ hideAfter: true });
+                } else {
+                    this._hide({
+                        duration: 100
+                    });
+                }
+
+                // handle refresh option
+                if (this.options.onClose) {
+                    this.reloadBrowser(this.options.onClose, false, true);
+                }
+
+                // reset maximize or minimize states for #3111
+                setTimeout(function () {
+                    if (that.minimized) {
+                        that.minimize();
+                    }
+                    if (that.maximized) {
+                        that.maximize();
+                    }
+                }, 300);
+            },
+
+            /**
+             * Animation helper for closing the iframe.
+             *
+             * @method _hide
+             * @param opts
+             * @param opts.duration {Number} animation duration
+             * @private
+             */
+            _hide: function _hide(opts) {
+                var that = this;
+                var duration = this.options.modalDuration;
+                if (opts && opts.duration) {
+                    duration = opts.duration;
+                }
 
                 that.ui.modal.removeClass('cms-modal-open');
 
@@ -305,7 +354,12 @@
                 that.ui.modalBody.removeClass('cms-loader');
             },
 
-            _minimize: function () {
+            /**
+             * Minimizes the window onto the toolbar.
+             *
+             * @method minimize
+             */
+            minimize: function minimize() {
                 // cancel action if maximized
                 if (this.maximized) {
                     return false;
@@ -339,7 +393,12 @@
                 }
             },
 
-            _maximize: function () {
+            /**
+             * Maximizes the window according to the browser size.
+             *
+             * @method maximize
+             */
+            maximize: function maximize() {
                 var container = this.ui.modal;
 
                 // cancel action when minimized
@@ -367,7 +426,14 @@
                 }
             },
 
-            _startMove: function (initial) {
+            /**
+             * Initiates the start move event from `_events`.
+             *
+             * @method _startMove
+             * @param originEvent {Object} passes starting
+             * @private
+             */
+            _startMove: function _startMove(originEvent) {
                 // cancel if maximized
                 if (this.maximized) {
                     return false;
@@ -380,11 +446,16 @@
                 var that = this;
                 var position = that.ui.modal.position();
 
+                // create event for stopping
+                this.ui.body.on(this.pointerUp, function (e) {
+                    that._stopMove(e);
+                });
+
                 this.ui.shim.show();
 
-                this.ui.body.attr('data-touch-action', 'none').on('pointermove.cms', function (e) {
-                    var left = position.left - (initial.originalEvent.pageX - e.originalEvent.pageX);
-                    var top = position.top - (initial.originalEvent.pageY - e.originalEvent.pageY);
+                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
+                    var left = position.left - (originEvent.originalEvent.pageX - e.originalEvent.pageX);
+                    var top = position.top - (originEvent.originalEvent.pageY - e.originalEvent.pageY);
 
                     that.ui.modal.css({
                         'left': left,
@@ -393,29 +464,50 @@
                 });
             },
 
-            _endMove: function () {
+            /**
+             * Initiates the stop move event from `_startResize`.
+             *
+             * @method _stopMove
+             * @private
+             */
+            _stopMove: function _stopMove() {
                 this.ui.shim.hide();
-
-                this.ui.body.off('pointermove.cms').removeAttr('data-touch-action');
+                this.ui.body
+                    .off(this.pointerMove)
+                    .off(this.pointerUp)
+                    .removeAttr('data-touch-action');
             },
 
-            _startResize: function (initial) {
+            /**
+             * Initiates the start resize event from `_events`.
+             *
+             * @method _startResize
+             * @param originEvent {Object} passes starting
+             * @private
+             */
+            _startResize: function _startResize(originEvent) {
                 // cancel if in fullscreen
                 if (this.maximized) {
                     return false;
                 }
                 // continue
+                var that = this;
                 var container = this.ui.modal;
                 var width = container.width();
                 var height = container.height();
                 var modalLeft = this.ui.modal.position().left;
                 var modalTop = this.ui.modal.position().top;
 
+                // create event for stopping
+                this.ui.body.on(this.pointerUp, function (e) {
+                    that._stopResize(e);
+                });
+
                 this.ui.shim.show();
 
-                this.ui.body.attr('data-touch-action', 'none').on('pointermove.cms', function (e) {
-                    var mvX = initial.originalEvent.pageX - e.originalEvent.pageX;
-                    var mvY = initial.originalEvent.pageY - e.originalEvent.pageY;
+                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
+                    var mvX = originEvent.originalEvent.pageX - e.originalEvent.pageX;
+                    var mvY = originEvent.originalEvent.pageY - e.originalEvent.pageY;
 
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
@@ -437,13 +529,28 @@
                 });
             },
 
-            _endResize: function () {
+            /**
+             * Initiates the stop resize event from `_startResize`.
+             *
+             * @method _stopResize
+             * @private
+             */
+            _stopResize: function _stopResize() {
                 this.ui.shim.hide();
-
-                this.ui.body.off('pointermove.cms').removeAttr('data-touch-action');
+                this.ui.body
+                    .off(this.pointerMove)
+                    .off(this.pointerUp)
+                    .removeAttr('data-touch-action');
             },
 
-            _setBreadcrumb: function (breadcrumb) {
+            /**
+             * Sets the breadcrumb inside the modal.
+             *
+             * @method _setBreadcrumb
+             * @param breadcrumb {Object} renderes breadcrumb on modal
+             * @private
+             */
+            _setBreadcrumb: function _setBreadcrumb(breadcrumb) {
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
@@ -478,7 +585,14 @@
                 bread.show();
             },
 
-            _setButtons: function (iframe) {
+            /**
+             *
+             *
+             * @method _setButtons
+             * @param iframe {jQuery} rendered iframe element
+             * @private
+             */
+            _setButtons: function _setButtons(iframe) {
                 var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
                 var that = this;
                 var group = $('<div class="cms-modal-item-buttons"></div>');
@@ -579,18 +693,20 @@
             },
 
             /**
-             * sanitise the ampersand within the url for #3404
+             * Sanitise the ampersand within the url for #3404.
              *
+             * @method _prepareUrl
              * @param url {String}
+             * @private
              */
-            _prepareUrl: function (url) {
+            _prepareUrl: function _prepareUrl(url) {
                 // FIXME: A better fix is needed for '&' being interpreted as the
                 url = url.replace('&', '&amp;');
                 return url;
             },
 
             /**
-             * load the iframe
+             * Version where the modal loads an iframe.
              *
              * @method _loadIframe
              * @param opts
@@ -711,7 +827,14 @@
                 holder.html(iframe);
             },
 
-            _changeIframe: function (el) {
+            /**
+             * Sanitise the ampersand within the url for #3404.
+             *
+             * @method _changeIframe
+             * @param el {jQuery} originated element
+             * @private
+             */
+            _changeIframe: function _changeIframe(el) {
                 if (el.hasClass('active')) {
                     return false;
                 }
@@ -729,14 +852,23 @@
                 this.ui.titlePrefix.text(el.text());
             },
 
-            _loadMarkup: function (opts) {
+            /**
+             * Version where the modal loads html markup.
+             *
+             * @method _loadIframe
+             * @param opts
+             * @param opts.html {String|HTMLNode|jQuery} html markup to render
+             * @param opts.title {String} modal window main title (bold)
+             * @param [opts.subtitle] {String} modal window secondary title (normal)
+             */
+            _loadMarkup: function _loadMarkup(opts) {
                 this.ui.modal.removeClass('cms-modal-iframe');
                 this.ui.modal.addClass('cms-modal-content');
 
                 // set content
                 this.ui.frame.html(opts.html);
                 this.ui.titlePrefix.text(opts.title);
-                this.ui.titleSuffix.text(opts.subtitle);
+                this.ui.titleSuffix.text(opts.subtitle || '');
 
                 this.ui.modal.trigger('cms.modal.html.loaded');
             },
@@ -751,7 +883,7 @@
              * @param [opts] {Object} general objects element that holds settings
              * @param [opts.hideAfter] {Object} hides the modal after the ajax requests succeeds
              */
-            _deletePlugin: function (opts) {
+            _deletePlugin: function _deletePlugin(opts) {
                 var that = this;
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
@@ -763,7 +895,9 @@
                 return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
                     CMS._newPlugin = false;
                     if (opts && opts.hideAfter) {
-                        that._hide(100);
+                        that._hide({
+                            duration: 100
+                        });
                     }
                 });
             }
