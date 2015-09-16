@@ -8,6 +8,7 @@
         right: $submenu-right;
         width: $submenu-icon-area-size;
         height: $submenu-icon-area-size;
+        cursor: pointer;
         top: 50%;
         margin-top: -($submenu-icon-area-size / 2);
         &:before {
