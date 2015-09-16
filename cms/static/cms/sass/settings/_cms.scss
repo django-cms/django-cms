@@ -86,10 +86,13 @@ $z-layers: (
             "draggable": 99,
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
-            "dropdown":    999,
+            "dropdown":    1002,
         ),
         "dimmer":       10,
     ),
+    // parent dependant, but should be higher than quicksearch, but
+    // lower than dropdown
+    "hovertooltip":     1001,
     "screenblock":      100,
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,

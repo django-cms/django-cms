@@ -1,7 +1,14 @@
 #cms-toolbar {
     .cms-hover-tooltip {
         position: relative;
-        cursor: pointer;
+        z-index: z(hovertooltip);
+    }
+    .cms-btn-active .cms-hover-tooltip {
+        &:before,
+        &:after {
+            opacity: 0 !important;
+            transition-delay: 0s !important;
+        }
     }
 
     /* Base styles for the entire tooltip */
