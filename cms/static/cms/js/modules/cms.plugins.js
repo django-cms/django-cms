@@ -699,14 +699,10 @@
                 dropdown = dropdown || this.ui.dropdown;
                 nav.addClass('cms-btn-active');
 
-                // reset z indexes
-                var reset = $('.cms-submenu').parentsUntil('.cms-dragarea').last();
                 var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
 
-                reset.addClass('cms-z-index-0');
-
                 var parents = nav.parentsUntil('.cms-dragarea').last();
-                parents.addClass('cms-z-index-999');
+                parents.addClass('cms-z-index-9999');
                 // set visible states
                 dropdown.show().on('scroll.cms', function () {
                     scrollHint.fadeOut(100);
@@ -971,8 +967,7 @@
 
             // set correct active state
             nav.closest('.cms-draggable').data('active', false);
-            $('.cms-z-index-0').removeClass('cms-z-index-0');
-            $('.cms-z-index-999').removeClass('cms-z-index-999');
+            $('.cms-z-index-9999').removeClass('cms-z-index-9999');
 
             nav.siblings('.cms-submenu-dropdown').hide();
             nav.siblings('.cms-submenu-quicksearch').hide();
