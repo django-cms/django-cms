@@ -96,13 +96,14 @@
             _setPlaceholder: function () {
                 var that = this;
                 this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
-                this.ui.submenu = this.ui.dragbar.find('.cms-submenu');
+                this.ui.submenu = this.ui.dragbar.find('.cms-submenu-settings');
                 var title = this.ui.dragbar.find('.cms-dragbar-title');
                 var togglerLinks = this.ui.dragbar.find('.cms-dragbar-toggler a');
                 var expanded = 'cms-dragbar-title-expanded';
 
                 // register the subnav on the placeholder
-                this._setSubnav(this.ui.submenu);
+                this._setSettingsMenu(this.ui.submenu);
+                this._setAddPluginMenu(this.ui.dragbar.find('.cms-submenu-add'));
 
                 CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
@@ -176,7 +177,8 @@
                 this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
                 // attach event to the plugin menu
-                this._setSubnav(this.ui.submenu);
+                this._setSettingsMenu(this.ui.submenu);
+                this._setAddPluginMenu(this.ui.dragitem.find('.cms-submenu-add'));
 
                 // adds double click to edit
                 this.ui.dragitem.on('dblclick', function (e) {
@@ -490,13 +492,16 @@
                 this.editPlugin(response.url, this.options.plugin_name, response.breadcrumb);
             },
 
-            _setSubnav: function (nav) {
+            /**
+             * _setSettingsMenu sets up event handlers for settings menu
+             *
+             * @param nav jQuery
+             * @private
+             */
+            _setSettingsMenu: function _setSettingsMenu(nav) {
                 var that = this;
-                this.ui.dropdown = nav.siblings('.cms-submenu-dropdown');
+                this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
                 var dropdown = this.ui.dropdown;
-
-                // set data attributes for original top positioning
-                dropdown.data('top', dropdown.css('top'));
 
                 nav.on(this.click, function (e) {
                     e.preventDefault();
@@ -517,6 +522,84 @@
                     e.stopPropagation();
                 });
 
+                that._setupActions(nav);
+                // prevent propagnation
+                nav.on(this.click + ' pointerup.cms pointerdown.cms click.cms dblclick.cms', function (e) {
+                    e.stopPropagation();
+                });
+
+                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown-settings')
+                    .on(this.click + ' click.cms dblclick.cms', function (e) {
+                    e.stopPropagation();
+                });
+            },
+
+            /**
+             * TODO will open a modal with traversable plugins list,
+             * so will eventually be removed from here
+             *
+             * @param nav
+             * @private
+             */
+            _setAddPluginMenu: function _setAddPluginMenu(nav) {
+                var that = this;
+                // FIXME children -> plugins
+                var dropdown = nav.siblings('.cms-submenu-dropdown-children');
+                nav.on(this.click, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var trigger = $(this);
+                    if (trigger.hasClass('cms-btn-active')) {
+                        CMS.Plugin._hideSubnav(trigger, dropdown);
+                    } else {
+                        CMS.Plugin._hideSubnav();
+                        that._showSubnav(trigger, dropdown);
+                        // show subnav
+                        nav.siblings('.cms-submenu-quicksearch').show();
+                        that._setupDropdownKeyboardTraversing(nav);
+                    }
+                });
+
+                // prevent propagnation
+                nav.on(this.click + ' pointerup.cms pointerdown.cms click.cms dblclick.cms', function (e) {
+                    e.stopPropagation();
+                });
+
+                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown')
+                    .on(this.click + ' click.cms dblclick.cms', function (e) {
+                    e.stopPropagation();
+                });
+
+                that._setupQuickSearch(nav);
+            },
+
+            /**
+             * sets up event handlers for quicksearching
+             * FIXME will be moved into a separate "add plugin" modal
+             *
+             * @param nav jQuery
+             * @private
+             */
+            _setupQuickSearch: function _setupQuickSearch(nav) {
+                var that = this;
+                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
+                    clearTimeout(that.timer);
+                    // keybound is not required
+                    that.timer = setTimeout(function () {
+                        that._searchSubnav(nav, $(e.currentTarget).val());
+                    }, 100);
+                });
+            },
+
+            /**
+             * Sets up click handlers for various plugin/placeholder items
+             * FIXME no need to go around nav, can be used directly in dragbar/dragitem
+             *
+             * @param nav jQuery
+             * @private
+             */
+            _setupActions: function _setupActions(nav) {
+                var that = this;
                 nav.parent().find('a').on('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -574,53 +657,16 @@
                     }
                 });
 
-                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
-                    clearTimeout(that.timer);
-                    // keybound is not required
-                    that.timer = setTimeout(function () {
-                        that._searchSubnav(nav, $(e.currentTarget).val());
-                    }, 100);
-                });
-
-                // prevent propagnation
-                nav.on(this.click + ' click.cms dblclick.cms', function (e) {
-                    e.stopPropagation();
-                });
-
-                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown')
-                    .on(this.click + ' click.cms dblclick.cms', function (e) {
-                    e.stopPropagation();
-                });
             },
 
-            _showSubnav: function (nav) {
-                var dropdown = this.ui.dropdown;
-                var offset = parseInt(dropdown.data('top'), 10);
-                nav.addClass('cms-btn-active');
-
-                // reset z indexes
-                var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
-                var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
-
-                reset.css('z-index', 0);
-
-                var parents = nav.parentsUntil('.cms-dragarea');
-                parents.css('z-index', 999);
-
-                // show subnav
-                nav.siblings('.cms-submenu-quicksearch').show().find('input');
-
-                // set visible states
-                dropdown.show().on('scroll.cms', function () {
-                    scrollHint.fadeOut(100);
-                    dropdown.off('scroll.cms');
-                });
-
-                // show scrollHint for FF on OSX
-                if (dropdown[0].scrollHeight > dropdown.height()) {
-                    scrollHint.show();
-                }
-
+            /**
+             * FIXME will be moved out of here
+             *
+             * @param nav
+             * @private
+             */
+            _setupDropdownKeyboardTraversing: function _setupDropdownKeyboardTraversing(nav) {
+                var dropdown = $('.cms-submenu-dropdown-children:visible');
                 // add key events
                 doc.off('keydown.cms.traverse');
                 doc.on('keydown.cms.traverse', function (e) {
@@ -653,25 +699,46 @@
                         CMS.Plugin._hideSubnav(nav);
                     }
                 });
+            },
 
-                // calculate subnav bounds
+            /**
+             * FIXME will only work with settings, add plugin will be handle differently
+             *
+             * @param nav jQuery
+             * @param [dropdown=this.ui.dropdown] jQuery
+             * @private
+             */
+            _showSubnav: function (nav, dropdown) {
+                dropdown = dropdown || this.ui.dropdown;
+                nav.addClass('cms-btn-active');
+
+                var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
+
+                var parents = nav.parentsUntil('.cms-dragarea').last();
+                parents.addClass('cms-z-index-9999');
+                // set visible states
+                dropdown.show().on('scroll.cms', function () {
+                    scrollHint.fadeOut(100);
+                    dropdown.off('scroll.cms');
+                });
+
+                // show scrollHint for FF on OSX
+                if (dropdown[0].scrollHeight > dropdown.height()) {
+                    scrollHint.show();
+                }
+
+                // calculate dropdown positioning
                 if (this.ui.window.height() + this.ui.window.scrollTop() -
                     nav.offset().top - dropdown.height() <= 10 && nav.offset().top - dropdown.height() >= 0) {
-                    dropdown.css({
-                        top: 'auto',
-                        bottom: offset
-                    });
+                    dropdown.removeClass('cms-submenu-dropdown-top').addClass('cms-submenu-dropdown-bottom');
                 } else {
-                    dropdown.css({
-                        top: offset,
-                        bottom: 'auto'
-                    });
+                    dropdown.removeClass('cms-submenu-dropdown-bottom').addClass('cms-submenu-dropdown-top');
                 }
             },
 
             _searchSubnav: function (nav, value) {
-                var items = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item');
-                var titles = nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-item-title');
+                var items = nav.siblings('.cms-submenu-dropdown-children').find('.cms-submenu-item');
+                var titles = nav.siblings('.cms-submenu-dropdown-children').find('.cms-submenu-item-title');
 
                 // cancel if value is zero
                 if (value === '') {
@@ -705,9 +772,9 @@
                 });
 
                 // if there is no element visible, show only first categoriy
-                nav.siblings('.cms-submenu-dropdown').show();
+                nav.siblings('.cms-submenu-dropdown-children').show();
                 if (items.add(titles).filter(':visible').length <= 0) {
-                    nav.siblings('.cms-submenu-dropdown').hide();
+                    nav.siblings('.cms-submenu-dropdown-children').hide();
                 }
 
                 // hide scrollHint
@@ -718,8 +785,8 @@
              * Toggles collapsable item
              *
              * @method toggleCollapsable
-             * @private
              * @param el jQuery element to toggle
+             * @private
              */
             _toggleCollapsable: function toggleCollapsable(el) {
                 var that = this;
@@ -901,11 +968,12 @@
         /**
          * hides the opened navigation
          *
-         * @static
          * @param [nav] jQuery element representing the subnav trigger
+         * @static
+         * @private
          */
         CMS.Plugin._hideSubnav = function (nav) {
-            nav = nav || $('.cms-submenu.cms-btn-active');
+            nav = nav || $('.cms-submenu-btn.cms-btn-active');
             if (!nav.length) {
                 return;
             }
@@ -913,11 +981,15 @@
 
             // set correct active state
             nav.closest('.cms-draggable').data('active', false);
+            $('.cms-z-index-9999').removeClass('cms-z-index-9999');
 
             nav.siblings('.cms-submenu-dropdown').hide();
             nav.siblings('.cms-submenu-quicksearch').hide();
             // reset search
-            nav.siblings('.cms-submenu-quicksearch').find('input').val('').blur();
+            nav.siblings('.cms-submenu-quicksearch')
+                .find('input')
+                .val('')
+                .trigger('keyup.cms').blur();
 
             // reset relativity
             $('.cms-dragbar').css('position', '');

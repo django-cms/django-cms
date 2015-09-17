@@ -4,6 +4,12 @@
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
+            {% if not plugin.disable_child_plugins %}
+            <span class="cms-submenu-btn cms-submenu-add cms-btn">
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}">
+                </span>
+            </span>
+            {% endif %}
             <a class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit" href="#">
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}">
                 </span>
@@ -14,15 +20,18 @@
                 <span class="cms-icon cms-icon-lock"></span>
             </span>
         {% endif %}
-        <div class="cms-submenu cms-submenu-btn cms-btn">
+        <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn">
         </div>
         <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
-        <div class="cms-submenu-dropdown" data-touch-action="pan-y">
-            <div class="cms-submenu-item cms-submenu-item-title"><span>{% trans "Settings" %}</span></div>
-            <div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy" %}</a></div>
-            <div class="cms-submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
-            <div class="cms-submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
-            {% extra_menu_items plugin %}
+        <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
+            <div class="cms-dropdown-inner">
+                <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">{% trans "Copy" %}</a></div>
+                <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
+                <div class="cms-submenu-item"><a data-icon="bin" data-rel="delete" href="#">{% trans "Delete" %}</a></div>
+                {% extra_menu_items plugin %}
+            </div>
+        </div>
+        <div class="cms-submenu-dropdown cms-submenu-dropdown-children" data-touch-action="pan-y">
             {% plugin_child_classes plugin %}
         </div>
 

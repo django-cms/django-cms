@@ -8,6 +8,7 @@
         right: $submenu-right;
         width: $submenu-icon-area-size;
         height: $submenu-icon-area-size;
+        cursor: pointer;
         top: 50%;
         margin-top: -($submenu-icon-area-size / 2);
         &:before {
@@ -30,15 +31,34 @@
         }
     }
     .cms-dragbar .cms-submenu-btn {
-        right: $submenu-right + 2px;
+        margin-right: 2px;
+        background-color: transparent;
+        &:active,
+        &.cms-btn-active {
+            background-color: darken($btn-default-bgcolor, 10%);
+        }
     }
-    .cms-submenu {
+    .cms-submenu-settings {
         border: none;
     }
 
     .cms-submenu-edit {
         @include icon(pencil);
+        right: $submenu-right * 3 + $submenu-icon-area-size * 2;
+    }
+    .cms-submenu-add {
+        @include icon(plus);
         right: $submenu-right * 2 + $submenu-icon-area-size;
+    }
+    .cms-submenu-edit,
+    .cms-submenu-add {
+        &:before {
+            $icon-size: $submenu-icon-size - 3px;
+            font-size: $icon-size;
+            margin-left: -($icon-size / 2);
+            margin-top: -($icon-size / 2);
+            font-size: $icon-size;
+        }
     }
 
     .cms-submenu-lang {
@@ -56,7 +76,6 @@
     .cms-submenu-dropdown {
         display: none;
         position: absolute;
-        top: $structure-dragbar-height + $structure-dragarea-space;
         right: $submenu-icon-area-size + $submenu-right;
         z-index: z(structure, content, dropdown);
         min-width: $submenu-dropdown-width;
@@ -115,6 +134,104 @@
             border-top: none;
         }
     }
+    .cms-submenu-dropdown-top {
+        top: $structure-dragbar-height + $structure-dragarea-space;
+    }
+    .cms-submenu-dropdown-bottom {
+        bottom: $structure-dragbar-height + $structure-dragarea-space;
+    }
+    .cms-submenu-dropdown-children {
+        right: $submenu-icon-area-size * 2 + $submenu-right * 3;
+    }
+
+    // TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
+    .cms-submenu-dropdown-settings {
+        border-radius: $border-radius-normal;
+        border: none;
+        overflow: initial;
+        box-shadow: $cms-dropdown-shadow;
+        right: $submenu-right * 2 + $submenu-icon-area-size;
+        .cms-submenu-item {
+            a {
+                position: relative;
+                line-height: $cms-dropdown-item-height;
+                height: $cms-dropdown-item-height;
+                color: $gray-light;
+                padding-left: $cms-dropdown-item-icon-space;
+                &[data-rel],
+                &[data-icon] {
+                    &:before {
+                        @extend %icon;
+                        position: absolute;
+                        left: $cms-dropdown-item-icon-position;
+                        top: 0;
+                        height: $cms-dropdown-item-height;
+                        line-height: $cms-dropdown-item-height
+                    }
+                }
+                &[data-icon=copy] {
+                    @include icon(copy);
+                }
+                &[data-icon=scissors] {
+                    @include icon(scissors);
+                }
+                &[data-icon=bin] {
+                    @include icon(bin);
+                }
+                &[href*=alias_plugin] {
+                    @include icon(alias);
+                }
+            }
+        }
+        &:before {
+            z-index: z(below);
+            position: absolute;
+            content: '';
+            left: 100%;
+            width: $cms-dropdown-arrow-side;
+            height: $cms-dropdown-arrow-side;
+            margin-left: -($cms-dropdown-arrow-side / 2);
+            transform: rotate(45deg);
+            background-color: $submenu-dropdown-bgcolor;
+            box-shadow: $cms-dropdown-shadow;
+        }
+
+        &::-webkit-scrollbar {
+            width: 0;
+        }
+
+        &.cms-submenu-dropdown-top {
+            // TODO importants can be removed
+            // after new "add plugin" is in place
+            top: 0 !important;
+            &:before {
+                top: $cms-dropdown-arrow-position !important;
+            }
+        }
+        &.cms-submenu-dropdown-bottom {
+            bottom: 0 !important;
+            &:before {
+                bottom: $cms-dropdown-arrow-position !important;
+            }
+        }
+
+        .cms-dropdown-inner {
+            z-index: 1;
+            background-color: white;
+            overflow: hidden;
+            border-radius: $border-radius-normal;
+        }
+
+    }
+    .cms-dragbar .cms-submenu-dropdown-settings {
+        &.cms-submenu-dropdown-top:before {
+            top: $cms-dropdown-arrow-position - 4px !important;
+        }
+        &.cms-submenu-dropdown-bottom:before {
+            bottom: 12px !important;
+            bottom: $cms-dropdown-arrow-position - 4px !important;
+        }
+    }
 
     .cms-submenu-quicksearch {
         $quicksearch-height: $structure-dragbar-height + $structure-draggable-space + $structure-dragarea-padding - 2px;
@@ -123,7 +240,7 @@
         display: none;
         position: absolute;
         top: 50%;
-        right: $submenu-icon-area-size + $submenu-right;
+        right: $submenu-icon-area-size * 2 + $submenu-right * 3;
         z-index: z(structure, content, quicksearch);
         text-align: right;
         height: $quicksearch-height;
@@ -171,5 +288,9 @@
         text-align: center;
         width: 100%;
         background-color: $gray-lighter;
+    }
+
+    .cms-z-index-9999 {
+        z-index: 9999 !important;
     }
 }

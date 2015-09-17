@@ -86,9 +86,12 @@ $z-layers: (
             "draggable": 99,
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
-            "dropdown":    999,
+            "dropdown":    1002,
         ),
     ),
+    // parent dependant, but should be higher than quicksearch, but
+    // lower than dropdown
+    "hovertooltip":     1001,
     "screenblock":      100,
     // sideframe > sideframe-frame > iframe >
     "dialog":           99999,
@@ -125,7 +128,7 @@ $btn-active-border: $gray-darkest;
 $structure-max-width: 980px;
 $structure-bgcolor: #f0f0f0;
 
-$structure-dragbar-height: 30px;
+$structure-dragbar-height: 34px;
 $structure-dragbar-color: $black;
 $structure-dragarea-padding: 8px;
 $structure-dragarea-padding-horizontal: 8px;
@@ -313,3 +316,13 @@ $cms-hover-tooltip-width: 160px;
 $cms-hover-tooltip-arrow-height: 6px;
 $cms-hover-tooltip-bgcolor: rgba($black, 0.8);
 $cms-hover-tooltip-padding: 6px 8px;
+
+
+//##############################################################################
+// Dropdown
+$cms-dropdown-shadow: 0 0 10px rgba($black, 0.25);
+$cms-dropdown-item-height: 42px;
+$cms-dropdown-item-icon-space: 40px;
+$cms-dropdown-item-icon-position: 14px;
+$cms-dropdown-arrow-side: 10px;
+$cms-dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $cms-dropdown-arrow-side/2;

@@ -1,7 +1,14 @@
 #cms-toolbar {
     .cms-hover-tooltip {
         position: relative;
-        cursor: pointer;
+        z-index: z(hovertooltip);
+    }
+    .cms-btn-active .cms-hover-tooltip {
+        &:before,
+        &:after {
+            opacity: 0 !important;
+            transition-delay: 0s !important;
+        }
     }
 
     /* Base styles for the entire tooltip */
@@ -21,9 +28,9 @@
     .cms-hover-tooltip-delay:hover:after,
     .cms-hover-tooltip-delay:focus:before,
     .cms-hover-tooltip-delay:focus:after {
-        transition: opacity 0.2s ease-in-out 1.5s,
-            visibility 0.2s ease-in-out 1.5s,
-            transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24) 1.5s;
+        transition: opacity 0.2s ease-in-out 2.5s,
+            visibility 0.2s ease-in-out 2.5s,
+            transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24) 2.5s;
     }
 
     /* Show the entire tooltip on hover and focus */

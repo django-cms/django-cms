@@ -78,6 +78,7 @@
         border-radius: $border-radius-base;
 
         .cms-dragbar-title {
+            display: inline-block;
             position: relative;
             color: $structure-dragbar-color;
             font-size: $font-size-normal;
@@ -172,8 +173,11 @@
         }
 
         // menu overwrites
-        .cms-submenu-dropdown {
+        .cms-submenu-dropdown-top {
             top: $structure-dragitem-height + $structure-dragarea-padding * 2;
+        }
+        .cms-submenu-dropdown-bottom {
+            bottom: $structure-dragitem-height + $structure-dragarea-padding * 2;
         }
         .cms-submenu-quicksearch {
             $quicksearch-height: $structure-dragitem-height + $structure-dragarea-padding * 2 - 2px;
