@@ -195,9 +195,6 @@ var CMS = window.CMS || {};
                 // hide tooltip
                 this.hideTooltip();
 
-                // show loader
-                CMS.API.Toolbar._loader(true);
-
                 // in case, the modal is larger than the window, we trigger fullscreen mode
                 if (height >= screenHeight) {
                     this.triggerMaximized = true;
@@ -263,9 +260,6 @@ var CMS = window.CMS || {};
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)
                     });
-
-                    // hide loader
-                    CMS.API.Toolbar._loader(false);
 
                     // check if we should maximize
                     if (that.triggerMaximized) {
@@ -381,7 +375,7 @@ var CMS = window.CMS || {};
                     this.minimized = false;
                 }
             },
-            
+
             /**
              * Maximizes the window according to the browser size.
              *
@@ -703,6 +697,9 @@ var CMS = window.CMS || {};
                 opts.title = opts.title || '';
                 opts.breadcrumbs = opts.breadcrumbs || '';
 
+                // show loader
+                CMS.API.Toolbar._loader(true);
+
                 // set classes
                 this.ui.modal.removeClass('cms-modal-markup');
                 this.ui.modal.addClass('cms-modal-iframe');
@@ -741,6 +738,9 @@ var CMS = window.CMS || {};
                         CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
                         that.close();
                     }
+
+                    // hide loader
+                    CMS.API.Toolbar._loader(false);
 
                     // show messages in toolbar if provided
                     messages = iframe.contents().find('.messagelist li');
