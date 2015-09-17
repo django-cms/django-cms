@@ -223,12 +223,21 @@ var CMS = window.CMS || {};
                 var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
+                var modalWidth = opts.width || this.options.minWidth;
+                var modalHeight = opts.width || this.options.minHeight;
                 // screen width and height calculation, WC = width
-                var screenWidthCalc = screenWidth >= (this.options.minWidth + widthOffset);
-                var screenHeightCalc = screenHeight >= (this.options.minHeight + heightOffset);
+                var screenWidthCalc = screenWidth >= (modalWidth + widthOffset);
+                var screenHeightCalc = screenHeight >= (modalHeight + heightOffset);
 
-                var width = screenWidthCalc ? screenWidth - widthOffset : this.options.minWidth;
-                var height = screenHeightCalc ? screenHeight - heightOffset : this.options.minHeight;
+                var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
+                var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
+
+                if (width >= screenWidth) {
+                    width = screenWidth * 0.9;
+                }
+                if (height >= screenHeight) {
+                    height = screenHeight * 0.9;
+                }
 
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
@@ -256,8 +265,8 @@ var CMS = window.CMS || {};
 
                 // display modal
                 this._show({
-                    width: opts.width || width,
-                    height: opts.height || height,
+                    width: width,
+                    height: height,
                     duration: this.options.modalDuration
                 });
 
