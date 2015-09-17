@@ -275,6 +275,10 @@ var CMS = window.CMS || {};
                 // TODO make use of transitionDuration
                 var speed = opts.duration;
 
+                if (this.ui.modal.hasClass('cms-modal-open')) {
+                    this.ui.modal.addClass('cms-modal-morphing');
+                }
+
                 this.ui.modal.css({
                     'display': 'block',
                     'width': width,
@@ -289,6 +293,7 @@ var CMS = window.CMS || {};
                 }, 0);
 
                 this.ui.modal.one('cmsTransitionEnd', function () {
+                    that.ui.modal.removeClass('cms-modal-morphing');
                     that.ui.modal.css({
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)

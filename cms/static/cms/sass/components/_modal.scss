@@ -58,6 +58,9 @@
             }
         }
     }
+    .cms-modal-morphing {
+        transition: all 0.2s;
+    }
     .cms-modal-open {
         transform: scale(1) translateZ(0);
     }
