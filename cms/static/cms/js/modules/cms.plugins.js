@@ -733,20 +733,11 @@
                 dropdown = dropdown || this.ui.dropdown;
                 nav.addClass('cms-btn-active');
 
-                var scrollHint = dropdown.find('.cms-submenu-scroll-hint');
-
                 var parents = nav.parentsUntil('.cms-dragarea').last();
                 parents.addClass('cms-z-index-9999');
-                // set visible states
-                dropdown.show().on('scroll.cms', function () {
-                    scrollHint.fadeOut(100);
-                    dropdown.off('scroll.cms');
-                });
 
-                // show scrollHint for FF on OSX
-                if (dropdown[0].scrollHeight > dropdown.height()) {
-                    scrollHint.show();
-                }
+                // set visible states
+                dropdown.show();
 
                 // calculate dropdown positioning
                 if (this.ui.window.height() + this.ui.window.scrollTop() -
