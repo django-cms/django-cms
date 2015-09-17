@@ -715,12 +715,6 @@
                             anchors.eq(anchors.length).focus();
                         }
                     }
-
-                    // hide subnav when hitting enter or escape
-                    if (e.keyCode === CMS.KEYS.ENTER || e.keyCode === CMS.KEYS.ESC) {
-                        nav.siblings('.cms-submenu-quicksearch').find('input').blur();
-                        CMS.Plugin._hideSubnav(nav);
-                    }
                 });
             },
 
