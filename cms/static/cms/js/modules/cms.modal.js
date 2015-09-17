@@ -420,7 +420,7 @@ var CMS = window.CMS || {};
                 }
 
                 var that = this;
-                var position = that.ui.modal.position();
+                var position = this.ui.modal.position();
                 var left;
                 var top;
 
@@ -622,7 +622,7 @@ var CMS = window.CMS || {};
 
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
-                            item[0].click();
+                            item[0].trigger('click');
                         }
 
                         if (item.is('a')) {
