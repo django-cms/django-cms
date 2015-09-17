@@ -560,28 +560,21 @@
                 nav.on(this.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    var trigger = $(this);
-                    if (trigger.hasClass('cms-btn-active')) {
-                        // CMS.Plugin._hideSubnav(trigger, dropdown);
-                    } else {
-                        CMS.Plugin._hideSubnav();
-                        // that._showSubnav(trigger, dropdown);
-                        // // show subnav
-                        // nav.siblings('.cms-submenu-quicksearch').show();
 
-                        // since we don't know exact plugin parent (because dragndrop)
-                        // we need to know the parent id by the time we open "add plugin" dialog
-                        var pluginsCopy = plugins.clone(true, true).data(
-                            'parentId', that._getId(nav.closest('.cms-draggable'))
-                        );
+                    CMS.Plugin._hideSubnav();
 
-                        modal.open({
-                            title: that.ui.container.data('settings').addPluginHelpTitle,
-                            html: pluginsCopy,
-                            width: 530,
-                            height: 280
-                        });
-                    }
+                    // since we don't know exact plugin parent (because dragndrop)
+                    // we need to know the parent id by the time we open "add plugin" dialog
+                    var pluginsCopy = plugins.clone(true, true).data(
+                        'parentId', that._getId(nav.closest('.cms-draggable'))
+                    );
+
+                    modal.open({
+                        title: that.ui.container.data('settings').addPluginHelpTitle,
+                        html: pluginsCopy,
+                        width: 530,
+                        height: 280
+                    });
                 });
 
                 // prevent propagnation
