@@ -3,20 +3,24 @@
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}">
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
-        {% if disabled_child %}
+        {% if not disabled_child %}
+            <a class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit" href="#">
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}">
+                </span>
+            </a>
+        {% else %}
             <span class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
                 data-tooltip="{% trans "This plugin cannot be moved or edited outside of it's parent" %}">
                 <span class="cms-icon cms-icon-lock"></span>
             </span>
         {% endif %}
-        <div class="cms-submenu cms-btn">
+        <div class="cms-submenu cms-submenu-btn cms-btn">
         </div>
         <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
         <div class="cms-submenu-dropdown" data-touch-action="pan-y">
             <div class="cms-submenu-item cms-submenu-item-title"><span>{% trans "Settings" %}</span></div>
             <div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy" %}</a></div>
             <div class="cms-submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
-            <div class="cms-submenu-item"><a data-rel="edit" href="#">{% trans "Edit" %}</a></div>
             <div class="cms-submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
             {% extra_menu_items plugin %}
             {% plugin_child_classes plugin %}

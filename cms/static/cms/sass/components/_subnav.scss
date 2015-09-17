@@ -1,12 +1,10 @@
 //######################################################################################################################
 // #SUBNAV#
 #cms-toolbar {
-    .cms-submenu {
+    .cms-submenu-btn {
         @include icon(menu);
         display: block;
         position: absolute;
-        cursor: pointer;
-        border: none;
         right: $submenu-right;
         width: $submenu-icon-area-size;
         height: $submenu-icon-area-size;
@@ -22,6 +20,25 @@
             font-size: $submenu-icon-size;
             color: $submenu-icon-color;
         }
+
+        .cms-hover-tooltip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+    }
+    .cms-dragbar .cms-submenu-btn {
+        right: $submenu-right + 2px;
+    }
+    .cms-submenu {
+        border: none;
+    }
+
+    .cms-submenu-edit {
+        @include icon(pencil);
+        right: $submenu-right * 2 + $submenu-icon-area-size;
     }
 
     .cms-submenu-lang {

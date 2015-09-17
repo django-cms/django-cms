@@ -17,6 +17,7 @@
         z-index: z(structure, content, base);
         width: 100%;
         height: 100%;
+        transform: translateZ(0);
         user-select: none;
     }
 }
@@ -468,7 +469,7 @@
 }
 
 // hide elements when dragging
-.ui-sortable-helper.cms-draggable .cms-submenu {
+.ui-sortable-helper.cms-draggable .cms-submenu-btn {
     display: none !important;
 }
 .ui-sortable-helper.cms-draggable .cms-draggables {
