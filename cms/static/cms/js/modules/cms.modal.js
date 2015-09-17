@@ -201,11 +201,10 @@ var CMS = window.CMS || {};
                 var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
                 var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
 
-                if (width >= screenWidth) {
-                    width = screenWidth * 0.9;
-                }
-                if (height >= screenHeight) {
-                    height = screenHeight * 0.9;
+
+                // in case, the modal is larger than the window, we trigger fullscreen mode
+                if (width >= screenWidth || height >= screenHeight) {
+                    this.triggerMaximized = true;
                 }
 
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
@@ -232,10 +231,6 @@ var CMS = window.CMS || {};
                 // hide tooltip
                 this.hideTooltip();
 
-                // in case, the modal is larger than the window, we trigger fullscreen mode
-                if (height >= screenHeight) {
-                    this.triggerMaximized = true;
-                }
 
                 // redirect to iframe rendering if url is provided
                 if (opts.url) {
