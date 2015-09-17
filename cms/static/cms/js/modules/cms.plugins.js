@@ -544,20 +544,13 @@
             _setAddPluginModal: function _setAddPluginModal(nav) {
                 var that = this;
                 // FIXME children -> plugins
-                var modal = new CMS.Modal();
-                var plugins = nav.siblings('.cms-submenu-dropdown-children');
-                var modalLoaded = function modalLoaded() {
-                    console.log('modal loaded');
-                };
-                modal.on('cms.modal.loaded', function () {
-                    console.log(this, modal);
-                    modal.off('cms.modal.loaded', modalLoaded);
-                    console.log(that.options.plugin_name, that.options.plugin_id);
-                    modalLoaded();
+                var modal = new CMS.Modal({
+                    minWidth: 400,
+                    minHeight: 150
                 });
-                modal.on('cms.modal.closed', function () {
-                    modal.off('cms.modal.loaded', modalLoaded);
-                });
+                var plugins = nav.siblings('.cms-add-plugins-list');
+
+                that._setupQuickSearch(plugins);
 
                 nav.on(this.click, function (e) {
                     e.preventDefault();
@@ -574,9 +567,9 @@
 
                         modal.open({
                             title: that.ui.container.data('settings').addPluginHelpTitle,
-                            html: plugins,
-                            width: 450,
-                            height: 300
+                            html: pluginsCopy,
+                            width: 530,
+                            height: 280
                         });
                     }
                 });
@@ -590,8 +583,6 @@
                     .on(this.click + ' click.cms dblclick.cms', function (e) {
                     e.stopPropagation();
                 });
-
-                that._setupQuickSearch(nav);
             },
 
             /**
