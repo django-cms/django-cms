@@ -301,6 +301,7 @@ var CMS = window.CMS || {};
 
                     // changed locked status to allow other modals again
                     CMS.API.locked = false;
+                    that.trigger('cms.modal.shown');
                 }).emulateTransitionEnd(speed);
 
                 // add esc close event
@@ -882,7 +883,6 @@ var CMS = window.CMS || {};
              * @param [opts.subtitle] {String} modal window secondary title (normal)
              */
             _loadMarkup: function _loadMarkup(opts) {
-                console.count('load markup');
                 this.ui.modal.removeClass('cms-modal-iframe');
                 this.ui.modal.addClass('cms-modal-markup');
 
