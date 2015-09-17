@@ -225,6 +225,10 @@ var CMS = window.CMS || {};
                 // clear elements
                 this.ui.modalButtons.empty();
                 this.ui.breadcrumb.empty();
+
+                // remove class from modal when no breadcrumbs is rendered
+                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+
                 // hide tooltip
                 this.hideTooltip();
 
@@ -563,11 +567,6 @@ var CMS = window.CMS || {};
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
                 var template = '<a href="{1}" class="{2}"><span>{3}</span></a>';
-
-                // remove class from modal when no breadcrumbs is rendered
-                if (!this.ui.breadcrumb.find('a').length) {
-                    this.ui.modal.removeClass('cms-modal-has-breadcrumb');
-                }
 
                 // cancel if there is no breadcrumbs)
                 if (!breadcrumbs || breadcrumbs.length <= 1) {
