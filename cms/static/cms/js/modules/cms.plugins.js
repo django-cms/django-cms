@@ -548,6 +548,7 @@
                     minWidth: 400,
                     minHeight: 150
                 });
+                modal.on('cms.modal.loaded', that._setupPluginsListKeyboardTraversing);
                 var plugins = nav.siblings('.cms-add-plugins-list');
 
                 that._setupQuickSearch(plugins);
@@ -563,7 +564,6 @@
                         // that._showSubnav(trigger, dropdown);
                         // // show subnav
                         // nav.siblings('.cms-submenu-quicksearch').show();
-                        // that._setupDropdownKeyboardTraversing(nav);
 
                         // since we don't know exact plugin parent (because dragndrop)
                         // we need to know the parent id by the time we open "add plugin" dialog
@@ -595,16 +595,18 @@
              * sets up event handlers for quicksearching
              * FIXME will be moved into a separate "add plugin" modal
              *
-             * @param nav jQuery
+             * @param plugins jQuery
              * @private
              */
-            _setupQuickSearch: function _setupQuickSearch(nav) {
+            _setupQuickSearch: function _setupQuickSearch(plugins) {
                 var that = this;
-                nav.siblings('.cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
+                plugins.find('> .cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
                     clearTimeout(that.timer);
+                    var input = $(e.currentTarget);
                     // keybound is not required
                     that.timer = setTimeout(function () {
-                        that._searchSubnav(nav, $(e.currentTarget).val());
+                        // has to be closest because we clone the list
+                        that._filterPluginsList(input.closest('.cms-add-plugins-list'), input.val());
                     }, 100);
                 });
             },
@@ -683,8 +685,11 @@
              * @param nav
              * @private
              */
-            _setupDropdownKeyboardTraversing: function _setupDropdownKeyboardTraversing(nav) {
-                var dropdown = $('.cms-submenu-dropdown-children:visible');
+            _setupPluginsListKeyboardTraversing: function _setupPluginsListKeyboardTraversing() {
+                var dropdown = $('.cms-modal-markup .cms-add-plugins-list');
+                if (!dropdown.length) {
+                    return;
+                }
                 // add key events
                 doc.off('keydown.cms.traverse');
                 doc.on('keydown.cms.traverse', function (e) {
@@ -754,9 +759,16 @@
                 }
             },
 
-            _searchSubnav: function (nav, value) {
-                var items = nav.siblings('.cms-submenu-dropdown-children').find('.cms-submenu-item');
-                var titles = nav.siblings('.cms-submenu-dropdown-children').find('.cms-submenu-item-title');
+            /**
+             * _filterPluginsList
+             *
+             * @private
+             * @param list {jQuery}
+             * @param value {String}
+             */
+            _filterPluginsList: function _filterPluginsList(list, value) {
+                var items = list.find('.cms-submenu-item');
+                var titles = list.find('.cms-submenu-item-title');
 
                 // cancel if value is zero
                 if (value === '') {
@@ -790,13 +802,13 @@
                 });
 
                 // if there is no element visible, show only first categoriy
-                nav.siblings('.cms-submenu-dropdown-children').show();
+                list.siblings('.cms-submenu-dropdown-children').show();
                 if (items.add(titles).filter(':visible').length <= 0) {
-                    nav.siblings('.cms-submenu-dropdown-children').hide();
+                    list.siblings('.cms-submenu-dropdown-children').hide();
                 }
 
                 // hide scrollHint
-                nav.siblings('.cms-submenu-dropdown').find('.cms-submenu-scroll-hint').hide();
+                list.siblings('.cms-submenu-dropdown').find('.cms-submenu-scroll-hint').hide();
             },
 
             /**
