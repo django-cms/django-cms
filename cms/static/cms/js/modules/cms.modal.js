@@ -525,8 +525,8 @@ var CMS = window.CMS || {};
                     var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
-                    var wMax = 680;
-                    var hMax = 150;
+                    var wMax = that.options.minWidth;
+                    var hMax = that.options.minHeight;
 
                     // add some limits
                     if (w <= wMax || h <= hMax) {
