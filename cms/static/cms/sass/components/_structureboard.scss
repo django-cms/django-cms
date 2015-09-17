@@ -179,22 +179,6 @@
         .cms-submenu-dropdown-bottom {
             bottom: $structure-dragitem-height + $structure-dragarea-padding * 2;
         }
-        .cms-submenu-quicksearch {
-            $quicksearch-height: $structure-dragitem-height + $structure-dragarea-padding * 2 - 2px;
-            top: 50%;
-            height: $quicksearch-height;
-            margin-top: -($quicksearch-height / 2);
-            border-left: 1px dotted $gray-lighter;
-            border-radius: 0;
-            background: $white;
-            &:before {
-                color: $gray-darker;
-            }
-        }
-        .cms-submenu-quicksearch input {
-            color: $black;
-            margin-top: 1px;
-        }
 
         .cms-dragitem {
             line-height: $structure-dragitem-height;

@@ -1,0 +1,69 @@
+//######################################################################################################################
+// Add plugins modal
+#cms-toolbar {
+    .cms-add-plugins-list {
+        display: none;
+
+        .cms-submenu-item.cms-submenu-item-title {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background-color: $white;
+        }
+        .cms-submenu-item a,
+        span {
+            display: block;
+            font-size: $submenu-item-font-size;
+            line-height: $submenu-item-height * 1.2;
+            min-height: $submenu-item-height * 1.2;
+            text-align: left;
+            padding: 0px $submenu-item-padding-horizontal;
+        }
+
+        .cms-submenu-item a {
+            color: $black;
+            &:hover,
+            &:focus {
+                color: $submenu-item-hover-color;
+                background: $color-primary;
+            }
+        }
+        .cms-submenu-item span {
+            color: $black;
+            font-weight: bold;
+            border-bottom: 1px solid $gray-lighter;
+            cursor: default;
+        }
+    }
+
+    .cms-modal-markup .cms-add-plugins-list {
+        display: block;
+    }
+
+    .cms-submenu-quicksearch {
+        display: none;
+        position: relative;
+        cursor: default;
+        height: $quicksearch-height;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    .cms-submenu-quicksearch label {
+        cursor: pointer;
+        display: block;
+        height: 100%;
+        width: 100%;
+    }
+    .cms-submenu-quicksearch input {
+        display: block;
+        width: 100%;
+        padding: 0 $padding-large;
+        height: 100%;
+        background-color: $gray-lightest;
+        border: none;
+        -webkit-appearance: none;
+    }
+
+    .cms-modal-markup .cms-submenu-quicksearch {
+        display: block;
+    }
+}
