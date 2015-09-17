@@ -381,7 +381,7 @@ var CMS = window.CMS || {};
                     this.minimized = false;
                 }
             },
-
+            
             /**
              * Maximizes the window according to the browser size.
              *
