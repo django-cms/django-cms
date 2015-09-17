@@ -165,6 +165,7 @@ var CMS = window.CMS || {};
              * Opens the modal either in an iframe or renders markup.
              *
              * @method open
+             * @chainable
              * @param opts either `opts.url` or `opts.html` are required
              * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
              * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
@@ -259,6 +260,8 @@ var CMS = window.CMS || {};
                     height: opts.height || height,
                     duration: this.options.modalDuration
                 });
+
+                return this;
             },
 
             /**
