@@ -487,10 +487,10 @@
             /**
              * _setSettingsMenu sets up event handlers for settings menu
              *
-             * @private
              * @param nav jQuery
+             * @private
              */
-            _setSettingsMenu: function (nav) {
+            _setSettingsMenu: function _setSettingsMenu(nav) {
                 var that = this;
                 this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
                 var dropdown = this.ui.dropdown;
@@ -531,6 +531,7 @@
              * so will eventually be removed from here
              *
              * @param nav
+             * @private
              */
             _setAddPluginMenu: function _setAddPluginMenu(nav) {
                 var that = this;
@@ -569,6 +570,7 @@
              * FIXME will be moved into a separate "add plugin" modal
              *
              * @param nav jQuery
+             * @private
              */
             _setupQuickSearch: function _setupQuickSearch(nav) {
                 var that = this;
@@ -586,6 +588,7 @@
              * FIXME no need to go around nav, can be used directly in dragbar/dragitem
              *
              * @param nav jQuery
+             * @private
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
@@ -652,6 +655,7 @@
              * FIXME will be moved out of here
              *
              * @param nav
+             * @private
              */
             _setupDropdownKeyboardTraversing: function _setupDropdownKeyboardTraversing(nav) {
                 var dropdown = $('.cms-submenu-dropdown-children:visible');
@@ -694,6 +698,7 @@
              *
              * @param nav jQuery
              * @param [dropdown=this.ui.dropdown] jQuery
+             * @private
              */
             _showSubnav: function (nav, dropdown) {
                 dropdown = dropdown || this.ui.dropdown;
@@ -772,8 +777,8 @@
              * Toggles collapsable item
              *
              * @method toggleCollapsable
-             * @private
              * @param el jQuery element to toggle
+             * @private
              */
             _toggleCollapsable: function toggleCollapsable(el) {
                 var that = this;
@@ -955,8 +960,9 @@
         /**
          * hides the opened navigation
          *
-         * @static
          * @param [nav] jQuery element representing the subnav trigger
+         * @static
+         * @private
          */
         CMS.Plugin._hideSubnav = function (nav) {
             nav = nav || $('.cms-submenu-btn.cms-btn-active');
