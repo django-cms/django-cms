@@ -103,7 +103,7 @@
 
                 // register the subnav on the placeholder
                 this._setSettingsMenu(this.ui.submenu);
-                this._setAddPluginMenu(this.ui.dragbar.find('.cms-submenu-add'));
+                this._setAddPluginModal(this.ui.dragbar.find('.cms-submenu-add'));
 
                 CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
@@ -178,7 +178,7 @@
 
                 // attach event to the plugin menu
                 this._setSettingsMenu(this.ui.submenu);
-                this._setAddPluginMenu(this.ui.dragitem.find('.cms-submenu-add'));
+                this._setAddPluginModal(this.ui.dragitem.find('.cms-submenu-add'));
 
                 // adds double click to edit
                 this.ui.dragitem.on('dblclick', function (e) {
@@ -541,22 +541,43 @@
              * @param nav
              * @private
              */
-            _setAddPluginMenu: function _setAddPluginMenu(nav) {
+            _setAddPluginModal: function _setAddPluginModal(nav) {
                 var that = this;
                 // FIXME children -> plugins
-                var dropdown = nav.siblings('.cms-submenu-dropdown-children');
+                var modal = new CMS.Modal();
+                var plugins = nav.siblings('.cms-submenu-dropdown-children');
+                var modalLoaded = function modalLoaded() {
+                    console.log('modal loaded');
+                };
+                modal.on('cms.modal.loaded', function () {
+                    console.log(this, modal);
+                    modal.off('cms.modal.loaded', modalLoaded);
+                    console.log(that.options.plugin_name, that.options.plugin_id);
+                    modalLoaded();
+                });
+                modal.on('cms.modal.closed', function () {
+                    modal.off('cms.modal.loaded', modalLoaded);
+                });
+
                 nav.on(this.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var trigger = $(this);
                     if (trigger.hasClass('cms-btn-active')) {
-                        CMS.Plugin._hideSubnav(trigger, dropdown);
+                        // CMS.Plugin._hideSubnav(trigger, dropdown);
                     } else {
                         CMS.Plugin._hideSubnav();
-                        that._showSubnav(trigger, dropdown);
-                        // show subnav
-                        nav.siblings('.cms-submenu-quicksearch').show();
-                        that._setupDropdownKeyboardTraversing(nav);
+                        // that._showSubnav(trigger, dropdown);
+                        // // show subnav
+                        // nav.siblings('.cms-submenu-quicksearch').show();
+                        // that._setupDropdownKeyboardTraversing(nav);
+
+                        modal.open({
+                            title: that.ui.container.data('settings').addPluginHelpTitle,
+                            html: plugins,
+                            width: 450,
+                            height: 300
+                        });
                     }
                 });
 

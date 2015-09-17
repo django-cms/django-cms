@@ -904,12 +904,13 @@ var CMS = window.CMS || {};
              * @param [opts.subtitle] {String} modal window secondary title (normal)
              */
             _loadMarkup: function _loadMarkup(opts) {
+                console.count('load markup');
                 this.ui.modal.removeClass('cms-modal-iframe');
                 this.ui.modal.addClass('cms-modal-markup');
 
                 // set content
                 this.ui.frame.html(opts.html);
-                this.ui.titlePrefix.text(opts.title);
+                this.ui.titlePrefix.text(opts.title || '');
                 this.ui.titleSuffix.text(opts.subtitle || '');
 
                 this.trigger('cms.modal.loaded');

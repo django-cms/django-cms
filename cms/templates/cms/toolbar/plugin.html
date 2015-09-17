@@ -17,6 +17,7 @@ CMS._plugins.push(['cms-plugin-{% if generic %}{{ generic.app_label }}-{{ generi
     plugin_breadcrumb: {{ instance.get_breadcrumb_json|default:"[]" }},
     plugin_restriction: [{% for cls in allowed_child_classes %}"{{ cls }}"{% if not forloop.last %},{% endif %}{% endfor %}],
     onClose: {% if refresh_page %}'REFRESH_PAGE'{% else %}{% if redirect_on_close %}'{{ redirect_on_close }}'{% else %}false{% endif %}{% endif %},
+    addPluginHelpTitle: '{% trans "Add plugin to" %} {{ instance.get_plugin_name|escapejs }}',
     urls: {
         add_plugin: '{% if instance.add_url %}{{ instance.add_url }}{% elif add_url %}{{ add_url }}{% else %}{% cms_admin_url "cms_page_add_plugin" %}}{% endif %}',
         edit_plugin: '{% if instance.edit_url %}{{ instance.edit_url }}{% elif edit_url %}{{ edit_url }}{% elif instance %}{% cms_admin_url "cms_page_edit_plugin" instance.pk %}{% endif %}',
