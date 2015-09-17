@@ -549,6 +549,10 @@
                     minHeight: 150
                 });
                 modal.on('cms.modal.loaded', that._setupPluginsListKeyboardTraversing);
+                modal.on('cms.modal.shown', function () {
+                    var dropdown = $('.cms-modal-markup .cms-add-plugins-list');
+                    dropdown.find('input').trigger('focus');
+                });
                 var plugins = nav.siblings('.cms-add-plugins-list');
 
                 that._setupQuickSearch(plugins);
