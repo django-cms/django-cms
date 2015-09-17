@@ -99,6 +99,11 @@ var CMS = window.CMS || {};
                     e.preventDefault();
                     that._startResize();
                 });
+
+                // close sideframe when clicking on the dimmer
+                this.ui.dimmer.on(this.click, function () {
+                    that.close();
+                });
             },
 
             /**
@@ -109,6 +114,11 @@ var CMS = window.CMS || {};
              * @param [animate] {Number} Animation speed in ms
              */
             open: function open(url, animate) {
+                if (!url) {
+                    throw new Error('The arguments passed to "open" were invalid.');
+                }
+
+                // setup internals
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
                 var params = [];
