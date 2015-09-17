@@ -81,7 +81,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Handles all internal events such as closing and resizing.
+             * Sets up all the event handlers, such as closing and resizing.
              *
              * @method _events
              * @private

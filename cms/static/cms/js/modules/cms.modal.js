@@ -94,7 +94,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Handles all internal events such as maximize/minimize and resizing.
+             * Sets up all the event handlers, such as maximize/minimize and resizing.
              *
              * @method _events
              * @private
@@ -102,7 +102,7 @@ var CMS = window.CMS || {};
             _events: function _events() {
                 var that = this;
 
-                // window behaviours
+                // modal behaviours
                 this.ui.minimizeButton.on(this.click, function (e) {
                     e.preventDefault();
                     that.minimize();
@@ -199,12 +199,12 @@ var CMS = window.CMS || {};
                 var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
-                // screen width and height calculation
-                var screenWC = screenWidth >= (this.options.minWidth + widthOffset);
-                var screenHC = screenHeight >= (this.options.minHeight + heightOffset);
+                // screen width and height calculation, WC = width
+                var screenWidthCalc = screenWidth >= (this.options.minWidth + widthOffset);
+                var screenHeightCalc = screenHeight >= (this.options.minHeight + heightOffset);
 
-                var width = screenWC ? screenWidth - widthOffset : this.options.minWidth;
-                var height = screenHC ? screenHeight - heightOffset : this.options.minHeight;
+                var width = screenWidthCalc ? screenWidth - widthOffset : this.options.minWidth;
+                var height = screenHeightCalc ? screenHeight - heightOffset : this.options.minHeight;
 
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
@@ -328,7 +328,7 @@ var CMS = window.CMS || {};
                     if (that.maximized) {
                         that.maximize();
                     }
-                }, 300);
+                }, this.options.duration);
 
                 this.ui.modal.trigger('cms.modal.closed');
             },
@@ -360,7 +360,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Minimizes the window onto the toolbar.
+             * Minimizes the modal onto the toolbar.
              *
              * @method minimize
              */
@@ -435,10 +435,10 @@ var CMS = window.CMS || {};
              * Initiates the start move event from `_events`.
              *
              * @method _startMove
-             * @param originEvent {Object} passes starting event
+             * @param pointerEvent {Object} passes starting event
              * @private
              */
-            _startMove: function _startMove(originEvent) {
+            _startMove: function _startMove(pointerEvent) {
                 // cancel if maximized
                 if (this.maximized) {
                     return false;
@@ -459,8 +459,8 @@ var CMS = window.CMS || {};
                 this.ui.shim.show();
 
                 this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
-                    var left = position.left - (originEvent.originalEvent.pageX - e.originalEvent.pageX);
-                    var top = position.top - (originEvent.originalEvent.pageY - e.originalEvent.pageY);
+                    var left = position.left - (pointerEvent.originalEvent.pageX - e.originalEvent.pageX);
+                    var top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
 
                     that.ui.modal.css({
                         'left': left,
@@ -478,8 +478,7 @@ var CMS = window.CMS || {};
             _stopMove: function _stopMove() {
                 this.ui.shim.hide();
                 this.ui.body
-                    .off(this.pointerMove)
-                    .off(this.pointerUp)
+                    .off(this.pointerMove + ' ' + this.pointerUp)
                     .removeAttr('data-touch-action');
             },
 
@@ -487,10 +486,10 @@ var CMS = window.CMS || {};
              * Initiates the start resize event from `_events`.
              *
              * @method _startResize
-             * @param originEvent {Object} passes starting event
+             * @param pointerEvent {Object} passes starting event
              * @private
              */
-            _startResize: function _startResize(originEvent) {
+            _startResize: function _startResize(pointerEvent) {
                 // cancel if in fullscreen
                 if (this.maximized) {
                     return false;
@@ -511,8 +510,8 @@ var CMS = window.CMS || {};
                 this.ui.shim.show();
 
                 this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
-                    var mvX = originEvent.originalEvent.pageX - e.originalEvent.pageX;
-                    var mvY = originEvent.originalEvent.pageY - e.originalEvent.pageY;
+                    var mvX = pointerEvent.originalEvent.pageX - e.originalEvent.pageX;
+                    var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
 
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
@@ -543,8 +542,7 @@ var CMS = window.CMS || {};
             _stopResize: function _stopResize() {
                 this.ui.shim.hide();
                 this.ui.body
-                    .off(this.pointerMove)
-                    .off(this.pointerUp)
+                    .off(this.pointerMove + ' ' + this.pointerUp)
                     .removeAttr('data-touch-action');
             },
 
@@ -727,7 +725,7 @@ var CMS = window.CMS || {};
                 opts.breadcrumbs = opts.breadcrumbs || '';
 
                 // set classes
-                this.ui.modal.removeClass('cms-modal-content');
+                this.ui.modal.removeClass('cms-modal-markup');
                 this.ui.modal.addClass('cms-modal-iframe');
 
                 // we need to render the breadcrumb
@@ -862,7 +860,7 @@ var CMS = window.CMS || {};
             /**
              * Version where the modal loads html markup.
              *
-             * @method _loadIframe
+             * @method _loadMarkup
              * @param opts
              * @param opts.html {String|HTMLNode|jQuery} html markup to render
              * @param opts.title {String} modal window main title (bold)
@@ -870,7 +868,7 @@ var CMS = window.CMS || {};
              */
             _loadMarkup: function _loadMarkup(opts) {
                 this.ui.modal.removeClass('cms-modal-iframe');
-                this.ui.modal.addClass('cms-modal-content');
+                this.ui.modal.addClass('cms-modal-markup');
 
                 // set content
                 this.ui.frame.html(opts.html);
@@ -883,7 +881,7 @@ var CMS = window.CMS || {};
             /**
              * _deletePlugin removes a plugin once created when clicking
              * on delete or the close item. If we don't do this, an empty
-             * placeholder is generated
+             * plugin is generated
              * https://github.com/divio/django-cms/pull/4381 will eventually
              * provide a better solution
              *
