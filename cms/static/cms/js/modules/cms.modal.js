@@ -622,7 +622,7 @@ var CMS = window.CMS || {};
 
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
-                            item[0].trigger('click');
+                            item[0].click();
                         }
 
                         if (item.is('a')) {
@@ -631,7 +631,7 @@ var CMS = window.CMS || {};
                                 name: title
                             });
                         }
-
+                        
                         // trigger only when blue action buttons are triggered
                         if (item.hasClass('default') || item.hasClass('deletelink')) {
                             // reset onClose when delete is triggered
