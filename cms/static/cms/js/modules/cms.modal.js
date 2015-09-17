@@ -242,11 +242,11 @@ var CMS = window.CMS || {};
              * Animation helper for opening the sideframe.
              *
              * @method _show
+             * @private
              * @param opts
              * @param opts.width {Number} width of the modal
              * @param opts.height {Number} height of the modal
              * @param opts.duration {Number} speed of opening, ms (not really used yet)
-             * @private
              */
             _show: function _show(opts) {
                 // we need to position the modal in the center
@@ -337,9 +337,9 @@ var CMS = window.CMS || {};
              * Animation helper for closing the iframe.
              *
              * @method _hide
+             * @private
              * @param opts
              * @param [opts.duration=this.options.modalDuration] {Number} animation duration
-             * @private
              */
             _hide: function _hide(opts) {
                 var that = this;
@@ -435,8 +435,8 @@ var CMS = window.CMS || {};
              * Initiates the start move event from `_events`.
              *
              * @method _startMove
-             * @param pointerEvent {Object} passes starting event
              * @private
+             * @param pointerEvent {Object} passes starting event
              */
             _startMove: function _startMove(pointerEvent) {
                 // cancel if maximized
@@ -486,8 +486,8 @@ var CMS = window.CMS || {};
              * Initiates the start resize event from `_events`.
              *
              * @method _startResize
-             * @param pointerEvent {Object} passes starting event
              * @private
+             * @param pointerEvent {Object} passes starting event
              */
             _startResize: function _startResize(pointerEvent) {
                 // cancel if in fullscreen
@@ -550,8 +550,8 @@ var CMS = window.CMS || {};
              * Sets the breadcrumb inside the modal.
              *
              * @method _setBreadcrumb
-             * @param breadcrumbs {Object[]} renderes breadcrumb on modal
              * @private
+             * @param breadcrumbs {Object[]} renderes breadcrumb on modal
              */
             _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
                 var bread = this.ui.breadcrumb;
@@ -592,8 +592,8 @@ var CMS = window.CMS || {};
              * Sets the buttons inside the modal.
              *
              * @method _setButtons
-             * @param iframe {jQuery} loaded iframe element
              * @private
+             * @param iframe {jQuery} loaded iframe element
              */
             _setButtons: function _setButtons(iframe) {
                 var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
@@ -699,8 +699,8 @@ var CMS = window.CMS || {};
              * Sanitise the ampersand within the url for #3404.
              *
              * @method _prepareUrl
-             * @param url {String}
              * @private
+             * @param url {String}
              */
             _prepareUrl: function _prepareUrl(url) {
                 // FIXME: A better fix is needed for '&' being interpreted as the
@@ -836,8 +836,8 @@ var CMS = window.CMS || {};
              * Version where the modal loads an url within an iframe.
              *
              * @method _changeIframe
-             * @param el {jQuery} originated element
              * @private
+             * @param el {jQuery} originated element
              */
             _changeIframe: function _changeIframe(el) {
                 if (el.hasClass('active')) {

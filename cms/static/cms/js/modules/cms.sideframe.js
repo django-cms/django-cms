@@ -155,8 +155,8 @@ var CMS = window.CMS || {};
              * Handles content replacement mechanisms.
              *
              * @method _content
-             * @param url {String} valid uri to pass on the iframe
              * @private
+             * @param url {String} valid uri to pass on the iframe
              */
             _content: function _content(url) {
                 var that = this;
@@ -211,9 +211,9 @@ var CMS = window.CMS || {};
              * Animation helper for opening the sideframe.
              *
              * @method _show
+             * @private
              * @param width {Number} width that the iframes opens to
              * @param animate {Number} Animation duration
-             * @private
              */
             _show: function _show(width, animate) {
                 this.ui.sideframe.show();
@@ -277,9 +277,9 @@ var CMS = window.CMS || {};
              * Animation helper for closing the iframe.
              *
              * @method _hide
+             * @private
              * @param opts
              * @param opts.duration {Number} animation duration
-             * @private
              */
             _hide: function _hide(opts) {
                 var duration = this.options.sideframeDuration;
