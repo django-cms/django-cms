@@ -565,6 +565,12 @@
                         // nav.siblings('.cms-submenu-quicksearch').show();
                         // that._setupDropdownKeyboardTraversing(nav);
 
+                        // since we don't know exact plugin parent (because dragndrop)
+                        // we need to know the parent id by the time we open "add plugin" dialog
+                        var pluginsCopy = plugins.clone(true, true).data(
+                            'parentId', that._getId(nav.closest('.cms-draggable'))
+                        );
+
                         modal.open({
                             title: that.ui.container.data('settings').addPluginHelpTitle,
                             html: pluginsCopy,
@@ -628,7 +634,7 @@
                             that.addPlugin(
                                 el.attr('href').replace('#', ''),
                                 el.text(),
-                                that._getId(el.closest('.cms-draggable'))
+                                el.closest('.cms-add-plugins-list').data('parentId')
                             );
                             break;
                         case 'ajax_add':
