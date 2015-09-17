@@ -1,14 +1,29 @@
-//##################################################################################################################
-// #MODAL#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// MODAL
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
+
+    // shorthand for jQuery(document).ready();
     $(function () {
-        /*!
-         * Modal
-         * Controls a cms specific modal
+        /**
+         * The modal is triggered via API calls from the backend either
+         * through the toolbar navigation or from plugins. The APIs allow to
+         * open content from a url (iframe) or inject html directly.
+         *
+         * @class Modal
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Modal = new CMS.Class({
 
@@ -22,15 +37,20 @@
                 newPlugin: false
             },
 
-            initialize: function (options) {
+            initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
+                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
 
-                // states
-                this.click = 'click.cms';
+                // states and events
+                this.click = 'click.cms.modal';
+                this.pointerDown = 'pointerdown.cms.modal contextmenu.cms.modal';
+                this.pointerUp = 'pointerup.cms.modal pointercancel.cms.modal';
+                this.pointerMove = 'pointermove.cms.modal';
+                this.doubleClick = 'dblclick.cms.modal';
                 this.maximized = false;
                 this.minimized = false;
                 this.triggerMaximized = false;
@@ -41,10 +61,16 @@
                     this._events();
                 }
 
-                // ready modal
+                // set a state to determine if we need to reinitialize this._events();
                 this.ui.modal.data('ready', true);
             },
 
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
             _setupUI: function _setupUI() {
                 var modal = $('.cms-modal');
                 this.ui = {
@@ -62,54 +88,75 @@
                     closeAndCancel: modal.find('.cms-modal-close, .cms-modal-cancel'),
                     modalButtons: modal.find('.cms-modal-buttons'),
                     modalBody: modal.find('.cms-modal-body'),
-                    iframeHolder: modal.find('.cms-modal-frame'),
+                    frame: modal.find('.cms-modal-frame'),
                     shim: modal.find('.cms-modal-shim')
                 };
             },
 
-            // initial methods
-            _events: function () {
+            /**
+             * Sets up all the event handlers, such as maximize/minimize and resizing.
+             *
+             * @method _events
+             * @private
+             */
+            _events: function _events() {
                 var that = this;
 
-                // attach events to window
+                // modal behaviours
                 this.ui.minimizeButton.on(this.click, function (e) {
                     e.preventDefault();
-                    that._minimize();
-                });
-                this.ui.title.on('pointerdown.cms contextmenu.cms', function (e) {
-                    e.preventDefault();
-                    that._startMove(e);
-                });
-                this.ui.title.on('dblclick.cms', function () {
-                    that._maximize();
-                });
-                this.ui.resize.on('pointerdown.cms contextmenu.cms', function (e) {
-                    e.preventDefault();
-                    that._startResize(e);
+                    that.minimize();
                 });
                 this.ui.maximizeButton.on(this.click, function (e) {
                     e.preventDefault();
-                    that._maximize();
+                    that.maximize();
                 });
+
+                this.ui.title.on(this.pointerDown, function (e) {
+                    e.preventDefault();
+                    that._startMove(e);
+                });
+                this.ui.title.on(this.doubleClick, function () {
+                    that.maximize();
+                });
+
+                this.ui.resize.on(this.pointerDown, function (e) {
+                    e.preventDefault();
+                    that._startResize(e);
+                });
+
+                // elements within the window
                 this.ui.breadcrumb.on(this.click, 'a', function (e) {
                     e.preventDefault();
-                    that._changeContent($(this));
+                    that._changeIframe($(this));
                 });
+
                 this.ui.closeAndCancel.on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
                 });
-
-                // stopper events
-                this.ui.body.on('pointerup.cms pointercancel.cms', function (e) {
-                    that._endMove(e);
-                    that._endResize(e);
-                });
             },
 
-            // public methods
-            open: function (url, name, breadcrumb) {
+            /**
+             * Opens the modal either in an iframe or renders markup.
+             *
+             * @method open
+             * @param opts either `opts.url` or `opts.html` are required
+             * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
+             * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
+             * @param [opts.title] {String} modal window main title (bold)
+             * @param [opts.subtitle] {String} modal window secondary title (normal)
+             * @param [opts.url] {String} url to render iframe, takes precedence over `opts.html`
+             * @param [opts.width] {Number} sets the width of the modal
+             * @param [opts.height] {Number} sets the height of the modal
+             */
+            open: function open(opts) {
+                // setup internals
+                if (!(opts && opts.url || opts && opts.html)) {
+                    throw new Error('The arguments passed to "open" were invalid.');
+                }
+
                 // cancel if another lightbox is already being opened
                 if (CMS.API.locked) {
                     CMS.API.locked = false;
@@ -134,11 +181,12 @@
                 // because a new instance is called, we have to ensure minimized state is removed #3620
                 if (this.ui.body.hasClass('cms-modal-minimized')) {
                     this.minimized = true;
-                    this._minimize();
+                    this.minimize();
                 }
 
                 // clear elements
                 this.ui.modalButtons.empty();
+                this.ui.breadcrumb.empty();
 
                 // show loader
                 CMS.API.Toolbar._loader(true);
@@ -146,20 +194,17 @@
                 // hide tooltip
                 this.hideTooltip();
 
-                this._loadContent(url, name);
-
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
                 var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
+                // screen width and height calculation, WC = width
+                var screenWidthCalc = screenWidth >= (this.options.minWidth + widthOffset);
+                var screenHeightCalc = screenHeight >= (this.options.minHeight + heightOffset);
 
-                var width = (screenWidth >= this.options.minWidth + widthOffset) ?
-                    screenWidth - widthOffset :
-                    this.options.minWidth;
-                var height = (screenHeight >= this.options.minHeight + heightOffset) ?
-                    screenHeight - heightOffset :
-                    this.options.minHeight;
+                var width = screenWidthCalc ? screenWidth - widthOffset : this.options.minWidth;
+                var height = screenHeightCalc ? screenHeight - heightOffset : this.options.minHeight;
 
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
@@ -169,53 +214,41 @@
                     this.triggerMaximized = true;
                 }
 
-                // we need to render the breadcrumb
-                this._setBreadcrumb(breadcrumb);
+                // redirect to iframe rendering if url is provided
+                if (opts.url) {
+                    this._loadIframe({
+                        url: opts.url,
+                        title: opts.title,
+                        breadcrumbs: opts.breadcrumbs
+                    });
+                } else {
+                    // if url is not provided we go for html
+                    this._loadMarkup({
+                        html: opts.html,
+                        title: opts.title,
+                        subtitle: opts.subtitle
+                    });
+                }
 
                 // display modal
                 this._show({
-                    width: width,
-                    height: height,
+                    width: opts.width || width,
+                    height: opts.height || height,
                     duration: this.options.modalDuration
                 });
             },
 
-            close: function () {
-                var that = this;
-
-                // handle remove option when plugin is new
-                if (CMS._newPlugin) {
-                    this._deletePlugin({ hideAfter: true });
-                } else {
-                    this._hide(100);
-                }
-
-                // handle refresh option
-                if (this.options.onClose) {
-                    this.reloadBrowser(this.options.onClose, false, true);
-                }
-
-                // reset maximize or minimize states for #3111
-                setTimeout(function () {
-                    if (that.minimized) {
-                        that._minimize();
-                    }
-                    if (that.maximized) {
-                        that._maximize();
-                    }
-                }, 300);
-            },
-
-            // private methods
             /**
-             * _show animates the modal to given size
+             * Animation helper for opening the sideframe.
              *
+             * @method _show
+             * @private
              * @param opts
              * @param opts.width {Number} width of the modal
              * @param opts.height {Number} height of the modal
              * @param opts.duration {Number} speed of opening, ms (not really used yet)
              */
-            _show: function (opts) {
+            _show: function _show(opts) {
                 // we need to position the modal in the center
                 var that = this;
                 var width = opts.width;
@@ -247,7 +280,7 @@
 
                     // check if we should maximize
                     if (that.triggerMaximized) {
-                        that._maximize();
+                        that.maximize();
                     }
 
                     // changed locked status to allow other modals again
@@ -265,8 +298,56 @@
                 this.ui.modal.focus();
             },
 
-            _hide: function (duration) {
+            /**
+             * Closes the current instance.
+             *
+             * @method close
+             */
+            close: function close() {
                 var that = this;
+
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    this._deletePlugin({ hideAfter: true });
+                } else {
+                    this._hide({
+                        duration: 100
+                    });
+                }
+
+                // handle refresh option
+                if (this.options.onClose) {
+                    this.reloadBrowser(this.options.onClose, false, true);
+                }
+
+                // reset maximize or minimize states for #3111
+                setTimeout(function () {
+                    if (that.minimized) {
+                        that.minimize();
+                    }
+                    if (that.maximized) {
+                        that.maximize();
+                    }
+                }, this.options.duration);
+
+                this.ui.modal.trigger('cms.modal.closed');
+            },
+
+            /**
+             * Animation helper for closing the iframe.
+             *
+             * @method _hide
+             * @private
+             * @param opts
+             * @param [opts.duration=this.options.modalDuration] {Number} animation duration
+             */
+            _hide: function _hide(opts) {
+                var that = this;
+                var duration = this.options.modalDuration;
+
+                if (opts && opts.duration) {
+                    duration = opts.duration;
+                }
 
                 that.ui.modal.removeClass('cms-modal-open');
 
@@ -274,11 +355,16 @@
                     that.ui.modal.css('display', 'none');
                 }).emulateTransitionEnd(duration);
 
-                that.ui.iframeHolder.find('iframe').remove();
+                that.ui.frame.empty();
                 that.ui.modalBody.removeClass('cms-loader');
             },
 
-            _minimize: function () {
+            /**
+             * Minimizes the modal onto the toolbar.
+             *
+             * @method minimize
+             */
+            minimize: function minimize() {
                 // cancel action if maximized
                 if (this.maximized) {
                     return false;
@@ -312,7 +398,12 @@
                 }
             },
 
-            _maximize: function () {
+            /**
+             * Maximizes the window according to the browser size.
+             *
+             * @method maximize
+             */
+            maximize: function maximize() {
                 var container = this.ui.modal;
 
                 // cancel action when minimized
@@ -340,7 +431,14 @@
                 }
             },
 
-            _startMove: function (initial) {
+            /**
+             * Initiates the start move event from `_events`.
+             *
+             * @method _startMove
+             * @private
+             * @param pointerEvent {Object} passes starting event
+             */
+            _startMove: function _startMove(pointerEvent) {
                 // cancel if maximized
                 if (this.maximized) {
                     return false;
@@ -353,11 +451,16 @@
                 var that = this;
                 var position = that.ui.modal.position();
 
+                // create event for stopping
+                this.ui.body.on(this.pointerUp, function (e) {
+                    that._stopMove(e);
+                });
+
                 this.ui.shim.show();
 
-                this.ui.body.attr('data-touch-action', 'none').on('pointermove.cms', function (e) {
-                    var left = position.left - (initial.originalEvent.pageX - e.originalEvent.pageX);
-                    var top = position.top - (initial.originalEvent.pageY - e.originalEvent.pageY);
+                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
+                    var left = position.left - (pointerEvent.originalEvent.pageX - e.originalEvent.pageX);
+                    var top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
 
                     that.ui.modal.css({
                         'left': left,
@@ -366,29 +469,49 @@
                 });
             },
 
-            _endMove: function () {
+            /**
+             * Initiates the stop move event from `_startResize`.
+             *
+             * @method _stopMove
+             * @private
+             */
+            _stopMove: function _stopMove() {
                 this.ui.shim.hide();
-
-                this.ui.body.off('pointermove.cms').removeAttr('data-touch-action');
+                this.ui.body
+                    .off(this.pointerMove + ' ' + this.pointerUp)
+                    .removeAttr('data-touch-action');
             },
 
-            _startResize: function (initial) {
+            /**
+             * Initiates the start resize event from `_events`.
+             *
+             * @method _startResize
+             * @private
+             * @param pointerEvent {Object} passes starting event
+             */
+            _startResize: function _startResize(pointerEvent) {
                 // cancel if in fullscreen
                 if (this.maximized) {
                     return false;
                 }
                 // continue
+                var that = this;
                 var container = this.ui.modal;
                 var width = container.width();
                 var height = container.height();
                 var modalLeft = this.ui.modal.position().left;
                 var modalTop = this.ui.modal.position().top;
 
+                // create event for stopping
+                this.ui.body.on(this.pointerUp, function (e) {
+                    that._stopResize(e);
+                });
+
                 this.ui.shim.show();
 
-                this.ui.body.attr('data-touch-action', 'none').on('pointermove.cms', function (e) {
-                    var mvX = initial.originalEvent.pageX - e.originalEvent.pageX;
-                    var mvY = initial.originalEvent.pageY - e.originalEvent.pageY;
+                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
+                    var mvX = pointerEvent.originalEvent.pageX - e.originalEvent.pageX;
+                    var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
 
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
@@ -410,46 +533,69 @@
                 });
             },
 
-            _endResize: function () {
+            /**
+             * Initiates the stop resize event from `_startResize`.
+             *
+             * @method _stopResize
+             * @private
+             */
+            _stopResize: function _stopResize() {
                 this.ui.shim.hide();
-
-                this.ui.body.off('pointermove.cms').removeAttr('data-touch-action');
+                this.ui.body
+                    .off(this.pointerMove + ' ' + this.pointerUp)
+                    .removeAttr('data-touch-action');
             },
 
-            _setBreadcrumb: function (breadcrumb) {
+            /**
+             * Sets the breadcrumb inside the modal.
+             *
+             * @method _setBreadcrumb
+             * @private
+             * @param breadcrumbs {Object[]} renderes breadcrumb on modal
+             */
+            _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
 
-                // remove class from modal
-                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+                // remove class from modal when no breadcrumbs is rendered
+                if (!this.ui.breadcrumb.find('a').length) {
+                    this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+                }
 
-                // cancel if there is no breadcrumb)
-                if (!breadcrumb || breadcrumb.length <= 1) {
+                // cancel if there is no breadcrumbs)
+                if (!breadcrumbs || breadcrumbs.length <= 1) {
                     return false;
                 }
-                if (!breadcrumb[0].title) {
+                if (!breadcrumbs[0].title) {
                     return false;
                 }
 
                 // add class to modal
                 this.ui.modal.addClass('cms-modal-has-breadcrumb');
 
-                // load breadcrumb
-                $.each(breadcrumb, function (index, item) {
+                // load breadcrumbs
+                $.each(breadcrumbs, function (index, item) {
                     // check if the item is the last one
-                    var last = (index >= breadcrumb.length - 1) ? 'active' : '';
-                    // render breadcrumb
+                    var last = (index >= breadcrumbs.length - 1) ? 'active' : '';
+                    // render breadcrumbs
                     crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
                 });
 
                 // attach elements
                 this.ui.breadcrumb.html(crumb);
 
-                // show breadcrumb
+                // show breadcrumbs
                 bread.show();
             },
 
-            _setButtons: function (iframe) {
+            /**
+             * Sets the buttons inside the modal.
+             *
+             * @method _setButtons
+             * @private
+             * @param iframe {jQuery} loaded iframe element
+             */
+            _setButtons: function _setButtons(iframe) {
                 var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
                 var that = this;
                 var group = $('<div class="cms-modal-item-buttons"></div>');
@@ -506,7 +652,10 @@
                             item[0].click();
                         }
                         if (item.is('a')) {
-                            that._loadContent(item.prop('href'), title);
+                            that._loadIframe({
+                                url: item.prop('href'),
+                                name: title
+                            });
                         }
 
                         // trigger only when blue action buttons are triggered
@@ -516,7 +665,7 @@
                                 that.options.onClose = null;
                             }
                             // hide iframe
-                            that.ui.iframeHolder.find('iframe').hide();
+                            that.ui.frame.find('iframe').hide();
                             // page has been saved or deleted, run checkup
                             that.saved = true;
                         }
@@ -547,29 +696,50 @@
             },
 
             /**
-             * sanitise the ampersand within the url for #3404
+             * Sanitise the ampersand within the url for #3404.
              *
+             * @method _prepareUrl
+             * @private
              * @param url {String}
              */
-            _prepareUrl: function (url) {
+            _prepareUrl: function _prepareUrl(url) {
                 // FIXME: A better fix is needed for '&' being interpreted as the
                 url = url.replace('&', '&amp;');
                 return url;
             },
 
-            _loadContent: function (url, name) {
+            /**
+             * Version where the modal loads an iframe.
+             *
+             * @method _loadIframe
+             * @param opts
+             * @param opts.url {String} url to render iframe, takes presedence over opts.html
+             * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
+             * @param [opts.title] {String} modal window main title (bold)
+             */
+            _loadIframe: function _loadIframe(opts) {
                 var that = this;
-                url = this._prepareUrl(url);
+
+                opts.url = this._prepareUrl(opts.url);
+                opts.title = opts.title || '';
+                opts.breadcrumbs = opts.breadcrumbs || '';
+
+                // set classes
+                this.ui.modal.removeClass('cms-modal-markup');
+                this.ui.modal.addClass('cms-modal-iframe');
+
+                // we need to render the breadcrumb
+                this._setBreadcrumb(opts.breadcrumbs);
 
                 // now refresh the content
-                var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
+                var iframe = $('<iframe src="' + opts.url + '" class="" frameborder="0" />');
                 iframe.css('visibility', 'hidden');
-                var holder = this.ui.iframeHolder;
+                var holder = this.ui.frame;
 
                 // set correct title
                 var titlePrefix = this.ui.titlePrefix;
                 var titleSuffix = this.ui.titleSuffix;
-                titlePrefix.text(name || '');
+                titlePrefix.text(opts.title || '');
                 titleSuffix.text('');
 
                 // ensure previous iframe is hidden
@@ -628,7 +798,7 @@
                         var innerTitle = iframe.contents().find('#content h1:eq(0)');
 
                         // case when there is no prefix
-                        if (name === undefined && that.ui.titlePrefix.text() === '') {
+                        if (opts.title === undefined && that.ui.titlePrefix.text() === '') {
                             var bc = iframe.contents().find('.breadcrumbs').contents();
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
@@ -658,9 +828,18 @@
 
                 // inject
                 holder.html(iframe);
+
+                this.ui.modal.trigger('cms.modal.loaded');
             },
 
-            _changeContent: function (el) {
+            /**
+             * Version where the modal loads an url within an iframe.
+             *
+             * @method _changeIframe
+             * @private
+             * @param el {jQuery} originated element
+             */
+            _changeIframe: function _changeIframe(el) {
                 if (el.hasClass('active')) {
                     return false;
                 }
@@ -670,23 +849,48 @@
 
                 el.addClass('active');
 
-                this._loadContent(el.attr('href'));
+                this._loadIframe({
+                    url: el.attr('href')
+                });
 
                 // update title
                 this.ui.titlePrefix.text(el.text());
+
+                this.ui.modal.trigger('cms.modal.changed');
+            },
+
+            /**
+             * Version where the modal loads html markup.
+             *
+             * @method _loadMarkup
+             * @param opts
+             * @param opts.html {String|HTMLNode|jQuery} html markup to render
+             * @param opts.title {String} modal window main title (bold)
+             * @param [opts.subtitle] {String} modal window secondary title (normal)
+             */
+            _loadMarkup: function _loadMarkup(opts) {
+                this.ui.modal.removeClass('cms-modal-iframe');
+                this.ui.modal.addClass('cms-modal-markup');
+
+                // set content
+                this.ui.frame.html(opts.html);
+                this.ui.titlePrefix.text(opts.title);
+                this.ui.titleSuffix.text(opts.subtitle || '');
+
+                this.ui.modal.trigger('cms.modal.loaded');
             },
 
             /**
              * _deletePlugin removes a plugin once created when clicking
              * on delete or the close item. If we don't do this, an empty
-             * placeholder is generated
+             * plugin is generated
              * https://github.com/divio/django-cms/pull/4381 will eventually
              * provide a better solution
              *
              * @param [opts] {Object} general objects element that holds settings
              * @param [opts.hideAfter] {Object} hides the modal after the ajax requests succeeds
              */
-            _deletePlugin: function (opts) {
+            _deletePlugin: function _deletePlugin(opts) {
                 var that = this;
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
@@ -698,7 +902,9 @@
                 return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
                     CMS._newPlugin = false;
                     if (opts && opts.hideAfter) {
-                        that._hide(100);
+                        that._hide({
+                            duration: 100
+                        });
                     }
                 });
             }
