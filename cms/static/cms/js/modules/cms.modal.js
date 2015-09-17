@@ -622,7 +622,9 @@ var CMS = window.CMS || {};
 
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
-                            item[0].trigger('click');
+                            // we need to use native `.click()` event specifically
+                            // as we are inside an iframe and magic is happening
+                            item[0].click();
                         }
 
                         if (item.is('a')) {
