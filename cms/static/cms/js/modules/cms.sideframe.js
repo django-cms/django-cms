@@ -19,7 +19,7 @@ var CMS = window.CMS || {};
         /**
          * The sideframe is triggered via API calls from the backend either
          * through the toolbar navigation or from plugins. The APIs only allow to
-         * open a url within the sideframe
+         * open a url within the sideframe.
          *
          * @class Sideframe
          * @namespace CMS
@@ -43,7 +43,7 @@ var CMS = window.CMS || {};
                 // elements
                 this._setupUI();
 
-                // states and event
+                // states and events
                 this.click = 'click.cms.sideframe';
                 this.pointerDown = 'pointerdown.cms.sideframe contextmenu.cms.sideframe';
                 this.pointerUp = 'pointerup.cms.sideframe pointercancel.cms.sideframe';
@@ -61,7 +61,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * stores all jQuery referemces within this.ui
+             * Stores all jQuery references within `this.ui`.
              *
              * @method _setupUI
              * @private
@@ -81,7 +81,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Handles all internal events such as closing and resizing
+             * Sets up all the event handlers, such as closing and resizing.
              *
              * @method _events
              * @private
@@ -102,7 +102,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * opens a given url within a sideframe
+             * Opens a given url within a sideframe.
              *
              * @method open
              * @param url {String} URL string
@@ -152,11 +152,11 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * handles content replacement mechanisms
+             * Handles content replacement mechanisms.
              *
              * @method _content
-             * @param url {String} valid uri to pass on the iframe
              * @private
+             * @param url {String} valid uri to pass on the iframe
              */
             _content: function _content(url) {
                 var that = this;
@@ -208,12 +208,12 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * animation helper for opening the sideframe
+             * Animation helper for opening the sideframe.
              *
              * @method _show
+             * @private
              * @param width {Number} width that the iframes opens to
              * @param animate {Number} Animation duration
-             * @private
              */
             _show: function _show(width, animate) {
                 this.ui.sideframe.show();
@@ -250,7 +250,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * closes the current instance
+             * Closes the current instance.
              *
              * @method close
              */
@@ -274,12 +274,12 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * animation helper for closing the iframe
+             * Animation helper for closing the iframe.
              *
              * @method _hide
+             * @private
              * @param opts
              * @param opts.duration {Number} animation duration
-             * @private
              */
             _hide: function _hide(opts) {
                 var duration = this.options.sideframeDuration;
@@ -298,7 +298,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * initiates the start resize event from _events
+             * Initiates the start resize event from `_events`.
              *
              * @method _startResize
              * @private
@@ -339,7 +339,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * initiates the stop resize event from _startResize
+             * Initiates the stop resize event from `_startResize`.
              *
              * @method _stopResize
              * @private
