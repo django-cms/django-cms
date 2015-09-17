@@ -8,7 +8,6 @@
     </span>
     <div class="cms-submenu-settings cms-submenu-btn cms-btn">
     </div>
-    <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
     <div class="cms-submenu-dropdown cms-submenu-dropdown-settings" data-touch-action="pan-y">
         <div class="cms-dropdown-inner">
             <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">{% trans "Copy all" %}</a></div>
@@ -19,7 +18,8 @@
             {% extra_menu_items placeholder %}
         </div>
     </div>
-    <div class="cms-submenu-dropdown cms-submenu-dropdown-children" data-touch-action="pan-y">
+    <div class="cms-add-plugins-list" data-touch-action="pan-y">
+        <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
         {% plugin_child_classes placeholder %}
     </div>
     {% endlanguage %}
