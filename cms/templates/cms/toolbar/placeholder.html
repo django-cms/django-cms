@@ -11,6 +11,7 @@ CMS._plugins.push(['cms-placeholder-{{ placeholder.pk|unlocalize }}', {
     placeholder_id: '{{ placeholder.pk|unlocalize }}',
     plugin_language: '{{ language }}',
     plugin_restriction: [{% for module in allowed_plugins %}"{{ module}}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+    addPluginHelpTitle: '{% trans "Add plugin to placeholder" %} "{{ placeholder.get_label|escapejs }}"',
     urls: { {% language request.toolbar.toolbar_language %}
         add_plugin: '{{ placeholder.get_add_url }}',
         copy_plugin: '{{ placeholder.get_copy_url }}'
