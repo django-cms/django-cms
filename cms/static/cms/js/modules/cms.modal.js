@@ -855,6 +855,8 @@ var CMS = window.CMS || {};
 
                 // update title
                 this.ui.titlePrefix.text(el.text());
+
+                this.ui.modal.trigger('cms.modal.changed');
             },
 
             /**
