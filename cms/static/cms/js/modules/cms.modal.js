@@ -44,6 +44,8 @@ var CMS = window.CMS || {};
 
                 // elements
                 this._setupUI();
+                // event emitter
+                this._setupEventEmitter();
 
                 // states and events
                 this.click = 'click.cms.modal';
@@ -63,6 +65,27 @@ var CMS = window.CMS || {};
 
                 // set a state to determine if we need to reinitialize this._events();
                 this.ui.modal.data('ready', true);
+            },
+
+            /**
+             * Setup event pubsub mechanism for the instance
+             *
+             * @private
+             * @method _setupEventEmitter
+             */
+            _setupEventEmitter: function _setupEventEmitter() {
+                var bus = $({});
+
+                function proxy(name) {
+                    return function () {
+                        bus[name].apply(bus, arguments);
+                    };
+                }
+
+                this.trigger = proxy('trigger');
+                this.one = proxy('one');
+                this.on = proxy('on');
+                this.off = proxy('off');
             },
 
             /**
@@ -330,7 +353,7 @@ var CMS = window.CMS || {};
                     }
                 }, this.options.duration);
 
-                this.ui.modal.trigger('cms.modal.closed');
+                this.trigger('cms.modal.closed');
             },
 
             /**
@@ -829,7 +852,7 @@ var CMS = window.CMS || {};
                 // inject
                 holder.html(iframe);
 
-                this.ui.modal.trigger('cms.modal.loaded');
+                this.trigger('cms.modal.loaded');
             },
 
             /**
@@ -856,7 +879,7 @@ var CMS = window.CMS || {};
                 // update title
                 this.ui.titlePrefix.text(el.text());
 
-                this.ui.modal.trigger('cms.modal.changed');
+                this.trigger('cms.modal.changed');
             },
 
             /**
@@ -877,7 +900,7 @@ var CMS = window.CMS || {};
                 this.ui.titlePrefix.text(opts.title);
                 this.ui.titleSuffix.text(opts.subtitle || '');
 
-                this.ui.modal.trigger('cms.modal.loaded');
+                this.trigger('cms.modal.loaded');
             },
 
             /**
