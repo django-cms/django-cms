@@ -833,7 +833,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Sanitise the ampersand within the url for #3404.
+             * Version where the modal loads an url within an iframe.
              *
              * @method _changeIframe
              * @param el {jQuery} originated element

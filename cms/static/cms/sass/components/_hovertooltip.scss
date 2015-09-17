@@ -17,6 +17,15 @@
         transform: translate3d(0, 0, 0);
     }
 
+    .cms-hover-tooltip-delay:hover:before,
+    .cms-hover-tooltip-delay:hover:after,
+    .cms-hover-tooltip-delay:focus:before,
+    .cms-hover-tooltip-delay:focus:after {
+        transition: opacity 0.2s ease-in-out 1.5s,
+            visibility 0.2s ease-in-out 1.5s,
+            transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24) 1.5s;
+    }
+
     /* Show the entire tooltip on hover and focus */
     .cms-hover-tooltip:focus {
         outline: none;

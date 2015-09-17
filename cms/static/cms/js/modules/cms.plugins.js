@@ -517,7 +517,7 @@
                     e.stopPropagation();
                 });
 
-                dropdown.find('a').on('click.cms', function (e) {
+                nav.parent().find('a').on('click.cms', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
