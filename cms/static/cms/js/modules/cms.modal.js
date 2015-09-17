@@ -157,21 +157,26 @@ var CMS = window.CMS || {};
                     throw new Error('The arguments passed to "open" were invalid.');
                 }
 
-                // cancel if another lightbox is already being opened
-                if (CMS.API.locked) {
-                    CMS.API.locked = false;
+                // handle remove option when plugin is new
+                // cancel open process when switching context
+                if (CMS._newPlugin && !this._deletePlugin()) {
                     return false;
-                } else {
-                    CMS.API.locked = true;
                 }
 
-                // handle remove option when plugin is new
-                if (CMS._newPlugin) {
-                    if (this._deletePlugin() === false) {
-                        // cancel open process when switching context
-                        return false;
-                    }
-                }
+                // lets set the modal width and height to the size of the browser
+                var widthOffset = 300; // adds margin left and right
+                var heightOffset = 300; // adds margin top and bottom;
+                var screenWidth = this.ui.window.width();
+                var screenHeight = this.ui.window.height();
+                // screen width and height calculation, WC = width
+                var screenWidthCalc = screenWidth >= (this.options.minWidth + widthOffset);
+                var screenHeightCalc = screenHeight >= (this.options.minHeight + heightOffset);
+                var width = screenWidthCalc ? screenWidth - widthOffset : this.options.minWidth;
+                var height = screenHeightCalc ? screenHeight - heightOffset : this.options.minHeight;
+
+                // set maximized
+                this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
+                this.maximized = false;
 
                 // new plugin will freeze the creation process
                 if (this.options.newPlugin) {
@@ -187,27 +192,11 @@ var CMS = window.CMS || {};
                 // clear elements
                 this.ui.modalButtons.empty();
                 this.ui.breadcrumb.empty();
-
-                // show loader
-                CMS.API.Toolbar._loader(true);
-
                 // hide tooltip
                 this.hideTooltip();
 
-                // lets set the modal width and height to the size of the browser
-                var widthOffset = 300; // adds margin left and right
-                var heightOffset = 300; // adds margin top and bottom;
-                var screenWidth = this.ui.window.width();
-                var screenHeight = this.ui.window.height();
-                // screen width and height calculation, WC = width
-                var screenWidthCalc = screenWidth >= (this.options.minWidth + widthOffset);
-                var screenHeightCalc = screenHeight >= (this.options.minHeight + heightOffset);
-
-                var width = screenWidthCalc ? screenWidth - widthOffset : this.options.minWidth;
-                var height = screenHeightCalc ? screenHeight - heightOffset : this.options.minHeight;
-
-                this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
-                this.maximized = false;
+                // show loader
+                CMS.API.Toolbar._loader(true);
 
                 // in case, the modal is larger than the window, we trigger fullscreen mode
                 if (height >= screenHeight) {
@@ -304,33 +293,21 @@ var CMS = window.CMS || {};
              * @method close
              */
             close: function close() {
-                var that = this;
-
-                // handle remove option when plugin is new
-                if (CMS._newPlugin) {
-                    this._deletePlugin({ hideAfter: true });
-                } else {
-                    this._hide({
-                        duration: 100
-                    });
-                }
-
                 // handle refresh option
                 if (this.options.onClose) {
                     this.reloadBrowser(this.options.onClose, false, true);
                 }
 
-                // reset maximize or minimize states for #3111
-                setTimeout(function () {
-                    if (that.minimized) {
-                        that.minimize();
-                    }
-                    if (that.maximized) {
-                        that.maximize();
-                    }
-                }, this.options.duration);
-
-                this.ui.modal.trigger('cms.modal.closed');
+                // handle remove option when plugin is new
+                if (CMS._newPlugin) {
+                    this._deletePlugin({
+                        hideAfter: true
+                    });
+                } else {
+                    this._hide({
+                        duration: this.options.modalDuration / 2
+                    });
+                }
             },
 
             /**
@@ -345,18 +322,28 @@ var CMS = window.CMS || {};
                 var that = this;
                 var duration = this.options.modalDuration;
 
+                this.ui.modal.trigger('cms.modal.closed');
+
                 if (opts && opts.duration) {
                     duration = opts.duration;
                 }
 
-                that.ui.modal.removeClass('cms-modal-open');
-
-                that.ui.modal.one('cmsTransitionEnd', function () {
+                this.ui.frame.empty();
+                this.ui.modalBody.removeClass('cms-loader');
+                this.ui.modal.removeClass('cms-modal-open');
+                this.ui.modal.one('cmsTransitionEnd', function () {
                     that.ui.modal.css('display', 'none');
                 }).emulateTransitionEnd(duration);
 
-                that.ui.frame.empty();
-                that.ui.modalBody.removeClass('cms-loader');
+                // reset maximize or minimize states for #3111
+                setTimeout(function () {
+                    if (that.minimized) {
+                        that.minimize();
+                    }
+                    if (that.maximized) {
+                        that.maximize();
+                    }
+                }, this.options.duration);
             },
 
             /**
@@ -381,17 +368,14 @@ var CMS = window.CMS || {};
 
                     // minimize
                     this.ui.body.addClass('cms-modal-minimized');
-
                     this.ui.modal.css({
                         'left': this.ui.toolbarLeftPart.outerWidth(true) + 50
                     });
 
                     this.minimized = true;
                 } else {
-                    // minimize
+                    // maximize
                     this.ui.body.removeClass('cms-modal-minimized');
-
-                    // reattach css
                     this.ui.modal.css(this.ui.modal.data('css'));
 
                     this.minimized = false;
@@ -404,30 +388,27 @@ var CMS = window.CMS || {};
              * @method maximize
              */
             maximize: function maximize() {
-                var container = this.ui.modal;
-
                 // cancel action when minimized
                 if (this.minimized) {
                     return false;
                 }
 
                 if (this.maximized === false) {
-                    // maximize
-                    this.maximized = true;
-
-                    container.data('css', this.ui.modal.css([
+                    // save initial state
+                    this.ui.modal.data('css', this.ui.modal.css([
                         'left', 'top', 'margin-left', 'margin-top',
                         'width', 'height'
                     ]));
 
                     this.ui.body.addClass('cms-modal-maximized');
-                } else {
-                    // restore
-                    this.maximized = false;
-                    this.ui.body.removeClass('cms-modal-maximized');
 
-                    // reattach css
-                    container.css(container.data('css'));
+                    this.maximized = true;
+                } else {
+                    // minimize
+                    this.ui.body.removeClass('cms-modal-maximized');
+                    this.ui.modal.css(this.ui.modal.data('css'));
+
+                    this.maximized = false;
                 }
             },
 
@@ -439,34 +420,32 @@ var CMS = window.CMS || {};
              * @param pointerEvent {Object} passes starting event
              */
             _startMove: function _startMove(pointerEvent) {
-                // cancel if maximized
-                if (this.maximized) {
-                    return false;
-                }
-                // cancel action when minimized
-                if (this.minimized) {
+                // cancel if maximized or minimized
+                if (this.maximized || this.minimized) {
                     return false;
                 }
 
                 var that = this;
                 var position = that.ui.modal.position();
+                var left;
+                var top;
+
+                this.ui.shim.show();
 
                 // create event for stopping
                 this.ui.body.on(this.pointerUp, function (e) {
                     that._stopMove(e);
                 });
 
-                this.ui.shim.show();
-
-                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
-                    var left = position.left - (pointerEvent.originalEvent.pageX - e.originalEvent.pageX);
-                    var top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
+                this.ui.body.on(this.pointerMove, function (e) {
+                    left = position.left - (pointerEvent.originalEvent.pageX - e.originalEvent.pageX);
+                    top = position.top - (pointerEvent.originalEvent.pageY - e.originalEvent.pageY);
 
                     that.ui.modal.css({
                         'left': left,
                         'top': top
                     });
-                });
+                }).attr('data-touch-action', 'none');
             },
 
             /**
@@ -496,9 +475,8 @@ var CMS = window.CMS || {};
                 }
                 // continue
                 var that = this;
-                var container = this.ui.modal;
-                var width = container.width();
-                var height = container.height();
+                var width = this.ui.modal.width();
+                var height = this.ui.modal.height();
                 var modalLeft = this.ui.modal.position().left;
                 var modalTop = this.ui.modal.position().top;
 
@@ -509,10 +487,9 @@ var CMS = window.CMS || {};
 
                 this.ui.shim.show();
 
-                this.ui.body.attr('data-touch-action', 'none').on(this.pointerMove, function (e) {
+                this.ui.body.on(this.pointerMove, function (e) {
                     var mvX = pointerEvent.originalEvent.pageX - e.originalEvent.pageX;
                     var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
-
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
                     var wMax = 680;
@@ -524,13 +501,13 @@ var CMS = window.CMS || {};
                     }
 
                     // set centered animation
-                    container.css({
+                    that.ui.modal.css({
                         'width': width - (mvX * 2),
                         'height': height - (mvY * 2),
                         'left': modalLeft + mvX,
                         'top': modalTop + mvY
                     });
-                });
+                }).attr('data-touch-action', 'none');
             },
 
             /**
@@ -556,6 +533,7 @@ var CMS = window.CMS || {};
             _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
+                var template = '<a href="{1}" class="{2}"><span>{3}</span></a>';
 
                 // remove class from modal when no breadcrumbs is rendered
                 if (!this.ui.breadcrumb.find('a').length) {
@@ -578,7 +556,10 @@ var CMS = window.CMS || {};
                     // check if the item is the last one
                     var last = (index >= breadcrumbs.length - 1) ? 'active' : '';
                     // render breadcrumbs
-                    crumb += '<a href="' + item.url + '" class="' + last + '"><span>' + item.title + '</span></a>';
+                    crumb += template
+                        .replace('{1}', item.url)
+                        .replace('{2}', last)
+                        .replace('{3}', item.title);
                 });
 
                 // attach elements
@@ -600,8 +581,10 @@ var CMS = window.CMS || {};
                 var that = this;
                 var group = $('<div class="cms-modal-item-buttons"></div>');
                 var render = $('<div class="cms-modal-buttons-inner"></div>');
+                var cancel = $('<a href="#" class="cms-btn">' + this.config.lang.cancel + '</a>');
                 var row;
                 var tmp;
+
                 if (!djangoSuit) {
                     row = iframe.contents().find('.submit-row:eq(0)');
                 } else {
@@ -619,21 +602,17 @@ var CMS = window.CMS || {};
                     buttons = row.find('input[type="submit"], button[type="submit"]');
                     buttons.addClass('deletelink').hide();
                 }
-                // attach relation id
-                buttons.each(function (index, item) {
-                    $(item).attr('data-rel', '_' + index);
-                });
 
                 // loop over input buttons
                 buttons.each(function (index, item) {
                     item = $(item);
+                    item.attr('data-rel', '_' + index);
 
                     // cancel if item is a hidden input
                     if (item.attr('type') === 'hidden') {
                         return false;
                     }
 
-                    // create helper variables
                     var title = item.attr('value') || item.text();
                     var cls = 'cms-btn';
 
@@ -645,12 +624,13 @@ var CMS = window.CMS || {};
                         cls = 'cms-btn cms-btn-caution';
                     }
 
-                    // create the element and attach events
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
+
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
                             item[0].click();
                         }
+
                         if (item.is('a')) {
                             that._loadIframe({
                                 url: item.prop('href'),
@@ -677,7 +657,6 @@ var CMS = window.CMS || {};
                 });
 
                 // manually add cancel button at the end
-                var cancel = $('<a href="#" class="cms-btn">' + that.config.lang.cancel + '</a>');
                 cancel.on(that.click, function () {
                     that.options.onClose = false;
                     that.close();
@@ -732,13 +711,14 @@ var CMS = window.CMS || {};
                 this._setBreadcrumb(opts.breadcrumbs);
 
                 // now refresh the content
-                var iframe = $('<iframe src="' + opts.url + '" class="" frameborder="0" />');
-                iframe.css('visibility', 'hidden');
                 var holder = this.ui.frame;
+                var iframe = $('<iframe src="' + opts.url + '" class="" frameborder="0" />');
 
                 // set correct title
                 var titlePrefix = this.ui.titlePrefix;
                 var titleSuffix = this.ui.titleSuffix;
+
+                iframe.css('visibility', 'hidden');
                 titlePrefix.text(opts.title || '');
                 titleSuffix.text('');
 
@@ -748,6 +728,12 @@ var CMS = window.CMS || {};
 
                 // attach load event for iframe to prevent flicker effects
                 iframe.on('load', function () {
+                    var messages;
+                    var contents;
+                    var body;
+                    var innerTitle;
+                    var bc;
+
                     // check if iframe can be accessed
                     try {
                         iframe.contents();
@@ -757,13 +743,13 @@ var CMS = window.CMS || {};
                     }
 
                     // show messages in toolbar if provided
-                    var messages = iframe.contents().find('.messagelist li');
+                    messages = iframe.contents().find('.messagelist li');
                     if (messages.length) {
                         CMS.API.Toolbar.openMessage(messages.eq(0).text());
                     }
                     messages.remove();
-                    var contents = iframe.contents();
-                    var body = contents.find('body');
+                    contents = iframe.contents();
+                    body = contents.find('body');
 
                     // inject css class
                     body.addClass('cms-admin cms-admin-modal');
@@ -795,11 +781,11 @@ var CMS = window.CMS || {};
                     } else {
                         iframe.show();
                         // set title of not provided
-                        var innerTitle = iframe.contents().find('#content h1:eq(0)');
+                        innerTitle = iframe.contents().find('#content h1:eq(0)');
 
                         // case when there is no prefix
                         if (opts.title === undefined && that.ui.titlePrefix.text() === '') {
-                            var bc = iframe.contents().find('.breadcrumbs').contents();
+                            bc = iframe.contents().find('.breadcrumbs').contents();
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
 
@@ -853,9 +839,7 @@ var CMS = window.CMS || {};
                     url: el.attr('href')
                 });
 
-                // update title
                 this.ui.titlePrefix.text(el.text());
-
                 this.ui.modal.trigger('cms.modal.changed');
             },
 
