@@ -231,7 +231,6 @@ var CMS = window.CMS || {};
                 // hide tooltip
                 this.hideTooltip();
 
-
                 // redirect to iframe rendering if url is provided
                 if (opts.url) {
                     this._loadIframe({
@@ -651,7 +650,7 @@ var CMS = window.CMS || {};
 
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
-                            item[0].trigger('click');
+                            item[0].click();
                         }
 
                         if (item.is('a')) {
