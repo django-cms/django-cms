@@ -201,7 +201,6 @@ var CMS = window.CMS || {};
                 var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
                 var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
 
-
                 // in case, the modal is larger than the window, we trigger fullscreen mode
                 if (width >= screenWidth || height >= screenHeight) {
                     this.triggerMaximized = true;
