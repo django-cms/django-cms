@@ -66,4 +66,14 @@
     .cms-modal-markup .cms-submenu-quicksearch {
         display: block;
     }
+
+    .cms-add-plugin-placeholder {
+        position: relative;
+        border: 2px solid $color-primary;
+        background-color: mix(white, $color-primary, 90%);
+        color: $color-primary;
+        border-radius: $border-radius-base;
+        line-height: 44px;
+        padding-left: 20px;
+    }
 }
