@@ -543,12 +543,33 @@
              */
             _setAddPluginModal: function _setAddPluginModal(nav) {
                 var that = this;
+                var placeholder = $('<div class="cms-add-plugin-placeholder">Plugin will be added here</div>');
                 // FIXME children -> plugins
                 var modal = new CMS.Modal({
                     minWidth: 400,
                     minHeight: 150
                 });
+                var dragItem = nav.closest('.cms-dragitem');
+                var isPlaceholder = !Boolean(dragItem.length);
+                var childrenList;
+                if (isPlaceholder) {
+                    childrenList = nav.closest('.cms-dragarea').find('> .cms-draggables');
+                } else {
+                    childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
+                }
+
                 modal.on('cms.modal.loaded', that._setupPluginsListKeyboardTraversing);
+                modal.on('cms.modal.loaded', function addPlaceholder() {
+                    if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
+                        that._toggleCollapsable(dragItem);
+                    }
+                    $('.cms-add-plugin-placeholder').remove();
+                    placeholder.appendTo(childrenList);
+                });
+                modal.on('cms.modal.closed', function removePlaceholder() {
+                    console.log('detaching');
+                    $('.cms-add-plugin-placeholder').remove();
+                });
                 modal.on('cms.modal.shown', function () {
                     var dropdown = $('.cms-modal-markup .cms-add-plugins-list');
                     dropdown.find('input').trigger('focus');
