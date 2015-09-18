@@ -699,7 +699,7 @@
                     e.stopPropagation();
 
                     // show loader and make sure scroll doesn't jump
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
 
                     var el = $(this);
                     CMS.Plugin._hideSettingsMenu(nav);
@@ -714,13 +714,13 @@
                             );
                             break;
                         case 'ajax_add':
-                            CMS.API.Toolbar.openAjax(
-                                el.attr('href'),
-                                JSON.stringify(el.data('post')),
-                                el.data('text'),
-                                that.editPluginPostAjax(that),
-                                el.data('on-success')
-                            );
+                            CMS.API.Toolbar.openAjax({
+                                url: el.attr('href'),
+                                post: JSON.stringify(el.data('post')),
+                                text: el.data('text'),
+                                callback: that.editPluginPostAjax(that),
+                                onSuccess: el.data('on-success')
+                            });
                             break;
                         case 'edit':
                             that.editPlugin(
@@ -746,7 +746,7 @@
                             );
                             break;
                         default:
-                            CMS.API.Toolbar._loader(false);
+                            CMS.API.Toolbar.hideLoader();
                             CMS.API.Toolbar._delegate(el);
                     }
                 });

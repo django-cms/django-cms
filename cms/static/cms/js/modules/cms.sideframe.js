@@ -135,7 +135,7 @@ var CMS = window.CMS || {};
 
                 // show loader
                 if (CMS.API && CMS.API.Toolbar) {
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                 }
 
                 // we need to modify the url appropriately to pass
@@ -261,8 +261,8 @@ var CMS = window.CMS || {};
                 if (CMS.API && CMS.API.Toolbar) {
                     // FIXME: initialization needs to be done after our libs are loaded
                     CMS.API.Toolbar.open();
+                    CMS.API.Toolbar.hideLoader();
                     CMS.API.Toolbar._lock(true);
-                    CMS.API.Toolbar._loader();
                 }
             },
 

@@ -733,7 +733,7 @@ var CMS = window.CMS || {};
                 opts.breadcrumbs = opts.breadcrumbs || '';
 
                 // show loader
-                CMS.API.Toolbar._loader(true);
+                CMS.API.Toolbar.showLoader();
 
                 // set classes
                 this.ui.modal.removeClass('cms-modal-markup');
@@ -778,7 +778,7 @@ var CMS = window.CMS || {};
                     }
 
                     // hide loader
-                    CMS.API.Toolbar._loader(false);
+                    CMS.API.Toolbar.hideLoader();
 
                     // show messages in toolbar if provided
                     messages = iframe.contents().find('.messagelist li');
@@ -924,12 +924,17 @@ var CMS = window.CMS || {};
                 );
 
                 // trigger an ajax request
-                return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
-                    CMS._newPlugin = false;
-                    if (opts && opts.hideAfter) {
-                        that._hide({
-                            duration: 100
-                        });
+                return CMS.API.Toolbar.openAjax({
+                    url: data['delete'],
+                    post: post,
+                    text: text,
+                    callback: function () {
+                        CMS._newPlugin = false;
+                        if (opts && opts.hideAfter) {
+                            that._hide({
+                                duration: 100
+                            });
+                        }
                     }
                 });
             }

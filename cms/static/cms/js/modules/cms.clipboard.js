@@ -107,7 +107,11 @@
                 // post needs to be a string, it will be converted using JSON.parse
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
                 // redirect to ajax
-                CMS.API.Toolbar.openAjax(this.config.clipboard.url, post, '', callback);
+                CMS.API.Toolbar.openAjax({
+                    url: this.config.clipboard.url,
+                    post: post,
+                    callback: callback
+                });
             }
 
         });

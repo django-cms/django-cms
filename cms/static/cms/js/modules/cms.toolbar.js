@@ -316,7 +316,7 @@ var CMS = window.CMS || {};
 
                 // enforce open state if user is not logged in but requests the toolbar
                 if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
-                    this.show();
+                    this.open();
                     this.settings = this.setSettings(CMS.config.settings);
                 }
 
@@ -550,8 +550,19 @@ var CMS = window.CMS || {};
                 this._lock(false);
             },
 
-            openAjax: function (url, post, text, callback, onSuccess) {
+            /**
+             * Closes the message window underneath the toolbar.
+             *
+             * @method open
+             */
+            openAjax: function (opts) {
                 var that = this;
+                // url, post, text, callback, onSuccess
+                var url = opts.url;
+                var post = opts.post;
+                var text = opts.text || '';
+                var callback = opts.callback;
+                var onSuccess = opts.onSuccess;
                 var question = (text) ? confirm(text) : true;
 
                 // cancel if question has been denied
@@ -560,7 +571,7 @@ var CMS = window.CMS || {};
                 }
 
                 // set loader
-                this._loader(true);
+                this.showLoader();
 
                 return $.ajax({
                     type: 'POST',
@@ -571,7 +582,7 @@ var CMS = window.CMS || {};
 
                     if (callback) {
                         callback(that, response);
-                        that._loader(false);
+                        that.hideLoader();
                     } else if (onSuccess) {
                         CMS.API.Helpers.reloadBrowser(onSuccess, false, true);
                     } else {
@@ -586,6 +597,68 @@ var CMS = window.CMS || {};
                         error: true
                     });
                 });
+            },
+
+            /**
+             * Shows the loader spinner on the trigger knob for the toolbar.
+             *
+             * @method showLoader
+             */
+            showLoader: function showLoader() {
+                this.ui.toolbarTrigger.addClass('cms-toolbar-loader');
+            },
+
+            /**
+             * Hides the loader spinner on the trigger knob for the toolbar.
+             *
+             * @method hideLoader
+             */
+            hideLoader: function hideLoader() {
+                this.ui.toolbarTrigger.removeClass('cms-toolbar-loader');
+            },
+
+            /**
+             * Delegates event from element to appropriate functionalities.
+             *
+             * @method _delegate
+             * @param el {jQuery} trigger element
+             * @private
+             */
+            _delegate: function _delegate(el) {
+                // save local vars
+                var target = el.data('rel');
+
+                switch (target) {
+                    case 'modal':
+                        var modal = new CMS.Modal({'onClose': el.data('on-close')});
+                        modal.open({
+                            url: el.attr('href'),
+                            title: el.data('name')
+                        });
+                        break;
+                    case 'message':
+                        this.openMessage({
+                            message: el.data('text')
+                        });
+                        break;
+                    case 'sideframe':
+                        var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
+                        sideframe.open({
+                            url: el.attr('href'),
+                            animate: true
+                        });
+                        break;
+                    case 'ajax':
+                        this.openAjax({
+                            url: el.attr('href'),
+                            post: JSON.stringify(el.data('post')),
+                            text: el.data('text'),
+                            onSuccess: el.data('on-success')
+                        });
+                        break;
+                    default:
+                        window.location.href = el.attr('href');
+                }
             },
 
             /**
@@ -643,47 +716,6 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Delegates event from element to appropriate functionalities.
-             *
-             * @method _delegate
-             * @param el {jQuery} trigger element
-             * @private
-             */
-            _delegate: function _delegate(el) {
-                // save local vars
-                var target = el.data('rel');
-
-                switch (target) {
-                    case 'modal':
-                        var modal = new CMS.Modal({'onClose': el.data('on-close')});
-                        modal.open({
-                            url: el.attr('href'),
-                            title: el.data('name')
-                        });
-                        break;
-                    case 'message':
-                        this.openMessage({
-                            message: el.data('text')
-                        });
-                        break;
-                    case 'sideframe':
-                        var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
-                        sideframe.open({
-                            url: el.attr('href'),
-                            animate: true
-                        });
-                        break;
-                    case 'ajax':
-                        this.openAjax(el.attr('href'), JSON.stringify(
-                            el.data('post')), el.data('text'), null, el.data('on-success')
-                        );
-                        break;
-                    default:
-                        window.location.href = el.attr('href');
-                }
-            },
-
-            /**
              * Locks the toolbar so it cannot be closed.
              *
              * @method _lock
@@ -699,14 +731,6 @@ var CMS = window.CMS || {};
                     this.lockToolbar = false;
                     // make button look disabled
                     this.ui.toolbarTrigger.css('opacity', 1);
-                }
-            },
-
-            _loader: function (loader) {
-                if (loader) {
-                    this.ui.toolbarTrigger.addClass('cms-toolbar-loader');
-                } else {
-                    this.ui.toolbarTrigger.removeClass('cms-toolbar-loader');
                 }
             },
 
@@ -736,7 +760,15 @@ var CMS = window.CMS || {};
                 });
             },
 
-            _screenBlock: function () {
+            /**
+             * This shows a dark screen with a note "This page is a redirect"
+             * on a page where the settings have been modified to redirect to
+             * another page.
+             *
+             * @method _screenBlock
+             * @private
+             */
+            _screenBlock: function _screenBlock() {
                 var that = this;
                 var interval = 20;
                 var blocker = this.ui.screenBlock;
