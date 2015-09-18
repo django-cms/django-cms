@@ -1,14 +1,29 @@
-//##################################################################################################################
-// #TOOLBAR#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// Toolbar
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
+
+    // shorthand for jQuery(document).ready();
     $(document).ready(function () {
-        /*!
-         * Toolbar
-         * Handles all features related to the toolbar
+        /**
+         * The toolbar is the generic element which holds verious components
+         * together and provides several commonly used API methods such as
+         * show/hide, message display or loader indication.
+         *
+         * @class Toolbar
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -21,31 +36,47 @@
             },
 
             initialize: function (options) {
-                this.container = $('#cms-toolbar');
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
                 this.settings = CMS.settings;
 
                 // elements
-                this.body = $('html');
-                this.toolbar = this.container.find('.cms-toolbar');
-                this.toolbarTrigger = this.container.find('.cms-toolbar-trigger');
-                this.navigations = this.container.find('.cms-toolbar-item-navigation');
-                this.buttons = this.container.find('.cms-toolbar-item-buttons');
-                this.switcher = this.container.find('.cms-toolbar-item-switch');
-                this.messages = this.container.find('.cms-messages');
-                this.screenBlock = this.container.find('.cms-screenblock');
+                this._setupUI();
 
                 // states
-                this.click = 'click.cms';
+                this.click = 'click.cms.toolbar';
                 this.timer = function () {};
                 this.lockToolbar = false;
 
                 // setup initial stuff
-                this._setup();
+                if (!this.ui.toolbar.data('ready')) {
+                    this._setup();
+                    this._events();
+                }
 
-                // setup events
-                this._events();
+                // set a state to determine if we need to reinitialize this._events();
+                this.ui.toolbar.data('ready', true);
+            },
+
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
+            _setupUI: function () {
+                var container = $('#cms-toolbar');
+                this.ui = {
+                    container: container,
+                    body: $('html'),
+                    toolbar: container.find('.cms-toolbar'),
+                    toolbarTrigger: container.find('.cms-toolbar-trigger'),
+                    navigations: container.find('.cms-toolbar-item-navigation'),
+                    buttons: container.find('.cms-toolbar-item-buttons'),
+                    switcher: container.find('.cms-toolbar-item-switch'),
+                    messages: container.find('.cms-messages'),
+                    screenBlock: container.find('.cms-screenblock')
+                };
             },
 
             // initial methods
@@ -97,12 +128,12 @@
                 }
 
                 // if there is a screenblock, do some resize magic
-                if (this.screenBlock.length) {
+                if (this.ui.screenBlock.length) {
                     this._screenBlock();
                 }
 
                 // add toolbar ready class to body and fire event
-                this.body.addClass('cms-ready');
+                this.ui.body.addClass('cms-ready');
                 $(document).trigger('cms-ready');
             },
 
@@ -110,13 +141,13 @@
                 var that = this;
 
                 // attach event to the trigger handler
-                this.toolbarTrigger.on('pointerup.cms', function (e) {
+                this.ui.toolbarTrigger.on('pointerup.cms', function (e) {
                     e.preventDefault();
                     that.toggleToolbar();
                 });
 
                 // attach event to the navigation elements
-                this.navigations.each(function () {
+                this.ui.navigations.each(function () {
                     var navigation = $(this);
                     var lists = navigation.find('li');
                     var root = 'cms-toolbar-item-navigation';
@@ -224,7 +255,7 @@
                 });
 
                 // attach event to the switcher elements
-                this.switcher.each(function () {
+                this.ui.switcher.each(function () {
                     $(this).bind(that.click, function (e) {
                         e.preventDefault();
                         that._setSwitcher($(e.currentTarget));
@@ -232,7 +263,7 @@
                 });
 
                 // attach event for first page publish
-                this.buttons.each(function () {
+                this.ui.buttons.each(function () {
                     var btn = $(this);
 
                     // in case the button has a data-rel attribute
@@ -285,7 +316,7 @@
                 this._lock(true);
 
                 // add content to element
-                this.messages.find('.cms-messages-inner').html(msg);
+                this.ui.messages.find('.cms-messages-inner').html(msg);
 
                 // clear timeout
                 clearTimeout(this.timer);
@@ -293,9 +324,9 @@
                 // determine width
                 var that = this;
                 var width = 320;
-                var height = this.messages.outerHeight(true);
-                var top = this.toolbar.outerHeight(true);
-                var close = this.messages.find('.cms-messages-close');
+                var height = this.ui.messages.outerHeight(true);
+                var top = this.ui.toolbar.outerHeight(true);
+                var close = this.ui.messages.find('.cms-messages-close');
                 close.hide();
                 close.bind(this.click, function () {
                     that.closeMessage();
@@ -312,12 +343,12 @@
                 }
 
                 // set correct position and show
-                this.messages.css('top', -height).show();
+                this.ui.messages.css('top', -height).show();
 
                 // error handling
-                this.messages.removeClass('cms-messages-error');
+                this.ui.messages.removeClass('cms-messages-error');
                 if (error) {
-                    this.messages.addClass('cms-messages-error');
+                    this.ui.messages.addClass('cms-messages-error');
                 }
 
                 // dir should be left, center, right
@@ -325,30 +356,30 @@
                 // set correct direction and animation
                 switch (dir) {
                     case 'left':
-                        this.messages.css({
+                        this.ui.messages.css({
                             'top': top,
                             'left': -width,
                             'right': 'auto',
                             'margin-left': 0
                         });
-                        this.messages.animate({ 'left': 0 });
+                        this.ui.messages.animate({ 'left': 0 });
                         break;
                     case 'right':
-                        this.messages.css({
+                        this.ui.messages.css({
                             'top': top,
                             'right': -width,
                             'left': 'auto',
                             'margin-left': 0
                         });
-                        this.messages.animate({ 'right': 0 });
+                        this.ui.messages.animate({ 'right': 0 });
                         break;
                     default:
-                        this.messages.css({
+                        this.ui.messages.css({
                             'left': '50%',
                             'right': 'auto',
                             'margin-left': -(width / 2)
                         });
-                        this.messages.animate({ 'top': top });
+                        this.ui.messages.animate({ 'top': top });
                 }
 
                 // cancel autohide if delay is 0
@@ -363,7 +394,7 @@
             },
 
             closeMessage: function () {
-                this.messages.fadeOut(300);
+                this.ui.messages.fadeOut(300);
                 // unlock toolbar
                 this._lock(false);
             },
@@ -418,16 +449,16 @@
                 var debugHeight = $('.cms-debug-bar').height() || 0;
                 var toolbarHeight = $('.cms-toolbar').height() + 10;
 
-                this.toolbar.css({
+                this.ui.toolbar.css({
                     'transition': 'margin-top ' + speed + 'ms',
                     'margin-top': 0
                 });
-                this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
+                this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
                 // animate html
-                this.body.addClass('cms-toolbar-expanded');
-                this.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
+                this.ui.body.addClass('cms-toolbar-expanded');
+                this.ui.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
                 // set messages top to toolbar height
-                this.messages.css('top', toolbarHeight + 1);
+                this.ui.messages.css('top', toolbarHeight + 1);
                 // set new settings
                 this.settings.toolbar = 'expanded';
                 if (!init) {
@@ -437,20 +468,19 @@
 
             _hideToolbar: function (speed, init) {
                 var toolbarHeight = $('.cms-toolbar').height() + 10;
-                this.toolbar.css('transition', 'margin-top ' + speed + 'ms');
+                this.ui.toolbar.css('transition', 'margin-top ' + speed + 'ms');
                 // cancel if sideframe is active
                 if (this.lockToolbar) {
                     return false;
                 }
 
-                this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
-                this.toolbar.css('margin-top', -toolbarHeight);
-                // this.toolbar.slideUp(speed);
+                this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+                this.ui.toolbar.css('margin-top', -toolbarHeight);
                 // animate html
-                this.body.removeClass('cms-toolbar-expanded');
-                this.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+                this.ui.body.removeClass('cms-toolbar-expanded');
+                this.ui.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
                 // set messages top to 0
-                this.messages.css('top', 0);
+                this.ui.messages.css('top', 0);
                 // set new settings
                 this.settings.toolbar = 'collapsed';
                 if (!init) {
@@ -535,19 +565,19 @@
                 if (lock) {
                     this.lockToolbar = true;
                     // make button look disabled
-                    this.toolbarTrigger.css('opacity', 0.2);
+                    this.ui.toolbarTrigger.css('opacity', 0.2);
                 } else {
                     this.lockToolbar = false;
                     // make button look disabled
-                    this.toolbarTrigger.css('opacity', 1);
+                    this.ui.toolbarTrigger.css('opacity', 1);
                 }
             },
 
             _loader: function (loader) {
                 if (loader) {
-                    this.toolbarTrigger.addClass('cms-toolbar-loader');
+                    this.ui.toolbarTrigger.addClass('cms-toolbar-loader');
                 } else {
-                    this.toolbarTrigger.removeClass('cms-toolbar-loader');
+                    this.ui.toolbarTrigger.removeClass('cms-toolbar-loader');
                 }
             },
 
@@ -557,7 +587,7 @@
                 var timer = function () {};
 
                 // bind message event
-                var debug = this.container.find('.cms-debug-bar');
+                var debug = this.ui.container.find('.cms-debug-bar');
                 debug.bind('mouseenter mouseleave', function (e) {
                     clearTimeout(timer);
 
@@ -571,7 +601,7 @@
 
             _screenBlock: function () {
                 var interval = 20;
-                var blocker = this.screenBlock;
+                var blocker = this.ui.screenBlock;
                 var sideframe = $('.cms-sideframe');
 
                 // automatically resize screenblock window according to given attributes
