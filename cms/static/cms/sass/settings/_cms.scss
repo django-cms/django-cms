@@ -86,8 +86,8 @@ $z-layers: (
             "draggable": 99,
             "empty": (
                 "addplugin": 3,
-                "droppable": 2,
-                "empty": 1
+                "empty": 2,
+                "droppable": 1
             ),
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
@@ -322,7 +322,6 @@ $hover-tooltip-padding: 6px 8px;
 
 //##############################################################################
 // Dropdown
-// FIXME remove `cms-`
 $dropdown-width: 180px;
 $dropdown-shadow: 0 0 10px rgba($black, 0.25);
 $dropdown-item-height: 42px;

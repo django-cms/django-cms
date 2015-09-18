@@ -579,6 +579,9 @@
              * @param nav {jQuery} modal trigger element
              */
             _setAddPluginModal: function _setAddPluginModal(nav) {
+                if (nav.hasClass('cms-btn-disabled')) {
+                    return false;
+                }
                 var that = this;
                 var placeholder = $(
                     '<div class="cms-add-plugin-placeholder">' +
@@ -587,7 +590,7 @@
                 );
                 var modal = new CMS.Modal({
                     minWidth: 400,
-                    minHeight: 150
+                    minHeight: 400
                 });
                 var dragItem = nav.closest('.cms-dragitem');
                 var isPlaceholder = !Boolean(dragItem.length);
@@ -634,7 +637,7 @@
                         title: that.ui.container.data('settings').addPluginHelpTitle,
                         html: pluginsCopy,
                         width: 530,
-                        height: 280
+                        height: 400
                     });
                 });
 
