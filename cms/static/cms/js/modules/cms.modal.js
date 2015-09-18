@@ -391,7 +391,7 @@ var CMS = window.CMS || {};
 
                 if (this.minimized === false) {
                     // ensure toolbar is shown
-                    CMS.API.Toolbar.toggleToolbar(true);
+                    CMS.API.Toolbar.show();
 
                     // save initial state
                     this.ui.modal.data('css', this.ui.modal.css([

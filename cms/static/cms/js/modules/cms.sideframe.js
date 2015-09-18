@@ -110,6 +110,7 @@ var CMS = window.CMS || {};
              * Opens a given url within a sideframe.
              *
              * @method open
+             * @chainable
              * @param opts
              * @param opts.url {String} url to render iframe
              * @param [opts.animate] {Boolean} should modal be animated
@@ -163,6 +164,8 @@ var CMS = window.CMS || {};
 
                 // show iframe
                 this._show(width, animate);
+
+                return this;
             },
 
             /**
@@ -257,8 +260,8 @@ var CMS = window.CMS || {};
                 // trigger API handlers
                 if (CMS.API && CMS.API.Toolbar) {
                     // FIXME: initialization needs to be done after our libs are loaded
+                    CMS.API.Toolbar.open();
                     CMS.API.Toolbar._lock(true);
-                    CMS.API.Toolbar._showToolbar(true);
                     CMS.API.Toolbar._loader();
                 }
             },

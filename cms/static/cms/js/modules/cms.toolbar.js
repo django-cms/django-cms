@@ -32,7 +32,8 @@ var CMS = window.CMS || {};
             options: {
                 preventSwitch: false,
                 preventSwitchMessage: 'Switching is disabled.',
-                messageDelay: 2000
+                messageDelay: 2000,
+                toolbarDuration: 200
             },
 
             initialize: function initialize(options) {
@@ -102,13 +103,13 @@ var CMS = window.CMS || {};
              * @method _events
              * @private
              */
-            _events: function () {
+            _events: function _events() {
                 var that = this;
 
                 // attach event to the trigger handler
                 this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
                     e.preventDefault();
-                    that.toggleToolbar();
+                    that.toggle();
                 });
 
                 // attach event to the navigation elements
@@ -310,7 +311,7 @@ var CMS = window.CMS || {};
 
                 // enforce open state if user is not logged in but requests the toolbar
                 if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
-                    this.toggleToolbar(true);
+                    this.show();
                     this.settings = this.setSettings(CMS.config.settings);
                 }
 
@@ -341,12 +342,53 @@ var CMS = window.CMS || {};
             },
 
             /**
+             * Toggles the toolbar state: open > closes / closed > opens.
+             *
+             * @method toggle
+             */
+            toggle: function toggle() {
+                // toggle bar
+                if (this.settings.toolbar === 'collapsed') {
+                    this.open();
+                } else {
+                    this.close();
+                }
+            },
+
+            /**
              * Opens the toolbar (slide down).
              *
              * @method open
              */
             open: function open() {
-                this._showToolbar(0, true);
+                this._show();
+
+                // set new settings
+                this.settings.toolbar = 'expanded';
+                this.settings = this.setSettings(this.settings);
+            },
+
+            /**
+             * Animation helper for opening the toolbar.
+             *
+             * @method _show
+             * @private
+             */
+            _show: function _show() {
+                var speed = this.options.toolbarDuration;
+                var debugHeight = $('.cms-debug-bar').height() || 0;
+                var toolbarHeight = $('.cms-toolbar').height() + 10;
+
+                this.ui.toolbar.css({
+                    'transition': 'margin-top ' + speed + 'ms',
+                    'margin-top': 0
+                });
+                this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
+                // animate html
+                this.ui.body.addClass('cms-toolbar-expanded');
+                this.ui.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
+                // set messages top to toolbar height
+                this.ui.messages.css('top', toolbarHeight + 1);
             },
 
             /**
@@ -355,17 +397,36 @@ var CMS = window.CMS || {};
              * @method close
              */
             close: function close() {
-                this._hideToolbar(0, true);
+                this._hide();
+
+                // set new settings
+                this.settings.toolbar = 'collapsed';
+                this.settings = this.setSettings(this.settings);
             },
 
-            // public methods
-            toggleToolbar: function (show) {
-                // overwrite state when provided
-                if (show) {
-                    this.settings.toolbar = 'collapsed';
+            /**
+             * Animation helper for closing the toolbar.
+             *
+             * @method _hide
+             * @private
+             */
+            _hide: function _hide() {
+                var speed = this.options.toolbarDuration;
+                var toolbarHeight = $('.cms-toolbar').height() + 10;
+
+                this.ui.toolbar.css('transition', 'margin-top ' + speed + 'ms');
+                // cancel if sideframe is active
+                if (this.lockToolbar) {
+                    return false;
                 }
-                // toggle bar
-                (this.settings.toolbar === 'collapsed') ? this._showToolbar(200) : this._hideToolbar(200);
+
+                this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+                this.ui.toolbar.css('margin-top', -toolbarHeight);
+                // animate html
+                this.ui.body.removeClass('cms-toolbar-expanded');
+                this.ui.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+                // set messages top to 0
+                this.ui.messages.css('top', 0);
             },
 
             openMessage: function (msg, dir, delay, error) {
@@ -498,50 +559,6 @@ var CMS = window.CMS || {};
                 // force reload if param is passed
                 if (reload) {
                     CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
-                }
-            },
-
-            // private methods
-            _showToolbar: function (speed, init) {
-                var debugHeight = $('.cms-debug-bar').height() || 0;
-                var toolbarHeight = $('.cms-toolbar').height() + 10;
-
-                this.ui.toolbar.css({
-                    'transition': 'margin-top ' + speed + 'ms',
-                    'margin-top': 0
-                });
-                this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
-                // animate html
-                this.ui.body.addClass('cms-toolbar-expanded');
-                this.ui.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
-                // set messages top to toolbar height
-                this.ui.messages.css('top', toolbarHeight + 1);
-                // set new settings
-                this.settings.toolbar = 'expanded';
-                if (!init) {
-                    this.settings = this.setSettings(this.settings);
-                }
-            },
-
-            _hideToolbar: function (speed, init) {
-                var toolbarHeight = $('.cms-toolbar').height() + 10;
-                this.ui.toolbar.css('transition', 'margin-top ' + speed + 'ms');
-                // cancel if sideframe is active
-                if (this.lockToolbar) {
-                    return false;
-                }
-
-                this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
-                this.ui.toolbar.css('margin-top', -toolbarHeight);
-                // animate html
-                this.ui.body.removeClass('cms-toolbar-expanded');
-                this.ui.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
-                // set messages top to 0
-                this.ui.messages.css('top', 0);
-                // set new settings
-                this.settings.toolbar = 'collapsed';
-                if (!init) {
-                    this.settings = this.setSettings(this.settings);
                 }
             },
 
