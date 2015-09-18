@@ -579,7 +579,11 @@
              */
             _setAddPluginModal: function _setAddPluginModal(nav) {
                 var that = this;
-                var placeholder = $('<div class="cms-add-plugin-placeholder">Plugin will be added here</div>');
+                var placeholder = $(
+                    '<div class="cms-add-plugin-placeholder">' +
+                        CMS.config.lang.pluginPlaceholder +
+                    '</div>'
+                );
                 var modal = new CMS.Modal({
                     minWidth: 400,
                     minHeight: 150
@@ -1031,7 +1035,7 @@
         });
 
         /**
-         * Hides the opened settings menu. By default looks for any open ones,
+         * Hides the opened settings menu. By default looks for any open ones.
          *
          * @static
          * @private
