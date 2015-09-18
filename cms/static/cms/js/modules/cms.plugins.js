@@ -752,7 +752,7 @@
                 });
 
             },
-
+            
             /**
              * Sets up keyboard traversing of plugin picker.
              *
