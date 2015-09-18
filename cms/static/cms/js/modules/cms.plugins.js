@@ -257,6 +257,11 @@
                     onClose: this.options.onClose || false,
                     redirectOnClose: this.options.redirectOnClose || false
                 });
+                if (!this.newPlugin) {
+                    modal.on('cms.modal.loaded', function removePlaceholder() {
+                        $('.cms-add-plugin-placeholder').remove();
+                    });
+                }
                 modal.open({
                     url: url,
                     title: name,
@@ -444,6 +449,9 @@
                     newPlugin: this.newPlugin || false,
                     onClose: this.options.onClose || false,
                     redirectOnClose: this.options.redirectOnClose || false
+                });
+                modal.on('cms.modal.loaded', function removePlaceholder() {
+                    $('.cms-add-plugin-placeholder').remove();
                 });
                 modal.open({
                     url: url,
