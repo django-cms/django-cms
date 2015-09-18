@@ -581,7 +581,7 @@
                 var that = this;
                 var placeholder = $(
                     '<div class="cms-add-plugin-placeholder">' +
-                        CMS.config.lang.pluginPlaceholder +
+                        CMS.config.lang.addPluginPlaceholder +
                     '</div>'
                 );
                 var modal = new CMS.Modal({
