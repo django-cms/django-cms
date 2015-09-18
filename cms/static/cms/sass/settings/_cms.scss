@@ -84,6 +84,11 @@ $z-layers: (
             "dragbar":  9999,
             "droppable": 1000,
             "draggable": 99,
+            "empty": (
+                "addplugin": 3,
+                "droppable": 2,
+                "empty": 1
+            ),
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
             "dropdown":    1002,

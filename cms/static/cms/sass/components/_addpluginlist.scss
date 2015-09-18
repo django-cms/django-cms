@@ -75,5 +75,6 @@
         border-radius: $border-radius-base;
         line-height: 44px;
         padding-left: 20px;
+        z-index: z(structure, content, empty, addplugin);
     }
 }
