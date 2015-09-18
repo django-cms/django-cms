@@ -15,7 +15,7 @@ var CMS = window.CMS || {};
     'use strict';
 
     // shorthand for jQuery(document).ready();
-    $(document).ready(function () {
+    $(function () {
         /**
          * The toolbar is the generic element which holds various components
          * together and provides several commonly used API methods such as
@@ -48,7 +48,7 @@ var CMS = window.CMS || {};
                 this.click = 'click.cms.toolbar';
                 this.touchStart = 'touchstart.cms.toolbar';
                 this.pointerUp = 'pointerup.cms.toolbar';
-                this.poimterOverOut = 'pointerover.cms.toolbar pointerout.csm.toolbar';
+                this.pointerOverOut = 'pointerover.cms.toolbar pointerout.csm.toolbar';
                 this.pointerLeave = 'pointerleave.csm.toolbar';
                 this.mouseEnter = 'mouseenter.cms.toolbar';
                 this.mouseLeave = 'mouseleave.cms.toolbar';
@@ -87,6 +87,7 @@ var CMS = window.CMS || {};
                 this.ui = {
                     container: container,
                     body: $('html'),
+                    document: $(document),
                     toolbar: container.find('.cms-toolbar'),
                     toolbarTrigger: container.find('.cms-toolbar-trigger'),
                     navigations: container.find('.cms-toolbar-item-navigation'),
@@ -133,7 +134,7 @@ var CMS = window.CMS || {};
                             reset();
                             return false;
                         }
-                    }).on(this.touchStart, function () {
+                    }).on(that.touchStart, function () {
                         isTouchingTopLevelMenu = true;
                     });
 
@@ -168,11 +169,11 @@ var CMS = window.CMS || {};
 
                         isTouchingTopLevelMenu = false;
                         // create the document event
-                        $(document).on(that.click, reset);
+                        that.ui.document.on(that.click, reset);
                     });
 
                     // attach hover
-                    lists.find('li').on(that.poimterOverOut, function () {
+                    lists.find('li').on(that.pointerOverOut, function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -216,7 +217,7 @@ var CMS = window.CMS || {};
                         lists.removeClass(hover);
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
-                        $(document).off(that.click);
+                        that.ui.document.off(that.click);
                     }
                 });
 
@@ -274,7 +275,7 @@ var CMS = window.CMS || {};
              *
              * @method _initialStates
              * @private
-             * @deprecated this method will be deprecated in > 3.2
+             * @deprecated this method is deprecated now, it will be removed in > 3.2
              */
             _initialStates: function _initialStates() {
                 var publishBtn = $('.cms-btn-publish').parent();
@@ -346,7 +347,7 @@ var CMS = window.CMS || {};
 
                 // add toolbar ready class to body and fire event
                 this.ui.body.addClass('cms-ready');
-                $(document).trigger('cms-ready');
+                this.ui.document.trigger('cms-ready');
             },
 
             /**
