@@ -1,7 +1,7 @@
 //######################################################################################################################
 // Add plugins modal
 #cms-toolbar {
-    .cms-add-plugins-list {
+    .cms-plugin-picker {
         display: none;
 
         .cms-submenu-item.cms-submenu-item-title {
@@ -36,24 +36,24 @@
         }
     }
 
-    .cms-modal-markup .cms-add-plugins-list {
+    .cms-modal-markup .cms-plugin-picker {
         display: block;
     }
 
-    .cms-submenu-quicksearch {
+    .cms-quicksearch {
         display: none;
         position: relative;
         cursor: default;
         height: $quicksearch-height;
         border-bottom: 1px solid $gray-lighter;
     }
-    .cms-submenu-quicksearch label {
+    .cms-quicksearch label {
         cursor: pointer;
         display: block;
         height: 100%;
         width: 100%;
     }
-    .cms-submenu-quicksearch input {
+    .cms-quicksearch input {
         display: block;
         width: 100%;
         padding: 0 $padding-large;
@@ -63,7 +63,7 @@
         -webkit-appearance: none;
     }
 
-    .cms-modal-markup .cms-submenu-quicksearch {
+    .cms-modal-markup .cms-quicksearch {
         display: block;
     }
 

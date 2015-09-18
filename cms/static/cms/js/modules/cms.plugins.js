@@ -11,7 +11,7 @@
         doc.on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
-            CMS.Plugin._hideSubnav();
+            CMS.Plugin._hideSettingsMenu();
         }).on('keydown.cms', function (e) {
             if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', true);
@@ -516,10 +516,10 @@
                     e.stopPropagation();
                     var trigger = $(this);
                     if (trigger.hasClass('cms-btn-active')) {
-                        CMS.Plugin._hideSubnav(trigger);
+                        CMS.Plugin._hideSettingsMenu(trigger);
                     } else {
-                        CMS.Plugin._hideSubnav();
-                        that._showSubnav(trigger);
+                        CMS.Plugin._hideSettingsMenu();
+                        that._showSettingsMenu(trigger);
                     }
                 });
 
@@ -536,7 +536,7 @@
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown-settings')
+                nav.siblings('.cms-quicksearch, .cms-submenu-dropdown-settings')
                     .on(this.click + ' click.cms dblclick.cms', function (e) {
                     e.stopPropagation();
                 });
@@ -571,17 +571,15 @@
             },
 
             /**
-             * TODO will open a modal with traversable plugins list,
-             * so will eventually be removed from here
+             * Opens a modal with traversable plugins list, adds a placeholder to where
+             * the plugin will be added.
              *
              * @private
-             * @param nav
+             * @param nav {jQuery} modal trigger element
              */
             _setAddPluginModal: function _setAddPluginModal(nav) {
-
                 var that = this;
                 var placeholder = $('<div class="cms-add-plugin-placeholder">Plugin will be added here</div>');
-                // FIXME children -> plugins
                 var modal = new CMS.Modal({
                     minWidth: 400,
                     minHeight: 150
@@ -595,7 +593,7 @@
                     childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
                 }
 
-                modal.on('cms.modal.loaded', that._setupPluginsListKeyboardTraversing);
+                modal.on('cms.modal.loaded', that._setupPluginsPickerKeyboardTraversing);
                 modal.on('cms.modal.loaded', function addPlaceholder() {
                     if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
                         that._toggleCollapsable(dragItem);
@@ -608,10 +606,10 @@
                     $('.cms-add-plugin-placeholder').remove();
                 });
                 modal.on('cms.modal.shown', function () {
-                    var dropdown = $('.cms-modal-markup .cms-add-plugins-list');
+                    var dropdown = $('.cms-modal-markup .cms-plugin-picker');
                     dropdown.find('input').trigger('focus');
                 });
-                var plugins = nav.siblings('.cms-add-plugins-list');
+                var plugins = nav.siblings('.cms-plugin-picker');
 
                 that._setupQuickSearch(plugins);
 
@@ -619,7 +617,7 @@
                     e.preventDefault();
                     e.stopPropagation();
 
-                    CMS.Plugin._hideSubnav();
+                    CMS.Plugin._hideSettingsMenu();
 
                     // since we don't know exact plugin parent (because dragndrop)
                     // we need to know the parent id by the time we open "add plugin" dialog
@@ -640,38 +638,37 @@
                     e.stopPropagation();
                 });
 
-                nav.siblings('.cms-submenu-quicksearch, .cms-submenu-dropdown')
+                nav.siblings('.cms-quicksearch, .cms-submenu-dropdown')
                     .on(this.click + ' click.cms dblclick.cms', function (e) {
                     e.stopPropagation();
                 });
             },
 
             /**
-             * sets up event handlers for quicksearching
-             * FIXME will be moved into a separate "add plugin" modal
+             * Sets up event handlers for quicksearching in the plugin picker.
              *
-             * @param plugins jQuery
              * @private
+             * @param plugins jQuery plugins picker element
              */
             _setupQuickSearch: function _setupQuickSearch(plugins) {
                 var that = this;
-                plugins.find('> .cms-submenu-quicksearch').find('input').on('keyup.cms', function (e) {
+                plugins.find('> .cms-quicksearch').find('input').on('keyup.cms', function (e) {
                     clearTimeout(that.timer);
                     var input = $(e.currentTarget);
                     // keybound is not required
                     that.timer = setTimeout(function () {
                         // has to be closest because we clone the list
-                        that._filterPluginsList(input.closest('.cms-add-plugins-list'), input.val());
+                        that._filterPluginsList(input.closest('.cms-plugin-picker'), input.val());
                     }, 100);
                 });
             },
 
             /**
-             * Sets up click handlers for various plugin/placeholder items
-             * FIXME no need to go around nav, can be used directly in dragbar/dragitem
+             * Sets up click handlers for various plugin/placeholder items.
+             * Items can be anywhere in the plugin dragitem, not only in dropdown.
              *
-             * @param nav jQuery
              * @private
+             * @param nav jQuery dropdown trigger with the items
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
@@ -683,7 +680,7 @@
                     CMS.API.Toolbar._loader(true);
 
                     var el = $(this);
-                    CMS.Plugin._hideSubnav(nav);
+                    CMS.Plugin._hideSettingsMenu(nav);
 
                     // set switch for subnav entries
                     switch (el.attr('data-rel')) {
@@ -691,7 +688,7 @@
                             that.addPlugin(
                                 el.attr('href').replace('#', ''),
                                 el.text(),
-                                el.closest('.cms-add-plugins-list').data('parentId')
+                                el.closest('.cms-plugin-picker').data('parentId')
                             );
                             break;
                         case 'ajax_add':
@@ -735,13 +732,12 @@
             },
 
             /**
-             * FIXME will be moved out of here
+             * Sets up keyboard traversing of plugin picker.
              *
-             * @param nav
              * @private
              */
-            _setupPluginsListKeyboardTraversing: function _setupPluginsListKeyboardTraversing() {
-                var dropdown = $('.cms-modal-markup .cms-add-plugins-list');
+            _setupPluginsPickerKeyboardTraversing: function _setupPluginsPickerKeyboardTraversing() {
+                var dropdown = $('.cms-modal-markup .cms-plugin-picker');
                 if (!dropdown.length) {
                     return;
                 }
@@ -774,12 +770,12 @@
             },
 
             /**
-             * FIXME will only work with settings, add plugin will be handle differently
+             * Opens the settings menu for a plugin.
              *
              * @private
-             * @param nav jQuery
+             * @param nav {jQuery} trigger element
              */
-            _showSubnav: function (nav) {
+            _showSettingsMenu: function (nav) {
                 var dropdown = this.ui.dropdown;
                 var parents = nav.parentsUntil('.cms-dragarea').last();
 
@@ -799,18 +795,18 @@
             },
 
             /**
-             * _filterPluginsList
+             * Filters given plugins list by a query.
              *
              * @private
-             * @param list {jQuery}
-             * @param value {String}
+             * @param list {jQuery} plugins picker element
+             * @param query {String} value to filter plugins with
              */
-            _filterPluginsList: function _filterPluginsList(list, value) {
+            _filterPluginsList: function _filterPluginsList(list, query) {
                 var items = list.find('.cms-submenu-item');
                 var titles = list.find('.cms-submenu-item-title');
 
-                // cancel if value is zero
-                if (value === '') {
+                // cancel if query is zero
+                if (query === '') {
                     items.add(titles).show();
                     return false;
                 }
@@ -819,7 +815,7 @@
                 items.find('a, span').each(function (index, item) {
                     item = $(item);
                     var text = item.text().toLowerCase();
-                    var search = value.toLowerCase();
+                    var search = query.toLowerCase();
 
                     (text.indexOf(search) >= 0) ? item.parent().show() : item.parent().hide();
                 });
@@ -1035,13 +1031,13 @@
         });
 
         /**
-         * hides the opened navigation
+         * Hides the opened settings menu. By default looks for any open ones,
          *
-         * @param [nav] jQuery element representing the subnav trigger
          * @static
          * @private
+         * @param [nav] jQuery element representing the subnav trigger
          */
-        CMS.Plugin._hideSubnav = function (nav) {
+        CMS.Plugin._hideSettingsMenu = function (nav) {
             nav = nav || $('.cms-submenu-btn.cms-btn-active');
             if (!nav.length) {
                 return;
@@ -1053,9 +1049,9 @@
             $('.cms-z-index-9999').removeClass('cms-z-index-9999');
 
             nav.siblings('.cms-submenu-dropdown').hide();
-            nav.siblings('.cms-submenu-quicksearch').hide();
+            nav.siblings('.cms-quicksearch').hide();
             // reset search
-            nav.siblings('.cms-submenu-quicksearch')
+            nav.siblings('.cms-quicksearch')
                 .find('input')
                 .val('')
                 .trigger('keyup.cms').blur();
