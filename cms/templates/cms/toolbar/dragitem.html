@@ -4,12 +4,15 @@
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
-            {% if not plugin.disable_child_plugins %}
-            <span class="cms-submenu-btn cms-submenu-add cms-btn">
+            <span class="cms-submenu-btn cms-submenu-add cms-btn{% if plugin.disable_child_plugins %} cms-btn-disabled{% endif %}">
+                {% if plugin.disable_child_plugins %}
+                <span class="cms-hover-tooltip" data-tooltip="{% trans "You cannot add plugins to this plugin." %}">
+                </span>
+                {% else %}
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}">
                 </span>
+                {% endif %}
             </span>
-            {% endif %}
             <a class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit" href="#">
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}">
                 </span>
@@ -22,7 +25,6 @@
         {% endif %}
         <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn">
         </div>
-        <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans 'Quicksearch' %}" /></label></div>
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
                 <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">{% trans "Copy" %}</a></div>
@@ -31,7 +33,8 @@
                 {% extra_menu_items plugin %}
             </div>
         </div>
-        <div class="cms-submenu-dropdown cms-submenu-dropdown-children" data-touch-action="pan-y">
+        <div class="cms-plugin-picker" data-touch-action="pan-y">
+            <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
             {% plugin_child_classes plugin %}
         </div>
 

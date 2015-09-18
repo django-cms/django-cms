@@ -84,6 +84,11 @@ $z-layers: (
             "dragbar":  9999,
             "droppable": 1000,
             "draggable": 99,
+            "empty": (
+                "addplugin": 3,
+                "empty": 2,
+                "droppable": 1
+            ),
             // special case as parent z-index is changed in js
             "quicksearch": 1000,
             "dropdown":    1002,
@@ -162,17 +167,14 @@ $submenu-right: ($structure-dragarea-padding * 2 + $structure-dragitem-height - 
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
-$submenu-item-padding-horizontal: 10px;
-$submenu-item-color: $black;
+$submenu-item-padding-horizontal: $padding-large;
+$submenu-item-color: $gray-light;
 $submenu-item-hover-color: $white;
 
-$submenu-dropdown-width: 180px;
-$submenu-dropdown-height: 10 * $submenu-item-height + 2px;
 $submenu-dropdown-bgcolor: $white;
 
 $submenu-quicksearch-icon-size: 14px;
 $submenu-quicksearch-padding: $structure-dragarea-padding * 2 + $submenu-quicksearch-icon-size;
-$submenu-quicksearch-input-width: $submenu-dropdown-width - $submenu-quicksearch-padding;
 $submenu-quicksearch-input-font-size: $font-size-normal - 1px;
 $submenu-quicksearch-input-line-height: $submenu-quicksearch-input-font-size;
 
@@ -312,17 +314,23 @@ $clipboard-button-icon-size: 12px;
 
 //##############################################################################
 // Tooltip
-$cms-hover-tooltip-width: 160px;
-$cms-hover-tooltip-arrow-height: 6px;
-$cms-hover-tooltip-bgcolor: rgba($black, 0.8);
-$cms-hover-tooltip-padding: 6px 8px;
+$hover-tooltip-width: 160px;
+$hover-tooltip-arrow-height: 6px;
+$hover-tooltip-bgcolor: rgba($black, 0.8);
+$hover-tooltip-padding: 6px 8px;
 
 
 //##############################################################################
 // Dropdown
-$cms-dropdown-shadow: 0 0 10px rgba($black, 0.25);
-$cms-dropdown-item-height: 42px;
-$cms-dropdown-item-icon-space: 40px;
-$cms-dropdown-item-icon-position: 14px;
-$cms-dropdown-arrow-side: 10px;
-$cms-dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $cms-dropdown-arrow-side/2;
+$dropdown-width: 180px;
+$dropdown-shadow: 0 0 10px rgba($black, 0.25);
+$dropdown-item-height: 42px;
+$dropdown-item-icon-space: 40px;
+$dropdown-item-icon-position: 14px;
+$dropdown-arrow-side: 10px;
+$dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $dropdown-arrow-side/2;
+
+
+//##############################################################################
+// Add plugin
+$quicksearch-height: 40px;

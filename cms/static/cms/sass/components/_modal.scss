@@ -16,7 +16,7 @@
         box-shadow: $modal-shadow;
         user-select: none;
         transform: scale(0) translateZ(0);
-        transition: transform 0.2s;
+        transition: transform $speed-base;
 
         .cms-modal-maximized & {
             right: 0;
@@ -57,6 +57,9 @@
                 right: $modal-header-button-area-size + $padding-base;
             }
         }
+    }
+    .cms-modal-morphing {
+        transition: all $speed-base;
     }
     .cms-modal-open {
         transform: scale(1) translateZ(0);
@@ -123,6 +126,10 @@
         line-height: $modal-header-height;
         padding: 0 $padding-large;
         cursor: move;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: $modal-header-button-area-size * 3 + $padding-normal;
         .cms-modal-title-suffix {
             font-weight: normal;
             padding-left: $padding-normal;

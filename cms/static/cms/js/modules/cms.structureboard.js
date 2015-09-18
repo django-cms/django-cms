@@ -380,7 +380,7 @@
                         // show empty
                         actualizeEmptyPlaceholders();
                         // ensure all menus are closed
-                        CMS.Plugin._hideSubnav();
+                        CMS.Plugin._hideSettingsMenu();
                         // keep in mind that caching cms-draggables query only works
                         // as long as we don't create them on the fly
                         that.ui.sortables.each(function () {

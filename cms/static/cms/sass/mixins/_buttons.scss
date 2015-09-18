@@ -54,11 +54,14 @@
         &.focus,
         &:active,
         &.cms-btn-active {
-            background-color: $background important($important);
-            border-color: $border important($important);
-            opacity: 0.65;
+            background-color: rgba($background, 0.4) important($important);
+            border-color: rgba($border, 0.4) important($important);
+            color: rgba($color, 0.4) important(1);
             cursor: not-allowed;
             box-shadow: none important($important);
+            &:before {
+                color: rgba($color, 0.4) important(1);
+            }
         }
     }
 }

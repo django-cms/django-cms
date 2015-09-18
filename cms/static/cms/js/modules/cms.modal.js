@@ -44,6 +44,8 @@ var CMS = window.CMS || {};
 
                 // elements
                 this._setupUI();
+                // event emitter
+                this._setupEventEmitter();
 
                 // states and events
                 this.click = 'click.cms.modal';
@@ -63,6 +65,27 @@ var CMS = window.CMS || {};
 
                 // set a state to determine if we need to reinitialize this._events();
                 this.ui.modal.data('ready', true);
+            },
+
+            /**
+             * Setup event pubsub mechanism for the instance.
+             *
+             * @private
+             * @method _setupEventEmitter
+             */
+            _setupEventEmitter: function _setupEventEmitter() {
+                var bus = $({});
+
+                function proxy(name) {
+                    return function () {
+                        bus[name].apply(bus, arguments);
+                    };
+                }
+
+                this.trigger = proxy('trigger');
+                this.one = proxy('one');
+                this.on = proxy('on');
+                this.off = proxy('off');
             },
 
             /**
@@ -142,6 +165,7 @@ var CMS = window.CMS || {};
              * Opens the modal either in an iframe or renders markup.
              *
              * @method open
+             * @chainable
              * @param opts either `opts.url` or `opts.html` are required
              * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
              * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
@@ -168,13 +192,20 @@ var CMS = window.CMS || {};
                 var heightOffset = 300; // adds margin top and bottom;
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
+                var modalWidth = opts.width || this.options.minWidth;
+                var modalHeight = opts.height || this.options.minHeight;
                 // screen width and height calculation, WC = width
-                var screenWidthCalc = screenWidth >= (this.options.minWidth + widthOffset);
-                var screenHeightCalc = screenHeight >= (this.options.minHeight + heightOffset);
-                var width = screenWidthCalc ? screenWidth - widthOffset : this.options.minWidth;
-                var height = screenHeightCalc ? screenHeight - heightOffset : this.options.minHeight;
+                var screenWidthCalc = screenWidth >= (modalWidth + widthOffset);
+                var screenHeightCalc = screenHeight >= (modalHeight + heightOffset);
 
-                // set maximized
+                var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
+                var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
+
+                // in case, the modal is larger than the window, we trigger fullscreen mode
+                if (width >= screenWidth || height >= screenHeight) {
+                    this.triggerMaximized = true;
+                }
+
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
 
@@ -192,13 +223,12 @@ var CMS = window.CMS || {};
                 // clear elements
                 this.ui.modalButtons.empty();
                 this.ui.breadcrumb.empty();
+
+                // remove class from modal when no breadcrumbs is rendered
+                this.ui.modal.removeClass('cms-modal-has-breadcrumb');
+
                 // hide tooltip
                 this.hideTooltip();
-
-                // in case, the modal is larger than the window, we trigger fullscreen mode
-                if (height >= screenHeight) {
-                    this.triggerMaximized = true;
-                }
 
                 // redirect to iframe rendering if url is provided
                 if (opts.url) {
@@ -218,10 +248,12 @@ var CMS = window.CMS || {};
 
                 // display modal
                 this._show({
-                    width: opts.width || width,
-                    height: opts.height || height,
+                    width: width,
+                    height: height,
                     duration: this.options.modalDuration
                 });
+
+                return this;
             },
 
             /**
@@ -242,6 +274,10 @@ var CMS = window.CMS || {};
                 // TODO make use of transitionDuration
                 var speed = opts.duration;
 
+                if (this.ui.modal.hasClass('cms-modal-open')) {
+                    this.ui.modal.addClass('cms-modal-morphing');
+                }
+
                 this.ui.modal.css({
                     'display': 'block',
                     'width': width,
@@ -256,6 +292,7 @@ var CMS = window.CMS || {};
                 }, 0);
 
                 this.ui.modal.one('cmsTransitionEnd', function () {
+                    that.ui.modal.removeClass('cms-modal-morphing');
                     that.ui.modal.css({
                         'margin-left': -(width / 2),
                         'margin-top': -(height / 2)
@@ -268,6 +305,7 @@ var CMS = window.CMS || {};
 
                     // changed locked status to allow other modals again
                     CMS.API.locked = false;
+                    that.trigger('cms.modal.shown');
                 }).emulateTransitionEnd(speed);
 
                 // add esc close event
@@ -316,7 +354,7 @@ var CMS = window.CMS || {};
                 var that = this;
                 var duration = this.options.modalDuration;
 
-                this.ui.modal.trigger('cms.modal.closed');
+                this.trigger('cms.modal.closed');
 
                 if (opts && opts.duration) {
                     duration = opts.duration;
@@ -486,8 +524,8 @@ var CMS = window.CMS || {};
                     var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
-                    var wMax = 680;
-                    var hMax = 150;
+                    var wMax = that.options.minWidth;
+                    var hMax = that.options.minHeight;
 
                     // add some limits
                     if (w <= wMax || h <= hMax) {
@@ -528,11 +566,6 @@ var CMS = window.CMS || {};
                 var bread = this.ui.breadcrumb;
                 var crumb = '';
                 var template = '<a href="{1}" class="{2}"><span>{3}</span></a>';
-
-                // remove class from modal when no breadcrumbs is rendered
-                if (!this.ui.breadcrumb.find('a').length) {
-                    this.ui.modal.removeClass('cms-modal-has-breadcrumb');
-                }
 
                 // cancel if there is no breadcrumbs)
                 if (!breadcrumbs || breadcrumbs.length <= 1) {
@@ -817,7 +850,7 @@ var CMS = window.CMS || {};
                 // inject
                 holder.html(iframe);
 
-                this.ui.modal.trigger('cms.modal.loaded');
+                this.trigger('cms.modal.loaded');
             },
 
             /**
@@ -842,7 +875,8 @@ var CMS = window.CMS || {};
                 });
 
                 this.ui.titlePrefix.text(el.text());
-                this.ui.modal.trigger('cms.modal.changed');
+
+                this.trigger('cms.modal.changed');
             },
 
             /**
@@ -860,10 +894,10 @@ var CMS = window.CMS || {};
 
                 // set content
                 this.ui.frame.html(opts.html);
-                this.ui.titlePrefix.text(opts.title);
+                this.ui.titlePrefix.text(opts.title || '');
                 this.ui.titleSuffix.text(opts.subtitle || '');
 
-                this.ui.modal.trigger('cms.modal.loaded');
+                this.trigger('cms.modal.loaded');
             },
 
             /**

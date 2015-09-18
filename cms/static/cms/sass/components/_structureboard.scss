@@ -179,22 +179,6 @@
         .cms-submenu-dropdown-bottom {
             bottom: $structure-dragitem-height + $structure-dragarea-padding * 2;
         }
-        .cms-submenu-quicksearch {
-            $quicksearch-height: $structure-dragitem-height + $structure-dragarea-padding * 2 - 2px;
-            top: 50%;
-            height: $quicksearch-height;
-            margin-top: -($quicksearch-height / 2);
-            border-left: 1px dotted $gray-lighter;
-            border-radius: 0;
-            background: $white;
-            &:before {
-                color: $gray-darker;
-            }
-        }
-        .cms-submenu-quicksearch input {
-            color: $black;
-            margin-top: 1px;
-        }
 
         .cms-dragitem {
             line-height: $structure-dragitem-height;
@@ -202,9 +186,12 @@
         }
         .cms-dragitem-text {
             display: block;
-            display: inline-block;
             overflow: visible;
-            width: 90%;
+            padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
+            margin-right: $submenu-icon-area-size * 3 + $submenu-right * 4;
+        }
+        .cms-dragitem-collapsable .cms-dragitem-text {
+            padding-left: $structure-dragitem-icon-space;
         }
     }
 
@@ -218,7 +205,6 @@
         line-height: 0;
         height: 0;
         min-height: 0;
-        box-shadow: 0 0 0 2px $color-primary;
         box-shadow: 0 0 0 2px $color-primary;
         transform: translateY(2px);
         .cms-draggable + & {
@@ -253,7 +239,7 @@
             right: -1px;
             bottom: -1px;
             left: -1px;
-            z-index: 1;
+            z-index: z(structure, content, empty, droppable);
             color: darken($gray-lighter, 15%);
             line-height: $structure-dragitem-height;
             height: auto;
@@ -278,7 +264,7 @@
             right: 0;
             bottom: 0;
             left: 0;
-            z-index: 2;
+            z-index: z(structure, content, empty, empty);
             color: darken($gray-lighter, 15%);
             line-height: 44px;
             padding-left: 20px;
@@ -300,7 +286,6 @@
             color: $white !important;
             white-space: nowrap;
             text-overflow: ellipsis;
-            padding-left: $structure-dragarea-padding-horizontal;
             border: none;
             border-radius: 0;
             background-color: $color-primary !important;
@@ -313,7 +298,7 @@
                 display: none;
             }
             .cms-dragitem-text {
-                display: inline;
+                padding-left: $structure-dragarea-padding-horizontal;
             }
         }
         &.cms-draggable-disabled > .cms-draggable {
@@ -329,7 +314,6 @@
 
     .cms-dragitem {
         position: relative;
-        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
         border-radius: $border-radius-normal;
         cursor: move;
         background: $white;
@@ -340,12 +324,8 @@
             background-size: 8px 33px;
         }
         &:hover {
-            box-shadow: inset 0 0 0 1px $color-primary;
+            box-shadow: inset 0 0 0 1px $gray-light;
         }
-    }
-    .cms-dragitem-collapsable {
-        padding-left: $structure-dragitem-icon-space;
-        cursor: pointer;
     }
     .cms-dragitem-collapsable {
         @include icon(arrow-wide);
@@ -359,6 +339,9 @@
             margin-top: -$structure-dragitem-icon-size/2;
             margin-left: $structure-dragarea-padding-horizontal - 10px;
             transform: rotate(180deg);
+        }
+        .cms-dragitem-text {
+            cursor: pointer;
         }
     }
     .cms-dragitem-expanded:before {
@@ -419,7 +402,9 @@
         }
 
         > .cms-dragitem-collapsable {
-            padding-left: $structure-dragarea-padding-horizontal;
+            .cms-dragitem-text {
+                padding-left: $structure-dragarea-padding-horizontal;
+            }
             &:before {
                 display: none;
             }
