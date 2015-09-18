@@ -671,7 +671,7 @@ var CMS = window.CMS || {};
             /**
              * Sets the functionality for the switcher button.
              *
-             * @method _hide
+             * @method _setSwitcher
              * @param el {jQuery} button element
              * @private
              */
