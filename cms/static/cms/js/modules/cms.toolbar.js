@@ -35,7 +35,7 @@ var CMS = window.CMS || {};
                 messageDelay: 2000
             },
 
-            initialize: function (options) {
+            initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
                 this.settings = CMS.settings;
@@ -50,9 +50,18 @@ var CMS = window.CMS || {};
 
                 // setup initial stuff
                 if (!this.ui.toolbar.data('ready')) {
-                    this._setup();
                     this._events();
                 }
+
+                // FIXME the general initialization is handled within the toolbar
+                // rather than a separate cms.setup or similar. Yet other components
+                // are loaded after the toolbar so it can create a clash where
+                // CMS.API is not ready. This is a workaround until a proper fix
+                // will be released in 3.x
+                var that = this;
+                setTimeout(function () {
+                    that._initialStates();
+                }, 200);
 
                 // set a state to determine if we need to reinitialize this._events();
                 this.ui.toolbar.data('ready', true);
@@ -64,7 +73,7 @@ var CMS = window.CMS || {};
              * @method _setupUI
              * @private
              */
-            _setupUI: function () {
+            _setupUI: function _setupUI() {
                 var container = $('#cms-toolbar');
                 this.ui = {
                     container: container,
@@ -79,13 +88,27 @@ var CMS = window.CMS || {};
                 };
             },
 
-            // initial methods
-            _setup: function () {
+            /**
+             * We check for various states on load if elements in the toolbar
+             * should appear or trigger other components. This preceeds a timeout
+             * which is not optimal and should be addressed separately.
+             *
+             * @method _initialStates
+             * @private
+             * @deprecated this method will be deprecated in > 3.2
+             */
+            _initialStates: function _initialStates() {
+                var publishBtn = $('.cms-btn-publish').parent();
+                var sideframe = new CMS.Sideframe();
+
                 // setup toolbar visibility, we need to reverse the options to set the correct state
-                (this.settings.toolbar === 'expanded') ? this._showToolbar(0, true) : this._hideToolbar(0, true);
+                if (this.settings.toolbar === 'expanded') {
+                    this.open();
+                } else {
+                    this.close();
+                }
 
                 // hide publish button
-                var publishBtn = $('.cms-btn-publish').parent();
                 publishBtn.hide();
 
                 if ($('.cms-btn-publish-active').length) {
@@ -123,8 +146,10 @@ var CMS = window.CMS || {};
 
                 // open sideframe if it was previously opened
                 if (this.settings.sideframe.url) {
-                    var sideframe = new CMS.Sideframe();
-                    sideframe.open(this.settings.sideframe.url, false);
+                    sideframe.open({
+                        url: this.settings.sideframe.url,
+                        animate: false
+                    });
                 }
 
                 // if there is a screenblock, do some resize magic
@@ -135,6 +160,24 @@ var CMS = window.CMS || {};
                 // add toolbar ready class to body and fire event
                 this.ui.body.addClass('cms-ready');
                 $(document).trigger('cms-ready');
+            },
+
+            /**
+             * Opens the toolbar (slide down).
+             *
+             * @method open
+             */
+            open: function open() {
+                this._showToolbar(0, true);
+            },
+
+            /**
+             * Closes the toolbar (slide up).
+             *
+             * @method close
+             */
+            close: function close() {
+                this._hideToolbar(0, true);
             },
 
             _events: function () {
@@ -549,7 +592,10 @@ var CMS = window.CMS || {};
                         break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
-                        sideframe.open(el.attr('href'), true);
+                        sideframe.open({
+                            url: el.attr('href'),
+                            animate: true
+                        });
                         break;
                     case 'ajax':
                         this.openAjax(el.attr('href'), JSON.stringify(
