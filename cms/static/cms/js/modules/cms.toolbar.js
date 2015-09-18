@@ -17,7 +17,7 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(document).ready(function () {
         /**
-         * The toolbar is the generic element which holds verious components
+         * The toolbar is the generic element which holds various components
          * together and provides several commonly used API methods such as
          * show/hide, message display or loader indication.
          *
@@ -554,12 +554,18 @@ var CMS = window.CMS || {};
              * Closes the message window underneath the toolbar.
              *
              * @method open
+             * @param opts
+             * @param opts.url {String} url where the ajax points to
+             * @param [opts.post] {Object} post data to be passed
+             * @param [opts.text] {String} message to be displayed
+             * @param [opts.callback] {Function} custom callback instead of reaload
+             * @param [opts.onSuccess] {String} reload and display custom message
              */
             openAjax: function (opts) {
                 var that = this;
                 // url, post, text, callback, onSuccess
                 var url = opts.url;
-                var post = opts.post;
+                var post = opts.post || {};
                 var text = opts.text || '';
                 var callback = opts.callback;
                 var onSuccess = opts.onSuccess;
