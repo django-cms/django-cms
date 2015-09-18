@@ -314,23 +314,22 @@ $clipboard-button-icon-size: 12px;
 
 //##############################################################################
 // Tooltip
-// FIXME remove `cms-`
-$cms-hover-tooltip-width: 160px;
-$cms-hover-tooltip-arrow-height: 6px;
-$cms-hover-tooltip-bgcolor: rgba($black, 0.8);
-$cms-hover-tooltip-padding: 6px 8px;
+$hover-tooltip-width: 160px;
+$hover-tooltip-arrow-height: 6px;
+$hover-tooltip-bgcolor: rgba($black, 0.8);
+$hover-tooltip-padding: 6px 8px;
 
 
 //##############################################################################
 // Dropdown
 // FIXME remove `cms-`
-$cms-dropdown-width: 180px;
-$cms-dropdown-shadow: 0 0 10px rgba($black, 0.25);
-$cms-dropdown-item-height: 42px;
-$cms-dropdown-item-icon-space: 40px;
-$cms-dropdown-item-icon-position: 14px;
-$cms-dropdown-arrow-side: 10px;
-$cms-dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $cms-dropdown-arrow-side/2;
+$dropdown-width: 180px;
+$dropdown-shadow: 0 0 10px rgba($black, 0.25);
+$dropdown-item-height: 42px;
+$dropdown-item-icon-space: 40px;
+$dropdown-item-icon-position: 14px;
+$dropdown-arrow-side: 10px;
+$dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $dropdown-arrow-side/2;
 
 
 //##############################################################################

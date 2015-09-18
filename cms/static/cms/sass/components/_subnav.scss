@@ -88,10 +88,10 @@
         display: none;
         position: absolute;
         z-index: z(structure, content, dropdown);
-        min-width: $cms-dropdown-width;
+        min-width: $dropdown-width;
         background: $submenu-dropdown-bgcolor;
         border-radius: $border-radius-normal;
-        box-shadow: $cms-dropdown-shadow;
+        box-shadow: $dropdown-shadow;
         right: $submenu-right * 2 + $submenu-icon-area-size;
         transform: translateZ(0);
 
@@ -104,9 +104,9 @@
                 min-height: $submenu-item-height;
                 text-align: left;
                 padding: 0px $submenu-item-padding-horizontal;
-                line-height: $cms-dropdown-item-height;
-                height: $cms-dropdown-item-height;
-                padding-left: $cms-dropdown-item-icon-space;
+                line-height: $dropdown-item-height;
+                height: $dropdown-item-height;
+                padding-left: $dropdown-item-icon-space;
                 color: $submenu-item-color;
                 &:hover,
                 &:focus {
@@ -118,10 +118,10 @@
                     &:before {
                         @extend %icon;
                         position: absolute;
-                        left: $cms-dropdown-item-icon-position;
+                        left: $dropdown-item-icon-position;
                         top: 0;
-                        height: $cms-dropdown-item-height;
-                        line-height: $cms-dropdown-item-height
+                        height: $dropdown-item-height;
+                        line-height: $dropdown-item-height
                     }
                 }
                 &[data-icon=copy] {
@@ -143,12 +143,12 @@
             position: absolute;
             content: '';
             left: 100%;
-            width: $cms-dropdown-arrow-side;
-            height: $cms-dropdown-arrow-side;
-            margin-left: -($cms-dropdown-arrow-side / 2);
+            width: $dropdown-arrow-side;
+            height: $dropdown-arrow-side;
+            margin-left: -($dropdown-arrow-side / 2);
             transform: rotate(45deg);
             background-color: $submenu-dropdown-bgcolor;
-            box-shadow: $cms-dropdown-shadow;
+            box-shadow: $dropdown-shadow;
         }
 
         &.cms-submenu-dropdown-top {
@@ -156,13 +156,13 @@
             // after new "add plugin" is in place
             top: 0 !important;
             &:before {
-                top: $cms-dropdown-arrow-position !important;
+                top: $dropdown-arrow-position !important;
             }
         }
         &.cms-submenu-dropdown-bottom {
             bottom: 0 !important;
             &:before {
-                bottom: $cms-dropdown-arrow-position !important;
+                bottom: $dropdown-arrow-position !important;
             }
         }
 
@@ -176,11 +176,11 @@
     }
     .cms-dragbar .cms-submenu-dropdown-settings {
         &.cms-submenu-dropdown-top:before {
-            top: $cms-dropdown-arrow-position - 4px !important;
+            top: $dropdown-arrow-position - 4px !important;
         }
         &.cms-submenu-dropdown-bottom:before {
             bottom: 12px !important;
-            bottom: $cms-dropdown-arrow-position - 4px !important;
+            bottom: $dropdown-arrow-position - 4px !important;
         }
     }
 
