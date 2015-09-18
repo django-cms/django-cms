@@ -110,13 +110,17 @@ var CMS = window.CMS || {};
              * Opens a given url within a sideframe.
              *
              * @method open
-             * @param url {String} URL string
-             * @param [animate] {Number} Animation speed in ms
+             * @param opts
+             * @param opts.url {String} url to render iframe
+             * @param [opts.animate] {Boolean} should modal be animated
              */
-            open: function open(url, animate) {
-                if (!url) {
+            open: function open(opts) {
+                if (!(opts && opts.url)) {
                     throw new Error('The arguments passed to "open" were invalid.');
                 }
+
+                var url = opts.url;
+                var animate = opts.animate;
 
                 // setup internals
                 var language = 'language=' + CMS.config.request.language;
@@ -223,7 +227,7 @@ var CMS = window.CMS || {};
              * @method _show
              * @private
              * @param width {Number} width that the iframes opens to
-             * @param animate {Number} Animation duration
+             * @param [animate] {Number} Animation duration
              */
             _show: function _show(width, animate) {
                 this.ui.sideframe.show();
