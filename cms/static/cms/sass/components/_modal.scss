@@ -16,7 +16,7 @@
         box-shadow: $modal-shadow;
         user-select: none;
         transform: scale(0) translateZ(0);
-        transition: transform 0.2s;
+        transition: transform $speed-base;
 
         .cms-modal-maximized & {
             right: 0;
@@ -59,7 +59,7 @@
         }
     }
     .cms-modal-morphing {
-        transition: all 0.2s;
+        transition: all $speed-base;
     }
     .cms-modal-open {
         transform: scale(1) translateZ(0);
