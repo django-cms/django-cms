@@ -185,10 +185,12 @@
             border: 2px solid #f0f0f0;
         }
         .cms-dragitem-text {
-            display: block;
             display: inline-block;
             overflow: visible;
-            width: 90%;
+            padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
+        }
+        .cms-dragitem-collapsable .cms-dragitem-text {
+            padding-left: $structure-dragitem-icon-space;
         }
     }
 
@@ -284,7 +286,6 @@
             color: $white !important;
             white-space: nowrap;
             text-overflow: ellipsis;
-            padding-left: $structure-dragarea-padding-horizontal;
             border: none;
             border-radius: 0;
             background-color: $color-primary !important;
@@ -297,7 +298,7 @@
                 display: none;
             }
             .cms-dragitem-text {
-                display: inline;
+                padding-left: $structure-dragarea-padding-horizontal;
             }
         }
         &.cms-draggable-disabled > .cms-draggable {
@@ -313,7 +314,6 @@
 
     .cms-dragitem {
         position: relative;
-        padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
         border-radius: $border-radius-normal;
         cursor: move;
         background: $white;
@@ -328,10 +328,6 @@
         }
     }
     .cms-dragitem-collapsable {
-        padding-left: $structure-dragitem-icon-space;
-        cursor: pointer;
-    }
-    .cms-dragitem-collapsable {
         @include icon(arrow-wide);
         &:before {
             @extend %icon;
@@ -343,6 +339,9 @@
             margin-top: -$structure-dragitem-icon-size/2;
             margin-left: $structure-dragarea-padding-horizontal - 10px;
             transform: rotate(180deg);
+        }
+        .cms-dragitem-text {
+            cursor: pointer;
         }
     }
     .cms-dragitem-expanded:before {
@@ -403,7 +402,9 @@
         }
 
         > .cms-dragitem-collapsable {
-            padding-left: $structure-dragarea-padding-horizontal;
+            .cms-dragitem-text {
+                padding-left: $structure-dragarea-padding-horizontal;
+            }
             &:before {
                 display: none;
             }

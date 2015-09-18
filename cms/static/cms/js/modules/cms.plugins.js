@@ -911,6 +911,7 @@
                 // one time setup
                 var that = this;
                 this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
+                var dragitem = this.ui.draggable.find('> .cms-dragitem');
 
                 // check which button should be shown for collapsemenu
                 this.ui.container.each(function (index, item) {
@@ -926,12 +927,11 @@
                 }
 
                 // attach events to draggable
-                this.ui.draggable.find('> .cms-dragitem').on('click.cms.plugin', function () {
-                    var el = $(this);
-                    if (!el.hasClass('cms-dragitem-collapsable')) {
+                dragitem.find('> .cms-dragitem-text').on('click.cms.plugin', function () {
+                    if (!dragitem.hasClass('cms-dragitem-collapsable')) {
                         return;
                     }
-                    that._toggleCollapsable(el);
+                    that._toggleCollapsable(dragitem);
                 });
 
                 // adds double click event
