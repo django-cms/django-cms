@@ -68,7 +68,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Setup event pubsub mechanism for the instance
+             * Setup event pubsub mechanism for the instance.
              *
              * @private
              * @method _setupEventEmitter
@@ -193,7 +193,7 @@ var CMS = window.CMS || {};
                 var screenWidth = this.ui.window.width();
                 var screenHeight = this.ui.window.height();
                 var modalWidth = opts.width || this.options.minWidth;
-                var modalHeight = opts.width || this.options.minHeight;
+                var modalHeight = opts.height || this.options.minHeight;
                 // screen width and height calculation, WC = width
                 var screenWidthCalc = screenWidth >= (modalWidth + widthOffset);
                 var screenHeightCalc = screenHeight >= (modalHeight + heightOffset);

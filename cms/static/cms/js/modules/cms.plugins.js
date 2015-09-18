@@ -546,13 +546,14 @@
              * Simplistic implementation, only scrolls down, only works in structuremode
              * and highly depends on the styles of the structureboard to work correctly
              *
-             * @method scrollIntoViewIfNeeded
+             * @method _scrollToElement
+             * @private
              * @param el {jQuery} element to scroll to
              * @param [opts] {Object}
              * @param [opts.duration=200] {Number} time to scroll
              * @param [opts.offset=50] {Number} distance in px to the bottom of the screen
              */
-            _scrollIntoStructureBoardIfNeeded: function _scrollIntoStructureBoardIfNeeded(el, opts) {
+            _scrollToElement: function _scrollToElement(el, opts) {
                 var duration = opts && opts.duration || 200;
                 var offset = opts && opts.offset || 50;
                 var scrollable = el.offsetParent();
@@ -597,14 +598,14 @@
                     childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
                 }
 
-                modal.on('cms.modal.loaded', that._setupPluginsPickerKeyboardTraversing);
+                modal.on('cms.modal.loaded', that._setupKeyboardTraversing);
                 modal.on('cms.modal.loaded', function addPlaceholder() {
                     if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
                         that._toggleCollapsable(dragItem);
                     }
                     $('.cms-add-plugin-placeholder').remove();
                     placeholder.appendTo(childrenList);
-                    that._scrollIntoStructureBoardIfNeeded(placeholder);
+                    that._scrollToElement(placeholder);
                 });
                 modal.on('cms.modal.closed', function removePlaceholder() {
                     $('.cms-add-plugin-placeholder').remove();
@@ -738,9 +739,10 @@
             /**
              * Sets up keyboard traversing of plugin picker.
              *
+             * @method _setupKeyboardTraversing
              * @private
              */
-            _setupPluginsPickerKeyboardTraversing: function _setupPluginsPickerKeyboardTraversing() {
+            _setupKeyboardTraversing: function _setupKeyboardTraversing() {
                 var dropdown = $('.cms-modal-markup .cms-plugin-picker');
                 if (!dropdown.length) {
                     return;
@@ -845,9 +847,6 @@
                 if (items.add(titles).filter(':visible').length <= 0) {
                     list.siblings('.cms-submenu-dropdown-children').hide();
                 }
-
-                // hide scrollHint
-                list.siblings('.cms-submenu-dropdown').find('.cms-submenu-scroll-hint').hide();
             },
 
             /**
