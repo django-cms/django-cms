@@ -45,6 +45,14 @@ var CMS = window.CMS || {};
 
                 // states
                 this.click = 'click.cms.toolbar';
+                this.touchStart = 'touchstart.cms.toolbar';
+                this.pointerUp = 'pointerup.cms.toolbar';
+                this.poimterOverOut = 'pointerover.cms.toolbar pointerout.csm.toolbar';
+                this.pointerLeave = 'pointerleave.csm.toolbar';
+                this.mouseEnter = 'mouseenter.cms.toolbar';
+                this.mouseLeave = 'mouseleave.cms.toolbar';
+                this.resize = 'resize.cms.toolbar';
+
                 this.timer = function () {};
                 this.lockToolbar = false;
 
@@ -86,6 +94,176 @@ var CMS = window.CMS || {};
                     messages: container.find('.cms-messages'),
                     screenBlock: container.find('.cms-screenblock')
                 };
+            },
+
+            /**
+             * Sets up all the event handlers, such as closing and resizing.
+             *
+             * @method _events
+             * @private
+             */
+            _events: function () {
+                var that = this;
+
+                // attach event to the trigger handler
+                this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
+                    e.preventDefault();
+                    that.toggleToolbar();
+                });
+
+                // attach event to the navigation elements
+                this.ui.navigations.each(function () {
+                    var navigation = $(this);
+                    var lists = navigation.find('li');
+                    var root = 'cms-toolbar-item-navigation';
+                    var hover = 'cms-toolbar-item-navigation-hover';
+                    var disabled = 'cms-toolbar-item-navigation-disabled';
+                    var children = 'cms-toolbar-item-navigation-children';
+                    var isTouchingTopLevelMenu = false;
+
+                    // remove events from first level
+                    navigation.find('a').on(that.click, function (e) {
+                        e.preventDefault();
+                        if ($(this).attr('href') !== '' &&
+                           $(this).attr('href') !== '#' &&
+                           !$(this).parent().hasClass(disabled) &&
+                           !$(this).parent().hasClass(disabled)) {
+                            that._delegate($(this));
+                            reset();
+                            return false;
+                        }
+                    }).on(this.touchStart, function () {
+                        isTouchingTopLevelMenu = true;
+                    });
+
+                    // handle click states
+                    lists.on(that.click, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var el = $(this);
+
+                        // close if el does not have children
+                        if (!el.hasClass(children)) {
+                            reset();
+                        }
+                        if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
+                            return false;
+                        } else {
+                            el.addClass(hover);
+                        }
+
+                        // activate hover selection
+                        if (!isTouchingTopLevelMenu) {
+                            // we only set the handler for mouseover when not touching because
+                            // the mouseover actually is triggered on touch devices :/
+                            navigation.find('> li').on(that.mouseEnter, function () {
+                                // cancel if item is already active
+                                if ($(this).hasClass(hover)) {
+                                    return false;
+                                }
+                                $(this).trigger(that.click);
+                            });
+                        }
+
+                        isTouchingTopLevelMenu = false;
+                        // create the document event
+                        $(document).on(that.click, reset);
+                    });
+
+                    // attach hover
+                    lists.find('li').on(that.poimterOverOut, function () {
+                        var el = $(this);
+                        var parent = el.closest('.cms-toolbar-item-navigation-children')
+                            .add(el.parents('.cms-toolbar-item-navigation-children'));
+                        var hasChildren = el.hasClass(children) || parent.length;
+
+                        // do not attach hover effect if disabled
+                        // cancel event if element has already hover class
+                        if (el.hasClass(disabled) || el.hasClass(hover)) {
+                            return true;
+                        }
+
+                        // reset
+                        lists.find('li').removeClass(hover);
+
+                        // add hover effect
+                        el.addClass(hover);
+
+                        // handle children elements
+                        if (hasChildren) {
+                            el.find('> ul').show();
+                            // add parent class
+                            parent.addClass(hover);
+                        } else {
+                            lists.find('ul ul').hide();
+                        }
+
+                        // Remove stale submenus
+                        el.siblings().find('> ul').hide();
+                    }).on(that.click, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+
+                    // fix leave event
+                    lists.find('> ul').on(that.pointerLeave, function () {
+                        lists.find('li').removeClass(hover);
+                    });
+
+                    // removes classes and events
+                    function reset() {
+                        lists.removeClass(hover);
+                        lists.find('ul ul').hide();
+                        navigation.find('> li').off(that.mouseEnter);
+                        $(document).off(that.click);
+                    }
+                });
+
+                // attach event to the switcher elements
+                this.ui.switcher.each(function () {
+                    $(this).on(that.click, function (e) {
+                        e.preventDefault();
+                        that._setSwitcher($(e.currentTarget));
+                    });
+                });
+
+                // attach event for first page publish
+                this.ui.buttons.each(function () {
+                    var btn = $(this);
+
+                    // in case the button has a data-rel attribute
+                    if (btn.find('a').attr('data-rel')) {
+                        btn.on(that.click, function (e) {
+                            e.preventDefault();
+                            that._delegate($(this).find('a'));
+                        });
+                    }
+
+                    // in case of the publish button
+                    btn.find('.cms-publish-page').on(that.click, function (e) {
+                        if (!confirm(that.config.lang.publish)) {
+                            e.preventDefault();
+                        }
+                    });
+
+                    btn.find('.cms-btn-publish').on(that.click, function (e) {
+                        e.preventDefault();
+                        // send post request to prevent xss attacks
+                        $.ajax({
+                            'type': 'post',
+                            'url': $(this).prop('href'),
+                            'data': {
+                                'csrfmiddlewaretoken': CMS.config.csrf
+                            },
+                            'success': function () {
+                                CMS.API.Helpers.reloadBrowser();
+                            },
+                            'error': function (request) {
+                                throw new Error(request);
+                            }
+                        });
+                    });
+                });
             },
 
             /**
@@ -180,170 +358,6 @@ var CMS = window.CMS || {};
                 this._hideToolbar(0, true);
             },
 
-            _events: function () {
-                var that = this;
-
-                // attach event to the trigger handler
-                this.ui.toolbarTrigger.on('pointerup.cms', function (e) {
-                    e.preventDefault();
-                    that.toggleToolbar();
-                });
-
-                // attach event to the navigation elements
-                this.ui.navigations.each(function () {
-                    var navigation = $(this);
-                    var lists = navigation.find('li');
-                    var root = 'cms-toolbar-item-navigation';
-                    var hover = 'cms-toolbar-item-navigation-hover';
-                    var disabled = 'cms-toolbar-item-navigation-disabled';
-                    var children = 'cms-toolbar-item-navigation-children';
-                    var isTouchingTopLevelMenu = false;
-
-                    // remove events from first level
-                    navigation.find('a').on(that.click, function (e) {
-                        e.preventDefault();
-                        if ($(this).attr('href') !== '' &&
-                           $(this).attr('href') !== '#' &&
-                           !$(this).parent().hasClass(disabled) &&
-                           !$(this).parent().hasClass(disabled)) {
-                            that._delegate($(this));
-                            reset();
-                            return false;
-                        }
-                    }).on('touchstart.cms', function () {
-                        isTouchingTopLevelMenu = true;
-                    });
-
-                    // handle click states
-                    lists.bind(that.click, function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        var el = $(this);
-
-                        // close if el does not have children
-                        if (!el.hasClass(children)) {
-                            reset();
-                        }
-                        if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
-                            return false;
-                        } else {
-                            el.addClass(hover);
-                        }
-
-                        // activate hover selection
-                        if (!isTouchingTopLevelMenu) {
-                            // we only set the handler for mouseover when not touching because
-                            // the mouseover actually is triggered on touch devices :/
-                            navigation.find('> li').on('mouseenter.cms', function () {
-                                // cancel if item is already active
-                                if ($(this).hasClass(hover)) {
-                                    return false;
-                                }
-                                $(this).trigger(that.click);
-                            });
-                        }
-
-                        isTouchingTopLevelMenu = false;
-                        // create the document event
-                        $(document).bind(that.click, reset);
-                    });
-
-                    // attach hover
-                    lists.find('li').on('pointerover pointerout', function () {
-                        var el = $(this);
-                        var parent = el.closest('.cms-toolbar-item-navigation-children')
-                            .add(el.parents('.cms-toolbar-item-navigation-children'));
-                        var hasChildren = el.hasClass(children) || parent.length;
-
-                        // do not attach hover effect if disabled
-                        // cancel event if element has already hover class
-                        if (el.hasClass(disabled) || el.hasClass(hover)) {
-                            return true;
-                        }
-
-                        // reset
-                        lists.find('li').removeClass(hover);
-
-                        // add hover effect
-                        el.addClass(hover);
-
-                        // handle children elements
-                        if (hasChildren) {
-                            el.find('> ul').show();
-                            // add parent class
-                            parent.addClass(hover);
-                        } else {
-                            lists.find('ul ul').hide();
-                        }
-
-                        // Remove stale submenus
-                        el.siblings().find('> ul').hide();
-                    }).on('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    });
-
-                    // fix leave event
-                    lists.find('> ul').bind('pointerleave', function () {
-                        lists.find('li').removeClass(hover);
-                    });
-
-                    // removes classes and events
-                    function reset() {
-                        lists.removeClass(hover);
-                        lists.find('ul ul').hide();
-                        navigation.find('> li').unbind('mouseenter.cms');
-                        $(document).unbind(that.click);
-                    }
-                });
-
-                // attach event to the switcher elements
-                this.ui.switcher.each(function () {
-                    $(this).bind(that.click, function (e) {
-                        e.preventDefault();
-                        that._setSwitcher($(e.currentTarget));
-                    });
-                });
-
-                // attach event for first page publish
-                this.ui.buttons.each(function () {
-                    var btn = $(this);
-
-                    // in case the button has a data-rel attribute
-                    if (btn.find('a').attr('data-rel')) {
-                        btn.on('click', function (e) {
-                            e.preventDefault();
-                            that._delegate($(this).find('a'));
-                        });
-                    }
-
-                    // in case of the publish button
-                    btn.find('.cms-publish-page').bind(that.click, function (e) {
-                        if (!confirm(that.config.lang.publish)) {
-                            e.preventDefault();
-                        }
-                    });
-
-                    btn.find('.cms-btn-publish').bind(that.click, function (e) {
-                        e.preventDefault();
-                        // send post request to prevent xss attacks
-                        $.ajax({
-                            'type': 'post',
-                            'url': $(this).prop('href'),
-                            'data': {
-                                'csrfmiddlewaretoken': CMS.config.csrf
-                            },
-                            'success': function () {
-                                CMS.API.Helpers.reloadBrowser();
-                            },
-                            'error': function (request) {
-                                throw new Error(request);
-                            }
-                        });
-                    });
-                });
-            },
-
             // public methods
             toggleToolbar: function (show) {
                 // overwrite state when provided
@@ -371,7 +385,7 @@ var CMS = window.CMS || {};
                 var top = this.ui.toolbar.outerHeight(true);
                 var close = this.ui.messages.find('.cms-messages-close');
                 close.hide();
-                close.bind(this.click, function () {
+                close.on(this.click, function () {
                     that.closeMessage();
                 });
 
@@ -634,10 +648,10 @@ var CMS = window.CMS || {};
 
                 // bind message event
                 var debug = this.ui.container.find('.cms-debug-bar');
-                debug.bind('mouseenter mouseleave', function (e) {
+                debug.on(this.mouseEnter + ' ' + this.mouseLeave, function (e) {
                     clearTimeout(timer);
 
-                    if (e.type === 'mouseenter') {
+                    if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
                             that.openMessage(that.config.lang.debug);
                         }, timeout);
@@ -646,23 +660,22 @@ var CMS = window.CMS || {};
             },
 
             _screenBlock: function () {
+                var that = this;
                 var interval = 20;
                 var blocker = this.ui.screenBlock;
                 var sideframe = $('.cms-sideframe');
 
                 // automatically resize screenblock window according to given attributes
-                $(window).on('resize.cms.screenblock', function () {
-                    var width = $(this).width() - sideframe.width();
-
+                $(window).on(this.resize, function () {
                     blocker.css({
-                        'width': width,
+                        'width': $(this).width() - sideframe.width(),
                         'height': $(window).height()
                     });
                 }).trigger('resize');
 
                 // set update interval
                 setInterval(function () {
-                    $(window).trigger('resize.cms.screenblock');
+                    $(window).trigger(that.resize);
                 }, interval);
             }
 
