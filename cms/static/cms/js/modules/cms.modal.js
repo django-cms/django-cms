@@ -656,6 +656,8 @@ var CMS = window.CMS || {};
 
                     el.on(that.click, function () {
                         if (item.is('input') || item.is('button')) {
+                            // we need to use native `.click()` event specifically
+                            // as we are inside an iframe and magic is happening
                             item[0].click();
                         }
 
