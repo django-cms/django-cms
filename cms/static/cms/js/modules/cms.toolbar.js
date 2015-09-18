@@ -301,12 +301,17 @@ var CMS = window.CMS || {};
 
                 // check if there are messages and display them
                 if (CMS.config.messages) {
-                    this.openMessage(CMS.config.messages);
+                    this.openMessage({
+                        message: CMS.config.messages
+                    });
                 }
 
                 // check if there are error messages and display them
                 if (CMS.config.error) {
-                    this.showError(CMS.config.error);
+                    this.openMessage({
+                        message: CMS.config.error,
+                        error: true
+                    });
                 }
 
                 // enforce open state if user is not logged in but requests the toolbar
@@ -317,7 +322,10 @@ var CMS = window.CMS || {};
 
                 // should switcher indicate that there is an unpublished page?
                 if (CMS.config.publisher) {
-                    this.openMessage(CMS.config.publisher, 'right');
+                    this.openMessage({
+                        message: CMS.config.publisher,
+                        dir: 'right'
+                    });
                     setInterval(function () {
                         CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
                     }, this.options.messageDelay);
@@ -429,24 +437,51 @@ var CMS = window.CMS || {};
                 this.ui.messages.css('top', 0);
             },
 
-            openMessage: function (msg, dir, delay, error) {
-                // set toolbar freeze
-                this._lock(true);
+            /**
+             * Opens a message window underneath the toolbar.
+             *
+             * @method open
+             * @deprecated this will be moved to `cms.messages.js`
+             * @param opts
+             * @param opts.message {String|HTMLNode} message to be displayed
+             * @param [opts.dir=center] {String} direction to be displayed `center` `left` or `right`
+             * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed
+             * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
+             */
+            openMessage: function openMessage(opts) {
+                if (!(opts && opts.message)) {
+                    throw new Error('The arguments passed to "openMessage" were invalid.');
+                }
 
-                // add content to element
-                this.ui.messages.find('.cms-messages-inner').html(msg);
-
-                // clear timeout
-                clearTimeout(this.timer);
-
-                // determine width
                 var that = this;
+
+                var msg = opts.message;
+                var dir = opts.dir || 'center';
+                var delay = opts.delay || this.options.messageDelay;
+                var error = opts.error || false;
+
                 var width = 320;
                 var height = this.ui.messages.outerHeight(true);
                 var top = this.ui.toolbar.outerHeight(true);
                 var close = this.ui.messages.find('.cms-messages-close');
+
+                // add content to element
+                this.ui.messages.find('.cms-messages-inner').html(msg);
+
+                // error handling
+                this.ui.messages.removeClass('cms-messages-error');
+                if (error) {
+                    this.ui.messages.addClass('cms-messages-error');
+                }
+
+                // set toolbar freeze
+                this._lock(true);
+
+                // clear timeout
+                clearTimeout(this.timer);
+
                 close.hide();
-                close.on(this.click, function () {
+                close.off(this.click).on(this.click, function () {
                     that.closeMessage();
                 });
 
@@ -463,14 +498,6 @@ var CMS = window.CMS || {};
                 // set correct position and show
                 this.ui.messages.css('top', -height).show();
 
-                // error handling
-                this.ui.messages.removeClass('cms-messages-error');
-                if (error) {
-                    this.ui.messages.addClass('cms-messages-error');
-                }
-
-                // dir should be left, center, right
-                dir = dir || 'center';
                 // set correct direction and animation
                 switch (dir) {
                     case 'left':
@@ -500,28 +527,33 @@ var CMS = window.CMS || {};
                         this.ui.messages.animate({ 'top': top });
                 }
 
-                // cancel autohide if delay is 0
-                if (delay === 0) {
+                // cancel autohide if delay is <= 0
+                if (delay <= 0) {
                     close.show();
-                    return false;
+                } else {
+                    // add delay to hide if delay > 0
+                    this.timer = setTimeout(function () {
+                        that.closeMessage();
+                    }, delay);
                 }
-                // add delay to hide
-                this.timer = setTimeout(function () {
-                    that.closeMessage();
-                }, delay || this.options.messageDelay);
             },
 
-            closeMessage: function () {
-                this.ui.messages.fadeOut(300);
+            /**
+             * Closes the message window underneath the toolbar.
+             *
+             * @method open
+             * @deprecated this will be moved to `cms.messages.js`
+             */
+            closeMessage: function closeMessage() {
+                this.ui.messages.fadeOut(this.options.toolbarDuration);
                 // unlock toolbar
                 this._lock(false);
             },
 
             openAjax: function (url, post, text, callback, onSuccess) {
                 var that = this;
-
-                // check if we have a confirmation text
                 var question = (text) ? confirm(text) : true;
+
                 // cancel if question has been denied
                 if (!question) {
                     return false;
@@ -530,39 +562,40 @@ var CMS = window.CMS || {};
                 // set loader
                 this._loader(true);
 
-                $.ajax({
-                    'type': 'POST',
-                    'url': url,
-                    'data': (post) ? JSON.parse(post) : {},
-                    'success': function (response) {
-                        CMS.API.locked = false;
+                return $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: (post) ? JSON.parse(post) : {}
+                }).done(function (response) {
+                    CMS.API.locked = false;
 
-                        if (callback) {
-                            callback(that, response);
-                            that._loader(false);
-                        } else if (onSuccess) {
-                            CMS.API.Helpers.reloadBrowser(onSuccess, false, true);
-                        } else {
-                            // reload
-                            CMS.API.Helpers.reloadBrowser(false, false, true);
-                        }
-                    },
-                    'error': function (jqXHR) {
-                        CMS.API.locked = false;
-                        that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                    if (callback) {
+                        callback(that, response);
+                        that._loader(false);
+                    } else if (onSuccess) {
+                        CMS.API.Helpers.reloadBrowser(onSuccess, false, true);
+                    } else {
+                        // reload
+                        CMS.API.Helpers.reloadBrowser(false, false, true);
                     }
+                }).fail(function (jqXHR) {
+                    CMS.API.locked = false;
+
+                    that.openMessage({
+                        message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                        error: true
+                    });
                 });
             },
 
-            showError: function (msg, reload) {
-                this.openMessage(msg, 'center', 0, true);
-                // force reload if param is passed
-                if (reload) {
-                    CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
-                }
-            },
-
-            _setSwitcher: function (el) {
+            /**
+             * Sets the functionality for the switcher button.
+             *
+             * @method _hide
+             * @param el {jQuery} button element
+             * @private
+             */
+            _setSwitcher: function _setSwitcher(el) {
                 // save local vars
                 var active = el.hasClass('cms-toolbar-item-switch-active');
                 var anchor = el.find('a');
@@ -571,7 +604,10 @@ var CMS = window.CMS || {};
 
                 // prevent if switchopstion is passed
                 if (this.options.preventSwitch) {
-                    this.openMessage(this.options.preventSwitchMessage, 'right');
+                    this.openMessage({
+                        message: this.options.preventSwitchMessage,
+                        dir: 'right'
+                    });
                     return false;
                 }
 
@@ -606,7 +642,14 @@ var CMS = window.CMS || {};
                 }, duration);
             },
 
-            _delegate: function (el) {
+            /**
+             * Delegates event from element to appropriate functionalities.
+             *
+             * @method _delegate
+             * @param el {jQuery} trigger element
+             * @private
+             */
+            _delegate: function _delegate(el) {
                 // save local vars
                 var target = el.data('rel');
 
@@ -619,7 +662,9 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'message':
-                        this.openMessage(el.data('text'));
+                        this.openMessage({
+                            message: el.data('text')
+                        });
                         break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
@@ -638,7 +683,14 @@ var CMS = window.CMS || {};
                 }
             },
 
-            _lock: function (lock) {
+            /**
+             * Locks the toolbar so it cannot be closed.
+             *
+             * @method _lock
+             * @param lock {Boolean} true if the toolbar should be locked
+             * @private
+             */
+            _lock: function _lock(lock) {
                 if (lock) {
                     this.lockToolbar = true;
                     // make button look disabled
@@ -658,7 +710,13 @@ var CMS = window.CMS || {};
                 }
             },
 
-            _debug: function () {
+            /**
+             * Handles the debub bar when `DEBUG=true` on top of the toolbar.
+             *
+             * @method _debug
+             * @private
+             */
+            _debug: function _debug() {
                 var that = this;
                 var timeout = 1000;
                 var timer = function () {};
@@ -670,7 +728,9 @@ var CMS = window.CMS || {};
 
                     if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
-                            that.openMessage(that.config.lang.debug);
+                            that.openMessage({
+                                message: that.config.lang.debug
+                            });
                         }, timeout);
                     }
                 });

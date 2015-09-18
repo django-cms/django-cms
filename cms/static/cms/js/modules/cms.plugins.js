@@ -245,7 +245,10 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that.openMessage({
+                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                            error: true
+                        });
                     }
                 });
             },
@@ -302,7 +305,9 @@
                     url: options.urls.copy_plugin,
                     data: data,
                     success: function () {
-                        CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+                        CMS.API.Toolbar.openMessage({
+                            message: CMS.config.lang.success
+                        });
                         // reload
                         CMS.API.Helpers.reloadBrowser();
                     },
@@ -310,7 +315,10 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that.openMessage({
+                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                            error: true
+                        });
                     }
                 };
 
@@ -363,7 +371,10 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 });
@@ -429,7 +440,10 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that.openMessage({
+                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                            error: true
+                        });
                     }
                 });
 
@@ -1017,10 +1031,6 @@
 
             _getIds: function (els) {
                 return CMS.API.StructureBoard.getIds(els);
-            },
-
-            _showError: function (msg) {
-                return CMS.API.Toolbar.showError(msg, true);
             },
 
             _showSuccess: function (el) {

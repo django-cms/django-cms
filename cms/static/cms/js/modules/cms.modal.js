@@ -770,7 +770,10 @@ var CMS = window.CMS || {};
                     try {
                         iframe.contents();
                     } catch (error) {
-                        CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
+                        CMS.API.Toolbar.openMessage({
+                            message: '<strong>' + error + '</strong>',
+                            error: true
+                        });
                         that.close();
                     }
 
@@ -780,7 +783,9 @@ var CMS = window.CMS || {};
                     // show messages in toolbar if provided
                     messages = iframe.contents().find('.messagelist li');
                     if (messages.length) {
-                        CMS.API.Toolbar.openMessage(messages.eq(0).text());
+                        CMS.API.Toolbar.openMessage({
+                            message: messages.eq(0).text()
+                        });
                     }
                     messages.remove();
                     contents = iframe.contents();

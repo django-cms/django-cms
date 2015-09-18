@@ -198,7 +198,10 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 }
@@ -241,7 +244,10 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 }
