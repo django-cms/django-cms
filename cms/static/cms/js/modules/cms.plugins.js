@@ -535,13 +535,42 @@
             },
 
             /**
+             * Simplistic implementation, only scrolls down, only works in structuremode
+             * and highly depends on the styles of the structureboard to work correctly
+             *
+             * @method scrollIntoViewIfNeeded
+             * @param el {jQuery} element to scroll to
+             * @param [opts] {Object}
+             * @param [opts.duration=200] {Number} time to scroll
+             * @param [opts.offset=50] {Number} distance in px to the bottom of the screen
+             */
+            _scrollIntoStructureBoardIfNeeded: function _scrollIntoStructureBoardIfNeeded(el, opts) {
+                var duration = opts && opts.duration || 200;
+                var offset = opts && opts.offset || 50;
+                var scrollable = el.offsetParent();
+                var win = $(window);
+                var scrollHeight = win.height();
+                var scrollTop = scrollable.scrollTop();
+                var elPosition = el.position().top;
+                var elHeight = el.height();
+                var isInViewport = (elPosition + elHeight + offset <= scrollHeight);
+
+                if (!isInViewport) {
+                    scrollable.animate({
+                        scrollTop: elPosition + offset + elHeight + scrollTop - scrollHeight
+                    }, duration);
+                }
+            },
+
+            /**
              * TODO will open a modal with traversable plugins list,
              * so will eventually be removed from here
              *
-             * @param nav
              * @private
+             * @param nav
              */
             _setAddPluginModal: function _setAddPluginModal(nav) {
+
                 var that = this;
                 var placeholder = $('<div class="cms-add-plugin-placeholder">Plugin will be added here</div>');
                 // FIXME children -> plugins
@@ -565,9 +594,9 @@
                     }
                     $('.cms-add-plugin-placeholder').remove();
                     placeholder.appendTo(childrenList);
+                    that._scrollIntoStructureBoardIfNeeded(placeholder);
                 });
                 modal.on('cms.modal.closed', function removePlaceholder() {
-                    console.log('detaching');
                     $('.cms-add-plugin-placeholder').remove();
                 });
                 modal.on('cms.modal.shown', function () {
