@@ -768,15 +768,14 @@
             /**
              * FIXME will only work with settings, add plugin will be handle differently
              *
-             * @param nav jQuery
-             * @param [dropdown=this.ui.dropdown] jQuery
              * @private
+             * @param nav jQuery
              */
-            _showSubnav: function (nav, dropdown) {
-                dropdown = dropdown || this.ui.dropdown;
-                nav.addClass('cms-btn-active');
-
+            _showSubnav: function (nav) {
+                var dropdown = this.ui.dropdown;
                 var parents = nav.parentsUntil('.cms-dragarea').last();
+
+                nav.addClass('cms-btn-active');
                 parents.addClass('cms-z-index-9999');
 
                 // set visible states
