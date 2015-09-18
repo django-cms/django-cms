@@ -5,6 +5,7 @@
         display: none;
 
         .cms-submenu-item.cms-submenu-item-title {
+            // only works in FF/iOS for the moment
             position: sticky;
             top: 0;
             z-index: 1;
@@ -15,9 +16,9 @@
             display: block;
             font-size: $submenu-item-font-size;
             line-height: $submenu-item-height * 1.2;
-            min-height: $submenu-item-height * 1.2;
             text-align: left;
-            padding: 0px $submenu-item-padding-horizontal;
+            min-height: $submenu-item-height * 1.2;
+            padding: 0 $submenu-item-padding-horizontal;
         }
 
         .cms-submenu-item a {
@@ -43,24 +44,25 @@
     .cms-quicksearch {
         display: none;
         position: relative;
-        cursor: default;
         height: $quicksearch-height;
         border-bottom: 1px solid $gray-lighter;
+        cursor: default;
     }
     .cms-quicksearch label {
-        cursor: pointer;
         display: block;
-        height: 100%;
         width: 100%;
+        height: 100%;
+        cursor: pointer;
     }
     .cms-quicksearch input {
         display: block;
         width: 100%;
-        padding: 0 $padding-large;
         height: 100%;
-        background-color: $gray-lightest;
+        padding: 0 $padding-large;
         border: none;
-        -webkit-appearance: none;
+        background-color: $gray-lightest;
+
+        appearance: none;
     }
 
     .cms-modal-markup .cms-quicksearch {
@@ -69,12 +71,12 @@
 
     .cms-add-plugin-placeholder {
         position: relative;
-        border: 2px solid $color-primary;
-        background-color: mix(white, $color-primary, 90%);
+        z-index: z(structure, content, empty, addplugin);
         color: $color-primary;
-        border-radius: $border-radius-base;
         line-height: 44px;
         padding-left: 20px;
-        z-index: z(structure, content, empty, addplugin);
+        border: 2px solid $color-primary;
+        border-radius: $border-radius-base;
+        background-color: mix(white, $color-primary, 90%);
     }
 }
