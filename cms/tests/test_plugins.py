@@ -30,9 +30,7 @@ from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     Article, Section, ArticlePluginModel,
     FKModel,
-    M2MTargetModel,
-    FKPluginModel,
-    PluginModelWithM2MToPlugin)
+    M2MTargetModel)
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
     TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5)
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
@@ -1603,72 +1601,6 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         )
         new_public_count = M2MTargetModel.objects.filter(
             pluginmodelwithm2mtomodel__placeholder__page__publisher_is_draft=False
-        ).count()
-        self.assertEqual(
-            new_public_count,
-            old_public_count + 1
-        )
-    
-    def test_copy_fk_from_plugin(self):
-        plugin = api.add_plugin(
-            placeholder=self.placeholder1,
-            plugin_type="PluginWithFKFromPlugin",
-            language=self.FIRST_LANG,
-        )
-        api.add_plugin(
-            placeholder=self.placeholder2,
-            plugin_type='FKPlugin',
-            language=self.FIRST_LANG,
-            fk_field=plugin
-        )
-        old_plugin_count = FKPluginModel.objects.filter(
-            fk_field__placeholder__page__publisher_is_draft=False
-        ).count()
-        api.publish_page(
-            self.page1,
-            self.super_user,
-            self.FIRST_LANG
-        )
-        api.publish_page(
-            self.page2,
-            self.super_user,
-            self.FIRST_LANG
-        )
-        new_plugin_count = FKPluginModel.objects.filter(
-            fk_field__placeholder__page__publisher_is_draft=False
-        ).count()
-        self.assertEqual(
-            new_plugin_count,
-            old_plugin_count + 1
-        )
-    
-    def test_copy_m2m_to_plugin(self):
-        plugin = api.add_plugin(
-            placeholder=self.placeholder1,
-            plugin_type="PluginWithM2MToPlugin",
-            language=self.FIRST_LANG,
-        )
-        m2m_target = api.add_plugin(
-            placeholder=self.placeholder2,
-            plugin_type='M2MTargetPlugin',
-            language=self.FIRST_LANG
-        )
-        plugin.m2m_field.add(m2m_target)
-        old_public_count = PluginModelWithM2MToPlugin.objects.filter(
-            m2m_field__placeholder__page__publisher_is_draft=False
-        ).count()
-        api.publish_page(
-            self.page1,
-            self.super_user,
-            self.FIRST_LANG
-        )
-        api.publish_page(
-            self.page2,
-            self.super_user,
-            self.FIRST_LANG
-        )
-        new_public_count = PluginModelWithM2MToPlugin.objects.filter(
-            m2m_field__placeholder__page__publisher_is_draft=False
         ).count()
         self.assertEqual(
             new_public_count,

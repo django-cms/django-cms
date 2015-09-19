@@ -7,10 +7,6 @@ from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     ArticlePluginModel, Article,
     PluginModelWithFKFromModel,
     PluginModelWithM2MToModel,
-    FKPluginModel,
-    M2MTargetPluginModel,
-    PluginModelWithFKFromPlugin,
-    PluginModelWithM2MToPlugin,
 )
 
 
@@ -66,31 +62,3 @@ class PluginWithM2MToModel(CMSPluginBase):
     render_template = "articles.html"
 
 plugin_pool.register_plugin(PluginWithM2MToModel)
-
-
-class FKPlugin(CMSPluginBase):
-    model = FKPluginModel
-    render_template = "articles.html"
-
-plugin_pool.register_plugin(FKPlugin)
-
-
-class M2MTargetPlugin(CMSPluginBase):
-    model = M2MTargetPluginModel
-    render_template = "articles.html"
-
-plugin_pool.register_plugin(M2MTargetPlugin)
-
-
-class PluginWithFKFromPlugin(CMSPluginBase):
-    model = PluginModelWithFKFromPlugin
-    render_template = "articles.html"
-
-plugin_pool.register_plugin(PluginWithFKFromPlugin)
-
-
-class PluginWithM2MToPlugin(CMSPluginBase):
-    model = PluginModelWithM2MToPlugin
-    render_template = "articles.html"
-
-plugin_pool.register_plugin(PluginWithM2MToPlugin)
