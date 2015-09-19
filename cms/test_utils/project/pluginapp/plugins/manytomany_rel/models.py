@@ -31,3 +31,60 @@ class ArticlePluginModel(CMSPlugin):
 
     def copy_relations(self, oldinstance):
         self.sections = oldinstance.sections.all()
+
+
+###
+
+
+class FKModel(models.Model):
+    fk_field = models.ForeignKey('PluginModelWithFKFromModel')
+
+
+class M2MTargetModel(models.Model):
+    title = models.CharField(max_length=50)
+
+
+class PluginModelWithFKFromModel(CMSPlugin):
+    title = models.CharField(max_length=50)
+    
+    def copy_relations(self, oldinstance):
+        # Like suggested in the docs
+        for associated_item in oldinstance.fkmodel_set.all():
+            associated_item.pk = None
+            associated_item.fk_field = self
+            associated_item.save()
+
+
+class PluginModelWithM2MToModel(CMSPlugin):
+    m2m_field = models.ManyToManyField(M2MTargetModel)
+    
+    def copy_relations(self, oldinstance):
+        # Like suggested in the docs
+        self.m2m_field = oldinstance.m2m_field.all()
+
+
+class FKPluginModel(CMSPlugin):
+    fk_field = models.ForeignKey('PluginModelWithFKFromPlugin')
+
+
+class M2MTargetPluginModel(CMSPlugin):
+    title = models.CharField(max_length=50)
+
+
+class PluginModelWithFKFromPlugin(CMSPlugin):
+    title = models.CharField(max_length=50)
+    
+    def copy_relations(self, oldinstance):
+        # Like suggested in the docs
+        for associated_item in oldinstance.fkpluginmodel_set.all():
+            associated_item.pk = None
+            associated_item.fk_field = self
+            associated_item.save()
+
+
+class PluginModelWithM2MToPlugin(CMSPlugin):
+    m2m_field = models.ManyToManyField(M2MTargetPluginModel)
+    
+    def copy_relations(self, oldinstance):
+        # Like suggested in the docs
+        self.m2m_field = oldinstance.m2m_field.all()
