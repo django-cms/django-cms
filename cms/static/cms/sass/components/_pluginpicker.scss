@@ -14,19 +14,30 @@
         .cms-submenu-item a,
         span {
             display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             font-size: $submenu-item-font-size;
-            line-height: $submenu-item-height * 1.2;
+            line-height: $submenu-item-height + 6px;
             text-align: left;
-            min-height: $submenu-item-height * 1.2;
+            min-height: $submenu-item-height + 6px;
             padding: 0 $submenu-item-padding-horizontal;
         }
 
         .cms-submenu-item a {
             color: $black;
-            &:hover,
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+            &:hover {
+                color: $color-primary;
+                border-top: 1px solid $color-primary;
+                border-bottom: 1px solid $color-primary;
+            }
             &:focus {
                 color: $submenu-item-hover-color;
                 background: $color-primary;
+                border-top: 1px solid $color-primary;
+                border-bottom: 1px solid $color-primary;
             }
         }
         .cms-submenu-item span {
