@@ -31,6 +31,7 @@ def default(name):
 
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
+    'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
