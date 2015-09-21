@@ -60,14 +60,6 @@ var CMS = window.CMS || {};
                 this.minimized = false;
                 this.triggerMaximized = false;
                 this.saved = false;
-
-                // if the modal is initialized the first time, set the events
-                if (!this.ui.modal.data('ready')) {
-                    this._events();
-                }
-
-                // set a state to determine if we need to reinitialize this._events();
-                this.ui.modal.data('ready', true);
             },
 
             /**
@@ -131,38 +123,38 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // modal behaviours
-                this.ui.minimizeButton.on(this.click, function (e) {
+                this.ui.minimizeButton.off(this.click).on(this.click, function (e) {
                     e.preventDefault();
                     that.minimize();
                 });
-                this.ui.maximizeButton.on(this.click, function (e) {
+                this.ui.maximizeButton.off(this.click).on(this.click, function (e) {
                     e.preventDefault();
                     that.maximize();
                 });
 
-                this.ui.title.on(this.pointerDown, function (e) {
+                this.ui.title.off(this.pointerDown).on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
-                this.ui.title.on(this.doubleClick, function () {
+                this.ui.title.off(this.doubleClick).on(this.doubleClick, function () {
                     that.maximize();
                 });
 
-                this.ui.resize.on(this.pointerDown, function (e) {
+                this.ui.resize.off(this.pointerDown).on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startResize(e);
-                });
-
-                // elements within the window
-                this.ui.breadcrumb.on(this.click, 'a', function (e) {
-                    e.preventDefault();
-                    that._changeIframe($(this));
                 });
 
                 this.ui.closeAndCancel.on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
+                });
+
+                // elements within the window
+                this.ui.breadcrumb.off(this.click, 'a').on(this.click, 'a', function (e) {
+                    e.preventDefault();
+                    that._changeIframe($(this));
                 });
             },
 
@@ -181,6 +173,7 @@ var CMS = window.CMS || {};
              * @param [opts.height] {Number} sets the height of the modal
              */
             open: function open(opts) {
+                this._events();
                 // setup internals
                 if (!(opts && opts.url || opts && opts.html)) {
                     throw new Error('The arguments passed to "open" were invalid.');
