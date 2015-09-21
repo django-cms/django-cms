@@ -185,6 +185,17 @@ var CMS = window.CMS || {};
                     return false;
                 }
 
+                this.trigger('cms.modal.load');
+                // trigger the event also on the dom element,
+                // because if we load another modal while one is already open
+                // the older instance won't receive any updates
+                this.ui.modal.trigger('cms.modal.load');
+
+                // common elements state
+                this.ui.resize.toggle(this.options.resizable);
+                this.ui.minimizeButton.toggle(this.options.minimizable);
+                this.ui.maximizeButton.toggle(this.options.maximizable);
+
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
                 var heightOffset = 300; // adds margin top and bottom;
