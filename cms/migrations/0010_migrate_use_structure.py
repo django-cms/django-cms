@@ -22,7 +22,7 @@ def forwards(apps, schema_editor):
                 user.user_permissions.add(permission.pk)
         for group in Group.objects.all():
             if page_permission in group.permissions.all():
-                group.permissions.add(permission)
+                group.permissions.add(permission.pk)
     except ContentType.DoesNotExist:
         print(u'Users not migrated to use_structure permission, please add the permission manually')
 
@@ -34,10 +34,10 @@ def backwards(apps, schema_editor):
     permission, __ = Permission.objects.get_or_create(
         codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
     for user in user_model.objects.filter(is_superuser=False, is_staff=True):
-        user.user_permissions.remove(permission)
+        user.user_permissions.remove(permission.pk)
     for group in Group.objects.all():
         if permission in group.permissions.all():
-            group.permissions.remove(permission)
+            group.permissions.remove(permission.pk)
 
 
 class Migration(migrations.Migration):
