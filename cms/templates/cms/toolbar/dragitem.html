@@ -1,6 +1,6 @@
 {% load i18n l10n cms_tags %}
 
-<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}">
+<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}{% if clipboard %} cms-draggable-from-clipboard{% endif %}">
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
@@ -33,12 +33,14 @@
                 {% extra_menu_items plugin %}
             </div>
         </div>
+        {% if not clipboard %}
         <div class="cms-plugin-picker" data-touch-action="pan-y">
             <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
             {% plugin_child_classes plugin %}
         </div>
+        {% endif %}
 
-        {% if show_language %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
+        {% if clipboard %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
         <span class="cms-dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
 
     </div>
