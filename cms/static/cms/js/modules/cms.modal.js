@@ -34,7 +34,10 @@ var CMS = window.CMS || {};
                 minHeight: 400,
                 minWidth: 800,
                 modalDuration: 200,
-                newPlugin: false
+                newPlugin: false,
+                resizable: true,
+                maximizable: true,
+                minimizable: true
             },
 
             initialize: function initialize(options) {
@@ -74,11 +77,13 @@ var CMS = window.CMS || {};
              * @method _setupEventEmitter
              */
             _setupEventEmitter: function _setupEventEmitter() {
+                var that = this;
                 var bus = $({});
 
                 function proxy(name) {
                     return function () {
                         bus[name].apply(bus, arguments);
+                        return that;
                     };
                 }
 
