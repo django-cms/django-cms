@@ -255,6 +255,8 @@ var CMS = window.CMS || {};
                     });
                 }
 
+                this.trigger('cms.modal.loaded');
+
                 // display modal
                 this._show({
                     width: width,
@@ -318,7 +320,7 @@ var CMS = window.CMS || {};
                 }).emulateTransitionEnd(speed);
 
                 // add esc close event
-                this.ui.body.on('keydown.cms', function (e) {
+                this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
                     if (e.keyCode === CMS.KEYS.ESC) {
                         that.close();
                     }
