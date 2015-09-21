@@ -354,8 +354,6 @@ var CMS = window.CMS || {};
                 var that = this;
                 var duration = this.options.modalDuration;
 
-                this.trigger('cms.modal.closed');
-
                 if (opts && opts.duration) {
                     duration = opts.duration;
                 }
@@ -375,6 +373,7 @@ var CMS = window.CMS || {};
                     if (that.maximized) {
                         that.maximize();
                     }
+                    that.trigger('cms.modal.closed');
                 }, this.options.duration);
             },
 
@@ -854,8 +853,6 @@ var CMS = window.CMS || {};
 
                 // inject
                 holder.html(iframe);
-
-                this.trigger('cms.modal.loaded');
             },
 
             /**
@@ -880,8 +877,6 @@ var CMS = window.CMS || {};
                 });
 
                 this.ui.titlePrefix.text(el.text());
-
-                this.trigger('cms.modal.changed');
             },
 
             /**
