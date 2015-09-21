@@ -903,11 +903,10 @@ var CMS = window.CMS || {};
                 this.ui.modalBody.removeClass('cms-loader');
 
                 // set content
-                this.ui.frame.html(opts.html);
+                // empty to remove events, append to keep events
+                this.ui.frame.empty().append(opts.html);
                 this.ui.titlePrefix.text(opts.title || '');
                 this.ui.titleSuffix.text(opts.subtitle || '');
-
-                this.trigger('cms.modal.loaded');
             },
 
             /**
