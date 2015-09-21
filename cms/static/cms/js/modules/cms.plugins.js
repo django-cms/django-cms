@@ -245,7 +245,10 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that.openMessage({
+                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                            error: true
+                        });
                     }
                 });
             },
@@ -302,7 +305,9 @@
                     url: options.urls.copy_plugin,
                     data: data,
                     success: function () {
-                        CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+                        CMS.API.Toolbar.openMessage({
+                            message: CMS.config.lang.success
+                        });
                         // reload
                         CMS.API.Helpers.reloadBrowser();
                     },
@@ -310,7 +315,10 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that.openMessage({
+                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                            error: true
+                        });
                     }
                 };
 
@@ -363,7 +371,10 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 });
@@ -429,7 +440,10 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that._showError(msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText);
+                        that.openMessage({
+                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
+                            error: true
+                        });
                     }
                 });
 
@@ -685,7 +699,7 @@
                     e.stopPropagation();
 
                     // show loader and make sure scroll doesn't jump
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
 
                     var el = $(this);
                     CMS.Plugin._hideSettingsMenu(nav);
@@ -700,13 +714,13 @@
                             );
                             break;
                         case 'ajax_add':
-                            CMS.API.Toolbar.openAjax(
-                                el.attr('href'),
-                                JSON.stringify(el.data('post')),
-                                el.data('text'),
-                                that.editPluginPostAjax(that),
-                                el.data('on-success')
-                            );
+                            CMS.API.Toolbar.openAjax({
+                                url: el.attr('href'),
+                                post: JSON.stringify(el.data('post')),
+                                text: el.data('text'),
+                                callback: that.editPluginPostAjax(that),
+                                onSuccess: el.data('on-success')
+                            });
                             break;
                         case 'edit':
                             that.editPlugin(
@@ -732,7 +746,7 @@
                             );
                             break;
                         default:
-                            CMS.API.Toolbar._loader(false);
+                            CMS.API.Toolbar.hideLoader();
                             CMS.API.Toolbar._delegate(el);
                     }
                 });
@@ -1017,10 +1031,6 @@
 
             _getIds: function (els) {
                 return CMS.API.StructureBoard.getIds(els);
-            },
-
-            _showError: function (msg) {
-                return CMS.API.Toolbar.showError(msg, true);
             },
 
             _showSuccess: function (el) {

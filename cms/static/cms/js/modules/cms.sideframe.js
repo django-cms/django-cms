@@ -110,13 +110,18 @@ var CMS = window.CMS || {};
              * Opens a given url within a sideframe.
              *
              * @method open
-             * @param url {String} URL string
-             * @param [animate] {Number} Animation speed in ms
+             * @chainable
+             * @param opts
+             * @param opts.url {String} url to render iframe
+             * @param [opts.animate] {Boolean} should modal be animated
              */
-            open: function open(url, animate) {
-                if (!url) {
+            open: function open(opts) {
+                if (!(opts && opts.url)) {
                     throw new Error('The arguments passed to "open" were invalid.');
                 }
+
+                var url = opts.url;
+                var animate = opts.animate;
 
                 // setup internals
                 var language = 'language=' + CMS.config.request.language;
@@ -130,7 +135,7 @@ var CMS = window.CMS || {};
 
                 // show loader
                 if (CMS.API && CMS.API.Toolbar) {
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                 }
 
                 // we need to modify the url appropriately to pass
@@ -159,6 +164,8 @@ var CMS = window.CMS || {};
 
                 // show iframe
                 this._show(width, animate);
+
+                return this;
             },
 
             /**
@@ -223,7 +230,7 @@ var CMS = window.CMS || {};
              * @method _show
              * @private
              * @param width {Number} width that the iframes opens to
-             * @param animate {Number} Animation duration
+             * @param [animate] {Number} Animation duration
              */
             _show: function _show(width, animate) {
                 this.ui.sideframe.show();
@@ -253,9 +260,9 @@ var CMS = window.CMS || {};
                 // trigger API handlers
                 if (CMS.API && CMS.API.Toolbar) {
                     // FIXME: initialization needs to be done after our libs are loaded
+                    CMS.API.Toolbar.open();
+                    CMS.API.Toolbar.hideLoader();
                     CMS.API.Toolbar._lock(true);
-                    CMS.API.Toolbar._showToolbar(true);
-                    CMS.API.Toolbar._loader();
                 }
             },
 

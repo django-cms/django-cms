@@ -391,7 +391,7 @@ var CMS = window.CMS || {};
 
                 if (this.minimized === false) {
                     // ensure toolbar is shown
-                    CMS.API.Toolbar.toggleToolbar(true);
+                    CMS.API.Toolbar.show();
 
                     // save initial state
                     this.ui.modal.data('css', this.ui.modal.css([
@@ -733,7 +733,7 @@ var CMS = window.CMS || {};
                 opts.breadcrumbs = opts.breadcrumbs || '';
 
                 // show loader
-                CMS.API.Toolbar._loader(true);
+                CMS.API.Toolbar.showLoader();
 
                 // set classes
                 this.ui.modal.removeClass('cms-modal-markup');
@@ -770,17 +770,22 @@ var CMS = window.CMS || {};
                     try {
                         iframe.contents();
                     } catch (error) {
-                        CMS.API.Toolbar.showError('<strong>' + error + '</strong>');
+                        CMS.API.Toolbar.openMessage({
+                            message: '<strong>' + error + '</strong>',
+                            error: true
+                        });
                         that.close();
                     }
 
                     // hide loader
-                    CMS.API.Toolbar._loader(false);
+                    CMS.API.Toolbar.hideLoader();
 
                     // show messages in toolbar if provided
                     messages = iframe.contents().find('.messagelist li');
                     if (messages.length) {
-                        CMS.API.Toolbar.openMessage(messages.eq(0).text());
+                        CMS.API.Toolbar.openMessage({
+                            message: messages.eq(0).text()
+                        });
                     }
                     messages.remove();
                     contents = iframe.contents();
@@ -919,12 +924,17 @@ var CMS = window.CMS || {};
                 );
 
                 // trigger an ajax request
-                return CMS.API.Toolbar.openAjax(data['delete'], post, text, function () {
-                    CMS._newPlugin = false;
-                    if (opts && opts.hideAfter) {
-                        that._hide({
-                            duration: 100
-                        });
+                return CMS.API.Toolbar.openAjax({
+                    url: data['delete'],
+                    post: post,
+                    text: text,
+                    callback: function () {
+                        CMS._newPlugin = false;
+                        if (opts && opts.hideAfter) {
+                            that._hide({
+                                duration: 100
+                            });
+                        }
                     }
                 });
             }

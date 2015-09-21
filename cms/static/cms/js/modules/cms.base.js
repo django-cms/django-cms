@@ -99,7 +99,7 @@ var CMS = {
                 var forms = $('#cms-toolbar').find('form');
                 forms.submit(function () {
                     // show loader
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                     // we cannot use disabled as the name action will be ignored
                     $('input[type="submit"]').bind('click', function (e) {
                         e.preventDefault();
@@ -167,7 +167,7 @@ var CMS = {
                 settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
                 // set loader
                 if (CMS.API.Toolbar) {
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                 }
 
                 // use local storage or session
@@ -175,7 +175,7 @@ var CMS = {
                     // save within local storage
                     localStorage.setItem('cms_cookie', settings);
                     if (CMS.API.Toolbar) {
-                        CMS.API.Toolbar._loader(false);
+                        CMS.API.Toolbar.hideLoader();
                     }
                 } else {
                     // save within session
@@ -194,11 +194,14 @@ var CMS = {
                             // determine if logged in or not
                             settings = (data) ? JSON.parse(data) : CMS.config.settings;
                             if (CMS.API.Toolbar) {
-                                CMS.API.Toolbar._loader(false);
+                                CMS.API.Toolbar.hideLoader();
                             }
                         },
                         error: function (jqXHR) {
-                            that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 }
@@ -215,7 +218,7 @@ var CMS = {
                 var settings;
                 // set loader
                 if (CMS.API.Toolbar) {
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                 }
 
                 // use local storage or session
@@ -223,7 +226,7 @@ var CMS = {
                     // get from local storage
                     settings = JSON.parse(localStorage.getItem('cms_cookie'));
                     if (CMS.API.Toolbar) {
-                        CMS.API.Toolbar._loader(false);
+                        CMS.API.Toolbar.hideLoader();
                     }
                 } else {
                     CMS.API.locked = true;
@@ -237,11 +240,14 @@ var CMS = {
                             // determine if logged in or not
                             settings = (data) ? JSON.parse(data) : CMS.config.settings;
                             if (CMS.API.Toolbar) {
-                                CMS.API.Toolbar._loader(false);
+                                CMS.API.Toolbar.hideLoader();
                             }
                         },
                         error: function (jqXHR) {
-                            that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 }
