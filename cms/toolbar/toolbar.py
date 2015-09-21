@@ -56,7 +56,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.clipboard = None
         self.language = None
         self.toolbar_language = None
-        self.simple_structure_mode = getattr(settings, 'CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE', True)
+        self.simple_structure_mode = get_cms_setting('TOOLBAR_SIMPLE_STRUCTURE_MODE')
         self.show_toolbar = True
         self.init_toolbar(request)
 
