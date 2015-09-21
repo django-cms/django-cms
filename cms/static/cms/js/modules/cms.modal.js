@@ -896,6 +896,7 @@ var CMS = window.CMS || {};
             _loadMarkup: function _loadMarkup(opts) {
                 this.ui.modal.removeClass('cms-modal-iframe');
                 this.ui.modal.addClass('cms-modal-markup');
+                this.ui.modalBody.removeClass('cms-loader');
 
                 // set content
                 this.ui.frame.html(opts.html);
