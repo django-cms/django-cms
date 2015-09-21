@@ -6,7 +6,11 @@
         "allowRegex": true,
         "allowUrlComments": true
     },
+    "requireDotNotation": {
+        "allExcept": [ "keywords" ]
+    },
     "disallowQuotedKeysInObjects": null,
     "requireMultipleVarDecl": null,
-    "disallowDanglingUnderscores": null
+    "disallowDanglingUnderscores": null,
+    "requireVarDeclFirst": false
 }
