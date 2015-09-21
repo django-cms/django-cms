@@ -175,7 +175,6 @@ if __name__ == '__main__':
             }
         },
         SESSION_ENGINE="django.contrib.sessions.backends.cache",
-        CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES=app_manage.DatabaseConfig(

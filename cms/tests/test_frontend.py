@@ -37,10 +37,25 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils.compat import DJANGO_1_6
 from cms.utils.conf import get_cms_setting
 
+
+# http://blog.yourlabs.org/post/70177426629/
 if DJANGO_1_6:
-    from django.test import LiveServerTestCase as StaticLiveServerTestCase
+    # Monkey-patch for travis:
+    from django.test import LiveServerTestCase
+    from django.test.testcases import StoppableWSGIServer
+
+    def patient_shutdown(self):
+        # Stops the serve_forever loop.
+        self._StoppableWSGIServer__serving = False
+        if not self._StoppableWSGIServer__is_shut_down.wait(30):
+            raise RuntimeError(
+                "Failed to shutdown the live test server in 2 seconds. The "
+                "server might be stuck or generating a slow response.")
+    StoppableWSGIServer.shutdown = patient_shutdown
 else:
-    from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+    # LiveServerTestCase doesn't serve static files in 1.7 anymore
+    from django.contrib.staticfiles.testing import (
+        StaticLiveServerTestCase as LiveServerTestCase)
 
 
 class FastLogin(object):
@@ -71,31 +86,21 @@ class FastLogin(object):
         self.wait_page_loaded()
 
 
-class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
+class CMSLiveTests(LiveServerTestCase, CMSTestCase):
+    MAX_WAIT = 15
     driver = None
+
     @classmethod
     def setUpClass(cls):
-        if os.environ.get('SELENIUM', '') != '':
+        if os.environ.get('SELENIUM', '1') == '0':
             #skip selenium tests
             raise unittest.SkipTest("Selenium env is set to 0")
         super(CMSLiveTests, cls).setUpClass()
         cache.clear()
-        if os.environ.get("TRAVIS_BUILD_NUMBER"):
-            capabilities = webdriver.DesiredCapabilities.CHROME
-            capabilities['version'] = '31'
-            capabilities['platform'] = 'OS X 10.9'
-            capabilities['name'] = 'django CMS'
-            capabilities['build'] = os.environ.get("TRAVIS_BUILD_NUMBER")
-            capabilities['tags'] = [os.environ.get("TRAVIS_PYTHON_VERSION"), "CI"]
-            username = os.environ.get("SAUCE_USERNAME")
-            access_key = os.environ.get("SAUCE_ACCESS_KEY")
-            capabilities["tunnel-identifier"] = os.environ.get("TRAVIS_JOB_NUMBER")
-            hub_url = "http://%s:%s@ondemand.saucelabs.com/wd/hub" % (username, access_key)
-            cls.driver = webdriver.Remote(desired_capabilities=capabilities, command_executor=hub_url)
-            cls.driver.implicitly_wait(30)
-        else:
-            cls.driver = webdriver.Firefox()
-            cls.driver.implicitly_wait(5)
+        cls.driver = webdriver.Firefox()
+        cls.driver.implicitly_wait(cls.MAX_WAIT)
+        cls.driver.set_page_load_timeout(cls.MAX_WAIT)
+        cls.driver.set_window_size(1120, 700)
         cls.accept_next_alert = True
 
     @classmethod
@@ -118,7 +123,7 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
         """
         WebDriverWait(self.driver, timeout).until(callback)
 
-    def wait_loaded_tag(self, tag_name, timeout=10):
+    def wait_loaded_tag(self, tag_name, timeout=15):
         """
         Helper function that blocks until the element with the given tag name
         is found on the page.
@@ -127,6 +132,14 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
             lambda driver: driver.find_element_by_tag_name(tag_name),
             timeout
         )
+
+    def wait_loaded_selector(self, selector):
+        """
+        Blocks until a selector is present.
+        """
+        WebDriverWait(self.driver, self.MAX_WAIT).until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, selector)))
 
     def wait_page_loaded(self):
         """
@@ -307,6 +320,7 @@ class ToolbarBasicTests(CMSLiveTests):
     SITE_ID=1,
 )
 class PlaceholderBasicTests(FastLogin, CMSLiveTests):
+
     def setUp(self):
         Site.objects.create(domain='example.org', name='example.org')
 
@@ -321,7 +335,7 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         self.user = self._create_user('admin', True, True, True)
 
-        self.driver.implicitly_wait(5)
+        self.driver.implicitly_wait(self.MAX_WAIT)
 
         super(PlaceholderBasicTests, self).setUp()
 
@@ -330,63 +344,44 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         password = username
         self._fastlogin(username=username, password=password)
 
-    def test_copy_from_language(self):
-        self._login()
-        self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-
-        # check if there are no plugins in italian version of the page
-
-        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
-        self.assertEqual(len(italian_plugins), 0)
-
-        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        build_button.click()
-
-        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
-
-        hov = ActionChains(self.driver).move_to_element(submenu)
-        hov.perform()
-
-        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
-        WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
-        copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
-        copy_from_english.click()
-
-        # Done, check if the text plugin was copied and it is only one
-
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
-
-        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
-        self.assertEqual(len(italian_plugins), 1)
-
-        plugin_instance = italian_plugins[0].get_plugin_instance()[0]
-
-        self.assertEqual(plugin_instance.body, 'test')
-
     def test_copy_to_from_clipboard(self):
         self.assertEqual(CMSPlugin.objects.count(), 1)
-        self._login()
 
-        build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
+        self._login()
+        time.sleep(10.0)
+        self.driver.get('%s/en/?%s' % (
+                self.live_server_url,
+                get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+
+        build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        self.wait_loaded_selector(build_button_selector)
+        build_button = self.driver.find_element_by_css_selector(build_button_selector)
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
+        cms_draggable_selector = '.cms-draggable:nth-child(1)'
+        self.wait_loaded_selector(cms_draggable_selector)
+        cms_draggable = self.driver.find_element_by_css_selector(cms_draggable_selector)
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
+        submenu_selector = '.cms-submenu'
+        submenu = cms_draggable.find_element_by_css_selector(submenu_selector)
+        WebDriverWait(
+            self.driver,
+            self.MAX_WAIT).until(lambda driver: submenu.is_displayed())
+        submenu.click()
 
-        hov = ActionChains(self.driver).move_to_element(submenu)
-        hov.perform()
-
-        copy = submenu.find_element_by_css_selector('a[data-rel="copy"]')
+        copy_selector = '.cms-submenu-dropdown a[data-rel="copy"]'
+        self.wait_loaded_selector(copy_selector)
+        copy = cms_draggable.find_element_by_css_selector(copy_selector)
         copy.click()
 
-        time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
+        clipboard_selector = '.cms-clipboard'
+        self.wait_loaded_selector(clipboard_selector)
+        clipboard = self.driver.find_element_by_css_selector(clipboard_selector)
 
-        WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
+        WebDriverWait(self.driver, self.MAX_WAIT).until(lambda driver: clipboard.is_displayed())
 
         hov = ActionChains(self.driver).move_to_element(clipboard)
         hov.perform()
@@ -394,9 +389,7 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         # necessary sleeps for making a "real" drag and drop, that works with the clipboard
 
         time.sleep(0.1)
-
         self.assertEqual(CMSPlugin.objects.count(), 2)
-
         drag = ActionChains(self.driver).click_and_hold(
             clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
         )
@@ -425,6 +418,40 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         plugins = self.page.placeholders.all()[0].get_plugins_list('en')
 
         self.assertEqual(len(plugins), 2)
+
+    def test_copy_from_language(self):
+        # check if there are no plugins in italian version of the page
+        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
+        self.assertEqual(len(italian_plugins), 0)
+
+        self._login()
+        self.driver.get('%s/it/?%s' % (self.live_server_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+        self.wait_page_loaded()
+
+        build_button_selector = '.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD')
+        self.wait_loaded_selector(build_button_selector)
+        build_button = self.driver.find_element_by_css_selector(build_button_selector)
+        build_button.click()
+
+        submenu_selector = '.cms-dragbar .cms-submenu'
+        self.wait_loaded_selector(submenu_selector)
+        submenu = self.driver.find_element_by_css_selector(submenu_selector)
+        submenu.click()
+
+        submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
+        self.wait_loaded_selector(submenu_link_selector)
+        copy_from_english = self.driver.find_element_by_css_selector(submenu_link_selector)
+        copy_from_english.click()
+
+        # Done, check if the text plugin was copied and it is only one
+        self.wait_loaded_selector('.cms-draggable:nth-child(1)')
+
+        italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
+        self.assertEqual(len(italian_plugins), 1)
+
+        plugin_instance = italian_plugins[0].get_plugin_instance()[0]
+
+        self.assertEqual(plugin_instance.body, 'test')
 
 
 @override_settings(
