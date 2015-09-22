@@ -100,12 +100,10 @@
                 position: relative;
                 display: block;
                 font-size: $submenu-item-font-size;
-                line-height: $submenu-item-height;
-                min-height: $submenu-item-height;
                 text-align: left;
                 padding: 0px $submenu-item-padding-horizontal;
                 line-height: $dropdown-item-height;
-                height: $dropdown-item-height;
+                min-height: $dropdown-item-height;
                 padding-left: $dropdown-item-icon-space;
                 color: $submenu-item-color;
                 &:hover,
