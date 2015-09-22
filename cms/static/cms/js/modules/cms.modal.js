@@ -624,7 +624,6 @@ var CMS = window.CMS || {};
              * @param breadcrumbs {Object[]} renderes breadcrumb on modal
              */
             _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
-                var bread = this.ui.breadcrumb;
                 var crumb = '';
                 var template = '<a href="{1}" class="{2}"><span>{3}</span></a>';
 
@@ -652,9 +651,6 @@ var CMS = window.CMS || {};
 
                 // attach elements
                 this.ui.breadcrumb.html(crumb);
-
-                // show breadcrumbs
-                bread.show();
             },
 
             /**
