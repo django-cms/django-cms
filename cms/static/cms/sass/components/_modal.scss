@@ -205,6 +205,12 @@
         line-height: $modal-breadcrumb-height;
         padding: 0 $padding-large;
         border-top: 1px solid $gray-lighter;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        height: $modal-breadcrumb-height * 2; // to account for the scrollbar
+        width: 100%;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
         a {
             color: $color-primary;
             &:hover {
