@@ -268,7 +268,8 @@
                 modal.open({
                     url: url,
                     title: name,
-                    breadcrumbs: breadcrumb
+                    breadcrumbs: breadcrumb,
+                    width: 850
                 });
             },
 
