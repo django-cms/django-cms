@@ -72,11 +72,6 @@
     }
 
     .cms-dragarea-static {
-        .cms-dragbar {
-            .cms-dragbar-title {
-                color: $gray;
-            }
-        }
         .cms-dragarea-static-icon {
             position: relative;
             top: 2px;
@@ -114,9 +109,9 @@
             display: inline-block;
             position: relative;
             color: $structure-dragbar-color;
-            font-size: $font-size-normal;
+            font-size: $font-size-large;
             font-weight: bold;
-            line-height: $structure-dragbar-height + 1px;
+            line-height: $structure-dragbar-height;
             height: $structure-dragbar-height;
             margin-right: $submenu-icon-area-size;
         }
@@ -127,7 +122,7 @@
             cursor: pointer;
             a {
                 color: $color-primary !important;
-                font-size: $font-size-normal - 2px !important;
+                font-size: $font-size-small !important;
                 &:hover {
                     color: darken($color-primary, 10%) !important;
                 }
@@ -151,7 +146,7 @@
 
     // #DRAGBAR/empty#
     .cms-dragbar-empty {
-        font-size: $font-size-normal - 2px;
+        font-size: $font-size-small;
         text-transform: uppercase;
         padding-top: 0;
         padding-bottom: 0;
@@ -180,9 +175,10 @@
         padding-left: $structure-draggable-inner-padding;
     }
     .cms-dragarea-empty .cms-draggables-root {
+        box-sizing: border-box;
         position: relative;
         min-height: 46px;
-        border: 1px dashed darken($gray-lighter, 15%);
+        border: 2px solid $btn-default-border;
         border-radius: $border-radius-base;
     }
 
@@ -245,7 +241,7 @@
             bottom: -1px;
             left: -1px;
             z-index: z(structure, content, empty, droppable);
-            color: darken($gray-lighter, 15%);
+            color: $gray;
             line-height: $structure-dragitem-height;
             height: auto;
             margin: 0;
@@ -270,7 +266,7 @@
             bottom: 0;
             left: 0;
             z-index: z(structure, content, empty, empty);
-            color: darken($gray-lighter, 15%);
+            color: $gray;
             line-height: 44px;
             padding-left: 20px;
         }
@@ -342,7 +338,7 @@
             position: absolute;
             top: 50%;
             left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
-            color: $gray-light;
+            color: $submenu-icon-color;
             font-size: $structure-dragitem-icon-size;
             margin-top: -$structure-dragitem-icon-size/2;
             margin-left: $structure-dragarea-padding-horizontal - 10px;
