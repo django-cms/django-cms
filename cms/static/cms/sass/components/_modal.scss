@@ -43,7 +43,7 @@
             .cms-modal-body,
             .cms-modal-breadcrumb,
             .cms-modal-foot {
-                display: none;
+                display: none !important;
             }
             .cms-modal-title {
                 // set correct cursor when maximized #3111
@@ -168,14 +168,14 @@
         }
         .cms-modal-maximized & {
             // ensure minimize button is hidden #3111
-            display: none;
+            display: none !important;
         }
     }
     .cms-modal-maximize {
         right: $modal-header-button-area-size + $padding-normal;
         // ensure maximize element is hidden #3111
         .cms-modal-minimized & {
-            display: none;
+            display: none !important;
         }
         .cms-modal-maximized & {
             color: $color-primary;
@@ -201,10 +201,17 @@
 
     // breadcrumb only shows for nested elements
     .cms-modal-breadcrumb {
+        display: none !important;
         font-size: $font-size-normal;
         line-height: $modal-breadcrumb-height;
         padding: 0 $padding-large;
         border-top: 1px solid $gray-lighter;
+        overflow-y: hidden;
+        overflow-x: scroll;
+        height: $modal-breadcrumb-height * 2; // to account for the scrollbar
+        width: 100%;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
         a {
             color: $color-primary;
             &:hover {
@@ -267,6 +274,11 @@
     }
 }
 
-.cms-modal-has-breadcrumb .cms-modal-body {
-    top: $modal-header-height + $modal-breadcrumb-height !important;
+#cms-toolbar .cms-modal-has-breadcrumb {
+    .cms-modal-body {
+        top: $modal-header-height + $modal-breadcrumb-height !important;
+    }
+    .cms-modal-breadcrumb {
+        display: block !important;
+    }
 }

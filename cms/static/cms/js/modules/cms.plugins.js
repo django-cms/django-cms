@@ -265,10 +265,14 @@
                         $('.cms-add-plugin-placeholder').remove();
                     });
                 }
+                modal.on('cms.modal.closed', function removePlaceholder() {
+                    $('.cms-add-plugin-placeholder').remove();
+                });
                 modal.open({
                     url: url,
                     title: name,
-                    breadcrumbs: breadcrumb
+                    breadcrumbs: breadcrumb,
+                    width: 850
                 });
             },
 

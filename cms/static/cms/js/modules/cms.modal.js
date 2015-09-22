@@ -145,7 +145,7 @@ var CMS = window.CMS || {};
                     that._startResize(e);
                 });
 
-                this.ui.closeAndCancel.on(this.click, function (e) {
+                this.ui.closeAndCancel.off(this.click).on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
@@ -173,11 +173,6 @@ var CMS = window.CMS || {};
              * @param [opts.height] {Number} sets the height of the modal
              */
             open: function open(opts) {
-                // We have to rebind events every time we open a modal
-                // because the event handlers contain references to the instance
-                // and since we reuse the same markup we need to update
-                // that instance reference every time.
-                this._events();
                 // setup internals
                 if (!(opts && opts.url || opts && opts.html)) {
                     throw new Error('The arguments passed to "open" were invalid.');
@@ -188,6 +183,12 @@ var CMS = window.CMS || {};
                 if (CMS._newPlugin && !this._deletePlugin()) {
                     return false;
                 }
+
+                // We have to rebind events every time we open a modal
+                // because the event handlers contain references to the instance
+                // and since we reuse the same markup we need to update
+                // that instance reference every time.
+                this._events();
 
                 this.trigger('cms.modal.load');
                 // trigger the event also on the dom element,
@@ -200,24 +201,7 @@ var CMS = window.CMS || {};
                 this.ui.minimizeButton.toggle(this.options.minimizable);
                 this.ui.maximizeButton.toggle(this.options.maximizable);
 
-                // lets set the modal width and height to the size of the browser
-                var widthOffset = 300; // adds margin left and right
-                var heightOffset = 300; // adds margin top and bottom;
-                var screenWidth = this.ui.window.width();
-                var screenHeight = this.ui.window.height();
-                var modalWidth = opts.width || this.options.minWidth;
-                var modalHeight = opts.height || this.options.minHeight;
-                // screen width and height calculation, WC = width
-                var screenWidthCalc = screenWidth >= (modalWidth + widthOffset);
-                var screenHeightCalc = screenHeight >= (modalHeight + heightOffset);
-
-                var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
-                var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
-
-                // in case, the modal is larger than the window, we trigger fullscreen mode
-                if (width >= screenWidth || height >= screenHeight) {
-                    this.triggerMaximized = true;
-                }
+                var position = this._calculateNewPosition(opts);
 
                 this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
                 this.maximized = false;
@@ -262,13 +246,69 @@ var CMS = window.CMS || {};
                 this.trigger('cms.modal.loaded');
 
                 // display modal
-                this._show({
-                    width: width,
-                    height: height,
+                this._show($.extend({
                     duration: this.options.modalDuration
-                });
+                }, position));
 
                 return this;
+            },
+
+            /**
+             * Calculates coordinates and dimensions for modal placement
+             *
+             * @param [opts] {Object}
+             * @param [opts.width] {Number} desired width of the modal
+             * @param [opts.height] {Number} desired height of the modal
+             */
+            _calculateNewPosition: function (opts) {
+                // lets set the modal width and height to the size of the browser
+                var widthOffset = 300; // adds margin left and right
+                var heightOffset = 300; // adds margin top and bottom;
+                var screenWidth = this.ui.window.width();
+                var screenHeight = this.ui.window.height();
+                var modalWidth = opts.width || this.options.minWidth;
+                var modalHeight = opts.height || this.options.minHeight;
+                // screen width and height calculation, WC = width
+                var screenWidthCalc = screenWidth >= (modalWidth + widthOffset);
+                var screenHeightCalc = screenHeight >= (modalHeight + heightOffset);
+
+                var width = screenWidthCalc && !opts.width ? screenWidth - widthOffset : modalWidth;
+                var height = screenHeightCalc && !opts.height ? screenHeight - heightOffset : modalHeight;
+
+                var currentLeft = this.ui.modal.css('left');
+                var currentTop = this.ui.modal.css('top');
+                var newLeft;
+                var newTop;
+
+                // jquery made me do it
+                if (currentLeft === '50%') {
+                    currentLeft = screenWidth / 2;
+                }
+                if (currentTop === '50%') {
+                    currentTop = screenHeight / 2;
+                }
+
+                currentTop = parseInt(currentTop);
+                currentLeft = parseInt(currentLeft);
+
+                // if new width/height go out of the screen - reset position to center of screen
+                if ((width / 2 + currentLeft > screenWidth) || (height / 2 + currentTop > screenHeight) ||
+                    (currentLeft - width / 2 < 0) || (currentTop - height / 2 < 0)) {
+                    newLeft = screenWidth / 2;
+                    newTop = screenHeight / 2;
+                }
+
+                // in case, the modal is larger than the window, we trigger fullscreen mode
+                if (width >= screenWidth || height >= screenHeight) {
+                    this.triggerMaximized = true;
+                }
+
+                return {
+                    width: width,
+                    height: height,
+                    top: newTop,
+                    left: newLeft
+                };
             },
 
             /**
@@ -279,6 +319,8 @@ var CMS = window.CMS || {};
              * @param opts
              * @param opts.width {Number} width of the modal
              * @param opts.height {Number} height of the modal
+             * @param opts.left {Number} left in px of the center of the modal
+             * @param opts.top {Number} top in px of the center of the modal
              * @param opts.duration {Number} speed of opening, ms (not really used yet)
              */
             _show: function _show(opts) {
@@ -286,8 +328,11 @@ var CMS = window.CMS || {};
                 var that = this;
                 var width = opts.width;
                 var height = opts.height;
-                // TODO make use of transitionDuration
+                // TODO make use of transitionDuration, currently capped at 0.2s
                 var speed = opts.duration;
+                var top = opts.top;
+                var left = opts.left;
+
 
                 if (this.ui.modal.hasClass('cms-modal-open')) {
                     this.ui.modal.addClass('cms-modal-morphing');
@@ -297,6 +342,8 @@ var CMS = window.CMS || {};
                     'display': 'block',
                     'width': width,
                     'height': height,
+                    'top': top,
+                    'left': left,
                     // TODO animate translateX if possible instead of margin
                     'margin-left': -(width / 2),
                     'margin-top': -(height / 2)
@@ -405,7 +452,7 @@ var CMS = window.CMS || {};
 
                 if (this.minimized === false) {
                     // ensure toolbar is shown
-                    CMS.API.Toolbar.show();
+                    CMS.API.Toolbar.open();
 
                     // save initial state
                     this.ui.modal.data('css', this.ui.modal.css([
@@ -577,7 +624,6 @@ var CMS = window.CMS || {};
              * @param breadcrumbs {Object[]} renderes breadcrumb on modal
              */
             _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
-                var bread = this.ui.breadcrumb;
                 var crumb = '';
                 var template = '<a href="{1}" class="{2}"><span>{3}</span></a>';
 
@@ -605,9 +651,6 @@ var CMS = window.CMS || {};
 
                 // attach elements
                 this.ui.breadcrumb.html(crumb);
-
-                // show breadcrumbs
-                bread.show();
             },
 
             /**
@@ -930,7 +973,7 @@ var CMS = window.CMS || {};
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
                 var text = this.config.lang.confirmEmpty.replace(
-                    '{1}', CMS._newPlugin.breadcrumb[0].title
+                    '{1}', CMS._newPlugin.breadcrumb.pop().title
                 );
 
                 // trigger an ajax request
