@@ -173,11 +173,6 @@ var CMS = window.CMS || {};
              * @param [opts.height] {Number} sets the height of the modal
              */
             open: function open(opts) {
-                // We have to rebind events every time we open a modal
-                // because the event handlers contain references to the instance
-                // and since we reuse the same markup we need to update
-                // that instance reference every time.
-                this._events();
                 // setup internals
                 if (!(opts && opts.url || opts && opts.html)) {
                     throw new Error('The arguments passed to "open" were invalid.');
@@ -188,6 +183,12 @@ var CMS = window.CMS || {};
                 if (CMS._newPlugin && !this._deletePlugin()) {
                     return false;
                 }
+
+                // We have to rebind events every time we open a modal
+                // because the event handlers contain references to the instance
+                // and since we reuse the same markup we need to update
+                // that instance reference every time.
+                this._events();
 
                 this.trigger('cms.modal.load');
                 // trigger the event also on the dom element,
