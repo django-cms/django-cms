@@ -3,6 +3,8 @@ import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 
+import sys
+
 from cms.app_base import CMSApp
 from cms.exceptions import AppAlreadyRegistered
 from cms.utils.conf import get_cms_setting
@@ -17,7 +19,9 @@ class ApphookPool(object):
         self.discovered = False
 
     def clear(self):
-        # TODO: remove this method, it's Python, we don't need it.
+        for name, label in list(self.get_apphooks()):
+            if self.apps[name].__class__.__module__ in sys.modules:
+                del sys.modules[self.apps[name].__class__.__module__]
         self.apphooks = []
         self.apps = {}
         self.discovered = False
