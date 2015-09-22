@@ -58,7 +58,7 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // FIXME kind of a magic number for 1 item in clipboard
-                var minHeight = 113;
+                var minHeight = 117;
                 var pluginsList = this.clipboard.find('.cms-clipboard-containers');
                 var modal = new CMS.Modal({
                     minWidth: 400,

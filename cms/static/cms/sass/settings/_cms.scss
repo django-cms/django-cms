@@ -7,7 +7,7 @@ $speed-base: 200ms;
 $white: #fff;
 $black: #000;
 
-$color-primary: #52bdf3;
+$color-primary: #00bbff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
@@ -15,9 +15,9 @@ $color-window: #fcfcfc;
 
 // #COLORS gray
 $gray:            lighten($black, 40%); // #666;
-$gray-lightest:   lighten($gray, 58%); // #fafafa
-$gray-lighter:    lighten($gray, 50%); // #e5e5e5
-$gray-light:      lighten($gray, 25%); // #a6a6a6
+$gray-lightest:   lighten($gray, 55%); // #f2f2f2
+$gray-lighter:    lighten($gray, 40%); // #ccc
+$gray-light:      lighten($gray, 20%); // #999
 $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
 
@@ -28,8 +28,9 @@ $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transpare
 
 //##############################################################################
 // BASE Variables
+$font-size-small: 12px;
 $font-size-normal: 14px;
-$font-size-large: 18px;
+$font-size-large: 16px;
 $line-height-normal: 20px;
 
 $border-radius-base: 3px;
@@ -111,7 +112,7 @@ $z-layers: (
 $btn-border-radius-base: $border-radius-base;
 $btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
 
-$btn-default-color: $gray;
+$btn-default-color: #555;
 $btn-default-bgcolor: $white;
 $btn-default-border: $gray-lighter;
 
@@ -133,14 +134,12 @@ $btn-active-border: $gray-darkest;
 $structure-max-width: 980px;
 $structure-bgcolor: #f0f0f0;
 
-$structure-dragbar-height: 34px;
+$structure-dragbar-height: 44px;
 $structure-dragbar-color: $black;
-$structure-dragarea-padding: 8px;
-$structure-dragarea-padding-horizontal: 8px;
 
 $structure-dragarea-margin-vertical: 20px;
 $structure-dragarea-space: 0px;
-$structure-dragarea-padding: 8px;
+$structure-dragarea-padding: 10px;
 $structure-dragarea-padding-horizontal: 10px;
 $structure-dragarea-use-background: 1;
 @if ($structure-dragarea-use-background == 1) {
@@ -160,15 +159,15 @@ $structure-dragitem-fullheight: $structure-dragitem-height + 2 * $structure-drag
 
 //##############################################################################
 // Structureboard
-$submenu-icon-area-size: 30px;
+$submenu-icon-area-size: 36px;
 $submenu-icon-size: 16px;
-$submenu-icon-color: $gray-light;
+$submenu-icon-color: #555;
 $submenu-right: ($structure-dragarea-padding * 2 + $structure-dragitem-height - $submenu-icon-area-size) / 2;
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
 $submenu-item-padding-horizontal: $padding-large;
-$submenu-item-color: $gray-light;
+$submenu-item-color: #555;
 $submenu-item-hover-color: $white;
 
 $submenu-dropdown-bgcolor: $white;
@@ -324,7 +323,7 @@ $hover-tooltip-padding: 6px 8px;
 // Dropdown
 $dropdown-width: 180px;
 $dropdown-shadow: 0 0 10px rgba($black, 0.25);
-$dropdown-item-height: 42px;
+$dropdown-item-height: 46px;
 $dropdown-item-icon-space: 40px;
 $dropdown-item-icon-position: 14px;
 $dropdown-arrow-side: 10px;
