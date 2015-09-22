@@ -12,7 +12,6 @@ from django.template import Variable
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page
-from cms.apphook_pool import apphook_pool
 from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase, ClearURLs
@@ -61,10 +60,10 @@ class ViewTests(CMSTestCase):
         )
         create_page("page2", "nav_playground.html", "en", published=True)
         with self.settings(CMS_APPHOOKS=apphooks):
-            apphook_pool.clear()
+            self.apphook_clear()
             response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
-            apphook_pool.clear()
+            self.apphook_clear()
 
     def test_external_redirect(self):
         # test external redirect
