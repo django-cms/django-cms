@@ -68,7 +68,7 @@ var CMS = window.CMS || {};
                     resizable: false
                 });
 
-                modal.on('cms.modal.loaded', function removePlaceholder() {
+                modal.on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
                     $('.cms-add-plugin-placeholder').remove();
                 }).on('cms.modal.closed cms.modal.load', function () {
                     pluginsList.prependTo(that.clipboard);
