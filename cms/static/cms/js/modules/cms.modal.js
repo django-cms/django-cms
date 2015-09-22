@@ -145,7 +145,7 @@ var CMS = window.CMS || {};
                     that._startResize(e);
                 });
 
-                this.ui.closeAndCancel.on(this.click, function (e) {
+                this.ui.closeAndCancel.off(this.click).on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
