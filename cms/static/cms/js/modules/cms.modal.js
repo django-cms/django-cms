@@ -406,7 +406,7 @@ var CMS = window.CMS || {};
 
                 if (this.minimized === false) {
                     // ensure toolbar is shown
-                    CMS.API.Toolbar.show();
+                    CMS.API.Toolbar.open();
 
                     // save initial state
                     this.ui.modal.data('css', this.ui.modal.css([
