@@ -977,7 +977,7 @@ var CMS = window.CMS || {};
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
                 var text = this.config.lang.confirmEmpty.replace(
-                    '{1}', CMS._newPlugin.breadcrumb[0].title
+                    '{1}', CMS._newPlugin.breadcrumb.pop().title
                 );
 
                 // trigger an ajax request
