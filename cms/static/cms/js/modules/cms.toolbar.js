@@ -561,6 +561,7 @@ var CMS = window.CMS || {};
              * @param [opts.text] {String} message to be displayed
              * @param [opts.callback] {Function} custom callback instead of reaload
              * @param [opts.onSuccess] {String} reload and display custom message
+             * @return {Boolean|jQuery.Deferred} either false or a promise
              */
             openAjax: function (opts) {
                 var that = this;
