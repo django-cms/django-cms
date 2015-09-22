@@ -34,7 +34,10 @@ var CMS = window.CMS || {};
                 minHeight: 400,
                 minWidth: 800,
                 modalDuration: 200,
-                newPlugin: false
+                newPlugin: false,
+                resizable: true,
+                maximizable: true,
+                minimizable: true
             },
 
             initialize: function initialize(options) {
@@ -57,14 +60,6 @@ var CMS = window.CMS || {};
                 this.minimized = false;
                 this.triggerMaximized = false;
                 this.saved = false;
-
-                // if the modal is initialized the first time, set the events
-                if (!this.ui.modal.data('ready')) {
-                    this._events();
-                }
-
-                // set a state to determine if we need to reinitialize this._events();
-                this.ui.modal.data('ready', true);
             },
 
             /**
@@ -74,11 +69,13 @@ var CMS = window.CMS || {};
              * @method _setupEventEmitter
              */
             _setupEventEmitter: function _setupEventEmitter() {
+                var that = this;
                 var bus = $({});
 
                 function proxy(name) {
                     return function () {
                         bus[name].apply(bus, arguments);
+                        return that;
                     };
                 }
 
@@ -126,38 +123,38 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // modal behaviours
-                this.ui.minimizeButton.on(this.click, function (e) {
+                this.ui.minimizeButton.off(this.click).on(this.click, function (e) {
                     e.preventDefault();
                     that.minimize();
                 });
-                this.ui.maximizeButton.on(this.click, function (e) {
+                this.ui.maximizeButton.off(this.click).on(this.click, function (e) {
                     e.preventDefault();
                     that.maximize();
                 });
 
-                this.ui.title.on(this.pointerDown, function (e) {
+                this.ui.title.off(this.pointerDown).on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startMove(e);
                 });
-                this.ui.title.on(this.doubleClick, function () {
+                this.ui.title.off(this.doubleClick).on(this.doubleClick, function () {
                     that.maximize();
                 });
 
-                this.ui.resize.on(this.pointerDown, function (e) {
+                this.ui.resize.off(this.pointerDown).on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startResize(e);
-                });
-
-                // elements within the window
-                this.ui.breadcrumb.on(this.click, 'a', function (e) {
-                    e.preventDefault();
-                    that._changeIframe($(this));
                 });
 
                 this.ui.closeAndCancel.on(this.click, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
+                });
+
+                // elements within the window
+                this.ui.breadcrumb.off(this.click, 'a').on(this.click, 'a', function (e) {
+                    e.preventDefault();
+                    that._changeIframe($(this));
                 });
             },
 
@@ -176,6 +173,11 @@ var CMS = window.CMS || {};
              * @param [opts.height] {Number} sets the height of the modal
              */
             open: function open(opts) {
+                // We have to rebind events every time we open a modal
+                // because the event handlers contain references to the instance
+                // and since we reuse the same markup we need to update
+                // that instance reference every time.
+                this._events();
                 // setup internals
                 if (!(opts && opts.url || opts && opts.html)) {
                     throw new Error('The arguments passed to "open" were invalid.');
@@ -186,6 +188,17 @@ var CMS = window.CMS || {};
                 if (CMS._newPlugin && !this._deletePlugin()) {
                     return false;
                 }
+
+                this.trigger('cms.modal.load');
+                // trigger the event also on the dom element,
+                // because if we load another modal while one is already open
+                // the older instance won't receive any updates
+                this.ui.modal.trigger('cms.modal.load');
+
+                // common elements state
+                this.ui.resize.toggle(this.options.resizable);
+                this.ui.minimizeButton.toggle(this.options.minimizable);
+                this.ui.maximizeButton.toggle(this.options.maximizable);
 
                 // lets set the modal width and height to the size of the browser
                 var widthOffset = 300; // adds margin left and right
@@ -245,6 +258,8 @@ var CMS = window.CMS || {};
                         subtitle: opts.subtitle
                     });
                 }
+
+                this.trigger('cms.modal.loaded');
 
                 // display modal
                 this._show({
@@ -309,7 +324,7 @@ var CMS = window.CMS || {};
                 }).emulateTransitionEnd(speed);
 
                 // add esc close event
-                this.ui.body.on('keydown.cms', function (e) {
+                this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
                     if (e.keyCode === CMS.KEYS.ESC) {
                         that.close();
                     }
@@ -354,8 +369,6 @@ var CMS = window.CMS || {};
                 var that = this;
                 var duration = this.options.modalDuration;
 
-                this.trigger('cms.modal.closed');
-
                 if (opts && opts.duration) {
                     duration = opts.duration;
                 }
@@ -375,6 +388,7 @@ var CMS = window.CMS || {};
                     if (that.maximized) {
                         that.maximize();
                     }
+                    that.trigger('cms.modal.closed');
                 }, this.options.duration);
             },
 
@@ -854,8 +868,6 @@ var CMS = window.CMS || {};
 
                 // inject
                 holder.html(iframe);
-
-                this.trigger('cms.modal.loaded');
             },
 
             /**
@@ -880,8 +892,6 @@ var CMS = window.CMS || {};
                 });
 
                 this.ui.titlePrefix.text(el.text());
-
-                this.trigger('cms.modal.changed');
             },
 
             /**
@@ -896,13 +906,13 @@ var CMS = window.CMS || {};
             _loadMarkup: function _loadMarkup(opts) {
                 this.ui.modal.removeClass('cms-modal-iframe');
                 this.ui.modal.addClass('cms-modal-markup');
+                this.ui.modalBody.removeClass('cms-loader');
 
                 // set content
-                this.ui.frame.html(opts.html);
+                // empty to remove events, append to keep events
+                this.ui.frame.empty().append(opts.html);
                 this.ui.titlePrefix.text(opts.title || '');
                 this.ui.titleSuffix.text(opts.subtitle || '');
-
-                this.trigger('cms.modal.loaded');
             },
 
             /**

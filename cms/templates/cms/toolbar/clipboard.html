@@ -3,7 +3,7 @@
 {% if request.toolbar.edit_mode or request.toolbar.build_mode %}
 {% if local_toolbar.get_clipboard_plugins %}
 {% with slot="clipboard" %}
-<div class="cms-clipboard">
+<div class="cms-clipboard" data-title="{% trans 'Clipboard' %}">
     <div class="cms-clipboard-triggers">
         {% for plugin in local_toolbar.get_clipboard_plugins %}
             {% if not plugin.parent_id %}
@@ -16,7 +16,7 @@
     {% endfor %}
     <div class="cms-clipboard-containers cms-dragarea cms-draggables">
         {% for plugin in local_toolbar.get_clipboard_plugins %}
-            {% with show_language="true" %}{% include "cms/toolbar/dragitem.html" with plugin=plugin %}{% endwith %}
+            {% with clipboard="true" %}{% include "cms/toolbar/dragitem.html" with plugin=plugin %}{% endwith %}
         {% endfor %}
     </div>
     <p class="cms-clipboard-empty"><a href="#" title="{% trans 'Empty Clipboard' %}"></a></p>

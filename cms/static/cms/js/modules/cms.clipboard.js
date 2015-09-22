@@ -1,11 +1,21 @@
-//##################################################################################################################
-// #CLIPBOARD#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// Clipboard
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
-    $(document).ready(function () {
+
+    // shorthand for jQuery(document).ready();
+    $(function () {
         /*!
          * Clipboard
          * Handles copy & paste
@@ -15,10 +25,10 @@
             implement: [CMS.API.Helpers],
 
             options: {
-                'position': 220, // offset to top
-                'speed': 100,
-                'id': null,
-                'url': ''
+                position: 220, // offset to top
+                speed: 100,
+                id: null,
+                url: ''
             },
 
             initialize: function (options) {
@@ -33,7 +43,7 @@
                 this.triggerRemove = this.clipboard.find('.cms-clipboard-empty a');
 
                 // states
-                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'touchend.cms click.cms';
+                this.click = 'click.cms.clipboard';
                 this.timer = function () {};
 
                 // setup initial stuff
@@ -47,46 +57,35 @@
             _setup: function () {
                 var that = this;
 
-                // attach visual events
-                this.triggers.bind('mouseenter mouseleave', function (e) {
+                // FIXME kind of a magic number for 1 item in clipboard
+                var minHeight = 113;
+                var pluginsList = this.clipboard.find('.cms-clipboard-containers');
+                var modal = new CMS.Modal({
+                    minWidth: 400,
+                    minHeight: minHeight,
+                    minimizable: false,
+                    maximizable: false,
+                    resizable: false
+                });
+
+                modal.on('cms.modal.loaded', function removePlaceholder() {
+                    $('.cms-add-plugin-placeholder').remove();
+                }).on('cms.modal.closed cms.modal.load', function () {
+                    pluginsList.prependTo(that.clipboard);
+                }).ui.modal.on('cms.modal.load', function () {
+                    pluginsList.prependTo(that.clipboard);
+                });
+
+                this.triggers.on(this.click, function (e) {
                     e.preventDefault();
-                    // clear timeout
-                    clearTimeout(that.timer);
 
-                    if (e.type === 'mouseleave' && !that.containers.has(e.toElement).length) {
-                        hide();
-                    }
-
-                    var index = that.clipboard.find('.cms-clipboard-triggers a').index(this);
-                    var el = that.containers.eq(index);
-                    // cancel if element is already open
-                    if (el.data('open') === true) {
-                        return false;
-                    }
-
-                    // show element
-                    that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
-                    el.stop().animate({ 'margin-left': 0 }, that.options.speed);
-                    el.data('open', true);
+                    modal.open({
+                        html: pluginsList,
+                        title: that.clipboard.data('title'),
+                        width: 400,
+                        height: minHeight
+                    });
                 });
-                that.containers.bind('mouseover mouseleave', function (e) {
-                    // clear timeout
-                    clearTimeout(that.timer);
-
-                    // cancel if we trigger mouseover
-                    if (e.type === 'mouseover') {
-                        return false;
-                    }
-
-                    // we need a little timer to detect if we should hide the menu
-                    hide();
-                });
-
-                function hide() {
-                    that.timer = setTimeout(function () {
-                        that.containers.stop().css({ 'margin-left': -that.options.position }).data('open', false);
-                    }, that.options.speed);
-                }
             },
 
             _events: function () {

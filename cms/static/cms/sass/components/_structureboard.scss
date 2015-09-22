@@ -1,5 +1,6 @@
 //######################################################################################################################
 // #STRUCTURE#
+
 #cms-toolbar .cms-structure {
     display: none;
     position: fixed;
@@ -25,6 +26,38 @@
 #cms-toolbar .cms-structure-dynamic {
     position: absolute;
     overflow: hidden;
+}
+
+#cms-toolbar {
+    .cms-droppable {
+        position: relative;
+        z-index: z(structure, content, droppable);
+        line-height: 0;
+        height: 0;
+        min-height: 0;
+        box-shadow: 0 0 0 2px $color-primary;
+        transform: translateY(2px);
+        .cms-draggable + & {
+            transform: translateY(-2px);
+        }
+        &:before {
+            content: "";
+            position: absolute;
+            top: -8px;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid $color-primary;
+        }
+    }
+    .cms-draggables > .cms-droppable:first-child {
+        transform: translateY(-2px);
+    }
+    .cms-draggables > .cms-droppable:only-child {
+        transform: translateY(2px);
+    }
 }
 
 #cms-toolbar .cms-structure {
@@ -161,11 +194,11 @@
         margin-left: 0 !important;
         padding: 0;
         border-radius: $border-radius-base;
+        white-space: nowrap;
         list-style-type: none;
 
         // levels
         .cms-draggable {
-            white-space: nowrap;
             border-color: $gray-lighter;
             &:hover {
                 border-color: $gray-light;
@@ -182,11 +215,13 @@
 
         .cms-dragitem {
             line-height: $structure-dragitem-height;
-            border: 2px solid #f0f0f0;
+            border: 2px solid $structure-bgcolor;
         }
         .cms-dragitem-text {
             display: block;
-            overflow: visible;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
             margin-right: $submenu-icon-area-size * 3 + $submenu-right * 4;
         }
@@ -197,36 +232,6 @@
 
     .cms-draggable-success {
         position: relative;
-    }
-
-    .cms-droppable {
-        position: relative;
-        z-index: z(structure, content, droppable);
-        line-height: 0;
-        height: 0;
-        min-height: 0;
-        box-shadow: 0 0 0 2px $color-primary;
-        transform: translateY(2px);
-        .cms-draggable + & {
-            transform: translateY(-2px);
-        }
-        &:before {
-            content: "";
-            position: absolute;
-            top: -8px;
-            left: -4px;
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid $color-primary;
-        }
-    }
-    .cms-draggables > .cms-droppable:first-child {
-        transform: translateY(-2px);
-    }
-    .cms-draggables > .cms-droppable:only-child {
-        transform: translateY(2px);
     }
 
     .cms-draggables-empty {
@@ -282,10 +287,7 @@
         border-radius: 0;
         transform: translateZ(0);
         .cms-dragitem {
-            overflow: hidden;
             color: $white !important;
-            white-space: nowrap;
-            text-overflow: ellipsis;
             border: none;
             border-radius: 0;
             background-color: $color-primary !important;
@@ -300,6 +302,12 @@
             .cms-dragitem-text {
                 padding-left: $structure-dragarea-padding-horizontal;
             }
+        }
+        .cms-dragitem-text {
+            margin-right: 0;
+        }
+        &.cms-draggable-from-clipboard .cms-dragitem-text {
+            margin-right: $padding-large;
         }
         &.cms-draggable-disabled > .cms-draggable {
             display: none !important;
