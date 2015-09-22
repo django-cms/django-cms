@@ -43,7 +43,7 @@ var CMS = window.CMS || {};
                 this.triggerRemove = this.clipboard.find('.cms-clipboard-empty a');
 
                 // states
-                this.click = 'click.cms';
+                this.click = 'click.cms.clipboard';
                 this.timer = function () {};
 
                 // setup initial stuff

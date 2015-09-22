@@ -7,7 +7,7 @@
         "allowUrlComments": true
     },
     "requireDotNotation": {
-        "allExcept": [ "keywords" ]
+        "allExcept": ["keywords"]
     },
     "disallowQuotedKeysInObjects": null,
     "requireMultipleVarDecl": null,

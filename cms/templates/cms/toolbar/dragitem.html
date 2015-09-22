@@ -34,10 +34,10 @@
             </div>
         </div>
         {% if not clipboard %}
-        <div class="cms-plugin-picker" data-touch-action="pan-y">
-            <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
-            {% plugin_child_classes plugin %}
-        </div>
+            <div class="cms-plugin-picker" data-touch-action="pan-y">
+                <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
+                {% plugin_child_classes plugin %}
+            </div>
         {% endif %}
 
         {% if clipboard %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
