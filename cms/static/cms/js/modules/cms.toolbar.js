@@ -650,10 +650,8 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'cms_frame':
-                        var cms_frame = new CMS.CMSFrame();
-                        cms_frame.open({
-                            url: el.attr('href')
-                        });
+                        var frame = window.open(el.attr('href'), 'cms_frame');
+                        frame.focus();
                         break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});

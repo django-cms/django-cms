@@ -283,7 +283,8 @@ class LinkItem(BaseItem):
 class FrameItem(BaseItem):
     # Be sure to define the correct template
 
-    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT):
+    def __init__(self, name, url, active=False, disabled=False,
+                 extra_classes=None, on_close=None, side=LEFT):
         super(FrameItem, self).__init__(side)
         self.name = "%s ..." % force_text(name)
         self.url = url
