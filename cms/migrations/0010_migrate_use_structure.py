@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import warnings
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 
@@ -24,7 +25,7 @@ def forwards(apps, schema_editor):
             if page_permission in group.permissions.all():
                 group.permissions.add(permission.pk)
     except Exception:
-        print(u'Users not migrated to use_structure permission, please add the permission manually')
+        warnings.warn(u'Users not migrated to use_structure permission, please add the permission manually')
 
 
 def backwards(apps, schema_editor):
@@ -40,7 +41,7 @@ def backwards(apps, schema_editor):
             if permission in group.permissions.all():
                 group.permissions.remove(permission.pk)
     except Exception:
-        print(u'use_structure not removed from all the users, please check the permission manually')
+        warnings.warn(u'use_structure not removed from all the users, please check the permission manually')
 
 
 class Migration(migrations.Migration):
