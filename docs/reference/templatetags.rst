@@ -2,25 +2,25 @@
 Template Tags
 #############
 
-****************
-CMS templatetags
-****************
+*****************
+CMS template tags
+*****************
 
 .. highlightlang:: html+django
 
-To use any of the following templatetags you first need to load them at the
+To use any of the following template tags you first need to load them at the
 top of your template::
 
     {% load cms_tags %}
 
-.. templatetag:: placeholder
+.. template tag:: placeholder
 
 placeholder
 ===========
 .. versionchanged:: 2.1
     The placeholder name became case sensitive.
 
-The ``placeholder`` templatetag defines a placeholder on a page. All
+The ``placeholder`` template tag defines a placeholder on a page. All
 placeholders in a template will be auto-detected and can be filled with
 plugins when editing a page that is using said template. When rendering, the
 content of these plugins will appear where the ``placeholder`` tag was.
@@ -40,7 +40,7 @@ Example::
     {% placeholder "content" or %}There is no content.{% endplaceholder %}
 
 If you want to add extra variables to the context of the placeholder, you
-should use Django's :ttag:`with` tag. For instance, if you want to resize images
+should use Django's :ttag:`with` tag. For instance, if you want to re-size images
 from your templates according to a context variable called ``width``, you can
 pass it as follows::
 
@@ -61,15 +61,15 @@ pages have plugins that generate content::
     {% placeholder "content" inherit or %}There is no spoon.{% endplaceholder %}
 
 See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extra
-context variables and change some other placeholder behavior.
+context variables and change some other placeholder behaviour.
 
-.. templatetag:: static_placeholder
+.. template tag:: static_placeholder
 
 static_placeholder
 ==================
 .. versionadded:: 3.0
 
-The static_placeholder templatetag can be used anywhere in any template and is not bound to any
+The static_placeholder template tag can be used anywhere in any template and is not bound to any
 page or model. It needs a name and it will create a placeholder that you can fill with plugins
 afterwards. The static_placeholder tag is normally used to display the same content on multiple
 locations or inside of apphooks or other 3rd party apps. Static_placeholder need to be published to
@@ -99,7 +99,7 @@ Example::
 By default, a static placeholder applies to *all* sites in a project.
 
 If you want to make your static placeholder site-specific, so that different sites can have their
-own content in it, you can add the flag ``site`` to the templatetag to achieve this.
+own content in it, you can add the flag ``site`` to the template tag to achieve this.
 
 Example::
 
@@ -125,12 +125,12 @@ The :ttag:`render_placeholder` tag takes the following parameters:
   specified language (optional)
 * ``language`` keyword plus ``language-code`` string to render content in the
   specified language (optional)
-* ``as`` keyword followed by ``varname`` (optional): the templatetag output can
+* ``as`` keyword followed by ``varname`` (optional): the template tag output can
   be saved as a context variable for later use.
 
 
-The following example renders the my_placeholder field from the mymodel_instance and will render
-only the english plugins:
+The following example renders the ``my_placeholder`` field from the ``mymodel_instance`` and will
+render only the English (``en``) plugins:
 
 .. code-block:: html+django
 
@@ -164,7 +164,7 @@ Arguments:
 * ``width`` parameter for context sensitive plugins (optional)
 * ``language`` keyword plus ``language-code`` string to render content in the
   specified language (optional)
-* ``as`` keyword followed by ``varname`` (optional): the templatetag output can
+* ``as`` keyword followed by ``varname`` (optional): the template tag output can
   be saved as a context variable for later use.
 
 Example::
@@ -220,7 +220,7 @@ Example::
 page_lookup
 ===========
 
-The ``page_lookup`` argument, passed to several templatetags to retrieve a
+The ``page_lookup`` argument, passed to several template tags to retrieve a
 page, can be of any of the following types:
 
 * :class:`str <basestring>`: interpreted as the ``reverse_id`` field of the desired page, which
@@ -237,7 +237,7 @@ hard-coded numeric ID in your template. For example, you might have a help
 page that you want to link to or display parts of on all pages. To do this,
 you would first open the help page in the admin interface and enter an ID
 (such as ``help``) under the 'Advanced' tab of the form. Then you could use
-that ``reverse_id`` with the appropriate templatetags::
+that ``reverse_id`` with the appropriate template tags::
 
     {% show_placeholder "right-column" "help" %}
     <a href="{% page_url "help" %}">Help page</a>
@@ -306,7 +306,7 @@ Example::
 page_attribute
 ==============
 
-This templatetag is used to display an attribute of the current page in the
+This template tag is used to display an attribute of the current page in the
 current language.
 
 Arguments:
@@ -355,7 +355,7 @@ Example::
 render_plugin
 =============
 
-This templatetag is used to render child plugins of the current plugin and should be used inside plugin templates.
+This template tag is used to render child plugins of the current plugin and should be used inside plugin templates.
 
 Arguments:
 
@@ -383,9 +383,9 @@ Plugins need the ``allow_children`` attribute to set to `True` for this to be en
 render_plugin_block
 ===================
 
-This templatetag acts like the templatetag 'render_model_block' but with a
+This template tag acts like the template tag ``render_model_block`` but with a
 plugin instead of a model as its target. This is used to link from a block of
-markup to a plugin's changeform in edit/preview mode.
+markup to a plugin's change form in edit/preview mode.
 
 This is useful for user interfaces that have some plugins hidden from display
 in edit/preview mode, but the CMS author needs to expose a way to edit them.
@@ -394,11 +394,11 @@ the change form for a plugin.
 
 This would typically be used inside a parent-plugin’s render template. In this
 example code below, there is a parent container plugin which renders a list of
-child plugins inside a NAV block, then the actual plugin contents inside a
-DIV.contentgroup-items block. In this example, the nav block is always shown,
+child plugins inside a navigation block, then the actual plugin contents inside a
+``DIV.contentgroup-items`` block. In this example, the navigation block is always shown,
 but the items are only shown once the corresponding navigation element is
-clicked. Adding this render_plugin_block makes it significantly more intuitive
-to edit a child plugins content, by double-clicking its nav item in edit mode.
+clicked. Adding this ``render_plugin_block`` makes it significantly more intuitive
+to edit a child plugins content, by double-clicking its navigation item in edit mode.
 
 Arguments:
 
@@ -442,7 +442,7 @@ render_model
 
     ``render_model`` marks as safe the content of the rendered model
     attribute. This may be a security risk if used on fields which may contains
-    non-trusted content. Be aware, and use the templatetag accordingly.
+    non-trusted content. Be aware, and use the template tag accordingly.
 
 ``render_model`` is the way to add frontend editing to any Django model.
 It both render the content of the given attribute of the model instance and
@@ -453,7 +453,7 @@ template without further action.
 
 If the toolbar is enabled, click to call frontend editing code is added.
 
-By using this templatetag you can show and edit page titles as well as fields in
+By using this template tag you can show and edit page titles as well as fields in
 standard django models, see :ref:`frontend-editable-fields` for examples and
 further documentation.
 
@@ -480,18 +480,18 @@ This will render to:
   field, while allowing editing **title**, **menu title** and **page title**
   fields in the same form;
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor; when templatetag is used on a page object this argument
+  popup editor; when template tag is used on a page object this argument
   accepts the special ``changelist`` value which allows editing the pages
   **changelist** (items list);
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
 * ``filters`` (optional): a string containing chained filters to apply to the
-  output content; works the same way as :ttag:`django:filter` templatetag;
-* ``view_url`` (optional): the name of a url that will be reversed using the
+  output content; works the same way as :ttag:`django:filter` template tag;
+* ``view_url`` (optional): the name of a URL that will be reversed using the
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``varname`` (optional): the templatetag output can be saved as a context
+* ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
 
@@ -536,11 +536,11 @@ This will render to:
     </div>
 
 In the block the ``my_model`` is aliased as ``instance`` and every attribute and
-method is available; also templatetags and filters are available in the block.
+method is available; also template tags and filters are available in the block.
 
 .. warning::
 
-    If the ``{% render_model_block %}`` contains templatetags or template code that rely on or
+    If the ``{% render_model_block %}`` contains template tags or template code that rely on or
     manipulate context data that the ``{% render_model_block %}`` also makes use of, you may
     experience some unexpected effects. Unless you are sure that such conflicts will not occur
     it is advised to keep the code within a ``{% render_model_block %}`` as simple and short as
@@ -550,16 +550,16 @@ method is available; also templatetags and filters are available in the block.
 
 * ``instance``: instance of your model in the template
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor; when templatetag is used on a page object this argument
+  popup editor; when template tag is used on a page object this argument
   accepts the special ``changelist`` value which allows editing the pages
   **changelist** (items list);
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
-* ``view_url`` (optional): the name of a url that will be reversed using the
+* ``view_url`` (optional): the name of a URL that will be reversed using the
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``varname`` (optional): the templatetag output can be saved as a context
+* ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
 
@@ -573,7 +573,7 @@ render_model_icon
 is not available for user interaction (for example, already has a link on it,
 think of a title in a list of items and the titles are linked to the object
 detail view); when in edit mode, it renders an **edit** icon, which will trigger
-the editing changeform for the provided fields.
+the editing change form for the provided fields.
 
 
 .. code-block:: html+django
@@ -594,23 +594,23 @@ It will render to something like:
 
 .. note::
 
-        Icon and position can be customized via CSS by setting a background
+        Icon and position can be customised via CSS by setting a background
         to the ``.cms-render-model-icon img`` selector.
 
 **Arguments:**
 
 * ``instance``: instance of your model in the template
 * ``edit_fields`` (optional): a comma separated list of fields editable in the
-  popup editor; when templatetag is used on a page object this argument
+  popup editor; when template tag is used on a page object this argument
   accepts the special ``changelist`` value which allows editing the pages
   **changelist** (items list);
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
-* ``view_url`` (optional): the name of a url that will be reversed using the
+* ``view_url`` (optional): the name of a URL that will be reversed using the
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``varname`` (optional): the templatetag output can be saved as a context
+* ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
 
@@ -622,7 +622,7 @@ render_model_add
 
 ``render_model_add`` is similar to ``render_model_icon`` but it will enable to
 create instances of the given instance class; when in edit mode, it renders an
-**add** icon, which will trigger the editing addform for the provided model.
+**add** icon, which will trigger the editing add form for the provided model.
 
 
 .. code-block:: html+django
@@ -643,7 +643,7 @@ It will render to something like:
 
 .. note::
 
-        Icon and position can be customized via CSS by setting a background
+        Icon and position can be customised via CSS by setting a background
         to the ``.cms-render-model-add img`` selector.
 
 **Arguments:**
@@ -657,7 +657,7 @@ It will render to something like:
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``varname`` (optional): the templatetag output can be saved as a context
+* ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
 ..warning::
@@ -681,7 +681,7 @@ emitting an icon that is linked to the add model form in a modal dialog, it
 wraps arbitrary markup with the same "link". This allows the developer to create
 front-end editing experiences better suited to the project.
 
-All arguments are identical to ``render_model_add``, but the templatetag is used
+All arguments are identical to ``render_model_add``, but the template tag is used
 in two parts to wrap the markup that should be wrapped.
 
 .. code-block:: html+django
@@ -703,7 +703,7 @@ It will render to something like:
     You **must** pass an *instance* of your model as instance parameter. The
     instance passed could be an existing models instance, or one newly created
     in your view/plugin. It does not even have to be saved, it is introspected
-    by the templatetag to determine the desired model class.
+    by the template tag to determine the desired model class.
 
 
 **Arguments:**
@@ -713,11 +713,11 @@ It will render to something like:
   popup editor;
 * ``language`` (optional): the admin language tab to be linked. Useful only for
   `django-hvad`_ enabled models.
-* ``view_url`` (optional): the name of a url that will be reversed using the
+* ``view_url`` (optional): the name of a URL that will be reversed using the
   instance ``pk`` and the ``language`` as arguments;
 * ``view_method`` (optional): a method name that will return a URL to a view;
   the method must accept ``request`` as first parameter.
-* ``varname`` (optional): the templatetag output can be saved as a context
+* ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
@@ -729,15 +729,15 @@ It will render to something like:
 page_language_url
 =================
 
-Returns the url of the current page in an other language::
+Returns the URL of the current page in an other language::
 
     {% page_language_url de %}
     {% page_language_url fr %}
     {% page_language_url en %}
 
-If the current url has no cms-page and is handled by a navigation extender and
-the url changes based on the language, you will need to set a language_changer
-function with the set_language_changer function in cms.utils.
+If the current URL has no CMS Page and is handled by a navigation extender and
+the URL changes based on the language, you will need to set a ``language_changer``
+function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
 
@@ -769,20 +769,20 @@ mode the languages are translated into the current language the user is seeing
 the site in (eg. if the site is displayed in German, Japanese will be displayed
 as "Japanisch"). "Short" mode takes the language code (eg. "en") to display.
 
-If the current url has no cms-page and is handled by a navigation extender and
-the url changes based on the language, you will need to set a language_changer
-function with the set_language_changer function in menus.utils.
+If the current URL has no CMS Page and is handled by a navigation extender and
+the URL changes based on the language, you will need to set a ``language_changer``
+function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
 
-********************
-Toolbar Templatetags
-********************
+*********************
+Toolbar template tags
+*********************
 
 .. highlightlang:: html+django
 
-The ``cms_toolbar`` templatetag is included in the ``cms_tags`` library and will add the
-required css and javascript to the sekizai blocks in the base template. The templatetag
+The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the
+required CSS and javascript to the sekizai blocks in the base template. The template tag
 has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences
 within your HTML.
 

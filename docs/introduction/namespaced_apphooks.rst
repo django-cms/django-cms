@@ -3,15 +3,16 @@ Namespaced Apphooks
 ###################
 
 
-Namespaced configuration for Apphooks allows to have multiple instances of the
+Namespaced configuration for apphooks allows to have multiple instances of the
 same app be used in different locations in the page tree. This also provides
 the building blocks needed to have some extra configuration in the database to
 control some aspects of each instance of the app.
 
+
 Basic concepts
 ##############
 
-The concept of apphooks-config is to store all the configuration in an
+The concept of apphook configuration is to store all the configuration in an
 applications-specific model, and let the developer specify the desired options
 in a form. In the views the configuration model instance specific for the
 current application namespace is loaded (through a mixin) and thus it is
@@ -23,12 +24,13 @@ When creating an application configuration, you are in fact defining a
 namespace, which is saved in the same field in the Page model as the
 plain namespaces.
 
+
 step-by-step implementation
 ###########################
 
 We're going to create a new application called FAQ. It is a simple list
 of Frequently asked questions. And we'll make it possible to setup multiple
-sets of FAQ Entries at different locations of the pagetree, each with its
+sets of FAQ Entries at different locations of the page tree, each with its
 individual set of entries.
 
 Lets create our new FAQ app:
@@ -97,7 +99,7 @@ the parent (abstract) model.
 
 In this case we're defining a few extra fields though. We're defining
 ``paginate_by`` as a normal model field. We'll use it later to control how
-maye entries should be displayed per page. For the title, we're using a
+many entries should be displayed per page. For the title, we're using a
 ``AppDataForm`` (see django-appdata). These forms can also be extended from
 other applications by just registering them. So other apps can add
 fields without altering the model (it's saved in a json field).
@@ -256,7 +258,7 @@ Finally, lets add ``faq`` to ``INSTALLED_APPS`` and create a migrations:
     python manage.py makemigrations faq
     python manage.py migrate faq
 
-Now we should be all set. Create two pages with the faq apphook with different
+Now we should be all set. Create two pages with the ``faq`` apphook with different
 namespaces and different configurations. Also create some entries assigned to
 the two namespaces. Don't forget to publish the pages with the apphook and
 restart the server.

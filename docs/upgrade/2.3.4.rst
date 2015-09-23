@@ -49,5 +49,5 @@ Two fixes to page change form
 The change form for pages would throw errors if the user editing the page does
 not have the permission to publish this page. This issue was resolved.
 
-Further the page change form would not correctly pre-popluate the slug field if
+Further the page change form would not correctly pre-populate the slug field if
 ``DEBUG`` was set to ``False``. Again, this issue is now resolved.

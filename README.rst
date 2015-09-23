@@ -44,7 +44,7 @@ Features
 * Edit content directly in the frontend on your pages
 * Hierarchical content plugins (columns, style changes etc)
 * Navigation rendering and extending from your apps
-* SEO friendly urls
+* SEO friendly URLs
 * Highly integrative into your own apps
 
 
@@ -105,7 +105,7 @@ Commercial support
 
 This project is backed by `Divio <http://divio.ch/en/commercial-support/>`_.
 If you need help implementing or hosting django CMS, please contact us:
-sales@divio.ch.
+sales@divio.com.
 
 *******
 Credits
@@ -114,7 +114,7 @@ Credits
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
+* JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
   `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!

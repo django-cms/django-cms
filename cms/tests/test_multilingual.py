@@ -5,7 +5,7 @@ import copy
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, QueryDict
 from django.test.utils import override_settings
 
 from cms.api import create_page, create_title, publish_page, add_plugin
@@ -22,12 +22,14 @@ from cms.utils.conf import get_languages
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
-def get_primary_lanaguage(current_site=None):
+
+def get_primary_language(current_site=None):
     """Fetch the first language of the current site settings."""
     current_site = current_site or Site.objects.get_current()
     return get_languages()[current_site.id][0]['code']
 
-def get_secondary_lanaguage(current_site=None):
+
+def get_secondary_language(current_site=None):
     """Fetch the other language of the current site settings."""
     current_site = current_site or Site.objects.get_current()
     return get_languages()[current_site.id][1]['code']
@@ -53,7 +55,7 @@ class MultilingualTestCase(CMSTestCase):
         # Use the very first language in the list of languages
         # for the current site
         current_site = Site.objects.get_current()
-        TESTLANG = get_primary_lanaguage(current_site=current_site)
+        TESTLANG = get_primary_language(current_site=current_site)
         page_data = self.get_new_page_data_dbfields(
             site=current_site,
             language=TESTLANG
@@ -102,7 +104,7 @@ class MultilingualTestCase(CMSTestCase):
             page_data2 = page_data.copy()
             page_data2['title'] = 'ein Titel'
             page_data2['slug'] = 'ein-slug'
-            TESTLANG2 = get_secondary_lanaguage(current_site=current_site)
+            TESTLANG2 = get_secondary_language(current_site=current_site)
             page_data2['language'] = TESTLANG2
 
             # Ensure that the language version is not returned
@@ -126,8 +128,8 @@ class MultilingualTestCase(CMSTestCase):
             self.assertEqual(page.get_title(fallback=False), page_data['title'])
 
     def test_multilingual_page(self):
-        TESTLANG = get_primary_lanaguage()
-        TESTLANG2 = get_secondary_lanaguage()
+        TESTLANG = get_primary_language()
+        TESTLANG2 = get_secondary_language()
         page = create_page("mlpage", "nav_playground.html", TESTLANG)
         create_title(TESTLANG2, page.get_title(), page, slug=page.get_slug())
         page.rescan_placeholders()
@@ -146,8 +148,8 @@ class MultilingualTestCase(CMSTestCase):
         self.assertEqual(placeholder.cmsplugin_set.filter(language=TESTLANG).count(), 1)
 
     def test_hide_untranslated(self):
-        TESTLANG = get_primary_lanaguage()
-        TESTLANG2 = get_secondary_lanaguage()
+        TESTLANG = get_primary_language()
+        TESTLANG2 = get_secondary_language()
         page = create_page("mlpage-%s" % TESTLANG, "nav_playground.html", TESTLANG)
         create_title(TESTLANG2, "mlpage-%s" % TESTLANG2, page, slug=page.get_slug())
         page2 = create_page("mlpage-2-%s" % TESTLANG, "nav_playground.html", TESTLANG, parent=page)
@@ -238,8 +240,8 @@ class MultilingualTestCase(CMSTestCase):
                 return 'testserver'
 
             request = AttributeObject(
-                REQUEST={'language': 'x-elvish'},
-                GET=[],
+                GET=QueryDict('language=x-elvish'),
+                POST=QueryDict(''),
                 session={},
                 path='/',
                 current_page=None,
@@ -281,8 +283,8 @@ class MultilingualTestCase(CMSTestCase):
 
             User = get_user_model()
             request = AttributeObject(
-                REQUEST={'language': 'x-elvish'},
-                GET=[],
+                GET=QueryDict('language=x-elvish'),
+                POST=QueryDict(''),
                 session={},
                 path='/',
                 current_page=None,
@@ -320,6 +322,54 @@ class MultilingualTestCase(CMSTestCase):
         with self.settings(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
             self.assertEqual(response.status_code, 302)
+
+    def test_publish_status(self):
+        p1 = create_page("page", "nav_playground.html", "en", published=True)
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en',)))
+        self.assertEqual(set(public.get_published_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_published_languages()), set(('en',)))
+
+        p1 = create_title('de', 'page de', p1).page
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en',)))
+        self.assertEqual(set(public.get_published_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
+        p1.publish('de')
+        p1 = p1.reload()
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_published_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
+        p1.unpublish('de')
+        p1 = p1.reload()
+
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_published_languages()), set(('en',)))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+
+        p1.publish('de')
+        p1 = p1.reload()
+        p1.unpublish('en')
+        p1 = p1.reload()
+
+        public = p1.get_public_object()
+        draft = p1.get_draft_object()
+        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_published_languages()), set(('de',)))
+        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
+        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
 
     def test_no_english_defined(self):
         with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],

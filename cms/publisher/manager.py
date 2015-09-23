@@ -2,6 +2,7 @@
 from django.db import models
 from cms.publisher.query import PublisherQuerySet
 
+
 class PublisherManager(models.Manager):
     """Manager with some support handling publisher.
     """

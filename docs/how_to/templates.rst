@@ -2,7 +2,7 @@
 Working with templates
 **********************
 
-Application can reuse cms templates by mixing cms templatetags and normal django
+Application can reuse cms templates by mixing cms template tags and normal django
 templating language.
 
 
@@ -21,9 +21,9 @@ CMS_TEMPLATE
 ``CMS_TEMPLATE`` is a context variable available in the context; it contains
 the template path for CMS pages and application using apphooks, and the default
 template (i.e.: the first template in :setting:`CMS_TEMPLATES`) for non-CMS
-managed urls.
+managed URLs.
 
-This is mostly useful to use it in the ``extends`` templatetag in the application
+This is mostly useful to use it in the ``extends`` template tag in the application
 templates to get the current page template.
 
 Example: cms template
@@ -54,7 +54,7 @@ Example: application template
     {% static_placeholder "sidebar" %}
     {% endblock main %}
 
-``CMS_TEMPLATE`` memorizes the path of the cms template so the application
+``CMS_TEMPLATE`` memorises the path of the cms template so the application
 template can dynamically import it.
 
 

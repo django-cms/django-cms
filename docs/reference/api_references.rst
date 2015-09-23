@@ -84,7 +84,7 @@ Functions and constants
     :param datetime publication_date: Date to publish this page
     :param datetime publication_end_date: Date to unpublish this page
     :param bool in_navigation: Whether this page should be in the navigation or not
-    :param bool soft_root: Whether this page is a softroot or not
+    :param bool soft_root: Whether this page is a soft root or not
     :param string reverse_id: Reverse ID of this page (for template tags)
     :param string navigation_extenders: Menu to attach to this page. Must be a valid menu
     :param bool published: Whether this page should be published or not
@@ -302,7 +302,7 @@ cms.plugin_base
 
     .. method:: icon_src(instance)
 
-        Returns the url to the icon to be used for the given instance when that
+        Returns the URL to the icon to be used for the given instance when that
         instance is used inside a text plugin.
 
     .. method:: render(context, instance, placeholder)
@@ -378,7 +378,7 @@ cms.toolbar.toolbar
 
     .. attribute:: watch_models
 
-        A list of model this toolbar works on; used for redirections after editing
+        A list of model this toolbar works on; used for redirection after editing
         (:ref:`url_changes`).
 
     .. method:: add_item(item, position=None)
@@ -388,7 +388,7 @@ cms.toolbar.toolbar
         Adds an item, which must be an instance of
         :class:`cms.toolbar.items.BaseItem`, to the toolbar.
 
-        This method should only be used for custom item classes, as all builtin
+        This method should only be used for custom item classes, as all built-in
         item classes have higher level APIs.
 
         Read above for information on ``position``.
