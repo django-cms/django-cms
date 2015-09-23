@@ -137,8 +137,8 @@ class BasicToolbar(CMSToolbar):
             self._admin_menu.add_cms_frame_item(_('Administration'), url=admin_reverse('index'))
             self._admin_menu.add_break(ADMINISTRATION_BREAK)
 
-            # cms users
-            self._admin_menu.add_cms_frame_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
+            # cms users settings
+            self._admin_menu.add_modal_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
             self._admin_menu.add_break(USER_SETTINGS_BREAK)
 
             # Disable toolbar
