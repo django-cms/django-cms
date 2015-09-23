@@ -649,6 +649,12 @@ var CMS = window.CMS || {};
                             message: el.data('text')
                         });
                         break;
+                    case 'cms_frame':
+                        var cms_frame = new CMS.CMSFrame();
+                        cms_frame.open({
+                            url: el.attr('href')
+                        });
+                        break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
                         sideframe.open({

@@ -269,11 +269,11 @@ class LinkItem(BaseItem):
         }
 
 
-class SideframeItem(BaseItem):
-    template = "cms/toolbar/items/item_sideframe.html"
+class FrameItem(BaseItem):
+    # Be sure to define the correct template
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT):
-        super(SideframeItem, self).__init__(side)
+        super(FrameItem, self).__init__(side)
         self.name = "%s ..." % force_text(name)
         self.url = url
         self.active = active
@@ -282,7 +282,8 @@ class SideframeItem(BaseItem):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % force_text(self.name)
+        # Should be overridden
+        return '<FrameItem:%s>' % force_text(self.name)
 
     def get_context(self):
         return {
@@ -293,6 +294,20 @@ class SideframeItem(BaseItem):
             'extra_classes': self.extra_classes,
             'on_close': self.on_close,
         }
+
+
+class SideframeItem(FrameItem):
+    template = "cms/toolbar/items/item_sideframe.html"
+
+    def __repr__(self):
+        return '<SideframeItem:%s>' % force_text(self.name)
+
+
+class CMSFrameItem(FrameItem):
+    template = "cms/toolbar/items/item_cms_frame.html"
+
+    def __repr__(self):
+        return '<CMSframeItem:%s>' % force_text(self.name)
 
 
 class ModalItem(SideframeItem):
@@ -337,8 +352,6 @@ class AjaxItem(BaseItem):
             'question': self.question,
             'on_success': self.on_success
         }
-
-
 
 
 class Break(BaseItem):
