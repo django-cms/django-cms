@@ -8,6 +8,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+import django
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import Permission
@@ -17,6 +18,7 @@ from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
 from django.utils import unittest
 from django.utils.importlib import import_module
+from distutils.version import LooseVersion
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -470,6 +472,8 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.implicitly_wait(2)
         super(FrontAdminTest, self).setUp()
 
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
+                     reason='test not supported in Django 1.7+')
     def test_cms_modal_html5_validation_error(self):
         User = get_user_model()
         try:
