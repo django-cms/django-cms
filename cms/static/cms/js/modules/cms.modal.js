@@ -735,7 +735,7 @@ var CMS = window.CMS || {};
                             }
 
                             if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
-                                that.modal.find('.cms-modal-frame iframe').hide();
+                                that.ui.modal.find('.cms-modal-frame iframe').hide();
                                 // page has been saved or deleted, run checkup
                                 that.saved = true;
                             } else { // submit button uses the form's submit event
