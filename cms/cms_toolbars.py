@@ -134,7 +134,7 @@ class BasicToolbar(CMSToolbar):
                                              active=site.pk == self.current_site.pk)
 
             # admin
-            self._admin_menu.add_modal_item(_('Administration'), url=admin_reverse('index'))
+            self._admin_menu.add_cms_frame_item(_('Administration'), url=admin_reverse('index'))
             self._admin_menu.add_break(ADMINISTRATION_BREAK)
 
             # cms users
@@ -156,7 +156,7 @@ class BasicToolbar(CMSToolbar):
 
             if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
                 user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
-                parent.add_modal_item(_('Users'), url=user_changelist_url)
+                parent.add_cms_frame_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
         # If current page is not published or has view restrictions user is redirected to the home page:
