@@ -122,6 +122,17 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
         self._remove_item(item)
         self._unmemoize(item)
 
+    def add_cms_frame_item(self, name, url, active=False, disabled=False,
+                           extra_classes=None, side=LEFT, position=None):
+        item = CMSFrameItem(name, url,
+                            active=active,
+                            disabled=disabled,
+                            extra_classes=extra_classes,
+                            side=side)
+        self.add_item(item, position=position)
+        return item
+
+
     def add_sideframe_item(self, name, url, active=False, disabled=False,
                            extra_classes=None, on_close=None, side=LEFT, position=None):
         item = SideframeItem(name, url,
@@ -310,7 +321,7 @@ class CMSFrameItem(FrameItem):
         return '<CMSframeItem:%s>' % force_text(self.name)
 
 
-class ModalItem(SideframeItem):
+class ModalItem(FrameItem):
     template = "cms/toolbar/items/item_modal.html"
 
     def __repr__(self):
