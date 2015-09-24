@@ -674,6 +674,15 @@ var CMS = window.CMS || {};
                 } else {
                     row = iframe.contents().find('.save-box:eq(0)');
                 }
+                var form = iframe.contents().find('form');
+                //avoids conflict between the browser's form validation and Django's validation
+                form.on('submit', function () {
+                    if (that.hideFrame) { // submit button was clicked
+                        that.ui.modal.find('.cms-modal-frame iframe').hide();
+                        // page has been saved, run checkup
+                        that.saved = true;
+                    }
+                });
                 var buttons = row.find('input, a, button');
 
                 // hide all submit-rows
@@ -711,12 +720,6 @@ var CMS = window.CMS || {};
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
                     el.on(that.click, function () {
-                        if (item.is('input') || item.is('button')) {
-                            // we need to use native `.click()` event specifically
-                            // as we are inside an iframe and magic is happening
-                            item[0].click();
-                        }
-
                         if (item.is('a')) {
                             that._loadIframe({
                                 url: item.prop('href'),
@@ -730,11 +733,22 @@ var CMS = window.CMS || {};
                             if (item.hasClass('deletelink')) {
                                 that.options.onClose = null;
                             }
-                            // hide iframe
-                            that.ui.frame.find('iframe').hide();
-                            // page has been saved or deleted, run checkup
-                            that.saved = true;
+
+                            if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
+                                that.ui.modal.find('.cms-modal-frame iframe').hide();
+                                // page has been saved or deleted, run checkup
+                                that.saved = true;
+                            } else { // submit button uses the form's submit event
+                                that.hideFrame = true;
+                            }
                         }
+
+                        if (item.is('input') || item.is('button')) {
+                            // we need to use native `.click()` event specifically
+                            // as we are inside an iframe and magic is happening
+                            item[0].click();
+                        }
+
                     });
                     el.wrap(group);
 
