@@ -445,7 +445,7 @@ var CMS = window.CMS || {};
              * @deprecated this will be moved to `cms.messages.js`
              * @param opts
              * @param opts.message {String|HTMLNode} message to be displayed
-             * @param [opts.dir=center] {String} direction to be displayed `center` `left` or `right`
+             * @param [opts.dir='center'] {String} direction to be displayed `center` `left` or `right`
              * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed
              * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
              */
