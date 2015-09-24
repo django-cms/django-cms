@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from distutils.version import LooseVersion
 import os
 import sys
 import time
@@ -8,6 +9,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+import django
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import Permission
@@ -470,6 +472,8 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.implicitly_wait(2)
         super(FrontAdminTest, self).setUp()
 
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
+                     reason='test not supported in Django 1.7+')
     def test_cms_modal_html5_validation_error(self):
         User = get_user_model()
         try:
