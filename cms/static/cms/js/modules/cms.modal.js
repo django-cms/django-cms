@@ -729,11 +729,6 @@ var CMS = window.CMS || {};
 
                         // trigger only when blue action buttons are triggered
                         if (item.hasClass('default') || item.hasClass('deletelink')) {
-                            // reset onClose when delete is triggered
-                            if (item.hasClass('deletelink')) {
-                                that.options.onClose = null;
-                            }
-
                             if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
                                 that.ui.modal.find('.cms-modal-frame iframe').hide();
                                 // page has been saved or deleted, run checkup
@@ -888,7 +883,11 @@ var CMS = window.CMS || {};
                     // when the window has been changed pressing the blue or red button, we need to run a reload check
                     // also check that no delete-confirmation is required
                     if (that.saved && !contents.find('.delete-confirmation').length) {
-                        that.reloadBrowser(window.location.href, false, true);
+                        that.reloadBrowser(
+                            that.options.onClose ? that.options.onClose : window.location.href,
+                            false,
+                            true
+                        );
                     } else {
                         iframe.show();
                         // set title of not provided
