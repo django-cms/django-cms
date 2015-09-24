@@ -19,9 +19,6 @@ Open source enterprise content management system based on the django framework.
 
 .. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
    :target: http://demo.django-cms.org/
-   :height: 32px
-   :width: 148px
-   :target: _blank
    :alt: Try demo with Aldryn
 
 .. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
