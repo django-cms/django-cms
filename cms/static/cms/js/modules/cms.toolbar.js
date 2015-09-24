@@ -457,9 +457,9 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 var msg = opts.message;
-                var dir = opts.dir || 'center';
-                var delay = opts.delay || this.options.messageDelay;
-                var error = opts.error || false;
+                var dir = opts.dir === undefined ? 'center' : opts.dir;
+                var delay = opts.delay === undefined ? this.options.messageDelay : opts.delay;
+                var error = opts.error === undefined ? false : opts.error;
 
                 var width = 320;
                 var height = this.ui.messages.outerHeight(true);
