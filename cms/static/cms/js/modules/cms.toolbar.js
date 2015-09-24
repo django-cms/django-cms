@@ -475,9 +475,6 @@ var CMS = window.CMS || {};
                     this.ui.messages.addClass('cms-messages-error');
                 }
 
-                // set toolbar freeze
-                this._lock(true);
-
                 // clear timeout
                 clearTimeout(this.timer);
 
@@ -542,13 +539,11 @@ var CMS = window.CMS || {};
             /**
              * Closes the message window underneath the toolbar.
              *
-             * @method open
+             * @method closeMessage
              * @deprecated this will be moved to `cms.messages.js`
              */
             closeMessage: function closeMessage() {
                 this.ui.messages.fadeOut(this.options.toolbarDuration);
-                // unlock toolbar
-                this._lock(false);
             },
 
             /**
