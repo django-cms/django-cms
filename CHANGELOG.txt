@@ -493,3 +493,13 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix language chooser template
 - Cast to int cache version
 - Fix extensions copy when using duplicate page/create page type
+
+=== 3.1.4 (Unreleased) ===
+
+- Fix use structure migration
+- Fix fix_tree command
+- Remove some warning for Django 1.9
+- Fix using scroll bar of plugin menu in Firefox & IE moves plugins
+- Fix JS error when using PageSelectWidget
+- Fix whitespace markup issues in draft mode
+- Detect plugin migrations layout in tests
