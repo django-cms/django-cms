@@ -134,6 +134,10 @@
             font-weight: normal;
             padding-left: $padding-normal;
         }
+        .cms-modal-title-prefix:empty + .cms-modal-title-suffix {
+            font-weight: bold;
+            padding-left: 0;
+        }
     }
 
     .cms-modal-minimize,
