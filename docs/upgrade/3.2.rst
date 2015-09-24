@@ -4,9 +4,9 @@
 3.2 release notes
 #################
 
-In this release we have tried to maintain maximum backwards-compatibility, particularly for
-third-party applications, and endeavoured to identify and tidy loose ends in the system wherever
-possible.
+django CMS 3.2 introduces touch-screen support, significant improvements to the structure-board,
+and numerous other updates and fixes for the frontend. Behind the scenes, auto-reloading following
+apphook configuration changes will make life simpler for all users.
 
 .. warning:: Upgrading from previous versions
 
@@ -14,9 +14,19 @@ possible.
     from a previous version. Please read :ref:`upgrade-guide-3.2` for a step-by-step guide to the
     process of upgrading from 3.1 to 3.2.
 
+
 *****************
 What's new in 3.2
 *****************
+
+* full touch-screen support at all sizes from small tablets to table-top devices
+* enhanced and polished user interface
+* much-needed improvements to the structure-board
+* enhancements to components such as the pop-up plugin editor, sideframe and the toolbar
+* significant speed improvements on loading, HTTP requests and file sizes
+* new *Link/Button* look & feel
+* restarts are no longer required when changing apphook configurations
+
 
 Renaming cms_app, cms_toolbar, menu modules
 ===========================================
@@ -26,21 +36,41 @@ Renaming cms_app, cms_toolbar, menu modules
 
 Old names are still supported but deprecated; support will be removed in 3.4.
 
+
 Action required
 ---------------
 
 In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
 ``cms_toolbar.py`` to ``cms_toolbar.py`` and ``menu.py`` to ``menus.py``.
 
+
 New ApphookReloadMiddleware
 ===========================
 
-A new, optional middleware is available:
-``cms.middleware.utils.ApphookReloadMiddleware``. If used, this should be placed
-very near the top of your ``MIDDLEWARE`` tuple in settings. This middleware and
-other changes in the CMS for version 3.2 provides automatic reloading of URLs
-when changes to an apphook are made. This is tested to work in many types of
-production environments, but may not work in some others.
+A new, optional middleware is available: ``cms.middleware.utils.ApphookReloadMiddleware``. If used,
+this should be placed very near the top of your ``MIDDLEWARE_CLASSES`` tuple in settings. This
+middleware and other changes in the CMS for version 3.2 provide automatic reloading of URLs when
+changes to an apphook are made.
+
+.. note::
+
+   This has been tested and works in many production environments and deployment configurations,
+   but we haven't been able to test it with all possible set-ups. Please file an issue if you
+   discover one where it fails.
+
+
+Developer tools
+===============
+
+SASS-related changes
+--------------------
+
+We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for building static
+files (this only affects frontend developers *of* django CMS - contributors to it, not other users
+or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
+
+.. todo:: link to the documentation for this
+
 
 *****************************
 Backward incompatible changes
@@ -57,3 +87,10 @@ Backward incompatible changes
 Upgrading django CMS 3.1 to 3.2
 *******************************
 
+.. todo:: upgrade steps
+
+********************
+Pending deprecations
+********************
+
+.. todo:: a note about which Python/Django versions are to be dropped
