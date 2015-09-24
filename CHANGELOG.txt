@@ -381,3 +381,26 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Pin South version to 1.0.2
 - Pin Html5lib version to 0.999 until a current bug is fixed
 - Fix language chooser template
+
+=== 3.0.15 (2015-09-01) ===
+
+- Relax html5lib versions
+- Fix redirect when deleting a page
+- Correct South migration error
+- Correct validation on numeric fields in modal popups
+- Exclude scssc from manifest
+- Remove unpublished pages from menu
+- Remove page from menu items for performance reason
+- Fix reachability of pages with expired ancestors
+- Don't try to modify an immutable QueryDict
+- Only attempt to delete cache keys if there are some to be deleted
+- Update documentation section
+- Fix language chooser template
+- Cast to int cache version
+- Fix extensions copy when using duplicate page/create page type
+
+=== 3.0.16 (Unreleased) ===
+
+- Fix JS error when using PageSelectWidget
+- Fix whitespace markup issues in draft mode
+- Detect plugin migrations layout in tests
