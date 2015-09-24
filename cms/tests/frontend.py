@@ -4,6 +4,7 @@ import datetime
 import os
 import time
 
+import django
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -11,6 +12,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
 from django.utils import unittest
+from distutils.version import LooseVersion
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -464,6 +466,8 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.implicitly_wait(2)
         super(FrontAdminTest, self).setUp()
 
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
+                     reason='test not supported in Django 1.7+')
     def test_cms_modal_html5_validation_error(self):
         User = get_user_model()
         try:
