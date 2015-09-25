@@ -3,12 +3,10 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.titlemodels import EmptyTitle
-from cms.utils.i18n import get_language_list
 
 
 class BaseCMSPageForm(forms.Form):
@@ -35,13 +33,21 @@ class CreateCMSPageForm(BaseCMSPageForm):
             if isinstance(title_obj, EmptyTitle):
                 create_title(language, title, page)
 
+    @staticmethod
+    def get_placeholder_slot(page):
+        """
+        Returns the slot name of the first editable, non-static placeholder
+        or None.
+        """
+        for ph in page.placeholders.all():
+            if ph.is_static or not ph.is_editable:
+                continue
+            return ph.slot
+        else:
+            return None
+
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
-
-        if self.page:
-            parent_page = self.page
-        else:
-            parent_page = None  # Root
 
         title = self.cleaned_data['title']
         page = create_page(
@@ -49,19 +55,22 @@ class CreateCMSPageForm(BaseCMSPageForm):
             template=TEMPLATE_INHERITANCE_MAGIC,
             language=self.language_code,
             created_by=unicode(self.user),
-            parent=parent_page,
+            parent=self.page,
             in_navigation=True,
             published=False
         )
-
-        # FIXME: Probably shouldn't be hard-coded to 'content'!
-        # Perhaps should be a list of placeholders to choose from?
-        placeholder = page.placeholders.get(slot='content')
-        add_plugin(
-            placeholder=placeholder,
-            plugin_type='TextPlugin',
-            language=self.language_code,
-            body=self.cleaned_data['content']
-        )
         self.create_page_titles(page, title, [self.language_code])
+
+        content = self.cleaned_data['content']
+        if content:
+            # Find the first editable, non-static placeholder
+            slot = self.get_placeholder_slot(page)
+            if slot:
+                placeholder = page.placeholders.get(slot=slot)
+                add_plugin(
+                    placeholder=placeholder,
+                    plugin_type='TextPlugin',
+                    language=self.language_code,
+                    body=content)
+
         return page
