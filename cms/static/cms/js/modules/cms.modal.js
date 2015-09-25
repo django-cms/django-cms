@@ -770,19 +770,6 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Sanitise the ampersand within the url for #3404.
-             *
-             * @method _prepareUrl
-             * @private
-             * @param url {String}
-             */
-            _prepareUrl: function _prepareUrl(url) {
-                // FIXME: A better fix is needed for '&' being interpreted as the
-                url = url.replace('&', '&amp;');
-                return url;
-            },
-
-            /**
              * Version where the modal loads an iframe.
              *
              * @method _loadIframe
@@ -794,7 +781,7 @@ var CMS = window.CMS || {};
             _loadIframe: function _loadIframe(opts) {
                 var that = this;
 
-                opts.url = this._prepareUrl(opts.url);
+                opts.url = this.makeURL(opts.url);
                 opts.title = opts.title || '';
                 opts.breadcrumbs = opts.breadcrumbs || '';
 
