@@ -45,7 +45,7 @@ $(document).ready(function () {
         'settings': {
             'version': '{{ cms_version }}',
             'toolbar': 'expanded',
-            'mode': 'edit',
+            'mode': {% if request.toolbar.build_mode %}'structure'{% else %}'edit'{% endif %},
             'sideframe': { 'url': '' },
             'states': []
         },
