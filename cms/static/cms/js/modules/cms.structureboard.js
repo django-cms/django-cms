@@ -124,6 +124,35 @@
                 this._drag();
             },
 
+            /**
+             * Uses history API to replace the url with new one
+             * If history api is not available it's a noop. There's no sanity checks,
+             * so use wisely.
+             *
+             * @method _setURL
+             * @param opts {Object}
+             * @param [opts.structure] {Boolean} go into structure mode
+             * @param [opts.edit] {Boolean} go into edit (content) mode
+             */
+            _setURL:  (window.history && 'pushState' in window.history) ? function _setURL(opts) {
+                var addParams = [];
+                var removeParams = [];
+                var modeToUrl = {
+                    structure: CMS.settings.structureURL,
+                    edit: CMS.settings.editURL
+                };
+
+                $.each(opts, function (key, value) {
+                    if (value) {
+                        addParams.push(modeToUrl[key] + '=1');
+                    } else {
+                        removeParams.push(modeToUrl[key]);
+                    }
+                });
+                var newUrl = this.makeURL(window.location.href, addParams, removeParams);
+                history.replaceState({}, document.title, newUrl.replace('&amp;', '&'));
+            } : $.noop,
+
             _events: function () {
                 var that = this;
                 var modes = that.ui.toolbarModeLinks;
@@ -177,6 +206,7 @@
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
+                this._setURL({ edit: false, structure: true });
 
                 // show clipboard
                 this.ui.clipboard.fadeIn(this.options.speed);
@@ -203,6 +233,7 @@
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
+                this._setURL({ edit: true, structure: false });
 
                 // hide clipboard if in edit mode
                 this.ui.container.find('.cms-clipboard').hide();
