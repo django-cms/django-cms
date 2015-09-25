@@ -255,6 +255,9 @@ var CMS = {
                 if (!settings) {
                     settings = this.setSettings(CMS.config.settings);
                 }
+                // mode is special in a way that we always prefer the mode from the url,
+                // and not the one from localStorage
+                settings.mode = CMS.config.settings.mode;
 
                 // save settings
                 CMS.settings = settings;
