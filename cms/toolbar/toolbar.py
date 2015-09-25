@@ -98,7 +98,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.request = request
         self.is_staff = self.request.user.is_staff
         self.edit_mode = self.is_staff and self.request.session.get('cms_edit', False)
-        self.build_mode = self.is_staff and self.request.session.get('cms_build', False)
+        self.build_mode = self.is_staff and request.GET.get(get_cms_setting('CMS_TOOLBAR_URL__BUILD')) != None
         self.use_draft = self.is_staff and self.edit_mode or self.build_mode
         self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
         self.login_form = CMSToolbarLoginForm(request=request)
