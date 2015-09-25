@@ -45,9 +45,11 @@ $(document).ready(function () {
         'settings': {
             'version': '{{ cms_version }}',
             'toolbar': 'expanded',
-            'mode': 'edit',
+            'mode': {% if request.toolbar.build_mode %}'structure'{% else %}'edit'{% endif %},
             'sideframe': { 'url': '' },
-            'states': []
+            'states': [],
+            'editURL': '{{ request.toolbar.edit_mode_url_on }}',
+            'structureURL': '{{ request.toolbar.build_mode_url_on }}'
         },
         'clipboard': {
             'id': '{{ request.toolbar.clipboard.pk|unlocalize }}',
