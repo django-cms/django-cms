@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from distutils.version import LooseVersion
 import os
 import sys
 import time
@@ -8,6 +9,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+import django
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import Permission
@@ -470,6 +472,8 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.implicitly_wait(2)
         super(FrontAdminTest, self).setUp()
 
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
+                     reason='test not supported in Django 1.7+')
     def test_cms_modal_html5_validation_error(self):
         User = get_user_model()
         try:
@@ -485,7 +489,7 @@ class FrontAdminTest(CMSLiveTests):
         create_page('apphook', 'simple.html', 'fr', published=True,
                     apphook=Example1App)
         url = '%s/%s/?%s' % (
-            self.live_server_url, 'apphook/detail/class/%s'
+            self.live_server_url, 'fr/apphook/detail/class/%s'
             % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             )
         self.driver.get(url)
@@ -498,7 +502,7 @@ class FrontAdminTest(CMSLiveTests):
 
         # Load modal iframe
         add_button = self.driver.find_element_by_css_selector(
-            '.cms_plugin-placeholderapp-example1-add-0'
+            '.cms-plugin-placeholderapp-example1-add-0'
             )
         open_modal_actions = ActionChains(self.driver)
         open_modal_actions.double_click(add_button)
@@ -535,7 +539,7 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.switch_to_default_content()
         submit_button = self.driver.find_element_by_css_selector('.default')
         submit_button.click()
-        time.sleep(0.5)
+        time.sleep(10)
         with self.assertRaises(NoSuchElementException):
             self.driver.find_element_by_css_selector('iframe')
         example = Example1.objects.get(char_1='test')

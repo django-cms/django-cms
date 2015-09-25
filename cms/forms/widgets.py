@@ -104,7 +104,9 @@ class PageSelectWidget(MultiWidget):
             $("#id_%(name)s_2 option").attr('selected', false);
             $("#id_%(name)s_2 option[value=" + page_id + "]").attr('selected', true);
         } else {
-            $("#id_%(name)s_2 option[value=]").attr('selected', true);
+            if ($("#id_%(name)s_2").length) {
+                $("#id_%(name)s_2 option[value=]").attr('selected', true);
+            }
         };
     };
     $("#id_%(name)s_0").change(function(){
