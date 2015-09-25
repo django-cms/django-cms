@@ -48,6 +48,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.edit_mode = None
         self.edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         self.edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        self.build_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
         self.disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
         self.build_mode = None
         self.use_draft = None
