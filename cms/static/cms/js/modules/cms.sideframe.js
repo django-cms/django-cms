@@ -128,6 +128,8 @@ var CMS = window.CMS || {};
                 var page_id = 'page_id=' + CMS.config.request.page_id;
                 var params = [];
                 var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                var currentWidth = this.ui.sideframe.outerWidth();
+                var isFrameVisible = this.ui.sideframe.is(':visible');
 
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();
@@ -149,17 +151,22 @@ var CMS = window.CMS || {};
                     }
                 }
 
-                url = this._url(url, params);
+                url = this.makeURL(url, params);
 
                 // load the iframe
                 this._content(url);
 
                 // cancel animation if sideframe is already shown
-                if (this.ui.sideframe.is(':visible') && this.ui.sideframe.outerWidth() < width) {
+                if (isFrameVisible && currentWidth < width) {
                     // The user has performed an action that requires the
                     // sideframe to be shown, this intent outweighs any
                     // previous intent to minimize the frame.
                     this.settings.sideframe.hidden = false;
+                }
+
+                if (isFrameVisible && Math.round(currentWidth) === Math.round(width)) {
+                    // Math.round because subpixel values
+                    animate = false;
                 }
 
                 // show iframe
@@ -367,63 +374,7 @@ var CMS = window.CMS || {};
                     .off(this.pointerUp)
                     .off(this.pointerMove)
                     .removeAttr('data-touch-action');
-            },
-
-            // FIXME: this should be replaced with a utility method
-            _url: function _url(url, params) {
-                var arr = [];
-                var keys = [];
-                var values = [];
-                var tmp = '';
-                var urlArray = [];
-                var urlParams = [];
-                var origin = url;
-
-                // return url if there is no param
-                if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
-                    // setup local vars
-                    urlArray = url.split('?');
-                    urlParams = urlArray[1].split('&');
-                    origin = urlArray[0];
-                }
-
-                // loop through the available params
-                $.each(urlParams, function (index, param) {
-                    arr.push({
-                        param: param.split('=')[0],
-                        value: param.split('=')[1]
-                    });
-                });
-                // loop through the new params
-                $.each(params, function (index, param) {
-                    arr.push({
-                        param: param.split('=')[0],
-                        value: param.split('=')[1]
-                    });
-                });
-
-                // merge manually because jquery...
-                $.each(arr, function (index, item) {
-                    var i = $.inArray(item.param, keys);
-
-                    if (i === -1) {
-                        keys.push(item.param);
-                        values.push(item.value);
-                    } else {
-                        values[i] = item.value;
-                    }
-                });
-
-                // merge new url
-                $.each(keys, function (index, key) {
-                    tmp += '&' + key + '=' + values[index];
-                });
-                tmp = tmp.replace('&', '?');
-                url = origin + tmp;
-
-                return url;
             }
-
         });
 
     });

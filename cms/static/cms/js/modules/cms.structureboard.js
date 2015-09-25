@@ -407,7 +407,7 @@
                         });
                     },
 
-                    stop: function (event, ui) {
+                    beforeStop: function (event, ui) {
                         that.dragging = false;
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                         that.ui.doc.off('keyup.cms.interrupt');
@@ -422,6 +422,12 @@
                         var newPluginContainer = ui.item.closest('.cms-draggables');
                         if (!originalPluginContainer.is(newPluginContainer)) {
                             actualizePluginsCollapsibleStatus(newPluginContainer.add(originalPluginContainer));
+                        } else {
+                            // if we moved inside same container,
+                            // but event is fired on a parent, discard update
+                            if (!newPluginContainer.is(this)) {
+                                return false;
+                            }
                         }
 
                         // we pass the id to the updater which checks within the backend the correct place
