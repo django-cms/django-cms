@@ -283,7 +283,7 @@ var CMS = window.CMS || {};
 
                 // setup toolbar visibility, we need to reverse the options to set the correct state
                 if (this.settings.toolbar === 'expanded') {
-                    this.open();
+                    this.open({ duration: 0 });
                 } else {
                     this.close();
                 }
@@ -317,7 +317,7 @@ var CMS = window.CMS || {};
 
                 // enforce open state if user is not logged in but requests the toolbar
                 if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
-                    this.open();
+                    this.open({ duration: 0 });
                     this.settings = this.setSettings(CMS.config.settings);
                 }
 
@@ -368,9 +368,11 @@ var CMS = window.CMS || {};
              * Opens the toolbar (slide down).
              *
              * @method open
+             * @param [opts] {Object}
+             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
              */
-            open: function open() {
-                this._show();
+            open: function open(opts) {
+                this._show(opts);
 
                 // set new settings
                 this.settings.toolbar = 'expanded';
@@ -382,9 +384,11 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
+             * @param [opts] {Object}
+             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
              */
-            _show: function _show() {
-                var speed = this.options.toolbarDuration;
+            _show: function _show(opts) {
+                var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
                 var debugHeight = $('.cms-debug-bar').height() || 0;
                 var toolbarHeight = $('.cms-toolbar').height() + 10;
 
