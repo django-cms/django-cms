@@ -445,7 +445,7 @@ var CMS = window.CMS || {};
              * @deprecated this will be moved to `cms.messages.js`
              * @param opts
              * @param opts.message {String|HTMLNode} message to be displayed
-             * @param [opts.dir=center] {String} direction to be displayed `center` `left` or `right`
+             * @param [opts.dir='center'] {String} direction to be displayed `center` `left` or `right`
              * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed
              * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
              */
@@ -457,9 +457,9 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 var msg = opts.message;
-                var dir = opts.dir || 'center';
-                var delay = opts.delay || this.options.messageDelay;
-                var error = opts.error || false;
+                var dir = opts.dir === undefined ? 'center' : opts.dir;
+                var delay = opts.delay === undefined ? this.options.messageDelay : opts.delay;
+                var error = opts.error === undefined ? false : opts.error;
 
                 var width = 320;
                 var height = this.ui.messages.outerHeight(true);
@@ -474,9 +474,6 @@ var CMS = window.CMS || {};
                 if (error) {
                     this.ui.messages.addClass('cms-messages-error');
                 }
-
-                // set toolbar freeze
-                this._lock(true);
 
                 // clear timeout
                 clearTimeout(this.timer);
@@ -542,13 +539,11 @@ var CMS = window.CMS || {};
             /**
              * Closes the message window underneath the toolbar.
              *
-             * @method open
+             * @method closeMessage
              * @deprecated this will be moved to `cms.messages.js`
              */
             closeMessage: function closeMessage() {
                 this.ui.messages.fadeOut(this.options.toolbarDuration);
-                // unlock toolbar
-                this._lock(false);
             },
 
             /**
