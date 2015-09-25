@@ -134,7 +134,7 @@
              * @param [opts.structure] {Boolean} go into structure mode
              * @param [opts.edit] {Boolean} go into edit (content) mode
              */
-            _setURL:  (window.history && 'pushState' in window.history) ? function _setURL(opts) {
+            _setURL: (window.history && 'pushState' in window.history) ? function _setURL(opts) {
                 var addParams = [];
                 var removeParams = [];
                 var modeToUrl = {
