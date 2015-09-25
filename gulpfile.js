@@ -54,6 +54,7 @@ var PROJECT_PATTERNS = {
 var JS_BUNDLES = {
     'bundle.admin.base.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
+        PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/modules/cms.base.js'
     ],
@@ -69,7 +70,9 @@ var JS_BUNDLES = {
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
+        PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.touchpunch.js',
         PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
         PROJECT_PATH.js + '/modules/cms.base.js',
         PROJECT_PATH.js + '/modules/jquery.transition.js',
@@ -140,13 +143,9 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
     gulp.task('bundle:' + bundleName, function () {
         return gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
-            .pipe(uglify({
-                preserveComments: 'some',
-                compress: {
-                    drop_console: !options.debug,
-                    drop_debugger: !options.debug
-                }
-            }))
+            .pipe(gulpif(!options.debug, uglify({
+                preserveComments: 'some'
+            })))
             .pipe(concat(bundleName, {
                 newLine: '\n'
             }))

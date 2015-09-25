@@ -8,16 +8,18 @@
     width: 100%;
 
     .cms-toolbar {
-        display: none;
+        margin-top: -$toolbar-height - 10px;
+        .cms-toolbar-expanded & {
+            margin-top: 0px;
+        }
         position: fixed;
         top: 0;
         left: 0;
         z-index: z(toolbar, base);
         width: 100%;
-        height: $toolbar-height;
-        border-bottom: 1px solid $gray !important;
+        min-height: $toolbar-height;
+        border-bottom: 1px solid $toolbar-border !important;
         background-color: $white;
-        background-image: linear-gradient($gradient-toolbar);
         box-shadow: $toolbar-shadow;
 
         .cms-toolbar-left {
@@ -43,9 +45,6 @@
         // items
         .cms-toolbar-item {
             float: left;
-        }
-        .cms-toolbar-item-buttons a {
-            border-bottom: none !important;
         }
     }
 
@@ -170,7 +169,6 @@
             > a {
                 color: $toolbar-menu-item-hover-color !important;
                 background: $toolbar-menu-item-hover-bgcolor;
-                background: linear-gradient($toolbar-menu-item-hover-bggradient);
             }
 
             // add active style
@@ -258,7 +256,7 @@
             float: right;
             position: relative;
             width: $messages-close-area-size;
-            height: $messages-close-area-size;
+            height: $messages-line-height;
             text-align: right;
             span {
                 font-size: $messages-close-icon-size;
@@ -330,30 +328,11 @@
             }
         }
         input[type="submit"] {
-            color: $login-form-submit-color;
             font-size: $login-form-input-font-size - 1px;
             text-transform: uppercase;
-            height: $login-form-input-height;
+            height: $login-form-input-height - 2px;
+            line-height: $login-form-input-height - 2px;
             padding: 0px $login-form-submit-padding-horizontal;
-            border: 1px solid $btn-active-border;
-            border-bottom: none;
-            border-radius: $login-form-input-border-radius;
-            cursor: pointer;
-            background-color: $btn-active-bgcolor;
-            background-image: linear-gradient($btn-active-bggradient);
-            box-shadow: $btn-default-shadow;
-
-            &:hover,
-            &:active,
-            &:focus {
-                background: $btn-active-bgcolor;
-                border: 1px solid $btn-active-border;
-                border-bottom: none;
-            }
-            &:active,
-            &:focus {
-                background: darken($btn-active-bgcolor, 10%);
-            }
         }
 
         .cms-error {
@@ -393,17 +372,17 @@
         top: 0;
         right: 0;
         z-index: z(toolbar-trigger);
-        border-bottom: 1px solid $gray;
-        border-left: 1px solid $gray;
+        border-bottom: 1px solid $toolbar-border;
+        border-left: 1px solid $toolbar-border;
 
         a {
             display: block;
             width: $toolbar-trigger-width;
-            height: $toolbar-trigger-height - 1px;
+            height: $toolbar-trigger-height;
             text-align: center;
             border-top: 1px solid $white;
             border-left: 1px solid $white;
-            background: $gray-lightest;
+            background: $white;
             &:hover {
                 background: $white;
             }

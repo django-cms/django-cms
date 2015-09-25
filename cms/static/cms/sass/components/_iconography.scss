@@ -27,53 +27,62 @@
 @function icon-char($filename) {
     $char: "";
 
-    @if $filename == arrow-wide {
+    @if $filename == alias {
         $char: "E001";
     }
-    @if $filename == arrow {
+    @if $filename == arrow-wide {
         $char: "E002";
     }
-    @if $filename == bin {
+    @if $filename == arrow {
         $char: "E003";
     }
-    @if $filename == close {
+    @if $filename == bin {
         $char: "E004";
     }
-    @if $filename == copy {
+    @if $filename == close {
         $char: "E005";
     }
-    @if $filename == handler {
+    @if $filename == copy {
         $char: "E006";
     }
-    @if $filename == home {
+    @if $filename == handler {
         $char: "E007";
     }
-    @if $filename == loader {
+    @if $filename == home {
         $char: "E008";
     }
-    @if $filename == logo {
+    @if $filename == loader {
         $char: "E009";
     }
-    @if $filename == menu {
+    @if $filename == lock {
         $char: "E00A";
     }
-    @if $filename == minus {
+    @if $filename == logo {
         $char: "E00B";
     }
-    @if $filename == pencil {
+    @if $filename == menu {
         $char: "E00C";
     }
-    @if $filename == plus {
+    @if $filename == minus {
         $char: "E00D";
     }
-    @if $filename == scissors {
+    @if $filename == pencil {
         $char: "E00E";
     }
-    @if $filename == search {
+    @if $filename == pin {
         $char: "E00F";
     }
-    @if $filename == window {
+    @if $filename == plus {
         $char: "E010";
+    }
+    @if $filename == scissors {
+        $char: "E011";
+    }
+    @if $filename == search {
+        $char: "E012";
+    }
+    @if $filename == window {
+        $char: "E013";
     }
 
     @return $char;
@@ -92,6 +101,10 @@
 // #ICONS:start#
 // use unicode characters for accessibility reasons and use aria-hidden="true" for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
+
+.cms-icon-alias {
+    @include icon(alias);
+}
 
 .cms-icon-arrow-wide {
     @include icon(arrow-wide);
@@ -125,6 +138,10 @@
     @include icon(loader);
 }
 
+.cms-icon-lock {
+    @include icon(lock);
+}
+
 .cms-icon-logo {
     @include icon(logo);
 }
@@ -139,6 +156,10 @@
 
 .cms-icon-pencil {
     @include icon(pencil);
+}
+
+.cms-icon-pin {
+    @include icon(pin);
 }
 
 .cms-icon-plus {

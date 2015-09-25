@@ -317,7 +317,7 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         Test for leaking Django 1.7 Model._meta.db_table monkeypatching
         on sqlite See #3891
         This test for a side-effect of the above which prevents placeholder
-        fields to return the 
+        fields to return the
         """
         example = Category.objects.create(
             name='category',
@@ -630,15 +630,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             for placeholder in page.placeholders.all():
                 self.assertContains(
-                    response, "'placeholder_id': '%s'" % placeholder.pk)
+                    response, "placeholder_id: '%s'" % placeholder.pk)
                 self.assertNotContains(
-                    response, "'placeholder_id': '%s'" % format(
+                    response, "placeholder_id: '%s'" % format(
                         placeholder.pk, ".", grouping=3, thousand_sep=","))
                 self.assertNotContains(
-                    response, "'plugin_id': '%s'" % format(
+                    response, "plugin_id: '%s'" % format(
                         placeholder.pk, ".", grouping=3, thousand_sep=","))
                 self.assertNotContains(
-                    response, "'clipboard': '%s'" % format(
+                    response, "clipboard: '%s'" % format(
                         response.context['request'].toolbar.clipboard.pk, ".",
                         grouping=3, thousand_sep=","))
 
@@ -1215,8 +1215,8 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
         """
         checks all combinations of plugin, app and object permission for all
         available actions (add, delete, change)
-        
-        * `itertools.product(*[[False, True]]*3)` is an iterable of all combinations available 
+
+        * `itertools.product(*[[False, True]]*3)` is an iterable of all combinations available
            with 3 booleans. e.g : `(True, True, True)`, `(True, True, False)`,  etc.
         * `Text` is the CMSPlugin Model from djangocms_text_ckeditor
         * `Exemple1` is the Model from placeholderapp test app
@@ -1232,14 +1232,14 @@ class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
 
         ## Testing performance issue
 
-        This method could tests the 2^3^3 = 512 perms combinations: 
+        This method could tests the 2^3^3 = 512 perms combinations:
           True/False combinations (2)
-          on Plugin, Model and instance (^3) 
+          on Plugin, Model and instance (^3)
           for add, change and delete perms (^3)
         but we remove some unuseful tests :
-          * when user has not perm on Plugin, we only test the most permissive case : when he has 
+          * when user has not perm on Plugin, we only test the most permissive case : when he has
             perms on instance AND model. (nb tests is now (2^3 - (2^2-1))^3 = 125)
-          * as adding perm on an instance is currently the same than adding perm to the model, 
+          * as adding perm on an instance is currently the same than adding perm to the model,
             we don't test case of instance perms. (nb tests is now (2^(3-1) - (2^(2-1)-1))^3 = 27)
         """
         self._create_example()

@@ -19,7 +19,16 @@ window.Class = window.Class || undefined;
 var CMS = {
     $: (typeof window.jQuery === 'function') ? window.jQuery : undefined,
     Class: (typeof window.Class === 'function') ? window.Class : undefined,
-    API: {}
+    API: {},
+    KEYS: {
+        SHIFT: 16,
+        TAB: 9,
+        UP: 38,
+        DOWN: 40,
+        ENTER: 13,
+        SPACE: 32,
+        ESC: 27
+    }
 };
 
 //##################################################################################################################
@@ -55,7 +64,7 @@ var CMS = {
                             if (response === '' && !url) {
                                 // cancel if response is empty
                                 return false;
-                            } else if (parent.location.pathname !== response) {
+                            } else if (parent.location.pathname !== response && response !== '') {
                                 // api call to the backend to check if the current path is still the same
                                 that.reloadBrowser(response);
                             } else if (url === 'REFRESH_PAGE') {
@@ -90,7 +99,7 @@ var CMS = {
                 var forms = $('#cms-toolbar').find('form');
                 forms.submit(function () {
                     // show loader
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                     // we cannot use disabled as the name action will be ignored
                     $('input[type="submit"]').bind('click', function (e) {
                         e.preventDefault();
@@ -158,7 +167,7 @@ var CMS = {
                 settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
                 // set loader
                 if (CMS.API.Toolbar) {
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                 }
 
                 // use local storage or session
@@ -166,7 +175,7 @@ var CMS = {
                     // save within local storage
                     localStorage.setItem('cms_cookie', settings);
                     if (CMS.API.Toolbar) {
-                        CMS.API.Toolbar._loader(false);
+                        CMS.API.Toolbar.hideLoader();
                     }
                 } else {
                     // save within session
@@ -185,11 +194,14 @@ var CMS = {
                             // determine if logged in or not
                             settings = (data) ? JSON.parse(data) : CMS.config.settings;
                             if (CMS.API.Toolbar) {
-                                CMS.API.Toolbar._loader(false);
+                                CMS.API.Toolbar.hideLoader();
                             }
                         },
                         error: function (jqXHR) {
-                            that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 }
@@ -206,7 +218,7 @@ var CMS = {
                 var settings;
                 // set loader
                 if (CMS.API.Toolbar) {
-                    CMS.API.Toolbar._loader(true);
+                    CMS.API.Toolbar.showLoader();
                 }
 
                 // use local storage or session
@@ -214,7 +226,7 @@ var CMS = {
                     // get from local storage
                     settings = JSON.parse(localStorage.getItem('cms_cookie'));
                     if (CMS.API.Toolbar) {
-                        CMS.API.Toolbar._loader(false);
+                        CMS.API.Toolbar.hideLoader();
                     }
                 } else {
                     CMS.API.locked = true;
@@ -228,11 +240,14 @@ var CMS = {
                             // determine if logged in or not
                             settings = (data) ? JSON.parse(data) : CMS.config.settings;
                             if (CMS.API.Toolbar) {
-                                CMS.API.Toolbar._loader(false);
+                                CMS.API.Toolbar.hideLoader();
                             }
                         },
                         error: function (jqXHR) {
-                            that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                            that.openMessage({
+                                message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                                error: true
+                            });
                         }
                     });
                 }
@@ -246,8 +261,71 @@ var CMS = {
 
                 // ensure new settings are returned
                 return CMS.settings;
-            }
+            },
 
+            /**
+             * Modifies the url with new params and sanitises the ampersand within the url for #3404.
+             *
+             * @method makeURL
+             * @param url {String} original url
+             * @param [params] {String[]} array of `param=value` strings to update the url
+             */
+            makeURL: function makeURL(url, params) {
+                var arr = [];
+                var keys = [];
+                var values = [];
+                var tmp = '';
+                var urlArray = [];
+                var urlParams = [];
+                var origin = url;
+
+                // return url if there is no param
+                if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
+                    // setup local vars
+                    urlArray = url.split('?');
+                    urlParams = urlArray[1].split('&');
+                    origin = urlArray[0];
+                }
+
+                // loop through the available params
+                $.each(urlParams, function (index, param) {
+                    arr.push({
+                        param: param.split('=')[0],
+                        value: param.split('=')[1]
+                    });
+                });
+                // loop through the new params
+                if (params && params.length) {
+                    $.each(params, function (index, param) {
+                        arr.push({
+                            param: param.split('=')[0],
+                            value: param.split('=')[1]
+                        });
+                    });
+                }
+
+                // merge manually because jquery...
+                $.each(arr, function (index, item) {
+                    var i = $.inArray(item.param, keys);
+
+                    if (i === -1) {
+                        keys.push(item.param);
+                        values.push(item.value);
+                    } else {
+                        values[i] = item.value;
+                    }
+                });
+
+                // merge new url
+                $.each(keys, function (index, key) {
+                    tmp += '&' + key + '=' + values[index];
+                });
+                tmp = tmp.replace('&', '?');
+                url = origin + tmp;
+                url = url.replace('&', '&amp;');
+
+                return url;
+            }
         };
 
         // autoinits

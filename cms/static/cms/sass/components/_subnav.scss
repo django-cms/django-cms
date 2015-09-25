@@ -1,22 +1,63 @@
 //######################################################################################################################
 // #SUBNAV#
 #cms-toolbar {
-    .cms-submenu {
+    .cms-submenu-btn {
         @include icon(menu);
         display: block;
         position: absolute;
-        cursor: pointer;
-        right: 0px;
+        right: $submenu-right;
         width: $submenu-icon-area-size;
-        height: 100%;
+        height: $submenu-icon-area-size;
+        cursor: pointer;
+        top: 50%;
+        margin-top: -($submenu-icon-area-size / 2);
         &:before {
             @extend %icon;
             position: absolute;
-            right: 0;
+            left: 50%;
             top: 50%;
+            margin-left: -($submenu-icon-size / 2);
             margin-top: -($submenu-icon-size / 2);
             font-size: $submenu-icon-size;
             color: $submenu-icon-color;
+        }
+
+        .cms-hover-tooltip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+    }
+    .cms-dragbar .cms-submenu-btn {
+        margin-right: 2px;
+        background-color: transparent;
+        &:active,
+        &.cms-btn-active {
+            background-color: darken($btn-default-bgcolor, 10%);
+        }
+    }
+    .cms-submenu-settings {
+        border: none;
+    }
+
+    .cms-submenu-edit {
+        @include icon(pencil);
+        right: $submenu-right * 3 + $submenu-icon-area-size * 2;
+    }
+    .cms-submenu-add {
+        @include icon(plus);
+        right: $submenu-right * 2 + $submenu-icon-area-size;
+    }
+    .cms-submenu-edit,
+    .cms-submenu-add {
+        &:before {
+            $icon-size: $submenu-icon-size - 3px;
+            font-size: $icon-size;
+            margin-left: -($icon-size / 2);
+            margin-top: -($icon-size / 2);
+            font-size: $icon-size;
         }
     }
 
@@ -25,132 +66,123 @@
         top: 50%;
         height: $line-height-normal;
         margin-top: -($line-height-normal / 2);
-        line-height: $line-height-normal;
-        right: 3px;
+        line-height: $line-height-normal - 2px;
+        right: 10px;
         padding: 0 5px;
         border: 1px solid $gray-lighter;
         border-radius: $border-radius-base;
-        background: $white;
     }
 
-    .cms-submenu-dropdown {
+    .cms-submenu-dropdown-top {
+        top: $structure-dragbar-height + $structure-dragarea-space;
+    }
+    .cms-submenu-dropdown-bottom {
+        bottom: $structure-dragbar-height + $structure-dragarea-space;
+    }
+    .cms-submenu-dropdown-children {
+        right: $submenu-icon-area-size * 2 + $submenu-right * 3;
+    }
+
+    // TODO this will be cms-submenu-dropdown (or rather cms-dropdown) in future
+    .cms-submenu-dropdown-settings {
         display: none;
         position: absolute;
-        top: $structure-dragbar-height + $structure-dragarea-space;
-        right: 0;
-        overflow: auto;
         z-index: z(structure, content, dropdown);
-        min-width: $submenu-dropdown-width;
-        max-height: $submenu-dropdown-height;
-        border: 1px solid $gray-lighter;
+        min-width: $dropdown-width;
         background: $submenu-dropdown-bgcolor;
-
-        // force scrollbars on subnav menu
-        // not yet working on firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=77790
-        &::-webkit-scrollbar {
-            width: 7px;
-            background: $gray-lighter;
-
-            -webkit-appearance: none;
-        }
-        &::-webkit-scrollbar-thumb {
-            border-left: 1px solid $gray-lighter;
-            background-color: $gray-darker;
-        }
+        border-radius: $border-radius-normal;
+        box-shadow: $dropdown-shadow;
+        right: $submenu-right * 2 + $submenu-icon-area-size;
+        transform: translateZ(0);
 
         .cms-submenu-item {
-            zoom: 1;
-        }
-        .cms-submenu-item a,
-        span {
-            display: block;
-            font-size: $submenu-item-font-size;
-            line-height: $submenu-item-height;
-            min-height: $submenu-item-height;
-            text-align: left;
-            padding: 0px $submenu-item-padding-horizontal;
-        }
-
-        .cms-submenu-item a {
-            color: $submenu-item-color;
-            &:hover,
-            &:focus {
-                color: $submenu-item-hover-color;
-                background: adjust-hue($color-primary, 15deg);
-                background: linear-gradient($btn-action-bggradient);
+            a {
+                position: relative;
+                display: block;
+                font-size: $submenu-item-font-size;
+                text-align: left;
+                padding: 0px $submenu-item-padding-horizontal;
+                line-height: $dropdown-item-height;
+                min-height: $dropdown-item-height;
+                padding-left: $dropdown-item-icon-space;
+                color: $submenu-item-color;
+                &:hover,
+                &:focus {
+                    color: $submenu-item-hover-color;
+                    background: $color-primary;
+                }
+                &[data-rel],
+                &[data-icon] {
+                    &:before {
+                        @extend %icon;
+                        position: absolute;
+                        left: $dropdown-item-icon-position;
+                        top: 0;
+                        height: $dropdown-item-height;
+                        line-height: $dropdown-item-height
+                    }
+                }
+                &[data-icon=copy] {
+                    @include icon(copy);
+                }
+                &[data-icon=scissors] {
+                    @include icon(scissors);
+                }
+                &[data-icon=bin] {
+                    @include icon(bin);
+                }
+                &[href*=alias_plugin] {
+                    @include icon(alias);
+                }
             }
-            &:first-child {
-                border-top: none;
-            }
         }
-        .cms-submenu-item span {
-            color: $submenu-item-color;
-            font-weight: bold;
-            border-top: 1px solid $gray-light;
-            border-bottom: 1px solid $gray-lighter;
-            cursor: default;
-        }
-        .cms-submenu-item:first-child span {
-            border-top: none;
-        }
-    }
-
-    .cms-submenu-quicksearch {
-        $quicksearch-height: $structure-dragbar-height + $structure-draggable-space + $structure-dragarea-padding;
-        @include icon(search);
-        cursor: default;
-        display: none;
-        position: absolute;
-        top: 50%;
-        right: -$structure-dragarea-padding;
-        z-index: z(structure, content, quicksearch);
-        text-align: right;
-        height: $quicksearch-height;
-        margin-top: -($quicksearch-height / 2);
-        border-radius: $border-radius-base + 1px;
-        background: $gray-darker;
-
         &:before {
-            @extend %icon;
+            z-index: z(below);
             position: absolute;
-            right: $structure-dragarea-padding;
-            top: 50%;
-            margin-top: -($submenu-quicksearch-icon-size / 2);
-            font-size: $submenu-quicksearch-icon-size;
-            color: white;
+            content: '';
+            left: 100%;
+            width: $dropdown-arrow-side;
+            height: $dropdown-arrow-side;
+            margin-left: -($dropdown-arrow-side / 2);
+            transform: rotate(45deg);
+            background-color: $submenu-dropdown-bgcolor;
+            box-shadow: $dropdown-shadow;
+        }
+
+        &.cms-submenu-dropdown-top {
+            // TODO importants can be removed
+            // after new "add plugin" is in place
+            top: 0 !important;
+            &:before {
+                top: $dropdown-arrow-position !important;
+            }
+        }
+        &.cms-submenu-dropdown-bottom {
+            bottom: 0 !important;
+            &:before {
+                bottom: $dropdown-arrow-position !important;
+            }
+        }
+
+        .cms-dropdown-inner {
+            z-index: 1;
+            background-color: white;
+            overflow: hidden;
+            border-radius: $border-radius-normal;
+        }
+
+    }
+    .cms-dragbar .cms-submenu-dropdown-settings {
+        &.cms-submenu-dropdown-top:before {
+            top: $dropdown-arrow-position - 4px !important;
+        }
+        &.cms-submenu-dropdown-bottom:before {
+            bottom: 12px !important;
+            bottom: $dropdown-arrow-position - 4px !important;
         }
     }
-    .cms-submenu-quicksearch label {
-        cursor: pointer;
-        height: 100%;
-    }
-    .cms-submenu-quicksearch input {
-        display: block;
-        color: white;
-        font-size: $submenu-quicksearch-input-font-size;
-        line-height: $submenu-quicksearch-input-line-height;
-        text-align: right;
-        width: $submenu-quicksearch-input-width;
-        height: 100%;
-        margin-right: $submenu-quicksearch-padding;
-        padding: 0px 1px;
-        border: none;
-        background: none;
-        -webkit-appearance: none;
-    }
 
-    // scrollhint
-    .cms-submenu-scroll-hint {
-        display: none;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        color: $gray-light;
-        font-size: $submenu-item-font-size;
-        line-height: $submenu-item-height;
-        height: $submenu-item-height;
-        text-align: center;
-        width: 100%;
-        background-color: $gray-lighter;
+    .cms-z-index-9999 {
+        z-index: 9999 !important;
     }
 }

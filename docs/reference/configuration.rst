@@ -955,16 +955,16 @@ CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
 =================================
 
 default:
-    ``False``
+    ``True``
 
 Enable or disable the absolute positioning within the structure board.
 
-By default the absolute positioned board is activated. Setting this attribute
-to ``False`` will prevent the absolute positioning and order the placeholders
-beneath each other. Static placeholders have a visual gap in the simple mode.
+By default the absolute positioned board is deactivated. Setting this attribute
+to ``False`` will allow the absolute positioning used in versions prior to 3.2.
+This setting will be removed in 3.3.
 
 
 Example::
 
-    CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = True
+    CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 

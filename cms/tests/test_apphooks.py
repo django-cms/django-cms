@@ -41,7 +41,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
             del sys.modules[APP_MODULE]
 
         self.reload_urls()
-        apphook_pool.clear()
+        self.apphook_clear()
 
     def tearDown(self):
         clear_app_resolvers()
@@ -51,7 +51,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
             del sys.modules[APP_MODULE]
 
         self.reload_urls()
-        apphook_pool.clear()
+        self.apphook_clear()
 
     def reload_urls(self):
         from django.conf import settings
@@ -88,7 +88,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         session.save()
 
     def create_base_structure(self, apphook, title_langs, namespace=None):
-        apphook_pool.clear()
+        self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
         page = create_page("home", "nav_playground.html", "en",
@@ -121,12 +121,12 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
         """
-        apphook_pool.clear()
+        self.apphook_clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
         self.assertEqual(len(hooks), 1)
         self.assertEqual(app_names, [APP_NAME])
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(
         INSTALLED_APPS=['cms.test_utils.project.sampleapp'],
@@ -136,16 +136,16 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         """
         Test implicit apphook loading with INSTALLED_APPS cms_apps.py
         """
-        apphook_pool.clear()
+        self.apphook_clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
         self.assertEqual(len(hooks), 6)
         self.assertIn(NS_APP_NAME, app_names)
         self.assertIn(APP_NAME, app_names)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     def test_apphook_on_root(self):
-        apphook_pool.clear()
+        self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("apphooked-page", "nav_playground.html", "en",
                            created_by=superuser, published=True, apphook="SampleApp")
@@ -164,11 +164,11 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         response = self.client.get('/en/blankapp/')
         self.assertTemplateUsed(response, 'nav_playground.html')
 
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
     def test_apphook_on_root_reverse(self):
-        apphook_pool.clear()
+        self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("apphooked-page", "nav_playground.html", "en",
                            created_by=superuser, published=True, apphook="SampleApp")
@@ -179,7 +179,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         self.reload_urls()
 
         self.assertFalse(reverse('sample-settings').startswith('//'))
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_page_for_apphook(self):
@@ -208,7 +208,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'sampleapp/home.html')
         self.assertContains(response, de_title.title)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_permissions(self):
@@ -227,7 +227,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
 
         response = self.client.get(path)
         self.assertEqual(response.status_code, 302)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_apphook_permissions_preserves_view_name(self):
@@ -261,7 +261,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         not_excluded_response = self.client.get(not_excluded_path)
         self.assertEqual(excluded_response.status_code, 200)
         self.assertEqual(not_excluded_response.status_code, 302)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_3')
     def test_get_page_for_apphook_on_preview_or_edit(self):
@@ -311,7 +311,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
 
         attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
         self.assertEqual(attached_to_page.pk, en_title.page.pk)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_child_page_for_apphook_with_instance_namespace(self):
@@ -327,7 +327,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         request.LANGUAGE_CODE = 'en'
         attached_to_page = applications_page_check(request, path=path[1:])  # strip leading slash
         self.assertEqual(attached_to_page.pk, en_title.page_id)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_sub_page_for_apphook_with_implicit_current_app(self):
@@ -345,7 +345,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         self.assertTemplateUsed(response, 'sampleapp/app.html')
         self.assertContains(response, 'namespaced_app_ns')
         self.assertContains(response, path)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_default_language_changer_with_implicit_current_app(self):
@@ -361,7 +361,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
 
         url = DefaultLanguageChanger(request)('de')
         self.assertEqual(url, '/de%s' % path[3:].replace('/page', '/Seite'))
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_get_i18n_apphook_with_explicit_current_app(self):
@@ -423,7 +423,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         self.assertTemplateUsed(response, 'sampleapp/app.html')
         self.assertContains(response, 'instance_ns')
         self.assertContains(response, path)
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_include_urlconf(self):
@@ -453,7 +453,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         self.assertTemplateUsed(response, 'sampleapp/extra.html')
         self.assertContains(response, "test included urlconf")
 
-        apphook_pool.clear()
+        self.apphook_clear()
 
     @override_settings(CMS_PERMISSION=False, ROOT_URLCONF='cms.test_utils.project.urls_2')
     def test_apphook_breaking_under_home_with_new_path_caching(self):
@@ -494,7 +494,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
     @override_settings(ROOT_URLCONF='cms.test_utils.project.third_urls_for_apphook_tests')
     def test_multiple_apphooks(self):
         # test for #1538
-        apphook_pool.clear()
+        self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
         create_page("apphook1-page", "nav_playground.html", "en",
@@ -504,7 +504,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
 
         reverse('sample-root')
         reverse('sample2-root')
-        apphook_pool.clear()
+        self.apphook_clear()
 
     def test_apphook_pool_register_returns_apphook(self):
         @apphook_pool.register
@@ -666,7 +666,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
     def test_nested_apphooks_urls(self):
         # make sure that urlparams actually reach the apphook views
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls'):
-            apphook_pool.clear()
+            self.apphook_clear()
 
             superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
             create_page("home", "nav_playground.html", "en", created_by=superuser, published=True, )
@@ -689,7 +689,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
             response = self.client.get(child_app_path)
             self.assertContains(response, 'child app content', status_code=200)
 
-            apphook_pool.clear()
+            self.apphook_clear()
 
 
 class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
@@ -707,7 +707,7 @@ class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
 
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
-        apphook_pool.clear()
+        self.apphook_clear()
 
     def reload_urls(self):
         from django.conf import settings
@@ -727,7 +727,7 @@ class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
 
     def test_page_language_url_for_apphook(self):
 
-        apphook_pool.clear()
+        self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser)
@@ -773,4 +773,4 @@ class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
         url = output['content']
         self.assertEqual(url, '/fr/child_page/child_child_page/extra_1/')
 
-        apphook_pool.clear()
+        self.apphook_clear()
