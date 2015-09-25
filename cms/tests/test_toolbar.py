@@ -1240,7 +1240,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
-        self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
+        self.assertContains(response, '<a href="%s">successful if</a>\n    \n</div>' % (reverse('detail', args=(ex1.pk,))))
 
         # This template is rendered directly
         template_text = '''{% extends "base.html" %}
@@ -1266,7 +1266,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 'placeholderapp', 'example1', ex1.pk))
         self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
-        self.assertContains(response, '<a href="%s">successful if</a></div>' % (reverse('detail', args=(ex1.pk,))))
+        self.assertContains(response, '<a href="%s">successful if</a>\n    \n</div>' % (reverse('detail', args=(ex1.pk,))))
 
         # Changelist check
         template_text = '''{% extends "base.html" %}
@@ -1671,7 +1671,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 page.pk, page.get_title(language)))
         self.assertContains(
             response,
-            '<div class="cms-plugin cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block"><h3>Menu</h3></div>' % page.pk)
+            '<div class="cms-plugin cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block">\n        <h3>Menu</h3>' % page.pk)
         self.assertContains(
             response,
             "edit_plugin: '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('cms_page_changelist'), language))

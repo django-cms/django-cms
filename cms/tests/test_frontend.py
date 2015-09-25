@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from distutils.version import LooseVersion
 import os
 import sys
 import time
@@ -8,6 +9,7 @@ try:
 except ImportError:
     from urlparse import urlparse
 
+import django
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
 from django.contrib.auth.models import Permission
@@ -342,7 +344,7 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
+        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu-settings')
         submenu.click()
 
         submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
@@ -352,7 +354,7 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         # Done, check if the text plugin was copied and it is only one
 
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(1)')))
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-draggable:nth-child(2)')))
 
         italian_plugins = self.page.placeholders.all()[0].get_plugins_list('it')
         self.assertEqual(len(italian_plugins), 1)
@@ -368,12 +370,12 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-        cms_draggable = self.driver.find_element_by_css_selector('.cms-draggable:nth-child(1)')
+        cms_draggable = self.driver.find_element_by_css_selector('.cms-dragarea-1 .cms-draggable')
 
         hov = ActionChains(self.driver).move_to_element(cms_draggable)
         hov.perform()
 
-        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
+        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu-settings')
         submenu.click()
 
         copy = cms_draggable.find_element_by_css_selector('.cms-submenu-dropdown a[data-rel="copy"]')
@@ -384,17 +386,15 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
 
-        hov = ActionChains(self.driver).move_to_element(clipboard)
-        hov.perform()
+        clipboard.find_element_by_css_selector('.cms-clipboard-numbers a:first-child').click()
 
         # necessary sleeps for making a "real" drag and drop, that works with the clipboard
-
-        time.sleep(0.1)
+        time.sleep(0.3)
 
         self.assertEqual(CMSPlugin.objects.count(), 2)
 
         drag = ActionChains(self.driver).click_and_hold(
-            clipboard.find_element_by_css_selector('.cms-draggable:nth-child(1)')
+            self.driver.find_element_by_css_selector('.cms-clipboard-containers .cms-draggable:nth-child(1)')
         )
 
         drag.perform()
@@ -472,6 +472,8 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.implicitly_wait(2)
         super(FrontAdminTest, self).setUp()
 
+    @unittest.skipIf(LooseVersion(django.get_version()) >= LooseVersion('1.7'),
+                     reason='test not supported in Django 1.7+')
     def test_cms_modal_html5_validation_error(self):
         User = get_user_model()
         try:
@@ -487,7 +489,7 @@ class FrontAdminTest(CMSLiveTests):
         create_page('apphook', 'simple.html', 'fr', published=True,
                     apphook=Example1App)
         url = '%s/%s/?%s' % (
-            self.live_server_url, 'apphook/detail/class/%s'
+            self.live_server_url, 'fr/apphook/detail/class/%s'
             % ex1.pk, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             )
         self.driver.get(url)
@@ -500,7 +502,7 @@ class FrontAdminTest(CMSLiveTests):
 
         # Load modal iframe
         add_button = self.driver.find_element_by_css_selector(
-            '.cms_plugin-placeholderapp-example1-add-0'
+            '.cms-plugin-placeholderapp-example1-add-0'
             )
         open_modal_actions = ActionChains(self.driver)
         open_modal_actions.double_click(add_button)
@@ -537,7 +539,7 @@ class FrontAdminTest(CMSLiveTests):
         self.driver.switch_to_default_content()
         submit_button = self.driver.find_element_by_css_selector('.default')
         submit_button.click()
-        time.sleep(0.5)
+        time.sleep(10)
         with self.assertRaises(NoSuchElementException):
             self.driver.find_element_by_css_selector('iframe')
         example = Example1.objects.get(char_1='test')

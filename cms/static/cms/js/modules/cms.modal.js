@@ -674,6 +674,15 @@ var CMS = window.CMS || {};
                 } else {
                     row = iframe.contents().find('.save-box:eq(0)');
                 }
+                var form = iframe.contents().find('form');
+                //avoids conflict between the browser's form validation and Django's validation
+                form.on('submit', function () {
+                    if (that.hideFrame) { // submit button was clicked
+                        that.ui.modal.find('.cms-modal-frame iframe').hide();
+                        // page has been saved, run checkup
+                        that.saved = true;
+                    }
+                });
                 var buttons = row.find('input, a, button');
 
                 // hide all submit-rows
@@ -715,12 +724,6 @@ var CMS = window.CMS || {};
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
                     el.on(that.click, function () {
-                        if (item.is('input') || item.is('button')) {
-                            // we need to use native `.click()` event specifically
-                            // as we are inside an iframe and magic is happening
-                            item[0].click();
-                        }
-
                         if (item.is('a')) {
                             that._loadIframe({
                                 url: item.prop('href'),
@@ -730,15 +733,21 @@ var CMS = window.CMS || {};
 
                         // trigger only when blue action buttons are triggered
                         if (item.hasClass('default') || item.hasClass('deletelink')) {
-                            // reset onClose when delete is triggered
-                            if (item.hasClass('deletelink')) {
-                                that.options.onClose = null;
+                            if (!item.hasClass('default')) { // hide iframe when using buttons other than submit
+                                that.ui.modal.find('.cms-modal-frame iframe').hide();
+                                // page has been saved or deleted, run checkup
+                                that.saved = true;
+                            } else { // submit button uses the form's submit event
+                                that.hideFrame = true;
                             }
-                            // hide iframe
-                            that.ui.frame.find('iframe').hide();
-                            // page has been saved or deleted, run checkup
-                            that.saved = true;
                         }
+
+                        if (item.is('input') || item.is('button')) {
+                            // we need to use native `.click()` event specifically
+                            // as we are inside an iframe and magic is happening
+                            item[0].click();
+                        }
+
                     });
                     el.wrap(group);
 
@@ -765,19 +774,6 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Sanitise the ampersand within the url for #3404.
-             *
-             * @method _prepareUrl
-             * @private
-             * @param url {String}
-             */
-            _prepareUrl: function _prepareUrl(url) {
-                // FIXME: A better fix is needed for '&' being interpreted as the
-                url = url.replace('&', '&amp;');
-                return url;
-            },
-
-            /**
              * Version where the modal loads an iframe.
              *
              * @method _loadIframe
@@ -789,7 +785,7 @@ var CMS = window.CMS || {};
             _loadIframe: function _loadIframe(opts) {
                 var that = this;
 
-                opts.url = this._prepareUrl(opts.url);
+                opts.url = this.makeURL(opts.url);
                 opts.title = opts.title || '';
                 opts.breadcrumbs = opts.breadcrumbs || '';
 
@@ -878,7 +874,11 @@ var CMS = window.CMS || {};
                     // when the window has been changed pressing the blue or red button, we need to run a reload check
                     // also check that no delete-confirmation is required
                     if (that.saved && !contents.find('.delete-confirmation').length) {
-                        that.reloadBrowser(window.location.href, false, true);
+                        that.reloadBrowser(
+                            that.options.onClose ? that.options.onClose : window.location.href,
+                            false,
+                            true
+                        );
                     } else {
                         iframe.show();
                         // set title of not provided
@@ -977,7 +977,7 @@ var CMS = window.CMS || {};
                 var data = CMS._newPlugin;
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
                 var text = this.config.lang.confirmEmpty.replace(
-                    '{1}', CMS._newPlugin.breadcrumb.pop().title
+                    '{1}', CMS._newPlugin.breadcrumb[CMS._newPlugin.breadcrumb.length - 1].title
                 );
 
                 // trigger an ajax request

@@ -64,7 +64,7 @@ var CMS = {
                             if (response === '' && !url) {
                                 // cancel if response is empty
                                 return false;
-                            } else if (parent.location.pathname !== response) {
+                            } else if (parent.location.pathname !== response && response !== '') {
                                 // api call to the backend to check if the current path is still the same
                                 that.reloadBrowser(response);
                             } else if (url === 'REFRESH_PAGE') {
@@ -261,8 +261,71 @@ var CMS = {
 
                 // ensure new settings are returned
                 return CMS.settings;
-            }
+            },
 
+            /**
+             * Modifies the url with new params and sanitises the ampersand within the url for #3404.
+             *
+             * @method makeURL
+             * @param url {String} original url
+             * @param [params] {String[]} array of `param=value` strings to update the url
+             */
+            makeURL: function makeURL(url, params) {
+                var arr = [];
+                var keys = [];
+                var values = [];
+                var tmp = '';
+                var urlArray = [];
+                var urlParams = [];
+                var origin = url;
+
+                // return url if there is no param
+                if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
+                    // setup local vars
+                    urlArray = url.split('?');
+                    urlParams = urlArray[1].split('&');
+                    origin = urlArray[0];
+                }
+
+                // loop through the available params
+                $.each(urlParams, function (index, param) {
+                    arr.push({
+                        param: param.split('=')[0],
+                        value: param.split('=')[1]
+                    });
+                });
+                // loop through the new params
+                if (params && params.length) {
+                    $.each(params, function (index, param) {
+                        arr.push({
+                            param: param.split('=')[0],
+                            value: param.split('=')[1]
+                        });
+                    });
+                }
+
+                // merge manually because jquery...
+                $.each(arr, function (index, item) {
+                    var i = $.inArray(item.param, keys);
+
+                    if (i === -1) {
+                        keys.push(item.param);
+                        values.push(item.value);
+                    } else {
+                        values[i] = item.value;
+                    }
+                });
+
+                // merge new url
+                $.each(keys, function (index, key) {
+                    tmp += '&' + key + '=' + values[index];
+                });
+                tmp = tmp.replace('&', '?');
+                url = origin + tmp;
+                url = url.replace('&', '&amp;');
+
+                return url;
+            }
         };
 
         // autoinits
