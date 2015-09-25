@@ -34,9 +34,9 @@ var PROJECT_PATH = {
 
 var PROJECT_PATTERNS = {
     js: [
-        PROJECT_PATH.js + '/components/*.js',
+        PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
-        '!' + PROJECT_PATH.js + '/components/jquery.ui.*.js',
+        '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
@@ -56,14 +56,14 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/libs/class.min.js',
-        PROJECT_PATH.js + '/components/cms.base.js'
+        PROJECT_PATH.js + '/modules/cms.base.js'
     ],
     'bundle.admin.changeform.min.js': [
-        PROJECT_PATH.js + '/components/cms.changeform.js'
+        PROJECT_PATH.js + '/modules/cms.changeform.js'
     ],
     'bundle.admin.changelist.min.js': [
-        PROJECT_PATH.js + '/components/jquery.ui.custom.js',
-        PROJECT_PATH.js + '/components/cms.changelist.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/cms.changelist.js',
         PROJECT_PATH.js + '/jstree/_lib/_all.js',
         PROJECT_PATH.js + '/jstree/tree_component.js'
     ],
@@ -71,17 +71,17 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
-        PROJECT_PATH.js + '/components/jquery.ui.custom.js',
-        PROJECT_PATH.js + '/components/jquery.ui.touchpunch.js',
-        PROJECT_PATH.js + '/components/jquery.ui.nestedsortable.js',
-        PROJECT_PATH.js + '/components/cms.base.js',
-        PROJECT_PATH.js + '/components/jquery.transition.js',
-        PROJECT_PATH.js + '/components/cms.modal.js',
-        PROJECT_PATH.js + '/components/cms.sideframe.js',
-        PROJECT_PATH.js + '/components/cms.clipboard.js',
-        PROJECT_PATH.js + '/components/cms.plugins.js',
-        PROJECT_PATH.js + '/components/cms.structureboard.js',
-        PROJECT_PATH.js + '/components/cms.toolbar.js'
+        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.touchpunch.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
+        PROJECT_PATH.js + '/modules/cms.base.js',
+        PROJECT_PATH.js + '/modules/jquery.transition.js',
+        PROJECT_PATH.js + '/modules/cms.modal.js',
+        PROJECT_PATH.js + '/modules/cms.sideframe.js',
+        PROJECT_PATH.js + '/modules/cms.clipboard.js',
+        PROJECT_PATH.js + '/modules/cms.plugins.js',
+        PROJECT_PATH.js + '/modules/cms.structureboard.js',
+        PROJECT_PATH.js + '/modules/cms.toolbar.js'
     ]
 };
 
