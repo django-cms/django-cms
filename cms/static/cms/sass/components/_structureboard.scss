@@ -338,6 +338,7 @@
             @extend %icon;
             position: absolute;
             top: 50%;
+            cursor: pointer;
             left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
             color: $submenu-icon-color;
             font-size: $structure-dragitem-icon-size;
