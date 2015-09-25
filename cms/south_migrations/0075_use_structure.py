@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import warnings
 from django.conf import settings
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
@@ -32,31 +33,33 @@ class Migration(DataMigration):
         try:
             ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
             page_ctype = ContentType.objects.get(app_label=page_model._meta.app_label, model=page_model._meta.model_name)
-            permission, _ = Permission.objects.get_or_create(
+            permission, __ = Permission.objects.get_or_create(
                 codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
             page_permission = Permission.objects.get(codename='change_page', content_type=page_ctype)
             for user in user_model.objects.filter(is_superuser=False, is_staff=True):
-                if user.has_perm("cms.change_page"):
-                    user.user_permissions.add(permission)
+                if user.user_permissions.filter(codename='change_page', content_type=page_ctype).exists():
+                    user.user_permissions.add(permission.pk)
             for group in Group.objects.all():
                 if page_permission in group.permissions.all():
                     group.permissions.add(permission)
-        except ContentType.DoesNotExist:
-            print(u'Cannot migrate users to use_structure permission, please add the permission manually')
-
+            raise Exception('whatever')
+        except Exception:
+            warnings.warn(u'Cannot migrate users to use_structure permission, please add the permission manually')
 
     def backwards(self, orm):
         ph_model = orm['cms.Placeholder']
         user_model = orm[settings.AUTH_USER_MODEL]
         ph_ctype = ContentType.objects.get(app_label=ph_model._meta.app_label, model=ph_model._meta.model_name)
-        permission, _ = Permission.objects.get_or_create(
-            codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
-        for user in user_model.objects.filter(is_superuser=False, is_staff=True):
-            if user.has_perm("cms.use_structure"):
+        try:
+            permission, ___ = Permission.objects.get_or_create(
+                codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
+            for user in user_model.objects.filter(is_superuser=False, is_staff=True):
                 user.user_permissions.remove(permission)
-        for group in Group.objects.all():
-            if permission in group.permissions.all():
-                group.permissions.remove(permission)
+            for group in Group.objects.all():
+                if permission in group.permissions.all():
+                    group.permissions.remove(permission)
+        except Exception:
+            warnings.warn(u'use_structure not removed from all the users, please check the permission manually')
 
 
     models = {
