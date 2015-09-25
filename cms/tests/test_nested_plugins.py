@@ -12,6 +12,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.plugins import reorder_plugins
 
 
 URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
@@ -133,8 +134,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
     def test_plugin_fix_tree(self):
         """
-        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the position
-        value to Null for all the plugins and then rebuild the tree.
+        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the
+        position value to Null for all the plugins and then rebuild the tree.
 
         The structure below isn't arbitrary, but has been designed to test
         various conditions, including:
@@ -229,6 +230,22 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
         new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
         self.assertSequenceEqual(original_plugins, new_plugins)
+
+        # Now, check to see if the correct order is restored, even if we
+        # re-arrange the plugins so that their natural «pk» order is different
+        # than their «position» order.
+
+        # Move the 2nd top-level plugin to the "left" or before the 1st.
+        reorder_plugins(placeholder, None, u"en", [plugin_5.pk, plugin_1.pk])
+        reordered_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
+        CMSPlugin.fix_tree()
+
+        # Now, they should NOT be in the original order at all. Are they?
+        new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
+        self.assertSequenceEqual(
+            reordered_plugins, new_plugins,
+            "Plugin order not preserved during fix_tree().")
+
 
     def test_plugin_deep_nesting_and_copying(self):
         """
