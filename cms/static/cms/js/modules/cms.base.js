@@ -269,8 +269,9 @@ var CMS = {
              * @method makeURL
              * @param url {String} original url
              * @param [params] {String[]} array of `param=value` strings to update the url
+             * @param [paramsToRemove] {String[]} array of `key` strings to remove from the url
              */
-            makeURL: function makeURL(url, params) {
+            makeURL: function makeURL(url, params, paramsToRemove) {
                 var arr = [];
                 var keys = [];
                 var values = [];
@@ -280,7 +281,7 @@ var CMS = {
                 var origin = url;
 
                 // return url if there is no param
-                if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
+                if (url.split('?').length > 1) {
                     // setup local vars
                     urlArray = url.split('?');
                     urlParams = urlArray[1].split('&');
@@ -316,9 +317,20 @@ var CMS = {
                     }
                 });
 
+                if (paramsToRemove && paramsToRemove.length) {
+                    $.each(paramsToRemove, function (index, paramToRemove) {
+                        var position = $.inArray(paramToRemove, keys);
+
+                        if (position !== -1) {
+                            keys.splice(position, 1);
+                            values.splice(position, 1);
+                        }
+                    });
+                }
+
                 // merge new url
                 $.each(keys, function (index, key) {
-                    tmp += '&' + key + '=' + values[index];
+                    tmp += '&' + key + (values[index] ? ('=' + values[index]) : '');
                 });
                 tmp = tmp.replace('&', '?');
                 url = origin + tmp;
