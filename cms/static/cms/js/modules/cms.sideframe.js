@@ -128,6 +128,8 @@ var CMS = window.CMS || {};
                 var page_id = 'page_id=' + CMS.config.request.page_id;
                 var params = [];
                 var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                var currentWidth = this.ui.sideframe.outerWidth();
+                var isFrameVisible = this.ui.sideframe.is(':visible');
 
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();
@@ -155,11 +157,16 @@ var CMS = window.CMS || {};
                 this._content(url);
 
                 // cancel animation if sideframe is already shown
-                if (this.ui.sideframe.is(':visible') && this.ui.sideframe.outerWidth() < width) {
+                if (isFrameVisible && currentWidth < width) {
                     // The user has performed an action that requires the
                     // sideframe to be shown, this intent outweighs any
                     // previous intent to minimize the frame.
                     this.settings.sideframe.hidden = false;
+                }
+
+                if (isFrameVisible && Math.round(currentWidth) === Math.round(width)) {
+                    // Math.round because subpixel values
+                    animate = false;
                 }
 
                 // show iframe
