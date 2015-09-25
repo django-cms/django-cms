@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<div class="content-wizard" id="content">
+    <h1>{% trans "Create" %} {{ wizard_entry.title }}</h1>
+    <form action="{% url 'wizard_create' %}" method="post"
+          enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        <div class="modal-body clearfix">
+            <div class="row">
+                <div class="col">
+                    {% if form.non_field_errors %}
+                        <ul class="errorlist list-unstyled text-danger">
+                            {% for error in form.non_field_errors %}<li>
+                            {{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    {% block form_fields %}
+                        {% include "cms/wizards/includes/form_fields.html" %}
+                    {% endblock form_fields %}
+                </div>
+            </div>
+        </div>
+        <div class="submit-row">
+            <button name="wizard_goto_step" class="cms-btn cms-btn-secondary cms-btn-group" value="{{ wizard.steps.prev }}">{% trans "Back" %}</button>
+            <input type="submit" class="cms-btn cms-btn-action" value="{% trans " Create" %}"/>
+        </div>
+    </form>
+</div>

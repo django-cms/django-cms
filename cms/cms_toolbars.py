@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.models import Title, Page
-from cms.toolbar.items import TemplateItem
+from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
@@ -294,11 +294,18 @@ class PageToolbar(CMSToolbar):
 
     def post_template_populate(self):
         self.init_placeholders_from_request()
-
+        self.add_wizard_button()
         self.add_draft_live()
         self.add_publish_button()
 
     # Buttons
+
+    def add_wizard_button(self):
+        if self.toolbar.edit_mode and self.has_publish_permission():
+            title = _('Create')
+            url = reverse('wizard_create')
+            self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
+                                          on_close=REFRESH_PAGE)
 
     def add_publish_button(self, classes=('cms-btn-action', 'cms-btn-publish',)):
         # only do dirty lookups if publish permission is granted else button isn't added anyway

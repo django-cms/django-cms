@@ -1,0 +1,35 @@
+{% load i18n %}
+
+<div class="content-wizard" id="content">
+    <h1>{% trans "Content Creation Wizard" %}</h1>
+    <form action="{% url 'wizard_create' %}" method="post" class="js-space-form">
+        {% csrf_token %}
+        {{ wizard.management_form }}
+        {{ form.page }}
+        <div class="modal-body">
+            <div class="btn-group btn-group-justified select-content" data-toggle="buttons">
+                <div class="row">
+                    {% with field=form.entry %}
+                        {% for radio_input in field %}
+                            {% with value=radio_input.choice_value label=radio_input.choice_label %}
+                            <div class="col">
+                                <label class="btn btn-default btn-block"
+                                    data-title="{{ request.current_page.get_title }}">
+                                    <input type="radio" name="{{ radio_input.name }}"
+                                           id="wizard-{{ radio_input.name }}-{{ value }}"
+                                           value="{{ value }}"
+                                           autocomplete="off" class="hide js-space-radio">
+                                    <span class="title">{{ label }}</span>
+                                </label>
+                            </div>
+                            {% endwith %}
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="Create" class="cms-btn cms-btn-action" name="_continue" />
+        </div>
+    </form>
+</div>
