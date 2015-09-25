@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+from distutils.version import LooseVersion
 import os
 import sys
 import time
@@ -18,7 +19,6 @@ from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
 from django.utils import unittest
 from django.utils.importlib import import_module
-from distutils.version import LooseVersion
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait

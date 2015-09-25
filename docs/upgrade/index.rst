@@ -12,10 +12,12 @@ makes changes to your database.
     :maxdepth: 1
 
     3.2
+    3.1.4
     3.1.3
     3.1.2
     3.1.1
     3.1
+    3.0.16
     3.0.15
     3.0.14
     3.0.13
