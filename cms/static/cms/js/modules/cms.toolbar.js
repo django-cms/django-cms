@@ -648,6 +648,10 @@ var CMS = window.CMS || {};
                             message: el.data('text')
                         });
                         break;
+                    case 'cms_frame':
+                        var frame = window.open(el.attr('href'), 'cms_frame');
+                        frame.focus();
+                        break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
                         sideframe.open({
