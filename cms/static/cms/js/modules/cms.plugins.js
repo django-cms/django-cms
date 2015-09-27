@@ -572,8 +572,8 @@
              * @param [opts.offset=50] {Number} distance in px to the bottom of the screen
              */
             _scrollToElement: function _scrollToElement(el, opts) {
-                var duration = opts && opts.duration || 200;
-                var offset = opts && opts.offset || 50;
+                var duration = opts && opts.duration !== undefined ? opts.duration : 200;
+                var offset = opts && opts.offset !== undefined ? opts.offset : 50;
                 var scrollable = el.offsetParent();
                 var win = $(window);
                 var scrollHeight = win.height();
