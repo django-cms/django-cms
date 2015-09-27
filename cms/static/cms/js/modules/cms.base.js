@@ -325,6 +325,37 @@ var CMS = {
                 url = url.replace('&', '&amp;');
 
                 return url;
+            },
+
+            /**
+             * Creates a debounced function that delays invoking `func`
+             * until after `wait` milliseconds have elapsed since
+             * the last time the debounced function was invoked.
+             * Optionally can be invoked first time immediately.
+             *
+             * @method debounce
+             * @param func {Function} function to debounce
+             * @param wait {Number} time in ms to wait
+             * @param [opts] {Object}
+             * @param [opts.immediate] {Boolean} trigger func immediately?
+             */
+            debounce: function debounce(func, wait, opts) {
+                var timeout;
+                return function () {
+                    var context = this, args = arguments;
+                    var later = function () {
+                        timeout = null;
+                        if (!opts || !opts.immediate) {
+                            func.apply(context, args);
+                        }
+                    };
+                    var callNow = opts && opts.immediate && !timeout;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                    if (callNow) {
+                        func.apply(context, args);
+                    }
+                };
             }
         };
 
