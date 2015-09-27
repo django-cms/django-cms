@@ -678,15 +678,15 @@
              */
             _setupQuickSearch: function _setupQuickSearch(plugins) {
                 var that = this;
-                plugins.find('> .cms-quicksearch').find('input').on('keyup.cms', function (e) {
-                    clearTimeout(that.timer);
-                    var input = $(e.currentTarget);
-                    // keybound is not required
-                    that.timer = setTimeout(function () {
-                        // has to be closest because we clone the list
-                        that._filterPluginsList(input.closest('.cms-plugin-picker'), input.val());
-                    }, 100);
-                });
+                var input = plugins.find('> .cms-quicksearch').find('input');
+
+                var handler = CMS.API.Helpers.debounce(function () {
+                    var input = $(this);
+                    // have to always find the pluginsPicker in the handler
+                    // because of how we move things into/out of the modal
+                    var pluginsPicker = input.closest('.cms-plugin-picker');
+                    that._filterPluginsList(pluginsPicker, input);
+                }, 100);
             },
 
             /**
@@ -826,11 +826,12 @@
              *
              * @private
              * @param list {jQuery} plugins picker element
-             * @param query {String} value to filter plugins with
+             * @param input {jQuery} input, which value to filter plugins with
              */
-            _filterPluginsList: function _filterPluginsList(list, query) {
+            _filterPluginsList: function _filterPluginsList(list, input) {
                 var items = list.find('.cms-submenu-item');
                 var titles = list.find('.cms-submenu-item-title');
+                var query = input.val();
 
                 // cancel if query is zero
                 if (query === '') {
