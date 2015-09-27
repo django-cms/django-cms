@@ -56,8 +56,6 @@
 
                 // states
                 this.csrf = CMS.config.csrf;
-                this.timer = function () {};
-                this.timeout = 250;
                 this.click = 'pointerup.cms';
 
                 // bind data element to the container
