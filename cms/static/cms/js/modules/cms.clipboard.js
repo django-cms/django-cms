@@ -44,7 +44,6 @@ var CMS = window.CMS || {};
 
                 // states
                 this.click = 'click.cms.clipboard';
-                this.timer = function () {};
 
                 // setup initial stuff
                 this._setup();
