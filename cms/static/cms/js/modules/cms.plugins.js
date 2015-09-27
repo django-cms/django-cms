@@ -687,6 +687,18 @@
                     var pluginsPicker = input.closest('.cms-plugin-picker');
                     that._filterPluginsList(pluginsPicker, input);
                 }, 100);
+
+                input.on('keyup.cms', handler).on('keyup.cms', CMS.API.Helpers.debounce(function (e) {
+                    var input;
+                    var pluginsPicker;
+                    if (e.keyCode === CMS.KEYS.ENTER) {
+                        input = $(this);
+                        pluginsPicker = input.closest('.cms-plugin-picker');
+                        pluginsPicker.find('.cms-submenu-item')
+                            .not('.cms-submenu-item-title').filter(':visible').first().find('> a').focus()
+                            .trigger('click');
+                    }
+                }, 110));
             },
 
             /**
