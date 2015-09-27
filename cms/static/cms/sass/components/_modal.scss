@@ -145,7 +145,6 @@
     .cms-modal-maximize {
         display: block;
         position: absolute;
-        font-size: $modal-header-button-icon-size;
         top: 50%;
         margin-top: -$modal-header-button-area-size / 2;
         right: $padding-normal;
@@ -156,7 +155,7 @@
         cursor: pointer;
         &:before {
             position: relative;
-            top: ($modal-header-button-area-size - $modal-header-button-icon-size) / 2;
+            top: ($modal-header-button-area-size - $icon-size) / 2;
         }
         &:hover,
         &:active,
