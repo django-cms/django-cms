@@ -566,7 +566,7 @@ var CMS = window.CMS || {};
                 var that = this;
                 // url, post, text, callback, onSuccess
                 var url = opts.url;
-                var post = opts.post || {};
+                var post = opts.post || '{}';
                 var text = opts.text || '';
                 var callback = opts.callback;
                 var onSuccess = opts.onSuccess;
@@ -647,6 +647,10 @@ var CMS = window.CMS || {};
                         this.openMessage({
                             message: el.data('text')
                         });
+                        break;
+                    case 'cms_frame':
+                        var frame = window.open(el.attr('href'), 'cms_frame');
+                        frame.focus();
                         break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
@@ -742,7 +746,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Handles the debub bar when `DEBUG=true` on top of the toolbar.
+             * Handles the debug bar when `DEBUG=true` on top of the toolbar.
              *
              * @method _debug
              * @private
