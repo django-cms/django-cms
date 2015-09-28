@@ -31,6 +31,9 @@ $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transpare
 $font-size-small: 12px;
 $font-size-normal: 14px;
 $font-size-large: 16px;
+
+$icon-size: 16px;
+
 $line-height-normal: 20px;
 
 $border-radius-base: 3px;
@@ -242,7 +245,6 @@ $modal-header-height: $toolbar-height;
 $modal-breadcrumb-height: $toolbar-height - 6px;
 $modal-footer-height: $toolbar-height;
 
-$modal-header-button-icon-size: 12px;
 $modal-header-button-area-size: 30px;
 
 $modal-resize-size: 25px;
