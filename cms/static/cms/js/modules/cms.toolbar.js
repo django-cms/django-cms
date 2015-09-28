@@ -746,7 +746,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Handles the debub bar when `DEBUG=true` on top of the toolbar.
+             * Handles the debug bar when `DEBUG=true` on top of the toolbar.
              *
              * @method _debug
              * @private
