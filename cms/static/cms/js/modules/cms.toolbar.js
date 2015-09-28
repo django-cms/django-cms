@@ -566,7 +566,7 @@ var CMS = window.CMS || {};
                 var that = this;
                 // url, post, text, callback, onSuccess
                 var url = opts.url;
-                var post = opts.post || {};
+                var post = opts.post || '{}';
                 var text = opts.text || '';
                 var callback = opts.callback;
                 var onSuccess = opts.onSuccess;
