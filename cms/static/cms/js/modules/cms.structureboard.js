@@ -402,7 +402,8 @@
                         that.ui.doc.on('keyup.cms.interrupt', function (e, cancel) {
                             if (e.keyCode === CMS.KEYS.ESC && that.dragging || cancel) {
                                 that.state = false;
-                                that.ui.sortables.sortable('cancel');
+                                $.ui.sortable.prototype._mouseStop();
+                                that.ui.sortables.trigger('mouseup');
                             }
                         });
                     },
@@ -452,7 +453,7 @@
                         actualizeEmptyPlaceholders();
                     },
                     isAllowed: function (placeholder, placeholderParent, originalItem) {
-                        // cancel if action is excecuted
+                        // cancel if action is executed
                         if (CMS.API.locked) {
                             return false;
                         }
