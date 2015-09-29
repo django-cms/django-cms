@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
@@ -65,5 +63,5 @@ class Wizard(WizardBase):
             return self.model
         if issubclass(self.form, ModelForm):
             return self.form._meta.model
-        raise ImproperlyConfigured("Please set entry 'model' attribute or use"
-                                   "ModelForm subclass as a form")
+        raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
+                                   u"ModelForm subclass as a form")

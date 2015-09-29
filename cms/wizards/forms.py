@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from django import forms
 from django.utils.translation import ugettext as _
 
@@ -77,7 +75,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         page = self.cleaned_data.get('page')
         space = self.cleaned_data.get('space')
 
-        invalid_request_message = _("We're unable to process your request.")
+        invalid_request_message = _(u"We're unable to process your request.")
 
         if page and space:
             if page.application_urls:

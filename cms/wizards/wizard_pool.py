@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from cms.utils.django_load import load
 
 from .wizard_base import Wizard
@@ -24,7 +22,7 @@ class WizardPool(object):
         return entry.id in self.entries
 
     def register(self, entry):
-        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
+        assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
         self.entries[entry.id] = entry
 
     def unregister(self, entry):
@@ -33,7 +31,7 @@ class WizardPool(object):
         :param entry: a wizard
         :return: True if a wizard was successfully removed, else False
         """
-        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
+        assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
         if self.is_registered(entry):
             try:
                 del self.entries[entry.id]

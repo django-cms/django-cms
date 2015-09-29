@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
-
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models import Page
@@ -15,7 +13,7 @@ from .forms.wizards import (
 
 
 cms_page_wizard = Wizard(
-    title=_(u'Page'),
+    title=_(u"Page"),
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
