@@ -32,7 +32,7 @@ var CMS = window.CMS || {};
             options: {
                 preventSwitch: false,
                 preventSwitchMessage: 'Switching is disabled.',
-                messageDelay: 2000,
+                messageDelay: 3000,
                 toolbarDuration: 200
             },
 
