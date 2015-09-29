@@ -162,7 +162,6 @@ var CMS = {
 
             // sends or retrieves a JSON from localStorage or the session if local storage is not available
             setSettings: function (settings) {
-                var that = this;
                 // merge settings
                 settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
                 // set loader
@@ -198,7 +197,7 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            that.openMessage({
+                            CMS.API.Toolbar.openMessage({
                                 message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -214,7 +213,6 @@ var CMS = {
             },
 
             getSettings: function () {
-                var that = this;
                 var settings;
                 // set loader
                 if (CMS.API.Toolbar) {
@@ -244,7 +242,7 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            that.openMessage({
+                            CMS.API.Toolbar.openMessage({
                                 message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -325,6 +323,37 @@ var CMS = {
                 url = url.replace('&', '&amp;');
 
                 return url;
+            },
+
+            /**
+             * Creates a debounced function that delays invoking `func`
+             * until after `wait` milliseconds have elapsed since
+             * the last time the debounced function was invoked.
+             * Optionally can be invoked first time immediately.
+             *
+             * @method debounce
+             * @param func {Function} function to debounce
+             * @param wait {Number} time in ms to wait
+             * @param [opts] {Object}
+             * @param [opts.immediate] {Boolean} trigger func immediately?
+             */
+            debounce: function debounce(func, wait, opts) {
+                var timeout;
+                return function () {
+                    var context = this, args = arguments;
+                    var later = function () {
+                        timeout = null;
+                        if (!opts || !opts.immediate) {
+                            func.apply(context, args);
+                        }
+                    };
+                    var callNow = opts && opts.immediate && !timeout;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                    if (callNow) {
+                        func.apply(context, args);
+                    }
+                };
             }
         };
 

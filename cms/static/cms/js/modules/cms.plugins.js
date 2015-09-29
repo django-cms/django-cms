@@ -56,8 +56,6 @@
 
                 // states
                 this.csrf = CMS.config.csrf;
-                this.timer = function () {};
-                this.timeout = 250;
                 this.click = 'pointerup.cms';
 
                 // bind data element to the container
@@ -245,7 +243,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.openMessage({
+                        CMS.API.Toolbar.openMessage({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -283,7 +281,6 @@
                 }
                 CMS.API.locked = true;
 
-                var that = this;
                 var move = (options || source_language) ? true : false;
                 // set correct options
                 options = options || this.options;
@@ -319,7 +316,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.openMessage({
+                        CMS.API.Toolbar.openMessage({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -375,7 +372,7 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            that.openMessage({
+                            CMS.API.Toolbar.openMessage({
                                 message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -444,7 +441,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.openMessage({
+                        CMS.API.Toolbar.openMessage({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -572,8 +569,8 @@
              * @param [opts.offset=50] {Number} distance in px to the bottom of the screen
              */
             _scrollToElement: function _scrollToElement(el, opts) {
-                var duration = opts && opts.duration || 200;
-                var offset = opts && opts.offset || 50;
+                var duration = opts && opts.duration !== undefined ? opts.duration : 200;
+                var offset = opts && opts.offset !== undefined ? opts.offset : 50;
                 var scrollable = el.offsetParent();
                 var win = $(window);
                 var scrollHeight = win.height();
@@ -678,15 +675,27 @@
              */
             _setupQuickSearch: function _setupQuickSearch(plugins) {
                 var that = this;
-                plugins.find('> .cms-quicksearch').find('input').on('keyup.cms', function (e) {
-                    clearTimeout(that.timer);
-                    var input = $(e.currentTarget);
-                    // keybound is not required
-                    that.timer = setTimeout(function () {
-                        // has to be closest because we clone the list
-                        that._filterPluginsList(input.closest('.cms-plugin-picker'), input.val());
-                    }, 100);
-                });
+                var input = plugins.find('> .cms-quicksearch').find('input');
+
+                var handler = CMS.API.Helpers.debounce(function () {
+                    var input = $(this);
+                    // have to always find the pluginsPicker in the handler
+                    // because of how we move things into/out of the modal
+                    var pluginsPicker = input.closest('.cms-plugin-picker');
+                    that._filterPluginsList(pluginsPicker, input);
+                }, 100);
+
+                input.on('keyup.cms', handler).on('keyup.cms', CMS.API.Helpers.debounce(function (e) {
+                    var input;
+                    var pluginsPicker;
+                    if (e.keyCode === CMS.KEYS.ENTER) {
+                        input = $(this);
+                        pluginsPicker = input.closest('.cms-plugin-picker');
+                        pluginsPicker.find('.cms-submenu-item')
+                            .not('.cms-submenu-item-title').filter(':visible').first().find('> a').focus()
+                            .trigger('click');
+                    }
+                }, 110));
             },
 
             /**
@@ -826,11 +835,12 @@
              *
              * @private
              * @param list {jQuery} plugins picker element
-             * @param query {String} value to filter plugins with
+             * @param input {jQuery} input, which value to filter plugins with
              */
-            _filterPluginsList: function _filterPluginsList(list, query) {
+            _filterPluginsList: function _filterPluginsList(list, input) {
                 var items = list.find('.cms-submenu-item');
                 var titles = list.find('.cms-submenu-item-title');
+                var query = input.val();
 
                 // cancel if query is zero
                 if (query === '') {
