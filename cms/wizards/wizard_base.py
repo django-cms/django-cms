@@ -13,28 +13,19 @@ class WizardBase(object):
     supports_safe_delete = True
     template_name = None
 
-    def __init__(self, title, weight, form, edit_form=None,
-                 cms_app_title=None, cms_app_slug=None, cms_app=None,
+    def __init__(self, title, weight, form,
                  model=None, admin_model=None,
                  template_name=None,
                  inlineformset=None, inlineformset_title=''):
         self.title = title
         self.weight = weight
         self.form = form
-        self.edit_form = edit_form if edit_form else form
         self.model = model
         self.admin_model = admin_model
         if template_name is not None:
             self.template_name = template_name
         self.inlineformset = inlineformset
         self.inlineformset_title = inlineformset_title
-
-        # TODO: Review if these are still relevant.
-        self.cms_app_title = cms_app_title
-        self.cms_app_slug = cms_app_slug
-        self.cms_app = cms_app
-
-        # TODO: add an option to skip metadata creation
 
 
 @python_2_unicode_compatible
@@ -47,23 +38,27 @@ class Wizard(WizardBase):
         return content_type.pk
 
     def __str__(self):
-        # TODO: Is this legit? Is it even necessary?
         return self.title
 
+    def user_has_add_permission(self, user):
+        """
+        Returns whether the given «user» has permission to add instances of this
+        wizard's associated model. Can be overridden as required for more
+        complex situations.
+        :param user: The current user using the wizard.
+        :return: True if the user should be able to use this wizard.
+        """
+        app_label = self.model._meta.app_label
+        model_name = self.model.__name__.lower()
+        return user.has_perm("%s.%s_%s" % (app_label, "add", model_name))
+
     def get_success_url(self, obj, *args, **kwargs):
-        # TODO: Review this comment for appropriateness.
-        # We've decided the detail view is OK for some type of objects, so
-        # default to it. Use language to redirect to a proper language version
-        # of the object:
+        """This should return the URL of the created object."""
         if 'language' in kwargs:
             with force_language(kwargs['language']):
                 return obj.get_absolute_url()
         else:
             return obj.get_absolute_url()
-
-    def user_can_edit_object(self, obj, user):
-        """Return True if object can be edited/deleted"""
-        raise NotImplementedError
 
     def get_model(self):
         if self.model:
@@ -72,9 +67,3 @@ class Wizard(WizardBase):
             return self.form._meta.model
         raise ImproperlyConfigured("Please set entry 'model' attribute or use"
                                    "ModelForm subclass as a form")
-
-    # TODO: Is this necessary?
-    def get_admin_model(self):
-        if self.admin_model:
-            return self.admin_model
-        return self.get_model()

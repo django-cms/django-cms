@@ -25,11 +25,29 @@ class WizardPool(object):
 
     def register(self, entry):
         assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
-
         self.entries[entry.id] = entry
 
-    # accepts Wizard instance or its "id", which is the PK of its content-type.
+    def unregister(self, entry):
+        """
+        If «entry» is registered into the pool, remove it.
+        :param entry: a wizard
+        :return: True if a wizard was successfully removed, else False
+        """
+        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
+        if self.is_registered(entry):
+            try:
+                del self.entries[entry.id]
+                return True
+            except KeyError:
+                pass
+        return False
+
     def get_entry(self, entry):
+        """
+        :param entry: Accepts a Wizard instance or its "id" (which is the PK of
+                      its content-type).
+        :return: The Wizard instance, if registered else raises IndexError.
+        """
         self._discover()
 
         if isinstance(entry, Wizard):
@@ -37,9 +55,8 @@ class WizardPool(object):
         return self.entries[entry]
 
     def get_entries(self):
+        """Returns all entries in weight-order."""
         self._discover()
-        # we can simplify (or complicate) this by implementing comparison
-        # methods on ContentEntry class
         return [value for (key, value) in sorted(
             self.entries.items(), key=lambda e: getattr(e[1], 'weight'))]
 

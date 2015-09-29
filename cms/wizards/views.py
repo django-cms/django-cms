@@ -6,11 +6,12 @@ import os
 
 from django.forms import Form
 from django.conf import settings
-from django.contrib.formtools.wizard.views import SessionWizardView
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.template.response import SimpleTemplateResponse
 from django.utils.translation import get_language_from_request
+
+from formtools.wizard.views import SessionWizardView
 
 from .wizard_pool import wizard_pool
 from .forms import (
@@ -56,7 +57,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         step = step or self.steps.current
         return step == '1'
 
-    # FIXME: Appears to be unused
     def get_form_initial(self, step):
         initial = super(WizardCreateView, self).get_form_initial(step)
 
@@ -67,7 +67,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
             initial['space'] = self.request.GET.get('space')
         return initial
 
-    # FIXME: Appears to be unused
     def get_context_data(self, **kwargs):
         context = super(WizardCreateView, self).get_context_data(**kwargs)
 
@@ -84,7 +83,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
             kwargs['wizard_page'] = self.get_origin_page()
         return kwargs
 
-    # FIXME: Appears to be unused
     def get_form(self, step=None, data=None, files=None):
         if step is None:
             step = self.steps.current
@@ -117,7 +115,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         """
         return WizardStep2BaseForm
 
-    # FIXME: Appears to be unused.
     def get_template_names(self):
         if self.is_first_step():
             template_name = self.template_name

@@ -1,24 +1,30 @@
-"""
-For Django < 1.7 form can not be a subclass of Form and ModelForm at the
-same time, so we use a mixin and insert field(s) here
-"""
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+
 from django import forms
-from django.utils.translation import ugettext
+from django.utils.translation import ugettext as _
 
 from cms.models import Page
 
 from .wizard_pool import wizard_pool
 
 
-def entry_choices():
+def entry_choices(user):
+    """
+    Yields a list of wizard entries that the current user can use based on their
+    permission to add instances of the underlying model objects.
+    """
     for entry in wizard_pool.get_entries():
-        yield (entry.id, entry.title)
+        if entry.user_has_add_permission(user):
+            yield (entry.id, entry.title)
 
 
 def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
     """
     Combines a form mixin with a form class, sets attrs to the resulting class.
-    This is used to provide a common behavior/logic for all wizard content forms.
+    This is used to provide a common behavior/logic for all wizard content
+    forms.
     """
     if attrs is None:
         attrs = {}
@@ -62,15 +68,16 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     entry = forms.ChoiceField(choices=[], widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs['wizard_user']
         super(WizardStep1Form, self).__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
-        self.fields['entry'].choices = entry_choices()
+        self.fields['entry'].choices = entry_choices(user=self.user)
 
     def clean(self):
         page = self.cleaned_data.get('page')
         space = self.cleaned_data.get('space')
 
-        invalid_request_message = ugettext("We're unable to process your request.")
+        invalid_request_message = _("We're unable to process your request.")
 
         if page and space:
             if page.application_urls:
@@ -88,6 +95,7 @@ class WizardStep2BaseForm(BaseFormMixin):
     # so this attribute will point to an inline formset instance
     # only when user reaches step two.
     inlineformset = None
+    user = None
 
     def is_valid(self):
         _is_valid = super(WizardStep2BaseForm, self).is_valid()

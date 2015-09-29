@@ -14,16 +14,10 @@ from .forms.wizards import (
 )
 
 
-class CMSPageWizard(Wizard):
-    def user_can_edit_object(self, obj, user):
-        return obj.has_change_permission(None, user)
-
-
-cms_page_wizard = CMSPageWizard(
+cms_page_wizard = Wizard(
     title=_(u'Page'),
     weight=100,
     form=CreateCMSPageForm,
-    edit_form=None,
     model=Page,
 )
 

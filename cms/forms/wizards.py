@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
@@ -40,9 +41,8 @@ class CreateCMSPageForm(BaseCMSPageForm):
         or None.
         """
         for ph in page.placeholders.all():
-            if ph.is_static or not ph.is_editable:
-                continue
-            return ph.slot
+            if not ph.is_static and ph.is_editable:
+                return ph.slot
         else:
             return None
 
@@ -54,7 +54,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
             title=title,
             template=TEMPLATE_INHERITANCE_MAGIC,
             language=self.language_code,
-            created_by=unicode(self.user),
+            created_by=smart_text(self.user),
             parent=self.page,
             in_navigation=True,
             published=False
@@ -63,7 +63,6 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
         content = self.cleaned_data['content']
         if content:
-            # Find the first editable, non-static placeholder
             slot = self.get_placeholder_slot(page)
             if slot:
                 placeholder = page.placeholders.get(slot=slot)
