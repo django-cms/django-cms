@@ -174,7 +174,7 @@ var CMS = window.CMS || {};
                         isTouchingTopLevelMenu = false;
                         // create the document event
                         that.ui.document.on(that.click, reset);
-                        that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 50));
+                        that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
                     });
 
                     // attach hover
