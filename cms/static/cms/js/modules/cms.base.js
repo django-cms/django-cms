@@ -162,7 +162,6 @@ var CMS = {
 
             // sends or retrieves a JSON from localStorage or the session if local storage is not available
             setSettings: function (settings) {
-                var that = this;
                 // merge settings
                 settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
                 // set loader
@@ -198,7 +197,7 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            that.openMessage({
+                            CMS.API.Toolbar.openMessage({
                                 message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -214,7 +213,6 @@ var CMS = {
             },
 
             getSettings: function () {
-                var that = this;
                 var settings;
                 // set loader
                 if (CMS.API.Toolbar) {
@@ -244,7 +242,7 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            that.openMessage({
+                            CMS.API.Toolbar.openMessage({
                                 message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });

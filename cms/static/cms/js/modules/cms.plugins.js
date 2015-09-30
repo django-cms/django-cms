@@ -243,7 +243,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.openMessage({
+                        CMS.API.Toolbar.openMessage({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -281,7 +281,6 @@
                 }
                 CMS.API.locked = true;
 
-                var that = this;
                 var move = (options || source_language) ? true : false;
                 // set correct options
                 options = options || this.options;
@@ -317,7 +316,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.openMessage({
+                        CMS.API.Toolbar.openMessage({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -373,7 +372,7 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            that.openMessage({
+                            CMS.API.Toolbar.openMessage({
                                 message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -442,7 +441,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.openMessage({
+                        CMS.API.Toolbar.openMessage({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
