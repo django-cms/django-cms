@@ -200,6 +200,9 @@ var CMS = window.CMS || {};
                     item = this.items.left[i].element;
 
                     this.ui.dropdown.prepend(item);
+                    if (item.find('> ul').children().length) {
+                        item.addClass('cms-toolbar-item-navigation-children');
+                    }
                 }
 
                 this.rightMostItemIndex -= numberOfItems;
@@ -223,7 +226,9 @@ var CMS = window.CMS || {};
                 for (var i = leftMostIndexToMove; i <= rightMostIndexToMove; i++) {
                     item = this.items.left[i].element;
 
-                    this.ui.trigger.before(item);
+                    item.insertBefore(this.ui.trigger);
+                    item.removeClass('cms-toolbar-item-navigation-children');
+                    item.find('> ul').removeAttr('style');
                 }
 
                 this.rightMostItemIndex += numberOfItems;
