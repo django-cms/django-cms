@@ -1,7 +1,7 @@
 {% load i18n l10n %}
 
 {% language request.toolbar.toolbar_language %}
-<div id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr">
+<div id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr" data-touch-action="none">
 
     {# debug, tooltip #}
     <div class="cms-debug-bar"></div>
@@ -41,15 +41,12 @@
 
     {# start: sidebar #}
     <div class="cms-sideframe">
-        <div class="cms-sideframe-resize"><span class="cms-sideframe-knob"></span></div>
+        <div class="cms-sideframe-resize"></div>
         <div class="cms-sideframe-frame"></div>
         <div class="cms-sideframe-shim"></div>
-        <div class="cms-sideframe-btn">
-            <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
-            <div class="cms-sideframe-hide"><span class="cms-icon cms-icon-arrow"></span></div>
-            <div class="cms-sideframe-maximize"><span class="cms-icon cms-icon-window"></span></div>
-        </div>
+        <div class="cms-sideframe-dimmer"></div>
         <div class="cms-sideframe-copy"></div>
+        <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
     </div>
     {# end: sidebar #}
 
@@ -58,22 +55,22 @@
     {# end: addons #}
 
     {# start: modal #}
-    <div class="cms-modal">
-        <div class="cms-modal-head">
-            <span class="cms-modal-title">&nbsp;</span>
+    <div class="cms-modal" data-touch-action="none">
+        <div class="cms-modal-head" data-touch-action="none">
+            <span class="cms-modal-title" data-touch-action="none">
+                <span class="cms-modal-title-prefix"></span>
+                <span class="cms-modal-title-suffix"></span>
+            </span>
             <span class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
             <span class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
             <span class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
         </div>
+        <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
         <div class="cms-modal-body">
             <div class="cms-modal-shim"></div>
             <div class="cms-modal-frame"></div>
         </div>
         <div class="cms-modal-foot">
-            <div class="cms-modal-breadcrumb">
-                <span class="cms-modal-breadcrumb-title cms-icon cms-icon-home" title="{% trans 'Breadcrumbs' %}"></span>
-                <span class="cms-modal-breadcrumb-items">&nbsp;</span>
-            </div>
             <div class="cms-modal-buttons"></div>
             <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
         </div>
@@ -81,25 +78,25 @@
     {# end: modal #}
 
     {# start: structure #}
-    <div class="cms-structure">
+    <div class="cms-structure" data-touch-action="pan-y">
         <div class="cms-structure-content">
             {% for placeholder in request.toolbar.placeholders.values %}
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
                 {% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
 
                 {# <div class="cms-dragitem cms-dragitem-1888"> #}
-                <div class="cms-draggables">
-                {% with placeholder.slot as slot %}
-                {% for plugin in placeholder.get_cached_plugins %}
-                    {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
-                {% endfor %}
-                {% endwith %}
+                <div class="cms-draggables cms-draggables-root">
+                    <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
+                    {% with placeholder.slot as slot %}
+                    {% for plugin in placeholder.get_cached_plugins %}
+                        {% include "cms/toolbar/dragitem.html" with plugin=plugin %}
+                    {% endfor %}
+                    {% endwith %}
                 </div>
                 {# </div> #}
             </div>
             {% endfor %}
         </div>
-        <div class="cms-structure-dimmer"></div>
     </div>
     {# end: structure #}
 

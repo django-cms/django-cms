@@ -1,14 +1,29 @@
-//##################################################################################################################
-// #TOOLBAR#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// Toolbar
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
-    $(document).ready(function () {
-        /*!
-         * Toolbar
-         * Handles all features related to the toolbar
+
+    // shorthand for jQuery(document).ready();
+    $(function () {
+        /**
+         * The toolbar is the generic element which holds various components
+         * together and provides several commonly used API methods such as
+         * show/hide, message display or loader indication.
+         *
+         * @class Toolbar
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -17,115 +32,99 @@
             options: {
                 preventSwitch: false,
                 preventSwitchMessage: 'Switching is disabled.',
-                messageDelay: 2000
+                messageDelay: 3000,
+                toolbarDuration: 200
             },
 
-            initialize: function (options) {
-                this.container = $('#cms-toolbar');
+            initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
                 this.settings = CMS.settings;
 
                 // elements
-                this.body = $('html');
-                this.toolbar = this.container.find('.cms-toolbar').hide();
-                this.toolbarTrigger = this.container.find('.cms-toolbar-trigger');
-                this.navigations = this.container.find('.cms-toolbar-item-navigation');
-                this.buttons = this.container.find('.cms-toolbar-item-buttons');
-                this.switcher = this.container.find('.cms-toolbar-item-switch');
-                this.messages = this.container.find('.cms-messages');
-                this.screenBlock = this.container.find('.cms-screenblock');
+                this._setupUI();
 
                 // states
-                this.click = 'click.cms';
+                this.click = 'click.cms.toolbar';
+                this.touchStart = 'touchstart.cms.toolbar';
+                this.pointerUp = 'pointerup.cms.toolbar';
+                this.pointerOverOut = 'pointerover.cms.toolbar pointerout.csm.toolbar';
+                this.pointerLeave = 'pointerleave.csm.toolbar';
+                this.mouseEnter = 'mouseenter.cms.toolbar';
+                this.mouseLeave = 'mouseleave.cms.toolbar';
+                this.resize = 'resize.cms.toolbar';
+
                 this.timer = function () {};
                 this.lockToolbar = false;
 
                 // setup initial stuff
-                this._setup();
+                if (!this.ui.toolbar.data('ready')) {
+                    this._events();
+                }
 
-                // setup events
-                this._events();
+                // FIXME the general initialization is handled within the toolbar
+                // rather than a separate cms.setup or similar. Yet other components
+                // are loaded after the toolbar so it can create a clash where
+                // CMS.API is not ready. This is a workaround until a proper fix
+                // will be released in 3.x
+                var that = this;
+                setTimeout(function () {
+                    that._initialStates();
+                }, 200);
+
+                // set a state to determine if we need to reinitialize this._events();
+                this.ui.toolbar.data('ready', true);
             },
 
-            // initial methods
-            _setup: function () {
-                // setup toolbar visibility, we need to reverse the options to set the correct state
-                (this.settings.toolbar === 'expanded') ? this._showToolbar(0, true) : this._hideToolbar(0, true);
-
-                // hide publish button
-                var publishBtn = $('.cms-btn-publish').parent();
-                publishBtn.hide();
-
-                if ($('.cms-btn-publish-active').length) {
-                    publishBtn.show();
-                }
-
-                // check if debug is true
-                if (CMS.config.debug) {
-                    this._debug();
-                }
-
-                // check if there are messages and display them
-                if (CMS.config.messages) {
-                    this.openMessage(CMS.config.messages);
-                }
-
-                // check if there are error messages and display them
-                if (CMS.config.error) {
-                    this.showError(CMS.config.error);
-                }
-
-                // enforce open state if user is not logged in but requests the toolbar
-                if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
-                    this.toggleToolbar(true);
-                    this.settings = this.setSettings(CMS.config.settings);
-                }
-
-                // should switcher indicate that there is an unpublished page?
-                if (CMS.config.publisher) {
-                    this.openMessage(CMS.config.publisher, 'right');
-                    setInterval(function () {
-                        CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
-                    }, this.options.messageDelay);
-                }
-
-                // open sideframe if it was previously opened
-                if (this.settings.sideframe.url) {
-                    var sideframe = new CMS.Sideframe();
-                    sideframe.open(this.settings.sideframe.url, false);
-                }
-
-                // if there is a screenblock, do some resize magic
-                if (this.screenBlock.length) {
-                    this._screenBlock();
-                }
-
-                // add toolbar ready class to body and fire event
-                this.body.addClass('cms-ready');
-                $(document).trigger('cms-ready');
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
+            _setupUI: function _setupUI() {
+                var container = $('#cms-toolbar');
+                this.ui = {
+                    container: container,
+                    body: $('html'),
+                    document: $(document),
+                    toolbar: container.find('.cms-toolbar'),
+                    toolbarTrigger: container.find('.cms-toolbar-trigger'),
+                    navigations: container.find('.cms-toolbar-item-navigation'),
+                    buttons: container.find('.cms-toolbar-item-buttons'),
+                    switcher: container.find('.cms-toolbar-item-switch'),
+                    messages: container.find('.cms-messages'),
+                    screenBlock: container.find('.cms-screenblock')
+                };
             },
 
-            _events: function () {
+            /**
+             * Sets up all the event handlers, such as closing and resizing.
+             *
+             * @method _events
+             * @private
+             */
+            _events: function _events() {
                 var that = this;
 
                 // attach event to the trigger handler
-                this.toolbarTrigger.bind(this.click, function (e) {
+                this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
                     e.preventDefault();
-                    that.toggleToolbar();
+                    that.toggle();
                 });
 
                 // attach event to the navigation elements
-                this.navigations.each(function () {
-                    var item = $(this);
-                    var lists = item.find('li');
+                this.ui.navigations.each(function () {
+                    var navigation = $(this);
+                    var lists = navigation.find('li');
                     var root = 'cms-toolbar-item-navigation';
                     var hover = 'cms-toolbar-item-navigation-hover';
                     var disabled = 'cms-toolbar-item-navigation-disabled';
                     var children = 'cms-toolbar-item-navigation-children';
+                    var isTouchingTopLevelMenu = false;
 
                     // remove events from first level
-                    item.find('a').bind(that.click, function (e) {
+                    navigation.find('a').on(that.click, function (e) {
                         e.preventDefault();
                         if ($(this).attr('href') !== '' &&
                            $(this).attr('href') !== '#' &&
@@ -135,37 +134,46 @@
                             reset();
                             return false;
                         }
+                    }).on(that.touchStart, function () {
+                        isTouchingTopLevelMenu = true;
                     });
 
                     // handle click states
-                    lists.bind(that.click, function (e) {
+                    lists.on(that.click, function (e) {
+                        e.preventDefault();
                         e.stopPropagation();
                         var el = $(this);
 
-                        // close if el is first item
-                        if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
+                        // close if el does not have children
+                        if (!el.hasClass(children)) {
                             reset();
+                        }
+                        if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
                             return false;
                         } else {
-                            reset();
                             el.addClass(hover);
                         }
 
                         // activate hover selection
-                        item.find('> li').bind('mouseenter', function () {
-                            // cancel if item is already active
-                            if ($(this).hasClass(hover)) {
-                                return false;
-                            }
-                            $(this).trigger(that.click);
-                        });
+                        if (!isTouchingTopLevelMenu) {
+                            // we only set the handler for mouseover when not touching because
+                            // the mouseover actually is triggered on touch devices :/
+                            navigation.find('> li').on(that.mouseEnter, function () {
+                                // cancel if item is already active
+                                if ($(this).hasClass(hover)) {
+                                    return false;
+                                }
+                                $(this).trigger(that.click);
+                            });
+                        }
 
+                        isTouchingTopLevelMenu = false;
                         // create the document event
-                        $(document).bind(that.click, reset);
+                        that.ui.document.on(that.click, reset);
                     });
 
                     // attach hover
-                    lists.find('li').bind('mouseenter mouseleave', function () {
+                    lists.find('li').on(that.pointerOverOut, function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -174,7 +182,7 @@
                         // do not attach hover effect if disabled
                         // cancel event if element has already hover class
                         if (el.hasClass(disabled) || el.hasClass(hover)) {
-                            return false;
+                            return true;
                         }
 
                         // reset
@@ -194,10 +202,13 @@
 
                         // Remove stale submenus
                         el.siblings().find('> ul').hide();
+                    }).on(that.click, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
                     });
 
                     // fix leave event
-                    lists.find('> ul').bind('mouseleave', function () {
+                    lists.find('> ul').on(that.pointerLeave, function () {
                         lists.find('li').removeClass(hover);
                     });
 
@@ -205,39 +216,39 @@
                     function reset() {
                         lists.removeClass(hover);
                         lists.find('ul ul').hide();
-                        item.find('> li').unbind('mouseenter');
-                        $(document).unbind(that.click);
+                        navigation.find('> li').off(that.mouseEnter);
+                        that.ui.document.off(that.click);
                     }
                 });
 
                 // attach event to the switcher elements
-                this.switcher.each(function () {
-                    $(this).bind(that.click, function (e) {
+                this.ui.switcher.each(function () {
+                    $(this).on(that.click, function (e) {
                         e.preventDefault();
                         that._setSwitcher($(e.currentTarget));
                     });
                 });
 
                 // attach event for first page publish
-                this.buttons.each(function () {
+                this.ui.buttons.each(function () {
                     var btn = $(this);
 
                     // in case the button has a data-rel attribute
                     if (btn.find('a').attr('data-rel')) {
-                        btn.on('click', function (e) {
+                        btn.on(that.click, function (e) {
                             e.preventDefault();
                             that._delegate($(this).find('a'));
                         });
                     }
 
                     // in case of the publish button
-                    btn.find('.cms-publish-page').bind(that.click, function (e) {
+                    btn.find('.cms-publish-page').on(that.click, function (e) {
                         if (!confirm(that.config.lang.publish)) {
                             e.preventDefault();
                         }
                     });
 
-                    btn.find('.cms-btn-publish').bind(that.click, function (e) {
+                    btn.find('.cms-btn-publish').on(that.click, function (e) {
                         e.preventDefault();
                         // send post request to prevent xss attacks
                         $.ajax({
@@ -257,34 +268,222 @@
                 });
             },
 
-            // public methods
-            toggleToolbar: function (show) {
-                // overwrite state when provided
-                if (show) {
-                    this.settings.toolbar = 'collapsed';
+            /**
+             * We check for various states on load if elements in the toolbar
+             * should appear or trigger other components. This preceeds a timeout
+             * which is not optimal and should be addressed separately.
+             *
+             * @method _initialStates
+             * @private
+             * @deprecated this method is deprecated now, it will be removed in > 3.2
+             */
+            _initialStates: function _initialStates() {
+                var publishBtn = $('.cms-btn-publish').parent();
+                var sideframe = new CMS.Sideframe();
+
+                // setup toolbar visibility, we need to reverse the options to set the correct state
+                if (this.settings.toolbar === 'expanded') {
+                    this.open({ duration: 0 });
+                } else {
+                    this.close();
                 }
-                // toggle bar
-                (this.settings.toolbar === 'collapsed') ? this._showToolbar(200) : this._hideToolbar(200);
+
+                // hide publish button
+                publishBtn.hide();
+
+                if ($('.cms-btn-publish-active').length) {
+                    publishBtn.show();
+                }
+
+                // check if debug is true
+                if (CMS.config.debug) {
+                    this._debug();
+                }
+
+                // check if there are messages and display them
+                if (CMS.config.messages) {
+                    this.openMessage({
+                        message: CMS.config.messages
+                    });
+                }
+
+                // check if there are error messages and display them
+                if (CMS.config.error) {
+                    this.openMessage({
+                        message: CMS.config.error,
+                        error: true
+                    });
+                }
+
+                // enforce open state if user is not logged in but requests the toolbar
+                if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
+                    this.open({ duration: 0 });
+                    this.settings = this.setSettings(CMS.config.settings);
+                }
+
+                // should switcher indicate that there is an unpublished page?
+                if (CMS.config.publisher) {
+                    this.openMessage({
+                        message: CMS.config.publisher,
+                        dir: 'right'
+                    });
+                    setInterval(function () {
+                        CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
+                    }, this.options.messageDelay);
+                }
+
+                // open sideframe if it was previously opened
+                if (this.settings.sideframe.url) {
+                    sideframe.open({
+                        url: this.settings.sideframe.url,
+                        animate: false
+                    });
+                }
+
+                // if there is a screenblock, do some resize magic
+                if (this.ui.screenBlock.length) {
+                    this._screenBlock();
+                }
+
+                // add toolbar ready class to body and fire event
+                this.ui.body.addClass('cms-ready');
+                this.ui.document.trigger('cms-ready');
             },
 
-            openMessage: function (msg, dir, delay, error) {
-                // set toolbar freeze
-                this._lock(true);
+            /**
+             * Toggles the toolbar state: open > closes / closed > opens.
+             *
+             * @method toggle
+             */
+            toggle: function toggle() {
+                // toggle bar
+                if (this.settings.toolbar === 'collapsed') {
+                    this.open();
+                } else {
+                    this.close();
+                }
+            },
+
+            /**
+             * Opens the toolbar (slide down).
+             *
+             * @method open
+             * @param [opts] {Object}
+             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             */
+            open: function open(opts) {
+                this._show(opts);
+
+                // set new settings
+                this.settings.toolbar = 'expanded';
+                this.settings = this.setSettings(this.settings);
+            },
+
+            /**
+             * Animation helper for opening the toolbar.
+             *
+             * @method _show
+             * @private
+             * @param [opts] {Object}
+             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             */
+            _show: function _show(opts) {
+                var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
+                var debugHeight = $('.cms-debug-bar').height() || 0;
+                var toolbarHeight = $('.cms-toolbar').height() + 10;
+
+                this.ui.toolbar.css({
+                    'transition': 'margin-top ' + speed + 'ms',
+                    'margin-top': 0
+                });
+                this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
+                // animate html
+                this.ui.body.addClass('cms-toolbar-expanded');
+                this.ui.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
+                // set messages top to toolbar height
+                this.ui.messages.css('top', toolbarHeight + 1);
+            },
+
+            /**
+             * Closes the toolbar (slide up).
+             *
+             * @method close
+             */
+            close: function close() {
+                this._hide();
+
+                // set new settings
+                this.settings.toolbar = 'collapsed';
+                this.settings = this.setSettings(this.settings);
+            },
+
+            /**
+             * Animation helper for closing the toolbar.
+             *
+             * @method _hide
+             * @private
+             */
+            _hide: function _hide() {
+                var speed = this.options.toolbarDuration;
+                var toolbarHeight = $('.cms-toolbar').height() + 10;
+
+                this.ui.toolbar.css('transition', 'margin-top ' + speed + 'ms');
+                // cancel if sideframe is active
+                if (this.lockToolbar) {
+                    return false;
+                }
+
+                this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+                this.ui.toolbar.css('margin-top', -toolbarHeight);
+                // animate html
+                this.ui.body.removeClass('cms-toolbar-expanded');
+                this.ui.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+                // set messages top to 0
+                this.ui.messages.css('top', 0);
+            },
+
+            /**
+             * Opens a message window underneath the toolbar.
+             *
+             * @method open
+             * @deprecated this will be moved to `cms.messages.js`
+             * @param opts
+             * @param opts.message {String|HTMLNode} message to be displayed
+             * @param [opts.dir='center'] {String} direction to be displayed `center` `left` or `right`
+             * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed
+             * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
+             */
+            openMessage: function openMessage(opts) {
+                if (!(opts && opts.message)) {
+                    throw new Error('The arguments passed to "openMessage" were invalid.');
+                }
+
+                var that = this;
+
+                var msg = opts.message;
+                var dir = opts.dir === undefined ? 'center' : opts.dir;
+                var delay = opts.delay === undefined ? this.options.messageDelay : opts.delay;
+                var error = opts.error === undefined ? false : opts.error;
+
+                var width = 320;
+                var height = this.ui.messages.outerHeight(true);
+                var top = this.ui.toolbar.outerHeight(true);
+                var close = this.ui.messages.find('.cms-messages-close');
 
                 // add content to element
-                this.messages.find('.cms-messages-inner').html(msg);
+                this.ui.messages.find('.cms-messages-inner').html(msg);
+
+                // error handling
+                this.ui.messages.removeClass('cms-messages-error');
+                if (error) {
+                    this.ui.messages.addClass('cms-messages-error');
+                }
 
                 // clear timeout
                 clearTimeout(this.timer);
 
-                // determine width
-                var that = this;
-                var width = 320;
-                var height = this.messages.outerHeight(true);
-                var top = this.toolbar.outerHeight(true);
-                var close = this.messages.find('.cms-messages-close');
                 close.hide();
-                close.bind(this.click, function () {
+                close.off(this.click).on(this.click, function () {
                     that.closeMessage();
                 });
 
@@ -299,145 +498,188 @@
                 }
 
                 // set correct position and show
-                this.messages.css('top', -height).show();
+                this.ui.messages.css('top', -height).show();
 
-                // error handling
-                this.messages.removeClass('cms-messages-error');
-                if (error) {
-                    this.messages.addClass('cms-messages-error');
-                }
-
-                // dir should be left, center, right
-                dir = dir || 'center';
                 // set correct direction and animation
                 switch (dir) {
                     case 'left':
-                        this.messages.css({
+                        this.ui.messages.css({
                             'top': top,
                             'left': -width,
                             'right': 'auto',
                             'margin-left': 0
                         });
-                        this.messages.animate({ 'left': 0 });
+                        this.ui.messages.animate({ 'left': 0 });
                         break;
                     case 'right':
-                        this.messages.css({
+                        this.ui.messages.css({
                             'top': top,
                             'right': -width,
                             'left': 'auto',
                             'margin-left': 0
                         });
-                        this.messages.animate({ 'right': 0 });
+                        this.ui.messages.animate({ 'right': 0 });
                         break;
                     default:
-                        this.messages.css({
+                        this.ui.messages.css({
                             'left': '50%',
                             'right': 'auto',
                             'margin-left': -(width / 2)
                         });
-                        this.messages.animate({ 'top': top });
+                        this.ui.messages.animate({ 'top': top });
                 }
 
-                // cancel autohide if delay is 0
-                if (delay === 0) {
+                // cancel autohide if delay is <= 0
+                if (delay <= 0) {
                     close.show();
-                    return false;
+                } else {
+                    // add delay to hide if delay > 0
+                    this.timer = setTimeout(function () {
+                        that.closeMessage();
+                    }, delay);
                 }
-                // add delay to hide
-                this.timer = setTimeout(function () {
-                    that.closeMessage();
-                }, delay || this.options.messageDelay);
             },
 
-            closeMessage: function () {
-                this.messages.fadeOut(300);
-                // unlock toolbar
-                this._lock(false);
+            /**
+             * Closes the message window underneath the toolbar.
+             *
+             * @method closeMessage
+             * @deprecated this will be moved to `cms.messages.js`
+             */
+            closeMessage: function closeMessage() {
+                this.ui.messages.fadeOut(this.options.toolbarDuration);
             },
 
-            openAjax: function (url, post, text, callback, onSuccess) {
+            /**
+             * Closes the message window underneath the toolbar.
+             *
+             * @method open
+             * @param opts
+             * @param opts.url {String} url where the ajax points to
+             * @param [opts.post] {Object} post data to be passed
+             * @param [opts.text] {String} message to be displayed
+             * @param [opts.callback] {Function} custom callback instead of reaload
+             * @param [opts.onSuccess] {String} reload and display custom message
+             * @return {Boolean|jQuery.Deferred} either false or a promise
+             */
+            openAjax: function (opts) {
                 var that = this;
-
-                // check if we have a confirmation text
+                // url, post, text, callback, onSuccess
+                var url = opts.url;
+                var post = opts.post || '{}';
+                var text = opts.text || '';
+                var callback = opts.callback;
+                var onSuccess = opts.onSuccess;
                 var question = (text) ? confirm(text) : true;
+
                 // cancel if question has been denied
                 if (!question) {
                     return false;
                 }
 
                 // set loader
-                this._loader(true);
+                this.showLoader();
 
-                $.ajax({
-                    'type': 'POST',
-                    'url': url,
-                    'data': (post) ? JSON.parse(post) : {},
-                    'success': function (response) {
-                        CMS.API.locked = false;
+                return $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: (post) ? JSON.parse(post) : {}
+                }).done(function (response) {
+                    CMS.API.locked = false;
 
-                        if (callback) {
-                            callback(that, response);
-                            that._loader(false);
-                        } else if (onSuccess) {
-                            CMS.API.Helpers.reloadBrowser(onSuccess, false, true);
-                        } else {
-                            // reload
-                            CMS.API.Helpers.reloadBrowser(false, false, true);
-                        }
-                    },
-                    'error': function (jqXHR) {
-                        CMS.API.locked = false;
-                        that.showError(jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText);
+                    if (callback) {
+                        callback(that, response);
+                        that.hideLoader();
+                    } else if (onSuccess) {
+                        CMS.API.Helpers.reloadBrowser(onSuccess, false, true);
+                    } else {
+                        // reload
+                        CMS.API.Helpers.reloadBrowser(false, false, true);
                     }
+                }).fail(function (jqXHR) {
+                    CMS.API.locked = false;
+
+                    that.openMessage({
+                        message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                        error: true
+                    });
                 });
             },
 
-            showError: function (msg, reload) {
-                this.openMessage(msg, 'center', 0, true);
-                // force reload if param is passed
-                if (reload) {
-                    CMS.API.Helpers.reloadBrowser(false, this.options.messageDelay);
+            /**
+             * Shows the loader spinner on the trigger knob for the toolbar.
+             *
+             * @method showLoader
+             */
+            showLoader: function showLoader() {
+                this.ui.toolbarTrigger.addClass('cms-toolbar-loader');
+            },
+
+            /**
+             * Hides the loader spinner on the trigger knob for the toolbar.
+             *
+             * @method hideLoader
+             */
+            hideLoader: function hideLoader() {
+                this.ui.toolbarTrigger.removeClass('cms-toolbar-loader');
+            },
+
+            /**
+             * Delegates event from element to appropriate functionalities.
+             *
+             * @method _delegate
+             * @param el {jQuery} trigger element
+             * @private
+             */
+            _delegate: function _delegate(el) {
+                // save local vars
+                var target = el.data('rel');
+
+                switch (target) {
+                    case 'modal':
+                        var modal = new CMS.Modal({'onClose': el.data('on-close')});
+                        modal.open({
+                            url: el.attr('href'),
+                            title: el.data('name')
+                        });
+                        break;
+                    case 'message':
+                        this.openMessage({
+                            message: el.data('text')
+                        });
+                        break;
+                    case 'cms_frame':
+                        var frame = window.open(el.attr('href'), 'cms_frame');
+                        frame.focus();
+                        break;
+                    case 'sideframe':
+                        var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
+                        sideframe.open({
+                            url: el.attr('href'),
+                            animate: true
+                        });
+                        break;
+                    case 'ajax':
+                        this.openAjax({
+                            url: el.attr('href'),
+                            post: JSON.stringify(el.data('post')),
+                            text: el.data('text'),
+                            onSuccess: el.data('on-success')
+                        });
+                        break;
+                    default:
+                        window.location.href = el.attr('href');
                 }
             },
 
-            // private methods
-            _showToolbar: function (speed, init) {
-                this.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
-                this.toolbar.slideDown(speed);
-                // animate html
-                this.body.animate({ 'margin-top': (this.config.debug) ? 35 : 30 }, (init) ? 0 : speed, function () {
-                    $(this).addClass('cms-toolbar-expanded');
-                });
-                // set messages top to toolbar height
-                this.messages.css('top', 31);
-                // set new settings
-                this.settings.toolbar = 'expanded';
-                if (!init) {
-                    this.settings = this.setSettings(this.settings);
-                }
-            },
-
-            _hideToolbar: function (speed, init) {
-                // cancel if sideframe is active
-                if (this.lockToolbar) {
-                    return false;
-                }
-
-                this.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
-                this.toolbar.slideUp(speed);
-                // animate html
-                this.body.removeClass('cms-toolbar-expanded')
-                    .animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
-                // set messages top to 0
-                this.messages.css('top', 0);
-                // set new settings
-                this.settings.toolbar = 'collapsed';
-                if (!init) {
-                    this.settings = this.setSettings(this.settings);
-                }
-            },
-
-            _setSwitcher: function (el) {
+            /**
+             * Sets the functionality for the switcher button.
+             *
+             * @method _setSwitcher
+             * @param el {jQuery} button element
+             * @private
+             */
+            _setSwitcher: function _setSwitcher(el) {
                 // save local vars
                 var active = el.hasClass('cms-toolbar-item-switch-active');
                 var anchor = el.find('a');
@@ -446,7 +688,10 @@
 
                 // prevent if switchopstion is passed
                 if (this.options.preventSwitch) {
-                    this.openMessage(this.options.preventSwitchMessage, 'right');
+                    this.openMessage({
+                        message: this.options.preventSwitchMessage,
+                        dir: 'right'
+                    });
                     return false;
                 }
 
@@ -481,88 +726,76 @@
                 }, duration);
             },
 
-            _delegate: function (el) {
-                // save local vars
-                var target = el.data('rel');
-
-                switch (target) {
-                    case 'modal':
-                        var modal = new CMS.Modal({'onClose': el.data('on-close')});
-                        modal.open(el.attr('href'), el.data('name'));
-                        break;
-                    case 'message':
-                        this.openMessage(el.data('text'));
-                        break;
-                    case 'sideframe':
-                        var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
-                        sideframe.open(el.attr('href'), true);
-                        break;
-                    case 'ajax':
-                        this.openAjax(el.attr('href'), JSON.stringify(
-                            el.data('post')), el.data('text'), null, el.data('on-success')
-                        );
-                        break;
-                    default:
-                        window.location.href = el.attr('href');
-                }
-            },
-
-            _lock: function (lock) {
+            /**
+             * Locks the toolbar so it cannot be closed.
+             *
+             * @method _lock
+             * @param lock {Boolean} true if the toolbar should be locked
+             * @private
+             */
+            _lock: function _lock(lock) {
                 if (lock) {
                     this.lockToolbar = true;
                     // make button look disabled
-                    this.toolbarTrigger.css('opacity', 0.2);
+                    this.ui.toolbarTrigger.css('opacity', 0.2);
                 } else {
                     this.lockToolbar = false;
                     // make button look disabled
-                    this.toolbarTrigger.css('opacity', 1);
+                    this.ui.toolbarTrigger.css('opacity', 1);
                 }
             },
 
-            _loader: function (loader) {
-                if (loader) {
-                    this.toolbarTrigger.addClass('cms-toolbar-loader');
-                } else {
-                    this.toolbarTrigger.removeClass('cms-toolbar-loader');
-                }
-            },
-
-            _debug: function () {
+            /**
+             * Handles the debug bar when `DEBUG=true` on top of the toolbar.
+             *
+             * @method _debug
+             * @private
+             */
+            _debug: function _debug() {
                 var that = this;
                 var timeout = 1000;
                 var timer = function () {};
 
                 // bind message event
-                var debug = this.container.find('.cms-debug-bar');
-                debug.bind('mouseenter mouseleave', function (e) {
+                var debug = this.ui.container.find('.cms-debug-bar');
+                debug.on(this.mouseEnter + ' ' + this.mouseLeave, function (e) {
                     clearTimeout(timer);
 
-                    if (e.type === 'mouseenter') {
+                    if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
-                            that.openMessage(that.config.lang.debug);
+                            that.openMessage({
+                                message: that.config.lang.debug
+                            });
                         }, timeout);
                     }
                 });
             },
 
-            _screenBlock: function () {
+            /**
+             * This shows a dark screen with a note "This page is a redirect"
+             * on a page where the settings have been modified to redirect to
+             * another page.
+             *
+             * @method _screenBlock
+             * @private
+             */
+            _screenBlock: function _screenBlock() {
+                var that = this;
                 var interval = 20;
-                var blocker = this.screenBlock;
+                var blocker = this.ui.screenBlock;
                 var sideframe = $('.cms-sideframe');
 
                 // automatically resize screenblock window according to given attributes
-                $(window).on('resize.cms.screenblock', function () {
-                    var width = $(this).width() - sideframe.width();
-
+                $(window).on(this.resize, function () {
                     blocker.css({
-                        'width': width,
+                        'width': $(this).width() - sideframe.width(),
                         'height': $(window).height()
                     });
                 }).trigger('resize');
 
                 // set update interval
                 setInterval(function () {
-                    $(window).trigger('resize.cms.screenblock');
+                    $(window).trigger(that.resize);
                 }, interval);
             }
 

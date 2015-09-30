@@ -7,6 +7,7 @@ from django.contrib.auth.models import AnonymousUser, Permission, Group
 from django.template import Template, TemplateSyntaxError
 from django.test.utils import override_settings
 from django.utils.translation import activate
+from cms.apphook_pool import apphook_pool
 from menus.base import NavigationNode, Menu
 from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
@@ -122,6 +123,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             self.assertEqual(static_menus_2, 0)
 
     def test_multiple_menus(self):
+        apphook_pool.discover_apps()
         with self.settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests'):
             create_page("apphooked-page", "nav_playground.html", "en",
                         published=True, apphook="SampleApp2")
@@ -135,6 +137,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
             menu_pool._expand_menus()
 
             self.assertEqual(len(menu_pool.get_menus_by_attribute("cms_enabled", True)), 2)
+
 
 class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
     """
