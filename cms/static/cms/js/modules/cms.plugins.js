@@ -139,7 +139,7 @@
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    (e.type === 'pointerover') ? that.showTooltip(e, name, id) : that.hideTooltip();
                 });
 
                 // adds listener for all plugin updates
@@ -206,7 +206,7 @@
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
                     if (e.type === 'pointerover') {
-                        that.showTooltip(name, id);
+                        that.showTooltip(e, name, id);
                     } else {
                         that.hideTooltip();
                     }
