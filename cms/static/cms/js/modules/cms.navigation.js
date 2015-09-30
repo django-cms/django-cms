@@ -31,8 +31,11 @@ var CMS = window.CMS || {};
                 this._setupUI();
                 this.getWidths();
 
-                /** The zero based index of the right-most visible nav menu item. */
+                /** The zero based index of the right-most visible menu item of the left toolbar part. */
                 this.rightMostItemIndex = this.items.left.length - 1;
+
+                /** The zero based index of the left-most visible item of the right toolbar part. */
+                this.leftMostItemIndex = 0;
 
                 this._events();
             },
@@ -153,8 +156,8 @@ var CMS = window.CMS || {};
                     this.showAll();
                 } else {
                     // first handle the left part
-                    remainingWidth = availableWidth - this.items.moreButtonWidth -
-                        this.ui.toolbarRightPart.width();
+                    remainingWidth = availableWidth - this.items.moreButtonWidth - this.items.rightTotalWidth;
+                    console.log('remainingWidth', remainingWidth);
 
                     // Figure out how many nav menu items fit into the available space.
                     var newRightMostItemIndex = -1;
@@ -168,7 +171,27 @@ var CMS = window.CMS || {};
                     } else if (this.rightMostItemIndex < newRightMostItemIndex) {
                         this.moveOutOfDropdown(newRightMostItemIndex - this.rightMostItemIndex);
                     }
+
                     this.showDropdown();
+
+                    if (remainingWidth <= 0) {
+                        console.log('do the right part');
+                        remainingWidth += this.items.rightTotalWidth;
+
+                        var newLeftMostItemIndex = this.items.right.length;
+                        while (remainingWidth - this.items.right[newLeftMostItemIndex - 1].width > 0) {
+                            remainingWidth -= this.items.right[newLeftMostItemIndex - 1].width;
+                            newLeftMostItemIndex--;
+                        }
+
+                        if (newLeftMostItemIndex > this.leftMostItemIndex) {
+                            this.moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
+                        } else if (newLeftMostItemIndex < this.leftMostItemIndex) {
+                            this.moveOutOfDropdown(this.leftMostItemIndex - newLeftMostItemIndex, 'right');
+                        }
+                    } else {
+                        this.showAllRight();
+                    }
                 }
             },
 
@@ -178,60 +201,120 @@ var CMS = window.CMS || {};
              * @method showAll
              */
             showAll: function showAll() {
-                this.moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
+                this.showAllLeft();
+                this.showAllRight();
                 this.hideDropdown();
             },
 
             /**
-             * Moves items into the dropdown
+             * Show all items in the left part of the toolbar
              *
-             * @param numberOfItems Number how many items to move to dropdown
+             * @method showAllLeft
              */
-            moveToDropdown: function moveToDropdown(numberOfItems) {
+            showAllLeft: function showAllLeft() {
+                this.moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
+            },
+
+            /**
+             * Show all items in the right part of the toolbar
+             *
+             * @method showAllRight
+             */
+            showAllRight: function showAllRight() {
+                this.moveOutOfDropdown(this.leftMostItemIndex, 'right');
+            },
+
+            /**
+             * Moves items into the dropdown, reducing menu right-to-left in case it's a left part of toolbar
+             * and left-to-right if it's right one
+             *
+             * @param numberOfItems {Number} how many items to move to dropdown
+             * @param part {String} from which part to move to dropdown (defaults to left)
+             */
+            moveToDropdown: function moveToDropdown(numberOfItems, part) {
                 if (numberOfItems <= 0) {
                     return;
                 }
 
-                // Move items (working right-to-left) from the nav bar to the more menu.
                 var item;
-                var rightMostIndexToMove = this.rightMostItemIndex;
-                var leftMostIndexToMove = this.rightMostItemIndex - numberOfItems + 1;
-                for (var i = rightMostIndexToMove; i >= leftMostIndexToMove; i--) {
-                    item = this.items.left[i].element;
+                var leftMostIndexToMove;
+                var rightMostIndexToMove;
+                var i;
 
-                    this.ui.dropdown.prepend(item);
-                    if (item.find('> ul').children().length) {
-                        item.addClass('cms-toolbar-item-navigation-children');
+                if (part === 'right') {
+                    console.log('moving from right part to dropdown');
+                    // Move items (working left-to-right) from the toolbar left part to the more menu.
+                    leftMostIndexToMove = this.leftMostItemIndex;
+                    rightMostIndexToMove = this.leftMostItemIndex + numberOfItems - 1;
+                    for (i = leftMostIndexToMove; i <= rightMostIndexToMove; i++) {
+                        item = this.items.right[i].element;
+
+                        this.ui.dropdown.append(item.wrap('<li></li>').parent());
                     }
-                }
 
-                this.rightMostItemIndex -= numberOfItems;
+                    this.leftMostItemIndex += numberOfItems;
+                } else {
+                    // Move items (working right-to-left) from the toolbar left part to the more menu.
+                    rightMostIndexToMove = this.rightMostItemIndex;
+                    leftMostIndexToMove = this.rightMostItemIndex - numberOfItems + 1;
+                    for (i = rightMostIndexToMove; i >= leftMostIndexToMove; i--) {
+                        item = this.items.left[i].element;
+
+                        this.ui.dropdown.prepend(item);
+                        if (item.find('> ul').children().length) {
+                            item.addClass('cms-toolbar-item-navigation-children');
+                        }
+                    }
+
+                    this.rightMostItemIndex -= numberOfItems;
+                }
             },
 
             /**
              * Moves items out of the dropdown
              *
              * @param numberOfItems Number how many items to move out of the dropdown
+             * @param part {String} to which part to move out of dropdown (defaults to left)
              */
-            moveOutOfDropdown: function moveOutOfDropdown(numberOfItems) {
+            moveOutOfDropdown: function moveOutOfDropdown(numberOfItems, part) {
                 if (numberOfItems <= 0) {
                     return;
                 }
 
-                // Move items (working top-to-bottom) from the more menu into the nav bar.
+                var i;
                 var item;
-                var leftMostIndexToMove = this.rightMostItemIndex + 1;
-                var rightMostIndexToMove = this.rightMostItemIndex + numberOfItems;
+                var leftMostIndexToMove;
+                var rightMostIndexToMove;
 
-                for (var i = leftMostIndexToMove; i <= rightMostIndexToMove; i++) {
-                    item = this.items.left[i].element;
+                if (part === 'right') {
+                    console.log('moving out of right part');
+                    // Move items (working bottom-to-top) from the more menu into the toolbar right part.
+                    rightMostIndexToMove = this.leftMostItemIndex - 1;
+                    leftMostIndexToMove = this.leftMostItemIndex - numberOfItems;
 
-                    item.insertBefore(this.ui.trigger);
-                    item.removeClass('cms-toolbar-item-navigation-children');
-                    item.find('> ul').removeAttr('style');
+                    for (i = rightMostIndexToMove; i >= leftMostIndexToMove; i--) {
+                        item = this.items.right[i].element;
+                        item.unwrap('<li></li>');
+
+                        item.prependTo(this.ui.toolbarRightPart);
+                    }
+
+                    this.leftMostItemIndex -= numberOfItems;
+                } else {
+                    // Move items (working top-to-bottom) from the more menu into the toolbar left part.
+                    leftMostIndexToMove = this.rightMostItemIndex + 1;
+                    rightMostIndexToMove = this.rightMostItemIndex + numberOfItems;
+
+                    for (i = leftMostIndexToMove; i <= rightMostIndexToMove; i++) {
+                        item = this.items.left[i].element;
+
+                        item.insertBefore(this.ui.trigger);
+                        item.removeClass('cms-toolbar-item-navigation-children');
+                        item.find('> ul').removeAttr('style');
+                    }
+
+                    this.rightMostItemIndex += numberOfItems;
                 }
-
-                this.rightMostItemIndex += numberOfItems;
             }
 
         });
