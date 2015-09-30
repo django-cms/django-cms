@@ -19,6 +19,12 @@
                 {% for item in request.toolbar.get_left_items %}
                     {{ item.render }}
                 {% endfor %}
+                <li class="cms-toolbar-more">
+                    <a href="#">
+                        <span>{% trans "More" %}...<span class="cms-icon cms-icon-arrow"></span></span>
+                    </a>
+                    <ul></ul>
+                </li>
             </ul>
             {% endif %}
         </div>
