@@ -16,9 +16,8 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            margin-left: -($submenu-icon-size / 2);
-            margin-top: -($submenu-icon-size / 2);
-            font-size: $submenu-icon-size;
+            margin-left: -($icon-size / 2);
+            margin-top: -($icon-size / 2);
             color: $submenu-icon-color;
         }
 
@@ -53,8 +52,6 @@
     .cms-submenu-edit,
     .cms-submenu-add {
         &:before {
-            $icon-size: $submenu-icon-size - 3px;
-            font-size: $icon-size;
             margin-left: -($icon-size / 2);
             margin-top: -($icon-size / 2);
             font-size: $icon-size;
