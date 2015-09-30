@@ -23,20 +23,25 @@
         box-shadow: $toolbar-shadow;
 
         .cms-toolbar-left {
-            position: relative;
-            float: left;
+            position: absolute;
+            left: 0;
+            top: 0;
             z-index: z(toolbar, left);
             padding-left: $toolbar-left-space;
         }
         .cms-toolbar-right {
-            position: relative;
-            float: right;
+            position: absolute;
+            right: 0;
+            top: 0;
             z-index: z(toolbar, right);
             padding-right: $toolbar-trigger-width + 2px;
         }
 
         .cms-toolbar-left .cms-toolbar-item {
-            margin-left: $toolbar-left-space;
+            margin-right: $toolbar-left-space;
+            &:last-child {
+                margin-right: 0;
+            }
         }
         .cms-toolbar-right .cms-toolbar-item {
             margin-right: $toolbar-right-space;
@@ -45,13 +50,6 @@
         // items
         .cms-toolbar-item {
             float: left;
-        }
-    }
-
-    // do some responsive magic
-    @media only screen and (max-width: $toolbar-right-hide-breakpoint) {
-        .cms-toolbar-right {
-            display: none;
         }
     }
 
@@ -202,6 +200,10 @@
             }
         }
     }
+
+    .cms-toolbar-more {
+        display: none;
+    }
     .cms-toolbar-item-cms-mode-switcher {
         display: none;
     }
@@ -273,7 +275,7 @@
     //###########################################################
     // #TOOLBAR/elements/logo#
     .cms-toolbar-item-logo {
-        margin: 0 !important;
+        margin-right: $toolbar-left-space;
 
         a {
             @extend .cms-icon;
