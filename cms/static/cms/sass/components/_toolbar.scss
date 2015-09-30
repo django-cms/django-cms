@@ -380,7 +380,7 @@
         a {
             display: block;
             width: $toolbar-trigger-width;
-            height: $toolbar-trigger-height;
+            height: $toolbar-trigger-height - 1px;
             text-align: center;
             border-top: 1px solid $white;
             border-left: 1px solid $white;
