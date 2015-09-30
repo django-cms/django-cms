@@ -4,7 +4,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.utils.translation import override as force_language
+from django.utils.translation import override as force_language, force_text
 
 
 class WizardBase(object):
@@ -37,6 +37,9 @@ class Wizard(WizardBase):
 
     def __str__(self):
         return self.title
+
+    def __repr__(self):
+        return 'Wizard: "{0}"'.format(force_text(self.title))
 
     def user_has_add_permission(self, user):
         """
