@@ -336,6 +336,7 @@ var CMS = {
              * @param wait {Number} time in ms to wait
              * @param [opts] {Object}
              * @param [opts.immediate] {Boolean} trigger func immediately?
+             * @return {Function}
              */
             debounce: function debounce(func, wait, opts) {
                 var timeout;
