@@ -68,11 +68,8 @@ class WizardPool(object):
         """
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
         if self.is_registered(entry):
-            try:
-                del self._entries[entry.id]
-                return True
-            except KeyError:
-                pass
+            del self._entries[entry.id]
+            return True
         return False
 
     def get_entry(self, entry):

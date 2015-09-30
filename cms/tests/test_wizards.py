@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase
 from cms.wizards.wizard_base import Wizard
-from cms.wizards.wizard_pool import wizard_pool
+from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
 
 
 class TestPageWizard(Wizard):
@@ -64,6 +64,10 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool._clear()
         self.assertEqual(len(wizard_pool._entries), 0)
         wizard_pool.register(self.page_wizard)
+        # Now, try to register the same thing
+        with self.assertRaises(AlreadyRegisteredException):
+            wizard_pool.register(self.page_wizard)
+
         self.assertEqual(len(wizard_pool._entries), 1)
         self.assertTrue(wizard_pool.is_registered(self.page_wizard))
         self.assertTrue(wizard_pool.unregister(self.page_wizard))
