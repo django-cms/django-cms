@@ -91,6 +91,7 @@ var CMS = window.CMS || {};
                     container: container,
                     body: $('html'),
                     document: $(document),
+                    window: $(window),
                     toolbar: container.find('.cms-toolbar'),
                     toolbarTrigger: container.find('.cms-toolbar-trigger'),
                     navigations: container.find('.cms-toolbar-item-navigation'),
@@ -173,10 +174,11 @@ var CMS = window.CMS || {};
                         isTouchingTopLevelMenu = false;
                         // create the document event
                         that.ui.document.on(that.click, reset);
+                        that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 50));
                     });
 
                     // attach hover
-                    lists.find('li').on(that.pointerOverOut, function () {
+                    lists.on(that.pointerOverOut, 'li', function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -211,7 +213,7 @@ var CMS = window.CMS || {};
                     });
 
                     // fix leave event
-                    lists.find('> ul').on(that.pointerLeave, function () {
+                    lists.on(that.pointerLeave, '> ul', function () {
                         lists.find('li').removeClass(hover);
                     });
 
