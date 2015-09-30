@@ -1,25 +1,33 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
+from django.forms.models import ModelForm
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
+
+from cms.api import create_page
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Page, UserSettings
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
 
 
-class TestPageWizard(Wizard):
-    pass
-
-class TestUserSettingsWizard(Wizard):
-    pass
-
-class PageWizardForm(forms.Form):
+class WizardForm(forms.Form):
     pass
 
 
-class TitleWizardForm(forms.Form):
-    pass
+class ModelWizardForm(ModelForm):
+    class Meta:
+        model = UserSettings
+
+
+class BadModelForm(ModelForm):
+    class Meta:
+        pass
 
 
 class WizardTestMixin(object):
@@ -32,19 +40,74 @@ class WizardTestMixin(object):
         # This prevents auto-discovery, which would otherwise occur as soon as
         # tests start, creating unexpected starting conditions.
         wizard_pool._discovered = True
-        cls.page_wizard = TestPageWizard(
+
+        # This is a basic Wizard
+        cls.page_wizard = Wizard(
             title=_(u"Page"),
             weight=100,
-            form=PageWizardForm,
+            form=WizardForm,
             model=Page,
+            template_name='my_template.html',  # This doesn't exist anywhere
         )
-        # NOTE: This is rather nonsensical, but is quite useful for our tests.
-        cls.user_settings_wizard = TestUserSettingsWizard(
+
+        # This is a Wizard that uses a ModelForm to define the model
+        cls.user_settings_wizard = Wizard(
             title=_(u"UserSettings"),
             weight=200,
-            form=TitleWizardForm,
-            model=UserSettings,
+            form=ModelWizardForm,
         )
+
+        # This is a bad wizard definition as it neither defines a model, nor
+        # uses a ModelForm that has model defined in Meta
+        cls.title_wizard = Wizard(
+            title=_(u"Page"),
+            weight=100,
+            form=BadModelForm,
+            template_name='my_template.html',  # This doesn't exist anywhere
+        )
+
+
+class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
+
+    def test_str(self):
+        self.assertEqual(str(self.page_wizard), self.page_wizard.title)
+
+    def test_repr(self):
+        self.assertEqual(self.page_wizard.__repr__(), 'Wizard: "Page"')
+
+    def test_user_has_add_permission(self):
+        # Test does not have permission
+        user = self.get_staff_user_with_no_permissions()
+        self.assertFalse(self.page_wizard.user_has_add_permission(user))
+
+        # Test has permission
+        user = self.get_superuser()
+        self.assertTrue(self.page_wizard.user_has_add_permission(user))
+
+    def test_get_success_url(self):
+        user = self.get_superuser()
+        page = create_page(
+            title="Sample Page",
+            template=TEMPLATE_INHERITANCE_MAGIC,
+            language="en",
+            created_by=smart_text(user),
+            parent=None,
+            in_navigation=True,
+            published=False
+        )
+        url = page.get_absolute_url(language="en")
+        self.assertEqual(
+            self.page_wizard.get_success_url(page, language="en"), url)
+
+        # Now again without a language code
+        url = page.get_absolute_url()
+        self.assertEqual(self.page_wizard.get_success_url(page), url)
+
+    def test_get_model(self):
+        self.assertEqual(self.page_wizard.get_model(), Page)
+        self.assertEqual(self.user_settings_wizard.get_model(), UserSettings)
+        with self.assertRaises(ImproperlyConfigured):
+            self.title_wizard.get_model()
 
 
 class TestWizardPool(WizardTestMixin, CMSTestCase):

@@ -65,6 +65,8 @@ class Wizard(WizardBase):
         if self.model:
             return self.model
         if issubclass(self.form, ModelForm):
-            return self.form._meta.model
+            model = self.form._meta.model
+            if model:
+                return model
         raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
                                    u"ModelForm subclass as a form")
