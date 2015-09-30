@@ -81,6 +81,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/modules/cms.clipboard.js',
         PROJECT_PATH.js + '/modules/cms.plugins.js',
         PROJECT_PATH.js + '/modules/cms.structureboard.js',
+        PROJECT_PATH.js + '/modules/cms.navigation.js',
         PROJECT_PATH.js + '/modules/cms.toolbar.js'
     ]
 };

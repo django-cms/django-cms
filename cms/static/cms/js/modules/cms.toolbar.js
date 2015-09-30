@@ -24,6 +24,7 @@ var CMS = window.CMS || {};
          * @class Toolbar
          * @namespace CMS
          * @uses CMS.API.Helpers
+         * @uses CMS.Navigation
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -43,6 +44,8 @@ var CMS = window.CMS || {};
 
                 // elements
                 this._setupUI();
+
+                this.navigation = new CMS.Navigation();
 
                 // states
                 this.click = 'click.cms.toolbar';
