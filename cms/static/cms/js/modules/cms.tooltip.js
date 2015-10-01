@@ -64,7 +64,7 @@ var CMS = window.CMS || {};
              * @param id {String} - current plugin id
              */
             displayToggle: function (isShown, e, name, id) {
-                isShown ? CMS.API.Tooltip.show(e, name, id) : CMS.API.Tooltip.hide();
+                isShown ? this.show(e, name, id) : this.hide();
             },
 
             /**
