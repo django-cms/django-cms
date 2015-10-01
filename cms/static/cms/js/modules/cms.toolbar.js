@@ -115,6 +115,7 @@ var CMS = window.CMS || {};
                 this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
                     e.preventDefault();
                     that.toggle();
+                    that.ui.document.trigger(that.click);
                 });
 
                 // attach event to the navigation elements
