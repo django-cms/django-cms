@@ -114,6 +114,7 @@ var CMS = window.CMS || {};
 
             /**
              * Calculates available width based on the state of the page
+             *
              * @method calculateAvailableWidth
              */
             calculateAvailableWidth: function calculateAvailableWidth() {
@@ -157,7 +158,6 @@ var CMS = window.CMS || {};
                 } else {
                     // first handle the left part
                     remainingWidth = availableWidth - this.items.moreButtonWidth - this.items.rightTotalWidth;
-                    console.log('remainingWidth', remainingWidth);
 
                     // Figure out how many nav menu items fit into the available space.
                     var newRightMostItemIndex = -1;
@@ -175,7 +175,6 @@ var CMS = window.CMS || {};
                     this.showDropdown();
 
                     if (remainingWidth < 0 && this.rightMostItemIndex === -1) {
-                        console.log('do the right part');
                         remainingWidth += this.items.rightTotalWidth;
 
                         var newLeftMostItemIndex = this.items.right.length;
@@ -242,7 +241,6 @@ var CMS = window.CMS || {};
                 var i;
 
                 if (part === 'right') {
-                    console.log('moving from right part to dropdown');
                     // Move items (working left-to-right) from the toolbar left part to the more menu.
                     leftMostIndexToMove = this.leftMostItemIndex;
                     rightMostIndexToMove = this.leftMostItemIndex + numberOfItems - 1;
@@ -287,7 +285,6 @@ var CMS = window.CMS || {};
                 var rightMostIndexToMove;
 
                 if (part === 'right') {
-                    console.log('moving out of right part');
                     // Move items (working bottom-to-top) from the more menu into the toolbar right part.
                     rightMostIndexToMove = this.leftMostItemIndex - 1;
                     leftMostIndexToMove = this.leftMostItemIndex - numberOfItems;
