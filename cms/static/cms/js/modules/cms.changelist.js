@@ -265,7 +265,7 @@
                     // check for reload changes
                     if (window.self !== window.top) {
                         window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
-                        window.parent.CMS.API.Toolbar.openMessage({
+                        window.parent.CMS.API.Messages.open({
                             message: that.options.lang.changes,
                             delay: 0
                         });

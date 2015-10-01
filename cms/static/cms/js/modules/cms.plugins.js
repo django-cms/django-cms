@@ -243,7 +243,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        CMS.API.Toolbar.openMessage({
+                        CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -282,6 +282,7 @@
                 CMS.API.locked = true;
 
                 var move = (options || source_language) ? true : false;
+
                 // set correct options
                 options = options || this.options;
                 if (source_language) {
@@ -306,7 +307,7 @@
                     url: options.urls.copy_plugin,
                     data: data,
                     success: function () {
-                        CMS.API.Toolbar.openMessage({
+                        CMS.API.Messages.open({
                             message: CMS.config.lang.success
                         });
                         // reload
@@ -316,7 +317,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        CMS.API.Toolbar.openMessage({
+                        CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -364,7 +365,7 @@
                         url: that.options.urls.move_plugin,
                         data: data,
                         success: function () {
-                            CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+                            CMS.API.Messages.open(CMS.config.lang.success);
                             // if response is reload
                             CMS.API.Helpers.reloadBrowser();
                         },
@@ -372,7 +373,7 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            CMS.API.Toolbar.openMessage({
+                            CMS.API.Messages.open({
                                 message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -441,7 +442,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        CMS.API.Toolbar.openMessage({
+                        CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
