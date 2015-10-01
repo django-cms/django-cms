@@ -178,15 +178,21 @@ var CMS = window.CMS || {};
                         remainingWidth += this.items.rightTotalWidth;
 
                         var newLeftMostItemIndex = this.items.right.length;
-                        while (remainingWidth - this.items.right[newLeftMostItemIndex - 1].width > 0) {
-                            remainingWidth -= this.items.right[newLeftMostItemIndex - 1].width;
-                            newLeftMostItemIndex--;
-                        }
+                        if (false) {
+                            // if you want to move items from the right one by one
+                            while (remainingWidth - this.items.right[newLeftMostItemIndex - 1].width > 0) {
+                                remainingWidth -= this.items.right[newLeftMostItemIndex - 1].width;
+                                newLeftMostItemIndex--;
+                            }
 
-                        if (newLeftMostItemIndex > this.leftMostItemIndex) {
+                            if (newLeftMostItemIndex > this.leftMostItemIndex) {
+                                this.moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
+                            } else if (newLeftMostItemIndex < this.leftMostItemIndex) {
+                                this.moveOutOfDropdown(this.leftMostItemIndex - newLeftMostItemIndex, 'right');
+                            }
+                        } else {
+                            // but for now we want to move all of them immediately
                             this.moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
-                        } else if (newLeftMostItemIndex < this.leftMostItemIndex) {
-                            this.moveOutOfDropdown(this.leftMostItemIndex - newLeftMostItemIndex, 'right');
                         }
                     } else {
                         this.showAllRight();
@@ -247,7 +253,7 @@ var CMS = window.CMS || {};
                     for (i = leftMostIndexToMove; i <= rightMostIndexToMove; i++) {
                         item = this.items.right[i].element;
 
-                        this.ui.dropdown.append(item.wrap('<li></li>').parent());
+                        this.ui.dropdown.prepend(item.wrap('<li class="cms-more-buttons"></li>').parent());
                     }
 
                     this.leftMostItemIndex += numberOfItems;
