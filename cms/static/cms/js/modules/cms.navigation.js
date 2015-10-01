@@ -193,9 +193,11 @@ var CMS = window.CMS || {};
                         } else {
                             // but for now we want to move all of them immediately
                             this.moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
+                            this.ui.dropdown.addClass('cms-more-dropdown-full');
                         }
                     } else {
                         this.showAllRight();
+                        this.ui.dropdown.removeClass('cms-more-dropdown-full');
                     }
                 }
             },
