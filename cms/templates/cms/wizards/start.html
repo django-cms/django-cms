@@ -19,7 +19,7 @@
             {% for entry in form.entry %}
                 <label class="choice active">
                     <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}" checked>
-                    <strong>New page</strong>
+                    <strong>{{ entry.choice_label }}</strong>
                     <span class="info">Start with a new blank page.</span>
                 </label>
                 <label class="choice">
@@ -42,13 +42,6 @@
                     <strong>Ask a question</strong>
                     <span class="info">Get answers from experts in your company. Discuss and vote on the best answer.</span>
                 </label>
-                {% comment %}
-                <label class="choice">
-                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
-                    {{ entry.choice_label }}
-                    <span class="info">{{ entry.info_text|truncatewords:"25" }}</span>
-                </label>
-                {% endcomment %}
             {% endfor %}
         </div>
         <div class="submit-row">
