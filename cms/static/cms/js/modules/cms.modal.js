@@ -225,7 +225,7 @@ var CMS = window.CMS || {};
                 this.ui.modal.removeClass('cms-modal-has-breadcrumb');
 
                 // hide tooltip
-                this.hideTooltip();
+                CMS.API.Tooltip.displayToggle(false);
 
                 // redirect to iframe rendering if url is provided
                 if (opts.url) {

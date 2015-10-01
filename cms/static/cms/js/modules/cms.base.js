@@ -39,8 +39,6 @@ var CMS = {
     $(document).ready(function () {
         CMS.API.Helpers = {
 
-            isTouch: window.ontouchstart !== undefined,
-
             // redirects to a specific url or reloads browser
             reloadBrowser: function (url, timeout, ajax) {
                 var that = this;
@@ -78,7 +76,7 @@ var CMS = {
                             }
                         }
                     });
-                    
+
                     // cancel further operations
                     return false;
                 }
@@ -116,63 +114,6 @@ var CMS = {
                         // set csrf_token
                         xhr.setRequestHeader('X-CSRFToken', csrf_token);
                     }
-                });
-            },
-
-            // handles the tooltip for the plugins
-            showTooltip: function (e, name, id) {
-                var tooltip = CMS.API.Helpers.pickTooltip();
-
-                // change css and attributes
-                tooltip.css('visibility', 'visible')
-                    .data('plugin_id', id || null)
-                    .show()
-                    .find('span').html(name);
-
-                if (CMS.API.Helpers.isTouch) {
-                    CMS.API.Helpers.positionTooltip(e, tooltip);
-
-                    // attach tooltip event for touch devices
-                    tooltip.bind('touchstart.cms', function () {
-                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
-                    });
-                } else {
-                    // attaches move event
-                    // this sets the correct position for the edit tooltip
-                    $('body').bind('mousemove.cms', function (e) {
-                        CMS.API.Helpers.positionTooltip(e, tooltip);
-                    });
-                }
-            },
-
-            hideTooltip: function () {
-                var tooltip = CMS.API.Helpers.pickTooltip();
-
-                // change css
-                tooltip.css('visibility', 'hidden').hide();
-
-                // unbind events
-                $('body').unbind('mousemove.cms');
-                if (CMS.API.Helpers.isTouch) {
-                    tooltip.unbind('touchstart.cms');
-                }
-            },
-
-            pickTooltip: function () {
-                return CMS.API.Helpers.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
-            },
-
-            positionTooltip: function (e, tooltip) {
-                // so lets figure out where we are
-                var offset = 20;
-                var relX = e.pageX - $(tooltip).offsetParent().offset().left;
-                var relY = e.pageY - $(tooltip).offsetParent().offset().top;
-                var bound = $(tooltip).offsetParent().width();
-                var pos = relX + tooltip.outerWidth(true) + offset;
-
-                tooltip.css({
-                    'left': (pos >= bound) ? relX - tooltip.outerWidth(true) - offset : relX + offset,
-                    'top': relY - 12
                 });
             },
 
