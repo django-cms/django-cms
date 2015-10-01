@@ -17,7 +17,7 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(function () {
         /**
-         * Displays a message underneath the toolbar
+         * Displays a message underneath the toolbar.
          *
          * @class Messages
          * @namespace CMS
@@ -61,7 +61,7 @@ var CMS = window.CMS || {};
              * @param opts
              * @param opts.message {String|HTMLNode} message to be displayed
              * @param [opts.dir='center'] {String} direction to be displayed `center` `left` or `right`
-             * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed
+             * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed, 0 leaves it open
              * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
              */
             open: function open(opts) {
