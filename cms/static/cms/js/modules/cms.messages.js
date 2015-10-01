@@ -19,10 +19,10 @@ var CMS = window.CMS || {};
         /**
          * Displays a message underneath the toolbar
          *
-         * @class Message
+         * @class Messages
          * @namespace CMS
          */
-        CMS.Message = new CMS.Class({
+        CMS.Messages = new CMS.Class({
 
             options: {
                 messageDuration: 300,

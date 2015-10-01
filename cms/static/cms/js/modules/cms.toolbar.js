@@ -57,7 +57,7 @@ var CMS = window.CMS || {};
                 this.lockToolbar = false;
 
                 // reference messaging system
-                this.messages = new CMS.Message();
+                this.messages = new CMS.Messages();
 
                 // setup initial stuff
                 if (!this.ui.toolbar.data('ready')) {

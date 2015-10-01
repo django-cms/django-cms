@@ -250,7 +250,7 @@
                 var that = this;
                 var msg = '';
                 var parent = null;
-                var message = new window.parent.CMS.Message();
+                var message = new window.parent.CMS.Messages();
 
                 window.moveSuccess = function (node) {
                     $.syncCols();

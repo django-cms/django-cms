@@ -62,7 +62,7 @@
                 this.ui.container.data('settings', this.options);
 
                 // reference messaging system
-                this.messages = new CMS.Message();
+                this.messages = new CMS.Messages();
 
                 // determine type of plugin
                 switch (this.options.type) {

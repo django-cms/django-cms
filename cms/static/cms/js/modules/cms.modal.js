@@ -51,7 +51,7 @@ var CMS = window.CMS || {};
                 this._setupEventEmitter();
 
                 // reference messaging system
-                this.messages = new CMS.Message();
+                this.messages = new CMS.Messages();
 
                 // states and events
                 this.click = 'click.cms.modal';

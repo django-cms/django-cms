@@ -197,7 +197,7 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            var message = new CMS.Message();
+                            var message = new CMS.Messages();
                             message.open({
                                 message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
@@ -243,7 +243,7 @@ var CMS = {
                             }
                         },
                         error: function (jqXHR) {
-                            var message = new CMS.Message();
+                            var message = new CMS.Messages();
                             message.open({
                                 message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
