@@ -118,7 +118,7 @@ var CMS = window.CMS || {};
              */
             calculateAvailableWidth: function calculateAvailableWidth() {
                 var fullWidth = this.ui.window.width();
-                var reduce = this.ui.toolbarTrigger.width() + this.ui.logo.offset().left +
+                var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.offset().left +
                     this.ui.logo.outerWidth(true);
 
                 return fullWidth - reduce;
