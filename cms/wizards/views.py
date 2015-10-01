@@ -12,7 +12,7 @@ from django.utils.translation import get_language_from_request
 try:
     # This try/except block can be removed when we stop supporting Django 1.6
     from django.contrib.formtools.wizard.views import SessionWizardView
-except ImportError:
+except ImportError:  # pragma: no cover
     # This is fine from Django 1.7
     from formtools.wizard.views import SessionWizardView
 
@@ -52,12 +52,19 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         ('1', Form),
     ]
 
+    def get_current_step(self):
+        """Returns the current step, if possible, else None"""
+        try:
+            return self.steps.current
+        except AttributeError:
+            return None
+
     def is_first_step(self, step=None):
-        step = step or self.steps.current
+        step = step or self.get_current_step()
         return step == '0'
 
     def is_second_step(self, step=None):
-        step = step or self.steps.current
+        step = step or self.get_current_step()
         return step == '1'
 
     def get_form_initial(self, step):
