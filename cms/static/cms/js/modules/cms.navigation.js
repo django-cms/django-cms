@@ -174,7 +174,7 @@ var CMS = window.CMS || {};
 
                     this.showDropdown();
 
-                    if (remainingWidth <= 0) {
+                    if (remainingWidth < 0 && this.rightMostItemIndex === -1) {
                         console.log('do the right part');
                         remainingWidth += this.items.rightTotalWidth;
 
