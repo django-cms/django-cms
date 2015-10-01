@@ -203,6 +203,67 @@
 
     .cms-toolbar-more {
         display: none;
+
+        .cms-toolbar-item-navigation-children {
+            padding: 0;
+        }
+
+        .cms-toolbar-item {
+            float: none;
+            margin: $toolbar-menu-item-padding !important;
+            overflow: hidden;
+            margin-top: 5px;
+            margin-bottom: 8px;
+        }
+        .cms-toolbar-item-cms-mode-switcher a {
+            float: left !important;
+            width: 50%;
+        }
+        .cms-toolbar-item-buttons {
+            .cms-btn {
+                text-align: center;
+            }
+        }
+
+        .cms-btn {
+            color: $btn-default-color;
+        }
+        .cms-btn-action {
+            color: $btn-action-color;
+        }
+        .cms-more-buttons + .cms-toolbar-item-navigation-children {
+            padding-top: 8px;
+            border-top: 1px solid $gray-lighter;
+            > a .cms-icon {
+                margin-top: -1px;
+            }
+        }
+    }
+    .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+        position: fixed;
+        right: 0;
+        top: $toolbar-height;
+        bottom: 0;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+
+        li a {
+            position: relative;
+            line-height: 1.4 * $toolbar-dropdown-item-height;
+            height: 1.4 * $toolbar-dropdown-item-height;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        ul {
+            position: relative;
+            left: 0;
+            top: 0;
+            border-radius: 0;
+            padding-left: 20px;
+        }
+    }
+    &.cms-toolbar-debug .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+        top: $toolbar-height + $toolbar-debug-height;
     }
     .cms-toolbar-item-cms-mode-switcher {
         display: none;
