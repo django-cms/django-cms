@@ -50,6 +50,9 @@ var CMS = window.CMS || {};
                 // event emitter
                 this._setupEventEmitter();
 
+                // reference messaging system
+                this.messages = new CMS.Message();
+
                 // states and events
                 this.click = 'click.cms.modal';
                 this.pointerDown = 'pointerdown.cms.modal contextmenu.cms.modal';
@@ -823,7 +826,7 @@ var CMS = window.CMS || {};
                     try {
                         iframe.contents();
                     } catch (error) {
-                        CMS.API.Toolbar.openMessage({
+                        that.messages.open({
                             message: '<strong>' + error + '</strong>',
                             error: true
                         });
@@ -836,7 +839,7 @@ var CMS = window.CMS || {};
                     // show messages in toolbar if provided
                     messages = iframe.contents().find('.messagelist li');
                     if (messages.length) {
-                        CMS.API.Toolbar.openMessage({
+                        that.messages.open({
                             message: messages.eq(0).text()
                         });
                     }

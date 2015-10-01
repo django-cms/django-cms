@@ -61,6 +61,9 @@
                 // bind data element to the container
                 this.ui.container.data('settings', this.options);
 
+                // reference messaging system
+                this.messages = new CMS.Message();
+
                 // determine type of plugin
                 switch (this.options.type) {
                     case 'placeholder': // handler for placeholder bars
@@ -243,7 +246,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        CMS.API.Toolbar.openMessage({
+                        that.message.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -282,6 +285,8 @@
                 CMS.API.locked = true;
 
                 var move = (options || source_language) ? true : false;
+                var that = this;
+
                 // set correct options
                 options = options || this.options;
                 if (source_language) {
@@ -306,7 +311,7 @@
                     url: options.urls.copy_plugin,
                     data: data,
                     success: function () {
-                        CMS.API.Toolbar.openMessage({
+                        that.message.open({
                             message: CMS.config.lang.success
                         });
                         // reload
@@ -316,7 +321,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        CMS.API.Toolbar.openMessage({
+                        that.message.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -364,7 +369,7 @@
                         url: that.options.urls.move_plugin,
                         data: data,
                         success: function () {
-                            CMS.API.Toolbar.openMessage(CMS.config.lang.success);
+                            that.message.open(CMS.config.lang.success);
                             // if response is reload
                             CMS.API.Helpers.reloadBrowser();
                         },
@@ -372,7 +377,7 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            CMS.API.Toolbar.openMessage({
+                            that.message.open({
                                 message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -441,7 +446,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        CMS.API.Toolbar.openMessage({
+                        that.message.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
