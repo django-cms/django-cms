@@ -98,7 +98,8 @@ var CMS = window.CMS || {};
                     buttons: container.find('.cms-toolbar-item-buttons'),
                     switcher: container.find('.cms-toolbar-item-switch'),
                     messages: container.find('.cms-messages'),
-                    screenBlock: container.find('.cms-screenblock')
+                    screenBlock: container.find('.cms-screenblock'),
+                    structureBoard: container.find('.cms-structure')
                 };
             },
 
@@ -175,6 +176,7 @@ var CMS = window.CMS || {};
                         isTouchingTopLevelMenu = false;
                         // create the document event
                         that.ui.document.on(that.click, reset);
+                        that.ui.structureBoard.on(that.click, reset);
                         that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
                     });
 
@@ -224,6 +226,7 @@ var CMS = window.CMS || {};
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
                         that.ui.document.off(that.click);
+                        that.ui.structureBoard.off(that.click);
                     }
                 });
 
