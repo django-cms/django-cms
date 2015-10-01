@@ -130,7 +130,7 @@ var CMS = window.CMS || {};
              * @method showDropdown
              */
             showDropdown: function showDropdown() {
-                this.ui.trigger.show();
+                this.ui.trigger.css('display', 'list-item');
             },
 
             /**
@@ -139,7 +139,7 @@ var CMS = window.CMS || {};
              * @method hideDropdown
              */
             hideDropdown: function hideDropdown() {
-                this.ui.trigger.hide();
+                this.ui.trigger.css('display', 'none');
             },
 
             /**
