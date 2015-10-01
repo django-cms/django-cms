@@ -86,6 +86,10 @@
         overflow-y: scroll;
         height: 100%;
         padding: ($toolbar-height + 40px) 5%;
+        @media (max-width: 480px) {
+            padding-left: 0;
+            padding-right: 0;
+        }
     }
     .cms-dragarea-simple {
         position: static;
