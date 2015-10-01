@@ -453,6 +453,7 @@
                     .addClass('cms-btn-publish-active')
                     .removeClass('cms-btn-disabled')
                     .parent().show();
+                this.ui.window.trigger('resize');
 
                 // enable revert to live
                 this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');

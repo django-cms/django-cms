@@ -299,6 +299,7 @@ var CMS = window.CMS || {};
 
                 if ($('.cms-btn-publish-active').length) {
                     publishBtn.show();
+                    this.ui.window.trigger('resize');
                 }
 
                 // check if debug is true
