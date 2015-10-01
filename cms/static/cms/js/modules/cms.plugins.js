@@ -282,7 +282,6 @@
                 CMS.API.locked = true;
 
                 var move = (options || source_language) ? true : false;
-                var that = this;
 
                 // set correct options
                 options = options || this.options;
