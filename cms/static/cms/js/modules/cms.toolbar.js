@@ -271,6 +271,10 @@ var CMS = window.CMS || {};
                             }
                         });
                     });
+
+                    btn.find('a').on(that.click, function (e) {
+                        e.stopPropagation();
+                    });
                 });
             },
 
