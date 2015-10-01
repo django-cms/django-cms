@@ -7,7 +7,6 @@
 cms/django
 *.DS_Store
 *.svn
-.*
 *.xml
 /*env*/
 *.sqlite
@@ -21,6 +20,7 @@ build
 dist
 .ropeproject
 .project
+.coverage
 .pydevproject
 .settings
 /*.egg-info/
