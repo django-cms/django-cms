@@ -116,11 +116,12 @@ var CMS = window.CMS || {};
              * Calculates available width based on the state of the page
              *
              * @method calculateAvailableWidth
+             * @return {Number} available width in px
              */
             calculateAvailableWidth: function calculateAvailableWidth() {
                 var fullWidth = this.ui.window.width();
                 var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.offset().left +
-                    this.ui.logo.outerWidth(true);
+                    this.ui.logo.outerWidth(true) + 15;
 
                 return fullWidth - reduce;
             },
