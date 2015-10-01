@@ -61,9 +61,6 @@
                 // bind data element to the container
                 this.ui.container.data('settings', this.options);
 
-                // reference messaging system
-                this.messages = new CMS.Messages();
-
                 // determine type of plugin
                 switch (this.options.type) {
                     case 'placeholder': // handler for placeholder bars
@@ -246,7 +243,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.message.open({
+                        CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -311,7 +308,7 @@
                     url: options.urls.copy_plugin,
                     data: data,
                     success: function () {
-                        that.message.open({
+                        CMS.API.Messages.open({
                             message: CMS.config.lang.success
                         });
                         // reload
@@ -321,7 +318,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.message.open({
+                        CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
@@ -369,7 +366,7 @@
                         url: that.options.urls.move_plugin,
                         data: data,
                         success: function () {
-                            that.message.open(CMS.config.lang.success);
+                            CMS.API.Messages.open(CMS.config.lang.success);
                             // if response is reload
                             CMS.API.Helpers.reloadBrowser();
                         },
@@ -377,7 +374,7 @@
                             CMS.API.locked = false;
                             var msg = CMS.config.lang.error;
                             // trigger error
-                            that.message.open({
+                            CMS.API.Messages.open({
                                 message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                                 error: true
                             });
@@ -446,7 +443,7 @@
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-                        that.message.open({
+                        CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });

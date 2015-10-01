@@ -250,7 +250,6 @@
                 var that = this;
                 var msg = '';
                 var parent = null;
-                var message = new window.parent.CMS.Messages();
 
                 window.moveSuccess = function (node) {
                     $.syncCols();
@@ -266,7 +265,7 @@
                     // check for reload changes
                     if (window.self !== window.top) {
                         window.parent.CMS.API.Helpers.reloadBrowser(false, false, true);
-                        message.open({
+                        window.parent.CMS.API.Messages.open({
                             message: that.options.lang.changes,
                             delay: 0
                         });

@@ -56,9 +56,6 @@ var CMS = window.CMS || {};
                 this.timer = function () {};
                 this.lockToolbar = false;
 
-                // reference messaging system
-                this.messages = new CMS.Messages();
-
                 // setup initial stuff
                 if (!this.ui.toolbar.data('ready')) {
                     this._events();
@@ -304,14 +301,14 @@ var CMS = window.CMS || {};
 
                 // check if there are messages and display them
                 if (CMS.config.messages) {
-                    this.messages.open({
+                    CMS.API.Messages.open({
                         message: CMS.config.messages
                     });
                 }
 
                 // check if there are error messages and display them
                 if (CMS.config.error) {
-                    this.messages.open({
+                    CMS.API.Messages.open({
                         message: CMS.config.error,
                         error: true
                     });
@@ -325,13 +322,13 @@ var CMS = window.CMS || {};
 
                 // should switcher indicate that there is an unpublished page?
                 if (CMS.config.publisher) {
-                    this.messages.open({
+                    CMS.API.Messages.open({
                         message: CMS.config.publisher,
                         dir: 'right'
                     });
                     setInterval(function () {
                         CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
-                    }, this.messages.messageDelay);
+                    }, CMS.API.Messages.messageDelay);
                 }
 
                 // open sideframe if it was previously opened
@@ -493,7 +490,7 @@ var CMS = window.CMS || {};
                 }).fail(function (jqXHR) {
                     CMS.API.locked = false;
 
-                    that.messages.open({
+                    CMS.API.Messages.open({
                         message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
                     });
@@ -538,7 +535,7 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'message':
-                        this.messages.open({
+                        CMS.API.Messages.open({
                             message: el.data('text')
                         });
                         break;
@@ -582,7 +579,7 @@ var CMS = window.CMS || {};
 
                 // prevent if switchopstion is passed
                 if (this.options.preventSwitch) {
-                    this.messages.open({
+                    CMS.API.Messages.open({
                         message: this.options.preventSwitchMessage,
                         dir: 'right'
                     });
@@ -657,7 +654,7 @@ var CMS = window.CMS || {};
 
                     if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
-                            that.messages.open({
+                            CMS.API.Messages.open({
                                 message: that.config.lang.debug
                             });
                         }, timeout);
