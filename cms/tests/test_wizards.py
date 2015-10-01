@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm

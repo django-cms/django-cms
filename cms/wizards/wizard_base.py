@@ -8,22 +8,15 @@ from django.utils.translation import override as force_language, force_text
 
 
 class WizardBase(object):
-    supports_safe_delete = True
     template_name = None
 
-    def __init__(self, title, weight, form,
-                 model=None, admin_model=None,
-                 template_name=None,
-                 inlineformset=None, inlineformset_title=''):
+    def __init__(self, title, weight, form, model=None, template_name=None):
         self.title = title
         self.weight = weight
         self.form = form
         self.model = model
-        self.admin_model = admin_model
         if template_name is not None:
             self.template_name = template_name
-        self.inlineformset = inlineformset
-        self.inlineformset_title = inlineformset_title
 
 
 @python_2_unicode_compatible
@@ -53,7 +46,7 @@ class Wizard(WizardBase):
         model_name = self.model.__name__.lower()
         return user.has_perm("%s.%s_%s" % (app_label, "add", model_name))
 
-    def get_success_url(self, obj, *args, **kwargs):
+    def get_success_url(self, obj, **kwargs):
         """This should return the URL of the created object."""
         if 'language' in kwargs:
             with force_language(kwargs['language']):

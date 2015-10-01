@@ -66,8 +66,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         if self.is_first_step(step):
             # set the current page from GET param.
             initial['page'] = self.request.GET.get('page')
-            # preselect a space if provided via GET param.
-            initial['space'] = self.request.GET.get('space')
         return initial
 
     def get_context_data(self, **kwargs):
@@ -75,7 +73,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
 
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()
-            context['inlineformset'] = context['form'].inlineformset
         return context
 
     def get_form_kwargs(self, step=None):
@@ -98,16 +95,9 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         entry_form_class = self.get_selected_entry().form
         step_2_base_form = self.get_step_2_base_form()
 
-        inlineformset = self.get_inline_formset(
-            data=data,
-            files=files,
-            prefix=self.get_form_prefix(step),
-        )
-
         form = step2_form_factory(
             mixin_cls=step_2_base_form,
             entry_form_class=entry_form_class,
-            attrs={'inlineformset': inlineformset}
         )
         return form
 
@@ -154,13 +144,3 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
             language=self.language_code
         )
         return success_url
-
-    def get_inline_formset(self, **kwargs):
-        entry = self.get_selected_entry()
-
-        if entry.inlineformset:
-            form_kwargs = self.get_form_kwargs(step='1')
-            form_kwargs.update(kwargs)
-            return entry.inlineformset(**form_kwargs)
-        else:
-            return None

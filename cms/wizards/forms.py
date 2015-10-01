@@ -89,27 +89,4 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
 
 class WizardStep2BaseForm(BaseFormMixin):
-    # Step two allows for inline formsets
-    # so this attribute will point to an inline formset instance
-    # only when user reaches step two.
-    inlineformset = None
     user = None
-
-    def is_valid(self):
-        _is_valid = super(WizardStep2BaseForm, self).is_valid()
-
-        if self.inlineformset:
-            # if the form has an inlineformset
-            # make sure both form and inlineformset are valid.
-            _is_valid = _is_valid and self.inlineformset.is_valid()
-        return _is_valid
-
-    def save(self, **kwargs):
-        instance = super(WizardStep2BaseForm, self).save(**kwargs)
-
-        if self.inlineformset:
-            # make sure to point to the new object
-            self.inlineformset.instance = instance
-            self.inlineformset.save()
-
-        return instance
