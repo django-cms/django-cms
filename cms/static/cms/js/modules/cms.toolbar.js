@@ -177,6 +177,7 @@ var CMS = window.CMS || {};
                         // create the document event
                         that.ui.document.on(that.click, reset);
                         that.ui.structureBoard.on(that.click, reset);
+                        that.ui.toolbar.on(that.click, reset);
                         that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
                     });
 
@@ -189,7 +190,10 @@ var CMS = window.CMS || {};
 
                         // do not attach hover effect if disabled
                         // cancel event if element has already hover class
-                        if (el.hasClass(disabled) || el.hasClass(hover)) {
+                        if (el.hasClass(disabled)) {
+                            return false;
+                        }
+                        if (el.hasClass(hover)) {
                             return true;
                         }
 
@@ -226,6 +230,7 @@ var CMS = window.CMS || {};
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
                         that.ui.document.off(that.click);
+                        that.ui.toolbar.off(that.click, reset);
                         that.ui.structureBoard.off(that.click);
                     }
                 });
