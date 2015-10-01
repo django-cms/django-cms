@@ -286,7 +286,7 @@ class FrameItem(BaseItem):
     def __init__(self, name, url, active=False, disabled=False,
                  extra_classes=None, on_close=None, side=LEFT):
         super(FrameItem, self).__init__(side)
-        self.name = "%s ..." % force_text(name)
+        self.name = "%s..." % force_text(name)
         self.url = url
         self.active = active
         self.disabled = disabled

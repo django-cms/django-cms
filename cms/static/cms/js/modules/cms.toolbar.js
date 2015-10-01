@@ -33,7 +33,6 @@ var CMS = window.CMS || {};
             options: {
                 preventSwitch: false,
                 preventSwitchMessage: 'Switching is disabled.',
-                messageDelay: 3000,
                 toolbarDuration: 200
             },
 
@@ -321,14 +320,14 @@ var CMS = window.CMS || {};
 
                 // check if there are messages and display them
                 if (CMS.config.messages) {
-                    this.openMessage({
+                    CMS.API.Messages.open({
                         message: CMS.config.messages
                     });
                 }
 
                 // check if there are error messages and display them
                 if (CMS.config.error) {
-                    this.openMessage({
+                    CMS.API.Messages.open({
                         message: CMS.config.error,
                         error: true
                     });
@@ -342,13 +341,13 @@ var CMS = window.CMS || {};
 
                 // should switcher indicate that there is an unpublished page?
                 if (CMS.config.publisher) {
-                    this.openMessage({
+                    CMS.API.Messages.open({
                         message: CMS.config.publisher,
                         dir: 'right'
                     });
                     setInterval(function () {
                         CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
-                    }, this.options.messageDelay);
+                    }, CMS.API.Messages.messageDelay);
                 }
 
                 // open sideframe if it was previously opened
@@ -462,114 +461,6 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Opens a message window underneath the toolbar.
-             *
-             * @method open
-             * @deprecated this will be moved to `cms.messages.js`
-             * @param opts
-             * @param opts.message {String|HTMLNode} message to be displayed
-             * @param [opts.dir='center'] {String} direction to be displayed `center` `left` or `right`
-             * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed
-             * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
-             */
-            openMessage: function openMessage(opts) {
-                if (!(opts && opts.message)) {
-                    throw new Error('The arguments passed to "openMessage" were invalid.');
-                }
-
-                var that = this;
-
-                var msg = opts.message;
-                var dir = opts.dir === undefined ? 'center' : opts.dir;
-                var delay = opts.delay === undefined ? this.options.messageDelay : opts.delay;
-                var error = opts.error === undefined ? false : opts.error;
-
-                var width = 320;
-                var height = this.ui.messages.outerHeight(true);
-                var top = this.ui.toolbar.outerHeight(true);
-                var close = this.ui.messages.find('.cms-messages-close');
-
-                // add content to element
-                this.ui.messages.find('.cms-messages-inner').html(msg);
-
-                // error handling
-                this.ui.messages.removeClass('cms-messages-error');
-                if (error) {
-                    this.ui.messages.addClass('cms-messages-error');
-                }
-
-                // clear timeout
-                clearTimeout(this.timer);
-
-                close.hide();
-                close.off(this.click).on(this.click, function () {
-                    that.closeMessage();
-                });
-
-                // set top to 0 if toolbar is collapsed
-                if (this.settings.toolbar === 'collapsed') {
-                    top = 0;
-                }
-
-                // do we need to add debug styles?
-                if (this.config.debug) {
-                    top = top + 5;
-                }
-
-                // set correct position and show
-                this.ui.messages.css('top', -height).show();
-
-                // set correct direction and animation
-                switch (dir) {
-                    case 'left':
-                        this.ui.messages.css({
-                            'top': top,
-                            'left': -width,
-                            'right': 'auto',
-                            'margin-left': 0
-                        });
-                        this.ui.messages.animate({ 'left': 0 });
-                        break;
-                    case 'right':
-                        this.ui.messages.css({
-                            'top': top,
-                            'right': -width,
-                            'left': 'auto',
-                            'margin-left': 0
-                        });
-                        this.ui.messages.animate({ 'right': 0 });
-                        break;
-                    default:
-                        this.ui.messages.css({
-                            'left': '50%',
-                            'right': 'auto',
-                            'margin-left': -(width / 2)
-                        });
-                        this.ui.messages.animate({ 'top': top });
-                }
-
-                // cancel autohide if delay is <= 0
-                if (delay <= 0) {
-                    close.show();
-                } else {
-                    // add delay to hide if delay > 0
-                    this.timer = setTimeout(function () {
-                        that.closeMessage();
-                    }, delay);
-                }
-            },
-
-            /**
-             * Closes the message window underneath the toolbar.
-             *
-             * @method closeMessage
-             * @deprecated this will be moved to `cms.messages.js`
-             */
-            closeMessage: function closeMessage() {
-                this.ui.messages.fadeOut(this.options.toolbarDuration);
-            },
-
-            /**
              * Closes the message window underneath the toolbar.
              *
              * @method open
@@ -618,7 +509,7 @@ var CMS = window.CMS || {};
                 }).fail(function (jqXHR) {
                     CMS.API.locked = false;
 
-                    that.openMessage({
+                    CMS.API.Messages.open({
                         message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                         error: true
                     });
@@ -663,7 +554,7 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'message':
-                        this.openMessage({
+                        CMS.API.Messages.open({
                             message: el.data('text')
                         });
                         break;
@@ -707,7 +598,7 @@ var CMS = window.CMS || {};
 
                 // prevent if switchopstion is passed
                 if (this.options.preventSwitch) {
-                    this.openMessage({
+                    CMS.API.Messages.open({
                         message: this.options.preventSwitchMessage,
                         dir: 'right'
                     });
@@ -782,7 +673,7 @@ var CMS = window.CMS || {};
 
                     if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
-                            that.openMessage({
+                            CMS.API.Messages.open({
                                 message: that.config.lang.debug
                             });
                         }, timeout);

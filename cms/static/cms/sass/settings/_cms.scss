@@ -66,12 +66,6 @@ $z-layers: (
         "left":         10,
         "right":        10,
     ),
-    "clipboard": (
-        "base":         99999,
-        "containers":   99,
-        "draggable":    99,
-        "triggers":     999,
-    ),
     "sideframe": (
         "base":         999999,
         "buttons":      40,
@@ -300,16 +294,6 @@ $sideframe-button-space: 2px;
 $sideframe-resize-width: 15px;
 $sideframe-box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
 $sideframe-dimmer: rgba(0, 0, 0, 0.6);
-
-
-//##############################################################################
-// Clipboard
-
-// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
-$clipboard-buttons-position-top: $sideframe-buttons-position-top +
-    3.5 * $sideframe-button-area-size + 20px;
-$clipboard-button-area-size: 30px;
-$clipboard-button-icon-size: 12px;
 
 
 //##############################################################################

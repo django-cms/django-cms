@@ -39,8 +39,8 @@ var CMS = window.CMS || {};
 
                 // elements
                 this.containers = this.clipboard.find('.cms-clipboard-containers > .cms-draggable');
-                this.triggers = this.clipboard.find('.cms-clipboard-triggers a');
-                this.triggerRemove = this.clipboard.find('.cms-clipboard-empty a');
+                this.triggers = $('.cms-clipboard-trigger a');
+                this.triggerRemove = $('.cms-clipboard-empty a');
 
                 // states
                 this.click = 'click.cms.clipboard';
@@ -77,6 +77,9 @@ var CMS = window.CMS || {};
 
                 this.triggers.on(this.click, function (e) {
                     e.preventDefault();
+                    if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
+                        return false;
+                    }
 
                     modal.open({
                         html: pluginsList,
@@ -91,11 +94,17 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // add remove event
-                this.triggerRemove.bind(this.click, function (e) {
+                this.triggerRemove.on(this.click, function (e) {
                     e.preventDefault();
+                    e.stopPropagation();
+                    if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
+                        return false;
+                    }
                     that.clear(function () {
                         // remove element on success
                         that.clipboard.hide();
+                        that.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
+                        that.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
                     });
                 });
             },
