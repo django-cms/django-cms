@@ -1,23 +1,26 @@
-{% extends "admin/base_site.html" %}
-{% load i18n admin_urls admin_static %}
+{% extends "cms/wizards/base.html" %}
+{% load i18n admin_urls %}
 
-{% block extrastyle %}
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
-{% endblock %}
-
-
-{% block content %}
+{% block wizard %}
     <h1>{% trans "Create" %} {{ wizard_entry.title }}</h1>
+
     <form action="{% url 'wizard_create' %}" method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
+
         {{ wizard.management_form }}
+
+        {% if form.errors %}
+            <p class="errornote">
+                {% trans "Please correct the error below." %}
+            </p>
+        {% endif %}
+
         <div>
             {% include "cms/wizards/includes/form_fields.html" %}
         </div>
         <div class="submit-row">
             <button name="wizard_goto_step" class="cms-btn cms-btn-secondary cms-btn-group" value="{{ wizard.steps.prev }}">{% trans "Back" %}</button>
-            <input type="submit" class="cms-btn cms-btn-action" value="{% trans " Create" %}"/>
+            <input type="submit" class="cms-btn cms-btn-action" value="{% trans "Create" %}"/>
         </div>
     </form>
 {% endblock %}

@@ -1,19 +1,25 @@
 {% load i18n %}
 
 {% csrf_token %}
-{% block form_fields %}
- {{ inlineformset.management_form }}
 
-    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+{{ inlineformset.management_form }}
 
-    <fieldset class="module aligned">
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+<fieldset class="module aligned">
     {% for field in form.visible_fields %}
-        <div class="form-row {{ field.name }}">
+        <div class="form-row {{ field.name }}{% if field.errors %} errors{% endif %}">
+            {% if field.errors %}
+                <ul class="errorlist">
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <div>
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
             </div>
         </div>
     {% endfor %}
-    </fieldset>
-{% endblock form_fields %}
+</fieldset>

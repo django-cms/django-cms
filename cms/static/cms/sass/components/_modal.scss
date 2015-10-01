@@ -131,8 +131,10 @@
         text-overflow: ellipsis;
         margin-right: $modal-header-button-area-size * 3 + $padding-normal;
         .cms-modal-title-suffix {
+            display: block;
             font-weight: normal;
             padding-left: $padding-normal;
+            height: $modal-header-height;
         }
         .cms-modal-title-prefix:empty + .cms-modal-title-suffix {
             font-weight: bold;

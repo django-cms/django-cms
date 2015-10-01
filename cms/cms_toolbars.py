@@ -66,6 +66,7 @@ class PlaceholderToolbar(CMSToolbar):
     def post_template_populate(self):
         self.init_placeholders_from_request()
 
+        self.add_wizard_button()
         self.add_structure_mode()
 
     def add_structure_mode(self):
@@ -90,6 +91,13 @@ class PlaceholderToolbar(CMSToolbar):
                                                     extra_classes=extra_classes)
             switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=False)
             switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
+
+    def add_wizard_button(self):
+        if self.request.user.has_perm("cms.add_content"):
+            title = _('Create')
+            url = reverse('wizard_create')
+            self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
+                                          on_close=REFRESH_PAGE)
 
 
 @toolbar_pool.register
@@ -294,18 +302,10 @@ class PageToolbar(CMSToolbar):
 
     def post_template_populate(self):
         self.init_placeholders_from_request()
-        self.add_wizard_button()
         self.add_draft_live()
         self.add_publish_button()
 
     # Buttons
-
-    def add_wizard_button(self):
-        if self.toolbar.edit_mode and self.has_publish_permission():
-            title = _('Create')
-            url = reverse('wizard_create')
-            self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
-                                          on_close=REFRESH_PAGE)
 
     def add_publish_button(self, classes=('cms-btn-action', 'cms-btn-publish',)):
         # only do dirty lookups if publish permission is granted else button isn't added anyway

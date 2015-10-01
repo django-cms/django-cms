@@ -13,7 +13,7 @@ from .forms.wizards import (
 
 
 cms_page_wizard = Wizard(
-    title=_(u"Page"),
+    title=_(u"New page"),
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
