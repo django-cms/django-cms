@@ -26,7 +26,7 @@ class WizardPool(object):
             self._discovered = True
 
     def _clear(self):
-        """Simply emties the pool but does not clear the discovered flag."""
+        """Simply empties the pool but does not clear the discovered flag."""
         self._entries = {}
 
     def _reset(self):
