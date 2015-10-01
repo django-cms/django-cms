@@ -381,12 +381,13 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         copy = cms_draggable.find_element_by_css_selector('.cms-submenu-dropdown a[data-rel="copy"]')
         copy.click()
 
-        time.sleep(0.2)
-        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-clipboard')))
 
-        WebDriverWait(self.driver, 10).until(lambda driver: clipboard.is_displayed())
+        menu_trigger = self.driver.find_element_by_css_selector('.cms-toolbar-left .cms-toolbar-item-navigation li:first-child')
 
-        clipboard.find_element_by_css_selector('.cms-clipboard-numbers a:first-child').click()
+        menu_trigger.click()
+
+        self.driver.find_element_by_css_selector('.cms-clipboard-trigger a').click()
 
         # necessary sleeps for making a "real" drag and drop, that works with the clipboard
         time.sleep(0.3)
