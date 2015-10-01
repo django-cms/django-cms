@@ -26,26 +26,56 @@ var CMS = window.CMS || {};
         CMS.Tooltip = new CMS.Class({
 
             initialize: function () {
+                this.body = $('body');
                 this.isTouch = false;
                 this.domElem = this.pick();
 
                 this.checkTouch();
             },
 
+            /**
+             * Checks for touch event and switches to touch tooltip if detected
+             *
+             * @method checkTouch
+             * @private
+             */
             checkTouch: function () {
                 var that = this;
 
-                $('body').one('touchstart.cms', function () {
+                this.body.one('touchstart.cms', function () {
                     that.isTouch = true;
                     that.domElem = that.pick();
+
+                    // attach tooltip event for touch devices
+                    that.domElem.on('touchstart.cms', function () {
+                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
+                    });
                 });
             },
 
+            /**
+             * Manages show/hide calls
+             *
+             * @method displayToggle
+             * @private
+             * @param isShown {Boolean}
+             * @param e {Object}
+             * @param name {String} - current plugin name
+             * @param id {String} - current plugin id
+             */
             displayToggle: function (isShown, e, name, id) {
                 isShown ? CMS.API.Tooltip.show(e, name, id) : CMS.API.Tooltip.hide();
             },
 
-            // handles the tooltip for the plugins
+            /**
+             * Shows tooltip with specific plugin-related parameters
+             *
+             * @method show
+             * @private
+             * @param e {Object}
+             * @param name {String} - current plugin name
+             * @param id {String} - current plugin id
+             */
             show: function (e, name, id) {
                 var tooltip = this.domElem;
                 var that = this;
@@ -58,37 +88,49 @@ var CMS = window.CMS || {};
 
                 if (this.isTouch) {
                     this.position(e, tooltip);
-
-                    // attach tooltip event for touch devices
-                    tooltip.bind('touchstart.cms', function () {
-                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
-                    });
                 } else {
                     // attaches move event
                     // this sets the correct position for the edit tooltip
-                    $('body').bind('mousemove.cms', function (e) {
+                    this.body.on('mousemove.cms', function (e) {
                         that.position(e, tooltip);
                     });
                 }
             },
 
+            /**
+             * Hides tooltip
+             *
+             * @method hide
+             * @private
+             */
             hide: function () {
-                var tooltip = this.domElem;
-
                 // change css
-                tooltip.css('visibility', 'hidden').hide();
+                this.domElem.css('visibility', 'hidden').hide();
 
                 // unbind events
-                $('body').unbind('mousemove.cms');
-                if (this.isTouch) {
-                    tooltip.unbind('touchstart.cms');
+                if (!this.isTouch) {
+                    this.body.off('mousemove.cms');
                 }
             },
 
+            /**
+             * Picks tooltip to show (touch or desktop)
+             *
+             * @method pick
+             * @private
+             */
             pick: function () {
                 return this.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
             },
 
+            /**
+             * Positions tooltip next to the pointer event coordinates
+             *
+             * @method position
+             * @private
+             * @param e {Object}
+             * @param tooltip {Object}
+             */
             position: function (e, tooltip) {
                 // so lets figure out where we are
                 var offset = 20;
@@ -98,8 +140,8 @@ var CMS = window.CMS || {};
                 var pos = relX + tooltip.outerWidth(true) + offset;
 
                 tooltip.css({
-                    'left': (pos >= bound) ? relX - tooltip.outerWidth(true) - offset : relX + offset,
-                    'top': relY - 12
+                    left: (pos >= bound) ? relX - tooltip.outerWidth(true) - offset : relX + offset,
+                    top: relY - 12
                 });
             }
 
