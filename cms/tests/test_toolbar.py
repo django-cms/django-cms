@@ -428,7 +428,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + page-menu + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 9, admin_items)
+        self.assertEqual(len(admin_items), 12, admin_items)
 
     def test_button_consistency_staff(self):
         """
@@ -466,7 +466,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         admin = toolbar.get_left_items()[0]
         lang = toolbar.get_left_items()[1]
-        self.assertEqual(len(admin.get_items()), 9)
+        self.assertEqual(len(admin.get_items()), 12)
         self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})

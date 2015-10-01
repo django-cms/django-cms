@@ -3,86 +3,6 @@
 #cms-toolbar {
     .cms-clipboard {
         display: none;
-        position: fixed;
-        top: $clipboard-buttons-position-top;
-        left: 0;
-        z-index: z(clipboard, base);
-        padding: $padding-base $padding-base $padding-base 0;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        background: rgba($white, 0.6);
-
-        p {
-            margin: 0;
-            padding: 0;
-        }
-    }
-    .cms-clipboard-numbers {
-        margin: 0 0 2px;
-    }
-    .cms-clipboard-numbers a {
-        // we have to use icons like this
-        // and not as classes in actual markup because of cms_reset
-        @extend %icon;
-        @include icon(copy);
-        display: block;
-        position: relative;
-        overflow: hidden;
-        color: $gray-lighter;
-        font-size: $clipboard-button-icon-size;
-        box-sizing: border-box;
-        width: $clipboard-button-area-size;
-        height: 1.5 * $clipboard-button-area-size;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        background: $gray-darker;
-        &:before {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -($clipboard-button-icon-size / 2);
-            margin-left: -($clipboard-button-icon-size / 2);
-        }
-        &:hover,
-        &:active,
-        &:focus {
-            color: $white;
-            background-color: $gray-darkest;
-        }
-    }
-    .cms-clipboard-numbers .cms-clipboard-numbers {
-        display: none !important;
-    }
-
-    .cms-clipboard-empty a {
-        @extend %icon;
-        @include icon(bin);
-        display: block;
-        position: relative;
-        color: $gray-lighter;
-        font-size: $clipboard-button-icon-size - 1px;
-        width: $clipboard-button-area-size;
-        height: $clipboard-button-area-size;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        cursor: pointer;
-        background: $gray-darker;
-        &:before {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -($clipboard-button-icon-size / 2);
-            margin-left: -($clipboard-button-icon-size / 2);
-        }
-        &:hover,
-        &:active,
-        &:focus {
-            color: $white;
-            background-color: $gray-darkest;
-        }
-    }
-
-    // placeholders
-    .cms-clipboard-triggers {
-        position: relative;
-        z-index: z(clipboard, triggers);
     }
 
     .cms-clipboard-containers {
@@ -96,7 +16,6 @@
             position: relative;
             top: 0;
             left: 0;
-            z-index: z(clipboard, draggable);
             border-radius: $border-radius-base;
             cursor: move;
         }
