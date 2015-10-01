@@ -1,35 +1,58 @@
+{% extends "cms/wizards/base.html" %}
 {% load i18n %}
 
-<div class="content-wizard" id="content">
-    <h1>{% trans "Content Creation Wizard" %}</h1>
-    <form action="{% url 'wizard_create' %}" method="post" class="js-space-form">
+{% block wizard %}
+    <h1>{% trans "Create" %}</h1>
+
+    <form action="{% url 'wizard_create' %}" method="post" class="modal-body">
         {% csrf_token %}
         {{ wizard.management_form }}
         {{ form.page }}
-        <div class="modal-body">
-            <div class="btn-group btn-group-justified select-content" data-toggle="buttons">
-                <div class="row">
-                    {% with field=form.entry %}
-                        {% for radio_input in field %}
-                            {% with value=radio_input.choice_value label=radio_input.choice_label %}
-                            <div class="col">
-                                <label class="btn btn-default btn-block"
-                                    data-title="{{ request.current_page.get_title }}">
-                                    <input type="radio" name="{{ radio_input.name }}"
-                                           id="wizard-{{ radio_input.name }}-{{ value }}"
-                                           value="{{ value }}"
-                                           autocomplete="off" class="hide js-space-radio">
-                                    <span class="title">{{ label }}</span>
-                                </label>
-                            </div>
-                            {% endwith %}
-                        {% endfor %}
-                    {% endwith %}
-                </div>
-            </div>
+
+        {% if form.errors %}
+            <p class="errornote">
+                {% trans "Please choose an option from below to proceed to the next step." %}
+            </p>
+        {% endif %}
+
+        <div class="choice-wrapper">
+            {% for entry in form.entry %}
+                <label class="choice active">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}" checked>
+                    <strong>New page</strong>
+                    <span class="info">Start with a new blank page.</span>
+                </label>
+                <label class="choice">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
+                    <strong>New sub page</strong>
+                    <span class="info">Create a sub page from "About Us".</span>
+                </label>
+                <label class="choice">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
+                    <strong>Page type</strong>
+                    <span class="info">Add a new page from a preset.</span>
+                </label>
+                <label class="choice">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
+                    <strong>Blog post</strong>
+                    <span class="info">Share your thoughts, news and announcements.</span>
+                </label>
+                <label class="choice" title="Get answers from experts in your company. Discuss and vote on the best answer.">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
+                    <strong>Ask a question</strong>
+                    <span class="info">Get answers from experts in your company. Discuss and vote on the best answer.</span>
+                </label>
+                {% comment %}
+                <label class="choice">
+                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
+                    {{ entry.choice_label }}
+                    <span class="info">{{ entry.info_text|truncatewords:"25" }}</span>
+                </label>
+                {% endcomment %}
+            {% endfor %}
         </div>
         <div class="submit-row">
-            <input type="submit" value="Create" class="cms-btn cms-btn-action" name="_continue" />
+            <input type="submit" value="{% trans 'Next' %}" class="cms-btn cms-btn-action" name="_continue">
         </div>
     </form>
-</div>
+{% endblock %}

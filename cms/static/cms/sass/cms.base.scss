@@ -3,12 +3,12 @@
  * @copyright: https://github.com/divio/django-cms
  */
 
-//##################################################################################################################
+//##############################################################################
 // #IMPORT SETTINGS#
 @import "settings/all";
 @import "mixins/all";
 
-//##################################################################################################################
+//##############################################################################
 // #IMPORT COMPONENTS#
 @import "components/reset";
 @import "components/iconography";
@@ -27,7 +27,7 @@
 @import "components/pluginpicker";
 @import "components/animation";
 
-//##################################################################################################################
+//##############################################################################
 // DJANGO DEBUG TOOLBAR FIX
 // removed as of: //github.com/divio/django-cms/issues/2476
 // #djDebug #djDebugToolbarHandle { top:35px !important; border-right:none !important; }
