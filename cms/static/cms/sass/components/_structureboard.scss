@@ -215,6 +215,7 @@
             border: 2px solid $structure-bgcolor;
         }
         .cms-dragitem-text {
+            position: relative;
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
