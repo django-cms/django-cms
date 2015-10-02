@@ -65,23 +65,26 @@
     @if $filename == minus {
         $char: "E00D";
     }
-    @if $filename == pencil {
+    @if $filename == paste {
         $char: "E00E";
     }
-    @if $filename == pin {
+    @if $filename == pencil {
         $char: "E00F";
     }
-    @if $filename == plus {
+    @if $filename == pin {
         $char: "E010";
     }
-    @if $filename == scissors {
+    @if $filename == plus {
         $char: "E011";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E012";
     }
-    @if $filename == window {
+    @if $filename == search {
         $char: "E013";
+    }
+    @if $filename == window {
+        $char: "E014";
     }
 
     @return $char;
@@ -151,6 +154,10 @@
 
 .cms-icon-minus {
     @include icon(minus);
+}
+
+.cms-icon-paste {
+    @include icon(paste);
 }
 
 .cms-icon-pencil {
