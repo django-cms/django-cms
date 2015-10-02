@@ -11,10 +11,4 @@
     .cms-btn-caution {
         @include button-variant($btn-caution-color, $btn-caution-bgcolor, $btn-caution-border, false);
     }
-    .cms-btn-publish {
-        display: none;
-    }
-    .cms-btn-publish-active {
-        display: block;
-    }
 }

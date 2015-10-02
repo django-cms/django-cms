@@ -336,6 +336,7 @@ var CMS = {
              * @param wait {Number} time in ms to wait
              * @param [opts] {Object}
              * @param [opts.immediate] {Boolean} trigger func immediately?
+             * @return {Function}
              */
             debounce: function debounce(func, wait, opts) {
                 var timeout;
@@ -353,6 +354,61 @@ var CMS = {
                     if (callNow) {
                         func.apply(context, args);
                     }
+                };
+            },
+
+            /**
+             * Returns a function that when invoked, will only be triggered
+             * at most once during a given window of time. Normally, the
+             * throttled function will run as much as it can, without ever
+             * going more than once per `wait` duration, but if you’d like to
+             * disable the execution on the leading edge, pass `{leading: false}`.
+             * To disable execution on the trailing edge, ditto.
+             *
+             * @param func {Function} function to throttle
+             * @param wait {Number} time window
+             * @param [opts] {Object}
+             * @param [opts.leading=true] {Boolean} execute on the leading edge
+             * @param [opts.trailing=true] {Boolean} execute on the trailing edge
+             * @return {Function}
+             */
+            throttle: function throttle(func, wait, opts) {
+                var context, args, result;
+                var timeout = null;
+                var previous = 0;
+                if (!opts) {
+                    opts = {};
+                }
+                var later = function () {
+                    previous = opts.leading === false ? 0 : $.now();
+                    timeout = null;
+                    result = func.apply(context, args);
+                    if (!timeout) {
+                        context = args = null;
+                    }
+                };
+                return function () {
+                    var now = $.now();
+                    if (!previous && opts.leading === false) {
+                        previous = now;
+                    }
+                    var remaining = wait - (now - previous);
+                    context = this;
+                    args = arguments;
+                    if (remaining <= 0 || remaining > wait) {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                        }
+                        previous = now;
+                        result = func.apply(context, args);
+                        if (!timeout) {
+                            context = args = null;
+                        }
+                    } else if (!timeout && opts.trailing !== false) {
+                        timeout = setTimeout(later, remaining);
+                    }
+                    return result;
                 };
             }
         };
