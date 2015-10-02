@@ -147,7 +147,7 @@
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover', e, name, id);
                 });
 
                 // adds listener for all plugin updates
@@ -216,11 +216,7 @@
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    if (e.type === 'pointerover') {
-                        that.showTooltip(name, id);
-                    } else {
-                        that.hideTooltip();
-                    }
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover', e, name, id);
                 });
             },
 
