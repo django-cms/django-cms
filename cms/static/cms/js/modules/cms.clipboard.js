@@ -113,6 +113,7 @@ var CMS = window.CMS || {};
             clear: function (callback) {
                 // post needs to be a string, it will be converted using JSON.parse
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+                $('.cms-submenu-item [data-rel=paste]').addClass('cms-submenu-item-disabled');
                 // redirect to ajax
                 CMS.API.Toolbar.openAjax({
                     url: this.config.clipboard.url,
