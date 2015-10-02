@@ -27,7 +27,9 @@ var CMS = {
         DOWN: 40,
         ENTER: 13,
         SPACE: 32,
-        ESC: 27
+        ESC: 27,
+        CMD_LEFT: 91,
+        CMD_RIGHT: 93
     }
 };
 
