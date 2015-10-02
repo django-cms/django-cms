@@ -36,35 +36,47 @@ class WizardPool(object):
 
     # PUBLIC METHODS ------------------
 
+    @property
+    def discovered(self):
+        """
+        A public getter for the private property _discovered. Note, there is no
+        public setter.
+        """
+        return self._discovered
+
     def is_registered(self, entry):
         """
-        Returns True if the provided entry is registered. NOTE: this method will
-        also trigger the discovery process, if it hasn't already been done.
+        Returns True if the provided entry is registered.
+
+        NOTE: This method triggers pool discovery.
         """
         self._discover()
         return entry.id in self._entries
 
-    def register(self, entry, force=False):
+    def register(self, entry):
         """
-        Registers the provided «entry». If the entry.id is already in the pool,
-        this method raises an AlreadyRegistered Exception.
-        The exception can be bypassed by setting «force» to true. This will
-        unceremoniously replace any existing wizard with the same underlying
-        content-type.
+        Registers the provided «entry».
+
+        Raises AlreadyRegisteredException if the entry is already registered.
+
+        NOTE: This method triggers pool discovery.
         """
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
-        if not force and self.is_registered(entry):
+        if self.is_registered(entry):
+            model = entry.get_model()
             raise AlreadyRegisteredException(
                 _(u"A wizard has already been registered for model: %s") %
-                entry.model.__name__)
+                model.__name__)
         else:
             self._entries[entry.id] = entry
 
     def unregister(self, entry):
         """
         If «entry» is registered into the pool, remove it.
-        :param entry: a wizard
-        :return: True if a wizard was successfully removed, else False
+
+        Returns True if the entry was successfully registered, else False.
+
+        NOTE: This method triggers pool discovery.
         """
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
         if self.is_registered(entry):
@@ -74,9 +86,11 @@ class WizardPool(object):
 
     def get_entry(self, entry):
         """
-        :param entry: Accepts a Wizard instance or its "id" (which is the PK of
-                      its content-type).
-        :return: The Wizard instance, if registered else raises IndexError.
+        Returns the wizard from the pool identified by «entry», which may be a
+        Wizard instance or its "id" (which is the PK of its underlying
+        content-type).
+
+        NOTE: This method triggers pool discovery.
         """
         self._discover()
 
@@ -85,7 +99,11 @@ class WizardPool(object):
         return self._entries[entry]
 
     def get_entries(self):
-        """Returns all entries in weight-order."""
+        """
+        Returns all entries in weight-order.
+
+        NOTE: This method triggers pool discovery.
+        """
         self._discover()
         return [value for (key, value) in sorted(
             self._entries.items(), key=lambda e: getattr(e[1], 'weight'))]
