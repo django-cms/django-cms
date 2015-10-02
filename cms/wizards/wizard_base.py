@@ -60,15 +60,19 @@ class Wizard(WizardBase):
         Returns whether the given «user» has permission to add instances of this
         wizard's associated model. Can be overridden as required for more
         complex situations.
+
         :param user: The current user using the wizard.
         :return: True if the user should be able to use this wizard.
         """
-        app_label = self.model._meta.app_label
-        model_name = self.model.__name__.lower()
+        model = self.get_model()
+        app_label = model._meta.app_label
+        model_name = model.__name__.lower()
         return user.has_perm("%s.%s_%s" % (app_label, "add", model_name))
 
     def get_success_url(self, obj, **kwargs):
-        """This should return the URL of the created object."""
+        """
+        This should return the URL of the created object, «obj».
+        """
         if 'language' in kwargs:
             with force_language(kwargs['language']):
                 return obj.get_absolute_url()
