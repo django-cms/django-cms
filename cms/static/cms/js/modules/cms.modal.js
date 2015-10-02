@@ -993,5 +993,44 @@ var CMS = window.CMS || {};
             }
         });
 
+        /**
+         * Sets up keyup/keydown listeners so you're able to save whatever you're
+         * editing inside of an iframe by pressing `ctrl + enter` on windows and `cmd + enter` on mac.
+         *
+         * It only works with default button (e.g. action), not the `delete` button,
+         * even though sometimes it's the only actionable button in the modal.
+         *
+         * @method _setupCtrlEnterSave
+         * @static
+         * @param document HTMLElement document element (iframe or parent window);
+         */
+        CMS.Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
+            var cmdPressed = false;
+            var mac = (navigator.platform.toLowerCase().indexOf('mac') + 1);
+
+            $(doc).on('keydown.cms.submit', function (e) {
+                if (e.ctrlKey && e.keyCode === CMS.KEYS.ENTER && !mac) {
+                    $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
+                }
+
+                if (mac) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                        cmdPressed = true;
+                    }
+
+                    if (e.keyCode === CMS.KEYS.ENTER && cmdPressed) {
+                        $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
+                    }
+                }
+            }).on('keyup.cms.submit', function (e) {
+                if (mac) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                        cmdPressed = false;
+                    }
+                }
+            });
+
+        };
     });
+
 })(CMS.$);
