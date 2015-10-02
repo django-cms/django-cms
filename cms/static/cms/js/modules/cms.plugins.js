@@ -234,22 +234,25 @@
              */
             _checkIfPasteAllowed: function _checkIfPasteAllowed() {
                 var pasteButton = this.ui.dropdown.find('[data-rel=paste]');
+                var pasteItem = pasteButton.parent();
                 if (!clipboardPlugin.length) {
-                    pasteButton.parent().addClass('cms-submenu-item-disabled');
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
                     return false;
                 }
 
                 if (this.ui.draggable && this.ui.draggable.hasClass('cms-draggable-disabled')) {
-                    pasteButton.parent().addClass('cms-submenu-item-disabled');
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-disabled').css('display', 'block');
                     return false;
                 }
 
                 var bounds = this.options.plugin_restriction;
                 var type = clipboardPlugin.data('settings').plugin_type;
-                console.log(type, bounds);
 
                 if (bounds.length && $.inArray(type, bounds) === -1) {
-                    pasteButton.parent().addClass('cms-submenu-item-disabled');
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
                     return false;
                 }
 
