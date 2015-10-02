@@ -830,6 +830,21 @@ var CMS = window.CMS || {};
                         that.close();
                     }
 
+                    CMS.Modal._setupCtrlEnterSave(document);
+                    CMS.Modal._setupCtrlEnterSave(iframe[0].contentWindow.document);
+                    // we need to go deeper
+                    if (iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
+                        $(iframe[0].contentWindow.document).ready(function () {
+                            setTimeout(function () {
+                                iframe[0].contentWindow.CMS.CKEditor.editor.on('loaded', function (e) {
+                                    CMS.Modal._setupCtrlEnterSave(
+                                        $(e.editor.container.$).find('iframe')[0].contentWindow.document
+                                    );
+                                });
+                            }, 100);
+                        });
+                    }
+
                     // hide loader
                     CMS.API.Toolbar.hideLoader();
 
