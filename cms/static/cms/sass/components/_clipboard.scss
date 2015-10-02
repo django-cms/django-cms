@@ -3,131 +3,63 @@
 #cms-toolbar {
     .cms-clipboard {
         display: none;
-        position: fixed;
-        top: $clipboard-buttons-position-top;
-        left: 0;
-        z-index: z(clipboard, base);
-        padding: $padding-base $padding-base $padding-base 0;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        background: rgba($white, 0.6);
+    }
 
-        p {
-            margin: 0;
-            padding: 0;
-        }
+    .cms-clipboard-containers {
+        display: none !important;
         // custom style for draggable item
         .cms-dragarea {
             padding-top: $padding-base;
         }
         .cms-draggable {
+            display: block !important;
             position: relative;
             top: 0;
             left: 0;
-            z-index: z(clipboard, draggable);
-            margin: 0 0 2px;
-            border: 1px solid $gray-darker;
             border-radius: $border-radius-base;
             cursor: move;
-            background: $gray-lightest;
         }
         .cms-draggable .cms-dragitem {
-            padding-left: $clipboard-button-area-size + $structure-dragarea-padding;
-            line-height: $clipboard-button-area-size * 1.5 - 2px;
-            height: $clipboard-button-area-size * 1.5 - 2px;
+            line-height: $structure-dragitem-fullheight;
+            height: $structure-dragitem-fullheight;
+            padding-left: $padding-large;
         }
-        .cms-draggable .cms-dragitem .cms-submenu {
+        .cms-draggable .cms-dragitem .cms-submenu-btn {
             display: none !important;
         }
         .cms-draggable .cms-dragitem-text {
-            display: inline-block;
             overflow: hidden;
-            width: 190px - $clipboard-button-area-size - $structure-dragarea-padding - 40px;
-            height: $clipboard-button-area-size * 1.5 - 2px;
         }
 
         .cms-plugins {
             display: none;
         }
-    }
-    .cms-clipboard-numbers {
-        margin: 0 0 2px;
-    }
-    .cms-clipboard-numbers a {
-        // we have to use icons like this
-        // and not as classes in actual markup because of cms_reset
-        @extend %icon;
-        @include icon(copy);
-        box-sizing: border-box;
-        display: block;
-        position: relative;
-        overflow: hidden;
-        color: $gray-lighter;
-        font-size: $clipboard-button-icon-size;
-        width: $clipboard-button-area-size;
-        height: 1.5 * $clipboard-button-area-size;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        background: $gray-darker;
-        &:before {
+        .cms-droppable {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -($clipboard-button-icon-size / 2);
-            margin-left: -($clipboard-button-icon-size / 2);
-        }
-        &:hover,
-        &:active,
-        &:focus {
-            color: $white;
-            background-color: $gray-darkest;
-        }
-    }
-    .cms-clipboard-numbers .cms-clipboard-numbers {
-        display: none !important;
-    }
-
-    .cms-clipboard-empty a {
-        @extend %icon;
-        @include icon(bin);
-        position: relative;
-        display: block;
-        cursor: pointer;
-        font-size: $clipboard-button-icon-size - 1px;
-        width: $clipboard-button-area-size;
-        height: $clipboard-button-area-size;
-        color: $gray-lighter;
-        border-radius: 0 $border-radius-base $border-radius-base 0;
-        background: $gray-darker;
-        &:before {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -($clipboard-button-icon-size / 2);
-            margin-left: -($clipboard-button-icon-size / 2);
-        }
-        &:hover,
-        &:active,
-        &:focus {
-            color: $white;
-            background-color: $gray-darkest;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: z(structure, content, empty, droppable);
+            color: darken($gray-lighter, 15%);
+            line-height: $structure-dragitem-height;
+            height: auto;
+            margin: 0;
+            border: 2px solid $color-primary;
+            border-radius: $border-radius-base;
+            background-color: mix(white, $color-primary, 90%);
+            box-shadow: none;
+            transform: translateY(0) !important;
+            &:before {
+                display: none;
+            }
         }
     }
-
-    // placeholders
-    .cms-clipboard-triggers {
-        position: relative;
-        z-index: z(clipboard, triggers);
+    .cms-modal-markup .cms-clipboard-containers {
+        display: block !important;
+        .cms-is-dragging {
+            display: block !important;
+            opacity: 0.3;
+        }
     }
-
-    .cms-clipboard-containers {
-        position: absolute;
-        top: 0;
-        left: -1px;
-        z-index: z(clipboard, containers);
-        width: 0;
-    }
-    .cms-clipboard-containers .cms-draggable {
-        width: 190px;
-        margin-left: -220px;
-    }
-
 }

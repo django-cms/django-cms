@@ -54,6 +54,7 @@ var PROJECT_PATTERNS = {
 var JS_BUNDLES = {
     'bundle.admin.base.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
+        PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/modules/cms.base.js'
     ],
@@ -69,16 +70,21 @@ var JS_BUNDLES = {
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
+        PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
+        PROJECT_PATH.js + '/modules/jquery.ui.touchpunch.js',
         PROJECT_PATH.js + '/modules/jquery.ui.nestedsortable.js',
         PROJECT_PATH.js + '/modules/cms.base.js',
         PROJECT_PATH.js + '/modules/jquery.transition.js',
+        PROJECT_PATH.js + '/modules/cms.messages.js',
         PROJECT_PATH.js + '/modules/cms.modal.js',
         PROJECT_PATH.js + '/modules/cms.sideframe.js',
         PROJECT_PATH.js + '/modules/cms.clipboard.js',
         PROJECT_PATH.js + '/modules/cms.plugins.js',
         PROJECT_PATH.js + '/modules/cms.structureboard.js',
-        PROJECT_PATH.js + '/modules/cms.toolbar.js'
+        PROJECT_PATH.js + '/modules/cms.navigation.js',
+        PROJECT_PATH.js + '/modules/cms.toolbar.js',
+        PROJECT_PATH.js + '/modules/cms.tooltip.js'
     ]
 };
 
@@ -140,13 +146,9 @@ Object.keys(JS_BUNDLES).forEach(function (bundleName) {
     gulp.task('bundle:' + bundleName, function () {
         return gulp.src(bundleFiles)
             .pipe(gulpif(options.debug, sourcemaps.init()))
-            .pipe(uglify({
-                preserveComments: 'some',
-                compress: {
-                    drop_console: !options.debug,
-                    drop_debugger: !options.debug
-                }
-            }))
+            .pipe(gulpif(!options.debug, uglify({
+                preserveComments: 'some'
+            })))
             .pipe(concat(bundleName, {
                 newLine: '\n'
             }))

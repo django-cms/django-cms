@@ -40,6 +40,7 @@ HISTORY_MENU_BREAK = 'History Menu Break'
 MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
 ADMINISTRATION_BREAK = 'Administration Break'
+CLIPBOARD_BREAK = 'Clipboard Break'
 USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
@@ -88,8 +89,8 @@ class PlaceholderToolbar(CMSToolbar):
         if self.request.user.has_perm("cms.use_structure"):
             switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
                                                     extra_classes=extra_classes)
-            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=not build_mode)
-            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=build_mode)
+            switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=False)
+            switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
 
 
 @toolbar_pool.register
@@ -108,10 +109,10 @@ class BasicToolbar(CMSToolbar):
         if not self.page:
             self.init_from_request()
 
-            self.add_admin_menu()
-            self.add_language_menu()
             user_settings = self.request.toolbar.get_user_settings()
             self.clipboard = user_settings.clipboard
+            self.add_admin_menu()
+            self.add_language_menu()
 
     def add_admin_menu(self):
         if not self._admin_menu:
@@ -127,19 +128,29 @@ class BasicToolbar(CMSToolbar):
 
             if len(sites_queryset) > 1:
                 sites_menu = self._admin_menu.get_or_create_menu('sites', _('Sites'))
-                sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
+                sites_menu.add_modal_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
                 sites_menu.add_break(ADMIN_SITES_BREAK)
                 for site in sites_queryset:
                     sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                              active=site.pk == self.current_site.pk)
 
             # admin
-            self._admin_menu.add_sideframe_item(_('Administration'), url=admin_reverse('index'))
+            self._admin_menu.add_cms_frame_item(_('Administration'), url=admin_reverse('index'))
             self._admin_menu.add_break(ADMINISTRATION_BREAK)
 
-            # cms users
-            self._admin_menu.add_sideframe_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
+            # cms users settings
+            self._admin_menu.add_modal_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
             self._admin_menu.add_break(USER_SETTINGS_BREAK)
+
+            # clipboard
+            if self.toolbar.edit_mode or self.toolbar.build_mode:
+                self._admin_menu.add_link_item(_('Clipboard...'), url='#',
+                        extra_classes=['cms-clipboard-trigger'],
+                        disabled=not self.get_clipboard_plugins())
+                self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
+                        extra_classes=['cms-clipboard-empty'],
+                        disabled=not self.get_clipboard_plugins())
+                self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
             self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
@@ -156,7 +167,7 @@ class BasicToolbar(CMSToolbar):
 
             if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
                 user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
-                parent.add_sideframe_item(_('Users'), url=user_changelist_url)
+                parent.add_cms_frame_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
         # If current page is not published or has view restrictions user is redirected to the home page:
@@ -421,15 +432,16 @@ class PageToolbar(CMSToolbar):
             # page operations menu
             add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Add Page'))
             app_page_url = admin_reverse('cms_page_add')
-            add_page_menu_sideframe_items = (
+
+            add_page_menu_items = (
                 (_('New Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.parent_id or ''}),
                 (_('New Sub Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.pk}),
                 (_('Duplicate this Page'), {'copy_target': self.page.pk})
             )
 
-            for title, params in add_page_menu_sideframe_items:
+            for title, params in add_page_menu_items:
                 params.update(language=self.toolbar.language)
-                add_page_menu.add_sideframe_item(title, url=add_url_parameters(app_page_url, params))
+                add_page_menu.add_modal_item(title, url=add_url_parameters(app_page_url, params))
 
             # first break
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)

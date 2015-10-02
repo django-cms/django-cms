@@ -20,6 +20,8 @@ $color-background-light-hover: #f5f5f5;
 $color-background-blue: #f3fbfe;
 $color-background-blue-hover: #e6f6fd;
 
+$row-height: 41px;
+
 // pagetree
 #sitemap {
     margin: 0;
@@ -92,7 +94,7 @@ $color-background-blue-hover: #e6f6fd;
         display: inline-block;
         width: 10px;
         height: 10px;
-        margin: 0 0 0 4px;
+        margin: 0 3px;
         padding: 0;
         background-position: 0 0;
     }
@@ -149,30 +151,37 @@ $color-background-blue-hover: #e6f6fd;
     }
     ul.header li .col2 > div {
         font-size: 10px;
-        line-height: 14px;
+        line-height: 14px !important;
+        height: auto;
         border: none;
         background: none;
     }
 
     // row
+    li {
+        padding-left: 20px;
+    }
+    li.last {
+        background-position: 5px 5px !important;
+    }
+    li.closed,
+    li.open {
+        background-position: 0 6px !important;
+    }
     li .cont {
         display: block;
+        height: $row-height !important;
         overflow: visible !important;
         border-top: 1px solid $color-border !important;
-    }
-    li.open > .cont {
         border-bottom: 1px solid $color-border !important;
+        background-color: white;
+        margin-top: -1px;
     }
     li.open ul .cont {
-        border-top: none !important;
-        border-bottom: 1px solid $color-border !important;
+        height: $row-height !important;
     }
-    li.moveable > div {
-        border-bottom: none !important;
-    }
-    li.last.leaf .cont,
-    li.last.closed .cont {
-        border-bottom: none !important;
+    .tree-default {
+        padding-top: 1px;
     }
     .tree-default .col-navigation,
     .tree-default .col-published {
@@ -181,13 +190,6 @@ $color-background-blue-hover: #e6f6fd;
     // add additional border to separate categories
     li.open ul {
         margin-left: 0;
-        border-bottom: 1px solid $color-border !important;
-    }
-    li.open.last ul {
-        border-bottom: none !important;
-    }
-    li.open ul.last {
-        border-bottom: none !important;
     }
 
     li .col1 > div {
@@ -208,9 +210,9 @@ $color-background-blue-hover: #e6f6fd;
     }
     li .col1 .title,
     li .col1 .success {
-        float: left;
-        line-height: 29px;
-        height: 28px;
+        display: block;
+        line-height: $row-height;
+        height: $row-height;
         padding-left: 20px;
     }
 
@@ -219,14 +221,13 @@ $color-background-blue-hover: #e6f6fd;
         float: left;
         font-size: 14px;
         line-height: 27px;
-        margin-right: 10px;
     }
     li .move-target-container a:hover {
         text-decoration: none;
     }
     li .move-target {
         display: inline-block;
-        padding: 2px 8px;
+        padding: 7px 8px;
         border-left: 1px solid $color-border-medium;
     }
     li .move-target:first-child {
@@ -235,12 +236,12 @@ $color-background-blue-hover: #e6f6fd;
 
     li .col2 > div {
         float: left;
-        line-height: 28px;
+        line-height: $row-height !important;
         text-align: center;
         white-space: nowrap;
         width: auto;
-        height: 28px;
-        padding: 0 5px;
+        height: $row-height;
+        padding: 0 8px;
         border-left: 1px solid $color-border-medium;
     }
     li .col2 > div a,
@@ -250,6 +251,10 @@ $color-background-blue-hover: #e6f6fd;
     // hide items
     .cont {
         position: relative;
+    }
+    .col1 {
+        display: block;
+        float: none !important;
     }
     .col1,
     .col2 {
@@ -276,8 +281,10 @@ $color-background-blue-hover: #e6f6fd;
     .success {
         position: absolute;
         right: 0;
-        float: right !important;
-        padding: 5px 10px !important;
+        top: 0;
+        padding-right: 10px !important;
+        line-height: $row-height;
+        height: $row-height;
     }
 
     // row hover states
@@ -309,6 +316,7 @@ $color-background-blue-hover: #e6f6fd;
     // drag modus
     li#dragged {
         min-width: 500px;
+        z-index: 99999;
     }
     li#dragged .col2 {
         display: none;
@@ -398,7 +406,8 @@ $color-background-blue-hover: #e6f6fd;
 #sitemap {
     border: 1px solid $color-border;
     ul.header li .col2 > div {
-        padding: 0 5.5px;
+        padding: 0 8px;
+        border-left: 1px solid transparent;
     }
     li .col-softroot span.icon {
         width: 18px !important;
@@ -417,7 +426,7 @@ $color-background-blue-hover: #e6f6fd;
         color: transparent;
         width: 12px !important;
         height: 12px !important;
-        margin: -3px 0 0 !important;
+        margin: 0 !important;
         border: 1px solid transparent;
         border-radius: 7px;
         // colors used within the tree
@@ -451,7 +460,7 @@ $color-background-blue-hover: #e6f6fd;
 .language-tooltip {
     display: none;
     position: absolute;
-    top: 4px;
+    top: 10px;
     right: 20px;
     z-index: 9999;
     color: #ccc;

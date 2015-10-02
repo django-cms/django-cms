@@ -3,7 +3,8 @@
 
 // used when hover over plugins in edit mode
 #cms-toolbar {
-    .cms-tooltip {
+    .cms-tooltip,
+    .cms-tooltip-touch {
         @include icon(pencil);
         visibility: hidden;
         position: absolute;

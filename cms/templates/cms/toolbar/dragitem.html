@@ -1,36 +1,64 @@
 {% load i18n l10n cms_tags %}
 
-<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}">
+<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}{% if clipboard %} cms-draggable-from-clipboard{% endif %}">
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
-        <div class="cms-switcher"></div>
-        <div class="cms-submenu">
-            <div class="cms-submenu-quicksearch"><label><input type="text" placeholder="{% trans "Quicksearch" %}" /></label></div>
-            <div class="cms-submenu-dropdown">
-                <div class="cms-submenu-item cms-submenu-item-title"><span>{% trans "Settings" %}</span></div>
-                <div class="cms-submenu-item"><a data-rel="copy" href="#">{% trans "Copy" %}</a></div>
-                <div class="cms-submenu-item"><a data-rel="cut" href="#">{% trans "Cut" %}</a></div>
-                <div class="cms-submenu-item"><a data-rel="edit" href="#">{% trans "Edit" %}</a></div>
-                <div class="cms-submenu-item"><a data-rel="delete" href="#">{% trans "Delete" %}</a></div>
+        {% if not disabled_child %}
+            <span class="cms-submenu-btn cms-submenu-add cms-btn{% if plugin.disable_child_plugins %} cms-btn-disabled{% endif %}">
+                {% if plugin.disable_child_plugins %}
+                <span class="cms-hover-tooltip" data-tooltip="{% trans "You cannot add plugins to this plugin." %}">
+                </span>
+                {% else %}
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}">
+                </span>
+                {% endif %}
+            </span>
+            <a class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit" href="#">
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}">
+                </span>
+            </a>
+        {% else %}
+            <span class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
+                data-tooltip="{% trans "This plugin cannot be moved or edited outside of it's parent" %}">
+                <span class="cms-icon cms-icon-lock"></span>
+            </span>
+        {% endif %}
+        <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn">
+        </div>
+        <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
+            <div class="cms-dropdown-inner">
+                <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
+                <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">{% trans "Copy" %}</a></div>
+                <div class="cms-submenu-item">
+                    <a data-icon="paste" data-rel="paste" href="#">{% trans "Paste" %}</a>
+                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-empty cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Clipboard is empty." %}"></span>
+                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-restricted cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "This plugin does not allow plugins of this type as nested plugins." %}"></span>
+                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "This plugin cannot have nested plugins." %}"></span>
+                </div>
+                <div class="cms-submenu-item"><a data-icon="bin" data-rel="delete" href="#">{% trans "Delete" %}</a></div>
                 {% extra_menu_items plugin %}
-                {% plugin_child_classes plugin %}
             </div>
         </div>
+        {% if not clipboard %}
+            <div class="cms-plugin-picker" data-touch-action="pan-y">
+                <div class="cms-quicksearch"><label><input type="text" placeholder="{% trans 'Filter plugins...' %}" /></label></div>
+                {% plugin_child_classes plugin %}
+            </div>
+        {% endif %}
 
-        {% if show_language %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
+        {% if clipboard %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
         <span class="cms-dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
 
     </div>
 
-    {% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables">{% endif %}
-    {% if plugin.get_plugin_class.allow_children and plugin.num_children == 0 %}
-        {# <div class="cms-reset cms-draggable cms-draggable-empty"><div class="cms-dragitem">{% trans "Drop a plugin here" %}</div></div> #}
-    {% endif %}
+    {% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables cms-hidden">{% endif %}
+
     {% if plugin.child_plugin_instances %}
         {% for child in plugin.child_plugin_instances %}
             {# workaround because include tag does not allow recursive includes #}
-            {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child %}{% endwith %}
+            {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=plugin.disable_child_plugins %}{% endwith %}
         {% endfor %}
     {% endif %}
+
     {% if plugin.get_plugin_class.allow_children %}</div>{% endif %}{% endlanguage %}
 </div>

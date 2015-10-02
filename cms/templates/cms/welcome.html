@@ -62,8 +62,10 @@
 if(window.CMS !== undefined) {
     CMS.$('#add-page').bind('click', function (e) {
         e.preventDefault();
-        var sideframe = new CMS.Sideframe();
-            sideframe.open('{% cms_admin_url "cms_page_add" %}?title=Home', true);
+        var modal = new CMS.Modal();
+            modal.open({
+                url: '{% cms_admin_url "cms_page_add" %}?title=Home'
+        });
     });
 }
 </script>
