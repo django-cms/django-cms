@@ -8,6 +8,10 @@
     // CMS.$ will be passed for $
     $(function () {
         var doc = $(document);
+        var clipboard = $('.cms-clipboard');
+        var clipboardDraggable = clipboard.find('.cms-draggable:first');
+        var clipboardPlugin = clipboard.find('.cms-plugin:first');
+
         doc.on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
@@ -120,6 +124,8 @@
                 if ($.inArray(this.options.placeholder_id, CMS.settings.dragbars) !== -1) {
                     title.addClass(expanded);
                 }
+
+                this._checkIfPasteAllowed();
             },
 
             _setPlugin: function () {
@@ -191,6 +197,8 @@
                         that.options.plugin_breadcrumb
                     );
                 });
+
+                this._checkIfPasteAllowed();
             },
 
             _setGeneric: function () {
@@ -214,6 +222,38 @@
                         that.hideTooltip();
                     }
                 });
+            },
+
+            /**
+             * Checks if paste is allowed into current plugin/placeholder based
+             * on restrictions we have. Also determines which tooltip to show.
+             *
+             * @method _checkIfPasteAllowed
+             * @private
+             * @return {Boolean}
+             */
+            _checkIfPasteAllowed: function _checkIfPasteAllowed() {
+                var pasteButton = this.ui.dropdown.find('[data-rel=paste]');
+                if (!clipboardPlugin.length) {
+                    pasteButton.parent().addClass('cms-submenu-item-disabled');
+                    return false;
+                }
+
+                if (this.ui.draggable && this.ui.draggable.hasClass('cms-draggable-disabled')) {
+                    pasteButton.parent().addClass('cms-submenu-item-disabled');
+                    return false;
+                }
+
+                var bounds = this.options.plugin_restriction;
+                var type = clipboardPlugin.data('settings').plugin_type;
+                console.log(type, bounds);
+
+                if (bounds.length && $.inArray(type, bounds) === -1) {
+                    pasteButton.parent().addClass('cms-submenu-item-disabled');
+                    return false;
+                }
+
+                return true;
             },
 
             // public methods
@@ -383,6 +423,17 @@
                         }
                     });
                 });
+            },
+
+            /**
+             * Method is called when you click on the paste button on the plugin.
+             * Uses existing solution of `copyPlugin(options)`
+             *
+             * @method pastePlugin
+             */
+            pastePlugin: function () {
+                clipboardDraggable.appendTo(this.ui.draggables);
+                clipboardPlugin.trigger('cms.plugin.update');
             },
 
             movePlugin: function (options) {
@@ -755,6 +806,13 @@
                             break;
                         case 'cut':
                             that.cutPlugin();
+                            break;
+                        case 'paste':
+                            if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                                that.pastePlugin();
+                            } else {
+                                CMS.API.Toolbar.hideLoader();
+                            }
                             break;
                         case 'delete':
                             that.deletePlugin(
