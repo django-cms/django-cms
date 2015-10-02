@@ -136,6 +136,19 @@
                 }
             }
         }
+        .cms-submenu-item-disabled {
+            a {
+                &,
+                &:hover,
+                &:focus {
+                    cursor: default !important;
+                    opacity: 0.2;
+                    color: $submenu-item-color !important;
+                    background: none !important;
+                    box-shadow: none;
+                }
+            }
+        }
         &:before {
             z-index: z(below);
             position: absolute;
