@@ -2,7 +2,6 @@
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve, reverse, Resolver404
 from django.forms.models import ModelForm
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
@@ -13,7 +12,6 @@ from cms.models import Page, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
-from cms.wizards.views import WizardCreateView
 
 
 class WizardForm(forms.Form):
