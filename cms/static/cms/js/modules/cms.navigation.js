@@ -31,46 +31,61 @@ var CMS = window.CMS || {};
                 this._setupUI();
                 this.getWidths();
 
-                /** The zero based index of the right-most visible menu item of the left toolbar part. */
+                /**
+                 * The zero based index of the right-most visible menu item of the left toolbar part.
+                 *
+                 * @property rightMostItemIndex {Number}
+                 */
                 this.rightMostItemIndex = this.items.left.length - 1;
 
-                /** The zero based index of the left-most visible item of the right toolbar part. */
+                /**
+                 * The zero based index of the left-most visible item of the right toolbar part.
+                 *
+                 * @property leftMostItemIndex {Number}
+                 */
                 this.leftMostItemIndex = 0;
+
+                this.resize = 'resize.cms.navigation';
+                this.load = 'load.cms.navigation';
 
                 this._events();
             },
 
             /**
-             * Cache UI jquery objects
+             * Cache UI jquery objects.
+             *
              * @method _setupUI
              * @private
              */
             _setupUI: function _setupUI() {
-                var trigger = $('.cms-toolbar-more');
+                var container = $('#cms-toolbar');
+                var trigger = container.find('.cms-toolbar-more');
                 this.ui = {
                     window: $(window),
-                    toolbarLeftPart: $('.cms-toolbar-left'),
-                    toolbarRightPart: $('.cms-toolbar-right'),
+                    toolbarLeftPart: container.find('.cms-toolbar-left'),
+                    toolbarRightPart: container.find('.cms-toolbar-right'),
                     trigger: trigger,
                     dropdown: trigger.find('> ul'),
-                    toolbarTrigger: $('.cms-toolbar-trigger'),
-                    logo: $('.cms-toolbar-item-logo')
+                    toolbarTrigger: container.find('.cms-toolbar-trigger'),
+                    logo: container.find('.cms-toolbar-item-logo')
                 };
             },
 
             /**
-             * Setup resize handler to construct the dropdown
+             * Setup resize handler to construct the dropdown.
+             *
              * @method _events
              * @private
              */
             _events: function _events() {
-                this.ui.window.on('resize.cms load.cms', CMS.API.Helpers.throttle(
+                this.ui.window.on(this.resize + ' ' + this.load, CMS.API.Helpers.throttle(
                     this._handleResize.bind(this), 50
                 ));
             },
 
             /**
-             * Calculates all the movable menu items widths
+             * Calculates all the movable menu items widths.
+             *
              * @method _getWidths
              */
             getWidths: function getWidths() {
@@ -113,7 +128,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Calculates available width based on the state of the page
+             * Calculates available width based on the state of the page.
              *
              * @method calculateAvailableWidth
              * @return {Number} available width in px
@@ -127,7 +142,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Shows the dropdown
+             * Shows the dropdown.
              *
              * @method showDropdown
              */
@@ -136,7 +151,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Hides the dropdown
+             * Hides the dropdown.
              *
              * @method hideDropdown
              */
@@ -145,7 +160,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Figures out if we need to show/hide/modify the dropdown
+             * Figures out if we need to show/hide/modify the dropdown.
              *
              * @method _handleResize
              * @private
@@ -175,6 +190,8 @@ var CMS = window.CMS || {};
 
                     this.showDropdown();
 
+                    // if we do not have any width left and all the items from the left part
+                    // are already in the dropdown - start with the right part
                     if (remainingWidth < 0 && this.rightMostItemIndex === -1) {
                         remainingWidth += this.items.rightTotalWidth;
 
@@ -204,7 +221,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Hides and empties dropdown
+             * Hides and empties dropdown.
              *
              * @method showAll
              */
@@ -215,7 +232,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Show all items in the left part of the toolbar
+             * Show all items in the left part of the toolbar.
              *
              * @method showAllLeft
              */
@@ -224,7 +241,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Show all items in the right part of the toolbar
+             * Show all items in the right part of the toolbar.
              *
              * @method showAllRight
              */
@@ -234,7 +251,7 @@ var CMS = window.CMS || {};
 
             /**
              * Moves items into the dropdown, reducing menu right-to-left in case it's a left part of toolbar
-             * and left-to-right if it's right one
+             * and left-to-right if it's right one.
              *
              * @param numberOfItems {Number} how many items to move to dropdown
              * @param part {String} from which part to move to dropdown (defaults to left)
@@ -278,7 +295,7 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Moves items out of the dropdown
+             * Moves items out of the dropdown.
              *
              * @param numberOfItems Number how many items to move out of the dropdown
              * @param part {String} to which part to move out of dropdown (defaults to left)
