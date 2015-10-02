@@ -1,20 +1,41 @@
 # -*- coding: utf-8 -*-
 
-from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.utils.translation import override as force_language, force_text
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import (
+    override as force_language,
+    force_text,
+    ugettext as _
+)
 
 
 class WizardBase(object):
     template_name = None
 
-    def __init__(self, title, weight, form, model=None, template_name=None):
+    def __init__(self, title, weight, form, model=None, template_name=None,
+                 description=None):
+        """
+        :param title: This is used on the start form.
+        :param weight: Used for determining the order of the wizards on the
+                       creation form.
+        :param form:
+        :param model: Required. This is used to determine uniqueness of
+                      the wizards, so, only one wizard per model.
+        :param template_name: The full-path to the template to use, if any.
+        :param description: This is used on the start form.
+        """
+        # NOTE: If class attributes or properties are changed, consider updating
+        # cms.templatetags.cms_wizard_tags.WizardProperty too.
         self.title = title
         self.weight = weight
         self.form = form
         self.model = model
+        if description is not None:
+            self.description = description
+        else:
+            self.description = _("Create a new %s instance.") % model.__name__
         if template_name is not None:
             self.template_name = template_name
 
