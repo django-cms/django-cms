@@ -85,6 +85,7 @@
                     revert: $('.cms-toolbar-revert'),
                     dragbar: null,
                     draggable: null,
+                    draggables: null,
                     submenu: null,
                     dropdown: null
                 };
@@ -94,6 +95,7 @@
             _setPlaceholder: function () {
                 var that = this;
                 this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
+                this.ui.draggables = this.ui.dragbar.closest('.cms-dragarea').find('> .cms-draggables');
                 this.ui.submenu = this.ui.dragbar.find('.cms-submenu-settings');
                 var title = this.ui.dragbar.find('.cms-dragbar-title');
                 var togglerLinks = this.ui.dragbar.find('.cms-dragbar-toggler a');
@@ -172,6 +174,7 @@
                 // variables for dragitems
                 this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
                 this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
+                this.ui.draggables = this.ui.draggable.find('> .cms-draggables');
                 this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
                 // attach event to the plugin menu
