@@ -17,6 +17,7 @@ cms_page_wizard = Wizard(
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
+    description="Start with a new blank page."
 )
 
 wizard_pool.register(cms_page_wizard)
