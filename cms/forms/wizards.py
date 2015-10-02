@@ -11,9 +11,12 @@ from cms.models.titlemodels import EmptyTitle
 
 
 class BaseCMSPageForm(forms.Form):
-    title = forms.CharField(label=_(u'Title'), max_length=255)
+    title = forms.CharField(label=_(u'Title'), max_length=255,
+                            help_text=_(u"Provide a title for the new page."))
     content = forms.CharField(
-        label=_(u'Content'), widget=forms.Textarea, required=False)
+        label=_(u'Content'), widget=forms.Textarea, required=False,
+        help_text=_(u"Optional. If supplied, will be automatically added "
+                    u"within a new text plugin."))
 
     def __init__(self, instance=None, *args, **kwargs):
         # Expect instance argument here, as we have to accept some of the
