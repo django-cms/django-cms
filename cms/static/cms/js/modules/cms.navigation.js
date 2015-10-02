@@ -29,7 +29,7 @@ var CMS = window.CMS || {};
 
             initialize: function initialize() {
                 this._setupUI();
-                this.getWidths();
+                this._getWidths();
 
                 /**
                  * The zero based index of the right-most visible menu item of the left toolbar part.
@@ -88,7 +88,7 @@ var CMS = window.CMS || {};
              *
              * @method _getWidths
              */
-            getWidths: function getWidths() {
+            _getWidths: function _getWidths() {
                 var that = this;
                 that.items = {
                     left: [],
@@ -130,10 +130,11 @@ var CMS = window.CMS || {};
             /**
              * Calculates available width based on the state of the page.
              *
-             * @method calculateAvailableWidth
+             * @method _calculateAvailableWidth
+             * @private
              * @return {Number} available width in px
              */
-            calculateAvailableWidth: function calculateAvailableWidth() {
+            _calculateAvailableWidth: function _calculateAvailableWidth() {
                 var fullWidth = this.ui.window.width();
                 var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.offset().left +
                     this.ui.logo.outerWidth(true) + 15;
@@ -144,18 +145,20 @@ var CMS = window.CMS || {};
             /**
              * Shows the dropdown.
              *
-             * @method showDropdown
+             * @method _showDropdown
+             * @private
              */
-            showDropdown: function showDropdown() {
+            _showDropdown: function _showDropdown() {
                 this.ui.trigger.css('display', 'list-item');
             },
 
             /**
              * Hides the dropdown.
              *
-             * @method hideDropdown
+             * @method _hideDropdown
+             * @private
              */
-            hideDropdown: function hideDropdown() {
+            _hideDropdown: function _hideDropdown() {
                 this.ui.trigger.css('display', 'none');
             },
 
@@ -167,10 +170,10 @@ var CMS = window.CMS || {};
              */
             _handleResize: function _handleResize() {
                 var remainingWidth;
-                var availableWidth = this.calculateAvailableWidth();
+                var availableWidth = this._calculateAvailableWidth();
 
                 if (availableWidth > this.items.leftTotalWidth + this.items.rightTotalWidth) {
-                    this.showAll();
+                    this._showAll();
                 } else {
                     // first handle the left part
                     remainingWidth = availableWidth - this.items.moreButtonWidth - this.items.rightTotalWidth;
@@ -183,12 +186,12 @@ var CMS = window.CMS || {};
                     }
 
                     if (newRightMostItemIndex < this.rightMostItemIndex) {
-                        this.moveToDropdown(this.rightMostItemIndex - newRightMostItemIndex);
+                        this._moveToDropdown(this.rightMostItemIndex - newRightMostItemIndex);
                     } else if (this.rightMostItemIndex < newRightMostItemIndex) {
-                        this.moveOutOfDropdown(newRightMostItemIndex - this.rightMostItemIndex);
+                        this._moveOutOfDropdown(newRightMostItemIndex - this.rightMostItemIndex);
                     }
 
-                    this.showDropdown();
+                    this._showDropdown();
 
                     // if we do not have any width left and all the items from the left part
                     // are already in the dropdown - start with the right part
@@ -204,17 +207,17 @@ var CMS = window.CMS || {};
                             }
 
                             if (newLeftMostItemIndex > this.leftMostItemIndex) {
-                                this.moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
+                                this._moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
                             } else if (newLeftMostItemIndex < this.leftMostItemIndex) {
-                                this.moveOutOfDropdown(this.leftMostItemIndex - newLeftMostItemIndex, 'right');
+                                this._moveOutOfDropdown(this.leftMostItemIndex - newLeftMostItemIndex, 'right');
                             }
                         } else {
                             // but for now we want to move all of them immediately
-                            this.moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
+                            this._moveToDropdown(newLeftMostItemIndex - this.leftMostItemIndex, 'right');
                             this.ui.dropdown.addClass('cms-more-dropdown-full');
                         }
                     } else {
-                        this.showAllRight();
+                        this._showAllRight();
                         this.ui.dropdown.removeClass('cms-more-dropdown-full');
                     }
                 }
@@ -223,40 +226,43 @@ var CMS = window.CMS || {};
             /**
              * Hides and empties dropdown.
              *
-             * @method showAll
+             * @method _showAll
+             * @private
              */
-            showAll: function showAll() {
-                this.showAllLeft();
-                this.showAllRight();
-                this.hideDropdown();
+            _showAll: function _showAll() {
+                this._showAllLeft();
+                this._showAllRight();
+                this._hideDropdown();
             },
 
             /**
              * Show all items in the left part of the toolbar.
              *
-             * @method showAllLeft
+             * @method _showAllLeft
              */
-            showAllLeft: function showAllLeft() {
-                this.moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
+            _showAllLeft: function _showAllLeft() {
+                this._moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
             },
 
             /**
              * Show all items in the right part of the toolbar.
              *
-             * @method showAllRight
+             * @method _showAllRight
              */
-            showAllRight: function showAllRight() {
-                this.moveOutOfDropdown(this.leftMostItemIndex, 'right');
+            _showAllRight: function _showAllRight() {
+                this._moveOutOfDropdown(this.leftMostItemIndex, 'right');
             },
 
             /**
              * Moves items into the dropdown, reducing menu right-to-left in case it's a left part of toolbar
              * and left-to-right if it's right one.
              *
+             * @method _moveToDropdown
+             * @private
              * @param numberOfItems {Number} how many items to move to dropdown
              * @param part {String} from which part to move to dropdown (defaults to left)
              */
-            moveToDropdown: function moveToDropdown(numberOfItems, part) {
+            _moveToDropdown: function _moveToDropdown(numberOfItems, part) {
                 if (numberOfItems <= 0) {
                     return;
                 }
@@ -297,10 +303,12 @@ var CMS = window.CMS || {};
             /**
              * Moves items out of the dropdown.
              *
+             * @method _moveOutOfDropdown
+             * @private
              * @param numberOfItems Number how many items to move out of the dropdown
              * @param part {String} to which part to move out of dropdown (defaults to left)
              */
-            moveOutOfDropdown: function moveOutOfDropdown(numberOfItems, part) {
+            _moveOutOfDropdown: function _moveOutOfDropdown(numberOfItems, part) {
                 if (numberOfItems <= 0) {
                     return;
                 }
