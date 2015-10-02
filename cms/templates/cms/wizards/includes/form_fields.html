@@ -17,8 +17,9 @@
                 </ul>
             {% endif %}
             <div>
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
+                <label {% if field.field.required %}class="required" {% endif %}for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}{% if field.help_text %}
+                <p class="help">{{ field.help_text }}</p>{% endif %}
             </div>
         </div>
     {% endfor %}
