@@ -41,11 +41,7 @@ class BaseFormMixin(object):
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop('wizard_page', None)
         self.user = kwargs.pop('wizard_user', None)
-        # This goes into a fake form data in clean() and is also used
-        # in a view to create objects in proper language.
-        # We have no use case for empty language_code yet, so it is required.
         self.language_code = kwargs.pop('wizard_language')
-        self.app_config = kwargs.pop('wizard_app_config', None)
         super(BaseFormMixin, self).__init__(*args, **kwargs)
 
     @property
@@ -66,7 +62,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     entry = forms.ChoiceField(choices=[], widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs['wizard_user']
+        self.user = kwargs.get('wizard_user', None)
         super(WizardStep1Form, self).__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
         self.fields['entry'].choices = entry_choices(user=self.user)
