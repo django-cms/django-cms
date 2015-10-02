@@ -122,6 +122,9 @@
                 &[data-icon=copy] {
                     @include icon(copy);
                 }
+                &[data-icon=paste] {
+                    @include icon(paste);
+                }
                 &[data-icon=scissors] {
                     @include icon(scissors);
                 }
