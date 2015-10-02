@@ -1,5 +1,5 @@
 {% extends "cms/wizards/base.html" %}
-{% load i18n %}
+{% load i18n cms_wizard_tags %}
 
 {% block wizard %}
     <h1>{% trans "Create" %}</h1>
@@ -17,30 +17,11 @@
 
         <div class="choice-wrapper">
             {% for entry in form.entry %}
-                <label class="choice active">
-                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}" checked>
-                    <strong>{{ entry.choice_label }}</strong>
-                    <span class="info">Start with a new blank page.</span>
-                </label>
+                {% cms_wizard entry.choice_value as wizard %}
                 <label class="choice">
                     <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
-                    <strong>New sub page</strong>
-                    <span class="info">Create a sub page from "About Us".</span>
-                </label>
-                <label class="choice">
-                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
-                    <strong>Page type</strong>
-                    <span class="info">Add a new page from a preset.</span>
-                </label>
-                <label class="choice">
-                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
-                    <strong>Blog post</strong>
-                    <span class="info">Share your thoughts, news and announcements.</span>
-                </label>
-                <label class="choice" title="Get answers from experts in your company. Discuss and vote on the best answer.">
-                    <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}">
-                    <strong>Ask a question</strong>
-                    <span class="info">Get answers from experts in your company. Discuss and vote on the best answer.</span>
+                    <strong>{{ wizard.title }}</strong>
+                    <span class="info">{{ wizard.description }}</span>
                 </label>
             {% endfor %}
         </div>
