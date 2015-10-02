@@ -287,7 +287,7 @@ var CMS = window.CMS || {};
 
             /**
              * We check for various states on load if elements in the toolbar
-             * should appear or trigger other components. This preceeds a timeout
+             * should appear or trigger other components. This precedes a timeout
              * which is not optimal and should be addressed separately.
              *
              * @method _initialStates
