@@ -238,7 +238,12 @@
     }
     .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
         position: fixed;
-        right: 0;
+        width: 100%;
+        // 100vw is better because if the user's content exceeds the viewport width
+        // the dropdown will also go out of the screen, which is not ideal, esp. on mobile
+        // technically we should also adapt toolbar trigger, but it would involve calc
+        // which is not very performant.
+        width: 100vw;
         top: $toolbar-height;
         bottom: 0;
         overflow-y: scroll;
@@ -250,6 +255,10 @@
 
         > li {
             border-bottom: 1px solid $gray-lighter;
+        }
+
+        .cms-more-buttons {
+            border-bottom: none;
         }
 
         li a:not(.cms-btn) {
