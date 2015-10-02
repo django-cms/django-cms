@@ -30,7 +30,7 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx']
+extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo']
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.6', None),
     'django': ('http://readthedocs.org/docs/django/en/latest/', None),
@@ -224,6 +224,9 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+todo_include_todos = True
+
 
 # -- Options for LaTeX output --------------------------------------------------
 

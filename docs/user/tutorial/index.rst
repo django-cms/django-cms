@@ -4,22 +4,31 @@ Tutorial
 
 .. _user-tutorial:
 
-.. note:: This is a new section in the django CMS documentation, and a priority
-          for the project. If you'd like to contribute to it, we'd love to hear
-          from you - join us on the #django-cms IRC channel on `freenode`_ or
-          the `django-cms-developers`_ email list.
+The tutorial project is available in three different ways.
 
-It's strongly recommended that you follow this tutorial step-by-step. It has
-been designed to introduce you to the system in a methodical way, and each
-step builds on the previous one.
+If you're new to django CMS and want to get started immediately, simply `sign up for a tutorial
+site <http://django-cms.org/tutorial-site>`_. This option is the easiest and will get you started
+in a few clicks of the mouse, and is strongly recommended for those new to the platform. It will
+create an account for you and automatically launch your own copy of the tutorial site. (If you
+already have an Aldryn account, it will create and deploy the site there.)
+
+You don't have to run the tutorial on Aldryn - if you have some technical knowledge you can also
+choose to :ref:`use a Docker image of the tutorial site <tutorial-docker>`, or :ref:`use the
+tutorial site from GitHub <tutorial-github>`.
+
+Whichever way you launch the tutorial site, once you have it running, you can move onto the first
+step and :ref:`log in to your site <cms_login>`.
+
+It's strongly recommended that you follow this tutorial step-by-step. It has been designed to
+introduce you to the system in a methodical way, and each step builds on the previous one.
 
 .. toctree::
     :maxdepth: 2
 
-    log-in
-    create_page
-    create_page_content
-    publish_page
+    launch-tutorial
+    basic-content-editing
+    files-and-images
+    integrating-applications
 
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/
