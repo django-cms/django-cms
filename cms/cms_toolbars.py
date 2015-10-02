@@ -40,6 +40,7 @@ HISTORY_MENU_BREAK = 'History Menu Break'
 MANAGE_PAGES_BREAK = 'Manage Pages Break'
 ADMIN_SITES_BREAK = 'Admin Sites Break'
 ADMINISTRATION_BREAK = 'Administration Break'
+CLIPBOARD_BREAK = 'Clipboard Break'
 USER_SETTINGS_BREAK = 'User Settings Break'
 ADD_PAGE_LANGUAGE_BREAK = "Add page language Break"
 REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
@@ -116,10 +117,10 @@ class BasicToolbar(CMSToolbar):
         if not self.page:
             self.init_from_request()
 
-            self.add_admin_menu()
-            self.add_language_menu()
             user_settings = self.request.toolbar.get_user_settings()
             self.clipboard = user_settings.clipboard
+            self.add_admin_menu()
+            self.add_language_menu()
 
     def add_admin_menu(self):
         if not self._admin_menu:
@@ -148,6 +149,16 @@ class BasicToolbar(CMSToolbar):
             # cms users settings
             self._admin_menu.add_modal_item(_('User settings'), url=admin_reverse('cms_usersettings_change'))
             self._admin_menu.add_break(USER_SETTINGS_BREAK)
+
+            # clipboard
+            if self.toolbar.edit_mode or self.toolbar.build_mode:
+                self._admin_menu.add_link_item(_('Clipboard...'), url='#',
+                        extra_classes=['cms-clipboard-trigger'],
+                        disabled=not self.get_clipboard_plugins())
+                self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
+                        extra_classes=['cms-clipboard-empty'],
+                        disabled=not self.get_clipboard_plugins())
+                self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
             self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))

@@ -64,7 +64,8 @@ $(document).ready(function () {
     $.extend(CMS.API, {
         'Toolbar': new CMS.Toolbar(),
         'Clipboard': new CMS.Clipboard(),
-        'StructureBoard': new CMS.StructureBoard()
+        'StructureBoard': new CMS.StructureBoard(),
+        'Messages': new CMS.Messages()
     });
 
     $.each(CMS._plugins, function (index, args) {

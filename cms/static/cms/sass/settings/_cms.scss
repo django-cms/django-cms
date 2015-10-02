@@ -31,6 +31,9 @@ $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transpare
 $font-size-small: 12px;
 $font-size-normal: 14px;
 $font-size-large: 16px;
+
+$icon-size: 16px;
+
 $line-height-normal: 20px;
 
 $border-radius-base: 3px;
@@ -62,12 +65,6 @@ $z-layers: (
         "base":         9999999,
         "left":         10,
         "right":        10,
-    ),
-    "clipboard": (
-        "base":         99999,
-        "containers":   99,
-        "draggable":    99,
-        "triggers":     999,
     ),
     "sideframe": (
         "base":         999999,
@@ -242,7 +239,6 @@ $modal-header-height: $toolbar-height;
 $modal-breadcrumb-height: $toolbar-height - 6px;
 $modal-footer-height: $toolbar-height;
 
-$modal-header-button-icon-size: 12px;
 $modal-header-button-area-size: 30px;
 
 $modal-resize-size: 25px;
@@ -299,16 +295,6 @@ $sideframe-button-space: 2px;
 $sideframe-resize-width: 15px;
 $sideframe-box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
 $sideframe-dimmer: rgba(0, 0, 0, 0.6);
-
-
-//##############################################################################
-// Clipboard
-
-// it's $sideframe-buttons-position-top + amount of buttons x 20 + some margin
-$clipboard-buttons-position-top: $sideframe-buttons-position-top +
-    3.5 * $sideframe-button-area-size + 20px;
-$clipboard-button-area-size: 30px;
-$clipboard-button-icon-size: 12px;
 
 
 //##############################################################################
