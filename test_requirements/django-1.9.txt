@@ -1,0 +1,7 @@
+-r requirements_base.txt
+https://github.com/django/django/tarball/stable/1.9.x/django.tar.gz#egg=django
+django-reversion>=1.8,<1.9
+-e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
+django-hvad>=1.1
+django-classy-tags>=0.6.1
+django-sekizai>=0.8.2
