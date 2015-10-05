@@ -2,8 +2,6 @@
 Wizards
 #######
 
-.. module:: cms.wizards
-
 ****************************
 CMS Content Creation Wizards
 ****************************
@@ -47,7 +45,7 @@ Then, simply initialize a Wizard and register it. If you were to do this for
 
 That is it!
 
-Note::
+.. note::
 
     the module name `cms_wizards` is special, in that any such-named modules in
     your project's python path will automatically be loaded, triggering the
@@ -63,7 +61,7 @@ Currently, each Wizard is associated with a single model
 determines wizard uniqueness. Because of this, the wizard pool can only have a
 single wizard per Model registered at any one time.
 
-The kwargs accepted for instantiating a Wizard object are::
+The kwargs accepted for instantiating a Wizard object are:
 
     :title: The title of the wizard. This will appear in a large fontsize on the
             wizard "menu"
