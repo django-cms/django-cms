@@ -252,6 +252,10 @@ var CMS = window.CMS || {};
                             e.preventDefault();
                             that._delegate($(this).find('a'));
                         });
+                    } else {
+                        btn.find('a').on(that.click, function (e) {
+                            e.stopPropagation();
+                        });
                     }
 
                     // in case of the publish button
@@ -277,10 +281,6 @@ var CMS = window.CMS || {};
                                 throw new Error(request);
                             }
                         });
-                    });
-
-                    btn.find('a').on(that.click, function (e) {
-                        e.stopPropagation();
                     });
                 });
             },
