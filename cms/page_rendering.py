@@ -5,6 +5,7 @@ from django.http import Http404
 from django.template import RequestContext
 from django.template.response import TemplateResponse
 
+from cms import __version__
 from cms.cache.page import set_page_cache
 from cms.models import Page
 from cms.utils import get_template_from_request
@@ -51,8 +52,11 @@ def render_page(request, page, current_language, slug):
 
 
 def _handle_no_page(request, slug):
+    context = RequestContext(request)
+    context['cms_version'] = __version__
+
     if not slug and settings.DEBUG:
-        return TemplateResponse(request, "cms/welcome.html", RequestContext(request))
+        return TemplateResponse(request, "cms/welcome.html", context)
     try:
         #add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
