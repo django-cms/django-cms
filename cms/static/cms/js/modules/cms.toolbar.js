@@ -468,7 +468,7 @@ var CMS = window.CMS || {};
              * @param opts.url {String} url where the ajax points to
              * @param [opts.post] {Object} post data to be passed
              * @param [opts.text] {String} message to be displayed
-             * @param [opts.callback] {Function} custom callback instead of reaload
+             * @param [opts.callback] {Function} custom callback instead of reload
              * @param [opts.onSuccess] {String} reload and display custom message
              * @return {Boolean|jQuery.Deferred} either false or a promise
              */
