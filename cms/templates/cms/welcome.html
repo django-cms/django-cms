@@ -86,12 +86,9 @@
                         height: 450
                     });
                 });
-                // CMS.Modal is not yet ready, we need to wait a bit and then
-                // trigger the click in order for the modal to appear
-                setTimeout(function () {
-                    btn.trigger('click');
-                    CMS.API.Toolbar.open();
-                }, 100);
+                // automatically trigger the modal
+                btn.trigger('click');
+                CMS.API.Toolbar.open();
             });
         {% else %}
             window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/?edit';
