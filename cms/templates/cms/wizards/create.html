@@ -4,7 +4,7 @@
 {% block wizard %}
     <h1>{% trans "Create" %} {{ wizard_entry.title }}</h1>
 
-    <form action="{% url 'wizard_create' %}" method="post" enctype="multipart/form-data" novalidate>
+    <form action="{% url 'cms_wizard_create' %}" method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
 
         {{ wizard.management_form }}

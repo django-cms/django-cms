@@ -21,8 +21,9 @@ class WizardBase(object):
         :param weight: Used for determining the order of the wizards on the
                        creation form.
         :param form:
-        :param model: Required. This is used to determine uniqueness of
-                      the wizards, so, only one wizard per model.
+        :param model: Required either here or in the form's Meta class. This is
+                      used to determine uniqueness of the wizards, so, only one
+                      wizard per model.
         :param template_name: The full-path to the template to use, if any.
         :param description: This is used on the start form.
         """
@@ -34,8 +35,9 @@ class WizardBase(object):
         self.model = model
         if description is not None:
             self.description = description
-        else:
-            self.description = _("Create a new %s instance.") % model.__name__
+        elif self.model:
+            model_name = model._meta.verbose_name
+            self.description = _(u"Create a new %s instance.") % model_name
         if template_name is not None:
             self.template_name = template_name
 

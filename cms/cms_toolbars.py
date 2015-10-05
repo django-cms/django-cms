@@ -94,11 +94,10 @@ class PlaceholderToolbar(CMSToolbar):
             switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
 
     def add_wizard_button(self):
-        if self.request.user.has_perm("cms.add_content"):
-            title = _('Create')
-            url = reverse('wizard_create')
-            self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
-                                          on_close=REFRESH_PAGE)
+        title = _("Create")
+        url = reverse("cms_wizard_create")
+        self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
+                                      on_close=REFRESH_PAGE)
 
 
 @toolbar_pool.register

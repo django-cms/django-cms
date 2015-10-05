@@ -4,7 +4,7 @@
 {% block wizard %}
     <h1>{% trans "Create" %}</h1>
 
-    <form action="{% url 'wizard_create' %}" method="post" class="modal-body">
+    <form action="{% url 'cms_wizard_create' %}" method="post" class="modal-body">
         {% csrf_token %}
         {{ wizard.management_form }}
         {{ form.page }}

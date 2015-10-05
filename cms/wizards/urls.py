@@ -6,6 +6,6 @@ from .views import WizardCreateView
 
 
 urlpatterns = patterns('',  # NOQA
-    url(r'^create/$',
-        WizardCreateView.as_view(), name='wizard_create'),
+    url(r"^create/$",
+        WizardCreateView.as_view(), name="cms_wizard_create"),
 )

@@ -44,13 +44,16 @@ class WizardPool(object):
         """
         return self._discovered
 
-    def is_registered(self, entry):
+    def is_registered(self, entry, **kwargs):
         """
         Returns True if the provided entry is registered.
 
-        NOTE: This method triggers pool discovery.
+        NOTE: This method triggers pool discovery unless a «passive» kwarg
+        is set to True
         """
-        self._discover()
+        passive = kwargs.get('passive', False)
+        if not passive:
+            self._discover()
         return entry.id in self._entries
 
     def register(self, entry):
@@ -58,11 +61,9 @@ class WizardPool(object):
         Registers the provided «entry».
 
         Raises AlreadyRegisteredException if the entry is already registered.
-
-        NOTE: This method triggers pool discovery.
         """
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
-        if self.is_registered(entry):
+        if self.is_registered(entry, passive=True):
             model = entry.get_model()
             raise AlreadyRegisteredException(
                 _(u"A wizard has already been registered for model: %s") %
@@ -79,7 +80,7 @@ class WizardPool(object):
         NOTE: This method triggers pool discovery.
         """
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
-        if self.is_registered(entry):
+        if self.is_registered(entry, passive=True):
             del self._entries[entry.id]
             return True
         return False
@@ -93,7 +94,6 @@ class WizardPool(object):
         NOTE: This method triggers pool discovery.
         """
         self._discover()
-
         if isinstance(entry, Wizard):
             entry = entry.id
         return self._entries[entry]

@@ -3,11 +3,16 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.contrib.auth import get_permission_codename
+from django.contrib.sites.models import Site
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.exceptions import NoPermissionsException
+from cms.models import Page, GlobalPagePermission
 from cms.models.titlemodels import EmptyTitle
+from cms.utils import permissions
 
 
 class BaseCMSPageForm(forms.Form):
@@ -38,21 +43,39 @@ class CreateCMSPageForm(BaseCMSPageForm):
                 create_title(language, title, page)
 
     @staticmethod
-    def get_placeholder_slot(page):
+    def get_first_placeholder(page):
         """
-        Returns the slot name of the first editable, non-static placeholder
-        or None.
+        Returns the first editable, non-static placeholder or None.
         """
-        for ph in page.placeholders.all():
-            if not ph.is_static and ph.is_editable:
-                return ph.slot
+        for placeholder in page.get_placeholders():
+            if not placeholder.is_static and placeholder.is_editable:
+                return placeholder
         else:
             return None
+
+    @staticmethod
+    def user_has_page_add_perm(user):
+        opts = Page._meta
+        site = Site.objects.get_current()
+        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
+            user, site).exists()
+        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
+        if user.is_superuser or (user.has_perm(perm_str) and global_add_perm):
+            return True
+        return False
 
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
 
+        # Check to see if this user has permissions to make this page. We've
+        # already checked this when producing a list of wizard entries, but this
+        # is to prevent people form-hacking.
+
+        if not self.user_has_page_add_perm(self.user):
+            raise NoPermissionsException(_(u"User does not have permission to "
+                                         u"add page."))
         title = self.cleaned_data['title']
+
         page = create_page(
             title=title,
             template=TEMPLATE_INHERITANCE_MAGIC,
@@ -62,17 +85,17 @@ class CreateCMSPageForm(BaseCMSPageForm):
             in_navigation=True,
             published=False
         )
-        self.create_page_titles(page, title, [self.language_code])
 
         content = self.cleaned_data['content']
-        if content:
-            slot = self.get_placeholder_slot(page)
-            if slot:
-                placeholder = page.placeholders.get(slot=slot)
+        if content and permissions.has_plugin_permission(
+                self.user, "TextPlugin", "add"):
+            placeholder = self.get_first_placeholder(page)
+            if placeholder:
                 add_plugin(
                     placeholder=placeholder,
                     plugin_type='TextPlugin',
                     language=self.language_code,
-                    body=content)
+                    body=content
+                )
 
         return page

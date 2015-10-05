@@ -67,22 +67,5 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         # set the entries here to get an up to date list of entries.
         self.fields['entry'].choices = entry_choices(user=self.user)
 
-    def clean(self):
-        page = self.cleaned_data.get('page')
-        space = self.cleaned_data.get('space')
-
-        invalid_request_message = _(u"We're unable to process your request.")
-
-        if page and space:
-            if page.application_urls:
-                # user is creating an object for an apphooked page.
-                raise forms.ValidationError(invalid_request_message)
-
-            else:
-                # user is creating an object for a page outside of space.
-                raise forms.ValidationError(invalid_request_message)
-        return self.cleaned_data
-
-
 class WizardStep2BaseForm(BaseFormMixin):
     user = None
