@@ -1,9 +1,9 @@
 // #############################################################################
-// #SETTINGS#
+// SETTINGS
 
 $speed-base: 200ms;
 
-// #COLORS#
+// COLORS
 $white: #fff;
 $black: #000;
 
@@ -13,7 +13,7 @@ $color-danger: #f00;
 $color-warning: #c93;
 $color-window: #fcfcfc;
 
-// #COLORS gray
+// COLORS gray
 $gray:            lighten($black, 40%); // #666;
 $gray-lightest:   lighten($gray, 55%); // #f2f2f2
 $gray-lighter:    lighten($gray, 40%); // #ccc
@@ -105,7 +105,7 @@ $z-layers: (
 
 
 //##############################################################################
-// #BUTTONS
+// BUTTONS
 $btn-border-radius-base: $border-radius-base;
 $btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
 
