@@ -70,31 +70,31 @@
     {% render_block "js" %}
 
     <script>
-    CMS.$(function () {
         {% if user.is_authenticated %}
-            var btn = CMS.$('.js-welcome-add');
-            btn.on('click', function (e) {
-                e.preventDefault();
-                var modal = new CMS.Modal({
-                    maximizable: false,
-                    minimizable: false
+            CMS.$(function () {
+                var btn = CMS.$('.js-welcome-add');
+                btn.on('click', function (e) {
+                    e.preventDefault();
+                    var modal = new CMS.Modal({
+                        maximizable: false,
+                        minimizable: false
+                    });
+                    modal.open({
+                        url: '{% cms_admin_url "cms_page_add" %}?title=Home',
+                        title: '{% trans "Create your first page" %}',
+                        subtitle: false
+                    });
                 });
-                modal.open({
-                    url: '{% cms_admin_url "cms_page_add" %}?title=Home',
-                    title: '{% trans "Create your first page" %}',
-                    subtitle: false
-                });
+                // CMS.Modal is not yet ready, we need to wait a bit and then
+                // trigger the click in order for the modal to appear
+                setTimeout(function () {
+                    btn.trigger('click');
+                    CMS.API.Toolbar.open();
+                }, 100);
             });
-            // CMS.Modal is not yet ready, we need to wait a bit and then
-            // trigger the click in order for the modal to appear
-            setTimeout(function () {
-                btn.trigger('click');
-                CMS.API.Toolbar.open();
-            }, 100);
         {% else %}
-            window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/';
+            window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/?edit';
         {% endif %}
-    });
     </script>
 </body>
 </html>
