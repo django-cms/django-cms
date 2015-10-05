@@ -1,11 +1,20 @@
-//##################################################################################################################
-// #PLUGINS#
-/* global CMS */
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// Plugin
 (function ($) {
     'use strict';
 
-    // CMS.$ will be passed for $
+    // shorthand for jQuery(document).ready();
     $(function () {
         var doc = $(document);
         var clipboard = $('.cms-clipboard');
@@ -13,8 +22,9 @@
         var clipboardPlugin = clipboard.find('.cms-plugin:first');
 
         doc.on('pointerup.cms', function () {
-            // call it as a static method, because otherwise we trigger it the amount of times
-            // CMS.Plugin is instantiated, which does not make much sense
+            // call it as a static method, because otherwise we trigger it the
+            // amount of times CMS.Plugin is instantiated,
+            // which does not make much sense
             CMS.Plugin._hideSettingsMenu();
         }).on('keydown.cms', function (e) {
             if (e.keyCode === CMS.KEYS.SHIFT) {
@@ -26,9 +36,14 @@
             }
         });
 
-        /*!
-         * Plugins
-         * for created plugins or generics (static content)
+        /**
+         * Class for handling Plugins / Placeholders or Generics.
+         * Handles adding / moving / copying / pasting / menus etc
+         * in structureboard.
+         *
+         * @class Plugin
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Plugin = new CMS.Class({
 
@@ -53,7 +68,7 @@
                 }
             },
 
-            initialize: function (container, options) {
+            initialize: function initialize(container, options) {
                 this.options = $.extend(true, {}, this.options, options);
 
                 this._setupUI(container);
@@ -80,6 +95,12 @@
                 }
             },
 
+            /**
+             * Caches some jQuery references and sets up structure for
+             * further initialisation.
+             *
+             * @param container {String} `cms-plugin-${id}`
+             */
             _setupUI: function setupUI(container) {
                 container = $('.' + container);
                 this.ui = {
@@ -95,7 +116,12 @@
                 };
             },
 
-            // initial methods
+            /**
+             * Sets up behaviours and ui for placeholder.
+             *
+             * @method _setPlaceholder
+             * @private
+             */
             _setPlaceholder: function () {
                 var that = this;
                 this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
@@ -128,11 +154,17 @@
                 this._checkIfPasteAllowed();
             },
 
+            /**
+             * Sets up behaviours and ui for plugin.
+             *
+             * @method _setPlugin
+             * @private
+             */
             _setPlugin: function () {
                 var that = this;
 
                 // adds double click to edit
-                this.ui.container.on('dblclick', function (e) {
+                this.ui.container.add(this.ui.dragitem).on('dblclick', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -155,6 +187,7 @@
                     e.stopPropagation();
                     that.movePlugin();
                 });
+
                 // adds listener for copy/paste updates
                 this.ui.container.on('cms.plugin.update', function (e) {
                     e.stopPropagation();
@@ -177,7 +210,7 @@
                     that.copyPlugin(data);
                 });
 
-                // variables for dragitems
+                // filling up ui object
                 this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
                 this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
                 this.ui.draggables = this.ui.draggable.find('> .cms-draggables');
@@ -185,22 +218,21 @@
 
                 // attach event to the plugin menu
                 this._setSettingsMenu(this.ui.submenu);
+
+                // attach events for the "Add plugin" modal
                 this._setAddPluginModal(this.ui.dragitem.find('.cms-submenu-add'));
 
-                // adds double click to edit
-                this.ui.dragitem.on('dblclick', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    that.editPlugin(
-                        that.options.urls.edit_plugin,
-                        that.options.plugin_name,
-                        that.options.plugin_breadcrumb
-                    );
-                });
-
+                // clickability of "Paste" menu item
                 this._checkIfPasteAllowed();
             },
 
+            /**
+             * Sets up behaviours and ui for generics.
+             * Generics do not show up in structure board.
+             *
+             * @method _setGeneric
+             * @private
+             */
             _setGeneric: function () {
                 var that = this;
 
@@ -255,7 +287,14 @@
                 return true;
             },
 
-            // public methods
+            /**
+             * Calls api to create a plugin and then proceeds to edit it.
+             *
+             * @method addPlugin
+             * @param type {String} type of the plugin, e.g "Bootstrap3ColumnCMSPlugin"
+             * @param name {String} name of the plugin, e.g. "Column"
+             * @param parent {String} id of a parent plugin
+             */
             addPlugin: function (type, name, parent) {
                 // cancel request if already in progress
                 if (CMS.API.locked) {
@@ -293,6 +332,15 @@
                 });
             },
 
+            /**
+             * Opens the modal for editing a plugin.
+             *
+             * @method editPlugin
+             * @param url {String} editing url
+             * @param name {String} Name of the plugin, e.g. "Column"
+             * @param breadcrumb {Object[]} array of objects representing a breadcrumb,
+             *     each item is `{ title: 'string': url: 'string' }`
+             */
             editPlugin: function (url, name, breadcrumb) {
                 // trigger modal window
                 var modal = new CMS.Modal({
@@ -316,6 +364,17 @@
                 });
             },
 
+            /**
+             * Used for copying _and_ pasting a plugin. If either of params
+             * is present method assumes that it's "paste" and will make a call
+             * to api to insert current plugin to specified `options.target_plugin_id`
+             * or `options.target_placeholder_id`. Copying a plugin also first
+             * clears the clipboard.
+             *
+             * @method copyPlugin
+             * @param [options=this.options] {Object}
+             * @param source_language {String}
+             */
             copyPlugin: function (options, source_language) {
                 // cancel request if already in progress
                 if (CMS.API.locked) {
@@ -376,8 +435,14 @@
                 }
             },
 
+            /**
+             * Essentially clears clipboard and moves plugin to a clipboard
+             * placholder through `movePlugin`.
+             *
+             * @method cutPlugin
+             */
             cutPlugin: function () {
-                // if cut is once triggered, prevend additional actions
+                // if cut is once triggered, prevent additional actions
                 if (CMS.API.locked) {
                     return false;
                 }
@@ -435,6 +500,17 @@
                 clipboardPlugin.trigger('cms.plugin.update');
             },
 
+            /**
+             * Moves plugin by querying the API and then updates some UI parts
+             * to reflect that the page has changed.
+             *
+             * @method movePlugin
+             * @param [options=this.options] {Object}
+             * @param [options.placeholder_id] {String}
+             * @param [options.plugin_id] {String}
+             * @param [options.plugin_parent] {String}
+             * @param [options.plugin_language]  {String}
+             */
             movePlugin: function (options) {
                 // cancel request if already in progress
                 if (CMS.API.locked) {
@@ -513,6 +589,14 @@
                 this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');
             },
 
+            /**
+             * Opens a modal to delete a plugin
+             *
+             * @param url {String} admin url for deleting a page
+             * @param name {String} plugin name, e.g. "Column"
+             * @param breadcrumb {Object[]} array of objects representing a breadcrumb,
+             *     each item is `{ title: 'string': url: 'string' }`
+             */
             deletePlugin: function (url, name, breadcrumb) {
                 // trigger modal window
                 var modal = new CMS.Modal({
@@ -530,7 +614,15 @@
                 });
             },
 
-            // private methods
+            /**
+             * Moves the plugin according to the place it should have in content mode.
+             *
+             * @method _setPosition
+             * @private
+             * @param id {String}
+             * @param plugin {jQuery} the `.cms-plugin` element
+             * @param dragitem {jQuery} the `.cms-draggable` of the plugin
+             */
             _setPosition: function (id, plugin, dragitem) {
                 // after we insert the plugin onto its new place, we need to figure out where to position it
                 var prevItem = dragitem.prev('.cms-draggable');
@@ -560,21 +652,23 @@
                 }
             },
 
-            editPluginPostAjax: function (caller, toolbar, response) {
-                if (typeof toolbar === 'undefined' || typeof response === 'undefined') {
-                    return function (toolbar, response) {
-                        var that = caller;
-                        that.editPlugin(response.url, that.options.plugin_name, response.breadcrumb);
-                    };
-                }
+            /**
+             * Called after plugin is added through ajax.
+             *
+             * @method editPluginPostAjax
+             * @param toolbar {Object} CMS.API.Toolbar instance (not used)
+             * @param response {Object} response from server
+             */
+            editPluginPostAjax: function (toolbar, response) {
                 this.editPlugin(response.url, this.options.plugin_name, response.breadcrumb);
             },
 
             /**
-             * _setSettingsMenu sets up event handlers for settings menu
+             * _setSettingsMenu sets up event handlers for settings menu.
              *
-             * @param nav jQuery
+             * @method _setSettingsMenu
              * @private
+             * @param nav {jQuery}
              */
             _setSettingsMenu: function _setSettingsMenu(nav) {
                 var that = this;
@@ -726,7 +820,7 @@
              * Sets up event handlers for quicksearching in the plugin picker.
              *
              * @private
-             * @param plugins jQuery plugins picker element
+             * @param plugins {jQuery} plugins picker element
              */
             _setupQuickSearch: function _setupQuickSearch(plugins) {
                 var that = this;
@@ -757,8 +851,9 @@
              * Sets up click handlers for various plugin/placeholder items.
              * Items can be anywhere in the plugin dragitem, not only in dropdown.
              *
+             * @method _setupActions
              * @private
-             * @param nav jQuery dropdown trigger with the items
+             * @param nav {jQuery} dropdown trigger with the items
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
@@ -786,7 +881,7 @@
                                 url: el.attr('href'),
                                 post: JSON.stringify(el.data('post')),
                                 text: el.data('text'),
-                                callback: that.editPluginPostAjax(that),
+                                callback: $.proxy(that.editPluginPostAjax, that),
                                 onSuccess: el.data('on-success')
                             });
                             break;
@@ -870,6 +965,7 @@
             /**
              * Opens the settings menu for a plugin.
              *
+             * @method _showSettingsMenu
              * @private
              * @param nav {jQuery} trigger element
              */
@@ -895,6 +991,7 @@
             /**
              * Filters given plugins list by a query.
              *
+             * @method _filterPluginsList
              * @private
              * @param list {jQuery} plugins picker element
              * @param input {jQuery} input, which value to filter plugins with
@@ -943,11 +1040,11 @@
             },
 
             /**
-             * Toggles collapsable item
+             * Toggles collapsable item.
              *
-             * @method toggleCollapsable
-             * @param el jQuery element to toggle
+             * @method _toggleCollapsable
              * @private
+             * @param el {jQuery} element to toggle
              */
             _toggleCollapsable: function toggleCollapsable(el) {
                 var that = this;
@@ -999,6 +1096,12 @@
                 CMS.API.Toolbar.setSettings(settings);
             },
 
+            /**
+             * Sets up collabspable event handlers.
+             *
+             * @method _collapsables
+             * @private
+             */
             _collapsables: function () {
                 // one time setup
                 var that = this;
@@ -1061,6 +1164,13 @@
                 CMS.Toolbar.ready = true;
             },
 
+            /**
+             * Expands all the collapsables in the given placeholder.
+             *
+             * @method _expandAll
+             * @private
+             * @param el {jQuery} trigger element that is a child of a placeholder
+             */
             _expandAll: function (el) {
                 var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
@@ -1083,6 +1193,13 @@
                 CMS.API.Toolbar.setSettings(settings);
             },
 
+            /**
+             * Collapses all the collapsables in the given placeholder.
+             *
+             * @method _collapseAll
+             * @private
+             * @param el {jQuery} trigger element that is a child of a placeholder
+             */
             _collapseAll: function (el) {
                 var that = this;
                 var items = el.closest('.cms-dragarea').find('.cms-dragitem-collapsable');
@@ -1101,14 +1218,36 @@
                 CMS.API.Toolbar.setSettings(settings);
             },
 
+            /**
+             * gets the id of the element, uses CMS.StructureBoard instance
+             *
+             * @private
+             * @param el jQuery element to get id from
+             * @return {String}
+             */
             _getId: function (el) {
                 return CMS.API.StructureBoard.getId(el);
             },
 
+            /**
+             * gets the ids of the list of  elements, uses CMS.StructureBoard instance
+             *
+             * @private
+             * @param el jQuery elements to get id from
+             * @return {String[]}
+             */
             _getIds: function (els) {
                 return CMS.API.StructureBoard.getIds(els);
             },
 
+            /**
+             * Shows and immediately fades out a success notification (when
+             * plugin was successfully moved.
+             *
+             * @method _showSuccess
+             * @private
+             * @param el {jQuery} draggable element
+             */
             _showSuccess: function (el) {
                 var tpl = $('<div class="cms-dragitem-success"></div>');
                 el.addClass('cms-draggable-success').append(tpl);
@@ -1127,7 +1266,7 @@
          *
          * @static
          * @private
-         * @param [nav] jQuery element representing the subnav trigger
+         * @param [nav] {jQuery} element representing the subnav trigger
          */
         CMS.Plugin._hideSettingsMenu = function (nav) {
             nav = nav || $('.cms-submenu-btn.cms-btn-active');
