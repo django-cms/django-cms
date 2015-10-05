@@ -102,10 +102,10 @@ class PageSelectWidget(MultiWidget):
     var handlePageChange = function(page_id) {
         if (page_id) {
             $("#id_%(name)s_2 option").attr('selected', false);
-            $("#id_%(name)s_2 option[value=" + page_id + "]").attr('selected', true);
+            $("#id_%(name)s_2 option[value='" + page_id + "']").attr('selected', true);
         } else {
             if ($("#id_%(name)s_2").length) {
-                $("#id_%(name)s_2 option[value=]").attr('selected', true);
+                $("#id_%(name)s_2 option[value]").attr('selected', true);
             }
         };
     };
