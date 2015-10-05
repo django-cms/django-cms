@@ -85,10 +85,10 @@
                         width: CMS.$('.cms-welcome-heading').width(),
                         height: 450
                     });
+                    CMS.API.Toolbar.open();
                 });
                 // automatically trigger the modal
                 btn.trigger('click');
-                CMS.API.Toolbar.open();
             });
         {% else %}
             window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/?edit';
