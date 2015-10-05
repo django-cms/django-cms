@@ -36,11 +36,12 @@
                 {% endblocktrans %}
                 </p>
             <p>
-                {% url cms_admin_url "cms_page_add" as admin_url %}
+                {% url "admin:index" as admin_index %}
+                {% url "admin:cms_page_add" as admin_add_page %}
                 {% blocktrans %}
-                    You can also login using the toolbar above and
-                    <a href="{{ admin_url }}?title=Home" class="js-welcome-add">add a page</a> manually
-                    if the modal does not open immedidately.
+                    You can also login through the <a href="{{ admin_index }}">admin</a> and
+                    <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">add a page</a> manually
+                    if JavaScript is disabled.
                 {% endblocktrans %}
         </section>
 
@@ -81,7 +82,7 @@
                 CMS.API.Toolbar.open();
             }, 100);
         {% else %}
-            window.location.href = '{% cms_admin_url "login" %}?next=/{{ LANGUAGE_CODE }}/';
+            //window.location.href = '{% cms_admin_url "login" %}?next=/{{ LANGUAGE_CODE }}/';
         {% endif %}
     </script>
 </body>
