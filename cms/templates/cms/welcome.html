@@ -76,13 +76,14 @@
                 btn.on('click', function (e) {
                     e.preventDefault();
                     var modal = new CMS.Modal({
-                        maximizable: false,
+                        minWidth: 320,
                         minimizable: false
                     });
                     modal.open({
                         url: '{% cms_admin_url "cms_page_add" %}?title=Home',
                         title: '{% trans "Create your first page" %}',
-                        subtitle: false
+                        width: CMS.$('.cms-welcome-heading').width(),
+                        height: 450
                     });
                 });
                 // CMS.Modal is not yet ready, we need to wait a bit and then
