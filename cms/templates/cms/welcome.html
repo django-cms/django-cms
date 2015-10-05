@@ -82,7 +82,7 @@
                 CMS.API.Toolbar.open();
             }, 100);
         {% else %}
-            //window.location.href = '{% cms_admin_url "login" %}?next=/{{ LANGUAGE_CODE }}/';
+            window.location.href = '{% cms_admin_url "login" %}?next=/{{ LANGUAGE_CODE }}/';
         {% endif %}
     </script>
 </body>
