@@ -1,4 +1,93 @@
-{% load staticfiles cms_tags sekizai_tags %}
+<!doctype html>{% load i18n staticfiles cms_tags sekizai_tags %}
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% trans "django CMS" %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    {% render_block "css" %}
+    <link rel="stylesheet" href="{% static 'cms/css/cms.welcome.css' %}">
+</head>
+<body class="cms-welcome-bg">
+    {% cms_toolbar %}
+    <div class="cms-reset cms-welcome">
+        <header class="cms-welcome-header">
+            <h1 class="cms-welcome-heading">
+                <span class="cms-icon cms-icon-check"></span>
+                {% trans "Installation successful!" %}
+            </h1>
+            <div class="cms-welcome-logo">
+                <span class="cms-hidden">{% trans "django CMS" %}</span>
+            </div>
+        </header>
+        {{ request.version }}
+
+        <section class="cms-welcome-section">
+            <h2>
+                {% if user.is_authenticated %}
+                    2. {% trans "Add your first page" %}
+                {% else %}
+                    1. {% trans "Please login" %}
+                {% endif %}
+            </h2>
+            <p>
+                {% blocktrans %}
+                    Welcome to django CMS version <strong>{{ cms_version }}</strong>.
+                {% endblocktrans %}
+                </p>
+            <p>
+                {% url cms_admin_url "cms_page_add" as admin_url %}
+                {% blocktrans %}
+                    You can also login using the toolbar above and
+                    <a href="{{ admin_url }}?title=Home" class="js-welcome-add">add a page</a> manually
+                    if the modal does not open immedidately.
+                {% endblocktrans %}
+        </section>
+
+        <footer class="cms-welcome-footer">
+            <h2 class="cms-hidden">{% trans "Installation Notes" %}</h2>
+            <p class="cms-welcome-links">
+                <a href="//django-cms.org/" target="_blank">{% trans "Website" %}</a>
+                <a href="//django-cms.org/en/support" target="_blank">{% trans "Support" %}</a>
+                <a href="//docs.django-cms.org/" target="_blank">{% trans "Documentation" %}</a>
+            </p>
+            {% blocktrans %}
+                <p class="cms-welcome-notes">If you don't see the django CMS logo at the top, make sure
+                    you linked the <code>static/cms</code> folder to your
+                    static files.</p>
+                <p class="cms-welcome-notes">You're seeing this message because you have
+                    <code>DEBUG = True</code> in your django settings file and
+                    haven't added any pages yet.
+                </p>
+            {% endblocktrans %}
+        </footer>
+    </div>
+    {% render_block "js" %}
+
+    <script>
+        {% if user.is_authenticated %}
+            var btn = CMS.$('.js-welcome-add');
+            btn.on('click', function (e) {
+                e.preventDefault();
+                var modal = new CMS.Modal();
+                modal.open({
+                    url: '{% cms_admin_url "cms_page_add" %}?title=Home'
+                });
+            });
+            // CMS.Modal is not yet ready, we need to wait a bit and then
+            // trigger the click in order for the modal to appear
+            setTimeout(function () {
+                btn.trigger('click');
+                CMS.API.Toolbar.open();
+            }, 100);
+        {% else %}
+            window.location.href = '{% cms_admin_url "login" %}?next=/{{ LANGUAGE_CODE }}/';
+        {% endif %}
+    </script>
+</body>
+</html>
+
+{% comment %}
 <!doctype html><html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="utf-8" />
@@ -43,18 +132,7 @@
 {% cms_toolbar %}
 <div class="wrapper">
     <div class="inner">
-        <h1 class="logo">Installation successful!</h1>
         <p>Switch to <a href="/?{{ request.toolbar.edit_mode_url_on }}">edit mode</a>,<br />log in and start <a href="{% cms_admin_url "cms_page_add" %}?title=Home" id="add-page">adding pages</a>.</p>
-        <p class="buttons">
-            <a href="//docs.django-cms.org/" class="btn" target="_blank">Documentation</a>
-            <a href="//www.django-cms.org/" class="btn" target="_blank">Support</a>
-        </p>
-        <p class="footnote">
-            If you don't see the django CMS logo at the top, make sure you linked the <code>static/cms</code> folder to your static files.</p>
-        <p class="footnote">
-            You're seeing this message because you have <code>DEBUG = True</code> in your
-            django settings file and haven't added any pages yet.
-        </p>
     </div>
 </div>
 {% render_block "js" %}
@@ -72,3 +150,4 @@ if(window.CMS !== undefined) {
 
 </body>
 </html>
+{% endcomment %}
