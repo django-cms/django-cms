@@ -2,13 +2,16 @@
 // #WELCOME
 //
 // Shown when there is no page available
+$welcome-width: 60%;
+$welcome-min-width: 320px;
+
 .cms-welcome-bg {
     background: #f7f7f7;
 }
 .cms-welcome {
     color: $gray-darker;
-    width: 60%;
-    min-width: 320px;
+    width: $welcome-width;
+    min-width: $welcome-min-width;
     margin: 0 auto;
 
     a {
@@ -26,8 +29,8 @@
 
     .cms-welcome-section,
     .cms-welcome-footer {
-        width: 50%;
-        min-width: 320px;
+        width: $welcome-width;
+        min-width: $welcome-min-width;
         margin: 0 auto;
     }
 
@@ -49,8 +52,8 @@
     }
 
     .cms-welcome-logo {
-        @extend .cms-icon;
-        @extend .cms-icon-logo;
+        @extend %icon;
+        @include icon(logo);
         font-size: 35px;
         margin: 50px auto 30px;
     }
@@ -59,11 +62,11 @@
     .cms-welcome-section {
         box-sizing: border-box;
         box-shadow: 0 0 5px $gray-lighter;
-        padding: 20px;
+        padding: $padding-large;
         margin-bottom: 5px;
-        background: white;
+        background: $white;
         h2 {
-            font-size: 16px;
+            font-size: $font-size-large;
             font-weight: bold;
             margin: 0 0 15px;
         }
@@ -83,7 +86,7 @@
     }
 
     .cms-welcome-notes {
-        font-size: 12px;
+        font-size: $font-size-small;
         line-height: 16px;
         color: $gray-light;
         padding: 5px 10px;

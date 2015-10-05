@@ -25,9 +25,9 @@
         <section class="cms-welcome-section">
             <h2>
                 {% if user.is_authenticated %}
-                    2. {% trans "Add your first page" %}
+                    {% trans "Add your first page" %}
                 {% else %}
-                    1. {% trans "Please login" %}
+                    {% trans "Please log in" %}
                 {% endif %}
             </h2>
             <p>
@@ -36,19 +36,23 @@
                 {% endblocktrans %}
                 </p>
             <p>
-                {% url "admin:index" as admin_index %}
                 {% url "admin:cms_page_add" as admin_add_page %}
-                {% blocktrans %}
-                    You can also login through the <a href="{{ admin_index }}">admin</a> and
-                    <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">add a page</a> manually
-                    if JavaScript is disabled.
-                {% endblocktrans %}
+                {% if user.is_authenticated %}
+                    {% blocktrans %}
+                        <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">Add the first page</a> to the system to continue.
+                    {% endblocktrans %}
+                {% else %}
+                    {% blocktrans %}
+                        JavaScript seems to be disabled so please
+                        <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">add a page</a> manually.
+                    {% endblocktrans %}
+                {% endif %}
         </section>
 
         <footer class="cms-welcome-footer">
             <h2 class="cms-hidden">{% trans "Installation Notes" %}</h2>
             <p class="cms-welcome-links">
-                <a href="//django-cms.org/" target="_blank">{% trans "Website" %}</a>
+                <a href="//django-cms.org/" target="_blank">{% trans "django CMS" %}</a>
                 <a href="//django-cms.org/en/support" target="_blank">{% trans "Support" %}</a>
                 <a href="//docs.django-cms.org/" target="_blank">{% trans "Documentation" %}</a>
             </p>
@@ -66,13 +70,19 @@
     {% render_block "js" %}
 
     <script>
+    CMS.$(function () {
         {% if user.is_authenticated %}
             var btn = CMS.$('.js-welcome-add');
             btn.on('click', function (e) {
                 e.preventDefault();
-                var modal = new CMS.Modal();
+                var modal = new CMS.Modal({
+                    maximizable: false,
+                    minimizable: false
+                });
                 modal.open({
-                    url: '{% cms_admin_url "cms_page_add" %}?title=Home'
+                    url: '{% cms_admin_url "cms_page_add" %}?title=Home',
+                    title: '{% trans "Create your first page" %}',
+                    subtitle: false
                 });
             });
             // CMS.Modal is not yet ready, we need to wait a bit and then
@@ -82,8 +92,9 @@
                 CMS.API.Toolbar.open();
             }, 100);
         {% else %}
-            window.location.href = '{% cms_admin_url "login" %}?next=/{{ LANGUAGE_CODE }}/';
+            window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/';
         {% endif %}
+    });
     </script>
 </body>
 </html>
