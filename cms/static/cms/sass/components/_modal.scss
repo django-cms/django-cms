@@ -124,6 +124,7 @@
         font-size: $modal-header-title-font-size;
         font-weight: bold;
         line-height: $modal-header-height;
+        min-height: $modal-header-height;
         padding: 0 $padding-large;
         cursor: move;
         white-space: nowrap;
