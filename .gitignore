@@ -7,7 +7,6 @@
 cms/django
 *.DS_Store
 *.svn
-.*
 *.xml
 /*env*/
 *.sqlite
@@ -21,6 +20,7 @@ build
 dist
 .ropeproject
 .project
+.coverage
 .pydevproject
 .settings
 /*.egg-info/
@@ -44,3 +44,5 @@ share/
 cms/static/cms/compass_app_log.txt
 !cms/static/cms/js/dist
 node_modules
+.idea
+.better_test.db

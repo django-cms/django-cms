@@ -27,7 +27,9 @@ var CMS = {
         DOWN: 40,
         ENTER: 13,
         SPACE: 32,
-        ESC: 27
+        ESC: 27,
+        CMD_LEFT: 91,
+        CMD_RIGHT: 93
     }
 };
 
@@ -115,49 +117,6 @@ var CMS = {
                         xhr.setRequestHeader('X-CSRFToken', csrf_token);
                     }
                 });
-            },
-
-            // handles the tooltip for the plugins
-            showTooltip: function (name, id) {
-                var tooltip = $('.cms-tooltip');
-
-                // change css and attributes
-                tooltip.css('visibility', 'visible')
-                    .data('plugin_id', id || null)
-                    .show()
-                    .find('span').html(name);
-
-                // attaches move event
-                // this sets the correct position for the edit tooltip
-                $('body').bind('mousemove.cms', function (e) {
-                    // so lets figure out where we are
-                    var offset = 20;
-                    var relX = e.pageX - $(tooltip).offsetParent().offset().left;
-                    var relY = e.pageY - $(tooltip).offsetParent().offset().top;
-                    var bound = $(tooltip).offsetParent().width();
-                    var pos = relX + tooltip.outerWidth(true) + offset;
-
-                    tooltip.css({
-                        'left': (pos >= bound) ? relX - tooltip.outerWidth(true) - offset : relX + offset,
-                        'top': relY - 12
-                    });
-                });
-
-                // attach tooltip event for touch devices
-                tooltip.bind('touchstart.cms', function () {
-                    $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
-                });
-            },
-
-            hideTooltip: function () {
-                var tooltip = $('.cms-tooltip');
-
-                // change css
-                tooltip.css('visibility', 'hidden').hide();
-
-                // unbind events
-                $('body').unbind('mousemove.cms');
-                tooltip.unbind('touchstart.cms');
             },
 
             // sends or retrieves a JSON from localStorage or the session if local storage is not available
@@ -336,6 +295,7 @@ var CMS = {
              * @param wait {Number} time in ms to wait
              * @param [opts] {Object}
              * @param [opts.immediate] {Boolean} trigger func immediately?
+             * @return {Function}
              */
             debounce: function debounce(func, wait, opts) {
                 var timeout;
@@ -353,6 +313,61 @@ var CMS = {
                     if (callNow) {
                         func.apply(context, args);
                     }
+                };
+            },
+
+            /**
+             * Returns a function that when invoked, will only be triggered
+             * at most once during a given window of time. Normally, the
+             * throttled function will run as much as it can, without ever
+             * going more than once per `wait` duration, but if you’d like to
+             * disable the execution on the leading edge, pass `{leading: false}`.
+             * To disable execution on the trailing edge, ditto.
+             *
+             * @param func {Function} function to throttle
+             * @param wait {Number} time window
+             * @param [opts] {Object}
+             * @param [opts.leading=true] {Boolean} execute on the leading edge
+             * @param [opts.trailing=true] {Boolean} execute on the trailing edge
+             * @return {Function}
+             */
+            throttle: function throttle(func, wait, opts) {
+                var context, args, result;
+                var timeout = null;
+                var previous = 0;
+                if (!opts) {
+                    opts = {};
+                }
+                var later = function () {
+                    previous = opts.leading === false ? 0 : $.now();
+                    timeout = null;
+                    result = func.apply(context, args);
+                    if (!timeout) {
+                        context = args = null;
+                    }
+                };
+                return function () {
+                    var now = $.now();
+                    if (!previous && opts.leading === false) {
+                        previous = now;
+                    }
+                    var remaining = wait - (now - previous);
+                    context = this;
+                    args = arguments;
+                    if (remaining <= 0 || remaining > wait) {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                        }
+                        previous = now;
+                        result = func.apply(context, args);
+                        if (!timeout) {
+                            context = args = null;
+                        }
+                    } else if (!timeout && opts.trailing !== false) {
+                        timeout = setTimeout(later, remaining);
+                    }
+                    return result;
                 };
             }
         };

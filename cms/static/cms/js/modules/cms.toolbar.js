@@ -24,6 +24,7 @@ var CMS = window.CMS || {};
          * @class Toolbar
          * @namespace CMS
          * @uses CMS.API.Helpers
+         * @uses CMS.Navigation
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -42,6 +43,8 @@ var CMS = window.CMS || {};
 
                 // elements
                 this._setupUI();
+
+                this.navigation = new CMS.Navigation();
 
                 // states
                 this.click = 'click.cms.toolbar';
@@ -87,13 +90,15 @@ var CMS = window.CMS || {};
                     container: container,
                     body: $('html'),
                     document: $(document),
+                    window: $(window),
                     toolbar: container.find('.cms-toolbar'),
                     toolbarTrigger: container.find('.cms-toolbar-trigger'),
                     navigations: container.find('.cms-toolbar-item-navigation'),
                     buttons: container.find('.cms-toolbar-item-buttons'),
                     switcher: container.find('.cms-toolbar-item-switch'),
                     messages: container.find('.cms-messages'),
-                    screenBlock: container.find('.cms-screenblock')
+                    screenBlock: container.find('.cms-screenblock'),
+                    structureBoard: container.find('.cms-structure')
                 };
             },
 
@@ -110,6 +115,7 @@ var CMS = window.CMS || {};
                 this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
                     e.preventDefault();
                     that.toggle();
+                    that.ui.document.trigger(that.click);
                 });
 
                 // attach event to the navigation elements
@@ -169,10 +175,13 @@ var CMS = window.CMS || {};
                         isTouchingTopLevelMenu = false;
                         // create the document event
                         that.ui.document.on(that.click, reset);
+                        that.ui.structureBoard.on(that.click, reset);
+                        that.ui.toolbar.on(that.click, reset);
+                        that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
                     });
 
                     // attach hover
-                    lists.find('li').on(that.pointerOverOut, function () {
+                    lists.on(that.pointerOverOut, 'li', function () {
                         var el = $(this);
                         var parent = el.closest('.cms-toolbar-item-navigation-children')
                             .add(el.parents('.cms-toolbar-item-navigation-children'));
@@ -180,7 +189,10 @@ var CMS = window.CMS || {};
 
                         // do not attach hover effect if disabled
                         // cancel event if element has already hover class
-                        if (el.hasClass(disabled) || el.hasClass(hover)) {
+                        if (el.hasClass(disabled)) {
+                            return false;
+                        }
+                        if (el.hasClass(hover)) {
                             return true;
                         }
 
@@ -207,7 +219,7 @@ var CMS = window.CMS || {};
                     });
 
                     // fix leave event
-                    lists.find('> ul').on(that.pointerLeave, function () {
+                    lists.on(that.pointerLeave, '> ul', function () {
                         lists.find('li').removeClass(hover);
                     });
 
@@ -217,6 +229,8 @@ var CMS = window.CMS || {};
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
                         that.ui.document.off(that.click);
+                        that.ui.toolbar.off(that.click, reset);
+                        that.ui.structureBoard.off(that.click);
                     }
                 });
 
@@ -264,12 +278,16 @@ var CMS = window.CMS || {};
                             }
                         });
                     });
+
+                    btn.find('a').on(that.click, function (e) {
+                        e.stopPropagation();
+                    });
                 });
             },
 
             /**
              * We check for various states on load if elements in the toolbar
-             * should appear or trigger other components. This preceeds a timeout
+             * should appear or trigger other components. This precedes a timeout
              * which is not optimal and should be addressed separately.
              *
              * @method _initialStates
@@ -292,6 +310,7 @@ var CMS = window.CMS || {};
 
                 if ($('.cms-btn-publish-active').length) {
                     publishBtn.show();
+                    this.ui.window.trigger('resize');
                 }
 
                 // check if debug is true

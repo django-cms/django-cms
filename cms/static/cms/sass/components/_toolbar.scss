@@ -23,20 +23,25 @@
         box-shadow: $toolbar-shadow;
 
         .cms-toolbar-left {
-            position: relative;
-            float: left;
+            position: absolute;
+            left: 0;
+            top: 0;
             z-index: z(toolbar, left);
             padding-left: $toolbar-left-space;
         }
         .cms-toolbar-right {
-            position: relative;
-            float: right;
+            position: absolute;
+            right: 0;
+            top: 0;
             z-index: z(toolbar, right);
             padding-right: $toolbar-trigger-width + 2px;
         }
 
         .cms-toolbar-left .cms-toolbar-item {
-            margin-left: $toolbar-left-space;
+            margin-right: $toolbar-left-space;
+            &:last-child {
+                margin-right: 0;
+            }
         }
         .cms-toolbar-right .cms-toolbar-item {
             margin-right: $toolbar-right-space;
@@ -45,13 +50,6 @@
         // items
         .cms-toolbar-item {
             float: left;
-        }
-    }
-
-    // do some responsive magic
-    @media only screen and (max-width: $toolbar-right-hide-breakpoint) {
-        .cms-toolbar-right {
-            display: none;
         }
     }
 
@@ -202,6 +200,92 @@
             }
         }
     }
+
+    .cms-toolbar-more {
+        display: none;
+
+        .cms-toolbar-item-navigation-children {
+            padding: 0;
+        }
+
+        .cms-toolbar-item {
+            float: none;
+            margin: $toolbar-menu-item-padding !important;
+            overflow: hidden;
+            margin-top: 5px;
+            margin-bottom: 8px;
+        }
+        .cms-toolbar-item-cms-mode-switcher a {
+            float: left !important;
+            width: 50%;
+        }
+        .cms-toolbar-item-buttons {
+            .cms-btn {
+                text-align: center;
+            }
+        }
+
+        .cms-btn {
+            color: $btn-default-color;
+        }
+        .cms-btn-action {
+            color: $btn-action-color;
+        }
+        .cms-more-buttons + .cms-toolbar-item-navigation-children {
+            padding-top: 8px;
+            border-top: 1px solid $gray-lighter;
+        }
+    }
+    .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+        position: fixed;
+        width: 100%;
+        // 100vw is better because if the user's content exceeds the viewport width
+        // the dropdown will also go out of the screen, which is not ideal, esp. on mobile
+        // technically we should also adapt toolbar trigger, but it would involve calc
+        // which is not very performant.
+        width: 100vw;
+        top: $toolbar-height;
+        bottom: 0;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+
+        .cms-icon {
+            display: none !important;
+        }
+
+        > li {
+            border-bottom: 1px solid $gray-lighter;
+        }
+
+        .cms-more-buttons {
+            border-bottom: none;
+        }
+
+        li a:not(.cms-btn) {
+            color: $toolbar-menu-item-color !important;
+            background: transparent !important;
+        }
+        li a {
+            position: relative;
+            line-height: 1.4 * $toolbar-dropdown-item-height;
+            height: 1.4 * $toolbar-dropdown-item-height;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        ul {
+            display: block !important;
+            border: none;
+            box-shadow: none;
+            position: relative;
+            left: 0;
+            top: 0;
+            border-radius: 0;
+            margin-left: 20px;
+        }
+    }
+    &.cms-toolbar-debug .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+        top: $toolbar-height + $toolbar-debug-height;
+    }
     .cms-toolbar-item-cms-mode-switcher {
         display: none;
     }
@@ -273,7 +357,7 @@
     //###########################################################
     // #TOOLBAR/elements/logo#
     .cms-toolbar-item-logo {
-        margin: 0 !important;
+        margin-right: $toolbar-left-space;
 
         a {
             @extend .cms-icon;
@@ -378,7 +462,7 @@
         a {
             display: block;
             width: $toolbar-trigger-width;
-            height: $toolbar-trigger-height;
+            height: $toolbar-trigger-height - 1px;
             text-align: center;
             border-top: 1px solid $white;
             border-left: 1px solid $white;

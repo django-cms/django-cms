@@ -122,6 +122,9 @@
                 &[data-icon=copy] {
                     @include icon(copy);
                 }
+                &[data-icon=paste] {
+                    @include icon(paste);
+                }
                 &[data-icon=scissors] {
                     @include icon(scissors);
                 }
@@ -131,6 +134,31 @@
                 &[href*=alias_plugin] {
                     @include icon(alias);
                 }
+            }
+        }
+        .cms-submenu-item-paste-tooltip {
+            display: none;
+        }
+        .cms-submenu-item-disabled {
+            position: relative;
+            a {
+                &,
+                &:hover,
+                &:focus {
+                    cursor: default !important;
+                    opacity: 0.2;
+                    color: $submenu-item-color !important;
+                    background: none !important;
+                    box-shadow: none;
+                }
+            }
+            .cms-submenu-item-paste-tooltip {
+                cursor: default;
+                position: absolute;
+                left: 0;
+                top: 0;
+                right: 0;
+                bottom: 0;
             }
         }
         &:before {
@@ -164,7 +192,6 @@
         .cms-dropdown-inner {
             z-index: 1;
             background-color: white;
-            overflow: hidden;
             border-radius: $border-radius-normal;
         }
 

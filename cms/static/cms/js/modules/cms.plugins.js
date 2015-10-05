@@ -8,6 +8,10 @@
     // CMS.$ will be passed for $
     $(function () {
         var doc = $(document);
+        var clipboard = $('.cms-clipboard');
+        var clipboardDraggable = clipboard.find('.cms-draggable:first');
+        var clipboardPlugin = clipboard.find('.cms-plugin:first');
+
         doc.on('pointerup.cms', function () {
             // call it as a static method, because otherwise we trigger it the amount of times
             // CMS.Plugin is instantiated, which does not make much sense
@@ -85,6 +89,7 @@
                     revert: $('.cms-toolbar-revert'),
                     dragbar: null,
                     draggable: null,
+                    draggables: null,
                     submenu: null,
                     dropdown: null
                 };
@@ -94,6 +99,7 @@
             _setPlaceholder: function () {
                 var that = this;
                 this.ui.dragbar = $('.cms-dragbar-' + this.options.placeholder_id);
+                this.ui.draggables = this.ui.dragbar.closest('.cms-dragarea').find('> .cms-draggables');
                 this.ui.submenu = this.ui.dragbar.find('.cms-submenu-settings');
                 var title = this.ui.dragbar.find('.cms-dragbar-title');
                 var togglerLinks = this.ui.dragbar.find('.cms-dragbar-toggler a');
@@ -118,6 +124,8 @@
                 if ($.inArray(this.options.placeholder_id, CMS.settings.dragbars) !== -1) {
                     title.addClass(expanded);
                 }
+
+                this._checkIfPasteAllowed();
             },
 
             _setPlugin: function () {
@@ -139,7 +147,7 @@
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    (e.type === 'pointerover') ? that.showTooltip(name, id) : that.hideTooltip();
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover', e, name, id);
                 });
 
                 // adds listener for all plugin updates
@@ -172,6 +180,7 @@
                 // variables for dragitems
                 this.ui.draggable = $('.cms-draggable-' + this.options.plugin_id);
                 this.ui.dragitem = this.ui.draggable.find('> .cms-dragitem');
+                this.ui.draggables = this.ui.draggable.find('> .cms-draggables');
                 this.ui.submenu = this.ui.dragitem.find('.cms-submenu');
 
                 // attach event to the plugin menu
@@ -188,6 +197,8 @@
                         that.options.plugin_breadcrumb
                     );
                 });
+
+                this._checkIfPasteAllowed();
             },
 
             _setGeneric: function () {
@@ -205,12 +216,43 @@
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    if (e.type === 'pointerover') {
-                        that.showTooltip(name, id);
-                    } else {
-                        that.hideTooltip();
-                    }
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover', e, name, id);
                 });
+            },
+
+            /**
+             * Checks if paste is allowed into current plugin/placeholder based
+             * on restrictions we have. Also determines which tooltip to show.
+             *
+             * @method _checkIfPasteAllowed
+             * @private
+             * @return {Boolean}
+             */
+            _checkIfPasteAllowed: function _checkIfPasteAllowed() {
+                var pasteButton = this.ui.dropdown.find('[data-rel=paste]');
+                var pasteItem = pasteButton.parent();
+                if (!clipboardPlugin.length) {
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
+                    return false;
+                }
+
+                if (this.ui.draggable && this.ui.draggable.hasClass('cms-draggable-disabled')) {
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-disabled').css('display', 'block');
+                    return false;
+                }
+
+                var bounds = this.options.plugin_restriction;
+                var type = clipboardPlugin.data('settings').plugin_type;
+
+                if (bounds.length && $.inArray(type, bounds) === -1) {
+                    pasteItem.addClass('cms-submenu-item-disabled');
+                    pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
+                    return false;
+                }
+
+                return true;
             },
 
             // public methods
@@ -382,6 +424,17 @@
                 });
             },
 
+            /**
+             * Method is called when you click on the paste button on the plugin.
+             * Uses existing solution of `copyPlugin(options)`
+             *
+             * @method pastePlugin
+             */
+            pastePlugin: function () {
+                clipboardDraggable.appendTo(this.ui.draggables);
+                clipboardPlugin.trigger('cms.plugin.update');
+            },
+
             movePlugin: function (options) {
                 // cancel request if already in progress
                 if (CMS.API.locked) {
@@ -454,6 +507,7 @@
                     .addClass('cms-btn-publish-active')
                     .removeClass('cms-btn-disabled')
                     .parent().show();
+                this.ui.window.trigger('resize');
 
                 // enable revert to live
                 this.ui.revert.removeClass('cms-toolbar-item-navigation-disabled');
@@ -751,6 +805,13 @@
                             break;
                         case 'cut':
                             that.cutPlugin();
+                            break;
+                        case 'paste':
+                            if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                                that.pastePlugin();
+                            } else {
+                                CMS.API.Toolbar.hideLoader();
+                            }
                             break;
                         case 'delete':
                             that.deletePlugin(
