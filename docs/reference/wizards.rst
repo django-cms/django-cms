@@ -45,7 +45,14 @@ Then, simply initialize a Wizard and register it. If you were to do this for
 
 That is it!
 
-Note that this example is using a ModelForm, but you can also use `forms.Form`.
+Note::
+
+    the module name `cms_wizards` is special, in that any such-named modules in
+    your project's python path will automatically be loaded, triggering the
+    registration of any wizards found in them. Wizards may be declared and
+    registered in other modules, but they might not be automatically loaded.
+
+The above example is using a ModelForm, but you can also use `forms.Form`.
 In this case, you **must** provide the model class as another kwarg when you
 instantiate the Wizard object.
 
@@ -80,9 +87,9 @@ is_registered
 =============
 
 Sometimes, it may be necessary to check to see if a specific wizard has been
-registered. To do this, simply call:
+registered. To do this, simply call::
 
-    value = wizard_pool.is_registered(«wizard or content-type ID«)
+    value = wizard_pool.is_registered(«wizard or content-type ID»)
 
 Remember that two wizards that both use the underlying model/content-type will
 considered the same wizard.
