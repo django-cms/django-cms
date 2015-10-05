@@ -2,6 +2,8 @@
 Wizards
 #######
 
+.. module:: cms.wizards
+
 ****************************
 CMS Content Creation Wizards
 ****************************
@@ -63,16 +65,16 @@ single wizard per Model registered at any one time.
 
 The kwargs accepted for instantiating a Wizard object are::
 
-    title - The title of the wizard. This will appear in a large fontsize on the
+    :title: The title of the wizard. This will appear in a large fontsize on the
             wizard "menu"
-    weight - The "weight" of the wizard when determining the sort-order.
-    form - The form to use for this wizard. This is mandatory, but can be
+    :weight: The "weight" of the wizard when determining the sort-order.
+    :form: The form to use for this wizard. This is mandatory, but can be
            subclassed from `django.forms.form` or `django.forms.ModelForm`.
-    model - If a Form is used above, this kwarg must be supplied and should
+    :model: If a Form is used above, this kwarg must be supplied and should
             contain the model class. This is used to determine the unique
             wizard "signature" amongst other things.
-    template_name - An optional template can be supplied.
-    description - The description is optional, but if it is not supplied, the
+    :template_name: An optional template can be supplied.
+    :description: The description is optional, but if it is not supplied, the
                   CMS will create one from the pattern:
                   "Create a new «model.verbose_name» instance."
 
