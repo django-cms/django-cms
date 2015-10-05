@@ -1,0 +1,29 @@
+{% extends "cms/welcome.html" %}
+
+{% load i18n %}
+
+{% block body %}
+  <h2>Log in to get started</h2>
+
+  <div id="content-main">
+  <form action="{% url 'pages-root' %}" method="post" id="login-form">{% csrf_token %}
+    <div class="form-row">
+      {{ form.username.errors }}
+      {{ form.username.label_tag }} {{ form.username }}
+    </div>
+    <div class="form-row">
+      {{ form.password.errors }}
+      {{ form.password.label_tag }} {{ form.password }}
+      <input type="hidden" name="next" value="{{ next }}" />
+    </div>
+    <div class="submit-row">
+      <label>&nbsp;</label><input type="submit" value="{% trans 'Log in' %}" />
+    </div>
+  </form>
+
+  <script type="text/javascript">
+  document.getElementById('id_username').focus()
+  </script>
+  </div>
+
+{% endblock %}
