@@ -21,16 +21,16 @@ var CMS = window.CMS || {};
         var clipboardDraggable = clipboard.find('.cms-draggable:first');
         var clipboardPlugin = clipboard.find('.cms-plugin:first');
 
-        doc.on('pointerup.cms', function () {
+        doc.on('pointerup.cms.plugin', function () {
             // call it as a static method, because otherwise we trigger it the
             // amount of times CMS.Plugin is instantiated,
             // which does not make much sense
             CMS.Plugin._hideSettingsMenu();
-        }).on('keydown.cms', function (e) {
+        }).on('keydown.cms.plugin', function (e) {
             if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', true);
             }
-        }).on('keyup.cms', function (e) {
+        }).on('keyup.cms.plugin', function (e) {
             if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', false);
             }
@@ -75,7 +75,15 @@ var CMS = window.CMS || {};
 
                 // states
                 this.csrf = CMS.config.csrf;
-                this.click = 'pointerup.cms';
+                this.click = 'click.cms.plugin';
+                this.pointerUp = 'pointerup.cms.plugin';
+                this.pointerDown = 'pointerdown.cms.plugin';
+                this.pointerOverAndOut = 'pointerover.cms.plugin pointerout.cms.plugin';
+                this.doubleClick = 'dblclick.cms.plugin';
+                this.keyUp = 'keyup.cms.plugin';
+                this.keyDown = 'keydown.cms.plugin';
+                this.mouseEvents = 'mousedown.cms.plugin mousemove.cms.plugin mouseup.cms.plugin';
+                this.touchStart = 'touchstart.cms.plugin';
 
                 // bind data element to the container
                 this.ui.container.data('settings', this.options);
@@ -138,7 +146,7 @@ var CMS = window.CMS || {};
                 CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
                 // enable expanding/collapsing globally within the placeholder
-                togglerLinks.on('click', function (e) {
+                togglerLinks.on(this.click, function (e) {
                     e.preventDefault();
                     if (title.hasClass(expanded)) {
                         that._collapseAll(title);
@@ -164,7 +172,7 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // adds double click to edit
-                this.ui.container.add(this.ui.dragitem).on('dblclick', function (e) {
+                this.ui.container.add(this.ui.dragitem).on(this.doubleClick, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(
@@ -175,7 +183,7 @@ var CMS = window.CMS || {};
                 });
 
                 // adds edit tooltip
-                this.ui.container.on('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.on(this.pointerOverAndOut, function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -237,14 +245,14 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // adds double click to edit
-                this.ui.container.on('dblclick', function (e) {
+                this.ui.container.on(this.doubleClick, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     that.editPlugin(that.options.urls.edit_plugin, that.options.plugin_name, []);
                 });
 
                 // adds edit tooltip
-                this.ui.container.on('pointerover.cms pointerout.cms', function (e) {
+                this.ui.container.on(this.pointerOverAndOut, function (e) {
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -675,7 +683,7 @@ var CMS = window.CMS || {};
                 this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
                 var dropdown = this.ui.dropdown;
 
-                nav.on(this.click, function (e) {
+                nav.on(this.pointerUp, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     var trigger = $(this);
@@ -687,21 +695,21 @@ var CMS = window.CMS || {};
                     }
                 });
 
-                dropdown.on('mousedown mousemove mouseup', function (e) {
+                dropdown.on(this.mouseEvents, function (e) {
                     e.stopPropagation();
-                }).on('touchstart', function (e) {
+                }).on(this.touchStart, function (e) {
                     // required for scrolling on mobile
                     e.stopPropagation();
                 });
 
                 that._setupActions(nav);
                 // prevent propagnation
-                nav.on(this.click + ' pointerup.cms pointerdown.cms click.cms dblclick.cms', function (e) {
+                nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
 
                 nav.siblings('.cms-quicksearch, .cms-submenu-dropdown-settings')
-                    .on(this.click + ' click.cms dblclick.cms', function (e) {
+                    .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
             },
@@ -785,7 +793,7 @@ var CMS = window.CMS || {};
 
                 that._setupQuickSearch(plugins);
 
-                nav.on(this.click, function (e) {
+                nav.on(this.pointerUp, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -806,12 +814,12 @@ var CMS = window.CMS || {};
                 });
 
                 // prevent propagnation
-                nav.on(this.click + ' pointerup.cms pointerdown.cms click.cms dblclick.cms', function (e) {
+                nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
 
                 nav.siblings('.cms-quicksearch, .cms-submenu-dropdown')
-                    .on(this.click + ' click.cms dblclick.cms', function (e) {
+                    .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
             },
@@ -834,7 +842,7 @@ var CMS = window.CMS || {};
                     that._filterPluginsList(pluginsPicker, input);
                 }, 100);
 
-                input.on('keyup.cms', handler).on('keyup.cms', CMS.API.Helpers.debounce(function (e) {
+                input.on(this.keyUp, handler).on(this.keyUp, CMS.API.Helpers.debounce(function (e) {
                     var input;
                     var pluginsPicker;
                     if (e.keyCode === CMS.KEYS.ENTER) {
@@ -857,7 +865,7 @@ var CMS = window.CMS || {};
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
-                nav.parent().find('a').on('click.cms', function (e) {
+                nav.parent().find('a').on(that.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -935,8 +943,8 @@ var CMS = window.CMS || {};
                     return;
                 }
                 // add key events
-                doc.off('keydown.cms.traverse');
-                doc.on('keydown.cms.traverse', function (e) {
+                doc.off(this.keyDown + '.traverse');
+                doc.on(this.keyDown + '.traverse', function (e) {
                     var anchors = dropdown.find('.cms-submenu-item:visible a');
                     var index = anchors.index(anchors.filter(':focus'));
 
@@ -1122,7 +1130,7 @@ var CMS = window.CMS || {};
                 }
 
                 // attach events to draggable
-                dragitem.find('> .cms-dragitem-text').on('click.cms.plugin', function () {
+                dragitem.find('> .cms-dragitem-text').on(this.click, function () {
                     if (!dragitem.hasClass('cms-dragitem-collapsable')) {
                         return;
                     }
@@ -1130,9 +1138,9 @@ var CMS = window.CMS || {};
                 });
 
                 // adds double click event
-                this.ui.draggable.on('dblclick', function (e) {
+                this.ui.draggable.on(this.doubleClick, function (e) {
                     e.stopPropagation();
-                    $('.cms-plugin-' + that._getId($(this))).trigger('dblclick');
+                    $('.cms-plugin-' + that._getId($(this))).trigger('dblclick.cms');
                 });
 
                 // only needs to be excecuted once
@@ -1285,7 +1293,7 @@ var CMS = window.CMS || {};
             nav.siblings('.cms-quicksearch')
                 .find('input')
                 .val('')
-                .trigger('keyup.cms').blur();
+                .trigger(this.keyUp).blur();
 
             // reset relativity
             $('.cms-dragbar').css('position', '');
