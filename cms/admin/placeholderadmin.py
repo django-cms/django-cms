@@ -425,11 +425,15 @@ class PlaceholderAdminMixin(object):
         -plugin_language (optional)
         -plugin_parent (optional)
         -plugin_order (array, optional)
+        -move_a_copy (Boolean, optional) (anything supplied here except "false" or "False" is True)
         """
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
         language = request.POST.get('plugin_language', None)
+        move_a_copy = request.POST.get('move_a_copy', False)
+        if move_a_copy:
+            move_a_copy = (move_a_copy.lower() != "false")
         source_placeholder = plugin.placeholder
         if not parent_id:
             parent_id = None
@@ -446,6 +450,9 @@ class PlaceholderAdminMixin(object):
                 has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
+        if move_a_copy:
+            new_plugins = copy_plugins.copy_plugins_to(source_placeholder, language, parent_id)
+            plugin = new_plugins[0][0]
         if parent_id:
             if plugin.parent_id != parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
@@ -470,7 +477,7 @@ class PlaceholderAdminMixin(object):
             return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
-        json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
+        json_response = {'reload': move_a_copy or requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
