@@ -138,6 +138,14 @@
                 @include icon(alias);
             }
         }
+        &:first-child a:hover,
+        &:first-child a:focus {
+            border-radius: $border-radius-base $border-radius-base 0 0;
+        }
+        &:last-child a:hover,
+        &:last-child a:focus {
+            border-radius: 0 0 $border-radius-base $border-radius-base;
+        }
     }
     .cms-submenu-item-paste-tooltip {
         display: none;
