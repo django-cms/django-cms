@@ -425,7 +425,8 @@ class PlaceholderAdminMixin(object):
         -plugin_language (optional)
         -plugin_parent (optional)
         -plugin_order (array, optional)
-        -move_a_copy (Boolean, optional) (anything supplied here except "false" or "False" is True)
+        -move_a_copy (Boolean, optional) (anything supplied here except a case-
+                                         insensitive "false" is True)
         """
         plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
@@ -443,23 +444,29 @@ class PlaceholderAdminMixin(object):
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
         if not self.has_move_plugin_permission(request, plugin, placeholder):
-            return HttpResponseForbidden(force_text(_("You have no permission to move this plugin")))
+            return HttpResponseForbidden(
+                force_text(_("You have no permission to move this plugin")))
         if not placeholder == source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
-                has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
+                has_reached_plugin_limit(placeholder, plugin.plugin_type,
+                                         plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
         if move_a_copy:
-            new_plugins = copy_plugins.copy_plugins_to(source_placeholder, language, parent_id)
+            new_plugins = copy_plugins.copy_plugins_to(source_placeholder,
+                                                       language, parent_id)
             plugin = new_plugins[0][0]
         if parent_id:
             if plugin.parent_id != parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
                 if parent.placeholder_id != placeholder.pk:
-                    return HttpResponseBadRequest(force_text('parent must be in the same placeholder'))
+                    return HttpResponseBadRequest(
+                        force_text('parent must be in the same placeholder'))
                 if parent.language != language:
-                    return HttpResponseBadRequest(force_text('parent must be in the same language as plugin_language'))
+                    return HttpResponseBadRequest(
+                        force_text('parent must be in the same language as '
+                                   'plugin_language'))
                 plugin.parent_id = parent.pk
                 plugin.save()
                 plugin = plugin.move(parent, pos='last-child')
@@ -474,11 +481,15 @@ class PlaceholderAdminMixin(object):
             child.save()
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
-            return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
+            return HttpResponseBadRequest('order parameter did not have all '
+                                          'plugins of the same level in it')
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
-        json_response = {'reload': move_a_copy or requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+        json_response = {
+            'reload': move_a_copy or requires_reload(
+                PLUGIN_MOVE_ACTION, [plugin])}
+        return HttpResponse(
+            json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):
