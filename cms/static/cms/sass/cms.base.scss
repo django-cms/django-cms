@@ -11,21 +11,25 @@
 //##############################################################################
 // IMPORT COMPONENTS
 @import "components/reset";
-@import "components/iconography";
-@import "components/tooltip";
-@import "components/button";
-@import "components/loader";
-@import "components/content";
-@import "components/toolbar";
-@import "components/modal";
-@import "components/dialog";
-@import "components/sideframe";
-@import "components/structureboard";
-@import "components/clipboard";
-@import "components/subnav";
-@import "components/hovertooltip";
-@import "components/pluginpicker";
 @import "components/animation";
+@import "components/iconography";
+@import "components/hovertooltip";
+@import "components/dialog";
+@import "components/content";
+@import "components/loader";
+
+// div.cms needs to beat .cms-reset a selectors
+div.cms {
+    @import "components/tooltip";
+    @import "components/button";
+    @import "components/toolbar";
+    @import "components/modal";
+    @import "components/sideframe";
+    @import "components/structureboard";
+    @import "components/subnav";
+    @import "components/clipboard";
+    @import "components/pluginpicker";
+}
 
 //##############################################################################
 // DJANGO DEBUG TOOLBAR FIX

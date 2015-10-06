@@ -98,7 +98,7 @@ var CMS = {
 
             // disable multiple form submissions
             preventSubmit: function () {
-                var forms = $('#cms-toolbar').find('form');
+                var forms = $('.cms-toolbar').find('form');
                 forms.submit(function () {
                     // show loader
                     CMS.API.Toolbar.showLoader();
