@@ -72,8 +72,8 @@ class CreateCMSPageForm(BaseCMSPageForm):
         # is to prevent people form-hacking.
 
         if not self.user_has_page_add_perm(self.user):
-            raise NoPermissionsException(_(u"User does not have permission to "
-                                         u"add page."))
+            raise NoPermissionsException(
+                _(u"User does not have permission to add page."))
         title = self.cleaned_data['title']
 
         page = create_page(

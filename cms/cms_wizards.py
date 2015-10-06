@@ -24,7 +24,6 @@ class CMSPageWizard(Wizard):
         perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
         if user.is_superuser or (user.has_perm(perm_str) and global_add_perm):
             return True
-        print("No permission: {0}, {1}".format(user.has_perm(perm_str), global_add_perm))
         return False
 
 
