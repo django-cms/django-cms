@@ -146,7 +146,7 @@ var CMS = window.CMS || {};
                 CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
                 // enable expanding/collapsing globally within the placeholder
-                togglerLinks.on(this.click, function (e) {
+                togglerLinks.off(this.click).on(this.click, function (e) {
                     e.preventDefault();
                     if (title.hasClass(expanded)) {
                         that._collapseAll(title);
