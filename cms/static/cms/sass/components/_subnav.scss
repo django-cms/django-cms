@@ -70,6 +70,9 @@
         border: 1px solid $gray-lighter;
         border-radius: $border-radius-base;
     }
+    .cms-structure-content .cms-submenu-lang {
+        display: none;
+    }
 
     .cms-submenu-dropdown-top {
         top: $structure-dragbar-height + $structure-dragarea-space;

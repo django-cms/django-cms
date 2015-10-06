@@ -16,85 +16,92 @@ var CMS = window.CMS || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        /*!
-         * Clipboard
-         * Handles copy & paste
+        /**
+         * Handles copy & paste in the structureboard.
+         *
+         * @class Clipboard
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.Clipboard = new CMS.Class({
 
             implement: [CMS.API.Helpers],
 
-            options: {
-                position: 220, // offset to top
-                speed: 100,
-                id: null,
-                url: ''
-            },
+            initialize: function () {
+                this._setupUI();
 
-            initialize: function (options) {
-                this.clipboard = $('.cms-clipboard');
-                this.options = $.extend(true, {}, this.options, options);
                 this.config = CMS.config;
                 this.settings = CMS.settings;
 
-                // elements
-                this.containers = this.clipboard.find('.cms-clipboard-containers > .cms-draggable');
-                this.triggers = $('.cms-clipboard-trigger a');
-                this.triggerRemove = $('.cms-clipboard-empty a');
-
                 // states
                 this.click = 'click.cms.clipboard';
-
-                // setup initial stuff
-                this._setup();
 
                 // setup events
                 this._events();
             },
 
-            // initial methods
-            _setup: function () {
+            /**
+             * Caches all the jQuery element queries.
+             *
+             * @method _setupUI
+             * @private
+             */
+            _setupUI: function _setupUI() {
+                var clipboard = $('.cms-clipboard');
+                this.ui = {
+                    clipboard: clipboard,
+                    triggers: $('.cms-clipboard-trigger a'),
+                    triggerRemove: $('.cms-clipboard-empty a'),
+                    pluginsList: clipboard.find('.cms-clipboard-containers')
+                };
+            },
+
+            /**
+             * Sets up event handlers for clipboard ui.
+             *
+             * @method _events
+             * @private
+             */
+            _events: function () {
                 var that = this;
 
+                var MIN_WIDTH = 400;
                 // FIXME kind of a magic number for 1 item in clipboard
-                var minHeight = 117;
-                var pluginsList = this.clipboard.find('.cms-clipboard-containers');
-                var modal = new CMS.Modal({
-                    minWidth: 400,
-                    minHeight: minHeight,
+                var MIN_HEIGHT = 117;
+
+                that.modal = new CMS.Modal({
+                    minWidth: MIN_WIDTH,
+                    minHeight: MIN_HEIGHT,
                     minimizable: false,
                     maximizable: false,
                     resizable: false
                 });
 
-                modal.on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
+                that.modal.on('cms.modal.loaded cms.modal.closed', function removePlaceholder() {
+                    // cannot be cached
                     $('.cms-add-plugin-placeholder').remove();
                 }).on('cms.modal.closed cms.modal.load', function () {
-                    pluginsList.prependTo(that.clipboard);
+                    that.ui.pluginsList.prependTo(that.ui.clipboard);
                 }).ui.modal.on('cms.modal.load', function () {
-                    pluginsList.prependTo(that.clipboard);
+                    that.ui.pluginsList.prependTo(that.ui.clipboard);
                 });
 
-                this.triggers.on(this.click, function (e) {
+                that.ui.triggers.on(that.click, function (e) {
                     e.preventDefault();
                     if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
                         return false;
                     }
 
-                    modal.open({
-                        html: pluginsList,
-                        title: that.clipboard.data('title'),
-                        width: 400,
-                        height: minHeight
+                    that.modal.open({
+                        html: that.ui.pluginsList,
+                        title: that.ui.clipboard.data('title'),
+                        width: MIN_WIDTH,
+                        height: MIN_HEIGHT
                     });
                 });
-            },
-
-            _events: function () {
-                var that = this;
 
                 // add remove event
-                this.triggerRemove.on(this.click, function (e) {
+                that.ui.triggerRemove.on(that.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
                     if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
@@ -102,20 +109,29 @@ var CMS = window.CMS || {};
                     }
                     that.clear(function () {
                         // remove element on success
-                        that.clipboard.hide();
-                        that.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
-                        that.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
+                        that.ui.clipboard.hide();
+                        that.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
+                        that.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
                     });
                 });
             },
 
-            // public methods
+            /**
+             * Clears the clipboard by quering the server.
+             * Callback is optional, but if provided - it's called
+             * no matter what outcome was of the ajax call.
+             *
+             * @method clear
+             * @param [callback] {Function}
+             */
             clear: function (callback) {
                 // post needs to be a string, it will be converted using JSON.parse
                 var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent().addClass('cms-submenu-item-disabled');
+                var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent().
+                    addClass('cms-submenu-item-disabled');
                 pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');
                 pasteItems.find('.cms-submenu-item-paste-tooltip-empty').css('display', 'block');
+
                 // redirect to ajax
                 CMS.API.Toolbar.openAjax({
                     url: this.config.clipboard.url,
