@@ -85,7 +85,7 @@ var CMS = window.CMS || {};
              * @private
              */
             _setupUI: function _setupUI() {
-                var container = $('.cms-toolbar');
+                var container = $('.cms');
                 this.ui = {
                     container: container,
                     body: $('html'),

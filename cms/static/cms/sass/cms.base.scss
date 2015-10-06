@@ -13,15 +13,15 @@
 @import "components/reset";
 @import "components/animation";
 @import "components/iconography";
-@import "components/tooltip";
 @import "components/hovertooltip";
-@import "components/button";
-@import "components/loader";
-@import "components/content";
 @import "components/dialog";
+@import "components/content";
+@import "components/loader";
+@import "components/tooltip";
 
-.cms-toolbar {
+.cms {
     @import "components/toolbar";
+    @import "components/button";
     @import "components/modal";
     @import "components/sideframe";
     @import "components/structureboard";

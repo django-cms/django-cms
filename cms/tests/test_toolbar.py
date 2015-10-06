@@ -190,7 +190,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'nav_playground.html')
-        self.assertContains(response, '<div id="cms-toolbar-top"')
+        self.assertContains(response, '<div id="cms-top"')
         self.assertContains(response, 'cms.base.css')
 
     def test_markup_generic_module(self):

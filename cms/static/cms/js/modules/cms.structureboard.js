@@ -369,7 +369,7 @@
                         return clone.parent();
                     },
                     appendTo: '.cms-structure-content',
-                    // appendTo: '.cms-toolbar',
+                    // appendTo: '.cms',
                     cursor: 'move',
                     cursorAt: { left: -15, top: -15 },
                     opacity: 1,

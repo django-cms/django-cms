@@ -274,12 +274,12 @@
 // placed outside the cms-toolbar scope
 @at-root .cms-modal-maximized {
     overflow: hidden !important;
-    .cms-toolbar.cms-toolbar-debug .cms-modal {
+    .cms.cms-toolbar-debug .cms-modal {
         top: $toolbar-debug-height !important;
     }
 }
 @at-root .cms-modal-minimized {
-    .cms-toolbar.cms-toolbar-debug .cms-modal {
+    .cms.cms-toolbar-debug .cms-modal {
         top: $toolbar-debug-height + 1px !important;
     }
 }
