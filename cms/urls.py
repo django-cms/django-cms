@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import include, url
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_patterns
@@ -21,7 +21,9 @@ if apphook_pool.get_apphooks():
 else:
     urlpatterns = []
 
+
 urlpatterns.extend([
+    url(r'^wizard/', include('cms.wizards.urls')),
     url(regexp, details, name='pages-details-by-slug'),
     url(r'^$', details, {'slug': ''}, name='pages-root'),
 ])

@@ -13,7 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
 from cms.models import Title, Page
-from cms.toolbar.items import TemplateItem
+from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
@@ -67,6 +67,7 @@ class PlaceholderToolbar(CMSToolbar):
     def post_template_populate(self):
         self.init_placeholders_from_request()
 
+        self.add_wizard_button()
         self.add_structure_mode()
 
     def add_structure_mode(self):
@@ -91,6 +92,12 @@ class PlaceholderToolbar(CMSToolbar):
                                                     extra_classes=extra_classes)
             switcher.add_button(_('Structure'), build_url, active=build_mode, disabled=False)
             switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
+
+    def add_wizard_button(self):
+        title = _("Create")
+        url = reverse("cms_wizard_create")
+        self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
+                                      on_close=REFRESH_PAGE)
 
 
 @toolbar_pool.register
@@ -305,7 +312,6 @@ class PageToolbar(CMSToolbar):
 
     def post_template_populate(self):
         self.init_placeholders_from_request()
-
         self.add_draft_live()
         self.add_publish_button()
 
