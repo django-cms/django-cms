@@ -34,7 +34,7 @@
             });
         }
 
-        /*!
+        /**
          * StructureBoard
          * handles drag & drop, mode switching and
          */
@@ -249,6 +249,12 @@
                 return id;
             },
 
+            /**
+             * gets the ids of the list of  elements
+             *
+             * @param el jQuery elements to get id from
+             * @return {String[]}
+             */
             getIds: function (els) {
                 var that = this;
                 var array = [];
