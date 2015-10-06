@@ -545,6 +545,15 @@ var CMS = window.CMS || {};
                 var plugin_parent = this._getId(dragitem.parent().closest('.cms-draggable'));
                 var plugin_order = this._getIds(dragitem.siblings('.cms-draggable').andSelf());
 
+                if (options.move_a_copy) {
+                    plugin_order = plugin_order.map(function (pluginId) {
+                        if (pluginId === options.plugin_id) {
+                            pluginId = '__COPY__';
+                        }
+                        return pluginId;
+                    });
+                }
+
                 // cancel here if we have no placeholder id
                 if (placeholder_id === false) {
                     return false;
