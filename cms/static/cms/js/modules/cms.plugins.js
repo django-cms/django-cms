@@ -214,8 +214,9 @@ var CMS = window.CMS || {};
                     var data = el.data('settings');
                     data.target = placeholder_id;
                     data.parent = that._getId(dragitem.parent().closest('.cms-draggable'));
+                    data.move_a_copy = true;
 
-                    that.copyPlugin(data);
+                    that.movePlugin(data);
                 });
 
                 // filling up ui object
@@ -518,6 +519,7 @@ var CMS = window.CMS || {};
              * @param [options.plugin_id] {String}
              * @param [options.plugin_parent] {String}
              * @param [options.plugin_language]  {String}
+             * @param [options.move_a_copy] {Boolean}
              */
             movePlugin: function (options) {
                 // cancel request if already in progress
@@ -556,7 +558,8 @@ var CMS = window.CMS || {};
                     // this is a hack: when moving to different languages use the global language
                     plugin_language: options.page_language,
                     plugin_order: plugin_order,
-                    csrfmiddlewaretoken: this.csrf
+                    csrfmiddlewaretoken: this.csrf,
+                    move_a_copy: options.move_a_copy
                 };
 
                 $.ajax({
