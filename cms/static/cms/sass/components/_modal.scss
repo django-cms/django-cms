@@ -122,6 +122,7 @@
     font-size: $modal-header-title-font-size;
     font-weight: bold;
     line-height: $modal-header-height;
+    min-heigh: $modal-header-height;
     padding: 0 $padding-large;
     cursor: move;
     white-space: nowrap;
@@ -134,7 +135,23 @@
     }
     .cms-modal-title-prefix:empty + .cms-modal-title-suffix {
         font-weight: bold;
-        padding-left: 0;
+        line-height: $modal-header-height;
+        min-height: $modal-header-height;
+        padding: 0 $padding-large;
+        cursor: move;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-right: $modal-header-button-area-size * 3 + $padding-normal;
+        .cms-modal-title-suffix {
+            font-weight: normal;
+            padding-left: $padding-normal;
+            height: $modal-header-height;
+        }
+        .cms-modal-title-prefix:empty + .cms-modal-title-suffix {
+            font-weight: bold;
+            padding-left: 0;
+        }
     }
 }
 
