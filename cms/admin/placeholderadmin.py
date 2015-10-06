@@ -459,7 +459,7 @@ class PlaceholderAdminMixin(object):
                 return HttpResponseBadRequest(er)
         if move_a_copy:
             new_plugins = copy_plugins.copy_plugins_to(
-                [plugin], source_placeholder)
+                [plugin] + list(plugin.get_descendants()), source_placeholder)
             plugin = new_plugins[0][0]
             # If an ordering was supplied, we should replace the item that has
             # been copied with the new copy
