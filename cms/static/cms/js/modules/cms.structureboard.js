@@ -1,5 +1,5 @@
-//##################################################################################################################
-// #STRUCTUREBOARD#
+//##############################################################################
+// STRUCTUREBOARD
 /* global CMS */
 
 (function ($) {
@@ -34,7 +34,7 @@
             });
         }
 
-        /*!
+        /**
          * StructureBoard
          * handles drag & drop, mode switching and
          */
@@ -69,7 +69,7 @@
 
             _setupUI: function setupUI() {
                 var container = $('.cms-structure');
-                var toolbar = $('#cms-toolbar');
+                var toolbar = $('.cms-toolbar');
                 this.ui = {
                     container: container,
                     content: $('.cms-structure-content'),
@@ -249,6 +249,12 @@
                 return id;
             },
 
+            /**
+             * gets the ids of the list of  elements
+             *
+             * @param el jQuery elements to get id from
+             * @return {String[]}
+             */
             getIds: function (els) {
                 var that = this;
                 var array = [];
@@ -363,7 +369,7 @@
                         return clone.parent();
                     },
                     appendTo: '.cms-structure-content',
-                    // appendTo: '#cms-toolbar',
+                    // appendTo: '.cms',
                     cursor: 'move',
                     cursorAt: { left: -15, top: -15 },
                     opacity: 1,

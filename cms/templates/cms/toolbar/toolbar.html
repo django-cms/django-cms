@@ -1,7 +1,11 @@
 {% load i18n l10n %}
 
 {% language request.toolbar.toolbar_language %}
-<div id="cms-toolbar" class="cms-reset{% if not user.is_authenticated %} cms-toolbar-auth{% endif %}{% if debug %} cms-toolbar-debug{% endif %}" dir="ltr" data-touch-action="none">
+<div id="cms-top"
+     class="cms cms-reset
+     {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
+     {% if debug %} cms-toolbar-debug{% endif %}"
+     dir="ltr" data-touch-action="none">
 
     {# debug, tooltip #}
     <div class="cms-debug-bar"></div>
