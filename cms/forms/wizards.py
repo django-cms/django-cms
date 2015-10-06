@@ -3,17 +3,13 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.auth import get_permission_codename
-from django.contrib.sites.models import Site
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import NoPermissionsException
-from cms.models import Page, GlobalPagePermission
 from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
-from cms.cms_wizards import user_has_page_add_perm
 
 
 class BaseCMSPageForm(forms.Form):
@@ -59,9 +55,9 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
-        # is to prevent people form-hacking.
+        # is to prevent people from possible form-hacking.
 
-        if not user_has_page_add_perm(self.user):
+        if not permissions.user_has_page_add_perm(self.user):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
         title = self.cleaned_data['title']
