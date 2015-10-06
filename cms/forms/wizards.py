@@ -13,6 +13,7 @@ from cms.exceptions import NoPermissionsException
 from cms.models import Page, GlobalPagePermission
 from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
+from cms.cms_wizards import user_has_page_add_perm
 
 
 class BaseCMSPageForm(forms.Form):
@@ -53,17 +54,6 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             return None
 
-    @staticmethod
-    def user_has_page_add_perm(user):
-        opts = Page._meta
-        site = Site.objects.get_current()
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-        if user.is_superuser or (user.has_perm(perm_str) and global_add_perm):
-            return True
-        return False
-
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
 
@@ -71,7 +61,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people form-hacking.
 
-        if not self.user_has_page_add_perm(self.user):
+        if not user_has_page_add_perm(self.user):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
         title = self.cleaned_data['title']

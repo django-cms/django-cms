@@ -14,17 +14,21 @@ from .forms.wizards import (
 )
 
 
+def user_has_page_add_perm(user):
+    opts = Page._meta
+    site = Site.objects.get_current()
+    global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
+        user, site).exists()
+    perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
+    if user.is_superuser or (user.has_perm(perm_str) and global_add_perm):
+        return True
+    return False
+
+
 class CMSPageWizard(Wizard):
 
     def user_has_add_permission(self, user):
-        opts = Page._meta
-        site = Site.objects.get_current()
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-        if user.is_superuser or (user.has_perm(perm_str) and global_add_perm):
-            return True
-        return False
+        return user_has_page_add_perm(user)
 
 
 cms_page_wizard = CMSPageWizard(
