@@ -17,10 +17,10 @@
 @import "components/dialog";
 @import "components/content";
 @import "components/loader";
-@import "components/tooltip";
 
 // div.cms needs to beat .cms-reset a selectors
 div.cms {
+    @import "components/tooltip";
     @import "components/button";
     @import "components/toolbar";
     @import "components/modal";
