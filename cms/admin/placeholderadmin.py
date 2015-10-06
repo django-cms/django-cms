@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+import sys
 
 from django.conf import settings
 from django.conf.urls import url
@@ -428,13 +429,15 @@ class PlaceholderAdminMixin(object):
         -move_a_copy (Boolean, optional) (anything supplied here except a case-
                                          insensitive "false" is True)
         """
-        plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
+        plugin_id = int(request.POST['plugin_id'])
+        plugin = CMSPlugin.objects.get(pk=plugin_id)
         placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
         parent_id = request.POST.get('plugin_parent', None)
         language = request.POST.get('plugin_language', None)
         move_a_copy = request.POST.get('move_a_copy', False)
         if move_a_copy:
             move_a_copy = (move_a_copy.lower() != "false")
+        move_a_copy = True
         source_placeholder = plugin.placeholder
         if not parent_id:
             parent_id = None
@@ -454,9 +457,11 @@ class PlaceholderAdminMixin(object):
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
         if move_a_copy:
-            new_plugins = copy_plugins.copy_plugins_to(source_placeholder,
-                                                       language, parent_id)
+            new_plugins = copy_plugins.copy_plugins_to(
+                [plugin], source_placeholder)
             plugin = new_plugins[0][0]
+            if order and plugin_id in order:
+                order[order.index(plugin_id)] = plugin.id
         if parent_id:
             if plugin.parent_id != parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
