@@ -19,14 +19,15 @@
 @import "components/loader";
 @import "components/tooltip";
 
-.cms {
-    @import "components/toolbar";
+// div.cms needs to beat .cms-reset a selectors
+div.cms {
     @import "components/button";
+    @import "components/toolbar";
     @import "components/modal";
     @import "components/sideframe";
     @import "components/structureboard";
-    @import "components/clipboard";
     @import "components/subnav";
+    @import "components/clipboard";
     @import "components/pluginpicker";
 }
 
