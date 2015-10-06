@@ -127,14 +127,15 @@ var CMS = window.CMS || {};
                     var disabled = 'cms-toolbar-item-navigation-disabled';
                     var children = 'cms-toolbar-item-navigation-children';
                     var isTouchingTopLevelMenu = false;
+                    var open = false;
 
                     // remove events from first level
                     navigation.find('a').on(that.click, function (e) {
                         e.preventDefault();
                         if ($(this).attr('href') !== '' &&
-                           $(this).attr('href') !== '#' &&
-                           !$(this).parent().hasClass(disabled) &&
-                           !$(this).parent().hasClass(disabled)) {
+                            $(this).attr('href') !== '#' &&
+                            !$(this).parent().hasClass(disabled) &&
+                            !$(this).parent().hasClass(disabled)) {
                             that._delegate($(this));
                             reset();
                             return false;
@@ -148,6 +149,12 @@ var CMS = window.CMS || {};
                         e.preventDefault();
                         e.stopPropagation();
                         var el = $(this);
+
+                        // close navigation once it's pressed again
+                        if (el.parent().hasClass(root) && open) {
+                            that.ui.body.trigger(that.click);
+                            return false;
+                        }
 
                         // close if el does not have children
                         if (!el.hasClass(children)) {
@@ -168,6 +175,7 @@ var CMS = window.CMS || {};
                                 if ($(this).hasClass(hover)) {
                                     return false;
                                 }
+                                open = false;
                                 $(this).trigger(that.click);
                             });
                         }
@@ -178,6 +186,8 @@ var CMS = window.CMS || {};
                         that.ui.structureBoard.on(that.click, reset);
                         that.ui.toolbar.on(that.click, reset);
                         that.ui.window.on('resize', CMS.API.Helpers.throttle(reset, 1000));
+                        // update states
+                        open = true;
                     });
 
                     // attach hover
@@ -225,6 +235,7 @@ var CMS = window.CMS || {};
 
                     // removes classes and events
                     function reset() {
+                        open = false;
                         lists.removeClass(hover);
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
