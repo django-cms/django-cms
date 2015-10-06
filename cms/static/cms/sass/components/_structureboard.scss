@@ -1,7 +1,42 @@
 //##############################################################################
 // STRUCTURE
 
-#cms-toolbar .cms-structure {
+.cms-structure-dynamic {
+    position: absolute;
+    overflow: hidden;
+}
+
+.cms-droppable {
+    position: relative;
+    z-index: z(structure, content, droppable);
+    line-height: 0;
+    height: 0;
+    min-height: 0;
+    box-shadow: 0 0 0 2px $color-primary;
+    transform: translateY(2px);
+    .cms-draggable + & {
+        transform: translateY(-2px);
+    }
+    &:before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: -4px;
+        width: 0;
+        height: 0;
+        border-top: 8px solid transparent;
+        border-bottom: 8px solid transparent;
+        border-left: 8px solid $color-primary;
+    }
+}
+.cms-draggables > .cms-droppable:first-child {
+    transform: translateY(-2px);
+}
+.cms-draggables > .cms-droppable:only-child {
+    transform: translateY(2px);
+}
+
+@at-root  .cms-structure {
     display: none;
     position: fixed;
     top: 0;
@@ -22,46 +57,7 @@
         user-select: none;
         -webkit-overflow-scrolling: touch;
     }
-}
 
-#cms-toolbar .cms-structure-dynamic {
-    position: absolute;
-    overflow: hidden;
-}
-
-#cms-toolbar {
-    .cms-droppable {
-        position: relative;
-        z-index: z(structure, content, droppable);
-        line-height: 0;
-        height: 0;
-        min-height: 0;
-        box-shadow: 0 0 0 2px $color-primary;
-        transform: translateY(2px);
-        .cms-draggable + & {
-            transform: translateY(-2px);
-        }
-        &:before {
-            content: "";
-            position: absolute;
-            top: -8px;
-            left: -4px;
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid $color-primary;
-        }
-    }
-    .cms-draggables > .cms-droppable:first-child {
-        transform: translateY(-2px);
-    }
-    .cms-draggables > .cms-droppable:only-child {
-        transform: translateY(2px);
-    }
-}
-
-#cms-toolbar .cms-structure {
     //###########################################################
     // #DRAGAREA#
     // basically a cms placeholder representation
@@ -469,9 +465,9 @@
 }
 
 // hide elements when dragging
-.ui-sortable-helper.cms-draggable .cms-submenu-btn {
+@at-root .ui-sortable-helper.cms-draggable .cms-submenu-btn {
     display: none !important;
 }
-.ui-sortable-helper.cms-draggable .cms-draggables {
+@at-root .ui-sortable-helper.cms-draggable .cms-draggables {
     display: none !important;
 }
