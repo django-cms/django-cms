@@ -716,6 +716,10 @@ var CMS = window.CMS || {};
                     var title = item.attr('value') || item.text();
                     var cls = 'cms-btn';
 
+                    if (item.is('button')) {
+                        title = item.text();
+                    }
+
                     // set additional special css classes
                     if (item.hasClass('default')) {
                         cls = 'cms-btn cms-btn-action';

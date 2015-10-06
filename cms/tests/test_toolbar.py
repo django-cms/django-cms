@@ -385,7 +385,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        self.assertEqual(len(items), 7)
+        self.assertEqual(len(items), 8)
 
     def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -399,7 +399,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.edit_mode)
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 5)
+        self.assertEqual(len(items), 6)
 
         # adding back structure mode permission
         permission = Permission.objects.get(codename='use_structure')
