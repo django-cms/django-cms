@@ -428,6 +428,8 @@ class PlaceholderAdminMixin(object):
         -plugin_order (array, optional)
         -move_a_copy (Boolean, optional) (anything supplied here except a case-
                                          insensitive "false" is True)
+        NOTE: If move_a_copy is set, the plugin_order should contain an item
+              '__COPY__' with the desired detination of the copied plugin.
         """
         plugin_id = int(request.POST['plugin_id'])
         plugin = CMSPlugin.objects.get(pk=plugin_id)
@@ -437,7 +439,6 @@ class PlaceholderAdminMixin(object):
         move_a_copy = request.POST.get('move_a_copy', False)
         if move_a_copy:
             move_a_copy = (move_a_copy.lower() != "false")
-        move_a_copy = True
         source_placeholder = plugin.placeholder
         if not parent_id:
             parent_id = None
@@ -460,8 +461,13 @@ class PlaceholderAdminMixin(object):
             new_plugins = copy_plugins.copy_plugins_to(
                 [plugin], source_placeholder)
             plugin = new_plugins[0][0]
-            if order and plugin_id in order:
-                order[order.index(plugin_id)] = plugin.id
+            # If an ordering was supplied, we should replace the item that has
+            # been copied with the new copy
+            if order:
+                if '__COPY__' in order:
+                    order[order.index('__COPY__')] = plugin.id
+                else:
+                    order.append(plugin.id)
         if parent_id:
             if plugin.parent_id != parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
@@ -488,7 +494,6 @@ class PlaceholderAdminMixin(object):
         if not plugins:
             return HttpResponseBadRequest('order parameter did not have all '
                                           'plugins of the same level in it')
-
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {
             'reload': move_a_copy or requires_reload(
