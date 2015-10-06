@@ -6,3 +6,4 @@ django-hvad>=1.1
 django-classy-tags>=0.6.1
 django-formtools==1.0
 django-sekizai>=0.8.2
+django-debug-toolbar

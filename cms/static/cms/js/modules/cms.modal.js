@@ -585,20 +585,27 @@ var CMS = window.CMS || {};
                     var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
-                    var wMax = that.options.minWidth;
-                    var hMax = that.options.minHeight;
+                    var wMin = that.options.minWidth;
+                    var hMin = that.options.minHeight;
+                    var left = mvX + modalLeft;
+                    var top = mvY + modalTop;
 
                     // add some limits
-                    if (w <= wMax || h <= hMax) {
-                        return false;
+                    if (w <= wMin) {
+                        w = wMin;
+                        left = modalLeft + width / 2 - w / 2;
+                    }
+                    if (h <= hMin) {
+                        h = hMin;
+                        top = modalTop + height / 2 - h / 2;
                     }
 
                     // set centered animation
                     that.ui.modal.css({
-                        'width': width - (mvX * 2),
-                        'height': height - (mvY * 2),
-                        'left': modalLeft + mvX,
-                        'top': modalTop + mvY
+                        width: w,
+                        height: h,
+                        left: left,
+                        top: top
                     });
                 }).attr('data-touch-action', 'none');
             },
