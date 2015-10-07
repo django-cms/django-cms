@@ -1,5 +1,6 @@
-//######################################################################################################################
-// #RESET#
+//##############################################################################
+// RESET
+
 .cms-reset {
     div,
     p,
@@ -13,7 +14,10 @@
     fieldset,
     label,
     input,
-    textarea {
+    textarea,
+    h1,
+    h2,
+    h3 {
         color: #222;
         font: normal #{$font-size-normal}/#{$line-height-normal} Helvetica,Arial,sans-serif;
         text-align: left;

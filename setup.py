@@ -24,6 +24,15 @@ CLASSIFIERS = [
     'Framework :: Django :: 1.8',
 ]
 
+INSTALL_REQUIREMENTS = [
+    'Django>=1.6.9,<1.9',
+    'django-classy-tags>=0.5',
+    'html5lib>=0.90,!=0.9999,!=0.99999',
+    'django-treebeard==3.0',
+    'django-sekizai>=0.7',
+    'djangocms-admin-style'
+]
+
 setup(
     author='Patrick Lauber',
     author_email='digi@treepy.com',
@@ -35,14 +44,7 @@ setup(
     license='BSD License',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
-    install_requires=[
-        'Django>=1.6.9,<1.9',
-        'django-classy-tags>=0.5',
-        'html5lib>=0.90,!=0.9999,!=0.99999',
-        'django-treebeard==3.0',
-        'django-sekizai>=0.7',
-        'djangocms-admin-style'
-    ],
+    install_requires=INSTALL_REQUIREMENTS,
     extras_require={
         'south': ['south>=1.0.0'],
     },

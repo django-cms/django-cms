@@ -585,20 +585,27 @@ var CMS = window.CMS || {};
                     var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
                     var w = width - (mvX * 2);
                     var h = height - (mvY * 2);
-                    var wMax = that.options.minWidth;
-                    var hMax = that.options.minHeight;
+                    var wMin = that.options.minWidth;
+                    var hMin = that.options.minHeight;
+                    var left = mvX + modalLeft;
+                    var top = mvY + modalTop;
 
                     // add some limits
-                    if (w <= wMax || h <= hMax) {
-                        return false;
+                    if (w <= wMin) {
+                        w = wMin;
+                        left = modalLeft + width / 2 - w / 2;
+                    }
+                    if (h <= hMin) {
+                        h = hMin;
+                        top = modalTop + height / 2 - h / 2;
                     }
 
                     // set centered animation
                     that.ui.modal.css({
-                        'width': width - (mvX * 2),
-                        'height': height - (mvY * 2),
-                        'left': modalLeft + mvX,
-                        'top': modalTop + mvY
+                        width: w,
+                        height: h,
+                        left: left,
+                        top: top
                     });
                 }).attr('data-touch-action', 'none');
             },
@@ -708,6 +715,10 @@ var CMS = window.CMS || {};
 
                     var title = item.attr('value') || item.text();
                     var cls = 'cms-btn';
+
+                    if (item.is('button')) {
+                        title = item.text();
+                    }
 
                     // set additional special css classes
                     if (item.hasClass('default')) {
@@ -828,6 +839,25 @@ var CMS = window.CMS || {};
                             error: true
                         });
                         that.close();
+                    }
+
+                    CMS.Modal._setupCtrlEnterSave(document);
+                    CMS.Modal._setupCtrlEnterSave(iframe[0].contentWindow.document);
+                    // for ckeditor we need to go deeper
+                    if (iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
+                        $(iframe[0].contentWindow.document).ready(function () {
+                            // setTimeout is required to battle CKEditor initialisation
+                            setTimeout(function () {
+                                var editor = iframe[0].contentWindow.CMS.CKEditor.editor;
+                                if (editor) {
+                                    editor.on('loaded', function (e) {
+                                        CMS.Modal._setupCtrlEnterSave(
+                                            $(e.editor.container.$).find('iframe')[0].contentWindow.document
+                                        );
+                                    });
+                                }
+                            }, 100);
+                        });
                     }
 
                     // hide loader
@@ -993,5 +1023,44 @@ var CMS = window.CMS || {};
             }
         });
 
+        /**
+         * Sets up keyup/keydown listeners so you're able to save whatever you're
+         * editing inside of an iframe by pressing `ctrl + enter` on windows and `cmd + enter` on mac.
+         *
+         * It only works with default button (e.g. action), not the `delete` button,
+         * even though sometimes it's the only actionable button in the modal.
+         *
+         * @method _setupCtrlEnterSave
+         * @static
+         * @param document HTMLElement document element (iframe or parent window);
+         */
+        CMS.Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
+            var cmdPressed = false;
+            var mac = (navigator.platform.toLowerCase().indexOf('mac') + 1);
+
+            $(doc).on('keydown.cms.submit', function (e) {
+                if (e.ctrlKey && e.keyCode === CMS.KEYS.ENTER && !mac) {
+                    $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
+                }
+
+                if (mac) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                        cmdPressed = true;
+                    }
+
+                    if (e.keyCode === CMS.KEYS.ENTER && cmdPressed) {
+                        $('.cms-modal-buttons .cms-btn-action:first').trigger('click');
+                    }
+                }
+            }).on('keyup.cms.submit', function (e) {
+                if (mac) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                        cmdPressed = false;
+                    }
+                }
+            });
+
+        };
     });
+
 })(CMS.$);

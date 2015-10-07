@@ -3,8 +3,8 @@
  * Multiple helpers used accross all CMS features
  */
 
-//##################################################################################################################
-// #COMPATIBILITY#
+//##############################################################################
+// COMPATIBILITY
 
 // ensuring django namespace is set correctly
 window.django = window.django || undefined;
@@ -27,12 +27,14 @@ var CMS = {
         DOWN: 40,
         ENTER: 13,
         SPACE: 32,
-        ESC: 27
+        ESC: 27,
+        CMD_LEFT: 91,
+        CMD_RIGHT: 93
     }
 };
 
-//##################################################################################################################
-// #CMS.API#
+//##############################################################################
+// CMS.API
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
@@ -96,7 +98,7 @@ var CMS = {
 
             // disable multiple form submissions
             preventSubmit: function () {
-                var forms = $('#cms-toolbar').find('form');
+                var forms = $('.cms-toolbar').find('form');
                 forms.submit(function () {
                     // show loader
                     CMS.API.Toolbar.showLoader();

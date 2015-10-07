@@ -52,9 +52,11 @@ install:
   - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
   - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
 
-script: coverage run --rcfile=.coverage.rc manage.py test
+script:
+  - coverage run --parallel-mode manage.py test
+  - coverage combine
 
-after_success: coveralls --config_file=.coverage.rc
+after_success: coveralls
 
 notifications:
   irc:
