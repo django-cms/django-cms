@@ -144,7 +144,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + admin-menu + logout
-        self.assertEqual(len(items), 2, items)
+        self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 9, admin_items)
 
@@ -155,7 +155,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 2)
+        self.assertEqual(len(items), 3)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 10, admin_items)
 
@@ -411,7 +411,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit mode + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
+        self.assertEqual(len(items), 7)
 
     def test_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -426,7 +426,7 @@ class ToolbarTests(ToolbarTestBase):
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 3, items)
+        self.assertEqual(len(items), 4, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 12, admin_items)
 
@@ -443,13 +443,13 @@ class ToolbarTests(ToolbarTestBase):
         en_toolbar.populate()
         en_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
     def test_double_menus(self):
         """
