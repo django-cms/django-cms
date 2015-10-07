@@ -32,6 +32,16 @@ class WizardTestMixin(object):
     page_wizard = None
     title_wizard = None
 
+    def assertSequencesEqual(self, seq_a, seq_b):
+        seq_a = list(seq_a)
+        seq_b = list(seq_b)
+        zipped = zip(seq_a, seq_b)
+        if len(zipped) < len(seq_a) or len(zipped) < len(seq_b):
+            self.fail("Sequence lengths are not the same.")
+        for idx, (a, b) in enumerate(zipped):
+            if a != b:
+                self.fail("Sequences differ at index {0}".format(idx))
+
     @classmethod
     def setUpClass(cls):
         super(WizardTestMixin, cls).setUpClass()
@@ -152,14 +162,14 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.register(self.page_wizard)
         wizard_pool.register(self.user_settings_wizard)
         wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards.sort(key=lambda e: getattr(e, 'weight'))
+        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
         entries = wizard_pool.get_entries()
-        self.assertItemsEqual(entries, wizards)
+        self.assertSequencesEqual(entries, wizards)
 
         wizard_pool._clear()
         wizard_pool.register(self.user_settings_wizard)
         wizard_pool.register(self.page_wizard)
         wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards.sort(key=lambda e: getattr(e, 'weight'))
+        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
         entries = wizard_pool.get_entries()
-        self.assertItemsEqual(entries, wizards)
+        self.assertSequencesEqual(entries, wizards)
