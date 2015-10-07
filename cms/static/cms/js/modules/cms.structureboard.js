@@ -502,7 +502,7 @@
 
                         return that.state;
                     }
-                });
+                }).on('cms.update', actualizeEmptyPlaceholders);
             }
 
         });
