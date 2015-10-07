@@ -19,6 +19,7 @@ apphook configuration changes will make life simpler for all users.
 What's new in 3.2
 *****************
 
+* new welcome page to help new users
 * full touch-screen support at all sizes from small tablets to table-top devices
 * enhanced and polished user interface
 * much-needed improvements to the structure-board
@@ -26,7 +27,12 @@ What's new in 3.2
 * significant speed improvements on loading, HTTP requests and file sizes
 * new *Link/Button* look & feel
 * restarts are no longer required when changing apphook configurations
+* a new content wizard system, adaptable to arbitrary content types
 
+
+******************************
+Changes that require attention
+******************************
 
 Renaming cms_app, cms_toolbar, menu modules
 ===========================================
@@ -47,7 +53,10 @@ In your own applications that use these modules, rename ``cms_app.py`` to ``cms_
 New ApphookReloadMiddleware
 ===========================
 
-A new, optional middleware is available: ``cms.middleware.utils.ApphookReloadMiddleware``. If used,
+Until now, changes to Apphooks have required a restart of the server in order to take effect. A new
+middleware class makes this automatic.
+
+The new middleware class, ``cms.middleware.utils.ApphookReloadMiddleware``, is optional. If used,
 this should be placed very near the top of your ``MIDDLEWARE_CLASSES`` tuple in settings. This
 middleware and other changes in the CMS for version 3.2 provide automatic reloading of URLs when
 changes to an apphook are made.
@@ -69,16 +78,24 @@ We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for 
 files (this only affects frontend developers *of* django CMS - contributors to it, not other users
 or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
 
-.. todo:: link to the documentation for this
+See the :ref:`Frontend code <contributing_frontend>` documentation.
 
 
-*****************************
-Backward incompatible changes
-*****************************
+Automated spelling checks for documentation
+-------------------------------------------
 
-* ``cms_app.py``, ``cms_toolbar.py`` and ``menu.py`` shipped in django CMS have been renamed
-  according to the new naming convention. If you import those modules, you will need to amend
-  your ``import`` statements appropriately.
+Documentation is now checked for spelling. A ``make spelling`` command is available now when
+working on documentation, and our `Travis Continuous Integration server
+<https://travis-ci.org/divio/django-cms>`_ also runs these checks.
+
+See the :ref:`spelling` section in the documentation.
+
+
+Content wizards
+===============
+
+:doc:`/reference/wizards` can help simplify production of content, and can be created to handle
+non-CMS content too.
 
 
 .. _upgrade-guide-3.2:
@@ -86,6 +103,9 @@ Backward incompatible changes
 *******************************
 Upgrading django CMS 3.1 to 3.2
 *******************************
+
+Please note any changes that require action above, and take action accordingly.
+
 
 .. todo:: upgrade steps
 

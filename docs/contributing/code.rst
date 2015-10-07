@@ -118,6 +118,8 @@ that the fix works.
 We have an IRC channel, our `django-cms-developers`_ email list,
 and of course the code reviews mechanism on GitHub - do use them.
 
+.. _contributing_frontend:
+
 ********
 Frontend
 ********
