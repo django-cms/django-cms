@@ -49,14 +49,14 @@ def user_has_page_add_perm(user, site=None):
     Checks to see if user has add page permission. This is used in multiple
     places so is DRYer as a true function.
     :param user:
-    :param site: optional
+    :param site: optional Site object (not just PK)
     :return: Boolean
     """
     opts = Page._meta
     if not site:
         site = Site.objects.get_current()
     global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-        user, site.id).exists()
+        user, site.pk).exists()
     perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
     if user.has_perm(perm_str) and global_add_perm:
         return True
@@ -92,19 +92,20 @@ def has_page_add_permission(request):
             return False
         global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
             request.user, site).exists()
-        if (request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts))
-                and global_add_perm):
+        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
+        if request.user.has_perm(perm_str) and global_add_perm:
             return True
         if position in ("first-child", "last-child"):
             return page.has_add_permission(request)
         elif position in ("left", "right"):
             if page.parent_id:
-                return has_generic_permission(page.parent_id, request.user, "add", page.site)
+                return has_generic_permission(
+                    page.parent_id, request.user, "add", page.site)
     else:
         global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
             request.user, site).exists()
-        if (request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts))
-                and global_add_perm):
+        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
+        if request.user.has_perm(perm_str) and global_add_perm:
             return True
     return False
 
