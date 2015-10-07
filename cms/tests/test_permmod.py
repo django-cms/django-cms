@@ -1171,7 +1171,7 @@ class GlobalPermissionTests(CMSTestCase):
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(FuzzyInt(6,7)):
+                with self.assertNumQueries(FuzzyInt(6, 7)):
                     # PageAdmin swaps out the methods called for permissions
                     # if the setting is true, it makes use of cms.utils.permissions
                     self.assertTrue(has_page_add_permission(request))

@@ -14,7 +14,7 @@ from .forms.wizards import CreateCMSPageForm
 class CMSPageWizard(Wizard):
 
     def user_has_add_permission(self, user):
-        return user_has_page_add_perm(user)
+        return user.is_superuser or user_has_page_add_perm(user)
 
 
 cms_page_wizard = CMSPageWizard(
