@@ -319,15 +319,18 @@ class PlaceholderAdminMixin(object):
         if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
         if target_placeholder.pk == request.toolbar.clipboard.pk and not source_plugin_id and not target_plugin_id:
-            # if we copy a whole placeholder to the clipboard create PlaceholderReference plugin instead and fill it
-            # the content of the source_placeholder.
+            # if we copy a whole placeholder to the clipboard create
+            # PlaceholderReference plugin instead and fill it the content of the
+            # source_placeholder.
             ref = PlaceholderReference()
             ref.name = source_placeholder.get_label()
             ref.plugin_type = "PlaceholderPlugin"
             ref.language = target_language
             ref.placeholder = target_placeholder
             ref.save()
-            ref.copy_from(source_placeholder, source_language)
+            copy_plugins.copy_plugins_to(
+                plugins, target_placeholder, to_language=source_language,
+                parent_plugin_id=ref.pk)
         else:
             copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
         plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
@@ -429,7 +432,7 @@ class PlaceholderAdminMixin(object):
         -move_a_copy (Boolean, optional) (anything supplied here except a case-
                                          insensitive "false" is True)
         NOTE: If move_a_copy is set, the plugin_order should contain an item
-              '__COPY__' with the desired detination of the copied plugin.
+              '__COPY__' with the desired destination of the copied plugin.
         """
         plugin_id = int(request.POST['plugin_id'])
         plugin = CMSPlugin.objects.get(pk=plugin_id)
@@ -458,43 +461,60 @@ class PlaceholderAdminMixin(object):
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
         if move_a_copy:
+            if plugin.plugin_type == "PlaceholderPlugin":
+                # This is a proxy, its children will be moved and the proxy
+                # itself will be forgotten.
+                source_plugins = list(plugin.get_descendants())
+            else:
+                source_plugins = [plugin] + list(plugin.get_descendants())
+
             new_plugins = copy_plugins.copy_plugins_to(
-                [plugin] + list(plugin.get_descendants()), placeholder,
-                    language, parent_id)
-            plugin = new_plugins[0][0]
+                source_plugins, placeholder, to_language=language,
+                parent_plugin_id=parent_id)
+
+            top_plugins = [p[0] for p in new_plugins if p[0].parent_id == parent_id]
+            top_plugins_pks = [p.pk for p in top_plugins]
             # If an ordering was supplied, we should replace the item that has
             # been copied with the new copy
             if order:
                 if '__COPY__' in order:
-                    order[order.index('__COPY__')] = plugin.id
+                    copy_idx = order.index('__COPY__')
+                    order[copy_idx:1] = top_plugins_pks
                 else:
-                    order.append(plugin.id)
-        if parent_id:
-            if plugin.parent_id != parent_id:
-                parent = CMSPlugin.objects.get(pk=parent_id)
-                if parent.placeholder_id != placeholder.pk:
-                    return HttpResponseBadRequest(
-                        force_text('parent must be in the same placeholder'))
-                if parent.language != language:
-                    return HttpResponseBadRequest(
-                        force_text('parent must be in the same language as '
-                                   'plugin_language'))
-                plugin.parent_id = parent.pk
-                plugin.save()
-                plugin = plugin.move(parent, pos='last-child')
+                    order.extend(top_plugins_pks)
+        else:
+            top_plugins = [plugin]
+        if plugin_id and parent_id:
+            for plugin in top_plugins:
+                if plugin.parent_id != parent_id:
+                    parent = CMSPlugin.objects.get(pk=parent_id)
+                    if parent.placeholder_id != placeholder.pk:
+                        return HttpResponseBadRequest(
+                            force_text('parent must be in the same placeholder'))
+                    if parent.language != language:
+                        return HttpResponseBadRequest(
+                            force_text('parent must be in the same language as '
+                                       'plugin_language'))
+                    plugin.parent_id = parent.pk
+                    plugin.save()
+                    plugin = plugin.move(parent, pos='last-child')
         else:
             sibling = CMSPlugin.get_last_root_node()
-            plugin.parent_id = None
-            plugin.save()
-            plugin = plugin.move(sibling, pos='right')
-        for child in [plugin] + list(plugin.get_descendants()):
-            child.placeholder = placeholder
-            child.language = language
-            child.save()
+            for plugin in top_plugins:
+                plugin.parent_id = None
+                plugin.save()
+                plugin = plugin.move(sibling, pos='right')
+
+        for plugin in top_plugins:
+            for child in [plugin] + list(plugin.get_descendants()):
+                child.placeholder = placeholder
+                child.language = language
+                child.save()
+
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
             return HttpResponseBadRequest('order parameter did not have all '
-                                          'plugins of the same level in it')
+                                          'plugins of the same level in it' + str(order))
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {
             'reload': move_a_copy or requires_reload(

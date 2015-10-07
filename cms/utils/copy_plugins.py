@@ -10,9 +10,13 @@ def copy_plugins_to(old_plugins, to_placeholder,
     # TODO: Refactor this and copy_plugins to cleanly separate plugin tree/node
     # copying and remove the need for the mutating parameter old_parent_cache.
     old_parent_cache = {}
-    # For subplugin copy, first plugin's parent must be nulled before copying.
+    # For subplugin copy, top-level plugin's parent must be nulled
+    # before copying.
     if old_plugins:
-        old_plugins[0].parent = old_plugins[0].parent_id = None
+        old_parent = old_plugins[0].parent
+        for old_plugin in old_plugins:
+            if old_plugin.parent == old_parent:
+                old_plugin.parent = old_plugin.parent_id = None
     new_plugins = [old.copy_plugin(to_placeholder, to_language or old.language,
                                    old_parent_cache, no_signals)
                    for old in old_plugins]
