@@ -106,7 +106,7 @@ var CMS = window.CMS || {};
                     }
                     that.clear(function () {
                         // remove element on success
-                        that.ui.clipboard.hide();
+                        that.modal.close();
                         that.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
                         that.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
                     });
