@@ -57,7 +57,8 @@ class CreateCMSPageForm(BaseCMSPageForm):
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people from possible form-hacking.
 
-        if not permissions.user_has_page_add_perm(self.user):
+        if not (self.user.is_superuser or
+                permissions.user_has_page_add_perm(self.user)):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
         title = self.cleaned_data['title']
