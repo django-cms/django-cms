@@ -44,19 +44,21 @@ def current_user(user):
     set_current_user(old_user)
 
 
-def user_has_page_add_perm(user):
+def user_has_page_add_perm(user, site=None):
     """
     Checks to see if user has add page permission. This is used in multiple
     places so is DRYer as a true function.
     :param user:
+    :param site: optional
     :return: Boolean
     """
     opts = Page._meta
-    site = Site.objects.get_current()
+    if not site:
+        site = Site.objects.get_current()
     global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-        user, site).exists()
+        user, site.id).exists()
     perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-    if user.is_superuser or (user.has_perm(perm_str) and global_add_perm):
+    if user.has_perm(perm_str) and global_add_perm:
         return True
     return False
 
@@ -99,7 +101,7 @@ def has_page_add_permission(request):
             if page.parent_id:
                 return has_generic_permission(page.parent_id, request.user, "add", page.site)
     else:
-        return user_has_page_add_perm(request.user)
+        return user_has_page_add_perm(request.user, site=site)
     return False
 
 

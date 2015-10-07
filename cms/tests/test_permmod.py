@@ -29,7 +29,8 @@ from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          GlobalPagePermission)
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
-                                      URL_CMS_PLUGIN_ADD, CMSTestCase)
+                                      URL_CMS_PLUGIN_ADD, CMSTestCase,
+                                      TransactionCMSTestCase)
 from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.i18n import force_language
@@ -1092,7 +1093,7 @@ class PublicViewPermissionTests(RestrictedViewPermissionTests):
         self.expected = [self.page.publisher_public_id]
 
 
-class GlobalPermissionTests(CMSTestCase):
+class GlobalPermissionTests(TransactionCMSTestCase):
 
     def test_sanity_check(self):
         """ Because we have a new manager, we'll do some basic checks."""
@@ -1171,7 +1172,7 @@ class GlobalPermissionTests(CMSTestCase):
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(FuzzyInt(6,7)):
+                with self.assertNumQueries(FuzzyInt(6, 7)):
                     # PageAdmin swaps out the methods called for permissions
                     # if the setting is true, it makes use of cms.utils.permissions
                     self.assertTrue(has_page_add_permission(request))
