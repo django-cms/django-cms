@@ -101,7 +101,11 @@ def has_page_add_permission(request):
             if page.parent_id:
                 return has_generic_permission(page.parent_id, request.user, "add", page.site)
     else:
-        return user_has_page_add_perm(request.user, site=site)
+        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
+            request.user, site).exists()
+        if (request.user.has_perm(opts.app_label + '.' + get_permission_codename('add', opts))
+                and global_add_perm):
+            return True
     return False
 
 
