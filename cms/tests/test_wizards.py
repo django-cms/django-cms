@@ -21,6 +21,7 @@ class WizardForm(forms.Form):
 class ModelWizardForm(ModelForm):
     class Meta:
         model = UserSettings
+        exclude = []
 
 
 class BadModelForm(ModelForm):
@@ -35,7 +36,7 @@ class WizardTestMixin(object):
     def assertSequencesEqual(self, seq_a, seq_b):
         seq_a = list(seq_a)
         seq_b = list(seq_b)
-        zipped = zip(seq_a, seq_b)
+        zipped = list(zip(seq_a, seq_b))
         if len(zipped) < len(seq_a) or len(zipped) < len(seq_b):
             self.fail("Sequence lengths are not the same.")
         for idx, (a, b) in enumerate(zipped):
