@@ -156,9 +156,6 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         elif getattr(self, 'render_template', False):
             return getattr(self, 'render_template', False)
 
-    def get_render_queryset(self):
-        return self.model._default_manager.all()
-
     def render(self, context, instance, placeholder):
         context['instance'] = instance
         context['placeholder'] = placeholder
