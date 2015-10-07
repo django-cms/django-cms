@@ -130,6 +130,17 @@ class CMSLiveTests(StaticLiveServerTestCase, CMSTestCase):
             timeout
         )
 
+    def wait_loaded_id(self, id, timeout=10):
+        self.wait_until(
+            lambda driver: driver.find_element_by_id(id), timeout
+        )
+
+    def wait_loaded_selector(self, selector, timeout=10):
+        self.wait_until(
+            lambda driver: driver.find_element_by_css_selector(selector),
+            timeout
+        )
+
     def wait_page_loaded(self):
         """
         Block until page has started to load.
@@ -276,17 +287,19 @@ class ToolbarBasicTests(CMSLiveTests):
         self.assertTrue(User.objects.all().count(), 1)
         driver = self.driver
         driver.get(self.base_url + "/de/")
-        driver.find_element_by_id("add-page").click()
         driver.find_element_by_id("id_username").clear()
         driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
         driver.find_element_by_id("id_password").clear()
         driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
         driver.find_element_by_css_selector("input[type=\"submit\"]").click()
-        driver.find_element_by_name("_save").click()
-        driver.find_element_by_link_text(u"Seite hinzufügen").click()
+        WebDriverWait(self.driver, 10).until(
+            EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe'))
+            )
         driver.find_element_by_id("id_title").clear()
         driver.find_element_by_id("id_title").send_keys("SubPage")
-        driver.find_element_by_name("_save").click()
+        driver.switch_to_default_content()
+        self.wait_loaded_selector(".cms-modal-foot .default")
+        driver.find_element_by_css_selector(".cms-modal-foot .default").click()
 
 
 @override_settings(
