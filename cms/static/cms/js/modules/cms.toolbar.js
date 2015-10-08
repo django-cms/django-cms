@@ -160,6 +160,7 @@ var CMS = window.CMS || {};
                         if (!el.hasClass(children)) {
                             reset();
                         }
+                        
                         if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
                             return false;
                         } else {

@@ -2,25 +2,20 @@
 // TOOLBAR
 
 .cms-toolbar {
-    position: absolute;
-    top: $toolbar-debug-height;
-    left: 0;
-    z-index: z(base);
-    width: 100%;
-    margin-top: -$toolbar-height - 10px;
-
-    .cms-toolbar-expanded & {
-        margin-top: 0px;
-    }
     position: fixed;
     top: 0;
     left: 0;
     z-index: z(toolbar, base);
     width: 100%;
     min-height: $toolbar-height;
+    margin-top: -$toolbar-height - 10px;
     border-bottom: 1px solid $toolbar-border !important;
     background-color: $white;
     box-shadow: $toolbar-shadow;
+
+    .cms-toolbar-expanded & {
+        margin-top: 0;
+    }
 
     .cms-toolbar-left {
         position: absolute;

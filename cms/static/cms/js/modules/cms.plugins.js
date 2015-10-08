@@ -484,7 +484,9 @@ var CMS = window.CMS || {};
                         url: that.options.urls.move_plugin,
                         data: data,
                         success: function () {
-                            CMS.API.Messages.open(CMS.config.lang.success);
+                            CMS.API.Messages.open({
+                                message: CMS.config.lang.success
+                            });
                             // if response is reload
                             CMS.API.Helpers.reloadBrowser();
                         },
