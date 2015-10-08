@@ -339,7 +339,7 @@ var CMS = window.CMS || {};
                     }
                 });
             },
-            
+
             /**
              * Opens the modal for editing a plugin.
              *
