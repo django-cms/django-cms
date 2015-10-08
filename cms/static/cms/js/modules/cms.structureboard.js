@@ -465,12 +465,14 @@
                         }
                         // getting restriction array
                         var bounds = [];
+                        var immediateParentType;
                         // save original state events
                         var original = $('.cms-plugin-' + that.getId(originalItem));
                         // cancel if item has no settings
                         if (original.length === 0 || original.data('settings') === null) {
                             return false;
                         }
+                        var parent_bounds = original.data('settings').plugin_parent_restriction;
                         var type = original.data('settings').plugin_type;
                         // prepare variables for bound
                         var holderId = that.getId(placeholder.closest('.cms-dragarea'));
@@ -487,9 +489,11 @@
                         // now set the correct bounds
                         if (holder.length) {
                             bounds = holder.data('settings').plugin_restriction;
+                            immediateParentType = holder.data('settings').plugin_type;
                         }
                         if (plugin.length) {
                             bounds = plugin.data('settings').plugin_restriction;
+                            immediateParentType = plugin.data('settings').plugin_type;
                         }
 
                         // if parent has class disabled, dissalow drop
@@ -499,6 +503,11 @@
 
                         // if restrictions is still empty, proceed
                         that.state = (!bounds.length || $.inArray(type, bounds) !== -1) ? true : false;
+
+                        // check if we have a parent restriction
+                        if (parent_bounds.length) {
+                            that.state = ($.inArray(immediateParentType, parent_bounds) !== -1) ? true : false;
+                        }
 
                         return that.state;
                     }
