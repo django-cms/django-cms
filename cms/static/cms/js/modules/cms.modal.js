@@ -916,7 +916,7 @@ var CMS = window.CMS || {};
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
 
-                        if (titlePrefix.text() === '') {
+                        if (titlePrefix.text().trim() === '') {
                             titlePrefix.text(innerTitle.text());
                         } else {
                             titleSuffix.text(innerTitle.text());
