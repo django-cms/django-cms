@@ -18,6 +18,15 @@
 @import "components/content";
 @import "components/loader";
 
+// general styling
+.cms {
+    position: absolute;
+    top: $toolbar-debug-height;
+    left: 0;
+    z-index: z(base);
+    width: 100%;
+}
+
 // div.cms needs to beat .cms-reset a selectors
 div.cms {
     @import "components/tooltip";

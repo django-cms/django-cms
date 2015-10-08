@@ -127,9 +127,11 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
 
     # Prepend frontedit toolbar output if applicable
     toolbar = getattr(request, 'toolbar', None)
-    if getattr(toolbar, 'edit_mode', False) and getattr(placeholder, 'is_editable', True) and editable:
+    if (getattr(toolbar, 'edit_mode', False) and
+            getattr(toolbar, "show_toolbar", False) and
+            getattr(placeholder, 'is_editable', True) and editable):
         from cms.middleware.toolbar import toolbar_plugin_processor
-        processors = (toolbar_plugin_processor,)
+        processors = (toolbar_plugin_processor, )
         edit = True
     else:
         processors = None
