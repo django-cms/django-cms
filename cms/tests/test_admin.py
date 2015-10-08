@@ -1265,7 +1265,7 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(CMSPlugin.objects.count(), 5)
         self.assertEqual(Placeholder.objects.count(), 4)
         url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
-        with self.assertNumQueries(FuzzyInt(70, 80)):
+        with self.assertNumQueries(FuzzyInt(70, 90)):
             response = self.client.post(url, {'test': 0})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CMSPlugin.objects.count(), 2)
