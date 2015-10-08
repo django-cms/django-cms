@@ -81,8 +81,8 @@
                         minimizable: false
                     });
                     modal.open({
-                        url: '{% cms_admin_url "cms_page_add" %}?title=Home',
-                        title: '{% trans "Create your first page" %}',
+                        url: '{% url "cms_wizard_create" %}',
+                        title: '{% trans "Welcome to django CMS" %}',
                         width: CMS.$('.cms-welcome-heading').width(),
                         height: 450
                     });
