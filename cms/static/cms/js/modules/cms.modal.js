@@ -916,7 +916,11 @@ var CMS = window.CMS || {};
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
 
-                        titleSuffix.text(innerTitle.text());
+                        if (titlePrefix.text() === '') {
+                            titlePrefix.text(innerTitle.text());
+                        } else {
+                            titleSuffix.text(innerTitle.text());
+                        }
                         innerTitle.remove();
 
                         // than show
