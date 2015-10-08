@@ -1,7 +1,20 @@
 === 3.2.0 (Unreleased) ===
 
+- Replaced 'develop.py' with enhanced 'manage.py' (devs)
+- Significant and numerous UI/UX enhancements including:
+  - Full touch support
+  - Larger UI elements for touch
+  - Better responsiveness design for smaller screens
+  - Improvements to clipboard
+  - New welcome/initial/start screen
+  - Overhauled "structure mode", significantly more responsive and much faster
+  - Overhauled the toolbar for new design, cleaner code, more responsive
+  - Switch to SVG for iconography for cleaner presentation
+  - Overhauled JS/CSS dead code removal, minification and file-count reductions
+- New content creation wizard infrastructure
+- Improvements in enforcing parent plugin restricts on frontend
+- Remove Alias from list of plugins (Create Alias still an option)
 - Pulls Aldryn Apphook Reload into core
--
 
 
 === 3.1.4 (Unreleased) ===
