@@ -548,6 +548,11 @@ var CMS = window.CMS || {};
 
                 if (options.move_a_copy) {
                     plugin_order = plugin_order.map(function (pluginId) {
+                        // TODO correct way would be to check if it's actually a
+                        // pasted plugin and only then replace the id with copy token
+                        // otherwise if we would copy from the same placeholder we would get
+                        // two copy tokens instead of original and a copy.
+                        // it's ok so far, as long as we copy only from clipboard
                         if (pluginId === options.plugin_id) {
                             pluginId = '__COPY__';
                         }
