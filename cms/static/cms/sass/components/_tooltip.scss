@@ -9,6 +9,7 @@
     position: absolute;
     top: 0;
     left: 0;
+    z-index: z(tooltip);
     font-size: $tooltip-font-size;
     line-height: $tooltip-line-height;
     font-weight: bold;
