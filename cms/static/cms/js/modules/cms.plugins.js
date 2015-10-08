@@ -339,7 +339,7 @@ var CMS = window.CMS || {};
                     }
                 });
             },
-
+            
             /**
              * Opens the modal for editing a plugin.
              *
@@ -775,7 +775,7 @@ var CMS = window.CMS || {};
                     childrenList = nav.closest('.cms-draggable').find('> .cms-draggables');
                 }
 
-                modal.on('cms.modal.loaded', that._setupKeyboardTraversing);
+                modal.on('cms.modal.loaded', $.proxy(that._setupKeyboardTraversing, that));
                 modal.on('cms.modal.loaded', function addPlaceholder() {
                     if (childrenList.hasClass('cms-hidden') && !isPlaceholder) {
                         that._toggleCollapsable(dragItem);
