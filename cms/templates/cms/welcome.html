@@ -81,8 +81,9 @@
                         minimizable: false
                     });
                     modal.open({
-                        url: '{% cms_admin_url "cms_page_add" %}?title=Home',
+                        url: '{% url "cms_wizard_create" %}',
                         title: '{% trans "Create your first page" %}',
+                        subtitle: '',
                         width: CMS.$('.cms-welcome-heading').width(),
                         height: 450
                     });
