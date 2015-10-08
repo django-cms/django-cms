@@ -329,9 +329,12 @@ class RenderPlugin(InclusionTag):
         #
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
-        if toolbar and toolbar.edit_mode and placeholder.has_change_permission(request) and getattr(placeholder, 'is_editable', True):
+        if (toolbar and getattr(toolbar, "edit_mode", False) and
+                getattr(toolbar, "show_toolbar", False) and
+                placeholder.has_change_permission(request) and
+                getattr(placeholder, 'is_editable', True)):
             from cms.middleware.toolbar import toolbar_plugin_processor
-            processors = (toolbar_plugin_processor,)
+            processors = (toolbar_plugin_processor, )
         else:
             processors = None
         return processors
@@ -708,7 +711,8 @@ class CMSEditableObject(InclusionTag):
 
     def _is_editable(self, request):
         return (request and hasattr(request, 'toolbar') and
-                request.toolbar.edit_mode)
+                request.toolbar.edit_mode and
+                request.toolbar.show_toolbar)
 
     def get_template(self, context, **kwargs):
         if self._is_editable(context.get('request', None)):
