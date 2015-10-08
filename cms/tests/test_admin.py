@@ -1246,7 +1246,7 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         clipboard_plugins = clipboard.get_plugins()
         self.assertEqual(CMSPlugin.objects.count(), 5)
-        self.assertEqual(clipboard_plugins.count(), 1)
+        self.assertEqual(clipboard_plugins.count(), 3)
         self.assertEqual(clipboard_plugins[0].plugin_type, "PlaceholderPlugin")
         placeholder_plugin, _ = clipboard_plugins[0].get_plugin_instance()
         ref_placeholder = placeholder_plugin.placeholder_ref
