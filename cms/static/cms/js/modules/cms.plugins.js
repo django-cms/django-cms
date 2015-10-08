@@ -59,6 +59,7 @@ var CMS = window.CMS || {};
                 plugin_order: null,
                 plugin_breadcrumb: [],
                 plugin_restriction: [],
+                plugin_parent_restriction: [],
                 urls: {
                     add_plugin: '',
                     edit_plugin: '',
@@ -285,8 +286,11 @@ var CMS = window.CMS || {};
 
                 var bounds = this.options.plugin_restriction;
                 var type = clipboardPlugin.data('settings').plugin_type;
+                var parent_bounds = clipboardPlugin.data('settings').plugin_parent_restriction;
+                var currentPluginType = this.options.plugin_type;
 
-                if (bounds.length && $.inArray(type, bounds) === -1) {
+                if ((bounds.length && $.inArray(type, bounds) === -1) ||
+                    (parent_bounds.length && $.inArray(currentPluginType, parent_bounds) === -1)) {
                     pasteItem.addClass('cms-submenu-item-disabled');
                     pasteItem.find('.cms-submenu-item-paste-tooltip-restricted').css('display', 'block');
                     return false;
