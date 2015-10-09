@@ -326,7 +326,6 @@ class PlaceholderAdminMixin(object):
             ref.plugin_type = "PlaceholderPlugin"
             ref.language = target_language
             ref.placeholder = target_placeholder
-            ref.save()
             copy_plugins.copy_plugins_to(
                 plugins, target_placeholder, to_language=source_language,
                 parent_plugin_id=ref.pk)
@@ -483,6 +482,7 @@ class PlaceholderAdminMixin(object):
                     order.extend(top_plugins_pks)
         else:
             top_plugins = [plugin]
+
         if plugin_id and parent_id:
             for plugin in top_plugins:
                 if plugin.parent_id != parent_id:
@@ -501,11 +501,11 @@ class PlaceholderAdminMixin(object):
             sibling = CMSPlugin.get_last_root_node()
             for plugin in top_plugins:
                 plugin.parent_id = None
-                plugin.save()
+                plugin.placeholder = placeholder
                 plugin = plugin.move(sibling, pos='right')
 
         for plugin in top_plugins:
-            for child in [plugin] + list(plugin.get_descendants()):
+            for child in list(plugin.get_descendants()):
                 child.placeholder = placeholder
                 child.language = language
                 child.save()
@@ -518,6 +518,7 @@ class PlaceholderAdminMixin(object):
         json_response = {
             'reload': move_a_copy or requires_reload(
                 PLUGIN_MOVE_ACTION, [plugin])}
+
         return HttpResponse(
             json.dumps(json_response), content_type='application/json')
 
