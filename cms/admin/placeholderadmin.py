@@ -313,11 +313,15 @@ class PlaceholderAdminMixin(object):
                 )
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
+                source_placeholder.cmsplugin_set.filter(
+                    language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
-        if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
-            return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
-        if target_placeholder.pk == request.toolbar.clipboard.pk and not source_plugin_id and not target_plugin_id:
+        if not self.has_copy_plugin_permission(
+                request, source_placeholder, target_placeholder, plugins):
+            return HttpResponseForbidden(force_text(
+                _('You do not have permission to copy these plugins.')))
+        if (target_placeholder.pk == request.toolbar.clipboard.pk and
+                not source_plugin_id and not target_plugin_id):
             # if we copy a whole placeholder to the clipboard create
             # PlaceholderReference plugin instead and fill it the content of the
             # source_placeholder.
@@ -326,13 +330,16 @@ class PlaceholderAdminMixin(object):
             ref.plugin_type = "PlaceholderPlugin"
             ref.language = target_language
             ref.placeholder = target_placeholder
+            ref.save()
             copy_plugins.copy_plugins_to(
-                plugins, target_placeholder, to_language=source_language,
-                parent_plugin_id=ref.pk)
+                plugins, target_placeholder, source_language, ref.pk)
         else:
-            copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
-        plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
-            'path')
+            copy_plugins.copy_plugins_to(
+                plugins, target_placeholder, target_language, target_plugin_id)
+        plugin_list = CMSPlugin.objects.filter(
+                language=target_language,
+                placeholder=target_placeholder
+            ).order_by('path')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
@@ -344,6 +351,7 @@ class PlaceholderAdminMixin(object):
             )
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
+        print(CMSPlugin.find_problems())
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
@@ -458,7 +466,7 @@ class PlaceholderAdminMixin(object):
                                          plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
-        if move_a_copy:
+        if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
                 # This is a proxy, its children will be moved and the proxy
                 # itself will be forgotten.
@@ -467,11 +475,24 @@ class PlaceholderAdminMixin(object):
                 source_plugins = [plugin] + list(plugin.get_descendants())
 
             new_plugins = copy_plugins.copy_plugins_to(
-                source_plugins, placeholder, to_language=language,
-                parent_plugin_id=parent_id)
+                source_plugins, placeholder, language, parent_id)
 
-            top_plugins = [p[0] for p in new_plugins if p[0].parent_id == parent_id]
+            new_plugins = [pair[0] for pair in new_plugins]
+            top_parent = new_plugins[0].parent_id
+            top_plugins = [p for p in new_plugins if p.parent_id == top_parent]
             top_plugins_pks = [p.pk for p in top_plugins]
+            if parent_id:
+                parent = CMSPlugin.objects.get(pk=parent_id)
+                for plugin in top_plugins:
+                    plugin.parent = parent
+                    plugin.placeholder = placeholder
+                    plugin.language = language
+                    plugin.save()
+                # FIXME: Total kludge, find issue where plugin.numchild is not
+                # getting set correctly and fix it. Also, why is plugin.move()
+                # not working properly.
+                CMSPlugin.fix_tree()
+
             # If an ordering was supplied, we should replace the item that has
             # been copied with the new copy
             if order:
@@ -480,45 +501,17 @@ class PlaceholderAdminMixin(object):
                     order[copy_idx:1] = top_plugins_pks
                 else:
                     order.extend(top_plugins_pks)
-        else:
-            top_plugins = [plugin]
-
-        if plugin_id and parent_id:
-            for plugin in top_plugins:
-                if plugin.parent_id != parent_id:
-                    parent = CMSPlugin.objects.get(pk=parent_id)
-                    if parent.placeholder_id != placeholder.pk:
-                        return HttpResponseBadRequest(
-                            force_text('parent must be in the same placeholder'))
-                    if parent.language != language:
-                        return HttpResponseBadRequest(
-                            force_text('parent must be in the same language as '
-                                       'plugin_language'))
-                    plugin.parent_id = parent.pk
-                    plugin.save()
-                    plugin = plugin.move(parent, pos='last-child')
-        else:
-            sibling = CMSPlugin.get_last_root_node()
-            for plugin in top_plugins:
-                plugin.parent_id = None
-                plugin.placeholder = placeholder
-                plugin = plugin.move(sibling, pos='right')
-
-        for plugin in top_plugins:
-            for child in list(plugin.get_descendants()):
-                child.placeholder = placeholder
-                child.language = language
-                child.save()
 
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
             return HttpResponseBadRequest('order parameter did not have all '
                                           'plugins of the same level in it' + str(order))
+
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {
             'reload': move_a_copy or requires_reload(
                 PLUGIN_MOVE_ACTION, [plugin])}
-
+        print(CMSPlugin.find_problems())
         return HttpResponse(
             json.dumps(json_response), content_type='application/json')
 

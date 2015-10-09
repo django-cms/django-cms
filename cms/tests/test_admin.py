@@ -1217,8 +1217,12 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugins_copy_placeholder_ref(self):
-        """User copies a placeholder into a clipboard. A PlaceholderReferencePlugin is created. Afterwards he copies this
-         into a placeholder and the PlaceholderReferencePlugin unpacks its content. After that he clear the clipboard"""
+        """
+        User copies a placeholder into a clipboard. A PlaceholderReferencePlugin
+        is created. Afterwards he copies this into a placeholder and the
+        PlaceholderReferencePlugin unpacks its content. After that he clears
+        the clipboard.
+        """
         self.assertEqual(Placeholder.objects.count(), 2)
         self._create_plugin()
         self._create_plugin()
