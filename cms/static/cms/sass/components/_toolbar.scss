@@ -12,6 +12,7 @@
     border-bottom: 1px solid $toolbar-border !important;
     background-color: $white;
     box-shadow: $toolbar-shadow;
+    backface-visibility: hidden;
 
     .cms-toolbar-expanded & {
         margin-top: 0;
