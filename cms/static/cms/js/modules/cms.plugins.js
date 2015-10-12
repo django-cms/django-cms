@@ -193,7 +193,6 @@ var CMS = window.CMS || {};
                     }
 
                     e.preventDefault();
-                    e.stopImmediatePropagation();
                     e.stopPropagation();
 
                     if (++clickCounter === 1) {
