@@ -63,7 +63,6 @@
     // basically a cms placeholder representation
     .cms-dragarea {
         position: absolute;
-        box-sizing: border-box;
         margin: 0 0 $structure-dragarea-space;
         padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
     }
@@ -176,7 +175,6 @@
         padding-left: $structure-draggable-inner-padding;
     }
     .cms-dragarea-empty .cms-draggables-root {
-        box-sizing: border-box;
         position: relative;
         min-height: 46px;
         border: 2px solid $btn-default-border;
