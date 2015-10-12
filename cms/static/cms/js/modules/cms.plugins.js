@@ -188,8 +188,13 @@ var CMS = window.CMS || {};
 
                 // prevents single click from messing up the edit call
                 this.ui.container.find('a').on('click', function (e) {
+                    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                        return;
+                    }
+
                     e.preventDefault();
                     e.stopImmediatePropagation();
+                    e.stopPropagation();
 
                     if (++clickCounter === 1) {
                         timer = setTimeout(function () {
