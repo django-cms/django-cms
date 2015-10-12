@@ -308,7 +308,6 @@ var CMS = window.CMS || {};
              */
             _initialStates: function _initialStates() {
                 var publishBtn = $('.cms-btn-publish').parent();
-                var sideframe = new CMS.Sideframe();
 
                 // setup toolbar visibility, we need to reverse the options to set the correct state
                 if (this.settings.toolbar === 'expanded') {
@@ -364,6 +363,7 @@ var CMS = window.CMS || {};
 
                 // open sideframe if it was previously opened
                 if (this.settings.sideframe.url) {
+                    var sideframe = new CMS.Sideframe();
                     sideframe.open({
                         url: this.settings.sideframe.url,
                         animate: false
@@ -559,7 +559,9 @@ var CMS = window.CMS || {};
 
                 switch (target) {
                     case 'modal':
-                        var modal = new CMS.Modal({'onClose': el.data('on-close')});
+                        var modal = new CMS.Modal({
+                            onClose: el.data('on-close')
+                        });
                         modal.open({
                             url: el.attr('href'),
                             title: el.data('name')
@@ -575,7 +577,9 @@ var CMS = window.CMS || {};
                         frame.focus();
                         break;
                     case 'sideframe':
-                        var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
+                        var sideframe = new CMS.Sideframe({
+                            onClose: el.data('on-close')
+                        });
                         sideframe.open({
                             url: el.attr('href'),
                             animate: true
