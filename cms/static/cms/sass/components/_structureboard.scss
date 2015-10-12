@@ -77,7 +77,6 @@
     // subclasses for the simple structure borad without absolute positioning
     .cms-structure-content-simple {
         position: relative;
-        overflow-x: hidden;
         overflow-y: scroll;
         height: 100%;
         padding: ($toolbar-height + 40px) 5%;
