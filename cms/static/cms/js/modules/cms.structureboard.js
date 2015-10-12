@@ -75,6 +75,7 @@
                     content: $('.cms-structure-content'),
                     doc: $(document),
                     window: $(window),
+                    html: $('html'),
                     toolbar: toolbar,
                     sortables: $('.cms-draggables'), // global scope to include clipboard
                     plugins: $('.cms-plugin'),
@@ -177,6 +178,8 @@
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
+                this.ui.html.removeClass('cms-structure-mode-content')
+                    .addClass('cms-structure-mode-structure');
 
                 // show clipboard
                 this.ui.clipboard.fadeIn(this.options.speed);
@@ -203,6 +206,8 @@
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
+                this.ui.html.removeClass('cms-structure-mode-structure')
+                    .addClass('cms-structure-mode-content');
 
                 // hide clipboard if in edit mode
                 this.ui.container.find('.cms-clipboard').hide();

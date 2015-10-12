@@ -464,6 +464,10 @@
     }
 }
 
+@at-root .cms-structure-mode-structure {
+    overflow: hidden;
+}
+
 // hide elements when dragging
 @at-root .ui-sortable-helper.cms-draggable .cms-submenu-btn {
     display: none !important;
