@@ -22,6 +22,7 @@
         font: normal #{$font-size-normal}/#{$line-height-normal} Helvetica,Arial,sans-serif;
         text-align: left;
         text-decoration: none;
+        box-sizing: border-box;
         height: auto;
         margin: 0;
         padding: 0;
