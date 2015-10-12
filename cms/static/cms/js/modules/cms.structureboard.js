@@ -181,9 +181,6 @@
                 this.ui.html.removeClass('cms-structure-mode-content')
                     .addClass('cms-structure-mode-structure');
 
-                // show clipboard
-                this.ui.clipboard.fadeIn(this.options.speed);
-
                 // apply new settings
                 this.settings.mode = 'structure';
                 if (!init) {
@@ -211,9 +208,6 @@
 
                 // hide clipboard if in edit mode
                 this.ui.container.find('.cms-clipboard').hide();
-
-                // hide clipboard
-                this.ui.clipboard.hide();
 
                 this.settings.mode = 'edit';
                 if (!init) {
