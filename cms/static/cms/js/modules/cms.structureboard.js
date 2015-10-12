@@ -75,6 +75,7 @@
                     content: $('.cms-structure-content'),
                     doc: $(document),
                     window: $(window),
+                    html: $('html'),
                     toolbar: toolbar,
                     sortables: $('.cms-draggables'), // global scope to include clipboard
                     plugins: $('.cms-plugin'),
@@ -82,9 +83,9 @@
                     placeholders: $('.cms-placeholder'),
                     dragitems: $('.cms-draggable'),
                     dragareas: $('.cms-dragarea'),
-                    clipboard: $('.cms-clipboard'),
                     toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
-                    toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
+                    toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a'),
+                    toolbarTrigger: $('.cms-toolbar-trigger')
                 };
             },
 
@@ -174,12 +175,22 @@
                     return false;
                 }
 
+                // in order to get consistent positioning
+                // of the toolbar we have to know if the page
+                // had the scrollbar nad if it had - we adjust
+                // the toolbar positioning
+                var width = this.ui.toolbar.width();
+                var scrollBarWidth = window.innerWidth - width;
+                if (scrollBarWidth) {
+                    this.ui.toolbar.css('right', scrollBarWidth);
+                    this.ui.toolbarTrigger.css('right', scrollBarWidth);
+                }
+
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
-
-                // show clipboard
-                this.ui.clipboard.fadeIn(this.options.speed);
+                this.ui.html.removeClass('cms-structure-mode-content')
+                    .addClass('cms-structure-mode-structure');
 
                 // apply new settings
                 this.settings.mode = 'structure';
@@ -200,15 +211,18 @@
                     return false;
                 }
 
+                // reset toolbar positioning
+                this.ui.toolbar.css('right', '');
+                this.ui.toolbarTrigger.css('right', '');
+
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
+                this.ui.html.removeClass('cms-structure-mode-structure')
+                    .addClass('cms-structure-mode-content');
 
                 // hide clipboard if in edit mode
                 this.ui.container.find('.cms-clipboard').hide();
-
-                // hide clipboard
-                this.ui.clipboard.hide();
 
                 this.settings.mode = 'edit';
                 if (!init) {
