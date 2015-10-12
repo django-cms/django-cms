@@ -5,8 +5,8 @@
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
     z-index: z(toolbar, base);
-    width: 100%;
     min-height: $toolbar-height;
     margin-top: -$toolbar-height - 10px;
     border-bottom: 1px solid $toolbar-border !important;
