@@ -4,27 +4,23 @@
     <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
-            <span class="cms-submenu-btn cms-submenu-add cms-btn{% if plugin.disable_child_plugins %} cms-btn-disabled{% endif %}">
+            <div class="cms-submenu-btn cms-submenu-add cms-btn{% if plugin.disable_child_plugins %} cms-btn-disabled{% endif %}">
                 {% if plugin.disable_child_plugins %}
-                <span class="cms-hover-tooltip" data-tooltip="{% trans "You cannot add plugins to this plugin." %}">
-                </span>
+                <span class="cms-hover-tooltip" data-tooltip="{% trans "You cannot add plugins to this plugin." %}"></span>
                 {% else %}
-                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}">
-                </span>
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}"></span>
                 {% endif %}
-            </span>
-            <a class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit" href="#">
-                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}">
-                </span>
-            </a>
+            </div>
+            <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}"></span>
+            </div>
         {% else %}
-            <span class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
+            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
                 data-tooltip="{% trans "This plugin cannot be moved or edited outside of it's parent" %}">
                 <span class="cms-icon cms-icon-lock"></span>
-            </span>
+            </div>
         {% endif %}
-        <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn">
-        </div>
+        <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
                 <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
@@ -48,7 +44,6 @@
 
         {% if clipboard %}<span class="cms-submenu-lang">{{ plugin.language }}</span>{% endif %}
         <span class="cms-dragitem-text"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
-
     </div>
 
     {% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables cms-hidden">{% endif %}
