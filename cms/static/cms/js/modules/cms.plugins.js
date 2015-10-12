@@ -187,13 +187,14 @@ var CMS = window.CMS || {};
                 });
 
                 // prevents single click from messing up the edit call
-                this.ui.container.find('a').on('click', function (e) {
-                    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                this.ui.container.on('click', '.cms-plugin a', function (e) {
+                    // don't go to the link if there is custom js attached to it
+                    // or if it's clicked along with shift, ctrl, cmd
+                    if (e.shiftKey || e.ctrlKey || e.metaKey || e.isDefaultPrevented()) {
                         return;
                     }
 
                     e.preventDefault();
-                    e.stopPropagation();
 
                     if (++clickCounter === 1) {
                         timer = setTimeout(function () {
