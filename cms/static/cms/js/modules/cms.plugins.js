@@ -773,6 +773,8 @@ var CMS = window.CMS || {};
                 var dragItem = nav.closest('.cms-dragitem');
                 var isPlaceholder = !Boolean(dragItem.length);
                 var childrenList;
+                var isTouching;
+
                 if (isPlaceholder) {
                     childrenList = nav.closest('.cms-dragarea').find('> .cms-draggables');
                 } else {
@@ -793,13 +795,20 @@ var CMS = window.CMS || {};
                 });
                 modal.on('cms.modal.shown', function () {
                     var dropdown = $('.cms-modal-markup .cms-plugin-picker');
-                    dropdown.find('input').trigger('focus');
+                    if (!isTouching) {
+                        // only focus the field if using mouse
+                        // otherwise keyboard pops up
+                        dropdown.find('input').trigger('focus');
+                    }
+                    isTouching = false;
                 });
                 var plugins = nav.siblings('.cms-plugin-picker');
 
                 that._setupQuickSearch(plugins);
 
-                nav.on(this.pointerUp, function (e) {
+                nav.on(this.touchStart, function () {
+                    isTouching = true;
+                }).on(this.pointerUp, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
