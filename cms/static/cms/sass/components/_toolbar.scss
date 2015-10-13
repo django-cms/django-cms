@@ -404,7 +404,7 @@
         &:focus {
             transition: outline 0.2s;
             border-color: $color-primary;
-            box-shadow: inset 0px 0px 2px $gray-lighter;
+            box-shadow: inset 0 0 2px $gray-lighter;
         }
     }
     input[type="submit"] {
@@ -412,7 +412,7 @@
         text-transform: uppercase;
         height: $login-form-input-height - 2px;
         line-height: $login-form-input-height - 2px;
-        padding: 0px $login-form-submit-padding-horizontal;
+        padding: 0 $login-form-submit-padding-horizontal;
     }
 
     .cms-error {

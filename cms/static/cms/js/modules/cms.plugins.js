@@ -171,16 +171,40 @@ var CMS = window.CMS || {};
              */
             _setPlugin: function () {
                 var that = this;
+                var clickCounter = 0;
+                var timer;
 
                 // adds double click to edit
                 this.ui.container.add(this.ui.dragitem).on(this.doubleClick, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
+
                     that.editPlugin(
                         that.options.urls.edit_plugin,
                         that.options.plugin_name,
                         that.options.plugin_breadcrumb
                     );
+                });
+
+                // prevents single click from messing up the edit call
+                this.ui.container.on('click', '.cms-plugin a', function (e) {
+                    // don't go to the link if there is custom js attached to it
+                    // or if it's clicked along with shift, ctrl, cmd
+                    if (e.shiftKey || e.ctrlKey || e.metaKey || e.isDefaultPrevented()) {
+                        return;
+                    }
+
+                    e.preventDefault();
+
+                    if (++clickCounter === 1) {
+                        timer = setTimeout(function () {
+                            clickCounter = 0;
+                            window.location.href = $(e.currentTarget).attr('href');
+                        }, 300);
+                    } else {
+                        clearTimeout(timer);
+                        clickCounter = 0;
+                    }
                 });
 
                 // adds edit tooltip
@@ -880,69 +904,71 @@ var CMS = window.CMS || {};
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
-                nav.parent().find('a').on(that.click, function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
+                var items = '.cms-submenu-edit, .cms-submenu-item a';
+                nav.parent().find(items).on(that.click, function (e) {
 
-                    // show loader and make sure scroll doesn't jump
-                    CMS.API.Toolbar.showLoader();
+                        e.preventDefault();
+                        e.stopPropagation();
 
-                    var el = $(this);
-                    CMS.Plugin._hideSettingsMenu(nav);
+                        // show loader and make sure scroll doesn't jump
+                        CMS.API.Toolbar.showLoader();
 
-                    // set switch for subnav entries
-                    switch (el.attr('data-rel')) {
-                        case 'add':
-                            that.addPlugin(
-                                el.attr('href').replace('#', ''),
-                                el.text(),
-                                el.closest('.cms-plugin-picker').data('parentId')
-                            );
-                            break;
-                        case 'ajax_add':
-                            CMS.API.Toolbar.openAjax({
-                                url: el.attr('href'),
-                                post: JSON.stringify(el.data('post')),
-                                text: el.data('text'),
-                                callback: $.proxy(that.editPluginPostAjax, that),
-                                onSuccess: el.data('on-success')
-                            });
-                            break;
-                        case 'edit':
-                            that.editPlugin(
-                                that.options.urls.edit_plugin,
-                                that.options.plugin_name,
-                                that.options.plugin_breadcrumb
-                            );
-                            break;
-                        case 'copy-lang':
-                            that.copyPlugin(this.options, el.attr('data-language'));
-                            break;
-                        case 'copy':
-                            that.copyPlugin();
-                            break;
-                        case 'cut':
-                            that.cutPlugin();
-                            break;
-                        case 'paste':
-                            if (!el.parent().hasClass('cms-submenu-item-disabled')) {
-                                that.pastePlugin();
-                            } else {
+                        var el = $(this);
+                        CMS.Plugin._hideSettingsMenu(nav);
+
+                        // set switch for subnav entries
+                        switch (el.attr('data-rel')) {
+                            case 'add':
+                                that.addPlugin(
+                                    el.attr('href').replace('#', ''),
+                                    el.text(),
+                                    el.closest('.cms-plugin-picker').data('parentId')
+                                );
+                                break;
+                            case 'ajax_add':
+                                CMS.API.Toolbar.openAjax({
+                                    url: el.attr('href'),
+                                    post: JSON.stringify(el.data('post')),
+                                    text: el.data('text'),
+                                    callback: $.proxy(that.editPluginPostAjax, that),
+                                    onSuccess: el.data('on-success')
+                                });
+                                break;
+                            case 'edit':
+                                that.editPlugin(
+                                    that.options.urls.edit_plugin,
+                                    that.options.plugin_name,
+                                    that.options.plugin_breadcrumb
+                                );
+                                break;
+                            case 'copy-lang':
+                                that.copyPlugin(this.options, el.attr('data-language'));
+                                break;
+                            case 'copy':
+                                that.copyPlugin();
+                                break;
+                            case 'cut':
+                                that.cutPlugin();
+                                break;
+                            case 'paste':
+                                if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                                    that.pastePlugin();
+                                } else {
+                                    CMS.API.Toolbar.hideLoader();
+                                }
+                                break;
+                            case 'delete':
+                                that.deletePlugin(
+                                    that.options.urls.delete_plugin,
+                                    that.options.plugin_name,
+                                    that.options.plugin_breadcrumb
+                                );
+                                break;
+                            default:
                                 CMS.API.Toolbar.hideLoader();
-                            }
-                            break;
-                        case 'delete':
-                            that.deletePlugin(
-                                that.options.urls.delete_plugin,
-                                that.options.plugin_name,
-                                that.options.plugin_breadcrumb
-                            );
-                            break;
-                        default:
-                            CMS.API.Toolbar.hideLoader();
-                            CMS.API.Toolbar._delegate(el);
-                    }
-                });
+                                CMS.API.Toolbar._delegate(el);
+                        }
+                    });
 
             },
 
