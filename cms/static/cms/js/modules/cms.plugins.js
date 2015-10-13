@@ -907,68 +907,68 @@ var CMS = window.CMS || {};
                 nav.parent().find('.cms-submenu-edit, .cms-submenu-item a')
                     .on(that.click, function (e) {
 
-                    e.preventDefault();
-                    e.stopPropagation();
+                        e.preventDefault();
+                        e.stopPropagation();
 
-                    // show loader and make sure scroll doesn't jump
-                    CMS.API.Toolbar.showLoader();
+                        // show loader and make sure scroll doesn't jump
+                        CMS.API.Toolbar.showLoader();
 
-                    var el = $(this);
-                    CMS.Plugin._hideSettingsMenu(nav);
+                        var el = $(this);
+                        CMS.Plugin._hideSettingsMenu(nav);
 
-                    // set switch for subnav entries
-                    switch (el.attr('data-rel')) {
-                        case 'add':
-                            that.addPlugin(
-                                el.attr('href').replace('#', ''),
-                                el.text(),
-                                el.closest('.cms-plugin-picker').data('parentId')
-                            );
-                            break;
-                        case 'ajax_add':
-                            CMS.API.Toolbar.openAjax({
-                                url: el.attr('href'),
-                                post: JSON.stringify(el.data('post')),
-                                text: el.data('text'),
-                                callback: $.proxy(that.editPluginPostAjax, that),
-                                onSuccess: el.data('on-success')
-                            });
-                            break;
-                        case 'edit':
-                            that.editPlugin(
-                                that.options.urls.edit_plugin,
-                                that.options.plugin_name,
-                                that.options.plugin_breadcrumb
-                            );
-                            break;
-                        case 'copy-lang':
-                            that.copyPlugin(this.options, el.attr('data-language'));
-                            break;
-                        case 'copy':
-                            that.copyPlugin();
-                            break;
-                        case 'cut':
-                            that.cutPlugin();
-                            break;
-                        case 'paste':
-                            if (!el.parent().hasClass('cms-submenu-item-disabled')) {
-                                that.pastePlugin();
-                            } else {
+                        // set switch for subnav entries
+                        switch (el.attr('data-rel')) {
+                            case 'add':
+                                that.addPlugin(
+                                    el.attr('href').replace('#', ''),
+                                    el.text(),
+                                    el.closest('.cms-plugin-picker').data('parentId')
+                                );
+                                break;
+                            case 'ajax_add':
+                                CMS.API.Toolbar.openAjax({
+                                    url: el.attr('href'),
+                                    post: JSON.stringify(el.data('post')),
+                                    text: el.data('text'),
+                                    callback: $.proxy(that.editPluginPostAjax, that),
+                                    onSuccess: el.data('on-success')
+                                });
+                                break;
+                            case 'edit':
+                                that.editPlugin(
+                                    that.options.urls.edit_plugin,
+                                    that.options.plugin_name,
+                                    that.options.plugin_breadcrumb
+                                );
+                                break;
+                            case 'copy-lang':
+                                that.copyPlugin(this.options, el.attr('data-language'));
+                                break;
+                            case 'copy':
+                                that.copyPlugin();
+                                break;
+                            case 'cut':
+                                that.cutPlugin();
+                                break;
+                            case 'paste':
+                                if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                                    that.pastePlugin();
+                                } else {
+                                    CMS.API.Toolbar.hideLoader();
+                                }
+                                break;
+                            case 'delete':
+                                that.deletePlugin(
+                                    that.options.urls.delete_plugin,
+                                    that.options.plugin_name,
+                                    that.options.plugin_breadcrumb
+                                );
+                                break;
+                            default:
                                 CMS.API.Toolbar.hideLoader();
-                            }
-                            break;
-                        case 'delete':
-                            that.deletePlugin(
-                                that.options.urls.delete_plugin,
-                                that.options.plugin_name,
-                                that.options.plugin_breadcrumb
-                            );
-                            break;
-                        default:
-                            CMS.API.Toolbar.hideLoader();
-                            CMS.API.Toolbar._delegate(el);
-                    }
-                });
+                                CMS.API.Toolbar._delegate(el);
+                        }
+                    });
 
             },
 
