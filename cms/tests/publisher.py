@@ -400,6 +400,12 @@ class PublishingTests(TestCase):
         self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
 
+    def test_publish_missing_page(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.post(admin_reverse("cms_page_publish_page", args=[999999, 'en']))
+            self.assertEqual(response.status_code, 404)
+
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)
         child = self.create_page('child', published=False, parent=parent)

@@ -1071,7 +1071,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 all_published = False
         statics = request.GET.get('statics', '')
         if not statics and not page:
-            return Http404("No page or stack found for publishing.")
+            raise Http404("No page or stack found for publishing.")
         if statics:
             static_ids = statics .split(',')
             for pk in static_ids:
