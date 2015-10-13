@@ -338,6 +338,8 @@ class PlaceholderAdminMixin(object):
                 request, source_placeholder, target_placeholder, plugins):
             return HttpResponseForbidden(force_text(
                 _('You do not have permission to copy these plugins.')))
+
+        # Are we copying an entire placeholder?
         if (target_placeholder.pk == request.toolbar.clipboard.pk and
                 not source_plugin_id and not target_plugin_id):
             # if we copy a whole placeholder to the clipboard create
@@ -369,7 +371,6 @@ class PlaceholderAdminMixin(object):
             )
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
-        print(CMSPlugin.find_problems())
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
@@ -491,8 +492,8 @@ class PlaceholderAdminMixin(object):
 
         if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
-                # This is a proxy, its children will be moved and the proxy
-                # itself will be forgotten.
+                # Note, we intentionally do not copy the PlaceholderPlugin
+                # itself here, it will be left behind.
                 source_plugins = list(plugin.get_descendants())
             else:
                 source_plugins = [plugin] + list(plugin.get_descendants())
@@ -511,14 +512,9 @@ class PlaceholderAdminMixin(object):
                     plugin.placeholder = placeholder
                     plugin.language = language
                     plugin.save()
-                # FIXME: Total kludge, find issue where plugin.numchild is not
-                # getting set correctly and fix it. Also, why is plugin.move()
-                # not working properly.
-                CMSPlugin.fix_tree()
 
             # If an ordering was supplied, we should replace the item that has
             # been copied with the new copy
-            print(order)
             if order:
                 if '__COPY__' in order:
                     copy_idx = order.index('__COPY__')
@@ -526,7 +522,6 @@ class PlaceholderAdminMixin(object):
                     order[copy_idx:0] = top_plugins_pks
                 else:
                     order.extend(top_plugins_pks)
-            print(order)
         else:
             # Regular move
             if parent_id:
@@ -557,7 +552,6 @@ class PlaceholderAdminMixin(object):
         json_response = {
             'reload': move_a_copy or requires_reload(
                 PLUGIN_MOVE_ACTION, [plugin])}
-        print(CMSPlugin.find_problems())
         return HttpResponse(
             json.dumps(json_response), content_type='application/json')
 
