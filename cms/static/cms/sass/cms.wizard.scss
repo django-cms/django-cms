@@ -15,6 +15,9 @@ $wizard-padding: 20px 25px !important;
 $wizard-input-size: 16px;
 
 .cms-content-wizard {
+    // admin style is adding margin-left
+    margin-left: calc(-3% + 10px);
+
     .clear {
         clear: both;
         overflow: hidden;

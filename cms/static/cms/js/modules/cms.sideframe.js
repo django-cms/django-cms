@@ -50,14 +50,6 @@ var CMS = window.CMS || {};
                 this.pointerMove = 'pointermove.cms.sideframe';
                 this.enforceReload = false;
                 this.settingsRefreshTimer = 600;
-
-                // if the modal is initialized the first time, set the events
-                if (!this.ui.sideframe.data('ready')) {
-                    this._events();
-                }
-
-                // set a state to determine if we need to reinitialize this._events();
-                this.ui.sideframe.data('ready', true);
             },
 
             /**
@@ -89,19 +81,19 @@ var CMS = window.CMS || {};
             _events: function _events() {
                 var that = this;
 
-                this.ui.close.on(this.click, function () {
+                this.ui.close.off(this.click).on(this.click, function () {
                     that.close();
                 });
 
                 // the resize event attaches an off event to the body
                 // which is handled within _startResize()
-                this.ui.resize.on(this.pointerDown, function (e) {
+                this.ui.resize.off(this.pointerDown).on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startResize();
                 });
 
                 // close sideframe when clicking on the dimmer
-                this.ui.dimmer.on(this.click, function () {
+                this.ui.dimmer.off(this.click).on(this.click, function () {
                     that.close();
                 });
             },
@@ -130,6 +122,12 @@ var CMS = window.CMS || {};
                 var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
                 var currentWidth = this.ui.sideframe.outerWidth();
                 var isFrameVisible = this.ui.sideframe.is(':visible');
+
+                // We have to rebind events every time we open a sideframe
+                // because the event handlers contain references to the instance
+                // and since we reuse the same markup we need to update
+                // that instance reference every time.
+                this._events();
 
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();

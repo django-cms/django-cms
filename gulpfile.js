@@ -101,7 +101,9 @@ gulp.task('sass', function () {
             browsers: ['last 3 versions'],
             cascade: false
         }))
-        .pipe(minifyCss())
+        .pipe(minifyCss({
+            rebase: false
+        }))
         .pipe(gulpif(options.debug, sourcemaps.write()))
         .pipe(gulp.dest(PROJECT_PATH.css));
 });

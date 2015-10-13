@@ -171,16 +171,40 @@ var CMS = window.CMS || {};
              */
             _setPlugin: function () {
                 var that = this;
+                var clickCounter = 0;
+                var timer;
 
                 // adds double click to edit
                 this.ui.container.add(this.ui.dragitem).on(this.doubleClick, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
+
                     that.editPlugin(
                         that.options.urls.edit_plugin,
                         that.options.plugin_name,
                         that.options.plugin_breadcrumb
                     );
+                });
+
+                // prevents single click from messing up the edit call
+                this.ui.container.on('click', '.cms-plugin a', function (e) {
+                    // don't go to the link if there is custom js attached to it
+                    // or if it's clicked along with shift, ctrl, cmd
+                    if (e.shiftKey || e.ctrlKey || e.metaKey || e.isDefaultPrevented()) {
+                        return;
+                    }
+
+                    e.preventDefault();
+
+                    if (++clickCounter === 1) {
+                        timer = setTimeout(function () {
+                            clickCounter = 0;
+                            window.location.href = $(e.currentTarget).attr('href');
+                        }, 300);
+                    } else {
+                        clearTimeout(timer);
+                        clickCounter = 0;
+                    }
                 });
 
                 // adds edit tooltip
@@ -791,6 +815,8 @@ var CMS = window.CMS || {};
                 var dragItem = nav.closest('.cms-dragitem');
                 var isPlaceholder = !Boolean(dragItem.length);
                 var childrenList;
+                var isTouching;
+
                 if (isPlaceholder) {
                     childrenList = nav.closest('.cms-dragarea').find('> .cms-draggables');
                 } else {
@@ -811,13 +837,20 @@ var CMS = window.CMS || {};
                 });
                 modal.on('cms.modal.shown', function () {
                     var dropdown = $('.cms-modal-markup .cms-plugin-picker');
-                    dropdown.find('input').trigger('focus');
+                    if (!isTouching) {
+                        // only focus the field if using mouse
+                        // otherwise keyboard pops up
+                        dropdown.find('input').trigger('focus');
+                    }
+                    isTouching = false;
                 });
                 var plugins = nav.siblings('.cms-plugin-picker');
 
                 that._setupQuickSearch(plugins);
 
-                nav.on(this.pointerUp, function (e) {
+                nav.on(this.touchStart, function () {
+                    isTouching = true;
+                }).on(this.pointerUp, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -889,7 +922,9 @@ var CMS = window.CMS || {};
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
-                nav.parent().find('a').on(that.click, function (e) {
+                nav.parent().find('.cms-submenu-edit, .cms-submenu-item a')
+                    .on(that.click, function (e) {
+
                     e.preventDefault();
                     e.stopPropagation();
 
