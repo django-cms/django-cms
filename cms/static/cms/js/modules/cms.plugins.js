@@ -942,6 +942,7 @@ var CMS = window.CMS || {};
                             break;
                         default:
                             CMS.API.Toolbar.hideLoader();
+                            CMS.API.Toolbar._delegate(el);
                     }
                 });
 
