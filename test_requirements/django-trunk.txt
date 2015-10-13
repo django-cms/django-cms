@@ -2,3 +2,4 @@
 https://github.com/django/django/tarball/master/django.tar.gz#egg=django
 django-reversion>=1.8
 https://github.com/gabejackson/django-hvad/archive/django_1.7_compat.zip
+django-debug-toolbar<=1.4
