@@ -135,8 +135,6 @@
                 // show the tooltip
                 tree.delegate(langTrigger, 'pointerover touchstart', function (e) {
                     var el = $(this).closest('.col-language').find('.language-tooltip');
-                    var anchors = el.find('a');
-                    var span = $(this);
 
                     // clear timer
                     clearTimeout(langTimer);
