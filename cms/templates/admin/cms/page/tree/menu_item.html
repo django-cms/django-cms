@@ -43,7 +43,7 @@
         {% endfor %}
         <div class="col-navigation" title="{% if page.in_navigation %}{% trans "in menu" %}{% else %}{% trans "not in menu" %}{% endif %}">
             <label>
-                <img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{% cms_admin_icon_base %}icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
+                <img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{{ STATIC_URL }}cms/img/pagetree/icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
                 {% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" {% if page.in_navigation %}checked="checked"{% endif %} value="{{ page.in_navigation|yesno:"1,0" }}" />{% endif %}
             </label>
         </div>
