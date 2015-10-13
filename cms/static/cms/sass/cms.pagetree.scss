@@ -51,63 +51,73 @@ $row-height: 41px;
     // icons
     li a.icon,
     li span.icon,
+    li a.preview,
     li a.move,
     li a.copy,
     li a.edit,
-    li a.advanced-settings,
-    li span.info {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
+    li div.info,
+    li div a.addlink,
+    li div a.deletelink,
+    li div.col-softroot span.icon,
+    li div.col-apphook span.icon {
+        display: inline-block !important;
+        width: 20px;
+        height: 20px;
         margin-top: 5px;
         background: url("../img/pagetree/sprite.png") no-repeat 0 0;
     }
+    li a.preview {
+        margin: 0 2px 0 0;
+        background-position: -55px -29px;
+    }
     li a.move {
-        margin-top: 0;
-        background-position: -20px -20px;
+        margin: 0;
+        background-position: -30px -29px;
     }
     li a.copy {
-        margin-top: 0;
-        background-position: -40px -60px;
+        margin: 0;
+        background-position: -29px -56px;
     }
     li a.edit {
-        margin-top: 0;
-        background-position: -40px -20px;
+        margin: 0 6px 0 2px;
+        background-position: -29px -4px;
     }
-    li a.advanced-settings {
-        margin-top: 0;
-        background-position: -60px -60px;
+    li div a.addlink {
+        margin: 0;
+        padding: 0;
+        background-position: -29px -81px;
+        &:before {
+            display: none;
+        }
     }
-    li span.info {
-        margin-top: -1px;
+    li div a.deletelink {
+        margin: 0;
+        padding: 0;
+        background-position: -3px -55px;
+        &:before {
+            display: none;
+        }
+    }
+    li div.info {
+        margin: 12px 0 0 !important;
         cursor: pointer;
-        background-position: -81px -20px;
+        background-position: -3px -29px;
     }
-
     li a.selector-add {
         margin-top: -1px;
         margin-left: 4px;
         background-position: -20px 0;
     }
-
-    li a.addlink,
-    li a.deletelink {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        margin: 0 3px;
-        padding: 0;
-        background-position: 0 0;
-    }
     li .col-softroot span.icon {
-        margin-top: 0;
-        background-position: -80px 0;
+        margin: 0 !important;
+        background-position: -3px -3px !important;
     }
     li .col-apphook span.icon {
-        margin-top: 0;
-        background-position: -40px -80px;
+        margin: 0 !important;
+        background-position: -55px -4px !important;
     }
 
+    li a.preview span,
     li a.move span,
     li a.copy span,
     li a.selector-add span,
@@ -115,13 +125,13 @@ $row-height: 41px;
     li a.deletelink span,
     li a.edit span,
     li a.advanced-settings span,
-    li span.info span,
+    li div.info span,
     .col-navigation input,
     .col-published input {
         display: none;
     }
     .col-navigation {
-        width: 25px !important;
+        width: 26px !important;
     }
 
     // header
@@ -217,7 +227,7 @@ $row-height: 41px;
         display: block;
         line-height: $row-height;
         height: $row-height;
-        padding-left: 20px;
+        padding-left: 25px;
     }
 
     li .move-target-container {
@@ -336,27 +346,40 @@ $row-height: 41px;
             display: block;
         }
     }
-    .info-details {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        z-index: 100;
-        line-height: 18px;
-        text-align: left;
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        border-radius: 3px 0 3px 3px;
-        cursor: default;
-        background: white;
-        mark {
-            display: inline-block;
-            font-weight: bold;
-            font-style: normal;
-            min-width: 100px;
-            background: none;
-        }
-        span {
-            display: inline !important;
+
+    // remove backgrounds
+    .moveable,
+    .tree-default,
+    .tree .tree-default ul {
+        background-image: none !important;
+    }
+    .moveable.open {
+        background-image: url("../js/jstree/themes/default/fminus2.gif") !important;
+    }
+    .moveable.closed {
+        background-image: url("../js/jstree/themes/default/fplus2.gif") !important;
+    }
+    .tree {
+        padding-bottom: 4px;
+        border-left: 1px solid $white;
+        border-bottom: 1px solid $white;
+        background: $gray-lightest;
+    }
+
+    // additional fixes
+    #dragged .removeicon {
+        left: 7px !important;
+        top: 5px !important;
+        z-index: 99 !important;
+    }
+    #dragged .col2 {
+        display: none;
+    }
+
+    .title {
+        cursor: move;
+        &:hover {
+            text-decoration: none;
         }
     }
 }
@@ -386,7 +409,7 @@ $row-height: 41px;
 }
 // remove background assigned from django
 .change-list .filtered {
-    min-height: auto;
+    min-height: 0;
     background: white !important;
 }
 
@@ -406,24 +429,11 @@ $row-height: 41px;
     background: white;
 }
 
-/* TODO this should be defined inside djangocms-admin.css instead (3.1) */
 #sitemap {
     border: 1px solid $color-border;
     ul.header li .col2 > div {
         padding: 0 8px;
         border-left: 1px solid transparent;
-    }
-    li .col-softroot span.icon {
-        width: 18px !important;
-        height: 18px !important;
-        margin: 0 !important;
-        background: url("../img/pagetree/sprite.png") -80px 0 no-repeat !important;
-    }
-    li .col-apphook span.icon {
-        width: 18px !important;
-        height: 18px !important;
-        margin: 0 !important;
-        background: url("../img/pagetree/sprite.png") -40px -80px no-repeat !important;
     }
     li .col-language span {
         display: inline-block;
@@ -460,43 +470,84 @@ $row-height: 41px;
 .col-language {
     position: relative;
 }
-#sitemap .tree li .col-language
-.language-tooltip {
+#sitemap .tree li .tooltip {
     display: none;
     position: absolute;
-    top: 10px;
+    top: 7px;
     right: 20px;
-    z-index: 9999;
-    color: #ccc;
-    font-size: 11px;
-    line-height: 1;
-    padding: 4px 6px;
-    border: none;
-    border-radius: 3px;
-    background: rgba(black, 0.8);
-    background-color: black;
-    a {
-        color: #ddd;
-    }
-    a:hover {
-        color: white;
-        text-decoration: none;
-    }
-    &:before {
-        content: " ";
+    z-index: 999999;
+
+    text-align: left;
+
+    border: 1px solid $gray-lighter;
+    border-radius: $border-radius-base;
+    background-color: $white;
+
+    h3 {
         display: block;
-        position: absolute;
-        top: 50%;
-        right: -5px;
-        width: 0;
-        height: 0;
-        margin-top: -4px;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-        border-left: 5px solid rgba(black, 0.8);
+        position: relative;
+        z-index: 10;
+        color: $gray-light;
+        font-size: $font-size-small;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 2px 10px;
+        margin: 0;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
     }
-    &.language-tooltip-multiple a:first-child:after {
-        content: " - ";
+    a {
+        display: block;
+        padding: 10px;
+        min-width: 100px;
+        text-transform: none;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    a:last-child {
+        border: none;
+    }
+
+    // content
+    .inner {
+        display: block;
+        padding: 10px;
+    }
+    mark {
+        color: $gray-light;
+        background: none;
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    // icons
+    .icon-publish {
+        background: url("../img/pagetree/publish.png") no-repeat 10px 13px;
+        padding-left: 30px;
+    }
+    .icon-unpublish {
+        background: url("../img/pagetree/unpublish.png") no-repeat 10px 13px;
+        padding-left: 30px;
+    }
+
+    // icon on the right
+    &:before {
+        z-index: 1;
+        position: absolute;
+        top: 7px;
+        content: '';
+        left: 100%;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        transform: rotate(45deg);
+        background-color: $submenu-dropdown-bgcolor;
+        box-shadow: $dropdown-shadow;
+    }
+
+    // special case
+    &.info-details {
+        top: -4px;
+        right: 24px;
     }
 }
 

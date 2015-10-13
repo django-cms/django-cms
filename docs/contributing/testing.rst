@@ -93,7 +93,7 @@ A solution is::
 You may find that a single frontend test raises an error. This sometimes happens, for some users,
 when the entire suite is run. To work around this you can invoke the test class on its own::
 
-    develop.py test cms.PlaceholderBasicTests
+    manage.py test cms.PlaceholderBasicTests
 
 and it should then run without errors.
 

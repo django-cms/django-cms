@@ -28,10 +28,10 @@
             {% if has_change_permission %}
                 <a href="{% if lang in page.languages %}./{{ page.id }}/{{ lang }}/preview/{% else %}./{{ page.id }}/?language={{ lang }}{% endif %}" class="trigger-tooltip"{% if lang in page.languages %} target="_top"{% endif %} title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}">{% tree_publish_row page lang %}</a>
                 {% if lang in page.languages %}
-                <div class="language-tooltip" hidden="hidden">
-                    {% trans "Pick an action:" %}
-                    <a href="./{{ page.id }}/{{ lang }}/unpublish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}" class="js-ajax-submit">{% trans "Unpublish" %}</a>
-                    <a href="./{{ page.id }}/{{ lang }}/publish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}" class="js-ajax-submit">{% trans "Publish" %}</a>
+                <div class="language-tooltip tooltip" hidden="hidden">
+                    <h3>{% trans "Pick an action:" %}</h3>
+                    <a href="./{{ page.id }}/{{ lang }}/publish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}" class="js-ajax-submit icon-publish">{% trans "Publish" %}</a>
+                    <a href="./{{ page.id }}/{{ lang }}/unpublish/?redirect_language={{ preview_language }}&redirect_page_id={{ request.GET.page_id }}" class="js-ajax-submit icon-unpublish">{% trans "Unpublish" %}</a>
                 </div>
                 {% endif %}
             {% else %}
@@ -41,12 +41,12 @@
         {% endfor %}
         <div class="col-navigation" title="{% if page.in_navigation %}{% trans "in menu" %}{% else %}{% trans "not in menu" %}{% endif %}">
             <label>
-                <img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{% cms_admin_icon_base %}icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
+                <img alt="{{ page.in_navigation|yesno:"True,False" }}" src="{{ STATIC_URL }}cms/img/pagetree/icon-{{ page.in_navigation|yesno:"yes,no" }}.gif" />
                 {% if has_change_permission %}<input type="checkbox" class="navigation-checkbox" name="navigation-{{ page.id }}" {% if page.in_navigation %}checked="checked"{% endif %} value="{{ page.in_navigation|yesno:"1,0" }}" />{% endif %}
             </label>
         </div>
         <div class="col-actions">
-
+            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview" title="{% trans "View on site" %}" target="_parent"><span>{% trans "View on site" %}</span></a>
             {% if has_change_permission %}
             <a class="edit" href="{{ url }}{{ page.id }}/" data-alt-class="advanced-settings" data-alt-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
             {# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}
@@ -67,16 +67,27 @@
         </div>
 
         <div class="col-info">
-            <span class="info">
+            <div class="info">
                 <span>{% trans "info" %}</span>
-                <div class="info-details">
-                    {% if page.publication_date %}<mark>{% trans "publication date" %}:</mark> {{ page.publication_date|date:"Y-m-d" }}<br />{% endif %}
-                    {% if page.publication_end_date %}<mark>{% trans "publication end date" %}:</mark> {{ page.publication_end_date|date:"Y-m-d" }}<br />{% endif %}
-                    <mark>{% trans "is restricted" %}:</mark> {{ page|is_restricted:request }}<br />
-                    {% if page.changed_by %}<mark>{% trans "last change by" %}:</mark> {{ page.changed_by }}<br />{% endif %}
-                    {% if page.get_template_display %}<mark>{% trans "template" %}:</mark> {{ page.get_template_display }}{% endif %}
+                <div class="info-details tooltip">
+                    <h3>{% trans "Information" %}</h3>
+                    <div class="inner">
+                        {% if page.publication_date %}
+                            <mark>{% trans "publication date" %}:</mark> {{ page.publication_date|date:"Y-m-d" }}<br />
+                        {% endif %}
+                        {% if page.publication_end_date %}
+                            <mark>{% trans "publication end date" %}:</mark> {{ page.publication_end_date|date:"Y-m-d" }}<br />
+                        {% endif %}
+                        <mark>{% trans "is restricted" %}:</mark> {{ page|is_restricted:request }}<br />
+                        {% if page.changed_by %}
+                            <mark>{% trans "last change by" %}:</mark> {{ page.changed_by }}<br />
+                        {% endif %}
+                        {% if page.get_template_display %}
+                            <mark>{% trans "template" %}:</mark> {{ page.get_template_display }}
+                        {% endif %}
+                    </div>
                 </div>
-            </span>
+            </div>
         </div>
     </div>
 </div>
