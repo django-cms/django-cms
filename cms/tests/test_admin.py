@@ -16,7 +16,6 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse,
                          QueryDict, HttpResponseNotFound)
-from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import force_text, smart_str
 from django.utils import timezone
 from django.utils.six.moves.urllib.parse import urlparse
