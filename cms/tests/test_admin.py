@@ -848,14 +848,14 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 405)
             request = self.get_request(post_data={'not_usable': '1'})
-            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'ids': plugin.pk})
-            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': 'invalid-placeholder', 'plugin_language': 'en'})
-            self.assertRaises(ValueError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
@@ -886,8 +886,12 @@ class AdminTests(AdminTestsBase):
 
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'plugin_id': sub_col.pk,
-                'placeholder_id': source.id, 'plugin_parent': col2.pk, 'plugin_language': 'de'})
+            request = self.get_request(post_data={
+                'plugin_id': sub_col.pk,
+                'placeholder_id': source.id,
+                'plugin_parent': col2.pk,
+                'plugin_language': 'de'
+            })
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
         sub_col = CMSPlugin.objects.get(pk=sub_col.pk)

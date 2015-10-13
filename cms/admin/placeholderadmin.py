@@ -468,9 +468,19 @@ class PlaceholderAdminMixin(object):
         """
         # plugin_id and placeholder_id are required, so, if nothing is supplied,
         # an ValueError exception will be raised by get_int().
-        plugin_id = get_int(request.POST.get('plugin_id'))
+        try:
+            plugin_id = get_int(request.POST.get('plugin_id'))
+        except TypeError:
+            raise RuntimeError("'plugin_id' is a required parameter.")
+        except ValueError:
+            raise RuntimeError("'plugin_id' must be an integer string.")
         plugin = CMSPlugin.objects.get(pk=plugin_id)
-        placeholder_id = get_int(request.POST.get('placeholder_id'))
+        try:
+            placeholder_id = get_int(request.POST.get('placeholder_id'))
+        except TypeError:
+            raise RuntimeError("'placeholder_id' is a required parameter.")
+        except ValueError:
+            raise RuntimeError("'placeholder_id' must be an integer string.")
         placeholder = Placeholder.objects.get(pk=placeholder_id)
         # The rest are optional
         parent_id = get_int(request.POST.get('plugin_parent', None), None)
@@ -540,6 +550,7 @@ class PlaceholderAdminMixin(object):
                             'parent must be in the same language as '
                             'plugin_language'))
                     plugin.parent_id = parent.pk
+                    plugin.language = language
                     plugin.save()
                     plugin = plugin.move(parent, pos='last-child')
             else:
