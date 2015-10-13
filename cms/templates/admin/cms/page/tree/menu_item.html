@@ -48,7 +48,7 @@
             </label>
         </div>
         <div class="col-actions">
-            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview" title="{% trans "View on site" %}"><span>{% trans "View on site" %}</span></a>
+            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview" title="{% trans "View on site" %}" target="_parent"><span>{% trans "View on site" %}</span></a>
             {% if has_change_permission %}
             <a class="edit" href="{{ url }}{{ page.id }}/" data-alt-class="advanced-settings" data-alt-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
             {# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}
