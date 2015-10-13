@@ -22,11 +22,12 @@ def copy_plugins_to(old_plugins, to_placeholder,
                         old_parent_cache, no_signals) for old in old_plugins]
     if new_plugins and parent_plugin_id:
         from cms.models import CMSPlugin
+        parent_plugin = CMSPlugin.objects.get(pk=parent_plugin_id)
         top_plugins = [p for p in new_plugins if p.parent_id is None]
-        parent = CMSPlugin.objects.get(pk=parent_plugin_id)
         for plugin in top_plugins:
-            plugin.parent = parent
+            plugin.parent_id = parent_plugin_id
             plugin.save()
+            plugin.move(parent_plugin, pos="last-child")
     plugins_ziplist = list(zip(new_plugins, old_plugins))
 
     # this magic is needed for advanced plugins like Text Plugins that can have
