@@ -55,7 +55,7 @@ $row-height: 41px;
     li a.move,
     li a.copy,
     li a.edit,
-    li span.info,
+    li div.info,
     li div a.addlink,
     li div a.deletelink,
     li div.col-softroot span.icon,
@@ -98,8 +98,8 @@ $row-height: 41px;
             display: none;
         }
     }
-    li span.info {
-        margin: 0;
+    li div.info {
+        margin: 12px 0 0 !important;
         cursor: pointer;
         background-position: -3px -29px;
     }
@@ -125,7 +125,7 @@ $row-height: 41px;
     li a.deletelink span,
     li a.edit span,
     li a.advanced-settings span,
-    li span.info span,
+    li div.info span,
     .col-navigation input,
     .col-published input {
         display: none;
@@ -346,29 +346,6 @@ $row-height: 41px;
             display: block;
         }
     }
-    .info-details {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        z-index: 100;
-        line-height: 18px;
-        text-align: left;
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        border-radius: 3px 0 3px 3px;
-        cursor: default;
-        background: white;
-        mark {
-            display: inline-block;
-            font-weight: bold;
-            font-style: normal;
-            min-width: 100px;
-            background: none;
-        }
-        span {
-            display: inline !important;
-        }
-    }
 
     // remove backgrounds
     .moveable,
@@ -493,43 +470,84 @@ $row-height: 41px;
 .col-language {
     position: relative;
 }
-#sitemap .tree li .col-language
-.language-tooltip {
+#sitemap .tree li .tooltip {
     display: none;
     position: absolute;
-    top: 10px;
+    top: 7px;
     right: 20px;
-    z-index: 9999;
-    color: #ccc;
-    font-size: 11px;
-    line-height: 1;
-    padding: 4px 6px;
-    border: none;
-    border-radius: 3px;
-    background: rgba(black, 0.8);
-    background-color: black;
-    a {
-        color: #ddd;
-    }
-    a:hover {
-        color: white;
-        text-decoration: none;
-    }
-    &:before {
-        content: " ";
+    z-index: 999999;
+
+    text-align: left;
+
+    border: 1px solid $gray-lighter;
+    border-radius: $border-radius-base;
+    background-color: $white;
+
+    h3 {
         display: block;
-        position: absolute;
-        top: 50%;
-        right: -5px;
-        width: 0;
-        height: 0;
-        margin-top: -4px;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-        border-left: 5px solid rgba(black, 0.8);
+        position: relative;
+        z-index: 10;
+        color: $gray-light;
+        font-size: $font-size-small;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 2px 10px;
+        margin: 0;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
     }
-    &.language-tooltip-multiple a:first-child:after {
-        content: " - ";
+    a {
+        display: block;
+        padding: 10px;
+        min-width: 100px;
+        text-transform: none;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    a:last-child {
+        border: none;
+    }
+
+    // content
+    .inner {
+        display: block;
+        padding: 10px;
+    }
+    mark {
+        color: $gray-light;
+        background: none;
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    // icons
+    .icon-publish {
+        background: url("../img/pagetree/publish.png") no-repeat 10px 13px;
+        padding-left: 30px;
+    }
+    .icon-unpublish {
+        background: url("../img/pagetree/unpublish.png") no-repeat 10px 13px;
+        padding-left: 30px;
+    }
+
+    // icon on the right
+    &:before {
+        z-index: 1;
+        position: absolute;
+        top: 7px;
+        content: '';
+        left: 100%;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        transform: rotate(45deg);
+        background-color: $submenu-dropdown-bgcolor;
+        box-shadow: $dropdown-shadow;
+    }
+
+    // special case
+    &.info-details {
+        top: -4px;
+        right: 24px;
     }
 }
 

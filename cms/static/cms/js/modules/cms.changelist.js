@@ -149,20 +149,8 @@
                     // set correct position
                     el.css('right', 20 + $(this).position().left);
 
-                    // figure out what should be shown
-                    anchors.hide();
-                    if (span.hasClass('unpublished') || span.hasClass('unpublishedparent')) {
-                        anchors.eq(1).show();
-                    }
-                    if (span.hasClass('published')) {
-                        anchors.eq(0).show();
-                    }
-                    if (span.hasClass('dirty')) {
-                        anchors.show().parent().addClass('language-tooltip-multiple');
-                    }
-
                     // hide all elements
-                    $(langTooltips).fadeOut(langDelay);
+                    $(langTooltips).hide();
 
                     if (e.type === 'touchstart') {
                         e.preventDefault();
@@ -186,7 +174,7 @@
                     clearTimeout(langTimer);
                     // hide all elements
                     langTimer = setTimeout(function () {
-                        $(langTooltips).fadeOut(langFadeDuration);
+                        $(langTooltips).hide();
                     }, langDelay * 2);
                 });
                 // reset hiding when entering the tooltip itself
@@ -197,7 +185,7 @@
                 tree.delegate(langTooltips, 'pointerout', function () {
                     // hide all elements
                     langTimer = setTimeout(function () {
-                        $(langTooltips).fadeOut(langFadeDuration);
+                        $(langTooltips).hide();
                     }, langDelay * 2);
                 });
                 // attach double check event if publish or unpublish should be triggered
