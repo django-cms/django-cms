@@ -522,7 +522,7 @@ class PlaceholderAdminMixin(object):
             if order:
                 if '__COPY__' in order:
                     copy_idx = order.index('__COPY__')
-                    del order['__COPY__']
+                    del order[copy_idx]
                     order[copy_idx:0] = top_plugins_pks
                 else:
                     order.extend(top_plugins_pks)
