@@ -47,6 +47,24 @@ from cms.utils.plugins import (
 )
 from cms.utils.urlutils import admin_reverse
 
+_no_default = object()
+
+
+def get_int(int_str, default=_no_default):
+    """
+    For convenience a get-like method for taking the int() of a string.
+    :param int_str: the string to convert to integer
+    :param default: an optional value to return if ValueError is raised.
+    :return: the int() of «int_str» or «default» on exception.
+    """
+    if default == _no_default:
+        return int(int_str)
+    else:
+        try:
+            return int(int_str)
+        except ValueError:
+            return default
+
 
 class FrontendEditableAdminMixin(object):
     frontend_editable_fields = []
@@ -429,33 +447,37 @@ class PlaceholderAdminMixin(object):
     @xframe_options_sameorigin
     def move_plugin(self, request):
         """
+        Performs a move or a "paste" operation (when «move_a_copy» is set)
+
         POST request with following parameters:
-        -plugin_id
-        -placeholder_id
-        -plugin_language (optional)
-        -plugin_parent (optional)
-        -plugin_order (array, optional)
-        -move_a_copy (Boolean, optional) (anything supplied here except a case-
-                                         insensitive "false" is True)
+        - plugin_id
+        - placeholder_id
+        - plugin_language (optional)
+        - plugin_parent (optional)
+        - plugin_order (array, optional)
+        - move_a_copy (Boolean, optional) (anything supplied here except a case-
+                                        insensitive "false" is True)
         NOTE: If move_a_copy is set, the plugin_order should contain an item
               '__COPY__' with the desired destination of the copied plugin.
         """
-        plugin_id = int(request.POST['plugin_id'])
+        # plugin_id and placeholder_id are required, so, if nothing is supplied,
+        # an ValueError exception will be raised by get_int().
+        plugin_id = get_int(request.POST.get('plugin_id'))
         plugin = CMSPlugin.objects.get(pk=plugin_id)
-        placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
-        parent_id = request.POST.get('plugin_parent', None)
+        placeholder_id = get_int(request.POST.get('placeholder_id'))
+        placeholder = Placeholder.objects.get(pk=placeholder_id)
+        # The rest are optional
+        parent_id = get_int(request.POST.get('plugin_parent', None), None)
         language = request.POST.get('plugin_language', None)
         move_a_copy = request.POST.get('move_a_copy', False)
-        if move_a_copy:
-            move_a_copy = (move_a_copy.lower() != "false")
+        move_a_copy = (move_a_copy and move_a_copy != "0" and
+                       move_a_copy.lower() != "false")
+
         source_placeholder = plugin.placeholder
-        if not parent_id:
-            parent_id = None
-        else:
-            parent_id = int(parent_id)
         if not language and plugin.language:
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
+
         if not self.has_move_plugin_permission(request, plugin, placeholder):
             return HttpResponseForbidden(
                 force_text(_("You have no permission to move this plugin")))
@@ -466,6 +488,7 @@ class PlaceholderAdminMixin(object):
                                          plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
+
         if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
                 # This is a proxy, its children will be moved and the proxy
@@ -480,7 +503,7 @@ class PlaceholderAdminMixin(object):
             new_plugins = [pair[0] for pair in new_plugins]
             top_parent = new_plugins[0].parent_id
             top_plugins = [p for p in new_plugins if p.parent_id == top_parent]
-            top_plugins_pks = [p.pk for p in top_plugins]
+            top_plugins_pks = [str(p.pk) for p in top_plugins]
             if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
                 for plugin in top_plugins:
@@ -495,12 +518,40 @@ class PlaceholderAdminMixin(object):
 
             # If an ordering was supplied, we should replace the item that has
             # been copied with the new copy
+            print(order)
             if order:
                 if '__COPY__' in order:
                     copy_idx = order.index('__COPY__')
-                    order[copy_idx:1] = top_plugins_pks
+                    del order['__COPY__']
+                    order[copy_idx:0] = top_plugins_pks
                 else:
                     order.extend(top_plugins_pks)
+            print(order)
+        else:
+            # Regular move
+            if parent_id:
+                if plugin.parent_id != parent_id:
+                    parent = CMSPlugin.objects.get(pk=parent_id)
+                    if parent.placeholder_id != placeholder.pk:
+                        return HttpResponseBadRequest(force_text(
+                            'parent must be in the same placeholder'))
+                    if parent.language != language:
+                        return HttpResponseBadRequest(force_text(
+                            'parent must be in the same language as '
+                            'plugin_language'))
+                    plugin.parent_id = parent.pk
+                    plugin.save()
+                    plugin = plugin.move(parent, pos='last-child')
+            else:
+                sibling = CMSPlugin.get_last_root_node()
+                plugin.parent_id = None
+                plugin.save()
+                plugin = plugin.move(sibling, pos='right')
+
+        for child in [plugin] + list(plugin.get_descendants()):
+            child.placeholder = placeholder
+            child.language = language
+            child.save()
 
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
