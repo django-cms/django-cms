@@ -11,6 +11,7 @@
   - Overhauled the toolbar for new design, code cleanliness, responsiveness
   - Switch to SVG for iconography
   - Overhauled JS/CSS
+  - Soft re-design of the pagetree
 - New content creation wizard infrastructure
 - Improvements in enforcing parent plugin restricts on frontend
 - Remove Alias from list of plugins (Create Alias still an option)

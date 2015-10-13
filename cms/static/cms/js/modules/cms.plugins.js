@@ -904,8 +904,8 @@ var CMS = window.CMS || {};
              */
             _setupActions: function _setupActions(nav) {
                 var that = this;
-                nav.parent().find('.cms-submenu-edit, .cms-submenu-item a')
-                    .on(that.click, function (e) {
+                var items = '.cms-submenu-edit, .cms-submenu-item a';
+                nav.parent().find(items).on(that.click, function (e) {
 
                         e.preventDefault();
                         e.stopPropagation();
