@@ -548,11 +548,6 @@ class PlaceholderAdminMixin(object):
                 plugin.save()
                 plugin = plugin.move(sibling, pos='right')
 
-        for child in [plugin] + list(plugin.get_descendants()):
-            child.placeholder = placeholder
-            child.language = language
-            child.save()
-
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
             return HttpResponseBadRequest('order parameter did not have all '
