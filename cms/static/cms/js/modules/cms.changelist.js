@@ -224,15 +224,6 @@
             },
 
             setupUIHacks: function () {
-                // enables tab click on title entry to open in new window
-                $('.tree').on('click', '.col1 .title', function (e) {
-                    if (!e.metaKey) {
-                        window.top.location.href = $(this).attr('href');
-                    } else {
-                        window.open($(this).attr('href'), '_blank');
-                    }
-                });
-
                 // adds functionality to the filter
                 $('#changelist-filter-button').bind('click', function () {
                     $('#changelist-filter').toggle();

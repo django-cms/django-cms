@@ -51,63 +51,73 @@ $row-height: 41px;
     // icons
     li a.icon,
     li span.icon,
+    li a.preview,
     li a.move,
     li a.copy,
     li a.edit,
-    li a.advanced-settings,
-    li span.info {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
+    li span.info,
+    li div a.addlink,
+    li div a.deletelink,
+    li div.col-softroot span.icon,
+    li div.col-apphook span.icon {
+        display: inline-block !important;
+        width: 20px;
+        height: 20px;
         margin-top: 5px;
         background: url("../img/pagetree/sprite.png") no-repeat 0 0;
     }
+    li a.preview {
+        margin: 0 2px 0 0;
+        background-position: -55px -29px;
+    }
     li a.move {
-        margin-top: 0;
-        background-position: -20px -20px;
+        margin: 0;
+        background-position: -30px -29px;
     }
     li a.copy {
-        margin-top: 0;
-        background-position: -40px -60px;
+        margin: 0;
+        background-position: -29px -56px;
     }
     li a.edit {
-        margin-top: 0;
-        background-position: -40px -20px;
+        margin: 0 6px 0 2px;
+        background-position: -29px -4px;
     }
-    li a.advanced-settings {
-        margin-top: 0;
-        background-position: -60px -60px;
+    li div a.addlink {
+        margin: 0;
+        padding: 0;
+        background-position: -29px -81px;
+        &:before {
+            display: none;
+        }
+    }
+    li div a.deletelink {
+        margin: 0;
+        padding: 0;
+        background-position: -3px -55px;
+        &:before {
+            display: none;
+        }
     }
     li span.info {
-        margin-top: -1px;
+        margin: 0;
         cursor: pointer;
-        background-position: -81px -20px;
+        background-position: -3px -29px;
     }
-
     li a.selector-add {
         margin-top: -1px;
         margin-left: 4px;
         background-position: -20px 0;
     }
-
-    li a.addlink,
-    li a.deletelink {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        margin: 0 3px;
-        padding: 0;
-        background-position: 0 0;
-    }
     li .col-softroot span.icon {
-        margin-top: 0;
-        background-position: -80px 0;
+        margin: 0 !important;
+        background-position: -3px -3px !important;
     }
     li .col-apphook span.icon {
-        margin-top: 0;
-        background-position: -40px -80px;
+        margin: 0 !important;
+        background-position: -55px -4px !important;
     }
 
+    li a.preview span,
     li a.move span,
     li a.copy span,
     li a.selector-add span,
@@ -217,7 +227,7 @@ $row-height: 41px;
         display: block;
         line-height: $row-height;
         height: $row-height;
-        padding-left: 20px;
+        padding-left: 25px;
     }
 
     li .move-target-container {
@@ -359,6 +369,42 @@ $row-height: 41px;
             display: inline !important;
         }
     }
+
+    // remove backgrounds
+    .moveable,
+    .tree-default,
+    .tree .tree-default ul {
+        background-image: none !important;
+    }
+    .moveable.open {
+        background-image: url("../js/jstree/themes/default/fminus2.gif") !important;
+    }
+    .moveable.closed {
+        background-image: url("../js/jstree/themes/default/fplus2.gif") !important;
+    }
+    .tree {
+        padding-bottom: 4px;
+        border-left: 1px solid $white;
+        border-bottom: 1px solid $white;
+        background: $gray-lightest;
+    }
+
+    // additional fixes
+    #dragged .removeicon {
+        left: 7px !important;
+        top: 5px !important;
+        z-index: 99 !important;
+    }
+    #dragged .col2 {
+        display: none;
+    }
+
+    .title {
+        cursor: move;
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 // filter button on top right
@@ -386,7 +432,7 @@ $row-height: 41px;
 }
 // remove background assigned from django
 .change-list .filtered {
-    min-height: auto;
+    min-height: 0;
     background: white !important;
 }
 
@@ -406,24 +452,11 @@ $row-height: 41px;
     background: white;
 }
 
-/* TODO this should be defined inside djangocms-admin.css instead (3.1) */
 #sitemap {
     border: 1px solid $color-border;
     ul.header li .col2 > div {
         padding: 0 8px;
         border-left: 1px solid transparent;
-    }
-    li .col-softroot span.icon {
-        width: 18px !important;
-        height: 18px !important;
-        margin: 0 !important;
-        background: url("../img/pagetree/sprite.png") -80px 0 no-repeat !important;
-    }
-    li .col-apphook span.icon {
-        width: 18px !important;
-        height: 18px !important;
-        margin: 0 !important;
-        background: url("../img/pagetree/sprite.png") -40px -80px no-repeat !important;
     }
     li .col-language span {
         display: inline-block;
