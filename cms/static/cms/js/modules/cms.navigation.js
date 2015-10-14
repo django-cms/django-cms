@@ -47,6 +47,7 @@ var CMS = window.CMS || {};
 
                 this.resize = 'resize.cms.navigation';
                 this.load = 'load.cms.navigation';
+                this.orientationChange = 'orientationchange.cms.navigation';
 
                 this._events();
             },
@@ -78,9 +79,12 @@ var CMS = window.CMS || {};
              * @private
              */
             _events: function _events() {
-                this.ui.window.on(this.resize + ' ' + this.load, CMS.API.Helpers.throttle(
-                    this._handleResize.bind(this), 50
-                ));
+                this.ui.window.on(
+                    [this.resize, this.load, this.orientationChange].join(' '),
+                    CMS.API.Helpers.throttle(
+                        this._handleResize.bind(this), 50
+                    )
+                );
             },
 
             /**
