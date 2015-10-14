@@ -459,13 +459,27 @@ class PluginsTestCase(PluginsTestBaseCase):
         columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
         column_1 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')
         column_2 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='30%')
-        api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the first")
+        first_text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the first")
         text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the second")
 
         returned_1 = copy_plugins_to([text_plugin], placeholder, 'en', column_1.pk)
         returned_2 = copy_plugins_to([text_plugin], placeholder_right, 'en')
         returned_3 = copy_plugins_to([text_plugin], placeholder, 'en', column_2.pk)
 
+        # STATE AT THIS POINT:
+        # placeholder
+        #     - columns
+        #         - column_1
+        #             - text_plugin "I'm the first"
+        #             - text_plugin "I'm the second"
+        #             - text_plugin "I'm the second" (returned_1)
+        #         - column_2
+        #             - text_plugin "I'm the second" (returned_3)
+        # placeholder_right
+        #     - text_plugin "I'm the second" (returned_2)
+
+        # First plugin in the plugin branch
+        self.assertEqual(first_text_plugin.position, 0)
         # Second plugin in the plugin branch
         self.assertEqual(text_plugin.position, 1)
         # Added as third plugin in the same branch as the above
