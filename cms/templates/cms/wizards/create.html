@@ -20,7 +20,10 @@
         </div>
         <div class="submit-row">
             <input type="submit" class="cms-btn cms-btn-action" value="{% trans "Create" %}">
-            <button name="wizard_goto_step" class="cms-btn cms-btn-secondary cms-btn-group" value="{{ wizard.steps.prev }}">{% trans "Back" %}</button>
+            <button type="button" name="wizard_goto_step"
+                class="cms-btn cms-btn-secondary cms-btn-group" value="{{ wizard.steps.prev }}">
+                {% trans "Back" %}
+            </button>
         </div>
     </form>
 {% endblock %}
