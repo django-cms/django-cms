@@ -395,7 +395,11 @@
                     doNotClear: true,
                     disableNestingClass: 'cms-draggable-disabled',
                     errorClass: 'cms-draggable-disallowed',
+                    scrollSpeed: 15,
+                    scrollSensitivity: that.ui.window.height() * 0.2,
                     start: function (e, ui) {
+                        that.ui.content.attr('data-touch-action', 'none');
+
                         originalPluginContainer = ui.item.closest('.cms-draggables');
                         that.dragging = true;
                         // show empty
@@ -432,6 +436,7 @@
                         that.dragging = false;
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                         that.ui.doc.off('keyup.cms.interrupt');
+                        that.ui.content.attr('data-touch-action', 'pan-y');
                     },
 
                     update: function (event, ui) {

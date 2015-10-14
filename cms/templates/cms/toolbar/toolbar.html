@@ -89,8 +89,8 @@
     {# end: modal #}
 
     {# start: structure #}
-    <div class="cms-structure" data-touch-action="pan-y">
-        <div class="cms-structure-content">
+    <div class="cms-structure">
+        <div class="cms-structure-content" data-touch-action="pan-y">
             {% for placeholder in request.toolbar.placeholders.values %}
             <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
                 {% include "cms/toolbar/dragbar.html" with placeholder=placeholder language=language %}
