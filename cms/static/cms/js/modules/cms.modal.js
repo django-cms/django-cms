@@ -728,7 +728,9 @@ var CMS = window.CMS || {};
 
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
-                    el.on(that.click, function () {
+                    el.on(that.click, function (e) {
+                        e.preventDefault();
+
                         if (item.is('a')) {
                             that._loadIframe({
                                 url: item.prop('href'),
