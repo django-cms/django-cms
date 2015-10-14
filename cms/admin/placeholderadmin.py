@@ -472,8 +472,6 @@ class PlaceholderAdminMixin(object):
             plugin_id = get_int(request.POST.get('plugin_id'))
         except TypeError:
             raise RuntimeError("'plugin_id' is a required parameter.")
-        except ValueError:
-            raise RuntimeError("'plugin_id' must be an integer string.")
         plugin = CMSPlugin.objects.get(pk=plugin_id)
         try:
             placeholder_id = get_int(request.POST.get('placeholder_id'))
@@ -483,7 +481,7 @@ class PlaceholderAdminMixin(object):
             raise RuntimeError("'placeholder_id' must be an integer string.")
         placeholder = Placeholder.objects.get(pk=placeholder_id)
         # The rest are optional
-        parent_id = get_int(request.POST.get('plugin_parent', None), None)
+        parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         language = request.POST.get('plugin_language', None)
         move_a_copy = request.POST.get('move_a_copy', False)
         move_a_copy = (move_a_copy and move_a_copy != "0" and
@@ -497,7 +495,7 @@ class PlaceholderAdminMixin(object):
         if not self.has_move_plugin_permission(request, plugin, placeholder):
             return HttpResponseForbidden(
                 force_text(_("You have no permission to move this plugin")))
-        if not placeholder == source_placeholder:
+        if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,
@@ -556,6 +554,7 @@ class PlaceholderAdminMixin(object):
             else:
                 sibling = CMSPlugin.get_last_root_node()
                 plugin.parent_id = None
+                plugin.placeholder = placeholder
                 plugin.save()
                 plugin = plugin.move(sibling, pos='right')
 
