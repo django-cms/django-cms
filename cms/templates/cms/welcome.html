@@ -17,9 +17,9 @@
                 <span class="cms-icon cms-icon-check"></span>
                 {% trans "Installation successful!" %}
             </h1>
-            <div class="cms-welcome-logo">
+            <a href="/" class="cms-welcome-logo">
                 <span class="cms-hidden">{% trans "django CMS" %}</span>
-            </div>
+            </a>
         </header>
         {{ request.version }}
 
@@ -35,7 +35,7 @@
                 {% blocktrans %}
                     Welcome to django CMS version <strong>{{ cms_version }}</strong>.
                 {% endblocktrans %}
-                </p>
+            </p>
             <p>
                 {% url "admin:cms_page_add" as admin_add_page %}
                 {% if user.is_authenticated %}
@@ -48,6 +48,7 @@
                         <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">add a page</a> manually.
                     {% endblocktrans %}
                 {% endif %}
+            </p>
         </section>
 
         <footer class="cms-welcome-footer">

@@ -31,8 +31,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -99,12 +97,12 @@ var CMS = window.CMS || {};
                 });
 
                 // set top to 0 if toolbar is collapsed
-                if (this.settings.toolbar === 'collapsed') {
+                if (CMS.settings.toolbar === 'collapsed') {
                     top = 0;
                 }
 
                 // do we need to add debug styles?
-                if (this.config.debug) {
+                if (CMS.config.debug) {
                     top = top + 5;
                 }
 

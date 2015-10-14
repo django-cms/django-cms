@@ -906,7 +906,6 @@ var CMS = window.CMS || {};
                 var that = this;
                 var items = '.cms-submenu-edit, .cms-submenu-item a';
                 nav.parent().find(items).on(that.click, function (e) {
-
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -969,7 +968,6 @@ var CMS = window.CMS || {};
                             CMS.API.Toolbar._delegate(el);
                     }
                 });
-
             },
 
             /**

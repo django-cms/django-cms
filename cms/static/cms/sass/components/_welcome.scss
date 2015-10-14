@@ -49,11 +49,21 @@
         }
     }
 
-    .cms-welcome-logo {
+    .cms-welcome-logo,
+    .cms-welcome-logo:hover {
         @extend %icon;
         @include icon(logo);
         font-size: 35px;
+        text-decoration: none;
         margin: 50px auto 30px;
+        color: $gray;
+        &:before {
+            color: black;
+            transition: color $speed-base;
+        }
+        &:hover:before {
+            color: $color-primary;
+        }
     }
 
     // section area

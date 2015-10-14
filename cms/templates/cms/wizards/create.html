@@ -19,8 +19,11 @@
             {% include "cms/wizards/includes/form_fields.html" %}
         </div>
         <div class="submit-row">
-            <button name="wizard_goto_step" class="cms-btn cms-btn-secondary cms-btn-group" value="{{ wizard.steps.prev }}">{% trans "Back" %}</button>
-            <input type="submit" class="cms-btn cms-btn-action" value="{% trans "Create" %}"/>
+            <input type="submit" class="cms-btn cms-btn-action" value="{% trans "Create" %}">
+            <button type="button" name="wizard_goto_step"
+                class="cms-btn cms-btn-secondary cms-btn-group" value="{{ wizard.steps.prev }}">
+                {% trans "Back" %}
+            </button>
         </div>
     </form>
 {% endblock %}

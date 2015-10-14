@@ -38,8 +38,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -112,7 +110,7 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // attach event to the trigger handler
-                this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
+                this.ui.toolbarTrigger.on(this.click, function (e) {
                     e.preventDefault();
                     that.toggle();
                     that.ui.document.trigger(that.click);
@@ -272,7 +270,7 @@ var CMS = window.CMS || {};
 
                     // in case of the publish button
                     btn.find('.cms-publish-page').on(that.click, function (e) {
-                        if (!confirm(that.config.lang.publish)) {
+                        if (!confirm(CMS.config.lang.publish)) {
                             e.preventDefault();
                         }
                     });
@@ -310,7 +308,7 @@ var CMS = window.CMS || {};
                 var publishBtn = $('.cms-btn-publish').parent();
 
                 // setup toolbar visibility, we need to reverse the options to set the correct state
-                if (this.settings.toolbar === 'expanded') {
+                if (CMS.settings.toolbar === 'expanded') {
                     this.open({ duration: 0 });
                 } else {
                     this.close();
@@ -345,9 +343,9 @@ var CMS = window.CMS || {};
                 }
 
                 // enforce open state if user is not logged in but requests the toolbar
-                if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
+                if (!CMS.config.auth || CMS.config.settings.version !== CMS.settings.version) {
                     this.open({ duration: 0 });
-                    this.settings = this.setSettings(CMS.config.settings);
+                    CMS.settings = this.setSettings(CMS.config.settings);
                 }
 
                 // should switcher indicate that there is an unpublished page?
@@ -362,10 +360,10 @@ var CMS = window.CMS || {};
                 }
 
                 // open sideframe if it was previously opened
-                if (this.settings.sideframe.url) {
+                if (CMS.settings.sideframe.url) {
                     var sideframe = new CMS.Sideframe();
                     sideframe.open({
-                        url: this.settings.sideframe.url,
+                        url: CMS.settings.sideframe.url,
                         animate: false
                     });
                 }
@@ -387,7 +385,7 @@ var CMS = window.CMS || {};
              */
             toggle: function toggle() {
                 // toggle bar
-                if (this.settings.toolbar === 'collapsed') {
+                if (CMS.settings.toolbar === 'collapsed') {
                     this.open();
                 } else {
                     this.close();
@@ -405,8 +403,8 @@ var CMS = window.CMS || {};
                 this._show(opts);
 
                 // set new settings
-                this.settings.toolbar = 'expanded';
-                this.settings = this.setSettings(this.settings);
+                CMS.settings.toolbar = 'expanded';
+                CMS.settings = this.setSettings(CMS.settings);
             },
 
             /**
@@ -443,8 +441,8 @@ var CMS = window.CMS || {};
                 this._hide();
 
                 // set new settings
-                this.settings.toolbar = 'collapsed';
-                this.settings = this.setSettings(this.settings);
+                CMS.settings.toolbar = 'collapsed';
+                CMS.settings = this.setSettings(CMS.settings);
             },
 
             /**
@@ -467,7 +465,7 @@ var CMS = window.CMS || {};
                 this.ui.toolbar.css('margin-top', -toolbarHeight);
                 // animate html
                 this.ui.body.removeClass('cms-toolbar-expanded');
-                this.ui.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+                this.ui.body.animate({ 'margin-top': (CMS.config.debug) ? 5 : 0 }, speed);
                 // set messages top to 0
                 this.ui.messages.css('top', 0);
             },
@@ -573,7 +571,10 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'cms_frame':
-                        var frame = window.open(el.attr('href'), JSON.stringify({ name: 'cms_frame', url: window.location.href }));
+                        var frame = window.open(el.attr('href'), JSON.stringify({
+                            name: 'cms_frame',
+                            url: window.location.href
+                        }));
                         frame.focus();
                         break;
                     case 'sideframe':
@@ -690,7 +691,7 @@ var CMS = window.CMS || {};
                     if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
                             CMS.API.Messages.open({
-                                message: that.config.lang.debug
+                                message: CMS.config.lang.debug
                             });
                         }, timeout);
                     }

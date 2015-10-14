@@ -37,8 +37,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -119,7 +117,7 @@ var CMS = window.CMS || {};
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
                 var params = [];
-                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                var width = CMS.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
                 var currentWidth = this.ui.sideframe.outerWidth();
                 var isFrameVisible = this.ui.sideframe.is(':visible');
 
@@ -159,7 +157,7 @@ var CMS = window.CMS || {};
                     // The user has performed an action that requires the
                     // sideframe to be shown, this intent outweighs any
                     // previous intent to minimize the frame.
-                    this.settings.sideframe.hidden = false;
+                    CMS.settings.sideframe.hidden = false;
                 }
 
                 if (isFrameVisible && Math.round(currentWidth) === Math.round(width)) {
@@ -202,13 +200,13 @@ var CMS = window.CMS || {};
                     iframe.show();
 
                     // add debug infos
-                    if (that.config.debug) {
+                    if (CMS.config.debug) {
                         iframe.contents().find('body').addClass('cms-debug');
                     }
 
                     // save url in settings
-                    that.settings.sideframe.url = iframe.prop('src');
-                    that.settings = that.setSettings(that.settings);
+                    CMS.settings.sideframe.url = iframe.prop('src');
+                    CMS.settings = that.setSettings(CMS.settings);
 
                     // bind extra events
                     body.on(that.click, function () {
@@ -241,7 +239,7 @@ var CMS = window.CMS || {};
                 this.ui.sideframe.show();
 
                 // check if sideframe should be hidden
-                if (this.settings.sideframe.hidden) {
+                if (CMS.settings.sideframe.hidden) {
                     this._hide();
                 }
 
@@ -281,12 +279,12 @@ var CMS = window.CMS || {};
                 this.ui.dimmer.hide();
 
                 // update settings
-                this.settings.sideframe = {
+                CMS.settings.sideframe = {
                     url: null,
                     hidden: false,
                     width: this.options.sideframeWidth
                 };
-                this.settings = this.setSettings(this.settings);
+                CMS.settings = this.setSettings(CMS.settings);
 
                 // check for reloading
                 this.reloadBrowser(this.options.onClose, false, true);
@@ -350,12 +348,12 @@ var CMS = window.CMS || {};
                     that.ui.sideframe.css('width', e.originalEvent.clientX);
 
                     // update settings
-                    that.settings.sideframe.position = e.originalEvent.clientX;
+                    CMS.settings.sideframe.position = e.originalEvent.clientX;
 
                     // save position into our settings
                     clearTimeout(timer);
                     timer = setTimeout(function () {
-                        that.settings = that.setSettings(that.settings);
+                        CMS.settings = that.setSettings(CMS.settings);
                     }, that.settingsRefreshTimer);
                 });
             },

@@ -30,9 +30,6 @@ var CMS = window.CMS || {};
             initialize: function () {
                 this._setupUI();
 
-                this.config = CMS.config;
-                this.settings = CMS.settings;
-
                 // states
                 this.click = 'click.cms.clipboard';
 
@@ -126,7 +123,7 @@ var CMS = window.CMS || {};
              */
             clear: function (callback) {
                 // post needs to be a string, it will be converted using JSON.parse
-                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
+                var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
                 var pasteItems = $('.cms-submenu-item [data-rel=paste]').parent().
                     addClass('cms-submenu-item-disabled');
                 pasteItems.find('.cms-submenu-item-paste-tooltip').css('display', 'none');
@@ -134,7 +131,7 @@ var CMS = window.CMS || {};
 
                 // redirect to ajax
                 CMS.API.Toolbar.openAjax({
-                    url: this.config.clipboard.url,
+                    url: CMS.config.clipboard.url,
                     post: post,
                     callback: callback
                 });
