@@ -29,7 +29,8 @@ var CMS = {
         SPACE: 32,
         ESC: 27,
         CMD_LEFT: 91,
-        CMD_RIGHT: 93
+        CMD_RIGHT: 93,
+        CMD_FIREFOX: 224
     }
 };
 

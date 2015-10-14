@@ -1048,7 +1048,9 @@ var CMS = window.CMS || {};
                 }
 
                 if (mac) {
-                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT ||
+                        e.keyCode === CMS.KEYS.CMD_RIGHT ||
+                        e.keyCode === CMS.KEYS.CMD_FIREFOX) {
                         cmdPressed = true;
                     }
 
