@@ -42,11 +42,11 @@ other changes in the CMS for version 3.2 provides automatic reloading of URLs
 when changes to an apphook are made. This is tested to work in many types of
 production environments, but may not work in some others.
 
-************************
-Minor changes / Bugfixes
-************************
+*************************
+Minor changes / Bug fixes
+*************************
 
-* Fix placeholder templatetags ignoring the lang parameter
+* Fix placeholder template tags ignoring the ``lang`` parameter
 
 
 *****************************
@@ -57,9 +57,9 @@ Backward incompatible changes
   according to the new naming convention. If you import those modules, you will need to amend
   your ``import`` statements appropriately.
 
-* Fixing "placeholder templatetags ignoring the lang parameter" may affect the behavior of your
+* Fixing "placeholder template tags ignoring the ``lang`` parameter" may affect the behaviour of your
   templates as a previously ignored parameter is no longer ignored; if you used the ``lang``
-  parameter for placeholder templatetags you may be affected: check the behavior after the upgrade.
+  parameter for placeholder template tags you may be affected: check the behaviour after the upgrade.
 
 
 .. _upgrade-guide-3.2:
