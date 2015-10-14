@@ -763,7 +763,8 @@ var CMS = window.CMS || {};
                 });
 
                 // manually add cancel button at the end
-                cancel.on(that.click, function () {
+                cancel.on(that.click, function (e) {
+                    e.preventDefault();
                     that.options.onClose = false;
                     that.close();
                 });
