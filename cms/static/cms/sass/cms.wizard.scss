@@ -67,8 +67,8 @@ $wizard-input-size: 16px;
         }
 
         &.active {
-            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border, false);
-            color: $btn-action-color !important;
+            border-color: $btn-action-border;
+            background: lighten($btn-action-bgcolor, 45%);
         }
     }
 }
