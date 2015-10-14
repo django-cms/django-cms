@@ -130,8 +130,14 @@ $row-height: 41px;
     .col-published input {
         display: none;
     }
+    // the tree is recalculated once you set the navigation to be
+    // shown or hidden. In initialization the calculation is off by
+    // 1px so we need to enforce the with for correct placement
     .col-navigation {
         width: 26px !important;
+    }
+    .col-actions {
+        width: 150px !important;
     }
 
     // header
