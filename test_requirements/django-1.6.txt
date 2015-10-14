@@ -6,3 +6,4 @@ django-reversion<1.8.3
 django-hvad>=1.0
 django-classy-tags>=0.5
 django-sekizai>=0.7
+django-debug-toolbar<=1.3.2
