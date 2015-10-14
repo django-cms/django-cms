@@ -112,7 +112,7 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // attach event to the trigger handler
-                this.ui.toolbarTrigger.find('a').on(this.pointerUp, function (e) {
+                this.ui.toolbarTrigger.on(this.click, function (e) {
                     e.preventDefault();
                     that.toggle();
                     that.ui.document.trigger(that.click);
