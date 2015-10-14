@@ -454,6 +454,7 @@
     z-index: z(toolbar-trigger);
     border-bottom: 1px solid $toolbar-border;
     border-left: 1px solid $toolbar-border;
+    background: $white;
 
     a {
         display: block;
