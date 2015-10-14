@@ -272,6 +272,30 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = template.render(context)
             self.assertIn('JAVASCRIPT', output)
 
+    def test_show_placeholder_lang_parameter(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en')
+        create_title('fr', 'Fr Test', page)
+        placeholder = page.placeholders.all()[0]
+        add_plugin(placeholder, TextPlugin, 'en', body='<b>En Test</b>')
+        add_plugin(placeholder, TextPlugin, 'fr', body='<b>Fr Test</b>')
+        request = RequestFactory().get('/')
+        request.user = AnonymousUser()
+        request.current_page = page
+        template = Template(
+            "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")
+        context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
+        output = template.render(context)
+        self.assertIn('<b>En Test</b>', output)
+
+        template = Template(
+            "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'fr' 1 %}{% render_block 'js' %}")
+        context = RequestContext(request, {'page': page, 'slot': placeholder.slot})
+        output = template.render(context)
+        self.assertIn('<b>Fr Test</b>', output)
+
     def test_show_placeholder_for_page_marks_output_safe(self):
         from django.core.cache import cache
 

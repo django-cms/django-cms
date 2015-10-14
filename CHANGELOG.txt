@@ -16,6 +16,7 @@
 - Improvements in enforcing parent plugin restricts on frontend
 - Remove Alias from list of plugins (Create Alias still an option)
 - Pulls Aldryn Apphook Reload into core
+- Fix placeholder templatetags ignoring the lang parameter
 
 
 === 3.1.4 (Unreleased) ===
