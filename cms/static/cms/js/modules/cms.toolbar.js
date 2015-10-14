@@ -571,7 +571,10 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'cms_frame':
-                        var frame = window.open(el.attr('href'), JSON.stringify({ name: 'cms_frame', url: window.location.href }));
+                        var frame = window.open(el.attr('href'), JSON.stringify({
+                            name: 'cms_frame',
+                            url: window.location.href
+                        }));
                         frame.focus();
                         break;
                     case 'sideframe':
