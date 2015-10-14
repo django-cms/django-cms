@@ -42,8 +42,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -672,7 +670,7 @@ var CMS = window.CMS || {};
                 var that = this;
                 var group = $('<div class="cms-modal-item-buttons"></div>');
                 var render = $('<div class="cms-modal-buttons-inner"></div>');
-                var cancel = $('<a href="#" class="cms-btn">' + this.config.lang.cancel + '</a>');
+                var cancel = $('<a href="#" class="cms-btn">' + CMS.config.lang.cancel + '</a>');
                 var row;
                 var tmp;
 
@@ -1005,8 +1003,8 @@ var CMS = window.CMS || {};
             _deletePlugin: function _deletePlugin(opts) {
                 var that = this;
                 var data = CMS._newPlugin;
-                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                var text = this.config.lang.confirmEmpty.replace(
+                var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
+                var text = CMS.config.lang.confirmEmpty.replace(
                     '{1}', CMS._newPlugin.breadcrumb[CMS._newPlugin.breadcrumb.length - 1].title
                 );
 
