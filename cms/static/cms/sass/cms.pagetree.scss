@@ -337,6 +337,10 @@ $row-height: 41px;
     li#dragged {
         min-width: 500px;
         z-index: 99999;
+        padding-right: 0;
+        margin-right: 0;
+        background-color: transparent;
+        border-right: 1px solid $gray-lighter;
     }
     li#dragged .col2 {
         display: none;
@@ -356,7 +360,8 @@ $row-height: 41px;
     // remove backgrounds
     .moveable,
     .tree-default,
-    .tree .tree-default ul {
+    .tree .tree-default ul,
+    #dragged {
         background-image: none !important;
     }
     .moveable.open {
