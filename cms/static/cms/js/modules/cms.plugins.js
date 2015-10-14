@@ -907,7 +907,7 @@ var CMS = window.CMS || {};
                 var items = '.cms-submenu-edit, .cms-submenu-item a';
                 nav.parent().find(items).on(that.click, function (e) {
 
-                        e.preventDefault();
+                            e.preventDefault();
                         e.stopPropagation();
 
                         // show loader and make sure scroll doesn't jump
