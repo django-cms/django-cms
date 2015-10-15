@@ -191,7 +191,7 @@ hook like this::
 
 
 .. note::
-    If you do provide an ``app_label``, then you will need to also give the app
+    If you do provide an ``app_name``, then you will need to also give the app
     a unique namespace in the *Advanced settings* of the page. If you do not, and
     no other instance of the app exists using it, then the 'default instance
     namespace' will be automatically set for you. You can then either reverse
