@@ -95,7 +95,7 @@
         display: none;
     }
     > li:first-child > a span {
-        font-weight: 800;
+        font-weight: 600;
     }
     .cms-icon {
         display: none;
@@ -454,6 +454,7 @@
     z-index: z(toolbar-trigger);
     border-bottom: 1px solid $toolbar-border;
     border-left: 1px solid $toolbar-border;
+    background: $white;
 
     a {
         display: block;

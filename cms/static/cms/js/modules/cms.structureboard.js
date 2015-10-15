@@ -48,8 +48,6 @@
 
             initialize: function (options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -108,7 +106,7 @@
                 // which should be fixed btw. _resizeBoard wants plugins to be initialized,
                 // otherwise throws errors
                 setTimeout(function () {
-                    if (that.settings.mode === 'structure') {
+                    if (CMS.settings.mode === 'structure') {
                         that.show(true);
                     } else {
                         // triggering hide here to switch proper classnames on switcher
@@ -133,7 +131,7 @@
                 modes.eq(1).on(that.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
-                    if (that.settings.mode === 'edit') {
+                    if (CMS.settings.mode === 'edit') {
                         return false;
                     }
                     // otherwise hide
@@ -143,7 +141,7 @@
                 modes.eq(0).on(that.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
-                    if (that.settings.mode === 'structure') {
+                    if (CMS.settings.mode === 'structure') {
                         return false;
                     }
                     // otherwise show
@@ -158,9 +156,9 @@
                         var haveFocusedField = document.activeElement !== document.body;
                         if (e.keyCode === CMS.KEYS.SPACE && !haveFocusedField) {
                             e.preventDefault();
-                            if (that.settings.mode === 'structure') {
+                            if (CMS.settings.mode === 'structure') {
                                 that.hide();
-                            } else if (that.settings.mode === 'edit') {
+                            } else if (CMS.settings.mode === 'edit') {
                                 that.show();
                             }
                         }
@@ -193,9 +191,9 @@
                     .addClass('cms-structure-mode-structure');
 
                 // apply new settings
-                this.settings.mode = 'structure';
+                CMS.settings.mode = 'structure';
                 if (!init) {
-                    this.settings = this.setSettings(this.settings);
+                    CMS.settings = this.setSettings(CMS.settings);
                 }
 
                 // ensure all elements are visible
@@ -224,9 +222,9 @@
                 // hide clipboard if in edit mode
                 this.ui.container.find('.cms-clipboard').hide();
 
-                this.settings.mode = 'edit';
+                CMS.settings.mode = 'edit';
                 if (!init) {
-                    this.settings = this.setSettings(this.settings);
+                    CMS.settings = this.setSettings(CMS.settings);
                 }
 
                 // hide canvas

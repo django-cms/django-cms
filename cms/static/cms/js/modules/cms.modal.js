@@ -42,8 +42,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -672,7 +670,7 @@ var CMS = window.CMS || {};
                 var that = this;
                 var group = $('<div class="cms-modal-item-buttons"></div>');
                 var render = $('<div class="cms-modal-buttons-inner"></div>');
-                var cancel = $('<a href="#" class="cms-btn">' + this.config.lang.cancel + '</a>');
+                var cancel = $('<a href="#" class="cms-btn">' + CMS.config.lang.cancel + '</a>');
                 var row;
                 var tmp;
 
@@ -730,7 +728,9 @@ var CMS = window.CMS || {};
 
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
-                    el.on(that.click, function () {
+                    el.on(that.click, function (e) {
+                        e.preventDefault();
+
                         if (item.is('a')) {
                             that._loadIframe({
                                 url: item.prop('href'),
@@ -763,7 +763,8 @@ var CMS = window.CMS || {};
                 });
 
                 // manually add cancel button at the end
-                cancel.on(that.click, function () {
+                cancel.on(that.click, function (e) {
+                    e.preventDefault();
                     that.options.onClose = false;
                     that.close();
                 });
@@ -1005,8 +1006,8 @@ var CMS = window.CMS || {};
             _deletePlugin: function _deletePlugin(opts) {
                 var that = this;
                 var data = CMS._newPlugin;
-                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                var text = this.config.lang.confirmEmpty.replace(
+                var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
+                var text = CMS.config.lang.confirmEmpty.replace(
                     '{1}', CMS._newPlugin.breadcrumb[CMS._newPlugin.breadcrumb.length - 1].title
                 );
 
@@ -1048,7 +1049,9 @@ var CMS = window.CMS || {};
                 }
 
                 if (mac) {
-                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT ||
+                        e.keyCode === CMS.KEYS.CMD_RIGHT ||
+                        e.keyCode === CMS.KEYS.CMD_FIREFOX) {
                         cmdPressed = true;
                     }
 

@@ -29,7 +29,8 @@ var CMS = {
         SPACE: 32,
         ESC: 27,
         CMD_LEFT: 91,
-        CMD_RIGHT: 93
+        CMD_RIGHT: 93,
+        CMD_FIREFOX: 224
     }
 };
 
@@ -129,7 +130,7 @@ var CMS = {
                 }
 
                 // use local storage or session
-                if (window.localStorage) {
+                if (this._isStorageSupported) {
                     // save within local storage
                     localStorage.setItem('cms_cookie', settings);
                     if (CMS.API.Toolbar) {
@@ -179,7 +180,7 @@ var CMS = {
                 }
 
                 // use local storage or session
-                if (window.localStorage) {
+                if (this._isStorageSupported) {
                     // get from local storage
                     settings = JSON.parse(localStorage.getItem('cms_cookie'));
                     if (CMS.API.Toolbar) {
@@ -369,7 +370,24 @@ var CMS = {
                     }
                     return result;
                 };
-            }
+            },
+
+            /**
+             * Localstorage shim from Modernizr
+             *
+             * @method _isStorageSupported
+             * @private
+             */
+            _isStorageSupported: (function localStorageCheck() {
+                var mod = 'modernizr';
+                try {
+                    localStorage.setItem(mod, mod);
+                    localStorage.removeItem(mod);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }())
         };
 
         // autoinits
