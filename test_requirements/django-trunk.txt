@@ -1,4 +1,9 @@
 -r requirements_base.txt
 https://github.com/django/django/tarball/master/django.tar.gz#egg=django
 django-reversion>=1.8
+<<<<<<< HEAD
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip
+=======
+https://github.com/gabejackson/django-hvad/archive/django_1.7_compat.zip
+django-debug-toolbar<=1.4
+>>>>>>> upstream/support/3.0.x
