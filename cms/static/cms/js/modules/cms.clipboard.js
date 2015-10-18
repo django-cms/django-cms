@@ -119,7 +119,7 @@ var CMS = window.CMS || {};
              * no matter what outcome was of the ajax call.
              *
              * @method clear
-             * @param [callback] {Function}
+             * @param {Function} [callback]
              */
             clear: function (callback) {
                 // post needs to be a string, it will be converted using JSON.parse
