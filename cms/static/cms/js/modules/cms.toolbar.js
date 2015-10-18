@@ -24,7 +24,6 @@ var CMS = window.CMS || {};
          * @class Toolbar
          * @namespace CMS
          * @uses CMS.API.Helpers
-         * @uses CMS.Navigation
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -42,6 +41,9 @@ var CMS = window.CMS || {};
                 // elements
                 this._setupUI();
 
+                /**
+                 * @property {CMS.Navigation} navigation
+                 */
                 this.navigation = new CMS.Navigation();
 
                 // states
@@ -396,8 +398,8 @@ var CMS = window.CMS || {};
              * Opens the toolbar (slide down).
              *
              * @method open
-             * @param [opts] {Object}
-             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             * @param {Object} [opts]
+             * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
              */
             open: function open(opts) {
                 this._show(opts);
@@ -412,8 +414,8 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
-             * @param [opts] {Object}
-             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             * @param {Object} [opts]
+             * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
              */
             _show: function _show(opts) {
                 var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
@@ -471,15 +473,15 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Closes the message window underneath the toolbar.
+             * Makes a request to the given url, runs optional callbacks.
              *
-             * @method open
-             * @param opts
-             * @param opts.url {String} url where the ajax points to
-             * @param [opts.post] {Object} post data to be passed
-             * @param [opts.text] {String} message to be displayed
-             * @param [opts.callback] {Function} custom callback instead of reload
-             * @param [opts.onSuccess] {String} reload and display custom message
+             * @method openAjax
+             * @param {Object} opts
+             * @param {String} opts.url url where the ajax points to
+             * @param {Object} [opts.post] post data to be passed
+             * @param {String} [opts.text] message to be displayed
+             * @param {Function} [opts.callback] custom callback instead of reload
+             * @param {String} [opts.onSuccess] reload and display custom message
              * @return {Boolean|jQuery.Deferred} either false or a promise
              */
             openAjax: function (opts) {
@@ -548,7 +550,7 @@ var CMS = window.CMS || {};
              * Delegates event from element to appropriate functionalities.
              *
              * @method _delegate
-             * @param el {jQuery} trigger element
+             * @param {jQuery} el trigger element
              * @private
              */
             _delegate: function _delegate(el) {
@@ -603,7 +605,7 @@ var CMS = window.CMS || {};
              * Sets the functionality for the switcher button.
              *
              * @method _setSwitcher
-             * @param el {jQuery} button element
+             * @param {jQuery} el button element
              * @private
              */
             _setSwitcher: function _setSwitcher(el) {
@@ -657,7 +659,7 @@ var CMS = window.CMS || {};
              * Locks the toolbar so it cannot be closed.
              *
              * @method _lock
-             * @param lock {Boolean} true if the toolbar should be locked
+             * @param {Boolean} lock true if the toolbar should be locked
              * @private
              */
             _lock: function _lock(lock) {
