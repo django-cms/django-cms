@@ -27,24 +27,34 @@ var CMS = window.CMS || {};
 
             initialize: function () {
                 this.body = $('body');
+                /**
+                 * Are we on touch device?
+                 *
+                 * @property {Boolean} isTouch
+                 */
                 this.isTouch = false;
-                this.domElem = this.pick();
+                /**
+                 * Tooltip DOM element
+                 *
+                 * @property {jQuery} domElem
+                 */
+                this.domElem = this._pick();
 
-                this.checkTouch();
+                this._checkTouch();
             },
 
             /**
-             * Checks for touch event and switches to touch tooltip if detected
+             * Checks for touch event and switches to touch tooltip if detected.
              *
              * @method checkTouch
              * @private
              */
-            checkTouch: function () {
+            _checkTouch: function () {
                 var that = this;
 
                 this.body.one('touchstart.cms', function () {
                     that.isTouch = true;
-                    that.domElem = that.pick();
+                    that.domElem = that._pick();
 
                     // attach tooltip event for touch devices
                     that.domElem.on('touchstart.cms', function () {
@@ -54,14 +64,13 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Manages show/hide calls
+             * Manages show/hide calls.
              *
              * @method displayToggle
-             * @private
-             * @param isShown {Boolean}
-             * @param e {Object}
-             * @param name {String} - current plugin name
-             * @param id {String} - current plugin id
+             * @param {Boolean} isShown
+             * @param {Object} e event object
+             * @param {String} name current plugin name
+             * @param {String} id current plugin id
              */
             displayToggle: function (isShown, e, name, id) {
                 isShown ? this.show(e, name, id) : this.hide();
@@ -71,10 +80,9 @@ var CMS = window.CMS || {};
              * Shows tooltip with specific plugin-related parameters
              *
              * @method show
-             * @private
-             * @param e {Object}
-             * @param name {String} - current plugin name
-             * @param id {String} - current plugin id
+             * @param {Object} e
+             * @param {String} name current plugin name
+             * @param {String} id current plugin id
              */
             show: function (e, name, id) {
                 var tooltip = this.domElem;
@@ -101,7 +109,6 @@ var CMS = window.CMS || {};
              * Hides tooltip
              *
              * @method hide
-             * @private
              */
             hide: function () {
                 // change css
@@ -114,22 +121,22 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Picks tooltip to show (touch or desktop)
+             * Picks tooltip to show (touch or desktop).
              *
-             * @method pick
+             * @method _pick
              * @private
              */
-            pick: function () {
+            _pick: function () {
                 return this.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
             },
 
             /**
-             * Positions tooltip next to the pointer event coordinates
+             * Positions tooltip next to the pointer event coordinates.
              *
              * @method position
              * @private
-             * @param e {Object}
-             * @param tooltip {Object}
+             * @param {Object} e event object
+             * @param {jQuery} tooltip element
              */
             position: function (e, tooltip) {
                 // so lets figure out where we are
