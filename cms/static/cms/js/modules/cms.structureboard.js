@@ -1,11 +1,14 @@
 //##############################################################################
 // STRUCTUREBOARD
-/* global CMS */
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
 
 (function ($) {
     'use strict';
 
-    // CMS.$ will be passed for $
+    // shorthand for jQuery(document).ready();
     $(function () {
         var placeholders = $('.cms-dragarea:not(.cms-clipboard-containers)');
         function actualizeEmptyPlaceholders() {
@@ -35,8 +38,11 @@
         }
 
         /**
-         * StructureBoard
-         * handles drag & drop, mode switching and
+         * Handles drag & drop, mode switching and collapsables.
+         *
+         * @class StructureBoard
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.StructureBoard = new CMS.Class({
 
@@ -60,11 +66,16 @@
                 // setup initial stuff
                 this._setup();
 
-                // setup events
-                this._events();
+                this._setupModeSwitcher();
                 actualizeEmptyPlaceholders();
             },
 
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
             _setupUI: function setupUI() {
                 var container = $('.cms-structure');
                 var toolbar = $('.cms-toolbar');
@@ -87,7 +98,13 @@
                 };
             },
 
-            // initial methods
+            /**
+             * Initial setup (and early bail if specific
+             * elements do not exist).
+             *
+             * @method _setup
+             * @private
+             */
             _setup: function () {
                 var that = this;
                 // cancel if there are no dragareas
@@ -123,7 +140,14 @@
                 this._drag();
             },
 
-            _events: function () {
+            /**
+             * Sets up events handlers for switching
+             * structureboard modes.
+             *
+             * @method _setupModeSwitcher
+             * @private
+             */
+            _setupModeSwitcher: function () {
                 var that = this;
                 var modes = that.ui.toolbarModeLinks;
 
@@ -166,7 +190,13 @@
                 }
             },
 
-            // public methods
+            /**
+             * Shows the structureboard. (Structure mode)
+             *
+             * @method show
+             * @public
+             * @param {Boolean} init true if this is first initialization
+             */
             show: function (init) {
                 // cancel show if live modus is active
                 if (CMS.config.mode === 'live') {
@@ -203,6 +233,11 @@
                 this._showBoard();
             },
 
+            /**
+             * Hides the structureboard. (Content mode)
+             *
+             * @param {Boolean} init true if this is first initialization
+             */
             hide: function (init) {
                 // cancel show if live modus is active
                 if (CMS.config.mode === 'live') {
@@ -232,10 +267,10 @@
             },
 
             /**
-             * gets the id of the element
+             * Gets the id of the element.
              *
-             * @param el jQuery element to get id from
-             * @return String
+             * @param {jQuery} el element to get id from
+             * @return {String}
              */
             getId: function (el) {
                 // cancel if no element is defined
@@ -262,9 +297,9 @@
             },
 
             /**
-             * gets the ids of the list of  elements
+             * Gets the ids of the list of  elements.
              *
-             * @param el jQuery elements to get id from
+             * @param {jQuery} el elements to get id from
              * @return {String[]}
              */
             getIds: function (els) {
@@ -276,7 +311,12 @@
                 return array;
             },
 
-            // private methods
+            /**
+             * Actually shows the board canvas.
+             *
+             * @method _showBoard
+             * @private
+             */
             _showBoard: function () {
                 var that = this;
 
@@ -310,6 +350,12 @@
                 }
             },
 
+            /**
+             * Hides the board canvas.
+             *
+             * @method _hideBoard
+             * @private
+             */
             _hideBoard: function () {
                 // hide elements
                 this.ui.container.hide();
@@ -325,7 +371,12 @@
                 }
             },
 
-            /*
+            /**
+             * Resizes the placeholder to fit their placement
+             * and the structure board.
+             *
+             * @method _resizeBoard
+             * @private
              * @deprecated as of CMS 3.2
              */
             _resizeBoard: function () {
@@ -363,6 +414,12 @@
                 });
             },
 
+            /**
+             * Sets up all the sortables.
+             *
+             * @method _drag
+             * @private
+             */
             _drag: function () {
                 var that = this;
                 var originalPluginContainer;
