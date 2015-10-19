@@ -537,6 +537,7 @@ var CMS = window.CMS || {};
              */
             pastePlugin: function () {
                 clipboardDraggable.appendTo(this.ui.draggables);
+                this.ui.draggables.trigger('cms.update');
                 clipboardPlugin.trigger('cms.plugin.update');
             },
 

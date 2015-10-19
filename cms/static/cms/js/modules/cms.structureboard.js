@@ -585,7 +585,7 @@ var CMS = window.CMS || {};
 
                         return that.state;
                     }
-                });
+                }).on('cms.update', actualizeEmptyPlaceholders);
             }
 
         });
