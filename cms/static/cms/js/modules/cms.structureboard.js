@@ -374,7 +374,7 @@ var CMS = window.CMS || {};
             /**
              * Resizes the placeholder to fit their placement
              * and the structure board.
-
+             *
              * @method _resizeBoard
              * @private
              * @deprecated as of CMS 3.2
