@@ -69,12 +69,34 @@ class CMSPageWizard(Wizard):
             user, page, position="right", site=site)
 
 
+class CMSSubPageWizard(Wizard):
+
+    def user_has_add_permission(self, user, page=None, **kwargs):
+        if not page:
+            return False
+        if not page.site_id:
+            site = Site.objects.get_current()
+        else:
+            site = Site.objects.get(pk=page.site_id)
+        return user_has_page_add_permission(
+            user, page, position="last-child", site=site)
+
+
 cms_page_wizard = CMSPageWizard(
     title=_(u"New page"),
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
-    description=_(u"Start with a new blank page.")
+    description=_(u"Create a new blank page as a sibling to the current page.")
+)
+
+cms_subpage_wizard = CMSSubPageWizard(
+    title=_(u"New sub page"),
+    weight=110,
+    form=CreateCMSSubPageForm,
+    model=Page,
+    description=_(u"Create a new blank page as a child of the current page.")
 )
 
 wizard_pool.register(cms_page_wizard)
+wizard_pool.register(cms_subpage_wizard)

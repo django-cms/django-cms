@@ -29,6 +29,8 @@ class BaseCMSPageForm(forms.Form):
 
 class CreateCMSPageForm(BaseCMSPageForm):
 
+    sub_page = forms.BooleanField(initial=False, widget=forms.HiddenInput)
+
     @staticmethod
     def create_page_titles(page, title, languages):
         # Import here due to potential circular dependency issues
@@ -58,20 +60,37 @@ class CreateCMSPageForm(BaseCMSPageForm):
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people from possible form-hacking.
 
+        if 'sub_page' in self.cleaned_data:
+            sub_page = self.cleaned_data['sub_page']
+        else:
+            sub_page = False
+
+        if self.page:
+            if sub_page:
+                parent = self.page
+                position = "last-child"
+            else:
+                parent = self.page.parent
+                position = "right"
+        else:
+            parent = None
+            position = "last-child"
+
+        # Before we do this, verify this user has perms to do so.
         if not (self.user.is_superuser or
                 user_has_page_add_permission(self.user, self.page,
                                              position=position,
                                              site=self.page.site_id)):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
-        title = self.cleaned_data['title']
 
+        title = self.cleaned_data['title']
         page = create_page(
             title=title,
             template=TEMPLATE_INHERITANCE_MAGIC,
             language=self.language_code,
             created_by=smart_text(self.user),
-            parent=self.page,
+            parent=parent,
             in_navigation=True,
             published=False
         )
@@ -89,3 +108,8 @@ class CreateCMSPageForm(BaseCMSPageForm):
                 )
 
         return page
+
+
+class CreateCMSSubPageForm(CreateCMSPageForm):
+
+    sub_page = forms.BooleanField(initial=True, widget=forms.HiddenInput)
