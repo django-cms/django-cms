@@ -20,7 +20,7 @@ class WizardBase(object):
         :param title: This is used on the start form.
         :param weight: Used for determining the order of the wizards on the
                        creation form.
-        :param form:
+        :param form: The form to use.
         :param model: Required either here or in the form's Meta class. This is
                       used to determine uniqueness of the wizards, so, only one
                       wizard per model.
