@@ -56,7 +56,7 @@ class Wizard(WizardBase):
     def __repr__(self):
         return 'Wizard: "{0}"'.format(force_text(self.title))
 
-    def user_has_add_permission(self, user):
+    def user_has_add_permission(self, user, **kwargs):
         """
         Returns whether the given «user» has permission to add instances of this
         wizard's associated model. Can be overridden as required for more
