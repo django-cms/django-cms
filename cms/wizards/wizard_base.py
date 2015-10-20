@@ -48,7 +48,7 @@ class Wizard(WizardBase):
 
     @property
     def id(self):
-        return self.__class__.__name__
+        return ".".join([self.__module__, self.__class__.__name__])
 
     def __str__(self):
         return self.title
