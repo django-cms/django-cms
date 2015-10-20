@@ -14,8 +14,8 @@ To begin, create a folder in the root level of your module called
     from cms.wizards.wizard_base import Wizard
     from cms.wizards.wizard_pool import wizard_pool
 
-Then, simply initialise a Wizard and register it. If you were to do this for
-`MyApp`, it might look like this::
+Then, simply subclass Wizard, instantiate it, then register it. If you were to
+do this for `MyApp`, it might look like this::
 
     # my_apps/forms.py
 
@@ -34,7 +34,10 @@ Then, simply initialise a Wizard and register it. If you were to do this for
     from .forms import MyAppWizardForm
     from .models import MyApp
 
-    my_app_wizard = Wizard(
+    class MyAppWizard(Wizard):
+        pass
+
+    my_app_wizard = MyAppWizard(
         title="New MyApp",
         weight=200,
         form=MyAppWizardForm,
@@ -56,10 +59,8 @@ The above example is using a ModelForm, but you can also use `forms.Form`.
 In this case, you **must** provide the model class as another keyword argument
 when you instantiate the Wizard object.
 
-Currently, each Wizard is associated with a single model
-(`django.db.models.Model`) and in fact, it is the model's content type that
-determines wizard uniqueness. Because of this, the wizard pool can only have a
-single wizard per Model registered at any one time.
+You must subclass `cms.wizards.wizard_base.Wizard` to use it. This is because
+each wizard's uniqueness is determined by its class and module name.
 
 The keyword arguments accepted for instantiating a Wizard object are:
 
@@ -89,10 +90,7 @@ is_registered
 Sometimes, it may be necessary to check to see if a specific wizard has been
 registered. To do this, simply call::
 
-    value = wizard_pool.is_registered(«wizard or content-type ID»)
-
-Remember that two wizards that both use the underlying model/content-type will
-considered the same wizard.
+    value = wizard_pool.is_registered(«wizard»)
 
 
 register
@@ -106,8 +104,8 @@ This sort of thing should look very familiar, as a similar approach is used for
 cms_apps, template tags and even Django's admin.
 
 Calling the wizard pool's `register` method will register the provided wizard
-into the pool, unless there is already a wizard of the same content-type
-(model). In this case, the register method will raise a
+into the pool, unless there is already a wizard of the same module and class
+name. In this case, the register method will raise a
 `cms.wizards.wizard_pool.AlreadyRegisteredException`.
 
 
@@ -117,7 +115,7 @@ unregister
 It may be useful to unregister wizards that have already been registered into
 the pool. To do this, simply call::
 
-    value = wizard_pool.unregister(«wizard or content-type ID»)
+    value = wizard_pool.unregister(«wizard»)
 
 The value returned will be a Boolean. True if a wizard was successfully
 unregistered or False otherwise.
@@ -130,12 +128,6 @@ If you would like to get a reference to a specific wizard in the pool, just call
 `get_entry()` as follows::
 
     wizard = wizard_pool.get_entry(my_app_wizard)
-
-In this case, it may seem silly, but consider that you can also supply the
-content-type ID of the model you are using, and this will return the entire
-corresponding wizard object::
-
-    wizard = wizard_pool.get_entry(«content-type ID»)
 
 
 get_entries
