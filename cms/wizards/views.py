@@ -16,6 +16,8 @@ except ImportError:  # pragma: no cover
     # This is fine from Django 1.7
     from formtools.wizard.views import SessionWizardView
 
+from cms.models import Page
+
 from .wizard_pool import wizard_pool
 from .forms import (
     WizardStep1Form,
@@ -69,10 +71,10 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
 
     def get_form_initial(self, step):
         initial = super(WizardCreateView, self).get_form_initial(step)
-
         if self.is_first_step(step):
-            # set the current page from GET param.
-            initial['page'] = self.request.GET.get('page')
+            # set the current page from GET param ?page=pk.
+            page_pk = self.request.GET.get('page', None)
+            initial['page'] = Page.objects.filter(pk=page_pk).first()
         return initial
 
     def get_context_data(self, **kwargs):
@@ -85,8 +87,10 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
     def get_form_kwargs(self, step=None):
         kwargs = super(WizardCreateView, self).get_form_kwargs()
         kwargs['wizard_user'] = self.request.user
-
-        if self.is_second_step(step):
+        if self.is_first_step(step):
+            kwargs['wizard_page'] = Page.objects.filter(
+                pk=self.request.GET.get('page', None)).first()
+        elif self.is_second_step(step):
             kwargs['wizard_page'] = self.get_origin_page()
         return kwargs
 
