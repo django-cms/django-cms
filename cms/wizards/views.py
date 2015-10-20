@@ -138,7 +138,7 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
 
     def get_selected_entry(self):
         data = self.get_cleaned_data_for_step('0')
-        return wizard_pool.get_entry(int(data['entry']))
+        return wizard_pool.get_entry(data['entry'])
 
     def get_origin_page(self):
         data = self.get_cleaned_data_for_step('0')
