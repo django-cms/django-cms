@@ -94,7 +94,7 @@ cms_subpage_wizard = CMSSubPageWizard(
     weight=110,
     form=CreateCMSSubPageForm,
     model=Page,
-    description=_(u"Create a new blank page as a child of the current page.")
+    description=_(u"Create a sub-page to the current page.")
 )
 
 wizard_pool.register(cms_page_wizard)
