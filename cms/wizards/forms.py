@@ -61,7 +61,6 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     entry = forms.ChoiceField(choices=[], widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('wizard_user', None)
         super(WizardStep1Form, self).__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
         self.fields['entry'].choices = entry_choices(user=self.user,

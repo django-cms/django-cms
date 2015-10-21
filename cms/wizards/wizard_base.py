@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib.contenttypes.models import ContentType
+import hashlib
+
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import python_2_unicode_compatible
@@ -45,10 +46,21 @@ class WizardBase(object):
 @python_2_unicode_compatible
 class Wizard(WizardBase):
     template_name = 'cms/wizards/create.html'
+    _hash_cache = None
 
     @property
     def id(self):
-        return ".".join([self.__module__, self.__class__.__name__])
+        """
+        To construct an unique ID for each wizard, we start with the module and
+        class name for uniqueness, we hash it because a wizard's ID is displayed
+        in the form's markup, and we'd rather not expose code paths there.
+        """
+        if not self._hash_cache:
+            full_path = ".".join([self.__module__, self.__class__.__name__])
+            hash = hashlib.sha1()
+            hash.update(full_path)
+            self._hash_cache = hash.hexdigest()
+        return self._hash_cache
 
     def __str__(self):
         return self.title
