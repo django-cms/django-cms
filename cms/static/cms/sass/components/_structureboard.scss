@@ -465,6 +465,12 @@
 
 @at-root .cms-structure-mode-structure {
     overflow: hidden;
+    // min-height is necessary for iOS9
+    // when we have a page that has content
+    // that takes less than a screen structureboard
+    // becomes unusable because it tries to fit
+    // in the size of the content and not the size
+    // of the device screen
     min-height: 100%;
 }
 
