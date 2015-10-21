@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _, get_language
@@ -62,10 +61,23 @@ def user_has_view_permission(user, page=None):
     return user.has_perm(codename)
 
 
+class PageTypeSelect(forms.widgets.Select):
+    """
+    Special widget for the page_type choice-field. This simply adds some JS for
+    hiding/showing the content field based on the selection of this select.
+    """
+    class Media:
+        js = (
+            'cms/js/modules/cms.base.js',
+            'cms/js/modules/cms.page_type_select.js',
+        )
+
+
 class BaseCMSPageForm(forms.Form):
     title = forms.CharField(label=_(u'Title'), max_length=255,
                             help_text=_(u"Provide a title for the new page."))
-    page_type = forms.ChoiceField(label=_(u'Page type'), required=False)
+    page_type = forms.ChoiceField(label=_(u'Page type'), required=False,
+                                  widget=PageTypeSelect())
     content = forms.CharField(
         label=_(u'Content'), widget=forms.Textarea, required=False,
         help_text=_(u"Optional. If supplied, will be automatically added "
@@ -79,17 +91,17 @@ class BaseCMSPageForm(forms.Form):
 
         # Either populate, or remove the page_type field
         if 'page_type' in self.fields:
-            site = Site.objects.get_current()
             try:
-                type_root = Page.objects.get(publisher_is_draft=True,
-                                             reverse_id=PAGE_TYPES_ID,
-                                             site=site.pk)
+                root = Page.objects.get(publisher_is_draft=True,
+                                        reverse_id=PAGE_TYPES_ID,
+                                        site=self.page.site_id)
             except Page.DoesNotExist:
-                type_root = None
-            if type_root:
+                root = None
+
+            if root:
+                # Set the choicefield's choices to the various page_types
                 language = get_language()
-                type_ids = type_root.get_descendants().values_list(
-                    'pk', flat=True)
+                type_ids = root.get_descendants().values_list('pk', flat=True)
                 titles = Title.objects.filter(page__in=type_ids,
                                               language=language)
                 choices = [('', '---------')]
@@ -97,6 +109,8 @@ class BaseCMSPageForm(forms.Form):
                     choices.append((title.page_id, title.title))
                 self.fields['page_type'].choices = choices
             else:
+                # There are no page_types, so don't bother the user with an
+                # empty choice field.
                 del self.fields['page_type']
 
 
