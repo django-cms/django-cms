@@ -33,8 +33,12 @@ class WizardProperty(AsTag):
             wizard = None
 
         if wizard:
-            if property in ['id', 'title', 'weight', 'form', 'model',
-                            'description', 'template_name']:
+            if property in ['description', 'title', 'weight']:
+                # getters
+                getter = getattr(wizard, "get_{0}".format(property), None)
+                return getter()
+            elif property in ['id', 'form', 'model', 'template_name']:
+                # properties
                 return getattr(wizard, property, None)
             else:
                 return wizard

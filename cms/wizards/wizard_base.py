@@ -34,11 +34,7 @@ class WizardBase(object):
         self.weight = weight
         self.form = form
         self.model = model
-        if description is not None:
-            self.description = description
-        elif self.model:
-            model_name = model._meta.verbose_name
-            self.description = _(u"Create a new %s instance.") % model_name
+        self.description = description
         if template_name is not None:
             self.template_name = template_name
 
@@ -61,6 +57,28 @@ class Wizard(WizardBase):
             hash.update(full_path)
             self._hash_cache = hash.hexdigest()
         return self._hash_cache
+
+    def get_title(self, **kwargs):
+        """
+        Return the title for this wizard. May be overridden as required.
+        """
+        return self.title
+
+    def get_weight(self, **kwargs):
+        """
+        Return the weight for this wizard. May be overridden as required.
+        """
+        return self.weight
+
+    def get_description(self, **kwargs):
+        """
+        Return the description for this wizard. May be overridden as required.
+        """
+        if self.description:
+            return self.description
+        elif self.model:
+            model_name = self.model._meta.verbose_name
+            self.description = _(u"Create a new %s instance.") % model_name
 
     def __str__(self):
         return self.title
