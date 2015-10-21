@@ -3,18 +3,69 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.contrib.sites.models import Site
+from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, get_language
 
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
+from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
+
+from cms.utils.conf import get_cms_setting
+
+
+def user_has_view_permission(user, page=None):
+    """
+    This code largely duplicates Page.has_view_permission(). We do this because
+    the source method requires a request object, which isn't appropriate in
+    this case. Fortunately, the source method (and its dependencies) use the
+    request object only to get the user object, when it isn't explicitly
+    provided and for caching permissions. We don't require caching here and we
+    can explicitly provide the user object.
+    """
+    if not user:
+        return False
+
+    class FakeRequest(object):
+        pass
+    fake_request = FakeRequest()
+
+    can_see_unrestricted = get_cms_setting('PUBLIC_FOR') == 'all' or (
+        get_cms_setting('PUBLIC_FOR') == 'staff' and user.is_staff)
+
+    # Inherited and direct view permissions
+    is_restricted = bool(
+        permissions.get_any_page_view_permissions(fake_request, page))
+
+    if not is_restricted and can_see_unrestricted:
+        return True
+    elif not user.is_authenticated():
+        return False
+
+    if not is_restricted:
+        # a global permission was given to the request's user
+        if permissions.has_global_page_permission(
+                fake_request, page.site_id, user=user, can_view=True):
+            return True
+    else:
+        # a specific permission was granted to the request's user
+        if page.get_draft_object().has_generic_permission(
+                fake_request, "view", user=user):
+            return True
+
+    # The user has a normal django permission to view pages globally
+    opts = page._meta
+    codename = '%s.view_%s' % (opts.app_label, opts.object_name.lower())
+    return user.has_perm(codename)
 
 
 class BaseCMSPageForm(forms.Form):
     title = forms.CharField(label=_(u'Title'), max_length=255,
                             help_text=_(u"Provide a title for the new page."))
+    page_type = forms.ChoiceField(label=_(u'Page type'), required=False)
     content = forms.CharField(
         label=_(u'Content'), widget=forms.Textarea, required=False,
         help_text=_(u"Optional. If supplied, will be automatically added "
@@ -26,10 +77,30 @@ class BaseCMSPageForm(forms.Form):
         self.instance = instance
         super(BaseCMSPageForm, self).__init__(*args, **kwargs)
 
+        # Either populate, or remove the page_type field
+        if 'page_type' in self.fields:
+            site = Site.objects.get_current()
+            try:
+                type_root = Page.objects.get(publisher_is_draft=True,
+                                             reverse_id=PAGE_TYPES_ID,
+                                             site=site.pk)
+            except Page.DoesNotExist:
+                type_root = None
+            if type_root:
+                language = get_language()
+                type_ids = type_root.get_descendants().values_list(
+                    'pk', flat=True)
+                titles = Title.objects.filter(page__in=type_ids,
+                                              language=language)
+                choices = [('', '---------')]
+                for title in titles:
+                    choices.append((title.page_id, title.title))
+                self.fields['page_type'].choices = choices
+            else:
+                del self.fields['page_type']
+
 
 class CreateCMSPageForm(BaseCMSPageForm):
-
-    sub_page = forms.BooleanField(initial=False, widget=forms.HiddenInput)
 
     @staticmethod
     def create_page_titles(page, title, languages):
@@ -95,17 +166,42 @@ class CreateCMSPageForm(BaseCMSPageForm):
             published=False
         )
 
-        content = self.cleaned_data['content']
-        if content and permissions.has_plugin_permission(
-                self.user, "TextPlugin", "add"):
-            placeholder = self.get_first_placeholder(page)
-            if placeholder:
-                add_plugin(
-                    placeholder=placeholder,
-                    plugin_type='TextPlugin',
-                    language=self.language_code,
-                    body=content
-                )
+        page_type = self.cleaned_data.get("page_type")
+        if page_type:
+            copy_target = Page.objects.filter(pk=page_type).first()
+        else:
+            copy_target = None
+
+        if copy_target:
+            # If the user selected a page type, copy that.
+            if not user_has_view_permission(self.user, copy_target):
+                raise PermissionDenied()
+
+            # Copy page attributes
+            copy_target._copy_attributes(page, clean=True)
+            page.save()
+
+            # Copy contents (for each language)
+            for lang in copy_target.get_languages():
+                copy_target._copy_contents(page, lang)
+
+            # Copy extensions
+            from cms.extensions import extension_pool
+            extension_pool.copy_extensions(copy_target, page)
+
+        else:
+            # If the user provided content, then use that instead.
+            content = self.cleaned_data.get('content')
+            if content and permissions.has_plugin_permission(
+                    self.user, "TextPlugin", "add"):
+                placeholder = self.get_first_placeholder(page)
+                if placeholder:
+                    add_plugin(
+                        placeholder=placeholder,
+                        plugin_type='TextPlugin',
+                        language=self.language_code,
+                        body=content
+                    )
 
         return page
 
