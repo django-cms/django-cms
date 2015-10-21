@@ -28,14 +28,19 @@ def user_has_page_add_permission(user, target, position=None, site=None):
         return True
     opts = Page._meta
 
+    if site is None:
+        if target:
+            site = target.site
+        if site is None:
+            site = Site.objects.get_current()
+    global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
+        user, site).exists()
+
+    perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
+
     if target:
         if not Page.objects.filter(pk=target.pk).exists():
             return False
-
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            user, target.site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-
         if user.has_perm(perm_str) and global_add_perm:
             return True
         if position in ("first-child", "last-child"):
@@ -45,11 +50,6 @@ def user_has_page_add_permission(user, target, position=None, site=None):
             return permissions.has_generic_permission(
                 target.parent_id, user, "add", target.site_id)
     else:
-        if site is None:
-            site = Site.objects.get_current()
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
         if user.has_perm(perm_str) and global_add_perm:
             return True
     return False
