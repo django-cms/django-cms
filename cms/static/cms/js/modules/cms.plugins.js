@@ -36,18 +36,14 @@ var CMS = window.CMS || {};
             if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', false);
             }
-        });
-
-        // prevents single click from messing up the edit call
-        doc.on('click', '.cms-plugin a', function (e) {
+        }).on('click', '.cms-plugin a', function (e) {
+            // prevents single click from messing up the edit call
             // don't go to the link if there is custom js attached to it
             // or if it's clicked along with shift, ctrl, cmd
             if (e.shiftKey || e.ctrlKey || e.metaKey || e.isDefaultPrevented()) {
                 return;
             }
-
             e.preventDefault();
-
             if (++clickCounter === 1) {
                 timer = setTimeout(function () {
                     clickCounter = 0;
