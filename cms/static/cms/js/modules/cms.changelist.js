@@ -21,11 +21,12 @@
             initialize: function (options) {
                 this.options = $.extend(true, {}, this.options, options);
 
+                this.setupFunctions();
+                this.setupTreePublishing();
+                this.setupUIHacks();
+
                 // load internal functions
                 if (!this.options.settings.filtered) {
-                    this.setupFunctions();
-                    this.setupTreePublishing();
-                    this.setupUIHacks();
                     this.setupGlobals();
                     this.setupTree();
 
@@ -33,8 +34,6 @@
                     window.initTree();
                 } else {
                     // when filtered is active, prevent tree actions
-                    this.setupFunctions();
-                    this.setupUIHacks();
                     $.syncCols();
                 }
             },
