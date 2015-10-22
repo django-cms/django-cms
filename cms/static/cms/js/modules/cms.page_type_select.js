@@ -1,25 +1,23 @@
 //##############################################################################
-// PAGE WIZARD
+// PAGE TYPE WIDGET
 
 /* global CMS */
 (function ($) {
     'use strict';
     // CMS.$ will be passed for $
-    $(document).ready(function () {
+    $(function () {
 
         var pageTypeField = $('.form-row.page_type select'),
             contentGroup = $('.form-row.content'),
             contentField = contentGroup.find('textarea');
 
-        // Show it if we change to an app_hook that requires a namespace
         pageTypeField.on('change', function () {
-            if ($(this).val()){
+            if ($(this).val()) {
                 contentGroup.hide();
                 contentField.prop('disabled', true);
-            }
-            else {
+            } else {
                 contentGroup.show();
-                contentField.removeProp('disabled');
+                contentField.prop('disabled', false);
             }
         });
     });
