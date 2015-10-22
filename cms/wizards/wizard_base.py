@@ -52,7 +52,8 @@ class Wizard(WizardBase):
         in the form's markup, and we'd rather not expose code paths there.
         """
         if not self._hash_cache:
-            full_path = ".".join([self.__module__, self.__class__.__name__])
+            full_path = force_text(
+                ".".join([self.__module__, self.__class__.__name__]))
             hash = hashlib.sha1()
             hash.update(full_path)
             self._hash_cache = hash.hexdigest()
