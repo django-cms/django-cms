@@ -16,6 +16,8 @@ except ImportError:  # pragma: no cover
     # This is fine from Django 1.7
     from formtools.wizard.views import SessionWizardView
 
+from cms.models import Page
+
 from .wizard_pool import wizard_pool
 from .forms import (
     WizardStep1Form,
@@ -53,7 +55,7 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
     ]
 
     def get_current_step(self):
-        """Returns the current step, if possible, else None"""
+        """Returns the current step, if possible, else None."""
         try:
             return self.steps.current
         except AttributeError:
@@ -67,14 +69,6 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         step = step or self.get_current_step()
         return step == '1'
 
-    def get_form_initial(self, step):
-        initial = super(WizardCreateView, self).get_form_initial(step)
-
-        if self.is_first_step(step):
-            # set the current page from GET param.
-            initial['page'] = self.request.GET.get('page')
-        return initial
-
     def get_context_data(self, **kwargs):
         context = super(WizardCreateView, self).get_context_data(**kwargs)
 
@@ -82,21 +76,39 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
             context['wizard_entry'] = self.get_selected_entry()
         return context
 
-    def get_form_kwargs(self, step=None):
-        kwargs = super(WizardCreateView, self).get_form_kwargs()
-        kwargs['wizard_user'] = self.request.user
-
-        if self.is_second_step(step):
-            kwargs['wizard_page'] = self.get_origin_page()
-        return kwargs
-
     def get_form(self, step=None, data=None, files=None):
         if step is None:
             step = self.steps.current
 
+        # We need to grab the page from pre-validated data so that the wizard
+        # has it to prepare the list of valid entries.
+        if data:
+            page_key = "{0}-page".format(step)
+            self.page_pk = data.get(page_key, None)
+        else:
+            self.page_pk = None
+
         if self.is_second_step(step):
             self.form_list[step] = self.get_step_2_form(step, data, files)
         return super(WizardCreateView, self).get_form(step, data, files)
+
+    def get_form_kwargs(self, step=None):
+        """This is called by self.get_form()"""
+        kwargs = super(WizardCreateView, self).get_form_kwargs()
+        kwargs['wizard_user'] = self.request.user
+        if self.is_second_step(step):
+            kwargs['wizard_page'] = self.get_origin_page()
+        else:
+            page_pk = self.page_pk or self.request.GET.get('page', None)
+            kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
+        return kwargs
+
+    def get_form_initial(self, step):
+        """This is called by self.get_form()"""
+        initial = super(WizardCreateView, self).get_form_initial(step)
+        if self.is_first_step(step):
+            initial['page'] = self.request.GET.get('page')
+        return initial
 
     def get_step_2_form(self, step=None, data=None, files=None):
         entry_form_class = self.get_selected_entry().form
@@ -138,7 +150,7 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
 
     def get_selected_entry(self):
         data = self.get_cleaned_data_for_step('0')
-        return wizard_pool.get_entry(int(data['entry']))
+        return wizard_pool.get_entry(data['entry'])
 
     def get_origin_page(self):
         data = self.get_cleaned_data_for_step('0')

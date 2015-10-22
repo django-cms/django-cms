@@ -20,8 +20,8 @@
                 {% cms_wizard entry.choice_value as wizard %}
                 <label class="choice{% if forloop.first %} active{% endif %}">
                     <input type="radio" name="{{ entry.name }}" value="{{ entry.choice_value }}"{% if forloop.first %} checked{% endif %}>
-                    <strong>{{ wizard.title }}</strong>
-                    <span class="info">{{ wizard.description }}</span>
+                    <strong>{{ wizard.get_title }}</strong>
+                    <span class="info">{{ wizard.get_description }}</span>
                 </label>
             {% endfor %}
         </div>
