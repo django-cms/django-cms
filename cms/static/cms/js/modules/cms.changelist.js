@@ -22,6 +22,7 @@
                 this.options = $.extend(true, {}, this.options, options);
 
                 this.setupFunctions();
+                this.setupTreePublishing();
                 this.setupUIHacks();
 
                 // load internal functions
@@ -35,8 +36,6 @@
                     // when filtered is active, prevent tree actions
                     $.syncCols();
                 }
-
-                this.setupTreePublishing();
             },
 
             setupFunctions: function () {
