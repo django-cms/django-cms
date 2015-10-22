@@ -95,9 +95,13 @@ class PlaceholderToolbar(CMSToolbar):
 
     def add_wizard_button(self):
         title = _("Create")
+        try:
+            page_pk = self.page.pk
+        except AttributeError:
+            page_pk = None
         url = "{url}?page={page}".format(
             url=reverse("cms_wizard_create"),
-            page=self.page.pk
+            page=page_pk
         )
         self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
                                       on_close=REFRESH_PAGE)
