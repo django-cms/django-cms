@@ -53,6 +53,16 @@ class BaseFormMixin(object):
 
 
 class WizardStep1Form(BaseFormMixin, forms.Form):
+
+    class Media:
+        css = {
+            'all': ('cms/css/cms.wizard.css', )
+        }
+        js = (
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/modules/cms.wizards.js',
+        )
+
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         required=False,
@@ -65,6 +75,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
         # set the entries here to get an up to date list of entries.
         self.fields['entry'].choices = entry_choices(user=self.user,
                                                      page=self.page)
+
 
 class WizardStep2BaseForm(BaseFormMixin):
     user = None

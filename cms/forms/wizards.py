@@ -68,6 +68,7 @@ class PageTypeSelect(forms.widgets.Select):
     """
     class Media:
         js = (
+            'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.base.js',
             'cms/js/modules/cms.page_type_select.js',
         )
