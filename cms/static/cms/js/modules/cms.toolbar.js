@@ -556,6 +556,9 @@ var CMS = window.CMS || {};
             _delegate: function _delegate(el) {
                 // save local vars
                 var target = el.data('rel');
+                if (el.hasClass('cms-btn-disabled')) {
+                    return false;
+                }
 
                 switch (target) {
                     case 'modal':
