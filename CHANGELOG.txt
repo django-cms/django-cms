@@ -36,6 +36,8 @@
 - Switched from ruby sass/compass to libsass/autoprefixer
 - Switched from sprite images to auto generated webfonts via gulp
 - Fix placeholder template tags ignoring the lang parameter
+- Renamed cms_app, cms_menu, cms_toolbar to plural versions eg. ``cms_apps.py``
+  ``cms_menus.py``, ``cms_toolbars.py`` with backwards compatibility
 - Removed all id attributes on html elements in favour of classes
 - Removed 'develop.py' to replace with 'manage.py' (devs)
 - Removed Alias plugin from list of plugins (Create Alias still an option)
