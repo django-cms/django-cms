@@ -17,8 +17,7 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(function () {
         /**
-         * This script adds internal methods for various UI components to the
-         * wizard through the "Create" button on the toolbar.
+         * Adds internal methods for the creation wizard.
          *
          * @class Wizards
          * @namespace CMS
