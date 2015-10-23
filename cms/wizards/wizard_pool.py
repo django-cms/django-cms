@@ -17,7 +17,7 @@ def entry_choices(user, page):
     permission to add instances of the underlying model objects.
     """
     for entry in wizard_pool.get_entries():
-        if entry.user_has_add_permission(user, page=page):
+        if user.is_superuser or entry.user_has_add_permission(user, page=page):
             yield (entry.id, entry.title)
 
 
