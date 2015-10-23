@@ -68,4 +68,7 @@
             }
         }
     }
+    &.cms-btn-disabled {
+        color: $gray-lighter;
+    }
 }
