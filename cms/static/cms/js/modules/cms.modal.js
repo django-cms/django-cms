@@ -42,8 +42,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -163,14 +161,14 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @chainable
-             * @param opts either `opts.url` or `opts.html` are required
-             * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
-             * @param [opts.html] {String|HTMLNode|jQuery} html markup to render
-             * @param [opts.title] {String} modal window main title (bold)
-             * @param [opts.subtitle] {String} modal window secondary title (normal)
-             * @param [opts.url] {String} url to render iframe, takes precedence over `opts.html`
-             * @param [opts.width] {Number} sets the width of the modal
-             * @param [opts.height] {Number} sets the height of the modal
+             * @param {Object} opts either `opts.url` or `opts.html` are required
+             * @param {Object[]} [opts.breadcrumbs] collection of breadcrumb items
+             * @param {String|HTMLNode|jQuery} [opts.html] html markup to render
+             * @param {String} [opts.title] modal window main title (bold)
+             * @param {String} [opts.subtitle] modal window secondary title (normal)
+             * @param {String} [opts.url] url to render iframe, takes precedence over `opts.html`
+             * @param {Number} [opts.width] sets the width of the modal
+             * @param {Number} [opts.height] sets the height of the modal
              */
             open: function open(opts) {
                 // setup internals
@@ -256,9 +254,11 @@ var CMS = window.CMS || {};
             /**
              * Calculates coordinates and dimensions for modal placement
              *
-             * @param [opts] {Object}
-             * @param [opts.width] {Number} desired width of the modal
-             * @param [opts.height] {Number} desired height of the modal
+             * @method _calculateNewPosition
+             * @private
+             * @param {Object} [opts]
+             * @param {Number} [opts.width] desired width of the modal
+             * @param {Number} [opts.height] desired height of the modal
              */
             _calculateNewPosition: function (opts) {
                 // lets set the modal width and height to the size of the browser
@@ -316,12 +316,12 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
-             * @param opts
-             * @param opts.width {Number} width of the modal
-             * @param opts.height {Number} height of the modal
-             * @param opts.left {Number} left in px of the center of the modal
-             * @param opts.top {Number} top in px of the center of the modal
-             * @param opts.duration {Number} speed of opening, ms (not really used yet)
+             * @param {Object} opts
+             * @param {Number} opts.width width of the modal
+             * @param {Number} opts.height height of the modal
+             * @param {Number} opts.left left in px of the center of the modal
+             * @param {Number} opts.top top in px of the center of the modal
+             * @param {Number} opts.duration speed of opening, ms (not really used yet)
              */
             _show: function _show(opts) {
                 // we need to position the modal in the center
@@ -409,8 +409,8 @@ var CMS = window.CMS || {};
              *
              * @method _hide
              * @private
-             * @param opts
-             * @param [opts.duration=this.options.modalDuration] {Number} animation duration
+             * @param {Object} opts
+             * @param {Number} [opts.duration=this.options.modalDuration] animation duration
              */
             _hide: function _hide(opts) {
                 var that = this;
@@ -510,7 +510,7 @@ var CMS = window.CMS || {};
              *
              * @method _startMove
              * @private
-             * @param pointerEvent {Object} passes starting event
+             * @param {Object} pointerEvent passes starting event
              */
             _startMove: function _startMove(pointerEvent) {
                 // cancel if maximized or minimized
@@ -559,7 +559,7 @@ var CMS = window.CMS || {};
              *
              * @method _startResize
              * @private
-             * @param pointerEvent {Object} passes starting event
+             * @param {Object} pointerEvent passes starting event
              */
             _startResize: function _startResize(pointerEvent) {
                 // cancel if in fullscreen
@@ -628,7 +628,7 @@ var CMS = window.CMS || {};
              *
              * @method _setBreadcrumb
              * @private
-             * @param breadcrumbs {Object[]} renderes breadcrumb on modal
+             * @param {Object[]} breadcrumbs renderes breadcrumb on modal
              */
             _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
                 var crumb = '';
@@ -665,14 +665,14 @@ var CMS = window.CMS || {};
              *
              * @method _setButtons
              * @private
-             * @param iframe {jQuery} loaded iframe element
+             * @param {jQuery} iframe loaded iframe element
              */
             _setButtons: function _setButtons(iframe) {
                 var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
                 var that = this;
                 var group = $('<div class="cms-modal-item-buttons"></div>');
                 var render = $('<div class="cms-modal-buttons-inner"></div>');
-                var cancel = $('<a href="#" class="cms-btn">' + this.config.lang.cancel + '</a>');
+                var cancel = $('<a href="#" class="cms-btn">' + CMS.config.lang.cancel + '</a>');
                 var row;
                 var tmp;
 
@@ -730,7 +730,9 @@ var CMS = window.CMS || {};
 
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
-                    el.on(that.click, function () {
+                    el.on(that.click, function (e) {
+                        e.preventDefault();
+
                         if (item.is('a')) {
                             that._loadIframe({
                                 url: item.prop('href'),
@@ -763,7 +765,8 @@ var CMS = window.CMS || {};
                 });
 
                 // manually add cancel button at the end
-                cancel.on(that.click, function () {
+                cancel.on(that.click, function (e) {
+                    e.preventDefault();
                     that.options.onClose = false;
                     that.close();
                 });
@@ -784,10 +787,11 @@ var CMS = window.CMS || {};
              * Version where the modal loads an iframe.
              *
              * @method _loadIframe
-             * @param opts
-             * @param opts.url {String} url to render iframe, takes presedence over opts.html
-             * @param [opts.breadcrumbs] {Object[]} collection of breadcrumb items
-             * @param [opts.title] {String} modal window main title (bold)
+             * @private
+             * @param {Object} opts
+             * @param {String} opts.url url to render iframe, takes presedence over opts.html
+             * @param {Object[]} [opts.breadcrumbs] collection of breadcrumb items
+             * @param {String} [opts.title] modal window main title (bold)
              */
             _loadIframe: function _loadIframe(opts) {
                 var that = this;
@@ -916,7 +920,11 @@ var CMS = window.CMS || {};
                             that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
                         }
 
-                        titleSuffix.text(innerTitle.text());
+                        if (titlePrefix.text().trim() === '') {
+                            titlePrefix.text(innerTitle.text());
+                        } else {
+                            titleSuffix.text(innerTitle.text());
+                        }
                         innerTitle.remove();
 
                         // than show
@@ -948,7 +956,7 @@ var CMS = window.CMS || {};
              *
              * @method _changeIframe
              * @private
-             * @param el {jQuery} originated element
+             * @param {jQuery} el originated element
              */
             _changeIframe: function _changeIframe(el) {
                 if (el.hasClass('active')) {
@@ -971,10 +979,11 @@ var CMS = window.CMS || {};
              * Version where the modal loads html markup.
              *
              * @method _loadMarkup
-             * @param opts
-             * @param opts.html {String|HTMLNode|jQuery} html markup to render
-             * @param opts.title {String} modal window main title (bold)
-             * @param [opts.subtitle] {String} modal window secondary title (normal)
+             * @private
+             * @param {Object} opts
+             * @param {String|HTMLNode|jQuery} opts.html html markup to render
+             * @param {String} opts.title modal window main title (bold)
+             * @param {String} [opts.subtitle] modal window secondary title (normal)
              */
             _loadMarkup: function _loadMarkup(opts) {
                 this.ui.modal.removeClass('cms-modal-iframe');
@@ -995,14 +1004,16 @@ var CMS = window.CMS || {};
              * https://github.com/divio/django-cms/pull/4381 will eventually
              * provide a better solution
              *
-             * @param [opts] {Object} general objects element that holds settings
-             * @param [opts.hideAfter] {Object} hides the modal after the ajax requests succeeds
+             * @method _deletePlugin
+             * @private
+             * @param {Object} [opts] general objects element that holds settings
+             * @param {Boolean} [opts.hideAfter] hides the modal after the ajax requests succeeds
              */
             _deletePlugin: function _deletePlugin(opts) {
                 var that = this;
                 var data = CMS._newPlugin;
-                var post = '{ "csrfmiddlewaretoken": "' + this.config.csrf + '" }';
-                var text = this.config.lang.confirmEmpty.replace(
+                var post = '{ "csrfmiddlewaretoken": "' + CMS.config.csrf + '" }';
+                var text = CMS.config.lang.confirmEmpty.replace(
                     '{1}', CMS._newPlugin.breadcrumb[CMS._newPlugin.breadcrumb.length - 1].title
                 );
 
@@ -1031,8 +1042,9 @@ var CMS = window.CMS || {};
          * even though sometimes it's the only actionable button in the modal.
          *
          * @method _setupCtrlEnterSave
+         * @private
          * @static
-         * @param document HTMLElement document element (iframe or parent window);
+         * @param {HTMLElement} document document element (iframe or parent window);
          */
         CMS.Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
             var cmdPressed = false;
@@ -1044,7 +1056,9 @@ var CMS = window.CMS || {};
                 }
 
                 if (mac) {
-                    if (e.keyCode === CMS.KEYS.CMD_LEFT || e.keyCode === CMS.KEYS.CMD_RIGHT) {
+                    if (e.keyCode === CMS.KEYS.CMD_LEFT ||
+                        e.keyCode === CMS.KEYS.CMD_RIGHT ||
+                        e.keyCode === CMS.KEYS.CMD_FIREFOX) {
                         cmdPressed = true;
                     }
 

@@ -2,25 +2,21 @@
 // TOOLBAR
 
 .cms-toolbar {
-    position: absolute;
-    top: $toolbar-debug-height;
-    left: 0;
-    z-index: z(base);
-    width: 100%;
-    margin-top: -$toolbar-height - 10px;
-
-    .cms-toolbar-expanded & {
-        margin-top: 0px;
-    }
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
     z-index: z(toolbar, base);
-    width: 100%;
     min-height: $toolbar-height;
+    margin-top: -$toolbar-height - 10px;
     border-bottom: 1px solid $toolbar-border !important;
     background-color: $white;
     box-shadow: $toolbar-shadow;
+    backface-visibility: hidden;
+
+    .cms-toolbar-expanded & {
+        margin-top: 0;
+    }
 
     .cms-toolbar-left {
         position: absolute;
@@ -99,7 +95,7 @@
         display: none;
     }
     > li:first-child > a span {
-        font-weight: 800;
+        font-weight: 600;
     }
     .cms-icon {
         display: none;
@@ -408,7 +404,7 @@
         &:focus {
             transition: outline 0.2s;
             border-color: $color-primary;
-            box-shadow: inset 0px 0px 2px $gray-lighter;
+            box-shadow: inset 0 0 2px $gray-lighter;
         }
     }
     input[type="submit"] {
@@ -416,7 +412,7 @@
         text-transform: uppercase;
         height: $login-form-input-height - 2px;
         line-height: $login-form-input-height - 2px;
-        padding: 0px $login-form-submit-padding-horizontal;
+        padding: 0 $login-form-submit-padding-horizontal;
     }
 
     .cms-error {
@@ -458,6 +454,7 @@
     z-index: z(toolbar-trigger);
     border-bottom: 1px solid $toolbar-border;
     border-left: 1px solid $toolbar-border;
+    background: $white;
 
     a {
         display: block;

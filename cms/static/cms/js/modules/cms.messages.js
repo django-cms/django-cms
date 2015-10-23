@@ -31,8 +31,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -59,10 +57,10 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @param opts
-             * @param opts.message {String|HTMLNode} message to be displayed
-             * @param [opts.dir='center'] {String} direction to be displayed `center` `left` or `right`
-             * @param [opts.delay=this.options.messageDelay] {Number} delay until message is closed, 0 leaves it open
-             * @param [opts.error] {Boolean} if true sets the style to `.cms-messages-error`
+             * @param {String|HTMLNode} opts.message message to be displayed
+             * @param {String} [opts.dir='center'] direction to be displayed `center` `left` or `right`
+             * @param {Number} [opts.delay=this.options.messageDelay] delay until message is closed, 0 leaves it open
+             * @param {Boolean} [opts.error] if true sets the style to `.cms-messages-error`
              */
             open: function open(opts) {
                 if (!(opts && opts.message)) {
@@ -99,12 +97,12 @@ var CMS = window.CMS || {};
                 });
 
                 // set top to 0 if toolbar is collapsed
-                if (this.settings.toolbar === 'collapsed') {
+                if (CMS.settings.toolbar === 'collapsed') {
                     top = 0;
                 }
 
                 // do we need to add debug styles?
-                if (this.config.debug) {
+                if (CMS.config.debug) {
                     top = top + 5;
                 }
 

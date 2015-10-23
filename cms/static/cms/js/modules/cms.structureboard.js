@@ -1,11 +1,14 @@
 //##############################################################################
 // STRUCTUREBOARD
-/* global CMS */
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
 
 (function ($) {
     'use strict';
 
-    // CMS.$ will be passed for $
+    // shorthand for jQuery(document).ready();
     $(function () {
         var placeholders = $('.cms-dragarea:not(.cms-clipboard-containers)');
         function actualizeEmptyPlaceholders() {
@@ -35,8 +38,11 @@
         }
 
         /**
-         * StructureBoard
-         * handles drag & drop, mode switching and
+         * Handles drag & drop, mode switching and collapsables.
+         *
+         * @class StructureBoard
+         * @namespace CMS
+         * @uses CMS.API.Helpers
          */
         CMS.StructureBoard = new CMS.Class({
 
@@ -48,8 +54,6 @@
 
             initialize: function (options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -62,11 +66,16 @@
                 // setup initial stuff
                 this._setup();
 
-                // setup events
-                this._events();
+                this._setupModeSwitcher();
                 actualizeEmptyPlaceholders();
             },
 
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
             _setupUI: function setupUI() {
                 var container = $('.cms-structure');
                 var toolbar = $('.cms-toolbar');
@@ -75,6 +84,7 @@
                     content: $('.cms-structure-content'),
                     doc: $(document),
                     window: $(window),
+                    html: $('html'),
                     toolbar: toolbar,
                     sortables: $('.cms-draggables'), // global scope to include clipboard
                     plugins: $('.cms-plugin'),
@@ -82,13 +92,19 @@
                     placeholders: $('.cms-placeholder'),
                     dragitems: $('.cms-draggable'),
                     dragareas: $('.cms-dragarea'),
-                    clipboard: $('.cms-clipboard'),
                     toolbarModeSwitcher: toolbar.find('.cms-toolbar-item-cms-mode-switcher'),
-                    toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a')
+                    toolbarModeLinks: toolbar.find('.cms-toolbar-item-cms-mode-switcher a'),
+                    toolbarTrigger: $('.cms-toolbar-trigger')
                 };
             },
 
-            // initial methods
+            /**
+             * Initial setup (and early bail if specific
+             * elements do not exist).
+             *
+             * @method _setup
+             * @private
+             */
             _setup: function () {
                 var that = this;
                 // cancel if there are no dragareas
@@ -107,7 +123,7 @@
                 // which should be fixed btw. _resizeBoard wants plugins to be initialized,
                 // otherwise throws errors
                 setTimeout(function () {
-                    if (that.settings.mode === 'structure') {
+                    if (CMS.settings.mode === 'structure') {
                         that.show(true);
                     } else {
                         // triggering hide here to switch proper classnames on switcher
@@ -124,7 +140,14 @@
                 this._drag();
             },
 
-            _events: function () {
+            /**
+             * Sets up events handlers for switching
+             * structureboard modes.
+             *
+             * @method _setupModeSwitcher
+             * @private
+             */
+            _setupModeSwitcher: function () {
                 var that = this;
                 var modes = that.ui.toolbarModeLinks;
 
@@ -132,7 +155,7 @@
                 modes.eq(1).on(that.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
-                    if (that.settings.mode === 'edit') {
+                    if (CMS.settings.mode === 'edit') {
                         return false;
                     }
                     // otherwise hide
@@ -142,7 +165,7 @@
                 modes.eq(0).on(that.click, function (e) {
                     e.preventDefault();
                     // cancel if already active
-                    if (that.settings.mode === 'structure') {
+                    if (CMS.settings.mode === 'structure') {
                         return false;
                     }
                     // otherwise show
@@ -157,9 +180,9 @@
                         var haveFocusedField = document.activeElement !== document.body;
                         if (e.keyCode === CMS.KEYS.SPACE && !haveFocusedField) {
                             e.preventDefault();
-                            if (that.settings.mode === 'structure') {
+                            if (CMS.settings.mode === 'structure') {
                                 that.hide();
-                            } else if (that.settings.mode === 'edit') {
+                            } else if (CMS.settings.mode === 'edit') {
                                 that.show();
                             }
                         }
@@ -167,24 +190,40 @@
                 }
             },
 
-            // public methods
+            /**
+             * Shows the structureboard. (Structure mode)
+             *
+             * @method show
+             * @public
+             * @param {Boolean} init true if this is first initialization
+             */
             show: function (init) {
                 // cancel show if live modus is active
                 if (CMS.config.mode === 'live') {
                     return false;
                 }
 
+                // in order to get consistent positioning
+                // of the toolbar we have to know if the page
+                // had the scrollbar nad if it had - we adjust
+                // the toolbar positioning
+                var width = this.ui.toolbar.width();
+                var scrollBarWidth = window.innerWidth - width;
+                if (scrollBarWidth) {
+                    this.ui.toolbar.css('right', scrollBarWidth);
+                    this.ui.toolbarTrigger.css('right', scrollBarWidth);
+                }
+
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
-
-                // show clipboard
-                this.ui.clipboard.fadeIn(this.options.speed);
+                this.ui.html.removeClass('cms-structure-mode-content')
+                    .addClass('cms-structure-mode-structure');
 
                 // apply new settings
-                this.settings.mode = 'structure';
+                CMS.settings.mode = 'structure';
                 if (!init) {
-                    this.settings = this.setSettings(this.settings);
+                    CMS.settings = this.setSettings(CMS.settings);
                 }
 
                 // ensure all elements are visible
@@ -194,25 +233,33 @@
                 this._showBoard();
             },
 
+            /**
+             * Hides the structureboard. (Content mode)
+             *
+             * @param {Boolean} init true if this is first initialization
+             */
             hide: function (init) {
                 // cancel show if live modus is active
                 if (CMS.config.mode === 'live') {
                     return false;
                 }
 
+                // reset toolbar positioning
+                this.ui.toolbar.css('right', '');
+                this.ui.toolbarTrigger.css('right', '');
+
                 // set active item
                 var modes = this.ui.toolbarModeLinks;
                 modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
+                this.ui.html.removeClass('cms-structure-mode-structure')
+                    .addClass('cms-structure-mode-content');
 
                 // hide clipboard if in edit mode
                 this.ui.container.find('.cms-clipboard').hide();
 
-                // hide clipboard
-                this.ui.clipboard.hide();
-
-                this.settings.mode = 'edit';
+                CMS.settings.mode = 'edit';
                 if (!init) {
-                    this.settings = this.setSettings(this.settings);
+                    CMS.settings = this.setSettings(CMS.settings);
                 }
 
                 // hide canvas
@@ -220,10 +267,10 @@
             },
 
             /**
-             * gets the id of the element
+             * Gets the id of the element.
              *
-             * @param el jQuery element to get id from
-             * @return String
+             * @param {jQuery} el element to get id from
+             * @return {String}
              */
             getId: function (el) {
                 // cancel if no element is defined
@@ -250,9 +297,9 @@
             },
 
             /**
-             * gets the ids of the list of  elements
+             * Gets the ids of the list of  elements.
              *
-             * @param el jQuery elements to get id from
+             * @param {jQuery} el elements to get id from
              * @return {String[]}
              */
             getIds: function (els) {
@@ -264,7 +311,12 @@
                 return array;
             },
 
-            // private methods
+            /**
+             * Actually shows the board canvas.
+             *
+             * @method _showBoard
+             * @private
+             */
             _showBoard: function () {
                 var that = this;
 
@@ -298,6 +350,12 @@
                 }
             },
 
+            /**
+             * Hides the board canvas.
+             *
+             * @method _hideBoard
+             * @private
+             */
             _hideBoard: function () {
                 // hide elements
                 this.ui.container.hide();
@@ -313,7 +371,12 @@
                 }
             },
 
-            /*
+            /**
+             * Resizes the placeholder to fit their placement
+             * and the structure board.
+             *
+             * @method _resizeBoard
+             * @private
              * @deprecated as of CMS 3.2
              */
             _resizeBoard: function () {
@@ -351,6 +414,12 @@
                 });
             },
 
+            /**
+             * Sets up all the sortables.
+             *
+             * @method _drag
+             * @private
+             */
             _drag: function () {
                 var that = this;
                 var originalPluginContainer;
@@ -381,7 +450,11 @@
                     doNotClear: true,
                     disableNestingClass: 'cms-draggable-disabled',
                     errorClass: 'cms-draggable-disallowed',
+                    scrollSpeed: 15,
+                    scrollSensitivity: that.ui.window.height() * 0.2,
                     start: function (e, ui) {
+                        that.ui.content.attr('data-touch-action', 'none');
+
                         originalPluginContainer = ui.item.closest('.cms-draggables');
                         that.dragging = true;
                         // show empty
@@ -418,6 +491,7 @@
                         that.dragging = false;
                         ui.item.removeClass('cms-is-dragging cms-draggable-stack');
                         that.ui.doc.off('keyup.cms.interrupt');
+                        that.ui.content.attr('data-touch-action', 'pan-y');
                     },
 
                     update: function (event, ui) {
@@ -465,12 +539,14 @@
                         }
                         // getting restriction array
                         var bounds = [];
+                        var immediateParentType;
                         // save original state events
                         var original = $('.cms-plugin-' + that.getId(originalItem));
                         // cancel if item has no settings
                         if (original.length === 0 || original.data('settings') === null) {
                             return false;
                         }
+                        var parent_bounds = original.data('settings').plugin_parent_restriction;
                         var type = original.data('settings').plugin_type;
                         // prepare variables for bound
                         var holderId = that.getId(placeholder.closest('.cms-dragarea'));
@@ -487,9 +563,11 @@
                         // now set the correct bounds
                         if (holder.length) {
                             bounds = holder.data('settings').plugin_restriction;
+                            immediateParentType = holder.data('settings').plugin_type;
                         }
                         if (plugin.length) {
                             bounds = plugin.data('settings').plugin_restriction;
+                            immediateParentType = plugin.data('settings').plugin_type;
                         }
 
                         // if parent has class disabled, dissalow drop
@@ -500,9 +578,14 @@
                         // if restrictions is still empty, proceed
                         that.state = (!bounds.length || $.inArray(type, bounds) !== -1) ? true : false;
 
+                        // check if we have a parent restriction
+                        if (parent_bounds.length) {
+                            that.state = ($.inArray(immediateParentType, parent_bounds) !== -1) ? true : false;
+                        }
+
                         return that.state;
                     }
-                });
+                }).on('cms.update', actualizeEmptyPlaceholders);
             }
 
         });

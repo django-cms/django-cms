@@ -21,11 +21,12 @@
             initialize: function (options) {
                 this.options = $.extend(true, {}, this.options, options);
 
+                this.setupFunctions();
+                this.setupTreePublishing();
+                this.setupUIHacks();
+
                 // load internal functions
                 if (!this.options.settings.filtered) {
-                    this.setupFunctions();
-                    this.setupTreePublishing();
-                    this.setupUIHacks();
                     this.setupGlobals();
                     this.setupTree();
 
@@ -33,8 +34,6 @@
                     window.initTree();
                 } else {
                     // when filtered is active, prevent tree actions
-                    this.setupFunctions();
-                    this.setupUIHacks();
                     $.syncCols();
                 }
             },
@@ -135,8 +134,6 @@
                 // show the tooltip
                 tree.delegate(langTrigger, 'pointerover touchstart', function (e) {
                     var el = $(this).closest('.col-language').find('.language-tooltip');
-                    var anchors = el.find('a');
-                    var span = $(this);
 
                     // clear timer
                     clearTimeout(langTimer);
@@ -149,20 +146,8 @@
                     // set correct position
                     el.css('right', 20 + $(this).position().left);
 
-                    // figure out what should be shown
-                    anchors.hide();
-                    if (span.hasClass('unpublished') || span.hasClass('unpublishedparent')) {
-                        anchors.eq(1).show();
-                    }
-                    if (span.hasClass('published')) {
-                        anchors.eq(0).show();
-                    }
-                    if (span.hasClass('dirty')) {
-                        anchors.show().parent().addClass('language-tooltip-multiple');
-                    }
-
                     // hide all elements
-                    $(langTooltips).fadeOut(langDelay);
+                    $(langTooltips).hide();
 
                     if (e.type === 'touchstart') {
                         e.preventDefault();
@@ -186,7 +171,7 @@
                     clearTimeout(langTimer);
                     // hide all elements
                     langTimer = setTimeout(function () {
-                        $(langTooltips).fadeOut(langFadeDuration);
+                        $(langTooltips).hide();
                     }, langDelay * 2);
                 });
                 // reset hiding when entering the tooltip itself
@@ -197,7 +182,7 @@
                 tree.delegate(langTooltips, 'pointerout', function () {
                     // hide all elements
                     langTimer = setTimeout(function () {
-                        $(langTooltips).fadeOut(langFadeDuration);
+                        $(langTooltips).hide();
                     }, langDelay * 2);
                 });
                 // attach double check event if publish or unpublish should be triggered
@@ -224,15 +209,6 @@
             },
 
             setupUIHacks: function () {
-                // enables tab click on title entry to open in new window
-                $('.tree').on('click', '.col1 .title', function (e) {
-                    if (!e.metaKey) {
-                        window.top.location.href = $(this).attr('href');
-                    } else {
-                        window.open($(this).attr('href'), '_blank');
-                    }
-                });
-
                 // adds functionality to the filter
                 $('#changelist-filter-button').bind('click', function () {
                     $('#changelist-filter').toggle();

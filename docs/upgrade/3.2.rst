@@ -78,6 +78,18 @@ We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for 
 files (this only affects frontend developers *of* django CMS - contributors to it, not other users
 or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
 
+
+*************************
+Minor changes / Bug fixes
+*************************
+
+* Fix placeholder template tags ignoring the ``lang`` parameter
+
+
+*****************************
+Backward incompatible changes
+*****************************
+
 See the :ref:`Frontend code <contributing_frontend>` documentation.
 
 
@@ -96,6 +108,10 @@ Content wizards
 
 :doc:`/reference/wizards` can help simplify production of content, and can be created to handle
 non-CMS content too.
+
+* Fixing "placeholder template tags ignoring the ``lang`` parameter" may affect the behaviour of your
+  templates as a previously ignored parameter is no longer ignored; if you used the ``lang``
+  parameter for placeholder template tags you may be affected: check the behaviour after the upgrade.
 
 
 .. _upgrade-guide-3.2:

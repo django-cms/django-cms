@@ -17,6 +17,17 @@
 <script src="{% static "cms/js/dist/bundle.admin.changeform.min.js" %}" type="text/javascript"></script>
 {% endblock %}
 
+{% block content_title %}
+    {% if title %}<h1>{{ title }}</h1>{% endif %}
+    {% if not popup %}
+        <ul class="object-tools">
+            <li>
+                <a href="../{{ page.id }}/{{ language }}/preview/" target="_parent">{% trans "View on site" %}</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div id="content-main">
 

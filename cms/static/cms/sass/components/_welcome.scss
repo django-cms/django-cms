@@ -43,22 +43,31 @@
         font-weight: 200;
         text-align: center;
         padding: 40px 0 15px;
-        border-bottom: 1px solid lighten($gray-lighter, 10%);
+        border-bottom: 1px solid $gray-lighter;
         .cms-icon {
             color: $color-success;
         }
     }
 
-    .cms-welcome-logo {
+    .cms-welcome-logo,
+    .cms-welcome-logo:hover {
         @extend %icon;
         @include icon(logo);
         font-size: 35px;
+        text-decoration: none;
         margin: 50px auto 30px;
+        color: $gray;
+        &:before {
+            color: black;
+            transition: color $speed-base;
+        }
+        &:hover:before {
+            color: $color-primary;
+        }
     }
 
     // section area
     .cms-welcome-section {
-        box-sizing: border-box;
         box-shadow: 0 0 5px $gray-lighter;
         padding: $padding-large;
         margin-bottom: 5px;
@@ -77,7 +86,7 @@
     .cms-welcome-links {
         padding: 10px 5px;
         margin: 0 0 15px;
-        border-bottom: 1px solid lighten($gray-lighter, 10%);
+        border-bottom: 1px solid $gray-lighter;
         a {
             padding: 0 5px;
         }

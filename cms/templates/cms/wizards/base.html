@@ -3,7 +3,6 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'cms/css/cms.wizard.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -14,15 +13,5 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <script src="{% static "cms/js/dist/bundle.admin.base.min.js" %}" type="text/javascript"></script>
-    <script>
-    $(function () {
-        var choices = $('.choice');
-        choices.on('click', function (e) {
-            choices.removeClass('active')
-                .eq(choices.index(e.currentTarget))
-                .addClass('active');
-        });
-    });
-    </script>
+    {{ form.media }}
 {% endblock %}

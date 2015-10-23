@@ -16,6 +16,7 @@
     color: $color important($important);
     background-color: $background important($important);
     border: 1px solid $border important($important);
+    -webkit-appearance: none;
 
     &:focus,
     &.focus {

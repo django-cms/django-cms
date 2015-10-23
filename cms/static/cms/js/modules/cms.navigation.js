@@ -47,6 +47,7 @@ var CMS = window.CMS || {};
 
                 this.resize = 'resize.cms.navigation';
                 this.load = 'load.cms.navigation';
+                this.orientationChange = 'orientationchange.cms.navigation';
 
                 this._events();
             },
@@ -78,15 +79,19 @@ var CMS = window.CMS || {};
              * @private
              */
             _events: function _events() {
-                this.ui.window.on(this.resize + ' ' + this.load, CMS.API.Helpers.throttle(
-                    this._handleResize.bind(this), 50
-                ));
+                this.ui.window.on(
+                    [this.resize, this.load, this.orientationChange].join(' '),
+                    CMS.API.Helpers.throttle(
+                        this._handleResize.bind(this), 50
+                    )
+                );
             },
 
             /**
              * Calculates all the movable menu items widths.
              *
              * @method _getWidths
+             * @private
              */
             _getWidths: function _getWidths() {
                 var that = this;
@@ -239,6 +244,7 @@ var CMS = window.CMS || {};
              * Show all items in the left part of the toolbar.
              *
              * @method _showAllLeft
+             * @private
              */
             _showAllLeft: function _showAllLeft() {
                 this._moveOutOfDropdown((this.items.left.length - 1) - this.rightMostItemIndex);
@@ -248,6 +254,7 @@ var CMS = window.CMS || {};
              * Show all items in the right part of the toolbar.
              *
              * @method _showAllRight
+             * @private
              */
             _showAllRight: function _showAllRight() {
                 this._moveOutOfDropdown(this.leftMostItemIndex, 'right');
@@ -259,8 +266,8 @@ var CMS = window.CMS || {};
              *
              * @method _moveToDropdown
              * @private
-             * @param numberOfItems {Number} how many items to move to dropdown
-             * @param part {String} from which part to move to dropdown (defaults to left)
+             * @param {Number} numberOfItems how many items to move to dropdown
+             * @param {String} part from which part to move to dropdown (defaults to left)
              */
             _moveToDropdown: function _moveToDropdown(numberOfItems, part) {
                 if (numberOfItems <= 0) {
@@ -305,8 +312,8 @@ var CMS = window.CMS || {};
              *
              * @method _moveOutOfDropdown
              * @private
-             * @param numberOfItems Number how many items to move out of the dropdown
-             * @param part {String} to which part to move out of dropdown (defaults to left)
+             * @param {Number} numberOfItems how many items to move out of the dropdown
+             * @param {String} part to which part to move out of dropdown (defaults to left)
              */
             _moveOutOfDropdown: function _moveOutOfDropdown(numberOfItems, part) {
                 if (numberOfItems <= 0) {

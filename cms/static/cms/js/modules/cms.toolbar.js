@@ -24,7 +24,6 @@ var CMS = window.CMS || {};
          * @class Toolbar
          * @namespace CMS
          * @uses CMS.API.Helpers
-         * @uses CMS.Navigation
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -38,12 +37,13 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
 
+                /**
+                 * @property {CMS.Navigation} navigation
+                 */
                 this.navigation = new CMS.Navigation();
 
                 // states
@@ -112,7 +112,7 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // attach event to the trigger handler
-                this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
+                this.ui.toolbarTrigger.on(this.click, function (e) {
                     e.preventDefault();
                     that.toggle();
                     that.ui.document.trigger(that.click);
@@ -160,6 +160,7 @@ var CMS = window.CMS || {};
                         if (!el.hasClass(children)) {
                             reset();
                         }
+
                         if (el.parent().hasClass(root) && el.hasClass(hover) || el.hasClass(disabled)) {
                             return false;
                         } else {
@@ -271,7 +272,7 @@ var CMS = window.CMS || {};
 
                     // in case of the publish button
                     btn.find('.cms-publish-page').on(that.click, function (e) {
-                        if (!confirm(that.config.lang.publish)) {
+                        if (!confirm(CMS.config.lang.publish)) {
                             e.preventDefault();
                         }
                     });
@@ -307,10 +308,9 @@ var CMS = window.CMS || {};
              */
             _initialStates: function _initialStates() {
                 var publishBtn = $('.cms-btn-publish').parent();
-                var sideframe = new CMS.Sideframe();
 
                 // setup toolbar visibility, we need to reverse the options to set the correct state
-                if (this.settings.toolbar === 'expanded') {
+                if (CMS.settings.toolbar === 'expanded') {
                     this.open({ duration: 0 });
                 } else {
                     this.close();
@@ -345,9 +345,9 @@ var CMS = window.CMS || {};
                 }
 
                 // enforce open state if user is not logged in but requests the toolbar
-                if (!CMS.config.auth || CMS.config.settings.version !== this.settings.version) {
+                if (!CMS.config.auth || CMS.config.settings.version !== CMS.settings.version) {
                     this.open({ duration: 0 });
-                    this.settings = this.setSettings(CMS.config.settings);
+                    CMS.settings = this.setSettings(CMS.config.settings);
                 }
 
                 // should switcher indicate that there is an unpublished page?
@@ -362,9 +362,10 @@ var CMS = window.CMS || {};
                 }
 
                 // open sideframe if it was previously opened
-                if (this.settings.sideframe.url) {
+                if (CMS.settings.sideframe.url) {
+                    var sideframe = new CMS.Sideframe();
                     sideframe.open({
-                        url: this.settings.sideframe.url,
+                        url: CMS.settings.sideframe.url,
                         animate: false
                     });
                 }
@@ -386,7 +387,7 @@ var CMS = window.CMS || {};
              */
             toggle: function toggle() {
                 // toggle bar
-                if (this.settings.toolbar === 'collapsed') {
+                if (CMS.settings.toolbar === 'collapsed') {
                     this.open();
                 } else {
                     this.close();
@@ -397,15 +398,15 @@ var CMS = window.CMS || {};
              * Opens the toolbar (slide down).
              *
              * @method open
-             * @param [opts] {Object}
-             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             * @param {Object} [opts]
+             * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
              */
             open: function open(opts) {
                 this._show(opts);
 
                 // set new settings
-                this.settings.toolbar = 'expanded';
-                this.settings = this.setSettings(this.settings);
+                CMS.settings.toolbar = 'expanded';
+                CMS.settings = this.setSettings(CMS.settings);
             },
 
             /**
@@ -413,8 +414,8 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
-             * @param [opts] {Object}
-             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             * @param {Object} [opts]
+             * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
              */
             _show: function _show(opts) {
                 var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
@@ -428,7 +429,7 @@ var CMS = window.CMS || {};
                 this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
                 // animate html
                 this.ui.body.addClass('cms-toolbar-expanded');
-                this.ui.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
+                this.ui.body.animate({ 'margin-top': toolbarHeight - 10 + debugHeight }, speed, 'linear');
                 // set messages top to toolbar height
                 this.ui.messages.css('top', toolbarHeight + 1);
             },
@@ -442,8 +443,8 @@ var CMS = window.CMS || {};
                 this._hide();
 
                 // set new settings
-                this.settings.toolbar = 'collapsed';
-                this.settings = this.setSettings(this.settings);
+                CMS.settings.toolbar = 'collapsed';
+                CMS.settings = this.setSettings(CMS.settings);
             },
 
             /**
@@ -466,21 +467,21 @@ var CMS = window.CMS || {};
                 this.ui.toolbar.css('margin-top', -toolbarHeight);
                 // animate html
                 this.ui.body.removeClass('cms-toolbar-expanded');
-                this.ui.body.animate({ 'margin-top': (this.config.debug) ? 5 : 0 }, speed);
+                this.ui.body.animate({ 'margin-top': (CMS.config.debug) ? 5 : 0 }, speed);
                 // set messages top to 0
                 this.ui.messages.css('top', 0);
             },
 
             /**
-             * Closes the message window underneath the toolbar.
+             * Makes a request to the given url, runs optional callbacks.
              *
-             * @method open
-             * @param opts
-             * @param opts.url {String} url where the ajax points to
-             * @param [opts.post] {Object} post data to be passed
-             * @param [opts.text] {String} message to be displayed
-             * @param [opts.callback] {Function} custom callback instead of reload
-             * @param [opts.onSuccess] {String} reload and display custom message
+             * @method openAjax
+             * @param {Object} opts
+             * @param {String} opts.url url where the ajax points to
+             * @param {Object} [opts.post] post data to be passed
+             * @param {String} [opts.text] message to be displayed
+             * @param {Function} [opts.callback] custom callback instead of reload
+             * @param {String} [opts.onSuccess] reload and display custom message
              * @return {Boolean|jQuery.Deferred} either false or a promise
              */
             openAjax: function (opts) {
@@ -549,7 +550,7 @@ var CMS = window.CMS || {};
              * Delegates event from element to appropriate functionalities.
              *
              * @method _delegate
-             * @param el {jQuery} trigger element
+             * @param {jQuery} el trigger element
              * @private
              */
             _delegate: function _delegate(el) {
@@ -558,7 +559,9 @@ var CMS = window.CMS || {};
 
                 switch (target) {
                     case 'modal':
-                        var modal = new CMS.Modal({'onClose': el.data('on-close')});
+                        var modal = new CMS.Modal({
+                            onClose: el.data('on-close')
+                        });
                         modal.open({
                             url: el.attr('href'),
                             title: el.data('name')
@@ -570,11 +573,16 @@ var CMS = window.CMS || {};
                         });
                         break;
                     case 'cms_frame':
-                        var frame = window.open(el.attr('href'), 'cms_frame');
+                        var frame = window.open(el.attr('href'), JSON.stringify({
+                            name: 'cms_frame',
+                            url: window.location.href
+                        }));
                         frame.focus();
                         break;
                     case 'sideframe':
-                        var sideframe = new CMS.Sideframe({'onClose': el.data('on-close')});
+                        var sideframe = new CMS.Sideframe({
+                            onClose: el.data('on-close')
+                        });
                         sideframe.open({
                             url: el.attr('href'),
                             animate: true
@@ -597,7 +605,7 @@ var CMS = window.CMS || {};
              * Sets the functionality for the switcher button.
              *
              * @method _setSwitcher
-             * @param el {jQuery} button element
+             * @param {jQuery} el button element
              * @private
              */
             _setSwitcher: function _setSwitcher(el) {
@@ -651,7 +659,7 @@ var CMS = window.CMS || {};
              * Locks the toolbar so it cannot be closed.
              *
              * @method _lock
-             * @param lock {Boolean} true if the toolbar should be locked
+             * @param {Boolean} lock true if the toolbar should be locked
              * @private
              */
             _lock: function _lock(lock) {
@@ -685,7 +693,7 @@ var CMS = window.CMS || {};
                     if (e.type === that.mouseEnter) {
                         timer = setTimeout(function () {
                             CMS.API.Messages.open({
-                                message: that.config.lang.debug
+                                message: CMS.config.lang.debug
                             });
                         }, timeout);
                     }

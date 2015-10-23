@@ -37,8 +37,6 @@ var CMS = window.CMS || {};
 
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
-                this.config = CMS.config;
-                this.settings = CMS.settings;
 
                 // elements
                 this._setupUI();
@@ -50,14 +48,6 @@ var CMS = window.CMS || {};
                 this.pointerMove = 'pointermove.cms.sideframe';
                 this.enforceReload = false;
                 this.settingsRefreshTimer = 600;
-
-                // if the modal is initialized the first time, set the events
-                if (!this.ui.sideframe.data('ready')) {
-                    this._events();
-                }
-
-                // set a state to determine if we need to reinitialize this._events();
-                this.ui.sideframe.data('ready', true);
             },
 
             /**
@@ -89,19 +79,19 @@ var CMS = window.CMS || {};
             _events: function _events() {
                 var that = this;
 
-                this.ui.close.on(this.click, function () {
+                this.ui.close.off(this.click).on(this.click, function () {
                     that.close();
                 });
 
                 // the resize event attaches an off event to the body
                 // which is handled within _startResize()
-                this.ui.resize.on(this.pointerDown, function (e) {
+                this.ui.resize.off(this.pointerDown).on(this.pointerDown, function (e) {
                     e.preventDefault();
                     that._startResize();
                 });
 
                 // close sideframe when clicking on the dimmer
-                this.ui.dimmer.on(this.click, function () {
+                this.ui.dimmer.off(this.click).on(this.click, function () {
                     that.close();
                 });
             },
@@ -111,9 +101,9 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @chainable
-             * @param opts
-             * @param opts.url {String} url to render iframe
-             * @param [opts.animate] {Boolean} should modal be animated
+             * @param {Object} opts
+             * @param {String} opts.url url to render iframe
+             * @param {Boolean} [opts.animate] should modal be animated
              */
             open: function open(opts) {
                 if (!(opts && opts.url)) {
@@ -127,9 +117,15 @@ var CMS = window.CMS || {};
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
                 var params = [];
-                var width = this.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                var width = CMS.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
                 var currentWidth = this.ui.sideframe.outerWidth();
                 var isFrameVisible = this.ui.sideframe.is(':visible');
+
+                // We have to rebind events every time we open a sideframe
+                // because the event handlers contain references to the instance
+                // and since we reuse the same markup we need to update
+                // that instance reference every time.
+                this._events();
 
                 // show dimmer even before iframe is loaded
                 this.ui.dimmer.show();
@@ -161,7 +157,7 @@ var CMS = window.CMS || {};
                     // The user has performed an action that requires the
                     // sideframe to be shown, this intent outweighs any
                     // previous intent to minimize the frame.
-                    this.settings.sideframe.hidden = false;
+                    CMS.settings.sideframe.hidden = false;
                 }
 
                 if (isFrameVisible && Math.round(currentWidth) === Math.round(width)) {
@@ -180,7 +176,7 @@ var CMS = window.CMS || {};
              *
              * @method _content
              * @private
-             * @param url {String} valid uri to pass on the iframe
+             * @param {String} url valid uri to pass on the iframe
              */
             _content: function _content(url) {
                 var that = this;
@@ -204,13 +200,13 @@ var CMS = window.CMS || {};
                     iframe.show();
 
                     // add debug infos
-                    if (that.config.debug) {
+                    if (CMS.config.debug) {
                         iframe.contents().find('body').addClass('cms-debug');
                     }
 
                     // save url in settings
-                    that.settings.sideframe.url = iframe.prop('src');
-                    that.settings = that.setSettings(that.settings);
+                    CMS.settings.sideframe.url = iframe.prop('src');
+                    CMS.settings = that.setSettings(CMS.settings);
 
                     // bind extra events
                     body.on(that.click, function () {
@@ -236,14 +232,14 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
-             * @param width {Number} width that the iframes opens to
-             * @param [animate] {Number} Animation duration
+             * @param {Number} width width that the iframes opens to
+             * @param {Number} [animate] Animation duration
              */
             _show: function _show(width, animate) {
                 this.ui.sideframe.show();
 
                 // check if sideframe should be hidden
-                if (this.settings.sideframe.hidden) {
+                if (CMS.settings.sideframe.hidden) {
                     this._hide();
                 }
 
@@ -283,12 +279,12 @@ var CMS = window.CMS || {};
                 this.ui.dimmer.hide();
 
                 // update settings
-                this.settings.sideframe = {
+                CMS.settings.sideframe = {
                     url: null,
                     hidden: false,
                     width: this.options.sideframeWidth
                 };
-                this.settings = this.setSettings(this.settings);
+                CMS.settings = this.setSettings(CMS.settings);
 
                 // check for reloading
                 this.reloadBrowser(this.options.onClose, false, true);
@@ -302,8 +298,8 @@ var CMS = window.CMS || {};
              *
              * @method _hide
              * @private
-             * @param opts
-             * @param opts.duration {Number} animation duration
+             * @param {Object} opts
+             * @param {Number} opts.duration animation duration
              */
             _hide: function _hide(opts) {
                 var duration = this.options.sideframeDuration;
@@ -352,12 +348,12 @@ var CMS = window.CMS || {};
                     that.ui.sideframe.css('width', e.originalEvent.clientX);
 
                     // update settings
-                    that.settings.sideframe.position = e.originalEvent.clientX;
+                    CMS.settings.sideframe.position = e.originalEvent.clientX;
 
                     // save position into our settings
                     clearTimeout(timer);
                     timer = setTimeout(function () {
-                        that.settings = that.setSettings(that.settings);
+                        CMS.settings = that.setSettings(CMS.settings);
                     }, that.settingsRefreshTimer);
                 });
             },

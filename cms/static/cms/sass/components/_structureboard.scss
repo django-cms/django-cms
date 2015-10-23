@@ -63,7 +63,6 @@
     // basically a cms placeholder representation
     .cms-dragarea {
         position: absolute;
-        box-sizing: border-box;
         margin: 0 0 $structure-dragarea-space;
         padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
     }
@@ -78,7 +77,6 @@
     // subclasses for the simple structure borad without absolute positioning
     .cms-structure-content-simple {
         position: relative;
-        overflow-x: hidden;
         overflow-y: scroll;
         height: 100%;
         padding: ($toolbar-height + 40px) 5%;
@@ -176,7 +174,6 @@
         padding-left: $structure-draggable-inner-padding;
     }
     .cms-dragarea-empty .cms-draggables-root {
-        box-sizing: border-box;
         position: relative;
         min-height: 46px;
         border: 2px solid $btn-default-border;
@@ -193,6 +190,8 @@
         border-radius: $border-radius-base;
         white-space: nowrap;
         list-style-type: none;
+        -ms-touch-action: none;
+        touch-action: none;
 
         // levels
         .cms-draggable {
@@ -462,6 +461,17 @@
         display: block !important;
         opacity: 0.3;
     }
+}
+
+@at-root .cms-structure-mode-structure {
+    overflow: hidden;
+    // min-height is necessary for iOS9
+    // when we have a page that has content
+    // that takes less than a screen structureboard
+    // becomes unusable because it tries to fit
+    // in the size of the content and not the size
+    // of the device screen
+    min-height: 100%;
 }
 
 // hide elements when dragging
