@@ -95,29 +95,24 @@ class PlaceholderToolbar(CMSToolbar):
 
     def add_wizard_button(self):
         from cms.wizards.wizard_pool import entry_choices
-
         title = _("Create")
         try:
             page_pk = self.page.pk
         except AttributeError:
             page_pk = None
-        try:
-            user = self.request.user
-        except AttributeError:
-            user = None
 
-        if page_pk and self.request.user:
-            disabled = len(list(entry_choices(user, self.page))) == 0
+        user = getattr(self.request, "user", None)
+        disabled = user and hasattr(self, "page") and len(
+            list(entry_choices(user, self.page))) == 0
 
-            url = "{url}?page={page}".format(
-                url=reverse("cms_wizard_create"),
-                page=page_pk
-            )
-            self.toolbar.add_modal_button(title, url,
-                                          side=self.toolbar.RIGHT,
-                                          disabled=disabled,
-                                          on_close=REFRESH_PAGE)
-
+        url = "{url}?page={page}".format(
+            url=reverse("cms_wizard_create"),
+            page=page_pk
+        )
+        self.toolbar.add_modal_button(title, url,
+                                      side=self.toolbar.RIGHT,
+                                      disabled=disabled,
+                                      on_close=REFRESH_PAGE)
 
 @toolbar_pool.register
 class BasicToolbar(CMSToolbar):
