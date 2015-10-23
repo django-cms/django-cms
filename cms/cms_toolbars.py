@@ -94,11 +94,25 @@ class PlaceholderToolbar(CMSToolbar):
             switcher.add_button(_('Content'), edit_url, active=not build_mode, disabled=False)
 
     def add_wizard_button(self):
+        from cms.wizards.wizard_pool import entry_choices
         title = _("Create")
-        url = reverse("cms_wizard_create")
-        self.toolbar.add_modal_button(title, url, side=self.toolbar.RIGHT,
-                                      on_close=REFRESH_PAGE)
+        try:
+            page_pk = self.page.pk
+        except AttributeError:
+            page_pk = None
 
+        user = getattr(self.request, "user", None)
+        disabled = user and hasattr(self, "page") and len(
+            list(entry_choices(user, self.page))) == 0
+
+        url = "{url}?page={page}".format(
+            url=reverse("cms_wizard_create"),
+            page=page_pk
+        )
+        self.toolbar.add_modal_button(title, url,
+                                      side=self.toolbar.RIGHT,
+                                      disabled=disabled,
+                                      on_close=REFRESH_PAGE)
 
 @toolbar_pool.register
 class BasicToolbar(CMSToolbar):
