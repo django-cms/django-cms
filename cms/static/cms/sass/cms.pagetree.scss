@@ -291,9 +291,11 @@ $row-height: 41px;
         position: relative;
         z-index: 100;
     }
+    .moveable.hover,
     .moveable:hover {
         z-index: 1000;
     }
+    .moveable.hover .cont,
     .moveable:hover .cont {
         position: relative;
         z-index: 1000;
