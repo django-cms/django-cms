@@ -36,22 +36,6 @@ var CMS = window.CMS || {};
 
                 // focus window so hitting "enter" doesnt trigger a refresh
                 $(window).focus();
-            },
-
-            _pageTypeSelect: function () {
-                var pageTypeField = $('.form-row.page_type select');
-                var contentGroup = $('.form-row.content');
-                var contentField = contentGroup.find('textarea');
-
-                pageTypeField.on('change', function () {
-                    if ($(this).val()) {
-                        contentGroup.hide();
-                        contentField.prop('disabled', true);
-                    } else {
-                        contentGroup.show();
-                        contentField.prop('disabled', false);
-                    }
-                });
             }
 
         };
@@ -59,9 +43,6 @@ var CMS = window.CMS || {};
         // directly initialize required methods
         if ($('.choice').length) {
             CMS.Wizards._choice();
-        }
-        if ($('.form-row.page_type select').length) {
-            CMS.Wizards._pageTypeSelect();
         }
 
     });
