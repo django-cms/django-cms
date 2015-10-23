@@ -131,14 +131,10 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
 class TestWizardPool(WizardTestMixin, CMSTestCase):
 
     def test_discover(self):
-        """
-        Tests that _discover() will register the page wizard.
-        """
         wizard_pool._reset()
         self.assertFalse(wizard_pool._discovered)
         self.assertEqual(len(wizard_pool._entries), 0)
         wizard_pool._discover()
-        self.assertTrue(len(wizard_pool._entries) > 0)
         self.assertTrue(wizard_pool._discovered)
 
     def test_register_unregister_isregistered(self):
