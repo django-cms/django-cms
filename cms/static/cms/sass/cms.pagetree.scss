@@ -64,28 +64,31 @@ $row-height: 41px;
         width: 20px;
         height: 20px;
         margin-top: 5px;
-        background: url("../img/pagetree/sprite.png") no-repeat 0 0;
+        background: url("../img/pagetree/sprite.png") no-repeat 0 0 !important;
     }
     li a.preview {
         margin: 0 2px 0 0;
-        background-position: -55px -29px;
+        background-position: -55px -29px !important;
+    }
+    li div a.preview-active {
+        background-position: -81px -29px !important;
     }
     li a.move {
         margin: 0;
-        background-position: -30px -29px;
+        background-position: -30px -29px !important;
     }
     li a.copy {
         margin: 0;
-        background-position: -29px -56px;
+        background-position: -29px -56px !important;
     }
     li a.edit {
         margin: 0 6px 0 2px;
-        background-position: -29px -4px;
+        background-position: -29px -4px !important;
     }
     li div a.addlink {
         margin: 0;
         padding: 0;
-        background-position: -29px -81px;
+        background-position: -29px -81px !important;
         &:before {
             display: none;
         }
@@ -93,7 +96,7 @@ $row-height: 41px;
     li div a.deletelink {
         margin: 0;
         padding: 0;
-        background-position: -3px -55px;
+        background-position: -3px -55px !important;
         &:before {
             display: none;
         }
@@ -101,18 +104,18 @@ $row-height: 41px;
     li div.info {
         margin: 12px 0 0 !important;
         cursor: pointer;
-        background-position: -3px -29px;
+        background-position: -3px -29px !important;
     }
     li a.selector-add {
         margin-top: -1px;
         margin-left: 4px;
-        background-position: -20px 0;
+        background-position: -20px 0 !important;
     }
-    li .col-softroot span.icon {
+    li div .col-softroot span.icon {
         margin: 0 !important;
         background-position: -3px -3px !important;
     }
-    li .col-apphook span.icon {
+    li div .col-apphook span.icon {
         margin: 0 !important;
         background-position: -55px -4px !important;
     }
