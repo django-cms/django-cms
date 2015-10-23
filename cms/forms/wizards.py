@@ -92,17 +92,18 @@ class BaseCMSPageForm(forms.Form):
 
         # Either populate, or remove the page_type field
         if 'page_type' in self.fields:
-            try:
-                root = Page.objects.get(publisher_is_draft=True,
-                                        reverse_id=PAGE_TYPES_ID,
-                                        site=self.page.site_id)
-            except Page.DoesNotExist:
-                root = None
-
+            root = Page.objects.filter(publisher_is_draft=True,
+                                       reverse_id=PAGE_TYPES_ID,
+                                       site=self.page.site_id).first()
             if root:
+                page_types = root.get_descendants()
+            else:
+                page_types = Page.objects.none()
+
+            if root and page_types:
                 # Set the choicefield's choices to the various page_types
                 language = get_language()
-                type_ids = root.get_descendants().values_list('pk', flat=True)
+                type_ids = page_types.values_list('pk', flat=True)
                 titles = Title.objects.filter(page__in=type_ids,
                                               language=language)
                 choices = [('', '---------')]
