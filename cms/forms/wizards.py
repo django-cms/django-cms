@@ -70,7 +70,7 @@ class PageTypeSelect(forms.widgets.Select):
         js = (
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.base.js',
-            'cms/js/modules/cms.page_type_select.js',
+            'cms/js/modules/cms.wizards.js',
         )
 
 
