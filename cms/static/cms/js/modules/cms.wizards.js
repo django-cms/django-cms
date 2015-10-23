@@ -25,7 +25,7 @@ var CMS = window.CMS || {};
          */
         CMS.Wizards = {
 
-            _choice: function initialize(options) {
+            _choice: function initialize() {
                 // set active element when making a choice
                 var choices = $('.choice');
                 choices.on('click', function (e) {
