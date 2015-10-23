@@ -4,17 +4,7 @@ from django import forms
 
 from cms.models import Page
 
-from .wizard_pool import wizard_pool
-
-
-def entry_choices(user, page):
-    """
-    Yields a list of wizard entries that the current user can use based on their
-    permission to add instances of the underlying model objects.
-    """
-    for entry in wizard_pool.get_entries():
-        if entry.user_has_add_permission(user, page=page):
-            yield (entry.id, entry.title)
+from .wizard_pool import entry_choices
 
 
 def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
