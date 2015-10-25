@@ -9,7 +9,6 @@ from django import http
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.core import urlresolvers
 from django.core.cache import cache
 from django.core.exceptions import ValidationError, ImproperlyConfigured
@@ -1555,10 +1554,6 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         self.page2 = api.create_page(**page_data2)
         self.placeholder1 = self.page1.placeholders.get(slot='body')
         self.placeholder2 = self.page2.placeholders.get(slot='body')
-    
-    def tearDown(self):
-        User.objects.all().delete()
-        Page.objects.all().delete()
     
     def test_copy_fk_from_model(self):
         plugin = api.add_plugin(
