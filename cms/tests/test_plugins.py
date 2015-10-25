@@ -1546,6 +1546,8 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
     def setUp(self):
         self.super_user = self._create_user("test", True, True)
         self.FIRST_LANG = settings.LANGUAGES[0][0]
+        self._login_context = self.login_user_context(self.super_user)
+        self._login_context.__enter__()
         page_data1 = self.get_new_page_data_dbfields()
         page_data1['published'] = False
         self.page1 = api.create_page(**page_data1)
