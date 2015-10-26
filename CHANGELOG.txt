@@ -35,6 +35,7 @@
 - Switched from tabs to 4 spaces everywhere
 - Switched from ruby sass/compass to libsass/autoprefixer
 - Switched from sprite images to auto generated webfonts via gulp
+- Moved widgets.py javascript to ``static/cms/js/widgets``
 - Fix placeholder template tags ignoring the lang parameter
 - Renamed cms_app, cms_menu, cms_toolbar to plural versions eg. ``cms_apps.py``
   ``cms_menus.py``, ``cms_toolbars.py`` with backwards compatibility
