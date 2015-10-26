@@ -1,11 +1,19 @@
-//##############################################################################
-// APPHOOKS
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
-/* global apphooks_configuration, CMS */
+// #############################################################################
+// NAMESPACES
+var CMS = window.CMS || {};
+var apphooks_configuration = window.apphooks_configuration || {};
+
+// #############################################################################
+// APP HOOK SELECT
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
-    $(document).ready(function () {
+
+    // shorthand for jQuery(document).ready();
+    $(function () {
 
         var appHooks = $('#application_urls'),
             selected = appHooks.find('option:selected'),
@@ -77,5 +85,6 @@
                 appNs.removeAttr('value');
             }
         });
+
     });
 })(CMS.$);

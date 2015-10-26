@@ -3,6 +3,10 @@
  */
 
 // #############################################################################
+// NAMESPACES
+var django = window.django || {};
+
+// #############################################################################
 // PAGE SELECT WIDGET
 // cms/forms/widgets.py
 (function ($) {
@@ -10,7 +14,8 @@
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        var options = window._CMSWidget;
+
+        var options = window._PageSelectWidget;
         var group0 = $('#id_' + options.name + '_0');
         var group1 = $('#id_' + options.name + '_1');
         var group2 = $('#id_' + options.name + '_2');

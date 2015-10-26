@@ -98,7 +98,7 @@ class PageSelectWidget(MultiWidget):
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         output.append(r'''<script type="text/javascript">
-            window._CMSWidget = {
+            window._PageSelectWidget = {
                 name: '%(name)s'
             };
         </script>''' % {
@@ -109,8 +109,21 @@ class PageSelectWidget(MultiWidget):
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
 
+
 class PageSmartLinkWidget(TextInput):
 
+    class Media:
+        css = {
+            'all': (
+                'cms/js/select2/select2.css',
+                'cms/js/select2/select2-bootstrap.css',
+            )
+        }
+        js = (
+            'cms/js/modules/cms.base.js',
+            'cms/js/select2/select2.js',
+            'cms/js/widgets/forms.pagesmartlinkwidget.js',
+        )
 
     def __init__(self, attrs=None, ajax_view=None):
         super(PageSmartLinkWidget, self).__init__(attrs)
@@ -129,44 +142,13 @@ class PageSmartLinkWidget(TextInput):
         id_ = final_attrs.get('id', None)
 
         output = [r'''<script type="text/javascript">
-(function($){
-    $(function(){
-        $("#%(element_id)s").select2({
-            placeholder: "%(placeholder_text)s",
-            allowClear: true,
-            minimumInputLength: 3,
-            ajax: {
-                url: "%(ajax_url)s",
-                dataType: 'json',
-                data: function (term, page) {
-                    return {
-                        q: term, // search term
-                        language_code: '%(language_code)s'
-                    };
-                },
-                results: function (data, page) {
-                    return {
-                        more: false,
-                        results: $.map(data, function(item, i){
-                            return {
-                                'id':item.redirect_url,
-                                'text': item.title + ' (/' + item.path + ')'}
-                            }
-                        )
-                    };
-                }
-            },
-            // Allow creation of new entries
-            createSearchChoice:function(term, data) { if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0) {return {id:term, text:term};} },
-            multiple: false,
-            initSelection : function (element, callback) {
-                var initialValue = element.val()
-                callback({id:initialValue, text: initialValue});
-            }
-        });
-    })
-})(CMS.$);
-</script>''' % {
+            window._PageSmartLinkWidget = {
+                id: '%(element_id)s',
+                text: '%(placeholder_text)s',
+                lang: '%(language_code)s',
+                url: '%(ajax_url)s'
+            };
+        </script>''' % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,
@@ -175,15 +157,6 @@ class PageSmartLinkWidget(TextInput):
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
-
-
-    class Media:
-        css = {
-            'all': ('cms/js/select2/select2.css',
-                    'cms/js/select2/select2-bootstrap.css',)
-        }
-        js = ('cms/js/modules/cms.base.js',
-              'cms/js/select2/select2.js',)
 
 
 class UserSelectAdminWidget(Select):
@@ -214,7 +187,10 @@ class AppHookSelect(Select):
     """
 
     class Media:
-        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
+        js = (
+            'cms/js/modules/cms.base.js',
+            'cms/js/widgets/forms.apphookselect.js',
+        )
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
         self.app_namespaces = app_namespaces
@@ -265,7 +241,10 @@ class ApplicationConfigSelect(Select):
     """
 
     class Media:
-        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
+        js = (
+            'cms/js/modules/cms.base.js',
+            'cms/js/widgets/forms.apphookselect.js',
+        )
 
     def __init__(self, attrs=None, choices=(), app_configs={}):
         self.app_configs = app_configs
