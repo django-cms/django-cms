@@ -553,10 +553,16 @@ class PlaceholderAdminMixin(object):
                     plugin = plugin.move(parent, pos='last-child')
             else:
                 sibling = CMSPlugin.get_last_root_node()
-                plugin.parent_id = None
+                plugin.parent = plugin.parent_id = None
                 plugin.placeholder = placeholder
                 plugin.save()
                 plugin = plugin.move(sibling, pos='right')
+
+            # Don't neglect the children
+            for child in [plugin] + list(plugin.get_descendants()):
+                child.placeholder = placeholder
+                child.language = language
+                child.save()
 
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
