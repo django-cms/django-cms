@@ -7,6 +7,7 @@ def copy_plugins_to(old_plugins, to_placeholder,
     """
     Copies a list of plugins to a placeholder to a language.
     """
+    # import pdb; pdb.set_trace()
     # TODO: Refactor this and copy_plugins to cleanly separate plugin tree/node
     # copying and remove the need for the mutating parameter old_parent_cache.
     old_parent_cache = {}
@@ -17,17 +18,22 @@ def copy_plugins_to(old_plugins, to_placeholder,
         for old_plugin in old_plugins:
             if old_plugin.parent == old_parent:
                 old_plugin.parent = old_plugin.parent_id = None
-    new_plugins = [
-        old.copy_plugin(to_placeholder, to_language or old.language,
-                        old_parent_cache, no_signals) for old in old_plugins]
+    new_plugins = []
+    for old in old_plugins:
+        new_plugins.append(
+            old.copy_plugin(to_placeholder, to_language or old.language,
+                            old_parent_cache, no_signals))
+
     if new_plugins and parent_plugin_id:
         from cms.models import CMSPlugin
         parent_plugin = CMSPlugin.objects.get(pk=parent_plugin_id)
         top_plugins = [p for p in new_plugins if p.parent_id is None]
-        for plugin in top_plugins:
-            plugin.parent_id = parent_plugin_id
-            plugin.save()
-            plugin.move(parent_plugin, pos="last-child")
+        for idx, plugin in enumerate(new_plugins):
+            if plugin in top_plugins:
+                plugin.parent_id = parent_plugin_id
+                plugin.save()
+                new_plugins[idx] = plugin.move(parent_plugin, pos="last-child")
+
     plugins_ziplist = list(zip(new_plugins, old_plugins))
 
     # this magic is needed for advanced plugins like Text Plugins that can have
