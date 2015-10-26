@@ -1,15 +1,18 @@
-//##############################################################################
-// PAGE TYPE WIDGET
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
-/* global CMS */
+// #############################################################################
+// PAGE TYPE SELECT
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
+
+    // shorthand for jQuery(document).ready();
     $(function () {
 
-        var pageTypeField = $('.form-row.page_type select'),
-            contentGroup = $('.form-row.content'),
-            contentField = contentGroup.find('textarea');
+        var pageTypeField = $('.form-row.page_type select');
+        var contentGroup = $('.form-row.content');
+        var contentField = contentGroup.find('textarea');
 
         pageTypeField.on('change', function () {
             if ($(this).val()) {
@@ -20,5 +23,6 @@
                 contentField.prop('disabled', false);
             }
         });
+
     });
 })(CMS.$);
