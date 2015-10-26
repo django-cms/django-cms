@@ -20,6 +20,12 @@ class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
+
+    class Media:
+        js = (
+            'cms/js/widgets/forms.pageselectwidget.js',
+        )
+
     def __init__(self, site_choices=None, page_choices=None, attrs=None):
         if attrs is not None:
             self.attrs = attrs.copy()
@@ -92,37 +98,12 @@ class PageSelectWidget(MultiWidget):
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         output.append(r'''<script type="text/javascript">
-(function($) {
-    var handleSiteChange = function(site_name, selected_id) {
-        $("#id_%(name)s_1 optgroup").remove();
-        var myOptions = $("#id_%(name)s_2 optgroup[label='" + site_name + "']").clone();
-        $("#id_%(name)s_1").append(myOptions);
-        $("#id_%(name)s_1").change();
-    };
-    var handlePageChange = function(page_id) {
-        if (page_id) {
-            $("#id_%(name)s_2 option").attr('selected', false);
-            $("#id_%(name)s_2 option[value='" + page_id + "']").attr('selected', true);
-        } else {
-            if ($("#id_%(name)s_2").length) {
-                $("#id_%(name)s_2 option[value='']").attr('selected', true);
-            }
-        };
-    };
-    $("#id_%(name)s_0").change(function(){
-        var site_label = $("#id_%(name)s_0").children(":selected").text();
-        handleSiteChange( site_label );
-    });
-    $("#id_%(name)s_1").change(function(){
-        var page_id = $(this).find('option:selected').val();
-        handlePageChange( page_id );
-    });
-    $(function(){
-        handleSiteChange( $("#id_%(name)s_0").children(":selected").text() );
-        $("#add_id_%(name)s").hide();
-    });
-})(django.jQuery);
-</script>''' % {'name': name})
+            window._CMSWidget = {
+                name: '%(name)s'
+            };
+        </script>''' % {
+            'name': name
+        })
         return mark_safe(self.format_output(output))
 
     def format_output(self, rendered_widgets):
