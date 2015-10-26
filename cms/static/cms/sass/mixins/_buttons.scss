@@ -69,6 +69,6 @@
         }
     }
     &.cms-btn-disabled {
-        color: $gray-lighter;
+        color: lighten($color, 50%);
     }
 }
