@@ -100,7 +100,10 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
             kwargs['wizard_page'] = self.get_origin_page()
         else:
             page_pk = self.page_pk or self.request.GET.get('page', None)
-            kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
+            if page_pk and page_pk != 'None':
+                kwargs['wizard_page'] = Page.objects.filter(pk=page_pk).first()
+            else:
+                kwargs['wizard_page'] = None
         return kwargs
 
     def get_form_initial(self, step):

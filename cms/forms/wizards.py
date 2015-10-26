@@ -70,7 +70,7 @@ class PageTypeSelect(forms.widgets.Select):
         js = (
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.base.js',
-            'cms/js/modules/cms.page_type_select.js',
+            'cms/js/widgets/wizard.pagetypeselect.js',
         )
 
 
@@ -91,7 +91,7 @@ class BaseCMSPageForm(forms.Form):
         super(BaseCMSPageForm, self).__init__(*args, **kwargs)
 
         # Either populate, or remove the page_type field
-        if 'page_type' in self.fields:
+        if 'page_type' in self.fields and self.page:
             root = Page.objects.filter(publisher_is_draft=True,
                                        reverse_id=PAGE_TYPES_ID,
                                        site=self.page.site_id).first()
