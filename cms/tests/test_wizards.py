@@ -135,7 +135,6 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         self.assertFalse(wizard_pool._discovered)
         self.assertEqual(len(wizard_pool._entries), 0)
         wizard_pool._discover()
-        self.assertNotEqual(len(wizard_pool._entries), 0)
         self.assertTrue(wizard_pool._discovered)
 
     def test_register_unregister_isregistered(self):
