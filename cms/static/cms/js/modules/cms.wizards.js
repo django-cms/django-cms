@@ -1,20 +1,48 @@
-//##############################################################################
-// WIZARDS
+/*
+ * Copyright https://github.com/divio/django-cms
+ */
 
-/* global CMS */
+// #############################################################################
+// NAMESPACES
+/**
+ * @module CMS
+ */
+var CMS = window.CMS || {};
+
+// #############################################################################
+// MODAL
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
-    $(function () {
-        // set active element when making a choice
-        var choices = $('.choice');
-        choices.on('click', function (e) {
-            choices.removeClass('active')
-                .eq(choices.index(e.currentTarget))
-                .addClass('active');
-        });
 
-        // focus window so hitting "enter" doesnt trigger a refresh
-        $(window).focus();
+    // shorthand for jQuery(document).ready();
+    $(function () {
+        /**
+         * Adds internal methods for the creation wizard.
+         *
+         * @class Wizards
+         * @namespace CMS
+         */
+        CMS.Wizards = {
+
+            _choice: function initialize() {
+                // set active element when making a choice
+                var choices = $('.choice');
+                choices.on('click', function (e) {
+                    choices.removeClass('active')
+                        .eq(choices.index(e.currentTarget))
+                        .addClass('active');
+                });
+
+                // focus window so hitting "enter" doesnt trigger a refresh
+                $(window).focus();
+            }
+
+        };
+
+        // directly initialize required methods
+        if ($('.choice').length) {
+            CMS.Wizards._choice();
+        }
+
     });
 })(CMS.$);

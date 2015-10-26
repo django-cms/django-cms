@@ -60,7 +60,7 @@
         &.cms-btn-active {
             background-color: rgba($background, 0.4) important($important);
             border-color: rgba($border, 0.4) important($important);
-            color: rgba($color, 0.8) important(1);
+            color: lighten($color, 50%) important(1);
             cursor: not-allowed;
             box-shadow: none important($important);
             &:before {

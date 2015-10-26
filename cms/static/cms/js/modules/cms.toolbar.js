@@ -98,7 +98,9 @@ var CMS = window.CMS || {};
                     switcher: container.find('.cms-toolbar-item-switch'),
                     messages: container.find('.cms-messages'),
                     screenBlock: container.find('.cms-screenblock'),
-                    structureBoard: container.find('.cms-structure')
+                    structureBoard: container.find('.cms-structure'),
+                    saveLive: $('.cms-btn-live'),
+                    saveDraft: $('.cms-btn-draft')
                 };
             },
 
@@ -287,7 +289,8 @@ var CMS = window.CMS || {};
                                 'csrfmiddlewaretoken': CMS.config.csrf
                             },
                             'success': function () {
-                                CMS.API.Helpers.reloadBrowser();
+                                var url = CMS.API.Helpers.makeURL(window.location.href, ['edit_off=true']);
+                                CMS.API.Helpers.reloadBrowser(url);
                             },
                             'error': function (request) {
                                 throw new Error(request);
@@ -321,6 +324,8 @@ var CMS = window.CMS || {};
 
                 if ($('.cms-btn-publish-active').length) {
                     publishBtn.show();
+                    this.ui.saveLive.hide();
+                    this.ui.saveDraft.show();
                     this.ui.window.trigger('resize');
                 }
 
@@ -556,6 +561,9 @@ var CMS = window.CMS || {};
             _delegate: function _delegate(el) {
                 // save local vars
                 var target = el.data('rel');
+                if (el.hasClass('cms-btn-disabled')) {
+                    return false;
+                }
 
                 switch (target) {
                     case 'modal':
