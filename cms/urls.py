@@ -23,7 +23,7 @@ else:
 
 
 urlpatterns.extend([
-    url(r'^wizard/', include('cms.wizards.urls')),
+    url(r'^cms_wizard/', include('cms.wizards.urls')),
     url(regexp, details, name='pages-details-by-slug'),
     url(r'^$', details, {'slug': ''}, name='pages-root'),
 ])

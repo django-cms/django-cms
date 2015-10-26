@@ -101,9 +101,9 @@ var CMS = window.CMS || {};
              *
              * @method open
              * @chainable
-             * @param opts
-             * @param opts.url {String} url to render iframe
-             * @param [opts.animate] {Boolean} should modal be animated
+             * @param {Object} opts
+             * @param {String} opts.url url to render iframe
+             * @param {Boolean} [opts.animate] should modal be animated
              */
             open: function open(opts) {
                 if (!(opts && opts.url)) {
@@ -176,7 +176,7 @@ var CMS = window.CMS || {};
              *
              * @method _content
              * @private
-             * @param url {String} valid uri to pass on the iframe
+             * @param {String} url valid uri to pass on the iframe
              */
             _content: function _content(url) {
                 var that = this;
@@ -232,8 +232,8 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
-             * @param width {Number} width that the iframes opens to
-             * @param [animate] {Number} Animation duration
+             * @param {Number} width width that the iframes opens to
+             * @param {Number} [animate] Animation duration
              */
             _show: function _show(width, animate) {
                 this.ui.sideframe.show();
@@ -298,8 +298,8 @@ var CMS = window.CMS || {};
              *
              * @method _hide
              * @private
-             * @param opts
-             * @param opts.duration {Number} animation duration
+             * @param {Object} opts
+             * @param {Number} opts.duration animation duration
              */
             _hide: function _hide(opts) {
                 var duration = this.options.sideframeDuration;

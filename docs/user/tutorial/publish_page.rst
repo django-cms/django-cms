@@ -15,7 +15,7 @@ and out of *Edit* mode.
 While your page remains in draft mode, you can continue working on it without affecting the published page.
 
 Once you have finished editing, you can exit editing mode and save the page
-using the **Save as draft** |save-as-draft| button.
+using the **View published** or **Save as draft** |save-as-draft| button.
 
 You have now worked through the complete cycle of content publishing in django
 CMS.

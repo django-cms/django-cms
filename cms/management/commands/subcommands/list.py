@@ -5,13 +5,37 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from django.core.management.base import NoArgsCommand
 
+
 class ListApphooksCommand(NoArgsCommand):
 
     help = 'Lists all apphooks in pages'
+
     def handle_noargs(self, **options):
-        urls = Page.objects.filter(application_urls__gt='').values_list("application_urls", flat=True)
-        for url in urls:
-            self.stdout.write(u'%s\n' % url)
+        urls = list(
+            Page.objects.exclude(application_urls='').exclude(
+                application_urls__isnull=True
+            ).values_list(
+                'application_urls', 'publisher_is_draft', 'application_namespace'
+            )
+        )
+        apphooks = {}
+        for apphook, is_draft, application_namespace in urls:
+            state = 'draft' if is_draft else 'published'
+            if apphook in apphooks:
+                apphooks[apphook][0].append(state)
+            else:
+                apphooks[apphook] = [[state], application_namespace]
+        for apphook, attributes in apphooks.items():
+            attributes[0].sort()
+            if attributes[1]:
+                self.stdout.write(u'{0}[instance: {1}] ({2})\n'.format(
+                    apphook, attributes[1], '/'.join(attributes[0])
+                ))
+            else:
+                self.stdout.write(u'{0} ({1})\n'.format(
+                    apphook, '/'.join(attributes[0])
+                ))
+
 
 def plugin_report():
     # structure of report:
@@ -51,10 +75,10 @@ def plugin_report():
     return plugin_report
 
 
-
 class ListPluginsCommand(NoArgsCommand):
 
     help = 'Lists all plugins in CMSPlugin'
+
     def handle_noargs(self, **options):
         self.stdout.write(u"==== Plugin report ==== \n\n")
         self.stdout.write(u"There are %s plugin types in your database \n" % len(plugin_report()))

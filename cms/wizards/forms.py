@@ -4,17 +4,7 @@ from django import forms
 
 from cms.models import Page
 
-from .wizard_pool import wizard_pool
-
-
-def entry_choices(user):
-    """
-    Yields a list of wizard entries that the current user can use based on their
-    permission to add instances of the underlying model objects.
-    """
-    for entry in wizard_pool.get_entries():
-        if entry.user_has_add_permission(user):
-            yield (entry.id, entry.title)
+from .wizard_pool import entry_choices
 
 
 def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
@@ -53,6 +43,16 @@ class BaseFormMixin(object):
 
 
 class WizardStep1Form(BaseFormMixin, forms.Form):
+
+    class Media:
+        css = {
+            'all': ('cms/css/cms.wizard.css', )
+        }
+        js = (
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/modules/cms.wizards.js',
+        )
+
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         required=False,
@@ -61,10 +61,11 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     entry = forms.ChoiceField(choices=[], widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.get('wizard_user', None)
         super(WizardStep1Form, self).__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
-        self.fields['entry'].choices = entry_choices(user=self.user)
+        self.fields['entry'].choices = entry_choices(user=self.user,
+                                                     page=self.page)
+
 
 class WizardStep2BaseForm(BaseFormMixin):
     user = None

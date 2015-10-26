@@ -50,8 +50,11 @@ class WizardTestMixin(object):
         # tests start, creating unexpected starting conditions.
         wizard_pool._discovered = True
 
+        class PageWizard(Wizard):
+            pass
+
         # This is a basic Wizard
-        cls.page_wizard = Wizard(
+        cls.page_wizard = PageWizard(
             title=_(u"Page"),
             weight=100,
             form=WizardForm,
@@ -59,16 +62,22 @@ class WizardTestMixin(object):
             template_name='my_template.html',  # This doesn't exist anywhere
         )
 
+        class SettingsWizard(Wizard):
+            pass
+
         # This is a Wizard that uses a ModelForm to define the model
-        cls.user_settings_wizard = Wizard(
+        cls.user_settings_wizard = SettingsWizard(
             title=_(u"UserSettings"),
             weight=200,
             form=ModelWizardForm,
         )
 
+        class TitleWizard(Wizard):
+            pass
+
         # This is a bad wizard definition as it neither defines a model, nor
         # uses a ModelForm that has model defined in Meta
-        cls.title_wizard = Wizard(
+        cls.title_wizard = TitleWizard(
             title=_(u"Page"),
             weight=100,
             form=BadModelForm,
@@ -122,14 +131,10 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
 class TestWizardPool(WizardTestMixin, CMSTestCase):
 
     def test_discover(self):
-        """
-        Tests that _discover() will register the page wizard.
-        """
         wizard_pool._reset()
         self.assertFalse(wizard_pool._discovered)
         self.assertEqual(len(wizard_pool._entries), 0)
         wizard_pool._discover()
-        self.assertTrue(len(wizard_pool._entries) > 0)
         self.assertTrue(wizard_pool._discovered)
 
     def test_register_unregister_isregistered(self):

@@ -50,7 +50,7 @@ class ManagementTestCase(CMSTestCase):
         command = cms.Command()
         command.stdout = out
         command.handle("list", "apphooks", interactive=False)
-        self.assertEqual(out.getvalue(), "SampleApp\n")
+        self.assertEqual(out.getvalue(), "SampleApp (draft)\n")
 
     def test_uninstall_apphooks_without_apphook(self):
         out = StringIO()
