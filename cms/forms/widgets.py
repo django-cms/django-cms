@@ -23,6 +23,7 @@ class PageSelectWidget(MultiWidget):
 
     class Media:
         js = (
+            'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.pageselectwidget.js',
         )
 
@@ -98,9 +99,11 @@ class PageSelectWidget(MultiWidget):
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         output.append(r'''<script type="text/javascript">
-            window._PageSelectWidget = {
-                name: '%(name)s'
-            };
+            $(function () {
+                new CMS.PageSelectWidget({
+                    name: '%(name)s'
+                });
+            });
         </script>''' % {
             'name': name
         })
@@ -142,12 +145,14 @@ class PageSmartLinkWidget(TextInput):
         id_ = final_attrs.get('id', None)
 
         output = [r'''<script type="text/javascript">
-            window._PageSmartLinkWidget = {
-                id: '%(element_id)s',
-                text: '%(placeholder_text)s',
-                lang: '%(language_code)s',
-                url: '%(ajax_url)s'
-            };
+            $(function () {
+                new CMS.PageSmartLinkWidget({
+                    id: '%(element_id)s',
+                    text: '%(placeholder_text)s',
+                    lang: '%(language_code)s',
+                    url: '%(ajax_url)s'
+                });
+            });
         </script>''' % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
