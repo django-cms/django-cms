@@ -55,6 +55,7 @@ var CMS = window.CMS || {};
                 this.mouseEnter = 'mouseenter.cms.toolbar';
                 this.mouseLeave = 'mouseleave.cms.toolbar';
                 this.resize = 'resize.cms.toolbar';
+                this.key = 'keydown.cms.toolbar keyup.cms.toolbar';
 
                 this.timer = function () {};
                 this.lockToolbar = false;
@@ -130,18 +131,44 @@ var CMS = window.CMS || {};
                     var children = 'cms-toolbar-item-navigation-children';
                     var isTouchingTopLevelMenu = false;
                     var open = false;
+                    var cmdPressed = false;
+                    var el;
 
                     // remove events from first level
-                    navigation.find('a').on(that.click, function (e) {
-                        e.preventDefault();
-                        if ($(this).attr('href') !== '' &&
-                            $(this).attr('href') !== '#' &&
-                            !$(this).parent().hasClass(disabled) &&
-                            !$(this).parent().hasClass(disabled)) {
-                            that._delegate($(this));
+                    navigation.find('a').on(that.click + ', ' + that.key, function (e) {
+                        el = $(this);
+                        // we need to restore the default behaviour once a user
+                        // presses ctrl/cmd and clicks on the entry. In this
+                        // case a new tab should open. First we determine if
+                        // ctrl/cmd is pressed:
+                        if (
+                            e.keyCode === CMS.KEYS.CMD_LEFT ||
+                            e.keyCode === CMS.KEYS.CMD_RIGHT ||
+                            e.keyCode === CMS.KEYS.CMD_FIREFOX
+                        ) {
+                            cmdPressed = true;
+                        }
+                        if (e.type === 'keyup') {
+                            cmdPressed = false;
+                        }
+
+                        if (el.attr('href') !== '' &&
+                            el.attr('href') !== '#' &&
+                            !el.parent().hasClass(disabled) &&
+                            !el.parent().hasClass(disabled)) {
+
+                            if (cmdPressed) {
+                                // control the behaviour when ctrl/cmd is pressed
+                                window.open(el.attr('href'), '_blank');
+                            } else {
+                                // otherwise delegate as usual
+                                that._delegate($(this));
+                            }
+
                             reset();
                             return false;
                         }
+
                     }).on(that.touchStart, function () {
                         isTouchingTopLevelMenu = true;
                     });
@@ -239,6 +266,7 @@ var CMS = window.CMS || {};
                     // removes classes and events
                     function reset() {
                         open = false;
+                        cmdPressed = false;
                         lists.removeClass(hover);
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
@@ -579,13 +607,6 @@ var CMS = window.CMS || {};
                         CMS.API.Messages.open({
                             message: el.data('text')
                         });
-                        break;
-                    case 'cms_frame':
-                        var frame = window.open(el.attr('href'), JSON.stringify({
-                            name: 'cms_frame',
-                            url: window.location.href
-                        }));
-                        frame.focus();
                         break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({
