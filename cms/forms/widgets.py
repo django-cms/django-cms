@@ -120,7 +120,7 @@ class PageSmartLinkWidget(TextInput):
             )
         }
         js = (
-            'cms/js/modules/cms.base.js',
+            'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/select2/select2.js',
             'cms/js/widgets/forms.pagesmartlinkwidget.js',
         )
@@ -188,7 +188,7 @@ class AppHookSelect(Select):
 
     class Media:
         js = (
-            'cms/js/modules/cms.base.js',
+            'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.apphookselect.js',
         )
 
@@ -242,7 +242,7 @@ class ApplicationConfigSelect(Select):
 
     class Media:
         js = (
-            'cms/js/modules/cms.base.js',
+            'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.apphookselect.js',
         )
 
