@@ -351,13 +351,7 @@ class PlaceholderAdminMixin(object):
             ref.language = target_language
             ref.placeholder = target_placeholder
             ref.save()
-            # FIXME! This corrupts the tree (wrong num of children), and
-            # prevents get_descendants() from working properly later in
-            # move_plugin(). We're fixing it for now with fix_tree()
-            copy_plugins.copy_plugins_to(
-                plugins, target_placeholder, source_language, ref.pk,
-                no_signals=True)
-            CMSPlugin.fix_tree()
+            ref.copy_from(source_placeholder, source_language)
         else:
             copy_plugins.copy_plugins_to(
                 plugins, target_placeholder, target_language, target_plugin_id)
