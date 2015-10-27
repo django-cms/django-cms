@@ -45,7 +45,8 @@ var CMS = {
         ESC: 27,
         CMD_LEFT: 91,
         CMD_RIGHT: 93,
-        CMD_FIREFOX: 224
+        CMD_FIREFOX: 224,
+        CTRL: 17
     }
 };
 
