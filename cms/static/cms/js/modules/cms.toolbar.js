@@ -144,7 +144,9 @@ var CMS = window.CMS || {};
                         if (
                             e.keyCode === CMS.KEYS.CMD_LEFT ||
                             e.keyCode === CMS.KEYS.CMD_RIGHT ||
-                            e.keyCode === CMS.KEYS.CMD_FIREFOX
+                            e.keyCode === CMS.KEYS.CMD_FIREFOX ||
+                            e.keyCode === CMS.KEYS.SHIFT ||
+                            e.keyCode === CMS.CTRL
                         ) {
                             cmdPressed = true;
                         }
