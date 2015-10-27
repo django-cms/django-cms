@@ -99,7 +99,7 @@ class PageSelectWidget(MultiWidget):
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         output.append(r'''<script type="text/javascript">
-            $(function () {
+            CMS.$(function () {
                 new CMS.PageSelectWidget({
                     name: '%(name)s'
                 });
@@ -145,7 +145,7 @@ class PageSmartLinkWidget(TextInput):
         id_ = final_attrs.get('id', None)
 
         output = [r'''<script type="text/javascript">
-            $(function () {
+            CMS.$(function () {
                 new CMS.PageSmartLinkWidget({
                     id: '%(element_id)s',
                     text: '%(placeholder_text)s',
