@@ -280,27 +280,6 @@ class ToolbarBasicTests(CMSLiveTests):
         self.wait_page_loaded()
         self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
-    @override_settings(DEBUG=True)
-    def test_basic_add_pages(self):
-        User = get_user_model()
-        self.assertEqual(Page.objects.all().count(), 0)
-        self.assertTrue(User.objects.all().count(), 1)
-        driver = self.driver
-        driver.get(self.base_url + "/de/")
-        driver.find_element_by_id("id_username").clear()
-        driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
-        driver.find_element_by_id("id_password").clear()
-        driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
-        driver.find_element_by_css_selector("input[type=\"submit\"]").click()
-        WebDriverWait(self.driver, 10).until(
-            EC.frame_to_be_available_and_switch_to_it((By.XPATH, '//iframe'))
-            )
-        driver.find_element_by_id("id_title").clear()
-        driver.find_element_by_id("id_title").send_keys("SubPage")
-        driver.switch_to_default_content()
-        self.wait_loaded_selector(".cms-modal-foot .default")
-        driver.find_element_by_css_selector(".cms-modal-foot .default").click()
-
 
 @override_settings(
     LANGUAGE_CODE='en',
@@ -393,8 +372,6 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         copy = cms_draggable.find_element_by_css_selector('.cms-submenu-dropdown a[data-rel="copy"]')
         copy.click()
-
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '.cms-clipboard')))
 
         menu_trigger = self.driver.find_element_by_css_selector('.cms-toolbar-left .cms-toolbar-item-navigation li:first-child')
 
