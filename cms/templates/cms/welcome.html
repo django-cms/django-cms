@@ -40,12 +40,12 @@
                 {% url "admin:cms_page_add" as admin_add_page %}
                 {% if user.is_authenticated %}
                     {% blocktrans %}
-                        <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">Add the first page</a> to the system to continue.
+                        <a href="{{ admin_add_page }}" class="js-welcome-add">Add the first page</a> to the system to continue.
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans %}
                         JavaScript seems to be disabled so please
-                        <a href="{{ admin_add_page }}?title=Home" class="js-welcome-add">add a page</a> manually.
+                        <a href="{{ admin_add_page }}" class="js-welcome-add">add a page</a> manually.
                     {% endblocktrans %}
                 {% endif %}
             </p>
