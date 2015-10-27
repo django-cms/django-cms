@@ -438,6 +438,8 @@ var CMS = window.CMS || {};
                     }
                     that.trigger('cms.modal.closed');
                 }, this.options.duration);
+
+                this.ui.body.off('keydown.cms.close');
             },
 
             /**
