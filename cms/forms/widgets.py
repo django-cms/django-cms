@@ -20,6 +20,13 @@ class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
+
+    class Media:
+        js = (
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/widgets/forms.pageselectwidget.js',
+        )
+
     def __init__(self, site_choices=None, page_choices=None, attrs=None):
         if attrs is not None:
             self.attrs = attrs.copy()
@@ -92,44 +99,34 @@ class PageSelectWidget(MultiWidget):
                 final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
             output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
         output.append(r'''<script type="text/javascript">
-(function($) {
-    var handleSiteChange = function(site_name, selected_id) {
-        $("#id_%(name)s_1 optgroup").remove();
-        var myOptions = $("#id_%(name)s_2 optgroup[label='" + site_name + "']").clone();
-        $("#id_%(name)s_1").append(myOptions);
-        $("#id_%(name)s_1").change();
-    };
-    var handlePageChange = function(page_id) {
-        if (page_id) {
-            $("#id_%(name)s_2 option").attr('selected', false);
-            $("#id_%(name)s_2 option[value='" + page_id + "']").attr('selected', true);
-        } else {
-            if ($("#id_%(name)s_2").length) {
-                $("#id_%(name)s_2 option[value='']").attr('selected', true);
-            }
-        };
-    };
-    $("#id_%(name)s_0").change(function(){
-        var site_label = $("#id_%(name)s_0").children(":selected").text();
-        handleSiteChange( site_label );
-    });
-    $("#id_%(name)s_1").change(function(){
-        var page_id = $(this).find('option:selected').val();
-        handlePageChange( page_id );
-    });
-    $(function(){
-        handleSiteChange( $("#id_%(name)s_0").children(":selected").text() );
-        $("#add_id_%(name)s").hide();
-    });
-})(django.jQuery);
-</script>''' % {'name': name})
+            CMS.$(function () {
+                new CMS.PageSelectWidget({
+                    name: '%(name)s'
+                });
+            });
+        </script>''' % {
+            'name': name
+        })
         return mark_safe(self.format_output(output))
 
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
 
+
 class PageSmartLinkWidget(TextInput):
 
+    class Media:
+        css = {
+            'all': (
+                'cms/js/select2/select2.css',
+                'cms/js/select2/select2-bootstrap.css',
+            )
+        }
+        js = (
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/select2/select2.js',
+            'cms/js/widgets/forms.pagesmartlinkwidget.js',
+        )
 
     def __init__(self, attrs=None, ajax_view=None):
         super(PageSmartLinkWidget, self).__init__(attrs)
@@ -148,44 +145,15 @@ class PageSmartLinkWidget(TextInput):
         id_ = final_attrs.get('id', None)
 
         output = [r'''<script type="text/javascript">
-(function($){
-    $(function(){
-        $("#%(element_id)s").select2({
-            placeholder: "%(placeholder_text)s",
-            allowClear: true,
-            minimumInputLength: 3,
-            ajax: {
-                url: "%(ajax_url)s",
-                dataType: 'json',
-                data: function (term, page) {
-                    return {
-                        q: term, // search term
-                        language_code: '%(language_code)s'
-                    };
-                },
-                results: function (data, page) {
-                    return {
-                        more: false,
-                        results: $.map(data, function(item, i){
-                            return {
-                                'id':item.redirect_url,
-                                'text': item.title + ' (/' + item.path + ')'}
-                            }
-                        )
-                    };
-                }
-            },
-            // Allow creation of new entries
-            createSearchChoice:function(term, data) { if ($(data).filter(function() { return this.text.localeCompare(term)===0; }).length===0) {return {id:term, text:term};} },
-            multiple: false,
-            initSelection : function (element, callback) {
-                var initialValue = element.val()
-                callback({id:initialValue, text: initialValue});
-            }
-        });
-    })
-})(CMS.$);
-</script>''' % {
+            CMS.$(function () {
+                new CMS.PageSmartLinkWidget({
+                    id: '%(element_id)s',
+                    text: '%(placeholder_text)s',
+                    lang: '%(language_code)s',
+                    url: '%(ajax_url)s'
+                });
+            });
+        </script>''' % {
             'element_id': id_,
             'placeholder_text': final_attrs.get('placeholder_text', ''),
             'language_code': self.language,
@@ -194,15 +162,6 @@ class PageSmartLinkWidget(TextInput):
 
         output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
         return mark_safe(u''.join(output))
-
-
-    class Media:
-        css = {
-            'all': ('cms/js/select2/select2.css',
-                    'cms/js/select2/select2-bootstrap.css',)
-        }
-        js = ('cms/js/modules/cms.base.js',
-              'cms/js/select2/select2.js',)
 
 
 class UserSelectAdminWidget(Select):
@@ -233,7 +192,10 @@ class AppHookSelect(Select):
     """
 
     class Media:
-        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
+        js = (
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/widgets/forms.apphookselect.js',
+        )
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
         self.app_namespaces = app_namespaces
@@ -284,7 +246,10 @@ class ApplicationConfigSelect(Select):
     """
 
     class Media:
-        js = ('cms/js/modules/cms.base.js', 'cms/js/modules/cms.app_hook_select.js', )
+        js = (
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/widgets/forms.apphookselect.js',
+        )
 
     def __init__(self, attrs=None, choices=(), app_configs={}):
         self.app_configs = app_configs

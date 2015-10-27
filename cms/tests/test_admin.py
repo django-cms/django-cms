@@ -1253,12 +1253,12 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         clipboard_plugins = clipboard.get_plugins()
         self.assertEqual(CMSPlugin.objects.count(), 5)
-        self.assertEqual(clipboard_plugins.count(), 3)
+        self.assertEqual(clipboard_plugins.count(), 1)
         self.assertEqual(clipboard_plugins[0].plugin_type, "PlaceholderPlugin")
         placeholder_plugin, _ = clipboard_plugins[0].get_plugin_instance()
         ref_placeholder = placeholder_plugin.placeholder_ref
         copied_plugins = ref_placeholder.get_plugins()
-        self.assertEqual(copied_plugins.count(), 0)
+        self.assertEqual(copied_plugins.count(), 2)
         data = dict(source_plugin_id=placeholder_plugin.pk,
                     source_placeholder_id=clipboard.pk,
                     source_language='en',
@@ -1268,14 +1268,14 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         plugins = self._placeholder.get_plugins()
-        self.assertEqual(plugins.count(), 2)
-        self.assertEqual(CMSPlugin.objects.count(), 5)
+        self.assertEqual(plugins.count(), 4)
+        self.assertEqual(CMSPlugin.objects.count(), 7)
         self.assertEqual(Placeholder.objects.count(), 4)
         url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
         with self.assertNumQueries(FuzzyInt(70, 90)):
             response = self.client.post(url, {'test': 0})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(CMSPlugin.objects.count(), 2)
+        self.assertEqual(CMSPlugin.objects.count(), 4)
         self.assertEqual(Placeholder.objects.count(), 3)
 
     def test_plugins_copy_language(self):
