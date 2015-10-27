@@ -77,15 +77,10 @@
                 var btn = CMS.$('.js-welcome-add');
                 btn.on('click', function (e) {
                     e.preventDefault();
-                    var modal = new CMS.Modal({
-                        minWidth: 320,
-                        minimizable: false
-                    });
+                    var modal = new CMS.Modal();
                     modal.open({
                         url: '{% url "cms_wizard_create" %}',
-                        title: '{% trans "Welcome to django CMS" %}',
-                        width: CMS.$('.cms-welcome-heading').width(),
-                        height: 450
+                        title: '{% trans "Welcome to django CMS" %}'
                     });
                     CMS.API.Toolbar.open();
                 });
