@@ -86,7 +86,7 @@ cms_page_wizard = CMSPageWizard(
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
-    description=_(u"Create a new blank page as a sibling to the current page.")
+    description=_(u"Create a new page next to the current page.")
 )
 
 cms_subpage_wizard = CMSSubPageWizard(
@@ -94,7 +94,7 @@ cms_subpage_wizard = CMSSubPageWizard(
     weight=110,
     form=CreateCMSSubPageForm,
     model=Page,
-    description=_(u"Create a sub-page to the current page.")
+    description=_(u"Create a page below the current page.")
 )
 
 wizard_pool.register(cms_page_wizard)
