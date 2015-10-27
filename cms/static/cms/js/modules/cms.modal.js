@@ -373,6 +373,7 @@ var CMS = window.CMS || {};
                 // add esc close event
                 this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
                     if (e.keyCode === CMS.KEYS.ESC) {
+                        that.options.onClose = null;
                         that.close();
                     }
                 });
