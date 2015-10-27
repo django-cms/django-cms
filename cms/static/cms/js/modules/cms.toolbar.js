@@ -132,11 +132,10 @@ var CMS = window.CMS || {};
                     var isTouchingTopLevelMenu = false;
                     var open = false;
                     var cmdPressed = false;
-                    var el;
 
                     // remove events from first level
                     navigation.find('a').on(that.click + ', ' + that.key, function (e) {
-                        el = $(this);
+                        var el = $(this);
                         // we need to restore the default behaviour once a user
                         // presses ctrl/cmd and clicks on the entry. In this
                         // case a new tab should open. First we determine if
@@ -146,7 +145,7 @@ var CMS = window.CMS || {};
                             e.keyCode === CMS.KEYS.CMD_RIGHT ||
                             e.keyCode === CMS.KEYS.CMD_FIREFOX ||
                             e.keyCode === CMS.KEYS.SHIFT ||
-                            e.keyCode === CMS.CTRL
+                            e.keyCode === CMS.KEYS.CTRL
                         ) {
                             cmdPressed = true;
                         }
@@ -156,7 +155,6 @@ var CMS = window.CMS || {};
 
                         if (el.attr('href') !== '' &&
                             el.attr('href') !== '#' &&
-                            !el.parent().hasClass(disabled) &&
                             !el.parent().hasClass(disabled)) {
 
                             if (cmdPressed) {
