@@ -14,7 +14,6 @@ from django.utils.translation import ugettext as _
 from cms.utils.urlutils import admin_reverse
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
-from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
 
 class PageSelectWidget(MultiWidget):
