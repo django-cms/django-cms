@@ -90,4 +90,4 @@ var CMS = window.CMS || {};
         });
 
     });
-})(django.jQuery);
+})(CMS.$);
