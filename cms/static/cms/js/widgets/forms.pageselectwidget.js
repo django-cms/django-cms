@@ -65,10 +65,10 @@ var CMS = window.CMS || {};
                     tmp = $(this).find('option:selected').val();
 
                     if (tmp) {
-                        group2.find('option').attr('selected', false);
-                        group2.find('option[value="' + tmp + '"]').attr('selected', true);
+                        group2.find('option').prop('selected', false);
+                        group2.find('option[value="' + tmp + '"]').prop('selected', true);
                     } else if (group2.length) {
-                        group2.find('option[value=""]').attr('selected', true);
+                        group2.find('option[value=""]').prop('selected', true);
                     }
                 });
 
