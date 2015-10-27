@@ -499,16 +499,16 @@ class PlaceholderAdminMixin(object):
 
         if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
-                # Note, we intentionally do not copy the PlaceholderPlugin
-                # itself here, it will be left behind.
-                source_plugins = list(plugin.get_descendants())
+                inst, _plugin = plugin.get_plugin_instance()
+                new_plugins = copy_plugins.copy_plugins_to(
+                    inst.placeholder_ref.get_plugins(), placeholder,
+                    to_language=language)
             else:
                 source_plugins = [plugin] + list(plugin.get_descendants())
+                new_plugins = copy_plugins.copy_plugins_to(
+                    source_plugins, placeholder, language, parent_id)
 
-            new_plugins = copy_plugins.copy_plugins_to(
-                source_plugins, placeholder, language, parent_id)
-
-            new_plugins = [pair[0] for pair in new_plugins]
+            new_plugins = [nu for nu, _old in new_plugins]
             top_parent = new_plugins[0].parent_id
             top_plugins = [p for p in new_plugins if p.parent_id == top_parent]
             top_plugins_pks = [str(p.pk) for p in top_plugins]
