@@ -34,6 +34,22 @@ What's new in 3.2
 Changes that require attention
 ******************************
 
+Content wizards
+===============
+
+:doc:`/reference/wizards` can help simplify production of content, and can be created to handle
+non-CMS content too.
+
+For a quick introduction to using a wizard as a content editor, see the :ref:`user-tutorial`.
+
+.. todo:: what does the following have to do with content wizards?
+
+* Fixing "placeholder template tags ignoring the ``lang`` parameter" may affect the behaviour of
+  your templates as a previously ignored parameter is no longer ignored; if you used the ``lang``
+  parameter for placeholder template tags you may be affected: check the behaviour after the
+  upgrade.
+
+
 Renaming cms_app, cms_toolbar, menu modules
 ===========================================
 
@@ -48,7 +64,6 @@ Action required
 
 In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
 ``cms_toolbar.py`` to ``cms_toolbar.py`` and ``menu.py`` to ``menus.py``.
-
 
 
 New ``ApphookReloadMiddleware``
@@ -113,6 +128,16 @@ or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
 We've added a ``.editorconfig`` (at the root of the project) to provide cues to text editors.
 
 
+Automated spelling checks for documentation
+-------------------------------------------
+
+Documentation is now checked for spelling. A ``make spelling`` command is available now when
+working on documentation, and our `Travis Continuous Integration server
+<https://travis-ci.org/divio/django-cms>`_ also runs these checks.
+
+See the :ref:`spelling` section in the documentation.
+
+
 New structure board
 ===================
 
@@ -149,33 +174,6 @@ Backward incompatible changes
 *****************************
 
 See the :ref:`Frontend code <contributing_frontend>` documentation.
-
-
-Automated spelling checks for documentation
--------------------------------------------
-
-Documentation is now checked for spelling. A ``make spelling`` command is available now when
-working on documentation, and our `Travis Continuous Integration server
-<https://travis-ci.org/divio/django-cms>`_ also runs these checks.
-
-See the :ref:`spelling` section in the documentation.
-
-
-Content wizards
-===============
-
-:doc:`/reference/wizards` can help simplify production of content, and can be created to handle
-non-CMS content too.
-
-For a quick introduction to using a wizard as a content editor, see the :ref:`user-tutorial`.
-
-.. todo:: what does the following have to do with content wizards?
-
-* Fixing "placeholder template tags ignoring the ``lang`` parameter" may affect the behaviour of
-  your templates as a previously ignored parameter is no longer ignored; if you used the ``lang``
-  parameter for placeholder template tags you may be affected: check the behaviour after the
-  upgrade.
-
 
 
 .. _upgrade-guide-3.2:

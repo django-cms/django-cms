@@ -1,8 +1,8 @@
+.. _user-tutorial:
+
 ########
 Tutorial
 ########
-
-.. _user-tutorial:
 
 .. note:: This is a new section in the django CMS documentation, and a priority
           for the project. If you'd like to contribute to it, we'd love to hear

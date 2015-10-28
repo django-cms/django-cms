@@ -16,6 +16,29 @@ The ``INSTALLED_APPS`` setting
 The ordering of items in ``INSTALLED_APPS`` matters. Entries for applications with plugins
 should come *after* ``cms``.
 
+
+.. _middleware:
+
+**********************************
+The ``MIDDLEWARE_CLASSES`` setting
+**********************************
+
+.. _ApphookReloadMiddleware:
+
+``cms.middleware.utils.ApphookReloadMiddleware``
+================================================
+
+Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE_CLASSES`` tuple will enable automatic server
+restarts when changes are made to apphook configurations. It should be placed as near to the top of
+the classes as possible.
+
+.. note::
+
+   This has been tested and works in many production environments and deployment configurations,
+   but we haven't been able to test it with all possible set-ups. Please file an issue if you
+   discover one where it fails.
+
+
 ************************
 Custom User Requirements
 ************************
@@ -43,6 +66,9 @@ Additionally, the application in which the model is defined **must** be loaded b
 
     Additionally, if you do intend to use a custom user model, it is generally advisable to do so
     only at the beginning of a project, before the database is created.
+
+
+
 
 *****************
 Required Settings
