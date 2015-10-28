@@ -106,7 +106,7 @@ var CMS = window.CMS || {};
                     if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
                         return false;
                     }
-                    that._gotToHistory('back');
+                    that._goToHistory('back');
                 });
 
                 // attach events to the forward button
@@ -114,7 +114,7 @@ var CMS = window.CMS || {};
                     if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
                         return false;
                     }
-                    that._gotToHistory('forward');
+                    that._goToHistory('forward');
                 });
             },
 
@@ -419,11 +419,11 @@ var CMS = window.CMS || {};
             /**
              * Retrieves the history states from `this.history`.
              *
-             * @method _gotToHistory
+             * @method _goToHistory
              * @private
              * @param {String} type can be either `back` or `forward`
              */
-            _gotToHistory: function _gotToHistory(type) {
+            _goToHistory: function _goToHistory(type) {
                 var iframe = this.ui.frame.find('iframe');
                 var tmp;
 
