@@ -73,6 +73,8 @@ Frontend code should be formatted for readability. If in doubt, follow existing
 examples, or ask.
 
 
+.. _js_linting:
+
 JS Linting
 ----------
 

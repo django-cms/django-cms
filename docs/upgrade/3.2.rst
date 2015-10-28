@@ -25,9 +25,9 @@ What's new in 3.2
 * much-needed improvements to the structure-board
 * enhancements to components such as the pop-up plugin editor, sideframe and the toolbar
 * significant speed improvements on loading, HTTP requests and file sizes
-* new *Link/Button* look & feel
 * restarts are no longer required when changing apphook configurations
 * a new content wizard system, adaptable to arbitrary content types
+* new *Link/Button* look & feel
 
 
 ******************************
@@ -50,10 +50,11 @@ In your own applications that use these modules, rename ``cms_app.py`` to ``cms_
 ``cms_toolbar.py`` to ``cms_toolbar.py`` and ``menu.py`` to ``menus.py``.
 
 
-New ApphookReloadMiddleware
-===========================
 
-Until now, changes to Apphooks have required a restart of the server in order to take effect. A new
+New ``ApphookReloadMiddleware``
+===============================
+
+Until now, changes to apphooks have required a restart of the server in order to take effect. A new
 middleware class makes this automatic.
 
 The new middleware class, ``cms.middleware.utils.ApphookReloadMiddleware``, is optional. If used,
@@ -71,12 +72,69 @@ changes to an apphook are made.
 Developer tools
 ===============
 
+Various improvements have been implemented to make developing with and for django CMS easier. These
+include:
+
+* improvements to frontend code, to comply better with `aldryn-boilerplate-bootstrap3
+  <https://github.com/aldryn/aldryn-boilerplate-bootstrap3>`_
+
+* changes to directory structure for frontend related components such as JavaScript and SASS.
+
+* We no longer use ``develop.py``; we now use ``manage.py`` for all development tasks. See
+  :ref:`contributing_patch` for examples.
+
+* We've moved our ``widgets.py`` JavaScript to ``static/cms/js/widgets``.
+
+
+Code formatting
+---------------
+
+We've switched from tabs (in some places) to four spaces *everywhere*. See :ref:`contributing-code`
+for more on formatting.
+
+
+gulp.js
+-------
+
+We now use :ref:`gulp.js <js_linting>` for linting, compressing and bundling of frontend files.
+
+
 SASS-related changes
 --------------------
 
 We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for building static
 files (this only affects frontend developers *of* django CMS - contributors to it, not other users
 or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
+
+
+``.editorconfig`` file
+----------------------
+
+We've added a ``.editorconfig`` (at the root of the project) to provide cues to text editors.
+
+
+New structure board
+===================
+
+The structure board is cleaner and easier to understand. It now displays its elements in a tree,
+rather than in a series of nested boxes.
+
+You can optionally enable the old appearance and behaviour with the
+:ref:`CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE` setting.
+
+
+Replaced the sidebar with an overlay
+====================================
+
+The sidebar that could be expanded and collapsed to reveal a view of the admin and other controls
+has been replaced by a simpler and more elegant overlay mechanism.
+
+
+New startup screen
+==================
+
+A new startup mode makes it easier for new users to dive straight into editing when launching a new
+site. See the :ref:`user-tutorial` for more.
 
 
 *************************
@@ -109,9 +167,15 @@ Content wizards
 :doc:`/reference/wizards` can help simplify production of content, and can be created to handle
 non-CMS content too.
 
-* Fixing "placeholder template tags ignoring the ``lang`` parameter" may affect the behaviour of your
-  templates as a previously ignored parameter is no longer ignored; if you used the ``lang``
-  parameter for placeholder template tags you may be affected: check the behaviour after the upgrade.
+For a quick introduction to using a wizard as a content editor, see the :ref:`user-tutorial`.
+
+.. todo:: what does the following have to do with content wizards?
+
+* Fixing "placeholder template tags ignoring the ``lang`` parameter" may affect the behaviour of
+  your templates as a previously ignored parameter is no longer ignored; if you used the ``lang``
+  parameter for placeholder template tags you may be affected: check the behaviour after the
+  upgrade.
+
 
 
 .. _upgrade-guide-3.2:

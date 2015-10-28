@@ -951,17 +951,17 @@ This should be an integer preferably taken from the Page object e.g.
 - X_FRAME_OPTIONS_DENY
 
 
+.. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
+
 CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
 =================================
 
 default:
     ``True``
 
-Enable or disable the absolute positioning within the structure board.
-
-By default the absolute positioned board is deactivated. Setting this attribute
-to ``False`` will allow the absolute positioning used in versions prior to 3.2.
-This setting will be removed in 3.3.
+The new structure board operates by default in "simple" mode. The older mode used absolute
+positioning. Setting this attribute to ``False`` will allow the absolute positioning used in
+versions prior to 3.2. This setting will be removed in 3.3.
 
 
 Example::
