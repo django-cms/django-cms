@@ -58,9 +58,7 @@ def user_has_page_add_permission(user, target, position=None, site=None):
 class CMSPageWizard(Wizard):
 
     def user_has_add_permission(self, user, page=None, **kwargs):
-        if not page:
-            return False
-        if not page.site_id:
+        if not page or not page.site_id:
             site = Site.objects.get_current()
         else:
             site = Site.objects.get(pk=page.site_id)
@@ -72,6 +70,7 @@ class CMSSubPageWizard(Wizard):
 
     def user_has_add_permission(self, user, page=None, **kwargs):
         if not page:
+            # We can't really add a sub-page to a non-existant page.
             return False
         if not page.site_id:
             site = Site.objects.get_current()

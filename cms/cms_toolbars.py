@@ -99,7 +99,7 @@ class PlaceholderToolbar(CMSToolbar):
         try:
             page_pk = self.page.pk
         except AttributeError:
-            page_pk = None
+            page_pk = ''
 
         user = getattr(self.request, "user", None)
         disabled = user and hasattr(self, "page") and len(

@@ -213,6 +213,13 @@ var CMS = window.CMS || {};
                         $(document).trigger(that.click);
                     });
 
+                    // attach close event
+                    body.on('keydown.cms', function (e) {
+                        if (e.keyCode === CMS.KEYS.ESC) {
+                            that.close();
+                        }
+                    });
+
                     // attach reload event
                     if (initialized) {
                         that.reloadBrowser(false, false, true);
@@ -236,6 +243,8 @@ var CMS = window.CMS || {};
              * @param {Number} [animate] Animation duration
              */
             _show: function _show(width, animate) {
+                var that = this;
+
                 this.ui.sideframe.show();
 
                 // check if sideframe should be hidden
@@ -267,6 +276,14 @@ var CMS = window.CMS || {};
                     CMS.API.Toolbar.hideLoader();
                     CMS.API.Toolbar._lock(true);
                 }
+
+                // add esc close event
+                this.ui.body.off('keydown.cms.close').on('keydown.cms.close', function (e) {
+                    if (e.keyCode === CMS.KEYS.ESC) {
+                        that.options.onClose = null;
+                        that.close();
+                    }
+                });
             },
 
             /**
@@ -315,6 +332,8 @@ var CMS = window.CMS || {};
                 if (CMS.API && CMS.API.Toolbar) {
                     CMS.API.Toolbar._lock(false);
                 }
+
+                this.ui.body.off('keydown.cms.close');
             },
 
             /**
