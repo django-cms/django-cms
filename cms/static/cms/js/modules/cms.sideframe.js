@@ -48,10 +48,6 @@ var CMS = window.CMS || {};
                 this.pointerMove = 'pointermove.cms.sideframe';
                 this.enforceReload = false;
                 this.settingsRefreshTimer = 600;
-                this.history = {
-                    back: [],
-                    forward: []
-                };
             },
 
             /**
@@ -85,6 +81,13 @@ var CMS = window.CMS || {};
             _events: function _events() {
                 var that = this;
 
+                // we need to set the history state on event creation
+                // to ensure we start with clean states in new instances
+                this.history = {
+                    back: [],
+                    forward: []
+                };
+
                 this.ui.close.off(this.click).on(this.click, function () {
                     that.close();
                 });
@@ -102,7 +105,7 @@ var CMS = window.CMS || {};
                 });
 
                 // attach events to the back button
-                this.ui.historyBack.on(this.click, function () {
+                this.ui.historyBack.off(this.click).on(this.click, function () {
                     if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
                         return false;
                     }
@@ -110,7 +113,7 @@ var CMS = window.CMS || {};
                 });
 
                 // attach events to the forward button
-                this.ui.historyForward.on(this.click, function () {
+                this.ui.historyForward.off(this.click).on(this.click, function () {
                     if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
                         return false;
                     }
