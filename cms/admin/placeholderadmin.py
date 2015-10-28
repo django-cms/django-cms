@@ -562,11 +562,7 @@ class PlaceholderAdminMixin(object):
                 child.language = language
                 child.save()
 
-        plugins = reorder_plugins(placeholder, parent_id, language, order)
-        if not plugins:
-            return HttpResponseBadRequest(
-                _('order parameter did not have all plugins of the same level '
-                  'in it') + str(order))
+        reorder_plugins(placeholder, parent_id, language, order)
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {
