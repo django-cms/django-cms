@@ -103,11 +103,17 @@ var CMS = window.CMS || {};
 
                 // attach events to the back button
                 this.ui.historyBack.on(this.click, function () {
+                    if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
+                        return false;
+                    }
                     that._getHistory('back');
                 });
 
                 // attach events to the forward button
                 this.ui.historyForward.on(this.click, function () {
+                    if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
+                        return false;
+                    }
                     that._getHistory('forward');
                 });
             },
