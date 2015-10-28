@@ -536,11 +536,11 @@ class PlaceholderAdminMixin(object):
                     parent = CMSPlugin.objects.get(pk=parent_id)
                     if parent.placeholder_id != placeholder.pk:
                         return HttpResponseBadRequest(force_text(
-                            'parent must be in the same placeholder'))
+                            _('parent must be in the same placeholder')))
                     if parent.language != language:
                         return HttpResponseBadRequest(force_text(
-                            'parent must be in the same language as '
-                            'plugin_language'))
+                            _('parent must be in the same language as '
+                              'plugin_language')))
                     plugin.parent_id = parent.pk
                     plugin.language = language
                     plugin.save()
@@ -560,8 +560,9 @@ class PlaceholderAdminMixin(object):
 
         plugins = reorder_plugins(placeholder, parent_id, language, order)
         if not plugins:
-            return HttpResponseBadRequest('order parameter did not have all '
-                                          'plugins of the same level in it' + str(order))
+            return HttpResponseBadRequest(
+                _('order parameter did not have all plugins of the same level '
+                  'in it') + str(order))
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
         json_response = {
@@ -572,9 +573,11 @@ class PlaceholderAdminMixin(object):
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):
-        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
+        plugin = get_object_or_404(
+            CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
         if not self.has_delete_plugin_permission(request, plugin):
-            return HttpResponseForbidden(force_text(_("You do not have permission to delete this plugin")))
+            return HttpResponseForbidden(force_text(
+                _("You do not have permission to delete this plugin")))
         plugin_cms_class = plugin.get_plugin_class()
         plugin_class = plugin_cms_class.model
         opts = plugin_class._meta
