@@ -106,7 +106,7 @@ var CMS = window.CMS || {};
                     if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
                         return false;
                     }
-                    that._getHistory('back');
+                    that._gotToHistory('back');
                 });
 
                 // attach events to the forward button
@@ -114,7 +114,7 @@ var CMS = window.CMS || {};
                     if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
                         return false;
                     }
-                    that._getHistory('forward');
+                    that._gotToHistory('forward');
                 });
             },
 
@@ -252,7 +252,7 @@ var CMS = window.CMS || {};
                     contents.find('.viewsitelink').attr('target', '_top');
 
                     // update history
-                    that._setHistory(this.contentWindow.location.href);
+                    that._addToHistory(this.contentWindow.location.href);
                 });
 
                 // inject iframe
@@ -419,11 +419,11 @@ var CMS = window.CMS || {};
             /**
              * Retrieves the history states from `this.history`.
              *
-             * @method _getHistory
+             * @method _gotToHistory
              * @private
              * @param {String} type can be either `back` or `forward`
              */
-            _getHistory: function _getHistory(type) {
+            _gotToHistory: function _gotToHistory(type) {
                 var iframe = this.ui.frame.find('iframe');
                 var tmp;
 
@@ -439,17 +439,17 @@ var CMS = window.CMS || {};
                     iframe.attr('src', tmp);
                 }
 
-                this._checkHistory();
+                this._updateHistoryButtons();
             },
 
             /**
              * Stores the history states in `this.history`.
              *
-             * @method _setHistory
+             * @method _addToHistory
              * @private
              * @param {String} url url to be stored in `this.history.back`
              */
-            _setHistory: function _setHistory(url) {
+            _addToHistory: function _addToHistory(url) {
                 var iframe = this.ui.frame.find('iframe');
 
                 // we need to update history first
@@ -467,16 +467,16 @@ var CMS = window.CMS || {};
                     this.history.back.pop();
                 }
 
-                this._checkHistory();
+                this._updateHistoryButtons();
             },
 
             /**
              * Sets the correct states for the history UI elements.
              *
-             * @method _checkHistory
+             * @method _updateHistoryButtons
              * @private
              */
-            _checkHistory: function _checkHistory() {
+            _updateHistoryButtons: function _updateHistoryButtons() {
                 if (this.history.back.length > 1) {
                     this.ui.historyBack.removeClass('cms-icon-disabled');
                 } else {
