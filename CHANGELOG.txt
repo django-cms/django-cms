@@ -1,7 +1,7 @@
 === 3.2.0 (Unreleased) ===
 
 - Added new wizard to improve content creation
-- Added Aldryn Apphook Reload into core
+- Added Aldryn Apphook Reload https://github.com/aldryn/aldryn-apphook-reload/ into core
 - Added tooltips for certain user interaction elements
 - Added full touch support and optimisations for mobile devices
 - Added gulp.js for linting, compressing and bundling
@@ -31,12 +31,12 @@
 - Improved frontend code to comply with aldryn-boilerplate-bootstrap3
 - Improved folder structure for frontend related components such as JavaScript and SASS
 - Improved color and value variable declarations for Styles
-- Improved key mapping for actions such as saving, closing and switching accross browsers
+- Improved key mapping for actions such as saving, closing and switching across browsers
 - Switched from tabs to 4 spaces everywhere
 - Switched from ruby sass/compass to libsass/autoprefixer
 - Switched from sprite images to auto generated webfonts via gulp
 - Moved widgets.py javascript to ``static/cms/js/widgets``
-- Fix placeholder template tags ignoring the lang parameter
+- Fixed an issue in which placeholder template tags ignored the ``lang`` parameter
 - Renamed cms_app, cms_menu, cms_toolbar to plural versions eg. ``cms_apps.py``
   ``cms_menus.py``, ``cms_toolbars.py`` with backwards compatibility
 - Removed all id attributes on html elements in favour of classes

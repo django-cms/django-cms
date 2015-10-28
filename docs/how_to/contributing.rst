@@ -53,7 +53,7 @@ The basic workflow for a code contribution will typically run as follows:
 #. Edit the django CMS codebase to implement the fix or feature.
 #. Run the test suite::
 
-    python develop.py test
+    python manage.py test
 
 #. Commit and push your code::
 
@@ -114,10 +114,10 @@ Let's try to run it:
 
 .. code-block:: bash
 
-    python develop.py test cms.SimplePluginTestCase
+    python manage.py test cms.SimplePluginTestCase
 
 This will call the new test case class only and it's handy when creating new tests and iterating
-quickly through the steps. A full test run (``python develop.py test``) is required before opening
+quickly through the steps. A full test run (``python manage.py test``) is required before opening
 a pull request.
 
 This is the output you'll get::
