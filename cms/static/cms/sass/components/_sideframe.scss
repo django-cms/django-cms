@@ -56,7 +56,8 @@
     height: 100%;
     background: transparent;
 }
-.cms-sideframe-close {
+.cms-sideframe-close,
+.cms-sideframe-history {
     position: absolute;
     top: $sideframe-buttons-position-top;
     right: $sideframe-buttons-position-right;
@@ -69,16 +70,35 @@
     height: $sideframe-button-area-size;
     margin-bottom: $sideframe-button-space;
 
-    &:hover {
-        color: $gray-darkest;
-    }
-
     span {
         position: absolute;
         top: 50%;
         left: 50%;
         margin-left: -($sideframe-button-icon-size / 2);
         margin-top: -($sideframe-button-icon-size / 2);
+
+        &:hover, &:active, &:focus {
+            color: $gray-darkest;
+        }
+    }
+}
+
+.cms-sideframe-history {
+    right: $sideframe-buttons-position-right + $sideframe-buttons-position-right + 5;
+
+    .cms-icon-arrow-back {
+        margin-left: -$sideframe-buttons-position-right - 5;
+    }
+    .cms-icon-arrow-forward {
+        transform: rotate(180deg);
+    }
+    // disabled state if there is no history
+    .cms-icon-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        &:hover, &:active, &:focus {
+            color: $gray-light;
+        }
     }
 }
 
