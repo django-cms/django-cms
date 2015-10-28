@@ -508,10 +508,14 @@ class PlaceholderAdminMixin(object):
                 new_plugins = copy_plugins.copy_plugins_to(
                     source_plugins, placeholder, language, parent_id)
 
-            new_plugins = [nu for nu, _old in new_plugins]
-            top_parent = new_plugins[0].parent_id
-            top_plugins = [p for p in new_plugins if p.parent_id == top_parent]
-            top_plugins_pks = [str(p.pk) for p in top_plugins]
+            top_plugins = []
+            top_plugins_pks = []
+            top_parent = new_plugins[0][0].parent_id
+            for new_plugin, _old_plugin in new_plugins:
+                if top_parent and new_plugin.parent_id == top_parent:
+                    top_plugins.append(new_plugin)
+                    top_plugins_pks.append(str(new_plugin.pk))
+
             if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
                 for plugin in top_plugins:
