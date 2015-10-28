@@ -417,10 +417,11 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Retreives the history states from `this.history`.
+             * Retrieves the history states from `this.history`.
              *
              * @method _getHistory
              * @private
+             * @param {String} type can be either `back` or `forward`
              */
             _getHistory: function _getHistory(type) {
                 var iframe = this.ui.frame.find('iframe');
@@ -446,6 +447,7 @@ var CMS = window.CMS || {};
              *
              * @method _setHistory
              * @private
+             * @param {String} url url to be stored in `this.history.back`
              */
             _setHistory: function _setHistory(url) {
                 var iframe = this.ui.frame.find('iframe');
