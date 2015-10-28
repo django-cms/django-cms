@@ -26,9 +26,8 @@ def copy_plugins_to(old_plugins, to_placeholder,
     if new_plugins and parent_plugin_id:
         from cms.models import CMSPlugin
         parent_plugin = CMSPlugin.objects.get(pk=parent_plugin_id)
-        top_plugins = [p for p in new_plugins if p.parent_id is None]
         for idx, plugin in enumerate(new_plugins):
-            if plugin in top_plugins:
+            if plugin.parent_id is None:
                 plugin.parent_id = parent_plugin_id
                 plugin.save()
                 new_plugins[idx] = plugin.move(parent_plugin, pos="last-child")
