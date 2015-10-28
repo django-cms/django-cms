@@ -49,8 +49,8 @@ var CMS = window.CMS || {};
                 this.enforceReload = false;
                 this.settingsRefreshTimer = 600;
                 this.history = {
-                    'back': [],
-                    'forward': []
+                    back: [],
+                    forward: []
                 };
             },
 
