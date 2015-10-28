@@ -454,18 +454,32 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_position(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-        placeholder = page_en.placeholders.get(slot="body")
+        placeholder = page_en.placeholders.get(slot="body")  # ID 2
         placeholder_right = page_en.placeholders.get(slot="right-column")
-        columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")
-        column_1 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')
-        column_2 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='30%')
-        api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the first")
-        text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the second")
+        columns = api.add_plugin(placeholder, "MultiColumnPlugin", "en")  # ID 1
+        column_1 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='10%')  # ID 2
+        column_2 = api.add_plugin(placeholder, "ColumnPlugin", "en", target=columns, width='30%')  # ID 3
+        first_text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the first")  # ID 4
+        text_plugin = api.add_plugin(placeholder, "TextPlugin", "en", target=column_1, body="I'm the second")  # ID 5
 
-        returned_1 = copy_plugins_to([text_plugin], placeholder, 'en', column_1.pk)
-        returned_2 = copy_plugins_to([text_plugin], placeholder_right, 'en')
-        returned_3 = copy_plugins_to([text_plugin], placeholder, 'en', column_2.pk)
+        returned_1 = copy_plugins_to([text_plugin], placeholder, 'en', column_1.pk)  # ID 6
+        returned_2 = copy_plugins_to([text_plugin], placeholder_right, 'en')  # ID 7
+        returned_3 = copy_plugins_to([text_plugin], placeholder, 'en', column_2.pk)  # ID 8
 
+        # STATE AT THIS POINT:
+        # placeholder
+        #     - columns
+        #         - column_1
+        #             - text_plugin "I'm the first"  created here
+        #             - text_plugin "I'm the second" created here
+        #             - text_plugin "I'm the second" (returned_1) copied here
+        #         - column_2
+        #             - text_plugin "I'm the second" (returned_3) copied here
+        # placeholder_right
+        #     - text_plugin "I'm the second" (returned_2) copied here
+
+        # First plugin in the plugin branch
+        self.assertEqual(first_text_plugin.position, 0)
         # Second plugin in the plugin branch
         self.assertEqual(text_plugin.position, 1)
         # Added as third plugin in the same branch as the above
