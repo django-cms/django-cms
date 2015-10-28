@@ -13,6 +13,7 @@
 - Added new installation screen with optimisation alongside the new content creation wizard
 - Added ``.editorconfig`` to the django-cms project
 - Added HTML rendering capabilities for the modal
+- Added browser history to the sideframe
 - Improved design for better touch support
 - Improved design for better accessibility support such as contrast ratio
 - Improved design to reflect latest responsive design standards such as the toolbar
