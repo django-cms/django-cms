@@ -7,7 +7,6 @@ def copy_plugins_to(old_plugins, to_placeholder,
     """
     Copies a list of plugins to a placeholder to a language.
     """
-    # import pdb; pdb.set_trace()
     # TODO: Refactor this and copy_plugins to cleanly separate plugin tree/node
     # copying and remove the need for the mutating parameter old_parent_cache.
     old_parent_cache = {}
