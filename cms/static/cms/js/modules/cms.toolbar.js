@@ -99,9 +99,7 @@ var CMS = window.CMS || {};
                     switcher: container.find('.cms-toolbar-item-switch'),
                     messages: container.find('.cms-messages'),
                     screenBlock: container.find('.cms-screenblock'),
-                    structureBoard: container.find('.cms-structure'),
-                    saveLive: $('.cms-btn-live'),
-                    saveDraft: $('.cms-btn-draft')
+                    structureBoard: container.find('.cms-structure')
                 };
             },
 
@@ -352,8 +350,6 @@ var CMS = window.CMS || {};
 
                 if ($('.cms-btn-publish-active').length) {
                     publishBtn.show();
-                    this.ui.saveLive.hide();
-                    this.ui.saveDraft.show();
                     this.ui.window.trigger('resize');
                 }
 
