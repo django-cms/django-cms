@@ -137,8 +137,6 @@ var CMS = window.CMS || {};
                     container: container,
                     publish: $('.cms-btn-publish'),
                     save: $('.cms-toolbar-item-switch-save-edit'),
-                    saveLive: $('.cms-btn-live'),
-                    saveDraft: $('.cms-btn-draft'),
                     window: $(window),
                     revert: $('.cms-toolbar-revert'),
                     dragbar: null,
@@ -640,8 +638,6 @@ var CMS = window.CMS || {};
                     .addClass('cms-btn-publish-active')
                     .removeClass('cms-btn-disabled')
                     .parent().show();
-                this.ui.saveLive.hide();
-                this.ui.saveDraft.show();
                 this.ui.window.trigger('resize');
 
                 // enable revert to live
