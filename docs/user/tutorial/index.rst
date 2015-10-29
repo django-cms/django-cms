@@ -18,8 +18,8 @@ step builds on the previous one.
 
     log-in
     create_page
-    create_page_content
-    publish_page
+    page_settings
+    structure-content-modes
 
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/
