@@ -49,7 +49,8 @@ var CMS = window.CMS || {};
                     clipboard: clipboard,
                     triggers: $('.cms-clipboard-trigger a'),
                     triggerRemove: $('.cms-clipboard-empty a'),
-                    pluginsList: clipboard.find('.cms-clipboard-containers')
+                    pluginsList: clipboard.find('.cms-clipboard-containers'),
+                    document: $(document)
                 };
             },
 
@@ -85,6 +86,7 @@ var CMS = window.CMS || {};
 
                 that.ui.triggers.on(that.click, function (e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     if ($(this).parent().hasClass('cms-toolbar-item-navigation-disabled')) {
                         return false;
                     }
@@ -95,6 +97,7 @@ var CMS = window.CMS || {};
                         width: MIN_WIDTH,
                         height: MIN_HEIGHT
                     });
+                    that.ui.document.trigger('click.cms.toolbar');
                 });
 
                 // add remove event
@@ -106,9 +109,10 @@ var CMS = window.CMS || {};
                     }
                     that.clear(function () {
                         // remove element on success
-                        that.ui.clipboard.hide();
+                        that.modal.close();
                         that.ui.triggers.parent().addClass('cms-toolbar-item-navigation-disabled');
                         that.ui.triggerRemove.parent().addClass('cms-toolbar-item-navigation-disabled');
+                        that.ui.document.trigger('click.cms.toolbar');
                     });
                 });
             },
@@ -119,7 +123,7 @@ var CMS = window.CMS || {};
              * no matter what outcome was of the ajax call.
              *
              * @method clear
-             * @param [callback] {Function}
+             * @param {Function} [callback]
              */
             clear: function (callback) {
                 // post needs to be a string, it will be converted using JSON.parse

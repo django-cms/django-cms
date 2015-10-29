@@ -24,7 +24,6 @@ var CMS = window.CMS || {};
          * @class Toolbar
          * @namespace CMS
          * @uses CMS.API.Helpers
-         * @uses CMS.Navigation
          */
         CMS.Toolbar = new CMS.Class({
 
@@ -42,6 +41,9 @@ var CMS = window.CMS || {};
                 // elements
                 this._setupUI();
 
+                /**
+                 * @property {CMS.Navigation} navigation
+                 */
                 this.navigation = new CMS.Navigation();
 
                 // states
@@ -53,6 +55,7 @@ var CMS = window.CMS || {};
                 this.mouseEnter = 'mouseenter.cms.toolbar';
                 this.mouseLeave = 'mouseleave.cms.toolbar';
                 this.resize = 'resize.cms.toolbar';
+                this.key = 'keydown.cms.toolbar keyup.cms.toolbar';
 
                 this.timer = function () {};
                 this.lockToolbar = false;
@@ -96,7 +99,9 @@ var CMS = window.CMS || {};
                     switcher: container.find('.cms-toolbar-item-switch'),
                     messages: container.find('.cms-messages'),
                     screenBlock: container.find('.cms-screenblock'),
-                    structureBoard: container.find('.cms-structure')
+                    structureBoard: container.find('.cms-structure'),
+                    saveLive: $('.cms-btn-live'),
+                    saveDraft: $('.cms-btn-draft')
                 };
             },
 
@@ -126,18 +131,44 @@ var CMS = window.CMS || {};
                     var children = 'cms-toolbar-item-navigation-children';
                     var isTouchingTopLevelMenu = false;
                     var open = false;
+                    var cmdPressed = false;
 
                     // remove events from first level
-                    navigation.find('a').on(that.click, function (e) {
-                        e.preventDefault();
-                        if ($(this).attr('href') !== '' &&
-                            $(this).attr('href') !== '#' &&
-                            !$(this).parent().hasClass(disabled) &&
-                            !$(this).parent().hasClass(disabled)) {
-                            that._delegate($(this));
+                    navigation.find('a').on(that.click + ', ' + that.key, function (e) {
+                        var el = $(this);
+                        // we need to restore the default behaviour once a user
+                        // presses ctrl/cmd and clicks on the entry. In this
+                        // case a new tab should open. First we determine if
+                        // ctrl/cmd is pressed:
+                        if (
+                            e.keyCode === CMS.KEYS.CMD_LEFT ||
+                            e.keyCode === CMS.KEYS.CMD_RIGHT ||
+                            e.keyCode === CMS.KEYS.CMD_FIREFOX ||
+                            e.keyCode === CMS.KEYS.SHIFT ||
+                            e.keyCode === CMS.KEYS.CTRL
+                        ) {
+                            cmdPressed = true;
+                        }
+                        if (e.type === 'keyup') {
+                            cmdPressed = false;
+                        }
+
+                        if (el.attr('href') !== '' &&
+                            el.attr('href') !== '#' &&
+                            !el.parent().hasClass(disabled)) {
+
+                            if (cmdPressed) {
+                                // control the behaviour when ctrl/cmd is pressed
+                                window.open(el.attr('href'), '_blank');
+                            } else {
+                                // otherwise delegate as usual
+                                that._delegate($(this));
+                            }
+
                             reset();
                             return false;
                         }
+
                     }).on(that.touchStart, function () {
                         isTouchingTopLevelMenu = true;
                     });
@@ -235,6 +266,7 @@ var CMS = window.CMS || {};
                     // removes classes and events
                     function reset() {
                         open = false;
+                        cmdPressed = false;
                         lists.removeClass(hover);
                         lists.find('ul ul').hide();
                         navigation.find('> li').off(that.mouseEnter);
@@ -285,7 +317,8 @@ var CMS = window.CMS || {};
                                 'csrfmiddlewaretoken': CMS.config.csrf
                             },
                             'success': function () {
-                                CMS.API.Helpers.reloadBrowser();
+                                var url = CMS.API.Helpers.makeURL(window.location.href, ['edit_off=true']);
+                                CMS.API.Helpers.reloadBrowser(url);
                             },
                             'error': function (request) {
                                 throw new Error(request);
@@ -319,6 +352,8 @@ var CMS = window.CMS || {};
 
                 if ($('.cms-btn-publish-active').length) {
                     publishBtn.show();
+                    this.ui.saveLive.hide();
+                    this.ui.saveDraft.show();
                     this.ui.window.trigger('resize');
                 }
 
@@ -396,8 +431,8 @@ var CMS = window.CMS || {};
              * Opens the toolbar (slide down).
              *
              * @method open
-             * @param [opts] {Object}
-             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             * @param {Object} [opts]
+             * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
              */
             open: function open(opts) {
                 this._show(opts);
@@ -412,8 +447,8 @@ var CMS = window.CMS || {};
              *
              * @method _show
              * @private
-             * @param [opts] {Object}
-             * @param [opts.duration] {Number} time in milliseconds for toolbar to animate
+             * @param {Object} [opts]
+             * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
              */
             _show: function _show(opts) {
                 var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
@@ -471,15 +506,15 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Closes the message window underneath the toolbar.
+             * Makes a request to the given url, runs optional callbacks.
              *
-             * @method open
-             * @param opts
-             * @param opts.url {String} url where the ajax points to
-             * @param [opts.post] {Object} post data to be passed
-             * @param [opts.text] {String} message to be displayed
-             * @param [opts.callback] {Function} custom callback instead of reload
-             * @param [opts.onSuccess] {String} reload and display custom message
+             * @method openAjax
+             * @param {Object} opts
+             * @param {String} opts.url url where the ajax points to
+             * @param {Object} [opts.post] post data to be passed
+             * @param {String} [opts.text] message to be displayed
+             * @param {Function} [opts.callback] custom callback instead of reload
+             * @param {String} [opts.onSuccess] reload and display custom message
              * @return {Boolean|jQuery.Deferred} either false or a promise
              */
             openAjax: function (opts) {
@@ -548,12 +583,15 @@ var CMS = window.CMS || {};
              * Delegates event from element to appropriate functionalities.
              *
              * @method _delegate
-             * @param el {jQuery} trigger element
+             * @param {jQuery} el trigger element
              * @private
              */
             _delegate: function _delegate(el) {
                 // save local vars
                 var target = el.data('rel');
+                if (el.hasClass('cms-btn-disabled')) {
+                    return false;
+                }
 
                 switch (target) {
                     case 'modal':
@@ -569,13 +607,6 @@ var CMS = window.CMS || {};
                         CMS.API.Messages.open({
                             message: el.data('text')
                         });
-                        break;
-                    case 'cms_frame':
-                        var frame = window.open(el.attr('href'), JSON.stringify({
-                            name: 'cms_frame',
-                            url: window.location.href
-                        }));
-                        frame.focus();
                         break;
                     case 'sideframe':
                         var sideframe = new CMS.Sideframe({
@@ -603,7 +634,7 @@ var CMS = window.CMS || {};
              * Sets the functionality for the switcher button.
              *
              * @method _setSwitcher
-             * @param el {jQuery} button element
+             * @param {jQuery} el button element
              * @private
              */
             _setSwitcher: function _setSwitcher(el) {
@@ -657,7 +688,7 @@ var CMS = window.CMS || {};
              * Locks the toolbar so it cannot be closed.
              *
              * @method _lock
-             * @param lock {Boolean} true if the toolbar should be locked
+             * @param {Boolean} lock true if the toolbar should be locked
              * @private
              */
             _lock: function _lock(lock) {

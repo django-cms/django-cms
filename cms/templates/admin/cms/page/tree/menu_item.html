@@ -1,4 +1,5 @@
 {% load cms_admin i18n %}
+
 <div class="cont {{ css_class }}{% if page.reverse_id == "page_types" %} cont-pagetype{% endif %}" data-page_id="{{ page.id }}">
     <div class="col1">
         {% if has_change_permission %}
@@ -46,7 +47,7 @@
             </label>
         </div>
         <div class="col-actions">
-            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview" title="{% trans "View on site" %}" target="_parent"><span>{% trans "View on site" %}</span></a>
+            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview{% if page.id|slugify == request.GET.page_id|slugify %} preview-active{% endif %}" title="{% trans "View on site" %}" target="_parent"><span>{% trans "View on site" %}</span></a>
             {% if has_change_permission %}
             <a class="edit" href="{{ url }}{{ page.id }}/" data-alt-class="advanced-settings" data-alt-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
             {# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}

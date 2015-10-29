@@ -16,10 +16,25 @@ window.jQuery = (window.django && window.django.jQuery) ? window.django.jQuery :
 window.Class = window.Class || undefined;
 
 // ensuring CMS namespace is set correctly
+/**
+ * @module CMS
+ */
 var CMS = {
     $: (typeof window.jQuery === 'function') ? window.jQuery : undefined,
     Class: (typeof window.Class === 'function') ? window.Class : undefined,
+    /**
+     * @module CMS
+     * @submodule CMS.API
+     */
     API: {},
+    /**
+     * Provides key codes for common keys.
+     *
+     * @module CMS
+     * @submodule CMS.KEYS
+     * @example
+     *     if (e.keyCode === CMS.KEYS.ENTER) { ... };
+     */
     KEYS: {
         SHIFT: 16,
         TAB: 9,
@@ -30,7 +45,8 @@ var CMS = {
         ESC: 27,
         CMD_LEFT: 91,
         CMD_RIGHT: 93,
-        CMD_FIREFOX: 224
+        CMD_FIREFOX: 224,
+        CTRL: 17
     }
 };
 
@@ -38,11 +54,29 @@ var CMS = {
 // CMS.API
 (function ($) {
     'use strict';
-    // CMS.$ will be passed for $
-    $(document).ready(function () {
+    // shorthand for jQuery(document).ready();
+    $(function () {
+        /**
+         * Provides various helpers that are mixed in all CMS classes.
+         *
+         * @class Helpers
+         * @static
+         * @module CMS
+         * @submodule CMS.API
+         * @namespace CMS.API
+         */
         CMS.API.Helpers = {
 
-            // redirects to a specific url or reloads browser
+            /**
+             * Redirects to a specific url or reloads browser.
+             *
+             * @method reloadBrowser
+             * @param {String} url where to redirect. if equal to `REFRESH_PAGE` will reload page instead
+             * @param {Number} timeout=0 timeout in ms
+             * @param {Boolean} ajax if set to true first initiates **synchronous**
+             *     ajax request to figure out if the browser should reload current page,
+             *     move to another one, or do nothing.
+             */
             reloadBrowser: function (url, timeout, ajax) {
                 var that = this;
                 // is there a parent window?
@@ -97,30 +131,46 @@ var CMS = {
                 }, timeout || 0);
             },
 
-            // disable multiple form submissions
+            /**
+             * Assigns an event handler to forms located in the toolbar
+             * to prevent multiple submissions.
+             *
+             * @method preventSubmit
+             */
             preventSubmit: function () {
                 var forms = $('.cms-toolbar').find('form');
                 forms.submit(function () {
                     // show loader
                     CMS.API.Toolbar.showLoader();
                     // we cannot use disabled as the name action will be ignored
-                    $('input[type="submit"]').bind('click', function (e) {
+                    $('input[type="submit"]').on('click', function (e) {
                         e.preventDefault();
                     }).css('opacity', 0.5);
                 });
             },
 
-            // fixes csrf behaviour
+            /**
+             * Sets csrf token header on ajax requests.
+             *
+             * @method csrf
+             * @param {String} csrf_token
+             */
             csrf: function (csrf_token) {
                 $.ajaxSetup({
                     beforeSend: function (xhr) {
-                        // set csrf_token
                         xhr.setRequestHeader('X-CSRFToken', csrf_token);
                     }
                 });
             },
 
-            // sends or retrieves a JSON from localStorage or the session if local storage is not available
+            /**
+             * Sends or retrieves a JSON from localStorage
+             * or the session (through synchronous ajax request)
+             * if localStorage is not available.
+             *
+             * @method setSettings
+             * @param settings
+             */
             setSettings: function (settings) {
                 // merge settings
                 settings = JSON.stringify($.extend({}, CMS.config.settings, settings));
@@ -172,6 +222,12 @@ var CMS = {
                 return CMS.settings;
             },
 
+            /**
+             * Gets user settings (from JSON or the session)
+             * in the same way as setSettings sets them.
+             *
+             * @method getSettings
+             */
             getSettings: function () {
                 var settings;
                 // set loader
@@ -222,11 +278,12 @@ var CMS = {
             },
 
             /**
-             * Modifies the url with new params and sanitises the ampersand within the url for #3404.
+             * Modifies the url with new params and sanitises
+             * the ampersand within the url for #3404.
              *
              * @method makeURL
-             * @param url {String} original url
-             * @param [params] {String[]} array of `param=value` strings to update the url
+             * @param {String} url original url
+             * @param {String[]} [params] array of `param=value` strings to update the url
              */
             makeURL: function makeURL(url, params) {
                 var arr = [];
@@ -292,10 +349,10 @@ var CMS = {
              * Optionally can be invoked first time immediately.
              *
              * @method debounce
-             * @param func {Function} function to debounce
-             * @param wait {Number} time in ms to wait
-             * @param [opts] {Object}
-             * @param [opts.immediate] {Boolean} trigger func immediately?
+             * @param {Function} func function to debounce
+             * @param {Number} wait time in ms to wait
+             * @param {Object} [opts]
+             * @param {Boolean} [opts.immediate] trigger func immediately?
              * @return {Function}
              */
             debounce: function debounce(func, wait, opts) {
@@ -325,11 +382,12 @@ var CMS = {
              * disable the execution on the leading edge, pass `{leading: false}`.
              * To disable execution on the trailing edge, ditto.
              *
-             * @param func {Function} function to throttle
-             * @param wait {Number} time window
-             * @param [opts] {Object}
-             * @param [opts.leading=true] {Boolean} execute on the leading edge
-             * @param [opts.trailing=true] {Boolean} execute on the trailing edge
+             * @method throttle
+             * @param {Function} func function to throttle
+             * @param {Number} wait time window
+             * @param {Object} [opts]
+             * @param {Boolean} [opts.leading=true] execute on the leading edge
+             * @param {Boolean} [opts.trailing=true] execute on the trailing edge
              * @return {Function}
              */
             throttle: function throttle(func, wait, opts) {
@@ -373,10 +431,12 @@ var CMS = {
             },
 
             /**
-             * Localstorage shim from Modernizr
+             * Is localStorage truly supported?
+             * Check is taken from modernizr.
              *
-             * @method _isStorageSupported
+             * @property _isStorageSupported
              * @private
+             * @type {Boolean}
              */
             _isStorageSupported: (function localStorageCheck() {
                 var mod = 'modernizr';

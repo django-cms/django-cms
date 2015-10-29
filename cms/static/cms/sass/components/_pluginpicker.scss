@@ -73,6 +73,9 @@
     padding: 0 $padding-large;
     border: none;
     background-color: $gray-lightest;
+    // has to be -webkit, otherwise autoprefixer
+    // won't add it and radius will not be reset on iOS
+    -webkit-border-radius: 0;
     appearance: none;
 }
 

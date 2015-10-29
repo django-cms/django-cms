@@ -90,6 +90,7 @@ are:
   existing page
 * **Edit** |edit| to open the page for editing
 * **Save as draft** |save-as-draft| to update the page and exit editing mode
+* **View published** does the same as "Save as draft"
 
 .. |publish-page-now| image:: /images/publish-page-now.png
    :width: 119

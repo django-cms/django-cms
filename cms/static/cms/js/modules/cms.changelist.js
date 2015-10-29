@@ -21,11 +21,12 @@
             initialize: function (options) {
                 this.options = $.extend(true, {}, this.options, options);
 
+                this.setupFunctions();
+                this.setupTreePublishing();
+                this.setupUIHacks();
+
                 // load internal functions
                 if (!this.options.settings.filtered) {
-                    this.setupFunctions();
-                    this.setupTreePublishing();
-                    this.setupUIHacks();
                     this.setupGlobals();
                     this.setupTree();
 
@@ -33,8 +34,6 @@
                     window.initTree();
                 } else {
                     // when filtered is active, prevent tree actions
-                    this.setupFunctions();
-                    this.setupUIHacks();
                     $.syncCols();
                 }
             },
@@ -149,6 +148,7 @@
 
                     // hide all elements
                     $(langTooltips).hide();
+                    $('.moveable').removeClass('hover');
 
                     if (e.type === 'touchstart') {
                         e.preventDefault();
@@ -161,6 +161,7 @@
                     // use a timeout to display the tooltip
                     langTimer = setTimeout(function () {
                         el.stop(true, true).fadeIn(langFadeDuration);
+                        el.closest('.moveable').addClass('hover');
                     }, langDelay);
                 });
                 // hide the tooltip when leaving the area
@@ -168,11 +169,13 @@
                     if (touchUsedNode) {
                         return;
                     }
+
                     // clear timer
                     clearTimeout(langTimer);
                     // hide all elements
                     langTimer = setTimeout(function () {
                         $(langTooltips).hide();
+                        $('.moveable').removeClass('hover');
                     }, langDelay * 2);
                 });
                 // reset hiding when entering the tooltip itself
@@ -184,6 +187,7 @@
                     // hide all elements
                     langTimer = setTimeout(function () {
                         $(langTooltips).hide();
+                        $('.moveable').removeClass('hover');
                     }, langDelay * 2);
                 });
                 // attach double check event if publish or unpublish should be triggered

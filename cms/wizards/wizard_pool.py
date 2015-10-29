@@ -11,6 +11,16 @@ class AlreadyRegisteredException(Exception):
     pass
 
 
+def entry_choices(user, page):
+    """
+    Yields a list of wizard entries that the current user can use based on their
+    permission to add instances of the underlying model objects.
+    """
+    for entry in wizard_pool.get_entries():
+        if user.is_superuser or entry.user_has_add_permission(user, page=page):
+            yield (entry.id, entry.title)
+
+
 class WizardPool(object):
     _entries = {}
     _discovered = False
