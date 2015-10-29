@@ -66,7 +66,9 @@ var CMS = window.CMS || {};
                     close: sideframe.find('.cms-sideframe-close'),
                     resize: sideframe.find('.cms-sideframe-resize'),
                     frame: sideframe.find('.cms-sideframe-frame'),
-                    shim: sideframe.find('.cms-sideframe-shim')
+                    shim: sideframe.find('.cms-sideframe-shim'),
+                    historyBack: sideframe.find('.cms-sideframe-history .cms-icon-arrow-back'),
+                    historyForward: sideframe.find('.cms-sideframe-history .cms-icon-arrow-forward')
                 };
             },
 
@@ -78,6 +80,13 @@ var CMS = window.CMS || {};
              */
             _events: function _events() {
                 var that = this;
+
+                // we need to set the history state on event creation
+                // to ensure we start with clean states in new instances
+                this.history = {
+                    back: [],
+                    forward: []
+                };
 
                 this.ui.close.off(this.click).on(this.click, function () {
                     that.close();
@@ -93,6 +102,22 @@ var CMS = window.CMS || {};
                 // close sideframe when clicking on the dimmer
                 this.ui.dimmer.off(this.click).on(this.click, function () {
                     that.close();
+                });
+
+                // attach events to the back button
+                this.ui.historyBack.off(this.click).on(this.click, function () {
+                    if (that.ui.historyBack.hasClass('cms-icon-disabled')) {
+                        return false;
+                    }
+                    that._goToHistory('back');
+                });
+
+                // attach events to the forward button
+                this.ui.historyForward.off(this.click).on(this.click, function () {
+                    if (that.ui.historyForward.hasClass('cms-icon-disabled')) {
+                        return false;
+                    }
+                    that._goToHistory('forward');
                 });
             },
 
@@ -228,6 +253,9 @@ var CMS = window.CMS || {};
 
                     // adding django hacks
                     contents.find('.viewsitelink').attr('target', '_top');
+
+                    // update history
+                    that._addToHistory(this.contentWindow.location.href);
                 });
 
                 // inject iframe
@@ -389,6 +417,80 @@ var CMS = window.CMS || {};
                     .off(this.pointerUp)
                     .off(this.pointerMove)
                     .removeAttr('data-touch-action');
+            },
+
+            /**
+             * Retrieves the history states from `this.history`.
+             *
+             * @method _goToHistory
+             * @private
+             * @param {String} type can be either `back` or `forward`
+             */
+            _goToHistory: function _goToHistory(type) {
+                var iframe = this.ui.frame.find('iframe');
+                var tmp;
+
+                if (type === 'back') {
+                    // remove latest entry (which is the current site)
+                    this.history.forward.push(this.history.back.pop());
+                    iframe.attr('src', this.history.back[this.history.back.length - 1]);
+                }
+
+                if (type === 'forward') {
+                    tmp = this.history.forward.pop();
+                    this.history.back.push(tmp);
+                    iframe.attr('src', tmp);
+                }
+
+                this._updateHistoryButtons();
+            },
+
+            /**
+             * Stores the history states in `this.history`.
+             *
+             * @method _addToHistory
+             * @private
+             * @param {String} url url to be stored in `this.history.back`
+             */
+            _addToHistory: function _addToHistory(url) {
+                var iframe = this.ui.frame.find('iframe');
+
+                // we need to update history first
+                this.history.back.push(url);
+                // and than set local variables
+                var length = this.history.back.length;
+
+                // store current url if array is empty
+                if (this.history.back.length <= 0) {
+                    this.history.back.push(iframe.attr('src'));
+                }
+
+                // check for duplicates
+                if (this.history.back[length - 1] === this.history.back[length - 2]) {
+                    this.history.back.pop();
+                }
+
+                this._updateHistoryButtons();
+            },
+
+            /**
+             * Sets the correct states for the history UI elements.
+             *
+             * @method _updateHistoryButtons
+             * @private
+             */
+            _updateHistoryButtons: function _updateHistoryButtons() {
+                if (this.history.back.length > 1) {
+                    this.ui.historyBack.removeClass('cms-icon-disabled');
+                } else {
+                    this.ui.historyBack.addClass('cms-icon-disabled');
+                }
+
+                if (this.history.forward.length >= 1) {
+                    this.ui.historyForward.removeClass('cms-icon-disabled');
+                } else {
+                    this.ui.historyForward.addClass('cms-icon-disabled');
+                }
             }
         });
 

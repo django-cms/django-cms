@@ -28,7 +28,7 @@ requirements that must be met.
 django CMS expects a user model with at minimum the following fields: ``email``, ``password``,
 ``is_active``, ``is_staff``, and ``is_superuser``. Additionally, it should inherit from
 ``AbstractBaseUser`` and ``PermissionsMixin`` (or ``AbstractUser``), and must define one field as
-the ``USERNAME_FIELD`` (see Django documentation for more details) and define a ``get_fullname()``
+the ``USERNAME_FIELD`` (see Django documentation for more details) and define a ``get_full_name()``
 method.
 
 The models must also be editable via Django's admin and have an admin class registered.

@@ -16,7 +16,6 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.http import (Http404, HttpResponseBadRequest, HttpResponseForbidden, HttpResponse,
                          QueryDict, HttpResponseNotFound)
-from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import force_text, smart_str
 from django.utils import timezone
 from django.utils.six.moves.urllib.parse import urlparse
@@ -848,14 +847,14 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 405)
             request = self.get_request(post_data={'not_usable': '1'})
-            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'ids': plugin.pk})
-            self.assertRaises(MultiValueDictKeyError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
         with self.login_user_context(admin_user):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': 'invalid-placeholder', 'plugin_language': 'en'})
-            self.assertRaises(ValueError, self.admin_class.move_plugin, request)
+            self.assertRaises(RuntimeError, self.admin_class.move_plugin, request)
         with self.login_user_context(permless):
             request = self.get_request(post_data={'plugin_id': pageplugin.pk,
                 'placeholder_id': placeholder.pk, 'plugin_parent': '', 'plugin_language': 'en'})
@@ -886,8 +885,12 @@ class AdminTests(AdminTestsBase):
 
         admin_user = self.get_admin()
         with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'plugin_id': sub_col.pk,
-                'placeholder_id': source.id, 'plugin_parent': col2.pk, 'plugin_language': 'de'})
+            request = self.get_request(post_data={
+                'plugin_id': sub_col.pk,
+                'placeholder_id': source.id,
+                'plugin_parent': col2.pk,
+                'plugin_language': 'de'
+            })
             response = self.admin_class.move_plugin(request)
             self.assertEqual(response.status_code, 200)
         sub_col = CMSPlugin.objects.get(pk=sub_col.pk)
@@ -1217,8 +1220,12 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_plugins_copy_placeholder_ref(self):
-        """User copies a placeholder into a clipboard. A PlaceholderReferencePlugin is created. Afterwards he copies this
-         into a placeholder and the PlaceholderReferencePlugin unpacks its content. After that he clear the clipboard"""
+        """
+        User copies a placeholder into a clipboard. A PlaceholderReferencePlugin
+        is created. Afterwards he copies this into a placeholder and the
+        PlaceholderReferencePlugin unpacks its content. After that he clears
+        the clipboard.
+        """
         self.assertEqual(Placeholder.objects.count(), 2)
         self._create_plugin()
         self._create_plugin()
@@ -1265,7 +1272,7 @@ class PluginPermissionTests(AdminTestsBase):
         self.assertEqual(CMSPlugin.objects.count(), 7)
         self.assertEqual(Placeholder.objects.count(), 4)
         url = admin_reverse('cms_page_clear_placeholder', args=[clipboard.pk])
-        with self.assertNumQueries(FuzzyInt(70, 80)):
+        with self.assertNumQueries(FuzzyInt(70, 90)):
             response = self.client.post(url, {'test': 0})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CMSPlugin.objects.count(), 4)
