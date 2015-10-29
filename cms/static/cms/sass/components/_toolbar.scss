@@ -112,9 +112,11 @@
         ul {
             display: block;
             position: absolute;
+            overflow: auto;
             top: $toolbar-height;
             left: 0;
             min-width: $toolbar-dropdown-min-width;
+            max-height: $toolbar-dropdown-max-height;
             padding: $toolbar-dropdown-padding;
             border: 1px solid $white;
             border-top: none;
