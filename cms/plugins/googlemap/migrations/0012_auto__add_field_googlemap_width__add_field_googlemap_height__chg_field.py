@@ -2,15 +2,15 @@
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
-from django.db import models
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'GoogleMap.width'
+        # You can't have default='100%', it has to be px
         db.add_column('cmsplugin_googlemap', 'width',
-                      self.gf('django.db.models.fields.CharField')(default='100%', max_length=6),
+                      self.gf('django.db.models.fields.CharField')(default='600px', max_length=6),
                       keep_default=False)
 
         # Adding field 'GoogleMap.height'
@@ -27,7 +27,6 @@ class Migration(SchemaMigration):
 
         # Deleting field 'GoogleMap.height'
         db.delete_column('cmsplugin_googlemap', 'height')
-
 
         # Changing field 'GoogleMap.zoom'
         db.alter_column('cmsplugin_googlemap', 'zoom', self.gf('django.db.models.fields.IntegerField')(null=True))
