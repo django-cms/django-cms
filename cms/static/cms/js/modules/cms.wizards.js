@@ -26,11 +26,16 @@ var CMS = window.CMS || {};
 
             _choice: function initialize() {
                 // set active element when making a choice
+                var form = $('form');
                 var choices = $('.choice');
                 choices.on('click', function (e) {
                     choices.removeClass('active')
                         .eq(choices.index(e.currentTarget))
                         .addClass('active');
+                });
+                // submit the form on double click
+                choices.on('dblclick', function () {
+                    form.submit();
                 });
 
                 // focus window so hitting "enter" doesnt trigger a refresh
