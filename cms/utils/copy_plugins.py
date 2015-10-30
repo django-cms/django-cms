@@ -10,17 +10,28 @@ def copy_plugins_to(old_plugins, to_placeholder,
     # TODO: Refactor this and copy_plugins to cleanly separate plugin tree/node
     # copying and remove the need for the mutating parameter old_parent_cache.
     old_parent_cache = {}
-    # For subplugin copy, first plugin's parent must be nulled before copying.
+    # For subplugin copy, top-level plugin's parent must be nulled
+    # before copying.
     if old_plugins:
-        old_plugins[0].parent = old_plugins[0].parent_id = None
-    new_plugins = [old.copy_plugin(to_placeholder, to_language or old.language,
-                                   old_parent_cache, no_signals)
-                   for old in old_plugins]
+        old_parent = old_plugins[0].parent
+        for old_plugin in old_plugins:
+            if old_plugin.parent == old_parent:
+                old_plugin.parent = old_plugin.parent_id = None
+    new_plugins = []
+    for old in old_plugins:
+        new_plugins.append(
+            old.copy_plugin(to_placeholder, to_language or old.language,
+                            old_parent_cache, no_signals))
+
     if new_plugins and parent_plugin_id:
         from cms.models import CMSPlugin
-        new_plugins[0].parent_id = parent_plugin_id
-        new_plugins[0].save()
-        new_plugins[0] = new_plugins[0].move(CMSPlugin.objects.get(pk=parent_plugin_id), pos='last-child')
+        parent_plugin = CMSPlugin.objects.get(pk=parent_plugin_id)
+        for idx, plugin in enumerate(new_plugins):
+            if plugin.parent_id is None:
+                plugin.parent_id = parent_plugin_id
+                plugin.save()
+                new_plugins[idx] = plugin.move(parent_plugin, pos="last-child")
+
     plugins_ziplist = list(zip(new_plugins, old_plugins))
 
     # this magic is needed for advanced plugins like Text Plugins that can have

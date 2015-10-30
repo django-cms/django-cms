@@ -22,7 +22,8 @@
     {% if not popup %}
         <ul class="object-tools">
             <li>
-                <a href="../{{ page.id }}/{{ language }}/preview/" target="_parent">{% trans "View on site" %}</a>
+                {% url 'admin:cms_page_preview_page' page.id language as admin_url %}
+                <a href="{{ admin_url }}" target="_parent">{% trans "View on site" %}</a>
             </li>
         </ul>
     {% endif %}

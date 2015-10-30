@@ -37,12 +37,16 @@ $wizard-input-size: 16px;
         box-sizing: border-box;
         position: relative;
 
-        float: left !important;
         text-transform: none;
-        width: 48% !important;
         height: 85px;
         padding: $wizard-padding;
         margin: 1% !important;
+
+        // tablet and up
+        @media (min-width: $screen-tablet) {
+            float: left !important;
+            width: 48% !important;
+        }
 
         input {
             position: absolute;

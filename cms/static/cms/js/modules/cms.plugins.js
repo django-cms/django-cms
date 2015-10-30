@@ -136,6 +136,7 @@ var CMS = window.CMS || {};
                 this.ui = {
                     container: container,
                     publish: $('.cms-btn-publish'),
+                    save: $('.cms-toolbar-item-switch-save-edit'),
                     window: $(window),
                     revert: $('.cms-toolbar-revert'),
                     dragbar: null,
@@ -237,8 +238,9 @@ var CMS = window.CMS || {};
                     var data = el.data('settings');
                     data.target = placeholder_id;
                     data.parent = that._getId(dragitem.parent().closest('.cms-draggable'));
+                    data.move_a_copy = true;
 
-                    that.copyPlugin(data);
+                    that.movePlugin(data);
                 });
 
                 // filling up ui object
@@ -547,6 +549,7 @@ var CMS = window.CMS || {};
              * @param {String} [options.plugin_id]
              * @param {String} [options.plugin_parent]
              * @param {String} [options.plugin_language]
+             * @param {Boolean} [options.move_a_copy]
              */
             movePlugin: function (options) {
                 // cancel request if already in progress
@@ -572,6 +575,20 @@ var CMS = window.CMS || {};
                 var plugin_parent = this._getId(dragitem.parent().closest('.cms-draggable'));
                 var plugin_order = this._getIds(dragitem.siblings('.cms-draggable').andSelf());
 
+                if (options.move_a_copy) {
+                    plugin_order = plugin_order.map(function (pluginId) {
+                        // TODO correct way would be to check if it's actually a
+                        // pasted plugin and only then replace the id with copy token
+                        // otherwise if we would copy from the same placeholder we would get
+                        // two copy tokens instead of original and a copy.
+                        // it's ok so far, as long as we copy only from clipboard
+                        if (pluginId === options.plugin_id) {
+                            pluginId = '__COPY__';
+                        }
+                        return pluginId;
+                    });
+                }
+
                 // cancel here if we have no placeholder id
                 if (placeholder_id === false) {
                     return false;
@@ -585,7 +602,8 @@ var CMS = window.CMS || {};
                     // this is a hack: when moving to different languages use the global language
                     plugin_language: options.page_language,
                     plugin_order: plugin_order,
-                    csrfmiddlewaretoken: this.csrf
+                    csrfmiddlewaretoken: this.csrf,
+                    move_a_copy: options.move_a_copy
                 };
 
                 $.ajax({
@@ -615,7 +633,7 @@ var CMS = window.CMS || {};
                     }
                 });
 
-                // show publish button
+                // show publish / save buttons
                 this.ui.publish
                     .addClass('cms-btn-publish-active')
                     .removeClass('cms-btn-disabled')
