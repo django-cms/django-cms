@@ -421,6 +421,53 @@
     .cms-error input {
         border: 1px solid $color-danger;
     }
+
+    // overlap with logo when it gets too small
+    @media (max-width: $screen-tablet - 280px) {
+        margin-left: -110px;
+    }
+    // mobile only
+    @media (max-width: $screen-tablet) {
+        position: relative;
+        // remove spaces
+        font-size: 1px;
+        line-height: 0;
+        background: $white;
+        label {
+            position: relative;
+            padding: 0;
+            margin-right: -1px;
+            margin-bottom: -1px;
+        }
+        label span {
+            position: absolute;
+            left: 5px;
+            top: 0;
+            z-index: 1;
+            color: $gray-light;
+        }
+        // setup inputs
+        input[type="text"] {
+            border-radius: $border-radius-base 0 0 $border-radius-base;
+        }
+        input[type="password"] {
+            border-radius: 0;
+        }
+        input[type="text"],
+        input[type="password"] {
+            position: relative;
+            z-index: 10;
+            width: 95px;
+            background: transparent;
+            &:focus {
+                background: $white;
+            }
+        }
+        input[type="submit"] {
+            border-radius: 0 $border-radius-base $border-radius-base 0;
+            padding: 0 $login-form-submit-padding-horizontal / 2;
+        }
+    }
 }
 
 // #TOOLBAR/elements/buttongroups#

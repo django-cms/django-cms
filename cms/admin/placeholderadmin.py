@@ -47,6 +47,24 @@ from cms.utils.plugins import (
 )
 from cms.utils.urlutils import admin_reverse
 
+_no_default = object()
+
+
+def get_int(int_str, default=_no_default):
+    """
+    For convenience a get-like method for taking the int() of a string.
+    :param int_str: the string to convert to integer
+    :param default: an optional value to return if ValueError is raised.
+    :return: the int() of «int_str» or «default» on exception.
+    """
+    if default == _no_default:
+        return int(int_str)
+    else:
+        try:
+            return int(int_str)
+        except ValueError:
+            return default
+
 
 class FrontendEditableAdminMixin(object):
     frontend_editable_fields = []
@@ -313,13 +331,20 @@ class PlaceholderAdminMixin(object):
                 )
         else:
             plugins = list(
-                source_placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
+                source_placeholder.cmsplugin_set.filter(
+                    language=source_language).order_by('path'))
             reload_required = requires_reload(PLUGIN_COPY_ACTION, plugins)
-        if not self.has_copy_plugin_permission(request, source_placeholder, target_placeholder, plugins):
-            return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
-        if target_placeholder.pk == request.toolbar.clipboard.pk and not source_plugin_id and not target_plugin_id:
-            # if we copy a whole placeholder to the clipboard create PlaceholderReference plugin instead and fill it
-            # the content of the source_placeholder.
+        if not self.has_copy_plugin_permission(
+                request, source_placeholder, target_placeholder, plugins):
+            return HttpResponseForbidden(force_text(
+                _('You do not have permission to copy these plugins.')))
+
+        # Are we copying an entire placeholder?
+        if (target_placeholder.pk == request.toolbar.clipboard.pk and
+                not source_plugin_id and not target_plugin_id):
+            # if we copy a whole placeholder to the clipboard create
+            # PlaceholderReference plugin instead and fill it the content of the
+            # source_placeholder.
             ref = PlaceholderReference()
             ref.name = source_placeholder.get_label()
             ref.plugin_type = "PlaceholderPlugin"
@@ -328,9 +353,12 @@ class PlaceholderAdminMixin(object):
             ref.save()
             ref.copy_from(source_placeholder, source_language)
         else:
-            copy_plugins.copy_plugins_to(plugins, target_placeholder, target_language, target_plugin_id)
-        plugin_list = CMSPlugin.objects.filter(language=target_language, placeholder=target_placeholder).order_by(
-            'path')
+            copy_plugins.copy_plugins_to(
+                plugins, target_placeholder, target_language, target_plugin_id)
+        plugin_list = CMSPlugin.objects.filter(
+                language=target_language,
+                placeholder=target_placeholder
+            ).order_by('path')
         reduced_list = []
         for plugin in plugin_list:
             reduced_list.append(
@@ -419,65 +447,137 @@ class PlaceholderAdminMixin(object):
     @xframe_options_sameorigin
     def move_plugin(self, request):
         """
+        Performs a move or a "paste" operation (when «move_a_copy» is set)
+
         POST request with following parameters:
-        -plugin_id
-        -placeholder_id
-        -plugin_language (optional)
-        -plugin_parent (optional)
-        -plugin_order (array, optional)
+        - plugin_id
+        - placeholder_id
+        - plugin_language (optional)
+        - plugin_parent (optional)
+        - plugin_order (array, optional)
+        - move_a_copy (Boolean, optional) (anything supplied here except a case-
+                                        insensitive "false" is True)
+        NOTE: If move_a_copy is set, the plugin_order should contain an item
+              '__COPY__' with the desired destination of the copied plugin.
         """
-        plugin = CMSPlugin.objects.get(pk=int(request.POST['plugin_id']))
-        placeholder = Placeholder.objects.get(pk=request.POST['placeholder_id'])
-        parent_id = request.POST.get('plugin_parent', None)
+        # plugin_id and placeholder_id are required, so, if nothing is supplied,
+        # an ValueError exception will be raised by get_int().
+        try:
+            plugin_id = get_int(request.POST.get('plugin_id'))
+        except TypeError:
+            raise RuntimeError("'plugin_id' is a required parameter.")
+        plugin = CMSPlugin.objects.get(pk=plugin_id)
+        try:
+            placeholder_id = get_int(request.POST.get('placeholder_id'))
+        except TypeError:
+            raise RuntimeError("'placeholder_id' is a required parameter.")
+        except ValueError:
+            raise RuntimeError("'placeholder_id' must be an integer string.")
+        placeholder = Placeholder.objects.get(pk=placeholder_id)
+        # The rest are optional
+        parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         language = request.POST.get('plugin_language', None)
+        move_a_copy = request.POST.get('move_a_copy', False)
+        move_a_copy = (move_a_copy and move_a_copy != "0" and
+                       move_a_copy.lower() != "false")
+
         source_placeholder = plugin.placeholder
-        if not parent_id:
-            parent_id = None
-        else:
-            parent_id = int(parent_id)
         if not language and plugin.language:
             language = plugin.language
         order = request.POST.getlist("plugin_order[]")
+
         if not self.has_move_plugin_permission(request, plugin, placeholder):
-            return HttpResponseForbidden(force_text(_("You have no permission to move this plugin")))
-        if not placeholder == source_placeholder:
+            return HttpResponseForbidden(
+                force_text(_("You have no permission to move this plugin")))
+        if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
-                has_reached_plugin_limit(placeholder, plugin.plugin_type, plugin.language, template=template)
+                has_reached_plugin_limit(placeholder, plugin.plugin_type,
+                                         plugin.language, template=template)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
-        if parent_id:
-            if plugin.parent_id != parent_id:
+
+        if move_a_copy:  # "paste"
+            if plugin.plugin_type == "PlaceholderPlugin":
+                inst, _plugin = plugin.get_plugin_instance()
+                new_plugins = copy_plugins.copy_plugins_to(
+                    inst.placeholder_ref.get_plugins(), placeholder,
+                    to_language=language)
+            else:
+                source_plugins = [plugin] + list(plugin.get_descendants())
+                new_plugins = copy_plugins.copy_plugins_to(
+                    source_plugins, placeholder, language, parent_id)
+
+            top_plugins = []
+            top_plugins_pks = []
+            top_parent = new_plugins[0][0].parent_id
+            for new_plugin, _old_plugin in new_plugins:
+                if top_parent and new_plugin.parent_id == top_parent:
+                    top_plugins.append(new_plugin)
+                    top_plugins_pks.append(str(new_plugin.pk))
+
+            if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
-                if parent.placeholder_id != placeholder.pk:
-                    return HttpResponseBadRequest(force_text('parent must be in the same placeholder'))
-                if parent.language != language:
-                    return HttpResponseBadRequest(force_text('parent must be in the same language as plugin_language'))
-                plugin.parent_id = parent.pk
-                plugin.save()
-                plugin = plugin.move(parent, pos='last-child')
+                for plugin in top_plugins:
+                    plugin.parent = parent
+                    plugin.placeholder = placeholder
+                    plugin.language = language
+                    plugin.save()
+
+            # If an ordering was supplied, we should replace the item that has
+            # been copied with the new copy
+            if order:
+                if '__COPY__' in order:
+                    copy_idx = order.index('__COPY__')
+                    del order[copy_idx]
+                    order[copy_idx:0] = top_plugins_pks
+                else:
+                    order.extend(top_plugins_pks)
         else:
-            sibling = CMSPlugin.get_last_root_node()
-            plugin.parent_id = None
-            plugin.save()
-            plugin = plugin.move(sibling, pos='right')
-        for child in [plugin] + list(plugin.get_descendants()):
-            child.placeholder = placeholder
-            child.language = language
-            child.save()
-        plugins = reorder_plugins(placeholder, parent_id, language, order)
-        if not plugins:
-            return HttpResponseBadRequest('order parameter did not have all plugins of the same level in it')
+            # Regular move
+            if parent_id:
+                if plugin.parent_id != parent_id:
+                    parent = CMSPlugin.objects.get(pk=parent_id)
+                    if parent.placeholder_id != placeholder.pk:
+                        return HttpResponseBadRequest(force_text(
+                            _('parent must be in the same placeholder')))
+                    if parent.language != language:
+                        return HttpResponseBadRequest(force_text(
+                            _('parent must be in the same language as '
+                              'plugin_language')))
+                    plugin.parent_id = parent.pk
+                    plugin.language = language
+                    plugin.save()
+                    plugin = plugin.move(parent, pos='last-child')
+            else:
+                sibling = CMSPlugin.get_last_root_node()
+                plugin.parent = plugin.parent_id = None
+                plugin.placeholder = placeholder
+                plugin.save()
+                plugin = plugin.move(sibling, pos='right')
+
+            # Don't neglect the children
+            for child in [plugin] + list(plugin.get_descendants()):
+                child.placeholder = placeholder
+                child.language = language
+                child.save()
+
+        reorder_plugins(placeholder, parent_id, language, order)
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
-        json_response = {'reload': requires_reload(PLUGIN_MOVE_ACTION, [plugin])}
-        return HttpResponse(json.dumps(json_response), content_type='application/json')
+        json_response = {
+            'reload': move_a_copy or requires_reload(
+                PLUGIN_MOVE_ACTION, [plugin])}
+        return HttpResponse(
+            json.dumps(json_response), content_type='application/json')
 
     @xframe_options_sameorigin
     def delete_plugin(self, request, plugin_id):
-        plugin = get_object_or_404(CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
+        plugin = get_object_or_404(
+            CMSPlugin.objects.select_related('placeholder'), pk=plugin_id)
         if not self.has_delete_plugin_permission(request, plugin):
-            return HttpResponseForbidden(force_text(_("You do not have permission to delete this plugin")))
+            return HttpResponseForbidden(force_text(
+                _("You do not have permission to delete this plugin")))
         plugin_cms_class = plugin.get_plugin_class()
         plugin_class = plugin_cms_class.model
         opts = plugin_class._meta

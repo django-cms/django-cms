@@ -11,9 +11,9 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
+from cms.utils.urlutils import admin_reverse
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.models import Page, PageUser
-from cms.templatetags.cms_admin import CMS_ADMIN_ICON_BASE
 
 
 class PageSelectWidget(MultiWidget):
@@ -177,10 +177,9 @@ class UserSelectAdminWidget(Select):
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
-            add_url = '../../../cms/pageuser/add/'
+            add_url = admin_reverse('cms_pageuser_add')
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-            output.append(u'<img src="%sicon_addlink.gif" width="10" height="10" alt="%s"/></a>' % (CMS_ADMIN_ICON_BASE, _('Add Another')))
         return mark_safe(u''.join(output))
 
 
