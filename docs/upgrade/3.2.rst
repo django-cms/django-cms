@@ -19,7 +19,7 @@ apphook configuration changes will make life simpler for all users.
 What's new in 3.2
 *****************
 
-* new welcome page to help new users
+* :ref:`new welcome page <create-first-page>` to help new users
 * full touch-screen support at all sizes from small tablets to table-top devices
 * enhanced and polished user interface
 * much-needed improvements to the structure-board
@@ -27,7 +27,6 @@ What's new in 3.2
 * significant speed improvements on loading, HTTP requests and file sizes
 * restarts are no longer required when changing apphook configurations
 * a new content wizard system, adaptable to arbitrary content types
-* new *Link/Button* look & feel
 
 
 ******************************
@@ -37,7 +36,7 @@ Changes that require attention
 Bug-fixes
 =========
 
-* An issue om which ``{% placeholder %}`` template tags ignored the ``lang`` parameter has been
+* An issue in which ``{% placeholder %}`` template tags ignored the ``lang`` parameter has been
   fixed. However this may affect the behaviour of your templates, as now a previously-ignored
   parameter will be recognised. If you used the ``lang`` parameter in these template tags you may
   be affected: check the behaviour of your templates after upgrading.
@@ -49,7 +48,8 @@ Content wizards
 :doc:`/reference/wizards` can help simplify production of content, and can be created to handle
 non-CMS content too.
 
-For a quick introduction to using a wizard as a content editor, see the :ref:`user-tutorial`.
+For a quick introduction to using a wizard as a content editor, see the :ref:`user tutorial
+<create-first-page>`.
 
 
 Renaming cms_app, cms_toolbar, menu modules
@@ -65,25 +65,14 @@ Action required
 ---------------
 
 In your own applications that use these modules, rename ``cms_app.py`` to ``cms_apps.py``,
-``cms_toolbar.py`` to ``cms_toolbar.py`` and ``menu.py`` to ``menus.py``.
+``cms_toolbar.py`` to ``cms_toolbars.py`` and ``menu.py`` to ``menus.py``.
 
 
 New ``ApphookReloadMiddleware``
 ===============================
 
 Until now, changes to apphooks have required a restart of the server in order to take effect. A new
-middleware class makes this automatic.
-
-The new middleware class, ``cms.middleware.utils.ApphookReloadMiddleware``, is optional. If used,
-this should be placed very near the top of your ``MIDDLEWARE_CLASSES`` tuple in settings. This
-middleware and other changes in the CMS for version 3.2 provide automatic reloading of URLs when
-changes to an apphook are made.
-
-.. note::
-
-   This has been tested and works in many production environments and deployment configurations,
-   but we haven't been able to test it with all possible set-ups. Please file an issue if you
-   discover one where it fails.
+optional middleware class, :ref:`ApphookReloadMiddleware`, makes this automatic.
 
 
 For developers
@@ -147,7 +136,7 @@ The structure board is cleaner and easier to understand. It now displays its ele
 rather than in a series of nested boxes.
 
 You can optionally enable the old appearance and behaviour with the
-:ref:`CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE` setting.
+:ref:`CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE` setting (this option will be removed in 3.3).
 
 
 Replaced the sidebar with an overlay
@@ -165,10 +154,12 @@ site. See the :ref:`user-tutorial` for more.
 
 
 *****************************
-Backward incompatible changes
+Backward-incompatible changes
 *****************************
 
 See the :ref:`Frontend code <contributing_frontend>` documentation.
+
+There are no other known backward-incompatible changes.
 
 
 .. _upgrade-guide-3.2:
@@ -179,12 +170,19 @@ Upgrading django CMS 3.1 to 3.2
 
 Please note any changes that require action above, and take action accordingly.
 
+Otherwise django CMS 3.2 represents a fairly easy upgrade path. There are no new migrations in this
+release (however third-party applications that you update may have their own migrations, so as
+always, before upgrading, please make sure that your current database is consistent and in a
+healthy state, and **make a copy of the database before proceeding further.**
 
-.. todo:: upgrade steps
 
 ********************
 Pending deprecations
 ********************
 
-In django CMS 3.3, Django 1.6 will no longer be supported. If you still using Django 1.6, you are
-stongly encouraged to begin exploring the upgrade process to a newer version.
+In django CMS 3.3:
+
+    Django 1.6 and Python 2.6 will no longer be supported. If you still using these versions, you
+    are strongly encouraged to begin exploring the upgrade process to a newer version.
+
+    The :ref:`CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE` setting will be removed.

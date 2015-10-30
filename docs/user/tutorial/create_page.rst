@@ -2,6 +2,8 @@
 Create a page
 #############
 
+.. _create-first-page:
+
 **********************
 Create your first page
 **********************
