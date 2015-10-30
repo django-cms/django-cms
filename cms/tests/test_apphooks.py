@@ -591,7 +591,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
         CMS_APPHOOKS=['cms.test_utils.project.placeholderapp.cms_apps.Example1App'],
         ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls',
     )
-    def atest_toolbar_staff(self):
+    def test_toolbar_staff(self):
         # Test that the toolbar contains edit mode switcher if placeholders are available
         apphooks = (
             'cms.test_utils.project.placeholderapp.cms_apps.Example1App',
