@@ -10,6 +10,7 @@ The *Change page* dialog that opens allows you to manage key settings for your p
 .. image:: /user/tutorial/images/change-page-dialog.png
    :alt: the 'Change page' dialog
    :align: center
+   :width: 50%
 
 
 Some key settings:
