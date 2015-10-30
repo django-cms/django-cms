@@ -36,7 +36,7 @@ var CMS = window.CMS || {};
             if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', false);
             }
-        }).on('click', '.cms-plugin a', function (e) {
+        }).on('click', '.cms-plugin a, a:has(.cms-plugin)', function (e) {
             // prevents single click from messing up the edit call
             // don't go to the link if there is custom js attached to it
             // or if it's clicked along with shift, ctrl, cmd
