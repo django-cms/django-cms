@@ -1,14 +1,15 @@
 {% load i18n %}{% spaceless %}
 <div class="cms-toolbar-item cms-toolbar-item-buttons cms-toolbar-item-switch-save-edit">
     {% if request.toolbar.edit_mode %}
-    <a class="cms-btn cms-btn-switch-save" href="{{ request.toolbar.get_object_public_url }}?{{ request.toolbar.edit_mode_url_off }}">
-        {% trans "Save as draft" %}
+    <a class="cms-btn cms-btn-switch-save"
+        href="{{ request.toolbar.get_object_public_url }}?{{ request.toolbar.edit_mode_url_off }}">
+        <span>{% trans "View published" %}</span>
     </a>
     {% else %}
-    <a class="cms-btn cms-btn-action cms-btn-switch-edit" href="{{ request.toolbar.get_object_draft_url }}?{{ request.toolbar.edit_mode_url_on }}">
+    <a class="cms-btn cms-btn-action cms-btn-switch-edit"
+        href="{{ request.toolbar.get_object_draft_url }}?{{ request.toolbar.edit_mode_url_on }}">
         {% trans "Edit" %}
     </a>
     {% endif %}
 </div>
 {% endspaceless %}
-<!-- This is different from 3.0 {% trans "Live" %} and {% trans "Draft" %} labels -->

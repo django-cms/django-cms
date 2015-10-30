@@ -27,6 +27,7 @@
 
     .cms-welcome-section,
     .cms-welcome-footer {
+        box-sizing: border-box;
         width: $welcome-width;
         min-width: $welcome-min-width;
         margin: 0 auto;

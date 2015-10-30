@@ -189,7 +189,7 @@ Inline markup
 * use strong emphasis - ``**`` - around:
     * buttons that perform an action::
 
-        Hit **Save as draft**.
+        Hit **View published** or **Save as draft**.
 
 
 

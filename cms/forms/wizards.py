@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _, get_language
@@ -70,7 +71,7 @@ class PageTypeSelect(forms.widgets.Select):
         js = (
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.base.js',
-            'cms/js/modules/cms.page_type_select.js',
+            'cms/js/widgets/wizard.pagetypeselect.js',
         )
 
 
@@ -90,11 +91,16 @@ class BaseCMSPageForm(forms.Form):
         self.instance = instance
         super(BaseCMSPageForm, self).__init__(*args, **kwargs)
 
+        if self.page:
+            site = self.page.site_id
+        else:
+            site = Site.objects.get_current()
+
         # Either populate, or remove the page_type field
         if 'page_type' in self.fields:
             root = Page.objects.filter(publisher_is_draft=True,
                                        reverse_id=PAGE_TYPES_ID,
-                                       site=self.page.site_id).first()
+                                       site=site).first()
             if root:
                 page_types = root.get_descendants()
             else:

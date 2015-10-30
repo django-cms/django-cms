@@ -35,6 +35,7 @@ var PROJECT_PATH = {
 var PROJECT_PATTERNS = {
     js: [
         PROJECT_PATH.js + '/modules/*.js',
+        PROJECT_PATH.js + '/widgets/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
         '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
