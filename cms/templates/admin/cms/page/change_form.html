@@ -20,7 +20,7 @@
 {% block content_title %}
     {% if title %}<h1>{{ title }}</h1>{% endif %}
     {% if not popup %}
-        <ul class="object-tools">
+        <ul class="object-tools hide-in-modal">
             <li>
                 {% url 'admin:cms_page_preview_page' page.id language as admin_url %}
                 <a href="{{ admin_url }}" target="_parent">{% trans "View on site" %}</a>
