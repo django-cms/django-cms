@@ -27,7 +27,7 @@ the Polls Plugin application we were working with in the previous tutorial):
     from cms.toolbar_pool import toolbar_pool
     from cms.toolbar_base import CMSToolbar
     from cms.utils.urlutils import admin_reverse
-    from poll.models import Poll
+    from polls.models import Poll
 
 
     @toolbar_pool.register
