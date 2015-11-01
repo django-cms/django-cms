@@ -396,11 +396,18 @@ class AdminTestCase(AdminTestsBase):
                 })
                 self.assertEqual(response.status_code, 302)
                 draft = Page.objects.get(pk=draft.pk)
-                self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
-                self.assertEqual(draft.publication_date.timetuple(), new_date.timetuple())
-                self.assertEqual(draft.publication_end_date.timetuple(), new_end_date.timetuple())
-                if original_end_date:
-                    self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
+                if DJANGO_1_4:
+                    self.assertNotEqual(draft.publication_date.date(), original_date.date())
+                    self.assertEqual(draft.publication_date.date(), new_date.date())
+                    self.assertEqual(draft.publication_end_date.date(), new_end_date.date())
+                    if original_end_date:
+                        self.assertNotEqual(draft.publication_end_date.date(), original_end_date.date())
+                else:
+                    self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
+                    self.assertEqual(draft.publication_date.timetuple(), new_date.timetuple())
+                    self.assertEqual(draft.publication_end_date.timetuple(), new_end_date.timetuple())
+                    if original_end_date:
+                        self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
 
         with self.settings(USE_TZ=True, TIME_ZONE='UTC'):
 
@@ -424,11 +431,18 @@ class AdminTestCase(AdminTestsBase):
                 })
                 self.assertEqual(response.status_code, 302)
                 draft = Page.objects.get(pk=draft.pk)
-                self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
-                self.assertEqual(timezone.localtime(draft.publication_date).timetuple(), new_date.timetuple())
-                self.assertEqual(timezone.localtime(draft.publication_end_date).timetuple(), new_end_date.timetuple())
-                if original_end_date:
-                    self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
+                if DJANGO_1_4:
+                    self.assertNotEqual(draft.publication_date.date(), original_date.date())
+                    self.assertEqual(timezone.localtime(draft.publication_date).date(), new_date.date())
+                    self.assertEqual(timezone.localtime(draft.publication_end_date).date(), new_end_date.date())
+                    if original_end_date:
+                        self.assertNotEqual(draft.publication_end_date.date(), original_end_date.date())
+                else:
+                    self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
+                    self.assertEqual(timezone.localtime(draft.publication_date).timetuple(), new_date.timetuple())
+                    self.assertEqual(timezone.localtime(draft.publication_end_date).timetuple(), new_end_date.timetuple())
+                    if original_end_date:
+                        self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
 
     def test_change_template(self):
         admin_user, staff = self._get_guys()
