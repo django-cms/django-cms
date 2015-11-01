@@ -309,8 +309,6 @@ def configure(db_url, **extra):
             'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.migrations_django',
         }
         defaults['MIGRATION_MODULES'].update(DJANGO_MIGRATION_MODULES)
-    print(DJANGO_MIGRATION_MODULES)
-    print(SOUTH_MIGRATION_MODULES)
     if DJANGO_1_5:
         defaults['MIDDLEWARE_CLASSES'].append('django.middleware.transaction.TransactionMiddleware')
 
