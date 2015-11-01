@@ -188,6 +188,7 @@ if __name__ == '__main__':
             arg=app_manage.Flag('--use-tz'),
             default=False,
         ),
+        TIME_ZONE='UTC',
         SITE_ID=1,
         USE_I18N=True,
         MEDIA_ROOT=app_manage.TempDir(),
