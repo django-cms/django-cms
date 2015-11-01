@@ -1,5 +1,7 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import sys
 
 import app_manage
 
@@ -141,12 +143,15 @@ if __name__ == '__main__':
 
     DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
 
+    migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
+
     if DJANGO_1_6:
         INSTALLED_APPS.insert(0, 'south')
         dynamic_configs['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
+        SOUTH_TESTS_MIGRATE = migrate
     else:
         dynamic_configs['MIGRATION_MODULES'] = DJANGO_MIGRATION_MODULES
-        if not dynamic_configs.get('TESTS_MIGRATE', False):
+        if not dynamic_configs.get('TESTS_MIGRATE', migrate):
             # Disable migrations for Django 1.7+
             class DisableMigrations(object):
 
@@ -338,7 +343,6 @@ if __name__ == '__main__':
         CMS_PLUGIN_CONTEXT_PROCESSORS=(),
         CMS_SITE_CHOICES_CACHE_KEY='CMS:site_choices',
         CMS_PAGE_CHOICES_CACHE_KEY='CMS:page_choices',
-        SOUTH_TESTS_MIGRATE=False,
         CMS_NAVIGATION_EXTENDERS=[
             ('cms.test_utils.project.sampleapp.menu_extender.get_nodes',
              'SampleApp Menu'),

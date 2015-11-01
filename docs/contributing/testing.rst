@@ -112,6 +112,11 @@ Use ``--retest`` to run the tests using the same configuration as the last run.
 Use ``--vanilla`` to bypass the advanced testing system and use the built-in
 Django test command.
 
+Use ``--migrate`` to run migrations during tests.
+
+To use a different database, set the ``DATABASE_URL`` environment variable to a
+dj-database-url compatible value.
+
 
 Using X virtual framebuffer for headless frontend testing
 ---------------------------------------------------------
