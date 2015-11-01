@@ -383,11 +383,13 @@ class AdminTestCase(AdminTestsBase):
 
     def test_change_dates(self):
         admin_user, staff = self._get_guys()
-        page = create_page('test-page', 'nav_playground.html', 'en')
-        page.publish('en')
-        draft = page.get_draft_object()
 
-        with self.settings(USE_TZ=False):
+        with self.settings(USE_TZ=False, TIME_ZONE='UTC'):
+
+            page = create_page('test-page', 'nav_playground.html', 'en')
+            page.publish('en')
+            draft = page.get_draft_object()
+
             original_date = draft.publication_date
             original_end_date = draft.publication_end_date
             new_date = timezone.now() - datetime.timedelta(days=1)
@@ -410,7 +412,12 @@ class AdminTestCase(AdminTestsBase):
                 if original_end_date:
                     self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
 
-        with self.settings(USE_TZ=True):
+        with self.settings(USE_TZ=True, TIME_ZONE='UTC'):
+
+            page = create_page('test-page-2', 'nav_playground.html', 'en')
+            page.publish('en')
+            draft = page.get_draft_object()
+
             original_date = draft.publication_date
             original_end_date = draft.publication_end_date
             new_date = timezone.localtime(timezone.now()) - datetime.timedelta(days=1)
