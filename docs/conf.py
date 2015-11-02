@@ -30,7 +30,7 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx']
+extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo']
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2.6', None),
     'django': ('http://readthedocs.org/docs/django/en/latest/', None),
@@ -106,6 +106,8 @@ pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
+
+todo_include_todos = True
 
 
 # -- Options for HTML output ---------------------------------------------------

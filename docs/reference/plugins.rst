@@ -17,7 +17,7 @@ admin_preview
 
 Default: ``False``
 
-Should the plugin be previewed in admin when you click on the plugin or save it?
+If ``True``, displays a preview in the admin.
 
 
 allow_children

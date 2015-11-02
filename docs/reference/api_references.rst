@@ -6,7 +6,7 @@ API References
 cms.api
 *******
 
-Python APIs for creating CMS contents. This is done in :mod:`cms.api` and not
+Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
 on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers. Also the functions defined in this
 module do sanity checks on arguments.
@@ -53,7 +53,6 @@ Functions and constants
 
     Used for the ``limit_menu_visibility`` keyword argument to
     :func:`create_page`. Limits menu visibility to authenticated users.
-
 
 .. data:: VISIBILITY_ANONYMOUS
 
@@ -251,7 +250,7 @@ cms.plugin_base
 
     .. attribute:: admin_preview
 
-        Defaults to ``False``, if ``True`` there will be a preview in the admin.
+        Defaults to ``False``, if ``True``, displays a preview in the admin.
 
     .. attribute:: change_form_template
 
@@ -614,7 +613,7 @@ cms.toolbar.items
 
 .. class:: Button(name, url, active=False, disabled=False, extra_classes=None)
 
-    A button to be used with :class:`ButtonList`. Opens ``url`` when clicked.
+    A button to be used with :class:`ButtonList`. Opens ``url`` when selected.
 
 
 **********
