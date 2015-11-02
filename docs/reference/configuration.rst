@@ -265,7 +265,7 @@ plugins in a granular fashion, as shown above with ``base.html content``.
 .. _placeholder_default_plugins:
 
 ``default_plugins``
-    You can specify the list of default plugins which will be automagically
+    You can specify the list of default plugins which will be automatically
     added when the placeholder will be created (or rendered).
     Each element of the list is a dictionary with following keys :
 
@@ -387,7 +387,7 @@ CMS_APPHOOKS
 default:
     ``()``
 
-A list of import paths for :class:`cms.app_base.CMSApp` subclasses.
+A list of import paths for :class:`cms.app_base.CMSApp` sub-classes.
 
 By default, apphooks are auto-discovered in applications listed in all
 :setting:`django:INSTALLED_APPS`, by trying to import their ``cms_app`` module.
@@ -707,7 +707,7 @@ default
 
 By default, django CMS creates a folder called ``cms_page_media`` in your
 static files folder where all uploaded media files are stored. The media files
-are stored in subfolders numbered with the id of the page.
+are stored in sub-folders numbered with the id of the page.
 
 You need to ensure that the directory to which it points is writable by the
 user under which Django will be running.

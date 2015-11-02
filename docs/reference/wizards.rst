@@ -30,7 +30,7 @@ When instantiating a Wizard object, use the keywords:
             the wizard "menu"
     :weight: The "weight" of the wizard when determining the sort-order.
     :form: The form to use for this wizard. This is mandatory, but can be
-           subclassed from `django.forms.form` or `django.forms.ModelForm`.
+           sub-classed from `django.forms.form` or `django.forms.ModelForm`.
     :model: If a Form is used above, this keyword argument must be supplied and
             should contain the model class. This is used to determine the unique
             wizard "signature" amongst other things.

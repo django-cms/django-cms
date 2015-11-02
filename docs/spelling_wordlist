@@ -1,10 +1,31 @@
-addons
+#
+#					Important
+#
+# Different systems, have different ideas of correct spelling, so a reported
+# error, or an accepted spelling, might not be seen on a different system, or
+# indeed on Travis.
+#
+# Until further notice please do not commit changes to this file before a
+# review by Daniele Procida.
+#
+# Please keep the two sections below separate.
+
+#### entries that need to be checked ####
+
 api
+fallbacks
+js
+rc
+src
+url
+
+#### accepted entries ####
+
+addons
 apphook
 apphooked
 apphooks
 astagi
-automagically
 backport
 backported
 backticks
@@ -25,7 +46,6 @@ customisable
 Daniele
 deprecations
 Deutsch
-dev
 dialogs
 Dini
 dirtycoder
@@ -37,10 +57,8 @@ django-cms
 docstrings
 doctormo
 douwevandermeij
-dragbars
 driesdesmet
 elpaso
-fallbacks
 Fankhauser
 fieldset
 filenames
@@ -52,7 +70,6 @@ framebuffer
 freenode
 frontend
 furiousdave
-getttext
 gigaroby
 Google
 Googlemap
@@ -65,7 +82,6 @@ ikudryavtsev
 Indices
 inline
 ipsum
-irc
 Japanisch
 JavaScript
 jedie
@@ -73,7 +89,6 @@ jokerejoker
 josjevv
 jQuery
 jrief
-js
 jsma
 Koistinen
 Larghi
@@ -95,13 +110,11 @@ minified
 mis
 misconfiguration
 misspelt
-mptt
 multi
 namespace
 namespaced
 namespaces
 newsblog
-nikolas
 nikolas
 northben
 nostalgiaz
@@ -116,16 +129,13 @@ pre
 prized
 Procida
 queryset
-reachability
 recurses
 refactor
-repo
 runserver
 runtime
 Saltvik
 sam
 Schoen
-scssc
 searchable
 Sekizai
 sephii
@@ -134,20 +144,9 @@ sitemap
 sitemaps
 slugified
 Spalletti
-sqlite
-SQLite3
-src
 stefanw
 structureboard
 stylesheets
-subclass
-subclass
-subclassed
-subclasses
-subclassing
-subcommands
-subfolder
-subfolders
 Sylvain
 templating
 timgraham
@@ -164,7 +163,6 @@ uncached
 unclosed
 uncomment
 uneditable
-uneditable
 unfussy
 unihandecode
 unimprovable
@@ -176,7 +174,6 @@ unoverridden
 unpublish
 unregister
 upgraders
-url
 urlconf
 username
 vad
@@ -191,3 +188,4 @@ YouTube
 Zürich
 Øyvind
 日本語
+

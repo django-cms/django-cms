@@ -27,7 +27,9 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    Article, Section, ArticlePluginModel)
+    Article, Section, ArticlePluginModel,
+    FKModel,
+    M2MTargetModel)
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
     TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5)
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
@@ -1536,6 +1538,71 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         db_counts = [plgn.sections.count() for plgn in ArticlePluginModel.objects.all()]
         expected = [self.section_count for _ in range(len(db_counts))]
         self.assertEqual(expected, db_counts)
+
+
+class PluginCopyRelationsTestCase(PluginsTestBaseCase):
+    """Test the suggestions in the docs for copy_relations()"""
+    
+    def setUp(self):
+        self.super_user = self._create_user("test", True, True)
+        self.FIRST_LANG = settings.LANGUAGES[0][0]
+        self._login_context = self.login_user_context(self.super_user)
+        self._login_context.__enter__()
+        page_data1 = self.get_new_page_data_dbfields()
+        page_data1['published'] = False
+        self.page1 = api.create_page(**page_data1)
+        page_data2 = self.get_new_page_data_dbfields()
+        page_data2['published'] = False
+        self.page2 = api.create_page(**page_data2)
+        self.placeholder1 = self.page1.placeholders.get(slot='body')
+        self.placeholder2 = self.page2.placeholders.get(slot='body')
+    
+    def test_copy_fk_from_model(self):
+        plugin = api.add_plugin(
+            placeholder=self.placeholder1,
+            plugin_type="PluginWithFKFromModel",
+            language=self.FIRST_LANG,
+        )
+        FKModel.objects.create(fk_field=plugin)
+        old_public_count = FKModel.objects.filter(
+            fk_field__placeholder__page__publisher_is_draft=False
+        ).count()
+        api.publish_page(
+            self.page1,
+            self.super_user,
+            self.FIRST_LANG
+        )
+        new_public_count = FKModel.objects.filter(
+            fk_field__placeholder__page__publisher_is_draft=False
+        ).count()
+        self.assertEqual(
+            new_public_count,
+            old_public_count + 1
+        )
+    
+    def test_copy_m2m_to_model(self):
+        plugin = api.add_plugin(
+            placeholder=self.placeholder1,
+            plugin_type="PluginWithM2MToModel",
+            language=self.FIRST_LANG,
+        )
+        m2m_target = M2MTargetModel.objects.create()
+        plugin.m2m_field.add(m2m_target)
+        old_public_count = M2MTargetModel.objects.filter(
+            pluginmodelwithm2mtomodel__placeholder__page__publisher_is_draft=False
+        ).count()
+        api.publish_page(
+            self.page1,
+            self.super_user,
+            self.FIRST_LANG
+        )
+        new_public_count = M2MTargetModel.objects.filter(
+            pluginmodelwithm2mtomodel__placeholder__page__publisher_is_draft=False
+        ).count()
+        self.assertEqual(
+            new_public_count,
+            old_public_count + 1
+        )
 
 
 class PluginsMetaOptionsTests(TestCase):

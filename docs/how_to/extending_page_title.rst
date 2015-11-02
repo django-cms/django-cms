@@ -54,7 +54,7 @@ Hooking the extension to the admin site
 =======================================
 
 To make your extension editable, you must first create an admin class that
-subclasses ``cms.extensions.PageExtensionAdmin``. This admin handles page
+sub-classes ``cms.extensions.PageExtensionAdmin``. This admin handles page
 permissions. If you want to use your own admin class, make sure to exclude the
 live versions of the extensions by using
 ``filter(extended_page__publisher_is_draft=True)`` on the queryset.

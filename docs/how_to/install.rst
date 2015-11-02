@@ -467,7 +467,7 @@ setting::
 
 .. note::
 
-    Please make sure both the ``static`` and ``media`` subfolders exist in your
+    Please make sure both the ``static`` and ``media`` sub-folders exist in your
     project and are writable.
 
 Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::

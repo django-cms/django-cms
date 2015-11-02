@@ -83,7 +83,7 @@ default, they're highlighted below:
     1.6 have known vulnerabilities, so don't choose to install this version unless you have a
     particular need to.
 
-* Database configuration (in URL format): sqlite://localhost/project.db
+* Database configuration (in URL format): ``sqlite://localhost/project.db``
 * django CMS version: stable
 * Django version: stable
 * Activate Django I18N / L10N setting: yes

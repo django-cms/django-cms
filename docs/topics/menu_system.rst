@@ -99,7 +99,7 @@ To add nodes to a menu a generator is required.
 
 There is one in cms for example, which examines the Pages in the database and adds them as nodes.
 
-These classes are subclasses of :py:class:`menus.base.Menu`. The one in cms is :py:class:`cms.menu.CMSMenu`.
+These classes are sub-classes of :py:class:`menus.base.Menu`. The one in cms is :py:class:`cms.menu.CMSMenu`.
 
 In order to use a generator, its :py:meth:`get_nodes` method must be called.
 
@@ -110,7 +110,7 @@ A modifier examines the nodes that have been assembled, and modifies them accord
 
 An important one in cms (:py:class:`cms.menu.SoftRootCutter`) removes the nodes that are no longer required when a soft root is encountered.
 
-These classes are subclasses of :py:class:`menus.base.Modifier`. Examples are :py:class:`cms.menu.NavExtender` and :py:class:`cms.menu.SoftRootCutter`.
+These classes are sub-classes of :py:class:`menus.base.Modifier`. Examples are :py:class:`cms.menu.NavExtender` and :py:class:`cms.menu.SoftRootCutter`.
 
 In order to use a modifier, its :py:meth:`modify()` method must be called.
 

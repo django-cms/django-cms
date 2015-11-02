@@ -57,7 +57,7 @@ the Polls Plugin application we were working with in the previous tutorial):
 
 What we're doing above is this:
 
-* defining a ``CMSToolbar`` subclass
+* defining a ``CMSToolbar`` sub-class
 * registering the toolbar class with ``@toolbar_pool.register``
 * defining a ``populate()`` method that adds an item to the menu
 
@@ -86,7 +86,7 @@ as a decorator.
   ``get_absolute_url`` whenever an instance is created or saved through the frontend editor
   (see :ref:`url_changes` for details)
 
-``CMSToolbar`` subclasses must implement a ``populate`` method. The ``populate``
+``CMSToolbar`` sub-classes must implement a ``populate`` method. The ``populate``
 method will only be called if the current user is a staff user.
 ``supported_apps`` is a list of app names that should be considered as
 ``is_current_app``. Usually you don't need to set ``supported_apps``, but in
