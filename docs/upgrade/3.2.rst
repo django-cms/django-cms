@@ -1,7 +1,7 @@
 .. _upgrade-to-3.2:
 
 #################
-3.2 Release notes
+3.2 release notes
 #################
 
 django CMS 3.2 introduces touch-screen support, significant improvements to the structure-board,
@@ -37,7 +37,9 @@ Bug-fixes
 =========
 
 * An issue in which ``{% placeholder %}`` template tags ignored the ``lang`` parameter has been
-  fixed. However this may affect the behaviour of your templates, as now a previously-ignored
+  fixed.
+
+  However this may affect the behaviour of your templates, as now a previously-ignored
   parameter will be recognised. If you used the ``lang`` parameter in these template tags you may
   be affected: check the behaviour of your templates after upgrading.
 
@@ -50,6 +52,7 @@ non-CMS content too.
 
 For a quick introduction to using a wizard as a content editor, see the :ref:`user tutorial
 <create-first-page>`.
+
 
 
 Renaming cms_app, cms_toolbar, menu modules
@@ -105,7 +108,34 @@ gulp.js
 We now use :ref:`gulp.js <js_linting>` for linting, compressing and bundling of frontend files.
 
 
-SASS-related changes
+Various improvements have been implemented to make developing with and for django CMS easier. These
+include:
+
+* improvements to frontend code, to comply better with `aldryn-boilerplate-bootstrap3
+  <https://github.com/aldryn/aldryn-boilerplate-bootstrap3>`_
+
+* changes to directory structure for frontend related components such as JavaScript and SASS.
+
+* We no longer use ``develop.py``; we now use ``manage.py`` for all development tasks. See
+  :ref:`contributing_patch` for examples.
+
+* We've moved our ``widgets.py`` JavaScript to ``static/cms/js/widgets``.
+
+
+Code formatting
+---------------
+
+We've switched from tabs (in some places) to four spaces *everywhere*. See :ref:`contributing-code`
+for more on formatting.
+
+
+gulp.js
+-------
+
+We now use :ref:`gulp.js <js_linting>` for linting, compressing and bundling of frontend files.
+
+
+Sass-related changes
 --------------------
 
 We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for building static

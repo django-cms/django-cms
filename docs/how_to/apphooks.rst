@@ -39,6 +39,8 @@ a page and open the advanced settings tab. Select your new apphook under
     If you have the :ref:`ApphookReloadMiddleware` (recommended) installed, the server will
     restart automatically. Otherwise, you will need to restart it manually.
 
+    If you have the
+
     An apphook won't appear until it is published. Take note that this also
     means all parent pages must also be published.
 
