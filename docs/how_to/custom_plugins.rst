@@ -61,19 +61,19 @@ These correspond to the familiar Model-View-Template scheme:
 
 And so to build your plugin, you'll make it from:
 
-* a subclass of :class:`cms.models.pluginmodel.CMSPlugin` to
+* a sub-class of :class:`cms.models.pluginmodel.CMSPlugin` to
   **store the configuration** for your plugin instances
-* a subclass of :class:`cms.plugin_base.CMSPluginBase` that **defines
+* a sub-class of :class:`cms.plugin_base.CMSPluginBase` that **defines
   the operating logic** of your plugin
 * a template that **renders your plugin**
 
 A note about :class:`cms.plugin_base.CMSPluginBase`
 ===================================================
 
-:class:`cms.plugin_base.CMSPluginBase` is actually a subclass of
+:class:`cms.plugin_base.CMSPluginBase` is actually a sub-class of
 :class:`django.contrib.admin.options.ModelAdmin`.
 
-Because :class:`CMSPluginBase` subclasses ``ModelAdmin`` several important
+Because :class:`CMSPluginBase` sub-classes ``ModelAdmin`` several important
 ``ModelAdmin`` options are also available to CMS plugin developers. These
 options are often used:
 
@@ -116,7 +116,7 @@ that are ignored by the CMS are:
 An aside on models and configuration
 ====================================
 
-The plugin **model**, the subclass of :class:`cms.models.pluginmodel.CMSPlugin`,
+The plugin **model**, the sub-class of :class:`cms.models.pluginmodel.CMSPlugin`,
 is actually optional.
 
 You could have a plugin that doesn't need to be configured, because it only
@@ -165,7 +165,7 @@ This plugin will now greet the users on your website either by their name if
 they're logged in, or as Guest if they're not.
 
 Now let's take a closer look at what we did there. The ``cms_plugins.py`` files
-are where you should define your subclasses of
+are where you should define your sub-classes of
 :class:`cms.plugin_base.CMSPluginBase`, these classes define the different
 plugins.
 
@@ -199,7 +199,7 @@ is ``True`` (the default):
   plugin with.
 
 In addition to those attributes, you can also define a :meth:`render` method on
-your subclasses. It is specifically this :ref:`render` method that is the
+your sub-classes. It is specifically this :ref:`render` method that is the
 **view** for your plugin.
 
 
@@ -227,7 +227,7 @@ example, if you have a plugin that shows the latest blog posts, you might want
 to be able to choose the amount of entries shown. Another example would be a
 gallery plugin where you want to choose the pictures to show for the plugin.
 
-To do so, you create a Django model by subclassing
+To do so, you create a Django model by sub-classing
 :class:`cms.models.pluginmodel.CMSPlugin` in the ``models.py`` of an installed
 application.
 
@@ -245,7 +245,7 @@ In our ``models.py`` we add the following::
 
 
 If you followed the Django tutorial, this shouldn't look too new to you. The
-only difference to normal models is that you subclass
+only difference to normal models is that you sub-class
 :class:`cms.models.pluginmodel.CMSPlugin` rather than
 :class:`django.db.models.base.Model`.
 
@@ -292,7 +292,7 @@ clause.
 
     You cannot name your model fields the same as any installed plugins lower-
     cased model name, due to the implicit one-to-one relation Django uses for
-    subclassed models. If you use all core plugins, this includes: ``file``,
+    sub-classed models. If you use all core plugins, this includes: ``file``,
     ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
     ``teaser``, ``twittersearch``, ``twitterrecententries`` and ``video``.
 
@@ -442,7 +442,7 @@ If you want to customise this the best way to do it is:
 
 * create a template of your own that extends ``cms/templates/admin/cms/page/plugin/change_form.html``
   to provide the functionality you require;
-* provide your :class:`cms.plugin_base.CMSPluginBase` subclass with a
+* provide your :class:`cms.plugin_base.CMSPluginBase` sub-class with a
   ``change_form_template`` attribute pointing at your new template.
 
 Extending ``admin/cms/page/plugin/change_form.html`` ensures that you'll keep

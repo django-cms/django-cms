@@ -73,7 +73,7 @@ Functions and constants
     :param string menu_title: Menu title for this page
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
-    :type apphook: string or :class:`cms.app_base.CMSApp` subclass
+    :type apphook: string or :class:`cms.app_base.CMSApp` sub-class
     :param string apphook_namespace: Name of the apphook namespace
     :param string redirect: URL redirect
     :param string meta_description: Description of this page for SEO
@@ -121,7 +121,7 @@ Functions and constants
     :param placeholder: Placeholder to add the plugin to
     :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
     :param plugin_type: What type of plugin to add
-    :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` subclass, must be a valid plugin
+    :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
     :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
     :param target: Parent plugin. Must be plugin instance
@@ -478,7 +478,7 @@ cms.toolbar.items
     .. method:: find_items(item_type, **attributes)
 
         Returns a list of :class:`ItemSearchResult` objects matching all items
-        of ``item_type``, which must be a subclass of :class:`BaseItem`, where
+        of ``item_type``, which must be a sub-class of :class:`BaseItem`, where
         all attributes in ``attributes`` match.
 
     .. method:: find_first(item_type, **attributes)
@@ -527,7 +527,7 @@ cms.toolbar.items
 
     .. attribute:: template
 
-        Must be set by subclasses and point to a Django template
+        Must be set by sub-classes and point to a Django template
 
     .. attribute:: side
 

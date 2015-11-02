@@ -129,7 +129,7 @@ In your poll application’s ``models.py`` add the following:
 .. note::
 
     django CMS plugins inherit from :class:`cms.models.CMSPlugin` (or a
-    subclass thereof) and not :class:`models.Model <django.db.models.Model>`.
+    sub-class thereof) and not :class:`models.Model <django.db.models.Model>`.
 
 The Plugin Class
 ================

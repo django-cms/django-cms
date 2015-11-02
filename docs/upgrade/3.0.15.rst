@@ -15,10 +15,10 @@ Bug Fixes
 * Fix redirect when deleting a page
 * Correct South migration error
 * Correct validation on numeric fields in modal pop-up dialogs
-* Exclude scssc from manifest
+* Exclude ``scssc`` from manifest
 * Remove unpublished pages from menu
 * Remove page from menu items for performance reason
-* Fix reachability of pages with expired ancestors
+* Fix access to pages with expired ancestors
 * Don't try to modify an immutable QueryDict
 * Only attempt to delete cache keys if there are some to be deleted
 * Update documentation section
