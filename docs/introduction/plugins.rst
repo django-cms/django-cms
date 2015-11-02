@@ -4,8 +4,10 @@ Plugins
 
 In this tutorial we're going to take a Django poll app and integrate it into the CMS.
 
+
+*********************
 Install the polls app
-#####################
+*********************
 
 Install the application from its GitHub repository using ``pip -e`` - this also places it in your virtualenv's ``src`` directory as a cloned Git repository::
 
@@ -51,7 +53,7 @@ Now run the application's migrations:
     python manage.py migrate polls
 
 At this point you should be able to create polls and choices in the Django
-admin - localhost:8000/admin/ - and fill them in at ``/polls/``.
+admin - ``localhost:8000/admin/`` - and fill them in at ``/polls/``.
 
 However, in pages of the polls application we only have minimal templates, and
 no navigation or styling. Let's improve this by overriding the polls
