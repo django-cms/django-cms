@@ -90,7 +90,7 @@ proposals prior to the roadmap goals.
 
 We officially support the **current** and **previous** released versions
 of django CMS. Older versions are maintained through the community.
-Long term support (LTS), such as django offers, is maintained through our
+Divio provides long term support (LTS), such as django offers, through
 `commercial support <http://divio.ch/en/commercial-support/>`_.
 
 
