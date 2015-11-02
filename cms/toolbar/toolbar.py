@@ -8,6 +8,7 @@ from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth import login, logout, REDIRECT_FIELD_NAME
 from django.contrib.auth.forms import AuthenticationForm
@@ -24,8 +25,12 @@ except ImportError:
 class CMSToolbarLoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
-        kwargs['prefix'] = kwargs.get('prefix', 'cms')
         super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)
+        kwargs['prefix'] = kwargs.get('prefix', 'cms')
+        self.fields['username'].widget = forms.TextInput(
+            attrs = { 'required': 'required' })
+        self.fields['password'].widget = forms.PasswordInput(
+            attrs = { 'required': 'required' })
 
 
 class CMSToolbar(ToolbarAPIMixin):
