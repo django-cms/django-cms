@@ -19,6 +19,7 @@ keep getting better.
 
 ..  _community-resources:
 
+
 *********
 Community
 *********
@@ -55,7 +56,6 @@ guidance of a **technical board**.
 All activity in the community is governed by our :doc:`code_of_conduct`.
 
 
-
 ***************
 Security issues
 ***************
@@ -72,6 +72,26 @@ Security issues
         * either of our email lists
 
         or in any other public forum until we have had a chance to deal with it.
+
+
+*************************
+Release schedule & policy
+*************************
+
+The roadmap <https://github.com/divio/django-cms/wiki/Roadmap>`_
+can be found within our GitHub wiki page.
+
+We are planning releases according to **key principles and aims**.
+Issues within milestones are therefore subject to change.
+
+The `django-cms-developers <https://groups.google.com/forum/#!forum/django-cms-developers>`_
+group serves as gathering point for developers. We are submitting ideas and
+proposals prior to the roadmap goals.
+
+We officially support the **current** and **previous** released versions
+of django CMS. Older versions are maintained through the community.
+Long term support (LTS), such as django offers, is maintained through our
+`commercial support <http://divio.ch/en/commercial-support/>`_.
 
 
 *************
