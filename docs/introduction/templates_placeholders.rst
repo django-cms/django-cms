@@ -5,8 +5,10 @@ Templates & Placeholders
 In this tutorial we'll introduce Placeholders, and we're also going to show how
 you can make your own HTML templates CMS-ready.
 
+
+*********
 Templates
-#########
+*********
 
 You can use HTML templates to customise the look of your website, define
 Placeholders to mark sections for managed content and use special tags to
@@ -16,11 +18,14 @@ You can define multiple templates, with different layouts or built-in
 components, and choose them for each page as required. A page's template
 can be switched for another at any time.
 
-You'll find the site's templates in ``mysite/templates``. If you didn't change
-the automatically-created home page's template, it's ``feature.html``.
+You'll find the site's templates in ``mysite/templates``.
 
+If you didn't change the automatically-created home page's template, it's ``feature.html``.
+
+
+************
 Placeholders
-############
+************
 
 Placeholders are an easy way to define sections in an HTML template that will
 be filled with content from the database when the page is rendered. This
@@ -37,9 +42,33 @@ If you're not already familiar with Django template tags, you can find out more
 in the `Django documentation
 <https://docs.djangoproject.com/en/dev/topics/templates/>`_.
 
-Try removing a placeholder from the template, or adding a new one in the
-template's HTML structure.
+Add a new placeholder ``{% placeholder "splashbox" %}`` to the template's HTML structure. You can
+add it anywhere, for example:
 
+.. code-block:: html+django
+   :emphasize-lines: 8-10
+
+    {% block content %}
+        <div class="jumbotron">
+            {% placeholder "feature" %}
+        </div>
+        <div>
+            {% placeholder "content" %}
+        </div>
+        <div>
+            {% placeholder "splashbox" %}
+        </div>
+    {% endblock content %}
+
+If you switch to *Structure* mode, you'll see the new placeholder available for use.
+
+.. image:: /introduction/images/new-placeholder.png
+   :alt: the new 'splashbox' placeholder
+   :width: 600
+   :align: center
+
+
+*******************
 Static Placeholders
 *******************
 
@@ -58,7 +87,7 @@ static placeholders from a template, you can reuse them later.
 
 So let's add a footer to all our pages. Since we want our footer on every
 single page, we should add it to our base template
-(``mysite/templates/base.html``). Place it at the bottom of the HTML body:
+(``mysite/templates/base.html``). Place it at the bottom of the HTML ``<body>``:
 
 .. code-block:: html+django
 
@@ -66,16 +95,17 @@ single page, we should add it to our base template
       {% static_placeholder 'footer' %}
     </footer>
 
-Save the template and return to your browser. Change to ``Draft`` and then
-``Structure`` mode and add some content to it.
+Save the template and return to your browser. Refresh any page in ``Structure`` mode, and you'll
+see the new static placeholder. If you add some content to it in the usual way, you'll see that it
+appears on your site's other pages too.
 
-After you've saved it, you'll see that it appears on your site's other pages
-too.
 
+***************
 Rendering Menus
----------------
+***************
 
-In order to render the CMS's menu in your template you can use the :doc:`show_menu </reference/navigation>` tag.
+In order to render the CMS's menu in your template you can use the :doc:`show_menu
+</reference/navigation>` tag.
 
 The example we use in ``mysite/templates/base.html``  is:
 
@@ -91,7 +121,6 @@ first:
 .. code-block:: html+django
 
     {% load menu_tags %}
-
 
 If you chose "bootstrap" while setting up with djangocms-installer, the menu
 will already be there and ``templates/menu.html`` will already contain a
