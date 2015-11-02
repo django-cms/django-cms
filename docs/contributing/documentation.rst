@@ -42,6 +42,8 @@ Now you can ``cd`` into the ``django-cms/docs`` directory and build the document
 This allows you to review your changes in your local browser.
 
 
+.. _spelling:
+
 ********
 Spelling
 ********

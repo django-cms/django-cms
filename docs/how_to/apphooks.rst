@@ -32,9 +32,12 @@ a page and open the advanced settings tab. Select your new apphook under
 
 .. warning::
 
-    Whenever you add or remove an apphook, change the slug of a page containing
-    an apphook or the slug if a page which has a descendant with an apphook, you
-    have to restart your server to re-load the URL caches.
+    Whenever you add or remove an apphook, change the slug of a page containing an apphook or the
+    slug if a page which has a descendant with an apphook, the server must restart to re-load the
+    URL caches.
+
+    If you have the :ref:`ApphookReloadMiddleware` (recommended) installed, the server will
+    restart automatically. Otherwise, you will need to restart it manually.
 
     An apphook won't appear until it is published. Take note that this also
     means all parent pages must also be published.

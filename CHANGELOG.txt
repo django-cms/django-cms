@@ -1,22 +1,48 @@
 === 3.2.0 (Unreleased) ===
 
-- Replace 'develop.py' with enhanced 'manage.py' (devs)
-- Significant and numerous UI/UX enhancements including:
-  - Full touch support
-  - Larger UI elements for touch
-  - Better responsiveness design for smaller screens
-  - Improvements to clipboard
-  - New welcome/initial/start screen
-  - Overhauled "structure mode", significantly more responsive and much faster
-  - Overhauled the toolbar for new design, code cleanliness, responsiveness
-  - Switch to SVG for iconography
-  - Overhauled JS/CSS
-  - Soft re-design of the pagetree
-- New content creation wizard infrastructure
-- Improvements in enforcing parent plugin restricts on frontend
-- Remove Alias from list of plugins (Create Alias still an option)
-- Pulls Aldryn Apphook Reload into core
-- Fix placeholder templatetags ignoring the lang parameter
+- Added new wizard to improve content creation
+- Added Aldryn Apphook Reload https://github.com/aldryn/aldryn-apphook-reload/ into core
+- Added tooltips for certain user interaction elements
+- Added full touch support and optimisations for mobile devices
+- Added gulp.js for linting, compressing and bundling
+- Added YuiDocs for Javascript documentation
+- Added ``CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE`` to switch back to the old board rendering,
+  this will be deprecated in 3.3.0
+- Added ``request.toolbars.placeholder_list`` this will replace
+  ``request.toolbars.placeholders`` in 3.3.0
+- Added new installation screen with optimisation alongside the new content creation wizard
+- Added ``.editorconfig`` to the django-cms project
+- Added HTML rendering capabilities for the modal
+- Added browser history to the sideframe
+- Improved design for better touch support
+- Improved design for better accessibility support such as contrast ratio
+- Improved design to reflect latest responsive design standards such as the toolbar
+  menu which collapses to "More"
+- Improved UI for scrolling, saving and navigating through content
+  creation and editing such as ``CTRL + Enter`` for saving
+- Improved overall speed loading times and interaction response
+- Improved drag & drop experience
+- Improved structure board hierarchy to be displayed as tree elements instead of nested boxes
+- Improved clipboard to be integrated within the toolbar and structure board (copy & paste)
+- Improved modal UI and added significant speed improvements
+- Improved sideframe UI and reduced functionality
+- Improved messaging system within ``cms.messages.js``
+- Improved pagetree design and UI (soft-redesign) refactoring will follow in 3.3
+- Improved parent plugin restricts on frontend
+- Improved frontend code to comply with aldryn-boilerplate-bootstrap3
+- Improved folder structure for frontend related components such as JavaScript and SASS
+- Improved color and value variable declarations for Styles
+- Improved key mapping for actions such as saving, closing and switching across browsers
+- Switched from tabs to 4 spaces everywhere
+- Switched from ruby sass/compass to libsass/autoprefixer
+- Switched from sprite images to auto generated webfonts via gulp
+- Moved widgets.py javascript to ``static/cms/js/widgets``
+- Fixed an issue in which placeholder template tags ignored the ``lang`` parameter
+- Renamed cms_app, cms_menu, cms_toolbar to plural versions eg. ``cms_apps.py``
+  ``cms_menus.py``, ``cms_toolbars.py`` with backwards compatibility
+- Removed all id attributes on html elements in favour of classes
+- Removed 'develop.py' to replace with 'manage.py' (devs)
+- Removed Alias plugin from list of plugins (Create Alias still an option)
 
 
 === 3.1.4 (Unreleased) ===
