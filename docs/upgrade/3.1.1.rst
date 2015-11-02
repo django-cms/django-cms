@@ -26,7 +26,7 @@ Bug Fixes
 * Fix get_language_from_request if POST and GET exists
 * Minor documentation fixes
 * Revert whitespace cleanup on flash player to fix it
-* Correctly restore previous status of dragbars
+* Correctly restore previous status of drag bars
 * Fix an issue related to "Empty all" Placeholder feature
 * Fix plugin sorting in Python 3
 * Fix language-related issues when retrieving page URL

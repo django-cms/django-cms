@@ -14,7 +14,7 @@ To begin, create a folder in the root level of your module called
     from cms.wizards.wizard_base import Wizard
     from cms.wizards.wizard_pool import wizard_pool
 
-Then, simply subclass Wizard, instantiate it, then register it. If you were to
+Then, simply sub-class Wizard, instantiate it, then register it. If you were to
 do this for `MyApp`, it might look like this::
 
     # my_apps/forms.py
@@ -59,7 +59,7 @@ The above example is using a ModelForm, but you can also use `forms.Form`.
 In this case, you **must** provide the model class as another keyword argument
 when you instantiate the Wizard object.
 
-You must subclass `cms.wizards.wizard_base.Wizard` to use it. This is because
+You must sub-class `cms.wizards.wizard_base.Wizard` to use it. This is because
 each wizard's uniqueness is determined by its class and module name.
 
 The keyword arguments accepted for instantiating a Wizard object are:
@@ -68,7 +68,7 @@ The keyword arguments accepted for instantiating a Wizard object are:
             the wizard "menu"
     :weight: The "weight" of the wizard when determining the sort-order.
     :form: The form to use for this wizard. This is mandatory, but can be
-           subclassed from `django.forms.form` or `django.forms.ModelForm`.
+           sub-classed from `django.forms.form` or `django.forms.ModelForm`.
     :model: If a Form is used above, this keyword argument must be supplied and
             should contain the model class. This is used to determine the unique
             wizard "signature" amongst other things.

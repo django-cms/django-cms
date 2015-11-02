@@ -20,7 +20,7 @@ Informational commands
 
 The ``list`` command is used to display information about your installation.
 
-It has two subcommands:
+It has two sub-commands:
 
 * ``cms list plugins`` lists all plugins that are used in your project.
 * ``cms list apphooks`` lists all apphooks that are used in your project.
@@ -71,7 +71,7 @@ delete_orphaned_plugins`` when required.
 The ``uninstall`` subcommand can be used to make uninstalling a CMS
 Plugin or an apphook easier.
 
-It has two subcommands:
+It has two sub-commands:
 
 * ``cms uninstall plugins <plugin name> [<plugin name 2> [...]]`` uninstalls
   one or several plugins by **removing** them from all pages where they are

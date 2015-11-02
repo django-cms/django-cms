@@ -45,7 +45,7 @@ The following changes will need to be made in your ``settings.py`` file::
 
 .. note::
 
-    Please make sure the ``static`` subfolder exists in your
+    Please make sure the ``static`` sub-folder exists in your
     project and is writable.
 
 .. note::
