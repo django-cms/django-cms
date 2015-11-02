@@ -396,10 +396,10 @@
         line-height: $login-form-input-height - 2px;
         width: $login-form-input-width;
         margin: 0;
-        padding: 0px $login-form-input-padding-horizontal;
+        padding: 0 $login-form-input-padding-horizontal;
         border: 1px solid $login-form-input-border;
         border-radius: $login-form-input-border-radius;
-        box-shadow: 0px 1px 0px $white;
+        box-shadow: 0 1px 0 $white;
 
         &:focus {
             transition: outline 0.2s;
@@ -458,8 +458,8 @@
             position: relative;
             z-index: 10;
             width: 95px;
-            background: transparent;
-            &:focus {
+            &:focus,
+            &:valid {
                 background: $white;
             }
         }
