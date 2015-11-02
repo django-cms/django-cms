@@ -27,6 +27,9 @@ still change the content and settings later on.
 This will create a page type and makes it selectable from within the
 **Add Page** and **Create** wizard dialog.
 
+.. image:: /contributing/images/add-page-type.png
+   :alt: Creating a page type
+
 
 *********************
 Selecting a Page Type
@@ -38,6 +41,9 @@ page types are selectable.
 
 The same behaviour also occurs within the *Content Creation Wizard* when
 selecting **Create > New Page**.
+
+.. image:: /contributing/images/select-page-type.png
+   :alt: Selecting a page type
 
 
 *******************
