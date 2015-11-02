@@ -13,6 +13,11 @@ convenient for the user because it saves having to switch between frontend and a
 Using this interface, model instance values that can be edited show the "Double-click to edit"
 hint on hover. Double-clicking opens a pop-up window containing the change form for that model.
 
+.. note::
+
+    This interface is not currently available for touchscreen users, but will be improved in
+    future releases.
+
 .. warning::
 
     Template tags used by this feature mark as safe the content of the rendered
@@ -34,7 +39,8 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 Template tags
 *************
 
-This feature relies on four template tags sharing common code:
+This feature relies on four template tags sharing common code. All require that you ``{% load
+cms_tags %}`` in your template:
 
 * :ttag:`render_model` (for editing a specific field)
 * :ttag:`render_model_block` (for editing any of the fields in a defined block)

@@ -13,7 +13,7 @@ What's new in 3.0
     3.0 introduces some changes that **require** action if you are upgrading
     from a previous version.
 
-.. note:: :ref:`Click here to see the quick upgrade guide <upgrading-from-2.4>`
+.. note:: :ref:`See the quick upgrade guide <upgrading-from-2.4>`
 
 New Frontend Editing
 ====================

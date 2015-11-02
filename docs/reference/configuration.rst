@@ -84,6 +84,7 @@ Example::
     provided within ``cms/templates/cms``. You are strongly advised not to use
     ``cms`` as a directory name for your own project templates.
 
+
 *******************
 Basic Customisation
 *******************
@@ -146,6 +147,7 @@ for translation.
     directory **must** be reachable by the template loading system.
     Currently **filesystem** and **app_directory** loader schemas are tested and
     supported.
+
 
 .. setting:: CMS_PLACEHOLDER_CONF
 
@@ -326,6 +328,7 @@ plugins in a granular fashion, as shown above with ``base.html content``.
 
 .. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
+
 CMS_PLUGIN_CONTEXT_PROCESSORS
 =============================
 
@@ -338,6 +341,7 @@ that modify all plugins' context *before* rendering. See
 
 .. setting:: CMS_PLUGIN_PROCESSORS
 
+
 CMS_PLUGIN_PROCESSORS
 =====================
 
@@ -349,6 +353,7 @@ plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
 for more information.
 
 .. setting:: CMS_APPHOOKS
+
 
 CMS_APPHOOKS
 ============
@@ -370,6 +375,7 @@ Example::
         'otherapp.cms_app.MyFancyApp',
         'sampleapp.cms_app.SampleApp',
     )
+
 
 *************
 I18N and L10N
@@ -459,12 +465,14 @@ What are the properties a language node can have?
 
 .. setting::code
 
+
 code
 ----
 String. RFC5646 code of the language.
 
 example
     ``"en"``.
+
 
 .. note:: Is required for every language.
 
@@ -473,6 +481,7 @@ name
 String. The verbose name of the language.
 
 .. note:: Is required for every language.
+
 
 .. setting::public
 
@@ -487,6 +496,7 @@ default
 
 .. setting::fallbacks
 
+
 fallbacks
 ---------
 A list of alternative languages, in order of preference, that are to be used if
@@ -499,6 +509,7 @@ default
 
 .. setting::hide_untranslated
 
+
 hide_untranslated
 -----------------
 Hide untranslated pages in menus
@@ -509,6 +520,7 @@ default
     ``True``
 
 .. setting::redirect_on_fallback
+
 
 redirect_on_fallback
 --------------------
@@ -597,6 +609,7 @@ current language does not provide a specific decoder in
 :setting:`CMS_UNIHANDECODE_DECODERS`. If set to ``None``, failing to find a
 specific decoder will disable unihandecode.js for this language.
 
+
 Example
 -------
 
@@ -620,6 +633,7 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
 
 More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.org/>`_.
 
+
 **************
 Media Settings
 **************
@@ -634,6 +648,7 @@ default
 
 The path from :setting:`django:MEDIA_ROOT` to the media files located in ``cms/media/``
 
+
 .. setting:: CMS_MEDIA_ROOT
 
 CMS_MEDIA_ROOT
@@ -644,6 +659,7 @@ default
 
 The path to the media root of the cms media files.
 
+
 .. setting:: CMS_MEDIA_URL
 
 CMS_MEDIA_URL
@@ -653,6 +669,7 @@ default
     :setting:`django:MEDIA_URL` + :setting:`CMS_MEDIA_PATH`
 
 The location of the media files that are located in ``cms/media/cms/``
+
 
 .. setting:: CMS_PAGE_MEDIA_PATH
 
@@ -669,10 +686,6 @@ are stored in subfolders numbered with the id of the page.
 You need to ensure that the directory to which it points is writable by the
 user under which Django will be running.
 
-
-****
-URLs
-****
 
 *****************
 Advanced Settings
@@ -703,6 +716,7 @@ edit a certain page all users he creates can, in turn, only edit this page.
 Naturally he can limit the rights of the users he creates even further,
 allowing them to see only a subset of the pages to which he is allowed access.
 
+
 .. setting:: CMS_RAW_ID_USERS
 
 CMS_RAW_ID_USERS
@@ -731,6 +745,7 @@ performance.
           limit.  Unfortunately, this means that non-superusers won't see any
           benefit from this setting.
 
+
 .. setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR
@@ -742,12 +757,14 @@ default
 Determines whether pages without any view restrictions are public by default or
 staff only. Possible values are ``all`` and ``staff``.
 
+
 .. setting:: CMS_CACHE_DURATIONS
 
 CMS_CACHE_DURATIONS
 ===================
 
 This dictionary carries the various cache duration settings.
+
 
 ``'content'``
 -------------
@@ -762,6 +779,7 @@ template tags.
 
     This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
 
+
 ``'menus'``
 -----------
 
@@ -774,6 +792,7 @@ Cache expiration (in seconds) for the menu tree.
 
     This settings was previously called :setting:`MENU_CACHE_DURATION`
 
+
 ``'permissions'``
 -----------------
 
@@ -781,6 +800,7 @@ default
     ``3600``
 
 Cache expiration (in seconds) for view and other permissions.
+
 
 .. setting:: CMS_CACHE_PREFIX
 
@@ -830,6 +850,7 @@ Should the output of the various placeholder template tags be cached?
 Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
 present the placeholders will not be cached.
 
+
 .. setting:: CMS_PLUGIN_CACHE
 
 CMS_PLUGIN_CACHE
@@ -842,6 +863,7 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
 
 .. warning::
     If you disable the plugin cache be sure to restart the server and clear the cache afterwards.
+
 
 .. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
@@ -858,6 +880,7 @@ help address this issue, only a limited number of *edit* revisions will now be s
 
 This setting declares how many edit revisions are saved in the database.
 By default the newest 15 edit revisions are kept.
+
 
 CMS_MAX_PAGE_PUBLISH_REVERSIONS
 ===============================

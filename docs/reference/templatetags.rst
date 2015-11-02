@@ -398,7 +398,7 @@ child plugins inside a navigation block, then the actual plugin contents inside 
 ``DIV.contentgroup-items`` block. In this example, the navigation block is always shown,
 but the items are only shown once the corresponding navigation element is
 clicked. Adding this ``render_plugin_block`` makes it significantly more intuitive
-to edit a child plugins content, by double-clicking its navigation item in edit mode.
+to edit a child plugin's content, by double-clicking its navigation item in edit mode.
 
 Arguments:
 
@@ -445,7 +445,7 @@ render_model
     non-trusted content. Be aware, and use the template tag accordingly.
 
 ``render_model`` is the way to add frontend editing to any Django model.
-It both render the content of the given attribute of the model instance and
+It both renders the content of the given attribute of the model instance and
 makes it clickable to edit the related model.
 
 If the toolbar is not enabled, the value of the attribute is rendered in the

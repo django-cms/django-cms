@@ -1,7 +1,7 @@
 .. _upgrade-to-3.2:
 
 #################
-3.2 release notes
+3.2 Release notes
 #################
 
 In this release we have tried to maintain maximum backwards-compatibility, particularly for

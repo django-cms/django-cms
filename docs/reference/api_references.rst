@@ -614,7 +614,7 @@ cms.toolbar.items
 
 .. class:: Button(name, url, active=False, disabled=False, extra_classes=None)
 
-    A button to be used with :class:`ButtonList`. Opens ``url`` when clicked.
+    A button to be used with :class:`ButtonList`. Opens ``url`` when selected.
 
 
 **********
