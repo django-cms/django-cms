@@ -9,9 +9,10 @@ cms/django
 *.svn
 *.xml
 /*env*/
+/*docs/env*/
+/*docs/_build*/
 *.sqlite
 cms/media/cms_page_media/
-cms/docs/build
 example/run
 example/local_settings.py
 reversion/
@@ -32,7 +33,6 @@ parts
 bin
 /dist
 *~
-/docs/*.html
 distribute-*.tar.gz
 include/
 lib/

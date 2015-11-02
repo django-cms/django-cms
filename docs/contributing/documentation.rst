@@ -28,18 +28,16 @@ Merging documentation is pretty fast and painless.
 
 Except for the tiniest of change, we recommend that you test them before
 submitting. Follow the same steps above to fork and clone the project locally.
-Next, create a virtualenv so you can install the documentation tools::
+Next, ``cd`` into the ``django-cms/docs`` and install the requirements::
 
-    virtualenv djcms-docs-env
-    source djcms-docs-env/bin/activate
-    pip install sphinx sphinx_rtd_theme
+    make install
 
-Now you can ``cd`` into the ``django-cms/docs`` directory and build the documentation::
+Now you can test and run the documentation locally using::
 
-    make html
-    open build/html/index.html
+    make run
 
-This allows you to review your changes in your local browser.
+This allows you to review your changes in your local browser using ´
+``http://localhost:8000/``.
 
 
 .. _spelling:

@@ -73,6 +73,10 @@ release = cms.__version__
 # a list of supported languages.
 language = "en"
 
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = ['_build', 'env']
+
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
 #today = ''

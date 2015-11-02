@@ -93,3 +93,17 @@ spelling:
 	@echo
 	@echo "Check finished. Wrong words can be found in " \
 		"build/spelling/output.txt."
+
+################################################################################
+VENV = env/bin/activate
+PORT = 8000
+# CORE COMMANDS
+install:
+	##### setup virtualenv
+	virtualenv env
+	. $(VENV); pip install -r requirements.txt
+	. $(VENV); sphinx-build . _build/html
+	##### done
+
+run:
+	. $(VENV); sphinx-autobuild . _build/html --host 0.0.0.0 --port $(PORT)
