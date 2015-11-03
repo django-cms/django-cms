@@ -78,19 +78,17 @@ Security issues
 Release schedule & policy
 *************************
 
-The roadmap <https://github.com/divio/django-cms/wiki/Roadmap>`_
-can be found within our GitHub wiki page.
+The roadmap <https://github.com/divio/django-cms/wiki/Roadmap>`_ can be found on our GitHub wiki
+page.
 
-We are planning releases according to **key principles and aims**.
-Issues within milestones are therefore subject to change.
+We are planning releases according to **key principles and aims**. Issues within milestones are
+therefore subject to change.
 
-The `django-cms-developers <https://groups.google.com/forum/#!forum/django-cms-developers>`_
-group serves as gathering point for developers. We are submitting ideas and
-proposals prior to the roadmap goals.
+The `django-cms-developers`_ group serves as gathering point for developers. We submit
+ideas and proposals prior to the roadmap goals.
 
-We officially support the **current** and **previous** released versions
-of django CMS. Older versions are maintained through the community.
-Divio provides long term support (LTS) through
+We officially support the **current** and **previous** released versions of django CMS. Older
+versions are maintained through the community. Divio provides long term support (LTS) through
 `commercial support <http://divio.ch/en/commercial-support/>`_.
 
 
@@ -99,9 +97,9 @@ Branch policy
 *************
 
 * **master**: this is the current stable release, the version released on PyPI.
-* **support/3.1.x**: this will be our *next stable release*; this is the most
+* **support/3.2.x**: this will be our *next stable release*; this is the most
   appropriate branch for fixes and patches that will go into the next **master**
-* **develop**: this will be *django CMS 3.2*; this is the most appropriate
+* **develop**: this will be *django CMS 3.3*; this is the most appropriate
   branch for more substantial features that will need team co-ordination
 
 If in doubt, ask on the #django-cms IRC channel on `freenode`_ or the

@@ -27,8 +27,15 @@ Documentation should be:
 Merging documentation is pretty fast and painless.
 
 Except for the tiniest of change, we recommend that you test them before
-submitting. Follow the same steps above to fork and clone the project locally.
-Next, ``cd`` into the ``django-cms/docs`` and install the requirements::
+submitting.
+
+
+##########################
+Building the documentation
+##########################
+
+Follow the same steps above to fork and clone the project locally. Next, ``cd`` into the
+``django-cms/docs`` and install the requirements::
 
     make install
 
@@ -36,8 +43,23 @@ Now you can test and run the documentation locally using::
 
     make run
 
-This allows you to review your changes in your local browser using ´
-``http://localhost:8000/``.
+This allows you to review your changes in your local browser using ``http://localhost:8001/``.
+
+.. note:: **What this does**
+
+    ``make install`` is roughly the equivalent of::
+
+    	virtualenv env
+        source env/bin/activate
+        pip install -r requirements.txt
+    	cd docs
+        make html
+
+    ``make run`` runs ``make html``, and serves the built documentation on port 8001 (that is, at
+    ``http://localhost:8001/``.
+
+    It then watches the ``docs`` directory; when it spots changes, it will automatically rebuild
+    the documentation, and refresh the page in your browser.
 
 
 .. _spelling:

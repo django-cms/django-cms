@@ -10,7 +10,7 @@ cms/django
 *.xml
 /*env*/
 /*docs/env*/
-/*docs/_build*/
+/*docs/build*/
 *.sqlite
 cms/media/cms_page_media/
 example/run

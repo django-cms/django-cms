@@ -96,7 +96,7 @@ spelling:
 
 ################################################################################
 VENV = env/bin/activate
-PORT = 8000
+PORT = 8001
 # CORE COMMANDS
 install:
 	##### setup virtualenv
