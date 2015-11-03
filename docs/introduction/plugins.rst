@@ -2,12 +2,13 @@
 Plugins
 #######
 
-In this tutorial we're going to take a Django poll app and integrate it into the CMS.
+In this tutorial we're going to take a basic Django opinion poll application and integrate it into
+the CMS.
 
 
-*********************
-Install the polls app
-*********************
+*********************************
+Install the ``polls`` application
+*********************************
 
 Install the application from its GitHub repository using ``pip -e`` - this also places it in your virtualenv's ``src`` directory as a cloned Git repository::
 
@@ -52,14 +53,42 @@ Now run the application's migrations:
 
     python manage.py migrate polls
 
-At this point you should be able to create polls and choices in the Django
-admin - ``localhost:8000/admin/`` - and fill them in at ``/polls/``.
+At this point you should be able to log in to the Django
+admin - ``localhost:8000/admin/`` - and find the Polls application.
 
-However, in pages of the polls application we only have minimal templates, and
-no navigation or styling. Let's improve this by overriding the polls
-application's base template.
+.. image:: /introduction/images/polls-admin.png
+   :alt: the polls application admin
+   :width: 400
+   :align: center
 
-add ``my_site/templates/polls/base.html``:
+Create a new **Poll**, for example:
+
+* **Question**: *Which browser do you prefer?*
+
+  **Choices**:
+
+    * *Safari*
+    * *Firefox*
+    * *Chrome*
+
+Now if you visit ``http://localhost:8000/en/polls/``, you should be able to see the published poll
+and submit a response.
+
+.. image:: /introduction/images/polls-unintegrated.png
+   :alt: the polls application
+   :width: 400
+   :align: center
+
+******************************************
+Set up a base template for the application
+******************************************
+
+However, in pages of the Polls application we only have minimal templates, and
+no navigation or styling.
+
+Let's improve this by overriding the polls application's base template.
+
+In ``mysite/templates``, add ``polls/base.html``, containing:
 
 .. code-block:: html+django
 
@@ -70,25 +99,36 @@ add ``my_site/templates/polls/base.html``:
         {% endblock %}
     {% endblock %}
 
-Open the ``/polls/`` again. The navigation should be visible now.
+Refresh the ``/polls/`` page again, which should now be properly integrated into the site.
 
-So now we have integrated the standard polls app in our project. But we've not
-done anything django CMS specific yet.
+.. image:: /introduction/images/polls-integrated.png
+   :alt: the polls application, integrated
+   :width: 400
+   :align: center
 
-Creating a plugin
-#################
+So now we have integrated the standard polls application into our project.
 
-If you've played around with the CMS for a little, you've probably already
-encountered CMS Plugins. They are the objects you can place into placeholders on
-your pages through the frontend: "Text", "Image" and so forth.
 
-We're now going to extend the django poll app so we can embed a poll easily
+*****************************************
+Create a new ``polls_plugin`` application
+*****************************************
+
+So far, however, the polls application has been integrated into the project, but not into django CMS
+itself.
+
+If you're already familiar with the CMS for a little, you'll have
+encountered django CMS *Plugins* - the objects you can place into placeholders on
+your pages: "Text", "Image" and so forth.
+
+We're now going to extend the Django poll application so we can embed a poll easily
 into any CMS page. We'll put this integration code in a separate package in our
 project.
 
-This allows integrating 3rd party apps without having to fork them. It would
-also be possible to add this code directly into the django-polls app to make it
-integrate out of the box.
+.. note:: **Why not build the plugin code into the polls application package?**
+
+    This would certainly be possible, and in fact, if you were developing your own application
+    it's what we would recommend. For a third-party application such as Polls however, placing the
+    plugin code into a separate package means we don't have to modify or fork the original.
 
 Create a new package at the project root called ``polls_plugin``::
 
@@ -102,9 +142,10 @@ So our workspace looks like this::
         __init__.py
         admin.py
         models.py
+        migrations.py
         tests.py
         views.py
-    my_site/
+    mysite/
     static/
     project.db
     requirements.txt
@@ -122,7 +163,7 @@ In your poll application’s ``models.py`` add the following:
     from polls.models import Poll
 
 
-    class PollPlugin(CMSPlugin):
+    class PollPluginModel(CMSPlugin):
         poll = models.ForeignKey(Poll)
 
         def __unicode__(self):
@@ -133,10 +174,15 @@ In your poll application’s ``models.py`` add the following:
     django CMS plugins inherit from :class:`cms.models.CMSPlugin` (or a
     sub-class thereof) and not :class:`models.Model <django.db.models.Model>`.
 
+    ``PollPluginModel`` might seem an odd choice for a model name (that is, with ``model`` in the
+    name) but it helps distinguish it from the next class, ``PollPluginPublisher``, that we need to
+    create.
+
+
 The Plugin Class
 ================
 
-Now create a file ``cms_plugins.py`` in the same folder your ``models.py`` is in.
+Now create a new file ``cms_plugins.py`` in the same folder your ``models.py`` is in.
 The plugin class is responsible for providing django CMS with the necessary
 information to render your plugin.
 
@@ -146,11 +192,11 @@ For our poll plugin, we're going to write the following plugin class:
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from polls_plugin.models import PollPlugin
+    from polls_plugin.models import PollPluginModel
     from django.utils.translation import ugettext as _
 
 
-    class CMSPollPlugin(CMSPluginBase):
+    class PollPluginPublisher(CMSPluginBase):
         model = PollPlugin  # model where plugin data are saved
         module = _("Polls")
         name = _("Poll Plugin")  # name of the plugin in the interface
@@ -160,30 +206,29 @@ For our poll plugin, we're going to write the following plugin class:
             context.update({'instance': instance})
             return context
 
-    plugin_pool.register_plugin(CMSPollPlugin)  # register the plugin
+    plugin_pool.register_plugin(PollPluginPublisher)  # register the plugin
 
 .. note::
 
     All plugin classes must inherit from :class:`cms.plugin_base.CMSPluginBase`
     and must register themselves with the :data:`cms.plugin_pool.plugin_pool`.
 
-The convention for plugin naming is as follows:
+A reasonable convention for plugin naming is:
 
-* SomePlugin: the *model* class
-* CMSSomePlugin: the *plugin* class
+* ``PollPluginModel``: the *model* class
+* ``PollPluginPublisher``: the *plugin* class
 
-You don't need to follow this, but it's a sensible thing to do.
+You don't need to follow this convention, but choose one that makes sense and stick to it.
+
 
 The template
 ============
 
-The ``render_template`` attribute in the plugin class is required, and tells
-the plugin which :attr:`render_template
-<cms.plugin_base.CMSPluginBase.render_template>` to use when rendering.
+The ``render_template`` attribute in the plugin class is required, and tells the plugin which
+:attr:`render_template <cms.plugin_base.CMSPluginBase.render_template>` to use when rendering.
 
 In this case the template needs to be at
-``polls_plugin/templates/djangocms_polls/poll_plugin.html`` and should look
-something like this:
+``polls_plugin/templates/djangocms_polls/poll_plugin.html`` and should look something like this:
 
 .. code-block:: html+django
 
@@ -205,8 +250,14 @@ something like this:
     </form>
 
 
-Now add ``polls_plugin`` to ``INSTALLED_APPS`` and create a database migration
-to add the plugin table::
+*******************************************
+Integrate the ``polls_plugin`` application
+*******************************************
+
+The final step is to integrate the ``polls_plugin`` application into the project.
+
+Add ``polls_plugin`` to ``INSTALLED_APPS`` in ``settings.py`` and create a database migration to
+add the plugin table::
 
     python manage.py makemigrations polls_plugin
     python manage.py migrate polls_plugin
@@ -215,6 +266,11 @@ Finally, start the runserver and visit http://localhost:8000/.
 
 You can now drop the ``Poll Plugin`` into any placeholder on any page, just as
 you would any other plugin.
+
+.. image:: /introduction/images/poll-plugin-in-menu.png
+   :alt: the 'Poll plugin' in the plugin selector
+   :width: 400
+   :align: center
 
 Next we'll integrate the Polls application more fully into our django CMS
 project.
