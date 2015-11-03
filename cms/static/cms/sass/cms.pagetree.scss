@@ -163,6 +163,7 @@ $row-height: 41px;
         padding: 5px 0 4px 5px;
         border-bottom: 1px solid $color-border;
         background: $color-background-light;
+        box-sizing: content-box;
     }
     ul.header li .cont {
         height: 15px;
@@ -266,6 +267,7 @@ $row-height: 41px;
         height: $row-height;
         padding: 0 8px;
         border-left: 1px solid $color-border-medium;
+        box-sizing: content-box;
     }
     li .col2 > div a,
     li .col2 > div span {
@@ -422,6 +424,10 @@ $row-height: 41px;
     h2 {
         display: none;
     }
+}
+#changelist-search {
+    margin-top: 35px;
+    margin-right: 0;
 }
 // remove background assigned from django
 .change-list .filtered {
