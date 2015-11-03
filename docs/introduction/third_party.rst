@@ -3,20 +3,34 @@ Integrating a third-party application
 #####################################
 
 We've already written our own django CMS plugins and apps, but now we want to
-extend our CMS with a third party app,
+extend our CMS with a third party application,
 `Aldryn News & Blog <https://github.com/aldryn/aldryn-newsblog>`_.
+
+
+******************
+Basic installation
+******************
 
 First, we need to install the app into our virtual environment from
 `PyPI <http://pypi.python.org>`_::
 
     pip install aldryn-newsblog
 
-Add the app and any of its requirements that are not there already to
+
+***************
+Django settings
+***************
+
+``INSTALLED_APPS``
+==================
+
+Add the application and any of its requirements that are not there already to
 ``INSTALLED_APPS`` in ``settings.py``. Some *will* be already present; it's up
 to you to check them:
 
 .. code-block:: python
 
+    # you will probably need to add:
     'aldryn_apphooks_config',
     'aldryn_boilerplates',
     'aldryn_categories',
@@ -24,16 +38,23 @@ to you to check them:
     'aldryn_people',
     'aldryn_reversion',
     'djangocms_text_ckeditor',
-    'easy_thumbnails',
-    'filer',
     'parler',
-    'reversion',
     'sortedm2m',
     'taggit',
 
-One of the dependencies is django-filer. It provides a special feature that
-allows nicer image cropping. For this to work it needs it's own
-thumbnail processor (easy-thumbnails) to be inserted in ``settings.py``:
+    # and you will probably find the following already listed:
+    'easy_thumbnails',
+    'filer',
+    'reversion',
+
+
+``THUMBNAIL_PROCESSORS``
+========================
+
+One of the dependencies is Django Filer. It provides a special feature that allows more
+sophisticated image cropping. For this to work it needs its own thumbnail processor
+(``filer.thumbnail_processors.scale_and_crop_with_subject_location``) to be listed in
+``settings.py`` in place of ``easy_thumbnails.processors.scale_and_crop``:
 
 .. code-block:: python
 
@@ -45,15 +66,23 @@ thumbnail processor (easy-thumbnails) to be inserted in ``settings.py``:
         'easy_thumbnails.processors.filters',
     )
 
-aldryn-newsblog uses aldryn-boilerplates_ to provide multiple sets of templates
-and static files for different CSS frameworks. We're using
-bootstrap3 in this tutorial, so lets choose `bootstrap3`.:
+
+``ALDRYN_BOILERPLATE_NAME``
+===========================
+
+Aldryn News & Blog uses aldryn-boilerplates_ to provide multiple sets of templates and static files
+for different CSS frameworks. We're using the Bootstrap 3 in this tutorial, so let's choose
+``bootstrap3`` by adding the setting:
 
 .. code-block:: python
 
     ALDRYN_BOILERPLATE_NAME='bootstrap3'
 
-Add boilerplates finder to ``STATICFILES_FINDERS``:
+
+``STATICFILES_FINDERS``
+=======================
+
+Add the boilerplates static files finder to ``STATICFILES_FINDERS``:
 
 .. code-block:: python
 
@@ -64,8 +93,12 @@ Add boilerplates finder to ``STATICFILES_FINDERS``:
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
 
-If ``STATICFILES_FINDERS`` is not defined in your ``settings.py`` just copy and paste the above
-code.
+If ``STATICFILES_FINDERS`` is not defined in your ``settings.py`` just copy and paste the code
+above.
+
+
+``TEMPLATE_LOADERS``
+====================
 
 Add the boilerplate template loader to ``TEMPLATE_LOADERS``:
 
@@ -78,6 +111,10 @@ Add the boilerplate template loader to ``TEMPLATE_LOADERS``:
         'django.template.loaders.eggs.Loader'
     )
 
+
+``TEMPLATE_CONTEXT_PROCESSORS``
+===============================
+
 Add the boilerplates context processor to ``TEMPLATE_CONTEXT_PROCESSORS``:
 
 .. code-block:: python
@@ -88,38 +125,49 @@ Add the boilerplates context processor to ``TEMPLATE_CONTEXT_PROCESSORS``:
     ]
 
 
-Since we added a new app, we need to update our database::
+********************
+Migrate the database
+********************
+
+We've added a new application so we need to update our database::
 
     python manage.py migrate
 
 Start the server again.
 
-The newsblog application comes with a django CMS apphook, so add a new django
-CMS page (let's call it 'Blog'), and add the blog application to it as you did
-for Polls in the previous tutorial step.
-In this case we also have to add an "Application configuration" (see the
-field right under the apphook field). You can configure some settings here,
-like the URL format. It's also possible to add multiple instances of the
-application, if you like.
-The *Instance namespace* should be ``blog`` (this is used for reversing URLs).
-Choose ``Blog`` as the *Application title* and choose whatever *Permalink type*
-you prefer.
 
-Publish the new page, and you should find the blog application at work there.
+***************************
+Create a new apphooked page
+***************************
 
-*You may need to restart your server at this point.*
+The News & Blog application comes with a django CMS apphook, so add a new django CMS page (call it
+*News*), and add the News & Blog application to it :ref:`just as you did for Polls
+<apply_apphook>`.
+
+For this application we also need to create and select an *Application configuration*.
+
+Give this application configuration some settings:
+
+* ``Instance namespace``: *news* (this is used for reversing URLs)
+* ``Application title``: *News* (the name that will represent the application configuration in the
+  admin)
+* ``Permalink type``: choose a format you prefer for news article URLs
+
+Save this application configuration, and make sure it's selected in ``Application configurations``.
+
+Publish the new page, and you should find the News & Blog application at work there. (Until you
+actually create any articles, it will simply inform you that there are *No items available*.)
 
 
-You can add new blog posts using the admin, but also have a look at the
-toolbar. When you're within the URLs of the blog, you should see an extra menu
-item called "Blog".
-You can now select "Blog" > "Add new article..." from it and add a new blog
-post directly from there.
+****************************
+Add new News & Blog articles
+****************************
 
-Try also inserting a "Latest articles" plugin into another page - as a good
-django CMS application, *Aldryn News & Blog* comes with plugins.
+You can add new articles using the admin or the new *News* menu that now appears in the toolbar when you are on a page belonging to News & Blog.
 
-In the next tutorial, we're going to integrate our Polls app into the toolbar
-in, just like the blog application has been.
+You can also insert a *Latest articles* plugin into another page - like all good
+django CMS applications, Aldryn News & Blog comes with plugins.
+
+In the next tutorial, we're going to integrate our Polls application into the toolbar too.
 
 .. _aldryn-boilerplates: https://github.com/aldryn/aldryn-boilerplates
