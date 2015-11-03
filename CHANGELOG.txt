@@ -44,6 +44,8 @@
 - Removed 'develop.py' to replace with 'manage.py' (devs)
 - Removed Alias plugin from list of plugins (Create Alias still an option)
 - Added support for 3rd party admin themes
+- Update the toolbar tutorial
+- Update the 3rd party integration tutorial
 
 
 === 3.1.4 (Unreleased) ===
