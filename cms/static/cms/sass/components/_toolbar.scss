@@ -408,11 +408,15 @@
         }
     }
     input[type="submit"] {
+        display: block;
         font-size: $login-form-input-font-size - 1px;
         text-transform: uppercase;
         height: $login-form-input-height - 2px;
         line-height: $login-form-input-height - 2px;
         padding: 0 $login-form-submit-padding-horizontal;
+        &:-moz-focus-inner {
+            border: 0;
+        }
     }
 
     .cms-error {
