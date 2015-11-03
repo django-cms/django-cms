@@ -105,7 +105,7 @@ class PlaceholderToolbar(CMSToolbar):
         disabled = user and hasattr(self, "page") and len(
             list(entry_choices(user, self.page))) == 0
 
-        url = "{url}?page={page}".format(
+        url = "{url}?page={page}&edit".format(
             url=reverse("cms_wizard_create"),
             page=page_pk
         )
