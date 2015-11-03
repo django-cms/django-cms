@@ -6,8 +6,10 @@ django CMS allows you to control what appears in the toolbar. This allows you
 to integrate your application in the frontend editing mode of django CMS and
 provide your users with a streamlined editing experience.
 
-Registering Toolbar items
-#########################
+
+*************************
+Registering toolbar items
+*************************
 
 There are two ways to control what gets shown in the toolbar.
 
@@ -15,11 +17,16 @@ One is the ``CMS_TOOLBARS`` setting. This gives you full control over which
 classes are loaded, but requires that you specify them all manually.
 
 The other is to provide ``cms_toolbars.py`` files in your apps, which will be
-automatically loaded as long ``CMS_TOOLBARS`` is not set (or set to `None`).
+automatically loaded as long ``CMS_TOOLBARS`` is not set (or set to ``None``).
 We'll work with this second method.
 
-Create a new ``cms_toolbars.py`` file in your Polls application (NOTE: *not* in
-the Polls Plugin application we were working with in the previous tutorial):
+
+******************
+Create the toolbar
+******************
+
+Create a new ``cms_toolbars.py`` file in your Polls application (note: *not* in
+the Polls Plugin application):
 
 .. code-block:: python
 
@@ -55,6 +62,9 @@ the Polls Plugin application we were working with in the previous tutorial):
             )
 
 
+What this all means
+===================
+
 What we're doing above is this:
 
 * defining a ``CMSToolbar`` sub-class
@@ -65,9 +75,8 @@ The ``populate()`` method:
 
 * checks whether we're in a page belonging to this application
 * if so, it creates a menu if one's not already there
-* adds a menu item to list all polls as a sideframe
+* adds a menu item to list all polls in the overlay
 * adds a menu item to add a now poll as a modal window
-
 
 Your ``cms_toolbars.py`` file should contain classes that extend
 ``cms.toolbar_base.CMSToolbar`` and are registered using
@@ -93,6 +102,13 @@ method will only be called if the current user is a staff user.
 our case we need it so ``is_current_app`` can be detected properly (because the
 views for the poll app are in ``polls`` and our ``cms_toolbars.py`` is in the
 ``polls_plugin`` app).
+
+
+**************
+See it at work
+**************
+
+Visit your Polls page on your site, and you'll see a new *Polls* item in the toolbar.
 
 There's a lot more to django CMS toolbar classes than this - see
 :doc:`/how_to/toolbar` for more.
