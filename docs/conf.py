@@ -75,7 +75,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', 'env']
+exclude_patterns = ['build', 'env']
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

@@ -102,8 +102,8 @@ install:
 	##### setup virtualenv
 	virtualenv env
 	. $(VENV); pip install -r requirements.txt
-	. $(VENV); sphinx-build . _build/html
+	. $(VENV); sphinx-build . build/html
 	##### done
 
 run:
-	. $(VENV); sphinx-autobuild . _build/html --host 0.0.0.0 --port $(PORT)
+	. $(VENV); sphinx-autobuild . build/html --host 0.0.0.0 --port $(PORT)
