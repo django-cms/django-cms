@@ -453,15 +453,15 @@ class PageToolbar(CMSToolbar):
             add_page_menu = current_page_menu.get_or_create_menu(PAGE_MENU_ADD_IDENTIFIER, _('Add Page'))
             app_page_url = admin_reverse('cms_page_add')
 
-            add_page_menu_sideframe_items = (
+            add_page_menu_modal_items = (
                 (_('New Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.parent_id or ''}),
                 (_('New Sub Page'), {'edit': 1, 'position': 'last-child', 'target': self.page.pk}),
                 (_('Duplicate this Page'), {'copy_target': self.page.pk})
             )
 
-            for title, params in add_page_menu_sideframe_items:
+            for title, params in add_page_menu_modal_items:
                 params.update(language=self.toolbar.language)
-                add_page_menu.add_sideframe_item(title, url=add_url_parameters(app_page_url, params))
+                add_page_menu.add_modal_item(title, url=add_url_parameters(app_page_url, params))
 
             # first break
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
