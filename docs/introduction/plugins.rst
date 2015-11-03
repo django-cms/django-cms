@@ -2,7 +2,8 @@
 Plugins
 #######
 
-In this tutorial we're going to take a Django poll app and integrate it into the CMS.
+In this tutorial we're going to take a basic Django opinion poll application and integrate it into
+the CMS.
 
 
 *********************************
@@ -53,7 +54,7 @@ Now run the application's migrations:
     python manage.py migrate polls
 
 At this point you should be able to log in to the Django
-admin - ``localhost:8000/admin/`` - and find the polls application.
+admin - ``localhost:8000/admin/`` - and find the Polls application.
 
 .. image:: /introduction/images/polls-admin.png
    :alt: the polls application admin
@@ -82,7 +83,7 @@ and submit a response.
 Set up a base template for the application
 ******************************************
 
-However, in pages of the polls application we only have minimal templates, and
+However, in pages of the Polls application we only have minimal templates, and
 no navigation or styling.
 
 Let's improve this by overriding the polls application's base template.
@@ -126,7 +127,7 @@ project.
 .. note:: **Why not build the plugin code into the polls application package?**
 
     This would certainly be possible, and in fact, if you were developing your own application
-    it's what we would recommend. For a third-party application such as polls however, placing the
+    it's what we would recommend. For a third-party application such as Polls however, placing the
     plugin code into a separate package means we don't have to modify or fork the original.
 
 Create a new package at the project root called ``polls_plugin``::
