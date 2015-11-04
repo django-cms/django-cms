@@ -6,8 +6,8 @@
 Content creation wizards
 ########################
 
-See the :ref:`How-to section on wizards <wizard_how_to>` for an introduction to creating
-wizards.
+See the :ref:`How-to section on wizards <wizard_how_to>` for an introduction to
+creating wizards.
 
 Wizard classes are sub-classes of ``cms.wizards.wizard_base.Wizard``.
 
@@ -38,19 +38,87 @@ When instantiating a Wizard object, use the keywords:
     :description: The description is optional, but if it is not supplied, the
                   CMS will create one from the pattern:
                   "Create a new «model.verbose_name» instance."
+    :edit_mode_on_success: If set, the CMS will switch the user to edit-mode by
+                           adding an ``edit`` param to the query-string of the
+                           URL returned by ``get_success_url``. This is ``True``
+                           by default.
+
+
+***********
+Base Wizard
+***********
+
+All wizard classes should inherit from ``cms.wizards.wizard_base.Wizard``. This
+class implements a number of methods that may be overridden as required.
+
+*******************
+Base Wizard methods
+*******************
+
+get_description
+===============
+
+Simply returns the ``description`` property assigned during instantiation or one
+derived from the model if description is not provided during instantiation.
+Override this method if this needs to be determined programmatically.
+
+
+get_title
+=========
+
+Simply returns the ``title`` property assigned during instantiation. Override
+this method if this needs to be determined programmatically.
+
+
+get_success_url
+===============
+
+Once the wizard has completed, the user will be redirected to the URL of the new
+object that was created. By default, this is done by return the result of
+calling the ``get_absolute_url`` method on the object. This may then be modified
+to force the user into edit mode if the wizard property ``edit_mode_on_success``
+is True.
+
+In some cases, the created content will not implement ``get_absolute_url`` or
+that redirecting the user is undesirable. In these cases, simply override this
+method.
+
+This method is called by the CMS with the parameter:
+
+    :obj: The created object
+
+
+get_weight
+==========
+
+Simply returns the ``weight`` property assigned during instantiation. Override
+this method if this needs to be determined programmatically.
+
+
+user_has_add_permission
+=======================
+
+This should return a boolean reflecting whether the user has permission to
+create the underlying content for the wizard.
+
+This method is called by the CMS with these parameters:
+
+    :user: The current user
+    :page: The current CMS page the user is viewing when invoking the wizard
+
 
 
 ***************
 ``wizard_pool``
 ***************
 
-``wizard_pool`` includes a read-only property ``discovered`` which returns the Boolean
-``True`` if wizard-discovery has already occurred and ``False`` otherwise.
+``wizard_pool`` includes a read-only property ``discovered`` which returns the
+Boolean ``True`` if wizard-discovery has already occurred and ``False``
+otherwise.
 
-
-*********************
-Wizard object methods
-*********************
+*******************
+Wizard pool methods
+*******************
 
 is_registered
 =============
@@ -108,3 +176,4 @@ returned first.::
 
     for wizard in wizard_pool.get_entries():
         # do something with a wizard...
+
