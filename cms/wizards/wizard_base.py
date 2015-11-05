@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
+from urlparse import urlunparse
 
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.http import QueryDict
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.six.moves.urllib.parse import urlparse
-from urlparse import urlunparse
+from django.utils.six.moves.urllib.parse import six_urlparse
 
 from django.utils.translation import (
     override as force_language,
@@ -121,7 +121,7 @@ class Wizard(WizardBase):
 
         # Add 'edit' to GET params of URL
         if self.edit_mode_on_success:
-            (scheme, netloc, path, params, query, fragment) = urlparse(url)
+            (scheme, netloc, path, params, query, fragment) = six_urlparse(url)
             query_dict = QueryDict(query).copy()
             query_dict['edit'] = ''
             query = query_dict.urlencode()
