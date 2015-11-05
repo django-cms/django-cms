@@ -518,7 +518,7 @@ class PlaceholderAdminMixin(object):
 
             # Creates a list of string PKs of the top-level plugins ordered by
             # their position.
-            top_plugins_pks = [str(plugin.pk) for plugin in sorted(
+            top_plugins_pks = [str(p.pk) for p in sorted(
                 top_plugins, key=lambda x: x.position)]
 
             if parent_id:
