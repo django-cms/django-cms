@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
-from urlparse import urlunparse
+
+try:
+    from urllib.parse import urlunparse  # Py3
+except ImportError:
+    from urlparse import urlunparse  # Py2
 
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
