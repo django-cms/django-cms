@@ -114,8 +114,8 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             published=False
         )
         url = page.get_absolute_url(language="en")
-        self.assertEqual(
-            self.page_wizard.get_success_url(page, language="en"), url)
+        self.assertEqual(self.page_wizard.get_success_url(
+            page, language="en"), "{0}?edit".format(url))
 
         # Now again without a language code
         url = page.get_absolute_url()
