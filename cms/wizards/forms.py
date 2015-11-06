@@ -49,7 +49,9 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
             'all': ('cms/css/cms.wizard.css', )
         }
         js = (
+            'cms/js/modules/jquery.noconflict.pre.js',
             'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/modules/jquery.noconflict.post.js',
             'cms/js/modules/cms.wizards.js',
         )
 
