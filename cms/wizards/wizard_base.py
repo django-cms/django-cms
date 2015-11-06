@@ -7,7 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.http import QueryDict
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.six.moves.urllib.parse import six_urlparse
+from django.utils.six.moves.urllib.parse import urlparse as six_urlparse
 
 from django.utils.translation import (
     override as force_language,
