@@ -113,12 +113,12 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             in_navigation=True,
             published=False
         )
-        url = page.get_absolute_url(language="en")
+        url = "{0}?edit=".format(page.get_absolute_url(language="en"))
         self.assertEqual(self.page_wizard.get_success_url(
-            page, language="en"), "{0}?edit=".format(url))
+            page, language="en"), url)
 
         # Now again without a language code
-        url = page.get_absolute_url()
+        url = "{0}?edit=".format(page.get_absolute_url())
         self.assertEqual(self.page_wizard.get_success_url(page), url)
 
     def test_get_model(self):
