@@ -500,21 +500,26 @@ class PlaceholderAdminMixin(object):
         if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
                 inst, _plugin = plugin.get_plugin_instance()
+                source_plugins = inst.placeholder_ref.get_plugins()
                 new_plugins = copy_plugins.copy_plugins_to(
-                    inst.placeholder_ref.get_plugins(), placeholder,
-                    to_language=language)
+                    source_plugins, placeholder, language)
             else:
                 source_plugins = [plugin] + list(plugin.get_descendants())
                 new_plugins = copy_plugins.copy_plugins_to(
                     source_plugins, placeholder, language, parent_id)
 
             top_plugins = []
-            top_plugins_pks = []
             top_parent = new_plugins[0][0].parent_id
-            for new_plugin, _old_plugin in new_plugins:
-                if top_parent and new_plugin.parent_id == top_parent:
+            for new_plugin, old_plugin in new_plugins:
+                if new_plugin.parent_id == top_parent:
+                    # NOTE: There is no need to save() the plugins here.
+                    new_plugin.position = old_plugin.position
                     top_plugins.append(new_plugin)
-                    top_plugins_pks.append(str(new_plugin.pk))
+
+            # Creates a list of string PKs of the top-level plugins ordered by
+            # their position.
+            top_plugins_pks = [str(p.pk) for p in sorted(
+                top_plugins, key=lambda x: x.position)]
 
             if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
