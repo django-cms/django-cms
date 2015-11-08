@@ -1017,3 +1017,27 @@ Example::
 
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
+
+CMS_WIZARD_CONTENT_PLUGIN
+=========================
+
+default
+    ``TextPlugin``
+
+This is the name of the plugin created in the Page Wizard when the "Content" field is
+filled in.
+There should be no need to change it, unless you **don't** use
+``djangocms-text-ckeditor`` in your project.
+
+
+CMS_WIZARD_CONTENT_PLUGIN_BODY
+==============================
+
+default
+    ``body``
+
+This is the name of the body field in the plugin created in the Page Wizard when the
+"Content" field is filled in.
+There should be no need to change it, unless you **don't** use
+``djangocms-text-ckeditor`` in your project **and** your custom plugin defined in
+``CMS_WIZARD_CONTENT_PLUGIN`` have a body field **different** than ``body``.

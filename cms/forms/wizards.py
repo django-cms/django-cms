@@ -215,15 +215,16 @@ class CreateCMSPageForm(BaseCMSPageForm):
             # If the user provided content, then use that instead.
             content = self.cleaned_data.get('content')
             if content and permissions.has_plugin_permission(
-                    self.user, "TextPlugin", "add"):
+                    self.user, get_cms_setting('WIZARD_CONTENT_PLUGIN'), "add"):
                 placeholder = self.get_first_placeholder(page)
                 if placeholder:
-                    add_plugin(
-                        placeholder=placeholder,
-                        plugin_type='TextPlugin',
-                        language=self.language_code,
-                        body=content
-                    )
+                    add_plugin(**{
+                        'placeholder': placeholder,
+                        'plugin_type': get_cms_setting('WIZARD_CONTENT_PLUGIN'),
+                        'language': self.language_code,
+                        get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY'): content
+
+                    })
 
         return page
 

@@ -63,7 +63,9 @@ DEFAULTS = {
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
     'APP_NAME': None,
-    'TOOLBAR_HIDE': False
+    'TOOLBAR_HIDE': False,
+    'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
+    'WIZARD_CONTENT_PLUGIN_BODY': 'body',
 }
 
 
