@@ -180,7 +180,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
         title = self.cleaned_data['title']
         page = create_page(
             title=title,
-            template=TEMPLATE_INHERITANCE_MAGIC,
+            template=get_cms_setting('WIZARD_DEFAULT_TEMPLATE'),
             language=self.language_code,
             created_by=smart_text(self.user),
             parent=parent,
