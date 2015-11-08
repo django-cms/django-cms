@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PAGE_TYPES_ID
+from cms.constants import PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
