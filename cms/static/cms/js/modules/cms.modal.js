@@ -54,6 +54,7 @@ var CMS = window.CMS || {};
                 this.pointerUp = 'pointerup.cms.modal pointercancel.cms.modal';
                 this.pointerMove = 'pointermove.cms.modal';
                 this.doubleClick = 'dblclick.cms.modal';
+                this.touchEnd = 'touchend.cms.modal';
                 this.maximized = false;
                 this.minimized = false;
                 this.triggerMaximized = false;
@@ -143,7 +144,9 @@ var CMS = window.CMS || {};
                     that._startResize(e);
                 });
 
-                this.ui.closeAndCancel.off(this.click).on(this.click, function (e) {
+                this.ui.closeAndCancel
+                    .off(this.click + ' ' + this.touchEnd)
+                    .on(this.click + ' ' + this.touchEnd, function (e) {
                     that.options.onClose = null;
                     e.preventDefault();
                     that.close();
