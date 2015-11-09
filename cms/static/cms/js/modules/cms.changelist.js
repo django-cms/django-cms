@@ -127,7 +127,6 @@
                 var langTooltips = '.language-tooltip';
                 var langTimer = function () {};
                 var langDelay = 100;
-                var langFadeDuration = 200;
                 // workaround for the publishing tooltip on touch devices
                 var touchUsedNode;
 
@@ -144,7 +143,7 @@
                     }
 
                     // set correct position
-                    el.css('right', 20 + $(this).position().left);
+                    el.css('right', 32 + $(this).position().left);
 
                     // hide all elements
                     $(langTooltips).hide();
@@ -160,8 +159,8 @@
 
                     // use a timeout to display the tooltip
                     langTimer = setTimeout(function () {
-                        el.stop(true, true).fadeIn(langFadeDuration);
                         el.closest('.moveable').addClass('hover');
+                        el.show();
                     }, langDelay);
                 });
                 // hide the tooltip when leaving the area
