@@ -58,7 +58,7 @@ var CMS = window.CMS || {};
 
                     // attach tooltip event for touch devices
                     that.domElem.on('touchstart.cms', function () {
-                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
+                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick.cms');
                     });
                 });
             },
@@ -95,10 +95,11 @@ var CMS = window.CMS || {};
                     .find('span').html(name);
 
                 if (this.isTouch) {
-                    this.position(e, tooltip);
+                    this.position(e.originalEvent, tooltip);
                 } else {
                     // attaches move event
                     // this sets the correct position for the edit tooltip
+                    that.position(e.originalEvent, tooltip);
                     this.body.on('mousemove.cms', function (e) {
                         that.position(e, tooltip);
                     });
@@ -127,6 +128,7 @@ var CMS = window.CMS || {};
              * @private
              */
             _pick: function () {
+                $('.cms-tooltip-touch, .cms-tooltip').css('visibility', 'hidden').hide();
                 return this.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
             },
 

@@ -207,11 +207,13 @@ var CMS = window.CMS || {};
                 });
 
                 // adds edit tooltip
-                this.ui.container.on(this.pointerOverAndOut, function (e) {
-                    e.stopPropagation();
+                this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
+                    if (e.type !== 'touchstart') {
+                        e.stopPropagation();
+                    }
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover', e, name, id);
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
                 });
 
                 // adds listener for all plugin updates
@@ -277,11 +279,13 @@ var CMS = window.CMS || {};
                 });
 
                 // adds edit tooltip
-                this.ui.container.on(this.pointerOverAndOut, function (e) {
-                    e.stopPropagation();
+                this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
+                    if (e.type !== 'touchstart') {
+                        e.stopPropagation();
+                    }
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
-                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover', e, name, id);
+                    CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
                 });
             },
 
