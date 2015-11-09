@@ -58,7 +58,7 @@ var CMS = window.CMS || {};
 
                     // attach tooltip event for touch devices
                     that.domElem.on('touchstart.cms', function () {
-                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick');
+                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick.cms');
                     });
                 });
             },
