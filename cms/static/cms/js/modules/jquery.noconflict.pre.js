@@ -1,2 +1,2 @@
-var _jQuery = window.jQuery || undefined;
-var _$ = window.$ || undefined;
+var __jQuery = (window.jQuery) ? window.jQuery : undefined;
+var __$ =__jQuery;

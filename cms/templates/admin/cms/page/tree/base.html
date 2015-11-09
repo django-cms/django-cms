@@ -28,7 +28,9 @@
 {% block extrahead %}
 {{ block.super }}
 {% block jquery %}{% endblock %}
+<script>console.log('head: ', window.jQuery);</script>
 <script src="{% static "cms/js/modules/jquery.noconflict.pre.js" %}" type="text/javascript"></script>
+<script>console.log('pre: ', window.jQuery);</script>
 <script src="{% static "cms/js/dist/bundle.admin.base.min.js" %}" type="text/javascript"></script>
 
 <!-- load changelist and jstree -->
@@ -39,7 +41,6 @@
 $(document).ready(function () {
     // bind csrf token to the header
     CMS.API.Helpers.csrf('{{ csrf_token }}');
-debugger;
     // initialize tree
     new CMS.TreeManager({
         'settings': {
@@ -58,7 +59,9 @@ debugger;
 });
 })(CMS.$);
 </script>
+<script>console.log('foot: ', window.jQuery);</script>
 <script src="{% static "cms/js/modules/jquery.noconflict.post.js" %}" type="text/javascript"></script>
+<script>console.log('post: ', window.jQuery);</script>
 
 {% endblock extrahead %}
 
