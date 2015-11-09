@@ -123,7 +123,7 @@
                 // ADD DIRECT PUBLISHING
                 var that = this;
                 var tree = $('.tree');
-                var langTrigger = '.col-language .trigger-tooltip span';
+                var langTrigger = '.col-language .trigger-tooltip';
                 var langTooltips = '.language-tooltip';
                 var langTimer = function () {};
                 var langDelay = 100;
