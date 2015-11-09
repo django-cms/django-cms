@@ -210,6 +210,12 @@ $row-height: 41px;
     }
     .tree-default {
         padding-top: 1px;
+        a {
+            color: $gray;
+            &:hover, &:focus, &:active {
+                color: $black !important;
+            }
+        }
     }
     .tree-default .col-navigation,
     .tree-default .col-published {
