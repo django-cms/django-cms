@@ -136,11 +136,15 @@ $row-height: 41px;
     // the tree is recalculated once you set the navigation to be
     // shown or hidden. In initialization the calculation is off by
     // 1px so we need to enforce the width for correct placement
-    .col-navigation {
+    .col-navigation,
+    .col-preview {
         width: 26px !important;
     }
+    .col-preview a {
+        margin: 0 !important;
+    }
     .col-actions {
-        width: 150px !important;
+        width: 126px !important;
     }
 
     // header
@@ -206,6 +210,12 @@ $row-height: 41px;
     }
     .tree-default {
         padding-top: 1px;
+        a {
+            color: $gray;
+            &:hover, &:focus, &:active {
+                color: $black !important;
+            }
+        }
     }
     .tree-default .col-navigation,
     .tree-default .col-published {
