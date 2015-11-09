@@ -467,6 +467,13 @@ $row-height: 41px;
         padding: 0 8px;
         border-left: 1px solid transparent;
     }
+    li .col-language > a {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
     li .col-language span {
         display: inline-block;
         color: transparent;
@@ -588,7 +595,7 @@ $row-height: 41px;
 }
 
 // animation for publishing
-@-webkit-keyframes pulsate {
+@keyframes pulsate {
     0% {
         opacity: 0.5;
     }
