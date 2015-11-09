@@ -128,6 +128,7 @@ var CMS = window.CMS || {};
              * @private
              */
             _pick: function () {
+                $('.cms-tooltip-touch, .cms-tooltip').css('visibility', 'hidden').hide();
                 return this.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
             },
 
