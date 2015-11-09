@@ -123,11 +123,10 @@
                 // ADD DIRECT PUBLISHING
                 var that = this;
                 var tree = $('.tree');
-                var langTrigger = '.col-language .trigger-tooltip span';
+                var langTrigger = '.col-language .trigger-tooltip';
                 var langTooltips = '.language-tooltip';
                 var langTimer = function () {};
                 var langDelay = 100;
-                var langFadeDuration = 200;
                 // workaround for the publishing tooltip on touch devices
                 var touchUsedNode;
 
@@ -144,7 +143,7 @@
                     }
 
                     // set correct position
-                    el.css('right', 20 + $(this).position().left);
+                    el.css('right', 32 + $(this).position().left);
 
                     // hide all elements
                     $(langTooltips).hide();
@@ -160,8 +159,8 @@
 
                     // use a timeout to display the tooltip
                     langTimer = setTimeout(function () {
-                        el.stop(true, true).fadeIn(langFadeDuration);
                         el.closest('.moveable').addClass('hover');
+                        el.show();
                     }, langDelay);
                 });
                 // hide the tooltip when leaving the area
@@ -191,7 +190,7 @@
                     }, langDelay * 2);
                 });
                 // attach double check event if publish or unpublish should be triggered
-                tree.delegate('.language-tooltip a', 'click', function (e) {
+                tree.delegate('.language-tooltip a', 'click touchstart', function (e) {
                     e.preventDefault();
 
                     // cancel if not confirmed

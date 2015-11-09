@@ -2,9 +2,17 @@
 
 import hashlib
 
+try:
+    from urllib.parse import urlunparse  # Py3
+except ImportError:
+    from urlparse import urlunparse  # Py2
+
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
+from django.http import QueryDict
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.six.moves.urllib.parse import urlparse as six_urlparse
+
 from django.utils.translation import (
     override as force_language,
     force_text,
@@ -16,7 +24,7 @@ class WizardBase(object):
     template_name = None
 
     def __init__(self, title, weight, form, model=None, template_name=None,
-                 description=None):
+                 description=None, edit_mode_on_success=True):
         """
         :param title: This is used on the start form.
         :param weight: Used for determining the order of the wizards on the
@@ -27,6 +35,8 @@ class WizardBase(object):
                       wizard per model.
         :param template_name: The full-path to the template to use, if any.
         :param description: This is used on the start form.
+        :param edit_mode_on_success: If true, the CMS will switch to edit mode
+                                     when going to the newly created object.
         """
         # NOTE: If class attributes or properties are changed, consider updating
         # cms.templatetags.cms_wizard_tags.WizardProperty too.
@@ -35,6 +45,7 @@ class WizardBase(object):
         self.form = form
         self.model = model
         self.description = description
+        self.edit_mode_on_success = edit_mode_on_success
         if template_name is not None:
             self.template_name = template_name
 
@@ -108,9 +119,19 @@ class Wizard(WizardBase):
         """
         if 'language' in kwargs:
             with force_language(kwargs['language']):
-                return obj.get_absolute_url()
+                url = obj.get_absolute_url()
         else:
-            return obj.get_absolute_url()
+            url = obj.get_absolute_url()
+
+        # Add 'edit' to GET params of URL
+        if self.edit_mode_on_success:
+            (scheme, netloc, path, params, query, fragment) = six_urlparse(url)
+            query_dict = QueryDict(query).copy()
+            query_dict['edit'] = ''
+            query = query_dict.urlencode()
+            url = urlunparse((scheme, netloc, path, params, query, fragment))
+
+        return url
 
     def get_model(self):
         if self.model:

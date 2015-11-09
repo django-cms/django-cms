@@ -8,16 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-27 21:31+0200\n"
-"PO-Revision-Date: 2013-12-12 08:53+0000\n"
-"Last-Translator: Patrick Lauber <patrick.lauber@divio.ch>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/django-cms/language/pl/)\n"
+"POT-Creation-Date: 2015-11-05 10:16-0500\n"
+"PO-Revision-Date: 2015-10-31 12:28+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"Language-Team: Polish (http://www.transifex.com/digi604/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: static/cms/js/modules/cms.changeform.js:60
+#: static/cms/js/dist/bundle.admin.changeform.min.js:1
+#: static/cms/js/modules/cms.changeform.js:75
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Czy na pewno chcesz zmienić zakładkę nie zapisując wcześniej strony?"
