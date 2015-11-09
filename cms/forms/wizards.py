@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PAGE_TYPES_ID
+from cms.constants import PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
@@ -180,7 +180,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
         title = self.cleaned_data['title']
         page = create_page(
             title=title,
-            template=TEMPLATE_INHERITANCE_MAGIC,
+            template=get_cms_setting('WIZARD_DEFAULT_TEMPLATE'),
             language=self.language_code,
             created_by=smart_text(self.user),
             parent=parent,
@@ -215,15 +215,16 @@ class CreateCMSPageForm(BaseCMSPageForm):
             # If the user provided content, then use that instead.
             content = self.cleaned_data.get('content')
             if content and permissions.has_plugin_permission(
-                    self.user, "TextPlugin", "add"):
+                    self.user, get_cms_setting('WIZARD_CONTENT_PLUGIN'), "add"):
                 placeholder = self.get_first_placeholder(page)
                 if placeholder:
-                    add_plugin(
-                        placeholder=placeholder,
-                        plugin_type='TextPlugin',
-                        language=self.language_code,
-                        body=content
-                    )
+                    add_plugin(**{
+                        'placeholder': placeholder,
+                        'plugin_type': get_cms_setting('WIZARD_CONTENT_PLUGIN'),
+                        'language': self.language_code,
+                        get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY'): content
+
+                    })
 
         return page
 
