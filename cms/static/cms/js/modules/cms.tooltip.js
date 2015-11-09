@@ -95,10 +95,11 @@ var CMS = window.CMS || {};
                     .find('span').html(name);
 
                 if (this.isTouch) {
-                    this.position(e, tooltip);
+                    this.position(e.originalEvent, tooltip);
                 } else {
                     // attaches move event
                     // this sets the correct position for the edit tooltip
+                    that.position(e.originalEvent, tooltip);
                     this.body.on('mousemove.cms', function (e) {
                         that.position(e, tooltip);
                     });
