@@ -46,8 +46,8 @@ For this we need a file called ``cms_menus.py`` in our application. Add
 
 What's happening here:
 
-* we define a ``PollsMenu`` class, and register it
-* we give the class a ``name`` attribute (will be displayed in admin)
+* we define a ``PollsMenu`` class, based on ``cms.menu_bases import CMSAttachMenu``, and register it
+* we give the class a ``name`` attribute (this will be displayed in the admin)
 * in its ``get_nodes()`` method, we build and return a list of nodes, where:
 * first we get all the ``Poll`` objects
 * ... and then create a ``NavigationNode`` object from each one
@@ -62,7 +62,7 @@ for importing ``PollsMenu`` and
 
     menus = [PollsMenu]
 
-to the ``PollsApp`` class.
+to the ``PollsApphook`` class.
 
 Any page that is attached to the ``Polls`` application will now have sub-menu
 items for each of the Polls in the database.

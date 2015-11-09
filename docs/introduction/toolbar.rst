@@ -78,10 +78,9 @@ The ``populate()`` method:
 * adds a menu item to list all polls in the overlay
 * adds a menu item to add a now poll as a modal window
 
-Your ``cms_toolbars.py`` file should contain classes that extend
-``cms.toolbar_base.CMSToolbar`` and are registered using
-``cms.toolbar_pool.toolbar_pool.register()``. The register function can be used
-as a decorator.
+Your ``cms_toolbars.py`` file should contain classes that extend ``cms.toolbar_base.CMSToolbar``
+and are registered using ``cms.toolbar_pool.toolbar_pool.register()``. The register function can be
+used as a decorator, as in the example above.
 
 ``CMSToolbar`` instances will have these attributes:
 
