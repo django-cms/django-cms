@@ -62,6 +62,20 @@ def user_has_view_permission(user, page=None):
     return user.has_perm(codename)
 
 
+def has_textplugin_permission(user=None):
+    """
+    Returns True if there exists a TextPlugin and the «user» has permission to
+    add one.
+    """
+    if user is None:
+        return False
+    # Do not continue if there is no TextPlugin
+    try:
+        return permissions.has_plugin_permission(user, "TextPlugin", "add")
+    except KeyError:
+        return False
+
+
 class PageTypeSelect(forms.widgets.Select):
     """
     Special widget for the page_type choice-field. This simply adds some JS for
@@ -95,6 +109,11 @@ class BaseCMSPageForm(forms.Form):
             site = self.page.site_id
         else:
             site = Site.objects.get_current()
+
+        # If user has no permission to add a TextPlugin (or the plugin doesn't
+        # exist), then do not show the content field
+        if not has_textplugin_permission(self.user):
+            del self.fields['content']
 
         # Either populate, or remove the page_type field
         if 'page_type' in self.fields:
@@ -213,9 +232,9 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
         else:
             # If the user provided content, then use that instead.
-            content = self.cleaned_data.get('content')
-            if content and permissions.has_plugin_permission(
-                    self.user, "TextPlugin", "add"):
+            content = self.cleaned_data.get('content', None)
+
+            if content and has_textplugin_permission(self.user):
                 placeholder = self.get_first_placeholder(page)
                 if placeholder:
                     add_plugin(
