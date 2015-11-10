@@ -300,7 +300,7 @@ var CMS = window.CMS || {};
 
                     // in case of the publish button
                     btn.find('.cms-publish-page').on(that.click, function (e) {
-                        if (!confirm(CMS.config.lang.publish)) {
+                        if (!CMS.API.Helpers.secureConfirm(CMS.config.lang.publish)) {
                             e.preventDefault();
                         }
                     });
@@ -521,7 +521,7 @@ var CMS = window.CMS || {};
                 var text = opts.text || '';
                 var callback = opts.callback;
                 var onSuccess = opts.onSuccess;
-                var question = (text) ? confirm(text) : true;
+                var question = (text) ? CMS.API.Helpers.secureConfirm(text) : true;
 
                 // cancel if question has been denied
                 if (!question) {

@@ -431,6 +431,23 @@ var CMS = {
             },
 
             /**
+             * Browsers allow to "Prevent this page form creating additional
+             * dialogs." checkbox which prevents further input from confirm messages.
+             * This method falls back to "true" once the user chooses this option.
+             *
+             * @method secureConfirm
+             * @param {String} message to be displayed
+             * @return {Boolean}
+             */
+            secureConfirm: function secureConfirm(message) {
+                var start = Number(new Date());
+                var result = confirm(message);
+                var end = Number(new Date());
+
+                return (end < (start + 10) || result === true);
+            },
+
+            /**
              * Is localStorage truly supported?
              * Check is taken from modernizr.
              *
