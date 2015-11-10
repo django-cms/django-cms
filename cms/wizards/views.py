@@ -5,7 +5,9 @@ import os
 from django.forms import Form
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.core.urlresolvers import NoReverseMatch
 from django.db import transaction
+
 from django.template.response import SimpleTemplateResponse
 from django.utils.translation import get_language_from_request
 
@@ -144,12 +146,18 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
         """
         form_two = list(form_list)[1]
         instance = form_two.save()
+        url = self.get_success_url(instance)
+        if not url:
+            page = self.get_origin_page()
+            if page:
+                try:
+                    url = page.get_absolute_url(self.language_code)
+                except NoReverseMatch:
+                    url = '/'
+            else:
+                url = '/'
 
-        context = {
-            "url": self.get_success_url(instance),
-        }
-
-        return SimpleTemplateResponse("cms/wizards/done.html", context)
+        return SimpleTemplateResponse("cms/wizards/done.html", {"url": url})
 
     def get_selected_entry(self):
         data = self.get_cleaned_data_for_step('0')

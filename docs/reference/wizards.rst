@@ -81,7 +81,8 @@ is True.
 
 In some cases, the created content will not implement ``get_absolute_url`` or
 that redirecting the user is undesirable. In these cases, simply override this
-method.
+method. If ``get_success_url`` returns ``None``, the CMS will just redirect to
+the current page after the object is created.
 
 This method is called by the CMS with the parameter:
 
