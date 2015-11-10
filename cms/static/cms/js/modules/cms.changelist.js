@@ -194,7 +194,8 @@
                     e.preventDefault();
 
                     // cancel if not confirmed
-                    if (!confirm(that.options.lang.publish.replace('§', $(this).text().toLowerCase()))) {
+                    if (!CMS.API.Helpers.secureConfirm(that.options.lang.publish
+                        .replace('§', $(this).text().toLowerCase()))) {
                         return false;
                     }
 

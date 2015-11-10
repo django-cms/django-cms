@@ -300,7 +300,7 @@ var CMS = window.CMS || {};
 
                     // in case of the publish button
                     btn.find('.cms-publish-page').on(that.click, function (e) {
-                        if (!confirm(CMS.config.lang.publish)) {
+                        if (!CMS.API.Helpers.secureConfirm(CMS.config.lang.publish)) {
                             e.preventDefault();
                         }
                     });
