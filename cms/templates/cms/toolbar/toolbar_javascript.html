@@ -3,10 +3,7 @@
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />{% endaddtoblock %}
 
 {% addtoblock "js" %}
-<script>
-var _jQuery = window.jQuery || undefined;
-var _$ = window.$ || undefined;
-</script>
+<script src="{% static "cms/js/modules/jquery.noconflict.pre.js" %}" type="text/javascript"></script>
 <script src="{% static "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript"></script>
 {% language request.toolbar.toolbar_language %}
 <script>
@@ -76,8 +73,5 @@ $(document).ready(function () {
 })(CMS.$);
 </script>
 {% endlanguage %}
-<script>
-window.jQuery = _jQuery;
-window.$ = _$;
-</script>
+<script src="{% static "cms/js/modules/jquery.noconflict.post.js" %}" type="text/javascript"></script>
 {% endaddtoblock %}
