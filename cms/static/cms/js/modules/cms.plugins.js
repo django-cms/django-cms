@@ -1129,7 +1129,9 @@ var CMS = window.CMS || {};
                 // collapsable function and save states
                 if (el.hasClass('cms-dragitem-expanded')) {
                     settings.states.splice($.inArray(id, settings.states), 1);
-                    el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').addClass('cms-hidden');
+                    el.removeClass('cms-dragitem-expanded').parent()
+                        .find('.cms-collapsable-container').eq(0).addClass('cms-hidden');
+
                     if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                         if (!items.length) {
@@ -1145,7 +1147,9 @@ var CMS = window.CMS || {};
 
                 } else {
                     settings.states.push(id);
-                    el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').removeClass('cms-hidden');
+                    el.addClass('cms-dragitem-expanded').parent()
+                        .find('.cms-collapsable-container').eq(0).removeClass('cms-hidden');
+
                     if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
                         if (!items.length) {
@@ -1226,7 +1230,7 @@ var CMS = window.CMS || {};
                     var el = $('.cms-draggable-' + id);
                     // only add this class to elements which have a draggable area
                     if (el.find('.cms-draggables').length) {
-                        el.find('> .cms-draggables').removeClass('cms-hidden');
+                        el.find('> .cms-collapsable-container').removeClass('cms-hidden');
                         el.find('> .cms-dragitem').addClass('cms-dragitem-expanded');
                     }
                 });

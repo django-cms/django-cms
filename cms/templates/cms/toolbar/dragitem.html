@@ -1,7 +1,10 @@
 {% load i18n l10n cms_tags %}
 
-<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}{% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}{% if clipboard %} cms-draggable-from-clipboard{% endif %}">
-    <div class="cms-dragitem cms-dragitem-handler{% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
+<div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
+    {% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}
+    {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
+    <div class="cms-dragitem cms-dragitem-handler
+        {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
             <div class="cms-submenu-btn cms-submenu-add cms-btn{% if plugin.disable_child_plugins %} cms-btn-disabled{% endif %}">
@@ -46,14 +49,14 @@
         <span class="cms-dragitem-text" title="{{ plugin.plugin_type }} ID: {{ plugin.pk }}"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
     </div>
 
-    {% if plugin.get_plugin_class.allow_children %}<div class="cms-draggables cms-hidden">{% endif %}
-
-    {% if plugin.child_plugin_instances %}
-        {% for child in plugin.child_plugin_instances %}
-            {# workaround because include tag does not allow recursive includes #}
-            {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=plugin.disable_child_plugins %}{% endwith %}
-        {% endfor %}
-    {% endif %}
-
-    {% if plugin.get_plugin_class.allow_children %}</div>{% endif %}{% endlanguage %}
+    <div class="cms-collapsable-container cms-hidden
+        {% if plugin.get_plugin_class.allow_children %} cms-draggables{% endif %}">
+        {% if plugin.child_plugin_instances %}
+            {% for child in plugin.child_plugin_instances %}
+                {# workaround because include tag does not allow recursive includes #}
+                {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=plugin.disable_child_plugins %}{% endwith %}
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% endlanguage %}
 </div>
