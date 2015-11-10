@@ -521,7 +521,16 @@ var CMS = window.CMS || {};
                 var text = opts.text || '';
                 var callback = opts.callback;
                 var onSuccess = opts.onSuccess;
-                var question = (text) ? confirm(text) : true;
+                // a user could click on "Prevent this page form creating additional
+                // dialogs." which would prevent the modal to be closed
+                // We fallback to "true" in this case to avoid this
+                var secureConfirm = function (message) {
+                    var start = Number(new Date());
+                    var result = confirm(message);
+                    var end = Number(new Date());
+                    return (end < (start + 10) || result === true);
+                };
+                var question = (text) ? secureConfirm(text) : true;
 
                 // cancel if question has been denied
                 if (!question) {
