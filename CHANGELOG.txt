@@ -46,6 +46,7 @@
 - Added support for 3rd party admin themes
 - Update the toolbar tutorial
 - Update the 3rd party integration tutorial
+- Fixed an issue where dialogs can't be closed when activating prevent checkbox
 
 
 === 3.1.4 (Unreleased) ===
