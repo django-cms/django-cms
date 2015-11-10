@@ -227,6 +227,10 @@
         }
     }
 
+    .cms-collapsable-container.cms-hidden > .cms-draggable {
+        display: none !important;
+    }
+
     .cms-draggable-success {
         position: relative;
     }
@@ -407,14 +411,6 @@
             display: none;
         }
 
-        > .cms-dragitem-collapsable {
-            .cms-dragitem-text {
-                padding-left: $structure-dragarea-padding-horizontal;
-            }
-            &:before {
-                display: none;
-            }
-        }
         > .cms-dragitem-collapsable,
         > .cms-dragitem {
             .cms-submenu {
