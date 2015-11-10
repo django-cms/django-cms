@@ -1130,7 +1130,7 @@ var CMS = window.CMS || {};
                 if (el.hasClass('cms-dragitem-expanded')) {
                     settings.states.splice($.inArray(id, settings.states), 1);
                     el.removeClass('cms-dragitem-expanded').parent()
-                        .find('.cms-collapsable-container').eq(0).addClass('cms-hidden');
+                        .find('> .cms-collapsable-container').addClass('cms-hidden');
 
                     if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
@@ -1148,7 +1148,7 @@ var CMS = window.CMS || {};
                 } else {
                     settings.states.push(id);
                     el.addClass('cms-dragitem-expanded').parent()
-                        .find('.cms-collapsable-container').eq(0).removeClass('cms-hidden');
+                        .find('> .cms-collapsable-container').removeClass('cms-hidden');
 
                     if (doc.data('expandmode')) {
                         items = draggable.find('.cms-draggable').find('.cms-dragitem-collapsable');
