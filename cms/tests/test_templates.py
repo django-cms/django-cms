@@ -50,7 +50,7 @@ class TemplatesConfig(CMSTestCase):
         labels = [force_text(template[1]) for template in templates]
         files = [template[0] for template in templates]
         if get_cms_setting('TEMPLATE_INHERITANCE'):
-            original_labels.append(force_text(_(constants.TEMPLATE_INHERITANCE_LABEL)))
+            original_labels.append(force_text(_('Inherit the template of the nearest ancestor')))
             original_files.append(constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(set(labels), set(original_labels))
         self.assertEqual(set(files), set(original_files))
