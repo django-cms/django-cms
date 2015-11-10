@@ -153,7 +153,7 @@ class WizardCreateView(WizardViewMixin, SessionWizardView):
                 try:
                     url = page.get_absolute_url(self.language_code)
                 except NoReverseMatch:
-                    pass
+                    url = '/'
             else:
                 url = '/'
 
