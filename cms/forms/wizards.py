@@ -69,9 +69,11 @@ class PageTypeSelect(forms.widgets.Select):
     """
     class Media:
         js = (
+            'cms/js/modules/jquery.noconflict.pre.js',
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.base.js',
             'cms/js/widgets/wizard.pagetypeselect.js',
+            'cms/js/modules/jquery.noconflict.post.js'
         )
 
 

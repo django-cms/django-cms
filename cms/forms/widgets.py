@@ -23,8 +23,10 @@ class PageSelectWidget(MultiWidget):
 
     class Media:
         js = (
+            'cms/js/modules/jquery.noconflict.pre.js',
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.pageselectwidget.js',
+            'cms/js/modules/jquery.noconflict.post.js'
         )
 
     def __init__(self, site_choices=None, page_choices=None, attrs=None):
@@ -192,8 +194,10 @@ class AppHookSelect(Select):
 
     class Media:
         js = (
+            'cms/js/modules/jquery.noconflict.pre.js',
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.apphookselect.js',
+            'cms/js/modules/jquery.noconflict.post.js'
         )
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
@@ -246,8 +250,10 @@ class ApplicationConfigSelect(Select):
 
     class Media:
         js = (
+            'cms/js/modules/jquery.noconflict.pre.js'
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.apphookselect.js',
+            'cms/js/modules/jquery.noconflict.post.js'
         )
 
     def __init__(self, attrs=None, choices=(), app_configs={}):
