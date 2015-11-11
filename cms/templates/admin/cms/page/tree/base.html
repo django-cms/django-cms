@@ -28,11 +28,14 @@
 {% block extrahead %}
 {{ block.super }}
 {% block jquery %}{% endblock %}
+<!-- load nonconflict pre and post files on line 33 and 63 to fix conflict if there is another jQuery loaded -->
+<!-- the code is included by a external file because the code has to be loaded into a python file where the wizard is loaded as well -->
 <script src="{% static "cms/js/modules/jquery.noconflict.pre.js" %}" type="text/javascript"></script>
 <script src="{% static "cms/js/dist/bundle.admin.base.min.js" %}" type="text/javascript"></script>
 
 <!-- load changelist and jstree -->
 <script src="{% static "cms/js/dist/bundle.admin.changelist.min.js" %}" type="text/javascript"></script>
+
 <script>
 (function($) {
 // CMS.$ will be passed for $
