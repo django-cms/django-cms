@@ -2,11 +2,6 @@
 
 import hashlib
 
-try:
-    from urllib.parse import urlunparse  # Py3
-except ImportError:
-    from urlparse import urlunparse  # Py2
-
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import python_2_unicode_compatible
