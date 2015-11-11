@@ -40,6 +40,7 @@
 $(document).ready(function () {
     // bind csrf token to the header
     CMS.API.Helpers.csrf('{{ csrf_token }}');
+
     // initialize tree
     new CMS.TreeManager({
         'settings': {
@@ -59,7 +60,6 @@ $(document).ready(function () {
 })(CMS.$);
 </script>
 <script src="{% static "cms/js/modules/jquery.noconflict.post.js" %}" type="text/javascript"></script>
-
 {% endblock extrahead %}
 
 {% block content %}
