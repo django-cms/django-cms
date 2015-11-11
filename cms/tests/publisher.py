@@ -537,9 +537,18 @@ class PublishingTests(TestCase):
         pageC = self.create_page('pageC', published=False, parent=pageA)
         pageB = self.create_page('pageB', published=False, parent=pageA)
         page = page.reload()
+        pageA = pageA.reload()
+        pageB = pageB.reload()
+        pageC = pageC.reload()
         pageA.publish('en')
+        page = page.reload()
+        pageB = pageB.reload()
+        pageC = pageC.reload()
         pageB.publish('en')
+        page = page.reload()
+        pageC = pageC.reload()
         pageC.publish('en')
+        page = page.reload()
         page.publish('en')
 
         drafts = Page.objects.filter(publisher_is_draft=True).order_by('path')
@@ -549,7 +558,6 @@ class PublishingTests(TestCase):
         for draft in drafts:
             self.assertEqual(draft.publisher_public_id, publics[x].pk)
             x += 1
-
 
     def test_unpublish_unpublish(self):
         name = self._testMethodName
