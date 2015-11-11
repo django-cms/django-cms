@@ -2,22 +2,17 @@
 
 import hashlib
 
-try:
-    from urllib.parse import urlunparse  # Py3
-except ImportError:
-    from urlparse import urlunparse  # Py2
-
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.http import QueryDict
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.six.moves.urllib.parse import urlparse as six_urlparse
 
 from django.utils.translation import (
     override as force_language,
     force_text,
     ugettext as _
 )
+
+from cms.utils import get_cms_setting
 
 
 class WizardBase(object):
@@ -125,12 +120,9 @@ class Wizard(WizardBase):
 
         # Add 'edit' to GET params of URL
         if self.edit_mode_on_success:
-            (scheme, netloc, path, params, query, fragment) = six_urlparse(url)
-            query_dict = QueryDict(query).copy()
-            query_dict['edit'] = ''
-            query = query_dict.urlencode()
-            url = urlunparse((scheme, netloc, path, params, query, fragment))
-
+            sep = "&" if "?" in url else "?"
+            url = '{0}{1}{2}'.format(
+                url, sep, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         return url
 
     def get_model(self):
