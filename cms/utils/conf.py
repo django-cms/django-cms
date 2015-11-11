@@ -63,7 +63,10 @@ DEFAULTS = {
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
     'APP_NAME': None,
-    'TOOLBAR_HIDE': False
+    'TOOLBAR_HIDE': False,
+    'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
+    'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
+    'WIZARD_CONTENT_PLUGIN_BODY': 'body',
 }
 
 
@@ -148,7 +151,7 @@ def get_templates():
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
-        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _(constants.TEMPLATE_INHERITANCE_LABEL)))
+        templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
 
 

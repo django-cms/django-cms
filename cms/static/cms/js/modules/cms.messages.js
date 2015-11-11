@@ -32,6 +32,9 @@ var CMS = window.CMS || {};
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
 
+                // states and events
+                this.click = 'click.cms.message';
+
                 // elements
                 this._setupUI();
             },

@@ -1,12 +1,14 @@
 {% load i18n cms_admin %}
 
-<div data-touch-action="none" id="sitemap" class="cms-tree">
+<div data-touch-action="pan-y" id="sitemap" class="cms-tree">
 <ul class="header">
     <li>
         <div class="cont">
             <div class="col2">
+                <div class="col-preview">{% trans "View" %}</div>
                 {% for lang in site_languages %}
-                <div class="col-language">{{ lang|upper }}</div>{% endfor %}
+                    <div class="col-language">{{ lang|upper }}</div>
+                {% endfor %}
                 <div class="col-navigation">{% trans "Menu" %}</div>
                 <div class="col-actions">{% trans "Actions" %}</div>
                 <div class="col-info">{% trans "Info" %}</div>

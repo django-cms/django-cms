@@ -4,7 +4,7 @@
     <div class="col1">
         {% if has_change_permission %}
             {% language preview_language %}
-            <a href="{{ page.id }}/{{ preview_language }}/preview/" target="_parent" class="title" lang="{{ preview_language }}" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;" title="{% trans "select this page" %}"{% else %}title="{% trans "edit this page" %}"{% endif %}><span>{{ page.get_admin_tree_title }}</span></a>
+            <a href="{{ page.id }}/{{ preview_language }}/preview/" target="_parent" class="title" lang="{{ preview_language }}" {% if cl.is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% else %}{% endif %}><span>{{ page.get_admin_tree_title }}</span></a>
             {% endlanguage %}
         {% else %}
             <span class="title" lang="{{ preview_language }}"><span>{{ page.get_admin_tree_title }}</span></span>
@@ -24,6 +24,9 @@
 
         {% if page.soft_root or page.is_home %}<div class="col-softroot"><span class="icon softroot-icon" title="{% if page.soft_root %}{% trans 'softroot' %}{% else %}{% trans 'home' %}{% endif %}"></span></div>{% endif %}
         {% if page.application_urls %}<div class="col-apphook"><a href="{{ page.id }}/advanced-settings/"><span class="icon apphook-icon" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}"></span></a></div>{% endif %}
+        <div class="col-preview">
+            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview{% if page.id|slugify == request.GET.page_id|slugify %} preview-active{% endif %}" title="{% trans "View on site" %}" target="_parent"><span>{% trans "View on site" %}</span></a>
+        </div>
         {% for lang in site_languages %}
         <div class="col-language">
             {% if has_change_permission %}
@@ -47,7 +50,6 @@
             </label>
         </div>
         <div class="col-actions">
-            <a href="{{ page.id }}/{{ preview_language }}/preview/" class="preview{% if page.id|slugify == request.GET.page_id|slugify %} preview-active{% endif %}" title="{% trans "View on site" %}" target="_parent"><span>{% trans "View on site" %}</span></a>
             {% if has_change_permission %}
             <a class="edit" href="{{ url }}{{ page.id }}/" data-alt-class="advanced-settings" data-alt-href="{{ url }}{{ page.id }}/advanced-settings/" title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"><span>{% trans "page settings" %}</span></a>
             {# <!--a href="{{ url }}{{ page.id }}/advanced-settings/" class="advanced-settings" title="{% trans "Advanced settings" %}"><span>{% trans "Advanced settings" %}</span></a--> #}
