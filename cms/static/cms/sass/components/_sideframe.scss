@@ -90,7 +90,7 @@
         margin-left: -$sideframe-buttons-position-right - 5;
     }
     .cms-icon-arrow-forward {
-        transform: rotate(180deg);
+        @include icon(arrow-right);
     }
     // disabled state if there is no history
     .cms-icon-disabled {

@@ -29,65 +29,68 @@
     @if $filename == alias {
         $char: "E001";
     }
-    @if $filename == arrow-wide {
+    @if $filename == arrow-right {
         $char: "E002";
     }
-    @if $filename == arrow {
+    @if $filename == arrow-wide {
         $char: "E003";
     }
-    @if $filename == bin {
+    @if $filename == arrow {
         $char: "E004";
     }
-    @if $filename == check {
+    @if $filename == bin {
         $char: "E005";
     }
-    @if $filename == close {
+    @if $filename == check {
         $char: "E006";
     }
-    @if $filename == copy {
+    @if $filename == close {
         $char: "E007";
     }
-    @if $filename == handler {
+    @if $filename == copy {
         $char: "E008";
     }
-    @if $filename == home {
+    @if $filename == handler {
         $char: "E009";
     }
-    @if $filename == loader {
+    @if $filename == home {
         $char: "E00A";
     }
-    @if $filename == lock {
+    @if $filename == loader {
         $char: "E00B";
     }
-    @if $filename == logo {
+    @if $filename == lock {
         $char: "E00C";
     }
-    @if $filename == menu {
+    @if $filename == logo {
         $char: "E00D";
     }
-    @if $filename == minus {
+    @if $filename == menu {
         $char: "E00E";
     }
-    @if $filename == paste {
+    @if $filename == minus {
         $char: "E00F";
     }
-    @if $filename == pencil {
+    @if $filename == paste {
         $char: "E010";
     }
-    @if $filename == pin {
+    @if $filename == pencil {
         $char: "E011";
     }
-    @if $filename == plus {
+    @if $filename == pin {
         $char: "E012";
     }
-    @if $filename == scissors {
+    @if $filename == plus {
         $char: "E013";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E014";
     }
-    @if $filename == window {
+    @if $filename == search {
         $char: "E015";
+    }
+    @if $filename == window {
+        $char: "E016";
     }
 
     @return $char;
@@ -102,13 +105,19 @@
     }
 }
 
-// #####################################################################################################################
-// #ICONS:start#
-// use unicode characters for accessibility reasons and use aria-hidden="true" for decorative icons
+// #############################################################################
+// ICONS:start
+// use unicode characters for accessibility reasons and use aria-hidden="true"
+// for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
+
 
 .cms-icon-alias {
     @include icon(alias);
+}
+
+.cms-icon-arrow-right {
+    @include icon(arrow-right);
 }
 
 .cms-icon-arrow-wide {
