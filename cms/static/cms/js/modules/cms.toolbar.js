@@ -117,6 +117,8 @@ var CMS = window.CMS || {};
                     e.preventDefault();
                     that.toggle();
                     that.ui.document.trigger(that.click);
+                }).on(this.click, function (e) {
+                    e.preventDefault();
                 });
 
                 // attach event to the navigation elements
