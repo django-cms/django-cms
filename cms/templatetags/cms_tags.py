@@ -658,6 +658,8 @@ class CMSToolbar(RenderBlock):
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
         context['cms_version'] =  __version__
+        context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        context['cms_edit_off'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):

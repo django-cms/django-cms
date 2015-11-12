@@ -315,7 +315,10 @@ var CMS = window.CMS || {};
                                 'csrfmiddlewaretoken': CMS.config.csrf
                             },
                             'success': function () {
-                                var url = CMS.API.Helpers.makeURL(window.location.href, ['edit_off=true']);
+                                var url = CMS.API.Helpers.makeURL(
+                                    window.location.href.split('?')[0],
+                                    [CMS.settings.edit_off + '=true']
+                                );
                                 CMS.API.Helpers.reloadBrowser(url);
                             },
                             'error': function (request) {
