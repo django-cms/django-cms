@@ -60,6 +60,7 @@ var CMS = window.CMS || {};
 
                 // states
                 this.click = 'click.cms';
+                this.pointerUp = 'pointerup.cms';
                 this.state = false;
                 this.dragging = false;
 
@@ -152,7 +153,7 @@ var CMS = window.CMS || {};
                 var modes = that.ui.toolbarModeLinks;
 
                 // show edit mode
-                modes.eq(1).on(that.click, function (e) {
+                modes.eq(1).on(that.click + ' ' + that.pointerUp, function (e) {
                     e.preventDefault();
                     // cancel if already active
                     if (CMS.settings.mode === 'edit') {
@@ -162,7 +163,7 @@ var CMS = window.CMS || {};
                     that.hide();
                 });
                 // show structure mode
-                modes.eq(0).on(that.click, function (e) {
+                modes.eq(0).on(that.click + ' ' + that.pointerUp, function (e) {
                     e.preventDefault();
                     // cancel if already active
                     if (CMS.settings.mode === 'structure') {
