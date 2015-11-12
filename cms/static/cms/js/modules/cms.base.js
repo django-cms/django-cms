@@ -195,7 +195,7 @@ var CMS = {
                         type: 'POST',
                         url: CMS.config.urls.settings,
                         data: {
-                            csrfmiddlewaretoken: this.config.csrf,
+                            csrfmiddlewaretoken: CMS.config.csrf,
                             settings: settings
                         },
                         success: function (data) {
