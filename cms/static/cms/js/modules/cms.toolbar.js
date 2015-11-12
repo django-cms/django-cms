@@ -634,6 +634,7 @@ var CMS = window.CMS || {};
              * @method _setSwitcher
              * @param {jQuery} el button element
              * @private
+             * @deprecated
              */
             _setSwitcher: function _setSwitcher(el) {
                 // save local vars
