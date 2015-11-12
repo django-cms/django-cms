@@ -25,11 +25,8 @@
     background: $white;
 
     iframe {
-         width: 10px;
-        min-width: 100%;
-        *width: 100%;
+        width: 100%;
         display: block;
-
         height: 100%;
         border: none;
         background: $white;
