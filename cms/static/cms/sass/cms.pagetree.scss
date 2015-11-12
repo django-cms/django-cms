@@ -273,6 +273,7 @@ $row-height: 41px;
         line-height: $row-height !important;
         text-align: center;
         white-space: nowrap;
+        min-width: 14px;
         width: auto;
         height: $row-height;
         padding: 0 8px;
