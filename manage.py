@@ -144,6 +144,10 @@ if __name__ == '__main__':
     DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
 
     migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
+    if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
+        print('Both --migrate and --no-migrations have been provided. --no-migrations is in effect.')
+    if '--migrate' in sys.argv:
+        sys.argv.remove('--migrate')
 
     if DJANGO_1_6:
         INSTALLED_APPS.insert(0, 'south')
