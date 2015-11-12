@@ -113,10 +113,12 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // attach event to the trigger handler
-                this.ui.toolbarTrigger.on(this.click, function (e) {
+                this.ui.toolbarTrigger.on(this.pointerUp, function (e) {
                     e.preventDefault();
                     that.toggle();
                     that.ui.document.trigger(that.click);
+                }).on(this.click, function (e) {
+                    e.preventDefault();
                 });
 
                 // attach event to the navigation elements
@@ -635,6 +637,7 @@ var CMS = window.CMS || {};
              * @method _setSwitcher
              * @param {jQuery} el button element
              * @private
+             * @deprecated
              */
             _setSwitcher: function _setSwitcher(el) {
                 // save local vars

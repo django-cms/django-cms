@@ -195,7 +195,7 @@ var CMS = {
                         type: 'POST',
                         url: CMS.config.urls.settings,
                         data: {
-                            csrfmiddlewaretoken: this.config.csrf,
+                            csrfmiddlewaretoken: CMS.config.csrf,
                             settings: settings
                         },
                         success: function (data) {
@@ -216,7 +216,7 @@ var CMS = {
                 }
 
                 // save settings
-                CMS.settings = JSON.parse(settings);
+                CMS.settings = typeof settings === 'object' ? settings : JSON.parse(settings);
 
                 // ensure new settings are returned
                 return CMS.settings;
