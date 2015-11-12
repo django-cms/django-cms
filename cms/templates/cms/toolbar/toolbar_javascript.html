@@ -44,7 +44,9 @@ $(document).ready(function () {
             'toolbar': 'expanded',
             'mode': 'edit',
             'sideframe': { 'url': '' },
-            'states': []
+            'states': [],
+            'edit': '{{ cms_edit_on }}',
+            'edit_off': '{{ cms_edit_off }}'
         },
         'clipboard': {
             'id': '{{ request.toolbar.clipboard.pk|unlocalize }}',
