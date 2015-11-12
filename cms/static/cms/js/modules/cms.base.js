@@ -216,7 +216,7 @@ var CMS = {
                 }
 
                 // save settings
-                CMS.settings = JSON.parse(settings);
+                CMS.settings = typeof settings === 'object' ? settings : JSON.parse(settings);
 
                 // ensure new settings are returned
                 return CMS.settings;
