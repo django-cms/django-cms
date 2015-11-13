@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import site
 from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.admin import UserAdmin
+from django.db import OperationalError
 from django.utils.translation import ugettext as _
 
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
@@ -37,9 +38,18 @@ class PagePermissionInlineAdmin(TabularInline):
     def raw_id_fields(cls):
         # Dynamically set raw_id_fields based on settings
         threshold = get_cms_setting('RAW_ID_USERS')
-        if threshold and get_user_model().objects.count() > threshold:
-            return ['user']
-        return []
+
+        # Given a fresh django-cms install and a django settings with the
+        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+        # django throws an OperationalError when running
+        # ./manage migrate
+        # because auth_user doesn't exists yet
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+
+        return ['user'] if threshold else []
 
     def get_queryset(self, request):
         """
