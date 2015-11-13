@@ -88,7 +88,7 @@
                 btn.trigger('click');
             });
         {% else %}
-            window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/?edit';
+            window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/?{{ cms_edit_on }}';
         {% endif %}
     </script>
 </body>

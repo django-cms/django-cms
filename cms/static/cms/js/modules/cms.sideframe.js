@@ -205,7 +205,6 @@ var CMS = window.CMS || {};
              */
             _content: function _content(url) {
                 var that = this;
-                var initialized = false;
                 var iframe = $('<iframe src="' + url + '" class="" frameborder="0" />');
                 var holder = this.ui.frame;
                 var contents;
@@ -244,12 +243,6 @@ var CMS = window.CMS || {};
                             that.close();
                         }
                     });
-
-                    // attach reload event
-                    if (initialized) {
-                        that.reloadBrowser(false, false, true);
-                    }
-                    initialized = true;
 
                     // adding django hacks
                     contents.find('.viewsitelink').attr('target', '_top');

@@ -122,11 +122,15 @@ var CMS = window.CMS || {};
                 var that = this;
 
                 // modal behaviours
-                this.ui.minimizeButton.off(this.click).on(this.click, function (e) {
+                this.ui.minimizeButton.
+                    off(this.click + ' ' + this.touchEnd)
+                    .on(this.click + ' ' + this.touchEnd, function (e) {
                     e.preventDefault();
                     that.minimize();
                 });
-                this.ui.maximizeButton.off(this.click).on(this.click, function (e) {
+                this.ui.maximizeButton
+                    .off(this.click + ' ' + this.touchEnd)
+                    .on(this.click + ' ' + this.touchEnd, function (e) {
                     e.preventDefault();
                     that.maximize();
                 });
@@ -736,7 +740,7 @@ var CMS = window.CMS || {};
 
                     var el = $('<a href="#" class="' + cls + ' ' + item.attr('class') + '">' + title + '</a>');
 
-                    el.on(that.click, function (e) {
+                    el.on(that.click + ' ' + that.touchEnd, function (e) {
                         e.preventDefault();
 
                         if (item.is('a')) {

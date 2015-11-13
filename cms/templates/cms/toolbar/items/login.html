@@ -1,7 +1,7 @@
 {% load i18n sekizai_tags cms_tags %}
 
 {% url 'logout' as logout_url %}
-<form action="{% url 'pages-root' %}{% if request.path != logout_url %}?next={{ request.path }}&amp;edit&amp;cms-toolbar-login=1{% endif %}"
+<form action="{% url 'pages-root' %}{% if request.path != logout_url %}?next={{ request.path }}&amp;{{ cms_edit_on }}&amp;cms-toolbar-login=1{% endif %}"
     class="cms-toolbar-item cms-form-login" method="post">
     {% csrf_token %}
     <label{% if request.toolbar.login_form.username.errors %} class="cms-error"{% endif %}>

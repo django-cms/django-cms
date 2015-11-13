@@ -9,6 +9,7 @@ from cms import __version__
 from cms.cache.page import set_page_cache
 from cms.models import Page
 from cms.utils import get_template_from_request
+from cms.utils.conf import get_cms_setting
 
 
 def render_page(request, page, current_language, slug):
@@ -54,6 +55,7 @@ def render_page(request, page, current_language, slug):
 def _handle_no_page(request, slug):
     context = RequestContext(request)
     context['cms_version'] = __version__
+    context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
 
     if not slug and settings.DEBUG:
         return TemplateResponse(request, "cms/welcome.html", context)
