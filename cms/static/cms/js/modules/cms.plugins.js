@@ -208,9 +208,9 @@ var CMS = window.CMS || {};
 
                 // adds edit tooltip
                 this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
-                    if (e.type !== 'touchstart') {
-                        e.stopPropagation();
-                    }
+                    // required for both, click and touch
+                    // otherwise propagnation won't work to the nested plugin
+                    e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
                     CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
