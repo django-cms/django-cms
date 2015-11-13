@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import contextlib
 import re
 
 from django.contrib.sites.models import SITE_CACHE, Site
+
 from .compat.dj import is_installed
 
 SITE_VAR = "site__exact"
@@ -157,3 +159,17 @@ def normalize_name(name):
     """
     new = re.sub('(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))', '_\\1', name)
     return new.lower().strip('_')
+
+
+@contextlib.contextmanager
+def maybe_transaction(*args, **kwargs):
+    """
+    MySQL misbehaves, even when setting READ COMMITTED isolation level
+    when nesting transactions using reversion. Thus we can't use external level
+    of transaction when doing Page._apply_revision
+    """
+    from django.db import connection, transaction
+    if connection.vendor == 'mysql':
+        yield
+    else:
+        yield transaction.atomic(*args, **kwargs)

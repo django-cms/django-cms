@@ -7,7 +7,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
-from django.db import models, transaction
+from django.db import models
 from django.shortcuts import get_object_or_404
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
@@ -26,7 +26,7 @@ from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
+from cms.utils.helpers import reversion_register, maybe_transaction
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
@@ -1343,7 +1343,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         old_titles = list(self.title_set.all())
 
         try:
-            with transaction.atomic():
+            with maybe_transaction():
                 # remove existing plugins / placeholders in the current page version
                 placeholder_ids = self.placeholders.all().values_list('pk', flat=True)
                 plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
