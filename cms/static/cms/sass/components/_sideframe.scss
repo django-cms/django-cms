@@ -59,7 +59,7 @@
 .cms-sideframe-close,
 .cms-sideframe-history {
     position: absolute;
-    top: $sideframe-buttons-position-top;
+    top: $sideframe-buttons-position-top + $sideframe-buttons-offset;
     right: $sideframe-buttons-position-right;
     z-index: z(sideframe, buttons);
     cursor: pointer;
@@ -68,14 +68,15 @@
     text-align: center;
     width: $sideframe-button-area-size;
     height: $sideframe-button-area-size;
-    margin-bottom: $sideframe-button-space;
+    background: $gray-lightest;
+    box-shadow: 0 0 3px $gray-lightest;
 
     span {
         position: absolute;
         top: 50%;
         left: 50%;
-        margin-left: -($sideframe-button-icon-size / 2);
-        margin-top: -($sideframe-button-icon-size / 2);
+        margin-left: -($sideframe-button-area-size / 4);
+        margin-top: -($sideframe-button-area-size / 4);
 
         &:hover, &:active, &:focus {
             color: $gray-darkest;
@@ -84,13 +85,20 @@
 }
 
 .cms-sideframe-history {
-    right: $sideframe-buttons-position-right + $sideframe-buttons-position-right + 5;
+    right: $sideframe-button-area-size + $sideframe-buttons-position-right;
+    width: $sideframe-button-area-size * 2;
 
-    .cms-icon-arrow-back {
-        margin-left: -$sideframe-buttons-position-right - 5;
+    .cms-icon {
+        float: left;
+        position: relative;
+        left: 0;
+        top: 0;
+        padding: 8px 4px 8px 12px;
+        margin: 0;
     }
     .cms-icon-arrow-forward {
         @include icon(arrow-right);
+        padding: 8px 12px 8px 4px;
     }
     // disabled state if there is no history
     .cms-icon-disabled {
