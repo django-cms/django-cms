@@ -58,7 +58,18 @@ var CMS = window.CMS || {};
 
                     // attach tooltip event for touch devices
                     that.domElem.on('touchstart.cms', function () {
-                        $('.cms-plugin-' + $(this).data('plugin_id')).trigger('dblclick.cms');
+                        var id = $(this).data('plugin_id');
+                        var plugin = $('.cms-plugin-' + id);
+                        // check if it is a normal plugin or a generic
+                        if (plugin.length) {
+                            plugin.trigger('dblclick.cms');
+                        } else {
+                            // generics are added through the content mode via special
+                            // template tags some generic element might be
+                            // cms-plugin-cms-page-changelist-x
+                            var generic = $('.cms-plugin[class*="cms-plugin-cms-"][class*="-' + id + '"]');
+                            generic.eq(0).trigger('dblclick.cms');
+                        }
                     });
                 });
             },
