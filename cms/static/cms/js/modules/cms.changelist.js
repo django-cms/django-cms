@@ -212,7 +212,9 @@
                     });
                 });
                 $('html').on('touchend', function (e) {
-                    if (!$(event.target).hasClass('unpuplushed') || !$(event.target).hasClass('published') || !$(event.target).hasClass('dirty')) {
+                    if (!$(event.target).hasClass('unpuplushed') ||
+                        !$(event.target).hasClass('published') ||
+                        !$(event.target).hasClass('dirty')) {
                         e.preventDefault();
                         $(langTooltips).hide();
                         $('.moveable').removeClass('hover');
