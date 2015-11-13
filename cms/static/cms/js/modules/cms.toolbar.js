@@ -454,7 +454,7 @@ var CMS = window.CMS || {};
             _show: function _show(opts) {
                 var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
                 var debugHeight = $('.cms-debug-bar').height() || 0;
-                var toolbarHeight = $('.cms-toolbar').height() + 10;
+                var toolbarHeight = $('.cms-toolbar').height();
 
                 this.ui.toolbar.css({
                     'transition': 'margin-top ' + speed + 'ms',
@@ -463,9 +463,9 @@ var CMS = window.CMS || {};
                 this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
                 // animate html
                 this.ui.body.addClass('cms-toolbar-expanded');
-                this.ui.body.animate({ 'margin-top': toolbarHeight - 10 + debugHeight }, speed, 'linear');
+                this.ui.body.animate({ 'margin-top': toolbarHeight + debugHeight }, speed, 'linear');
                 // set messages top to toolbar height
-                this.ui.messages.css('top', toolbarHeight + 1);
+                this.ui.messages.css('top', toolbarHeight);
             },
 
             /**

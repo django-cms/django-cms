@@ -303,6 +303,7 @@
     padding: $messages-padding;
     border-radius: 0 0 $messages-border-radius $messages-border-radius;
     background: rgba($messages-bgcolor, 0.74);
+    transition: top $speed-base;
     * {
         color: $messages-color;
         font-size: $messages-font-size;
@@ -348,6 +349,9 @@
 }
 .cms-messages-error strong {
     color: $color-danger;
+}
+&.cms-toolbar-debug .cms-messages {
+    margin-top: $toolbar-debug-height;
 }
 
 //###########################################################
