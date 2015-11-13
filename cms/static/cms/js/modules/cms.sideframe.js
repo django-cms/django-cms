@@ -142,9 +142,15 @@ var CMS = window.CMS || {};
                 var language = 'language=' + CMS.config.request.language;
                 var page_id = 'page_id=' + CMS.config.request.page_id;
                 var params = [];
-                var width = CMS.settings.sideframe.position || (window.innerWidth * this.options.sideframeWidth);
+                var width = window.innerWidth;
                 var currentWidth = this.ui.sideframe.outerWidth();
                 var isFrameVisible = this.ui.sideframe.is(':visible');
+
+                // set the ratio for bigger devices than mobile
+                if (this.ui.body.width() >= CMS.BREAKPOINTS.mobile) {
+                    width = CMS.settings.sideframe.position ||
+                        (this.options.sideframeWidth * 100 + '%');
+                }
 
                 // We have to rebind events every time we open a sideframe
                 // because the event handlers contain references to the instance
@@ -305,6 +311,9 @@ var CMS = window.CMS || {};
                         that.close();
                     }
                 });
+
+                // disable scrolling for touch
+                this.ui.body.addClass('cms-prevent-scrolling');
             },
 
             /**
@@ -355,6 +364,9 @@ var CMS = window.CMS || {};
                 }
 
                 this.ui.body.off('keydown.cms.close');
+
+                // enable scrolling again
+                this.ui.body.removeClass('cms-prevent-scrolling');
             },
 
             /**
