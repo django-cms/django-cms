@@ -209,7 +209,7 @@ var CMS = window.CMS || {};
                 // adds edit tooltip
                 this.ui.container.on(this.pointerOverAndOut + ' ' + this.touchStart, function (e) {
                     // required for both, click and touch
-                    // otherwise propagnation won't work to the nested plugin
+                    // otherwise propagation won't work to the nested plugin
                     e.stopPropagation();
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
@@ -755,7 +755,7 @@ var CMS = window.CMS || {};
                 });
 
                 that._setupActions(nav);
-                // prevent propagnation
+                // prevent propagation
                 nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
@@ -875,7 +875,7 @@ var CMS = window.CMS || {};
                     });
                 });
 
-                // prevent propagnation
+                // prevent propagation
                 nav.on([this.pointerUp, this.pointerDown, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
