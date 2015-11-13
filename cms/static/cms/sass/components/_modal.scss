@@ -152,9 +152,7 @@
         position: relative;
         top: ($modal-header-button-area-size - $icon-size) / 2;
     }
-    &:hover,
-    &:active,
-    &:focus {
+    &:hover {
         color: $color-primary;
     }
 }
@@ -177,6 +175,7 @@
     }
     .cms-modal-maximized & {
         color: $color-primary;
+        @include icon(minimize);
     }
 }
 
