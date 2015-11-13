@@ -47,7 +47,6 @@
 - Update the toolbar tutorial
 - Update the 3rd party integration tutorial
 - Fixed an issue where dialogs can't be closed when activating prevent checkbox
-– Fixed pagetree col width on change menu state
 
 
 === 3.1.4 (Unreleased) ===
