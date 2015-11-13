@@ -211,6 +211,11 @@
                         }
                     });
                 });
+                   $('html').on('touchend', function (e) {
+                    e.preventDefault();
+                    $(langTooltips).hide();
+                    $('.moveable').removeClass('hover');
+                });
             },
 
             setupUIHacks: function () {
