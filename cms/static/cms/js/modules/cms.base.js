@@ -47,6 +47,17 @@ var CMS = {
         CMD_RIGHT: 93,
         CMD_FIREFOX: 224,
         CTRL: 17
+    },
+    /**
+     * Provides breakpoints for certain device widths
+     *
+     * @module CMS
+     * @submodule CMS.BREAKPOINTS
+     * @example
+     *     if (window.width >= CMS.BREAKPOINTS.mobile) { ... };
+     */
+    BREAKPOINTS: {
+        mobile: 420
     }
 };
 
