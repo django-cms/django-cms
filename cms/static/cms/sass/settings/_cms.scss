@@ -289,9 +289,10 @@ $login-form-submit-padding-horizontal: 15px;
 
 //##############################################################################
 // Sideframe
-$sideframe-buttons-position-top: $toolbar-height + 5px;
+$sideframe-buttons-position-top: $toolbar-height;
 $sideframe-buttons-position-right: 20px;
-$sideframe-button-area-size: 30px;
+$sideframe-buttons-offset: 5px;
+$sideframe-button-area-size: 32px;
 $sideframe-button-icon-size: 12px;
 $sideframe-button-space: 2px;
 $sideframe-resize-width: 15px;
