@@ -1,10 +1,17 @@
 {% extends "admin/change_form.html" %}{% load i18n cms_tags %}
 
-{% block extrahead %}{{ block.super }}
-<script type="text/javascript">
-    if (history.pushState && location.href.indexOf('reload_window') > -1) {
-        history.pushState(null, null, location.href.replace(/[?&]reload_window/, ''));
-        window.top.location.reload()
+{% block extrahead %}
+{{ block.super }}
+<script>
+    var CMS = window.parent.CMS;
+    // we need to reload the parent window once "?reload_window" is defined and
+    // set the new url for the sideframe with the correct language specification
+    if (location.href.indexOf('reload_window') > -1 && CMS) {
+        // save url in settings
+        CMS.settings.sideframe.url = window.location.href.replace(/[?&]reload_window/, '');
+        CMS.settings = CMS.API.Helpers.setSettings(CMS.settings);
+        // reload everything
+        CMS.API.Helpers.reloadBrowser();
     }
 </script>
 {% endblock %}

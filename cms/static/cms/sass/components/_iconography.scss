@@ -68,29 +68,32 @@
     @if $filename == menu {
         $char: "E00E";
     }
-    @if $filename == minus {
+    @if $filename == minimize {
         $char: "E00F";
     }
-    @if $filename == paste {
+    @if $filename == minus {
         $char: "E010";
     }
-    @if $filename == pencil {
+    @if $filename == paste {
         $char: "E011";
     }
-    @if $filename == pin {
+    @if $filename == pencil {
         $char: "E012";
     }
-    @if $filename == plus {
+    @if $filename == pin {
         $char: "E013";
     }
-    @if $filename == scissors {
+    @if $filename == plus {
         $char: "E014";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E015";
     }
-    @if $filename == window {
+    @if $filename == search {
         $char: "E016";
+    }
+    @if $filename == window {
+        $char: "E017";
     }
 
     @return $char;
@@ -166,6 +169,10 @@
 
 .cms-icon-menu {
     @include icon(menu);
+}
+
+.cms-icon-minimize {
+    @include icon(minimize);
 }
 
 .cms-icon-minus {

@@ -1,0 +1,19 @@
+// #############################################################################
+// GENERAL
+
+// general styling
+.cms {
+    position: absolute;
+    top: $toolbar-debug-height;
+    left: 0;
+    z-index: z(base);
+    width: 100%;
+}
+
+// other styles that might be used by components accross the components
+.cms-prevent-scrolling {
+    overflow: hidden !important;
+    body {
+        overflow: hidden !important;
+    }
+}
