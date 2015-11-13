@@ -27,6 +27,13 @@ def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
 class BaseFormMixin(object):
     has_separate_optional_fields = False
 
+    class Media:
+        js = (
+            'cms/js/modules/jquery.noconflict.pre.js',
+            'cms/js/dist/bundle.admin.base.min.js',
+            'cms/js/modules/jquery.noconflict.post.js'
+        )
+
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop('wizard_page', None)
         self.user = kwargs.pop('wizard_user', None)
