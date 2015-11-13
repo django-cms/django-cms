@@ -212,7 +212,7 @@ Pending deprecations
 
 In django CMS 3.3:
 
-    Django 1.6 and Python 2.6 will no longer be supported. If you still using these versions, you
-    are strongly encouraged to begin exploring the upgrade process to a newer version.
+    Django 1.6, 1.7 and Python 2.6 will no longer be supported. If you still using these versions,
+    you are strongly encouraged to begin exploring the upgrade process to a newer version.
 
     The :ref:`CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE` setting will be removed.
