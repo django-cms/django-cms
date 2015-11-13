@@ -78,7 +78,7 @@
         margin-left: -($sideframe-button-area-size / 4);
         margin-top: -($sideframe-button-area-size / 4);
 
-        &:hover, &:active, &:focus {
+        &:hover {
             color: $gray-darkest;
         }
     }
@@ -104,7 +104,7 @@
     .cms-icon-disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        &:hover, &:active, &:focus {
+        &:hover {
             color: $gray-light;
         }
     }
