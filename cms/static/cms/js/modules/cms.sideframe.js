@@ -257,15 +257,6 @@ var CMS = window.CMS || {};
                     that._addToHistory(this.contentWindow.location.href);
                 });
 
-                // prevent scrolling in underlying page
-                iframe.on('mouseenter mouseleave', function (e) {
-                    if (e.type === 'mouseenter') {
-                        that.ui.body.addClass('cms-prevent-scrolling');
-                    } else {
-                        that.ui.body.removeClass('cms-prevent-scrolling');
-                    }
-                });
-
                 // inject iframe
                 holder.html(iframe);
             },
@@ -320,6 +311,9 @@ var CMS = window.CMS || {};
                         that.close();
                     }
                 });
+
+                // disable scrolling for touch
+                this.ui.body.addClass('cms-prevent-scrolling');
             },
 
             /**
@@ -370,6 +364,9 @@ var CMS = window.CMS || {};
                 }
 
                 this.ui.body.off('keydown.cms.close');
+
+                // enable scrolling again
+                this.ui.body.removeClass('cms-prevent-scrolling');
             },
 
             /**
