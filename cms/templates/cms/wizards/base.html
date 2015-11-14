@@ -13,5 +13,7 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <script type="text/javascript" src="{% static "admin/js/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "admin/js/jquery.init.js" %}"></script>
     {{ form.media }}
 {% endblock %}
