@@ -48,6 +48,7 @@
 - Update the 3rd party integration tutorial
 - Fixed an issue where dialogs can't be closed when activating prevent checkbox
 - Fixed edit and edit_off constants not being honoured in frontend code
+- Deprecate CMSPlugin.disable_child_plugin in favour of disable_child_plugins
 
 
 === 3.1.4 (Unreleased) ===
