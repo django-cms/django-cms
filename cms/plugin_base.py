@@ -118,7 +118,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     require_parent = False
     parent_classes = None
 
-    disable_child_plugin = False
+    disable_child_plugins = False
+    disable_child_plugin = False  # DEPRECATED: REMOVE IN CMS v3.3
 
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
