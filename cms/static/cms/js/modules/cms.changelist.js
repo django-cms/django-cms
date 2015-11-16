@@ -151,7 +151,8 @@
 
                     if (e.type === 'touchstart') {
                         e.preventDefault();
-                        touchUsedNode = touchUsedNode === e.target ? false : e.target;
+                        var target = $(e.target).closest(langTrigger);
+                        touchUsedNode = touchUsedNode && touchUsedNode.is(target) ? false : target;
                         if (touchUsedNode) {
                             return;
                         }
@@ -215,7 +216,6 @@
                     if (!$(event.target).hasClass('unpuplushed') ||
                         !$(event.target).hasClass('published') ||
                         !$(event.target).hasClass('dirty')) {
-                        e.preventDefault();
                         $(langTooltips).hide();
                         $('.moveable').removeClass('hover');
                     }
