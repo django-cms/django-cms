@@ -1,14 +1,17 @@
 {% load i18n l10n cms_tags %}
 
+{% with allow_children=plugin.get_plugin_instance.1.allow_children disable_child_plugins=plugin.get_plugin_instance.1.disable_child_plugins %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
-    {% if plugin.disable_child_plugins %} cms-draggable-disabled{% endif %}
+    {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
+
     <div class="cms-dragitem cms-dragitem-handler
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% language request.toolbar.toolbar_language %}
         {% if not disabled_child %}
-            <div class="cms-submenu-btn cms-submenu-add cms-btn{% if plugin.disable_child_plugins %} cms-btn-disabled{% endif %}">
-                {% if plugin.disable_child_plugins %}
+            <div class="cms-submenu-btn cms-submenu-add cms-btn
+                {% if not allow_children %} cms-btn-disabled{% endif %}">
+                {% if not allow_children %}
                 <span class="cms-hover-tooltip" data-tooltip="{% trans "You cannot add plugins to this plugin." %}"></span>
                 {% else %}
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}"></span>
@@ -17,13 +20,13 @@
             <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
                 <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}"></span>
             </div>
+            <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
         {% else %}
             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
                 data-tooltip="{% trans "This plugin cannot be moved or edited outside of its parent" %}">
                 <span class="cms-icon cms-icon-lock"></span>
             </div>
         {% endif %}
-        <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
                 <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
@@ -50,13 +53,14 @@
     </div>
 
     <div class="cms-collapsable-container cms-hidden
-        {% if plugin.get_plugin_class.allow_children %} cms-draggables{% endif %}">
+        {% if allow_children %} cms-draggables{% endif %}">
         {% if plugin.child_plugin_instances %}
             {% for child in plugin.child_plugin_instances %}
                 {# workaround because include tag does not allow recursive includes #}
-                {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=plugin.disable_child_plugins %}{% endwith %}
+                {% with template_name="cms/toolbar/dragitem.html" %}{% include template_name with plugin=child disabled_child=disable_child_plugins %}{% endwith %}
             {% endfor %}
         {% endif %}
     </div>
     {% endlanguage %}
 </div>
+{% endwith %}
