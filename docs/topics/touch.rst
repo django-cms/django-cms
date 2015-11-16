@@ -46,14 +46,14 @@ Device support
 Smaller devices such as most phones are too small to be adequately usable. For example, your Apple
 Watch is sadly unlikely to provide a very good django CMS editing experience.
 
-Older devices will often lack the performance to support support a usefully responsive frontend
+Older devices will often lack the performance to support a usefully responsive frontend
 editing/administration interface.
 
 The following devices are known to work well, so newer devices and more powerful models should also
 be suitable:
 
 * iOS: Apple iPad Air 1, Mini 4
-* Android: Asus Nexus 7, Sony Xperia Z2 Tablet, Samsung Galaxy Tab 4
+* Android: Sony Xperia Z2 Tablet, Samsung Galaxy Tab 4
 * Windows 10: Microsoft Surface
 
 We welcome feedback about specific devices.
