@@ -213,9 +213,9 @@
                     });
                 });
                 $('html').on('touchend', function (e) {
-                    if (!$(event.target).hasClass('unpuplushed') ||
-                        !$(event.target).hasClass('published') ||
-                        !$(event.target).hasClass('dirty')) {
+                    if (!$(e.target).hasClass('unpublished') ||
+                        !$(e.target).hasClass('published') ||
+                        !$(e.target).hasClass('dirty')) {
                         $(langTooltips).hide();
                         $('.moveable').removeClass('hover');
                     }
