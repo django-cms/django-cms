@@ -3,9 +3,9 @@ Caching
 #######
 
 
-*****
-Setup
-*****
+******
+Set-up
+******
 
 To setup caching configure a caching backend in django.
 

@@ -176,7 +176,7 @@ For example::
 
     {% url 'my_view' %}
 
-Will not work anymore when you namespace an app. You will need to do something like::
+Will not work any more when you namespace an app. You will need to do something like::
 
     {% url 'my_namespace:my_view' %}
 

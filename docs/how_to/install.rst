@@ -382,7 +382,7 @@ for detailed installation information, and then return to this tutorial.
 
 If you opt for the core plugins you should take care that directory to which
 the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
-relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which Django
+relative to :setting:`django:MEDIA_ROOT`) is writeable by the user under which Django
 will be running. If you have opted for django-filer there is a similar requirement
 for its configuration.
 
@@ -468,7 +468,7 @@ setting::
 .. note::
 
     Please make sure both the ``static`` and ``media`` sub-folders exist in your
-    project and are writable.
+    project and are writeable.
 
 Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
 

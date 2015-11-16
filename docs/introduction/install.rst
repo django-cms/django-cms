@@ -97,7 +97,7 @@ indicated with an asterisk *****).
 * Languages to enable. Option can be provided multiple times, or as a comma separated list: ``en,
   de`` *****
 * Optional default time zone: ``America/Chicago``
-* Activate Django timezone support: ``yes``
+* Activate Django time zone support: ``yes``
 * Activate CMS permission management: ``yes``
 * Use Twitter Bootstrap Theme: ``yes`` *****
 * Use custom template set: ``no``

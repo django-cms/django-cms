@@ -23,7 +23,7 @@ Bug Fixes
 * Fix some Python 3.4 compatibility issue when using proxy modules
 * Fix corner case in plugin copy
 * Documentation fixes
-* Minor code cleanups
+* Minor code clean-ups
 
 .. warning:: Fix for plugin copy patches a reference leak in
              ``cms.models.pluginmodel.CMSPlugin.copy_plugins``, which caused the
