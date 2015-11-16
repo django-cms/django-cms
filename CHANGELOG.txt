@@ -503,3 +503,4 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix JS error when using PageSelectWidget
 - Fix whitespace markup issues in draft mode
 - Detect plugin migrations layout in tests
+- Fix some treebeard corruption issues
