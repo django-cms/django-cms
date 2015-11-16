@@ -151,7 +151,8 @@
 
                     if (e.type === 'touchstart') {
                         e.preventDefault();
-                        touchUsedNode = touchUsedNode === e.target ? false : e.target;
+                        var target = $(e.target).closest(langTrigger);
+                        touchUsedNode = touchUsedNode && touchUsedNode.is(target) ? false : target;
                         if (touchUsedNode) {
                             return;
                         }
