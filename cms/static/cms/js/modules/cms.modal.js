@@ -506,12 +506,14 @@ var CMS = window.CMS || {};
                     this.ui.body.addClass('cms-modal-maximized');
 
                     this.maximized = true;
+                    this.dispatchEvent('modal-maximized', { instance: this });
                 } else {
                     // minimize
                     this.ui.body.removeClass('cms-modal-maximized');
                     this.ui.modal.css(this.ui.modal.data('css'));
 
                     this.maximized = false;
+                    this.dispatchEvent('modal-restored', { instance: this });
                 }
             },
 
