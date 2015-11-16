@@ -418,6 +418,14 @@ cms.toolbar.toolbar
 cms.toolbar.items
 =================
 
+.. important:: **Overlay** and **sideframe**
+
+    Then django CMS *sideframe* has been replaced with an *overlay* mechanism. The API still refers
+    to the ``sideframe``, because it is invoked in the same way, and what has changed is merely the
+    behaviour in the user's browser.
+
+    In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
+
 .. module:: cms.toolbar.items
 
 
@@ -489,16 +497,16 @@ cms.toolbar.items
 
     .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT, position=None)
 
-        Adds an item which opens ``url`` in the side frame and returns it.
+        Adds an item which opens ``url`` in the sideframe and returns it.
 
-        ``on_close`` can be set to ``None`` to do nothing when the side frame
+        ``on_close`` can be set to ``None`` to do nothing when the sideframe
         closes, :attr:`REFRESH_PAGE` to refresh the page when it
         closes or a URL to open once it closes.
 
     .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None)
 
         The same as :meth:`add_sideframe_item`, but opens the ``url`` in a
-        modal dialog instead of the side frame.
+        modal dialog instead of the sideframe.
 
         ``on_close`` can be set to ``None`` to do nothing when the side modal
         closes, :attr:`REFRESH_PAGE` to refresh the page when it
@@ -575,7 +583,7 @@ cms.toolbar.items
 
 .. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT)
 
-    Item that opens ``url`` in side frame.
+    Item that opens ``url`` in sideframe.
 
 
 .. class:: AjaxItem(name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None, question=None, side=LEFT)

@@ -9,6 +9,13 @@ mode into your application, and provide your users with a streamlined editing ex
 
 For the toolbar API reference, please refer to :ref:`toolbar-api-reference`.
 
+.. important:: **Overlay** and **sideframe**
+
+    Then django CMS *sideframe* has been replaced with an *overlay* mechanism. The API still refers
+    to the ``sideframe``, because it is invoked in the same way, and what has changed is merely the
+    behaviour in the user's browser.
+
+    In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
 
 ***********
 Registering

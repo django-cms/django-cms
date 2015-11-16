@@ -24,7 +24,8 @@ What's new in 3.2
   devices
 * enhanced and polished user interface
 * much-needed improvements to the structure-board
-* enhancements to components such as the pop-up plugin editor, sideframe and the toolbar
+* enhancements to components such as the pop-up plugin editor, sideframe (now called the *overlay*)
+  and the toolbar
 * significant speed improvements on loading, HTTP requests and file sizes
 * restarts are no longer required when changing apphook configurations
 * a new content wizard system, adaptable to arbitrary content types
@@ -47,7 +48,7 @@ For general information about touch interface support, see the :ref:`touch scree
     responsibility of the site developer.
 
 Numerous aspects of the CMS and its interface have been updated to work well with touch-screen
-devices. There are are some restrictions and warnings that need to be borne in mind.
+devices. There are some restrictions and warnings that need to be borne in mind.
 
 
 Device support
@@ -56,7 +57,7 @@ Device support
 Smaller devices such as most phones are too small to be adequately usable. For example, your Apple
 Watch is sadly unlikely to provide a very good django CMS editing experience.
 
-Older devices will often lack the performance to support support a usefully responsive frontend
+Older devices will often lack the performance to support a usefully responsive frontend
 editing/administration interface.
 
 See :ref:`device-support` for information about devices that have been tested and confirmed to
@@ -233,7 +234,12 @@ Replaced the sideframe with an overlay
 ======================================
 
 The sideframe that could be expanded and collapsed to reveal a view of the admin and other controls
-has been replaced by a simpler and more elegant overlay mechanism.
+has been replaced by a simpler and more elegant *overlay* mechanism.
+
+The API documentation still refers to the ``sideframe``, because it is invoked in the same way, and
+what has changed is merely the behaviour in the user's browser.
+
+In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
 
 
 New startup screen
