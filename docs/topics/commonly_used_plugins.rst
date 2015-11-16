@@ -137,7 +137,7 @@ There are several solutions for Python and Django out there to automatically
 resize your pictures, you can find some on `Django Packages`_ and compare them
 there.
 
-In your project template directory create a folder called ``djangocms_picture/plugins`` and
+In your project template directory create a folder called ``cms/plugins`` and
 in it create a file called ``picture.html``. Here is an example
 ``picture.html`` template using `easy-thumbnails`_:
 
