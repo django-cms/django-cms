@@ -20,7 +20,8 @@ What's new in 3.2
 *****************
 
 * :ref:`new welcome page <create-first-page>` to help new users
-* full touch-screen support at all sizes from small tablets to table-top devices
+* touch-screen support for most editing interfaces, for sizes from small tablets to table-top
+  devices
 * enhanced and polished user interface
 * much-needed improvements to the structure-board
 * enhancements to components such as the pop-up plugin editor, sideframe and the toolbar
@@ -32,6 +33,65 @@ What's new in 3.2
 ******************************
 Changes that require attention
 ******************************
+
+Touch interface support
+=======================
+
+For general information about touch interface support, see the :ref:`touch screen device notes
+<touch>` in the documentation.
+
+.. important::
+
+    These notes about touch interface support apply only to the **django CMS admin and editing
+    interfaces**. The visitor-facing published site is **wholly independent** of this, and the
+    responsibility of the site developer.
+
+Numerous aspects of the CMS and its interface have been updated to work well with touch-screen
+devices. There are are some restrictions and warnings that need to be borne in mind.
+
+
+Device support
+--------------
+
+Smaller devices such as most phones are too small to be adequately usable. For example, your Apple
+Watch is sadly unlikely to provide a very good django CMS editing experience.
+
+Older devices will often lack the performance to support support a usefully responsive frontend
+editing/administration interface.
+
+See :ref:`device-support` for information about devices that have been tested and confirmed to
+work well.
+
+There are some device-specific issues still to be resolved. Some of these relate to the CKEditor
+(the default django CMS text editor). We will continue to work on these and they will be addressed
+in a future release.
+
+
+General issues
+--------------
+
+* Editing links that lack sufficient padding is currently difficult or impossible using
+  touch-screens.
+
+* Adding links is known to be problematic on some Android devices, because of the behaviour of the
+  keyboard.
+
+
+CKEditor issues
+---------------
+
+Scrolling on narrow devices, especially when opening the keyboard inside the CKEditor, does not
+always work ideally - sometimes the keyboard can appear in the wrong place on-screen.
+
+Sometimes the CKEditor moves unexpectedly on-screen in use.
+
+
+Feedback required
+-----------------
+
+We've tested the CMS interface extensively, but will be very keen to have feedback from other users
+- device reports, bug reports and general suggestions and opinions are very welcome.
+
 
 Bug-fixes
 =========
@@ -169,10 +229,10 @@ You can optionally enable the old appearance and behaviour with the
 :ref:`CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE` setting (this option will be removed in 3.3).
 
 
-Replaced the sidebar with an overlay
-====================================
+Replaced the sideframe with an overlay
+======================================
 
-The sidebar that could be expanded and collapsed to reveal a view of the admin and other controls
+The sideframe that could be expanded and collapsed to reveal a view of the admin and other controls
 has been replaced by a simpler and more elegant overlay mechanism.
 
 
