@@ -709,7 +709,7 @@ By default, django CMS creates a folder called ``cms_page_media`` in your
 static files folder where all uploaded media files are stored. The media files
 are stored in sub-folders numbered with the id of the page.
 
-You need to ensure that the directory to which it points is writable by the
+You need to ensure that the directory to which it points is writeable by the
 user under which Django will be running.
 
 
@@ -860,7 +860,7 @@ default
     ``True``
 
 Should the output of pages be cached?
-Takes the language, and timezone into account. Pages for logged in users are not cached.
+Takes the language, and time zone into account. Pages for logged in users are not cached.
 If the toolbar is visible the page is not cached as well.
 
 
@@ -873,7 +873,7 @@ default
     ``True``
 
 Should the output of the various placeholder template tags be cached?
-Takes the current language and timezone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
+Takes the current language and time zone into account. If the toolbar is in edit mode or a plugin with ``cache=False`` is
 present the placeholders will not be cached.
 
 

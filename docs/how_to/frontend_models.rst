@@ -15,7 +15,7 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 
 .. note::
 
-    This interface is not currently available for touchscreen users, but will be improved in
+    This interface is not currently available for touch-screen users, but will be improved in
     future releases.
 
 .. warning::

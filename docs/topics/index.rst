@@ -9,6 +9,7 @@ concerned with explaining *how to do things* than with helping you understand
 .. toctree::
     :maxdepth: 2
 
+    touch
     menu_system
     publishing
     multiple_languages
