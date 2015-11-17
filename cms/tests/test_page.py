@@ -103,9 +103,12 @@ class PagesTestCase(CMSTestCase):
         page1 = create_page('home', 'nav_playground.html', 'en')
         page2 = create_page('page2', 'nav_playground.html', 'en', parent=page1)
         page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2)
-        page1 = page1.reload()
-        page2 = page2.reload()
-        page3 = page3.reload()
+        page1.publish('en')
+        page2.publish('en')
+        page3.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
 
         self.assertEqual(page1.depth, 1)
         self.assertEqual(page1.numchild, 1)
@@ -120,16 +123,67 @@ class PagesTestCase(CMSTestCase):
         self.assertTrue(page3.is_leaf())
 
         page3.delete()
-        page1 = page1.reload()
-        page2 = page2.reload()
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 0)
+        self.assertTrue(page2.is_leaf())
+
+        page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2, reverse_id='page3')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
+
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
+
+        page1.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        page2.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        page3.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+        page1_p = page1.reload().get_public_object()
+        page2_p = page2.reload().get_public_object()
+        page3_p = page3.reload().get_public_object()
 
         self.assertEqual(page1.depth, 1)
         self.assertEqual(page1.numchild, 1)
         self.assertFalse(page1.is_leaf())
 
         self.assertEqual(page2.depth, 2)
-        self.assertEqual(page2.numchild, 0)
-        self.assertTrue(page2.is_leaf())
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
+
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
+
+        self.assertEqual(page1_p.depth, 1)
+        self.assertEqual(page1_p.numchild, 1)
+        self.assertFalse(page1_p.is_leaf())
+
+        self.assertEqual(page2_p.depth, 2)
+        self.assertEqual(page2_p.numchild, 1)
+        self.assertFalse(page2_p.is_leaf())
+
+        self.assertEqual(page3_p.depth, 3)
+        self.assertEqual(page3_p.numchild, 0)
+        self.assertTrue(page3_p.is_leaf())
 
     def test_create_page_admin(self):
         """
