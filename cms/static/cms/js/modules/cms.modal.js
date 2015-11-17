@@ -881,7 +881,7 @@ var CMS = window.CMS || {};
                     CMS.API.Toolbar.hideLoader();
 
                     // show messages in toolbar if provided
-                    messageList = $(iframe.contents().find('.messagelist');
+                    messageList = iframe.contents().find('.messagelist');
                     messages = iframe.contents().find('.messagelist li');
                     if (messages.length) {
                         CMS.API.Messages.open({
