@@ -520,6 +520,23 @@ var CMS = {
              */
             dispatchEvent: function dispatchEvent(eventName, payload) {
                 return root.trigger(_ns(eventName), [payload]);
+            },
+
+            once: function once(fn) {
+                var result;
+                var didRunOnce = false;
+
+                return function () {
+                    console.log('running "once", did already run?', didRunOnce);
+                    if (!didRunOnce) {
+                        didRunOnce = true;
+                        result = fn.apply(this, arguments);
+                    }
+                    if (didRunOnce) {
+                        fn = undefined;
+                    }
+                    return result;
+                };
             }
         };
 
