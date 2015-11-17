@@ -445,6 +445,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         menu_pool.clear(site_id=site.pk)
         return first_page
 
+    def delete(self):
+        pages = [self.pk]
+        if self.publisher_public_id:
+            pages.append(self.publisher_public_id)
+        self.__class__.objects.filter(pk__in=pages).delete()
+
     def save(self, no_signals=False, commit=True, **kwargs):
         """
         Args:
