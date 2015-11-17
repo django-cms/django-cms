@@ -1112,6 +1112,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         try:
             path = page.get_absolute_url(language=language)
+            path = '%s?%s' % (
+                path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         except:
             referer = request.META.get('HTTP_REFERER', '')
             path = '../../'
