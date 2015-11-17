@@ -25,7 +25,7 @@ var CMS = window.CMS || {};
          */
         CMS.Tooltip = new CMS.Class({
 
-            initialize: function () {
+            initialize: function initialize() {
                 this.body = $('body');
                 /**
                  * Are we on touch device?
@@ -41,36 +41,43 @@ var CMS = window.CMS || {};
                 this.domElem = this._pick();
 
                 this._checkTouch();
+                this._forceTouchOnce = CMS.API.Helpers.once(this._forceTouch);
             },
 
             /**
              * Checks for touch event and switches to touch tooltip if detected.
              *
-             * @method checkTouch
+             * @method _checkTouch
              * @private
              */
-            _checkTouch: function () {
-                var that = this;
+            _checkTouch: function _checkTouch() {
+                this.body.one('touchstart.cms', $.proxy(this._forceTouchOnce, this));
+            },
 
-                this.body.one('touchstart.cms', function () {
-                    that.isTouch = true;
-                    that.domElem = that._pick();
+            /**
+             * Force tooltip to be "touch".
+             *
+             * @method _forceTouch
+             * @private
+             */
+            _forceTouch: function _forceTouch() {
+                this.isTouch = true;
+                this.domElem = this._pick();
 
-                    // attach tooltip event for touch devices
-                    that.domElem.on('touchstart.cms', function () {
-                        var id = $(this).data('plugin_id');
-                        var plugin = $('.cms-plugin-' + id);
-                        // check if it is a normal plugin or a generic
-                        if (plugin.length) {
-                            plugin.trigger('dblclick.cms');
-                        } else {
-                            // generics are added through the content mode via special
-                            // template tags some generic element might be
-                            // cms-plugin-cms-page-changelist-x
-                            var generic = $('.cms-plugin[class*="cms-plugin-cms-"][class*="-' + id + '"]');
-                            generic.eq(0).trigger('dblclick.cms');
-                        }
-                    });
+                // attach tooltip event for touch devices
+                this.domElem.on('touchstart.cms', function () {
+                    var id = $(this).data('plugin_id');
+                    var plugin = $('.cms-plugin-' + id);
+                    // check if it is a normal plugin or a generic
+                    if (plugin.length) {
+                        plugin.trigger('dblclick.cms');
+                    } else {
+                        // generics are added through the content mode via special
+                        // template tags some generic element might be
+                        // cms-plugin-cms-page-changelist-x
+                        var generic = $('.cms-plugin[class*="cms-plugin-cms-"][class*="-' + id + '"]');
+                        generic.eq(0).trigger('dblclick.cms');
+                    }
                 });
             },
 
@@ -83,19 +90,19 @@ var CMS = window.CMS || {};
              * @param {String} name current plugin name
              * @param {String} id current plugin id
              */
-            displayToggle: function (isShown, e, name, id) {
+            displayToggle: function displayToggle(isShown, e, name, id) {
                 isShown ? this.show(e, name, id) : this.hide();
             },
 
             /**
-             * Shows tooltip with specific plugin-related parameters
+             * Shows tooltip with specific plugin-related parameters.
              *
              * @method show
              * @param {Object} e
              * @param {String} name current plugin name
              * @param {String} id current plugin id
              */
-            show: function (e, name, id) {
+            show: function show(e, name, id) {
                 var tooltip = this.domElem;
                 var that = this;
 
@@ -118,11 +125,11 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Hides tooltip
+             * Hides tooltip.
              *
              * @method hide
              */
-            hide: function () {
+            hide: function hide() {
                 // change css
                 this.domElem.css('visibility', 'hidden').hide();
 
@@ -138,7 +145,7 @@ var CMS = window.CMS || {};
              * @method _pick
              * @private
              */
-            _pick: function () {
+            _pick: function _pick() {
                 $('.cms-tooltip-touch, .cms-tooltip').css('visibility', 'hidden').hide();
                 return this.isTouch ? $('.cms-tooltip-touch') : $('.cms-tooltip');
             },
@@ -151,7 +158,7 @@ var CMS = window.CMS || {};
              * @param {Object} e event object
              * @param {jQuery} tooltip element
              */
-            position: function (e, tooltip) {
+            position: function position(e, tooltip) {
                 // so lets figure out where we are
                 var offset = 20;
                 var relX = e.pageX - $(tooltip).offsetParent().offset().left;
@@ -164,7 +171,6 @@ var CMS = window.CMS || {};
                     top: relY - 12
                 });
             }
-
         });
     });
 })(CMS.$);

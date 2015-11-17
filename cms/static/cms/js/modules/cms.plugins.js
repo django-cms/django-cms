@@ -36,7 +36,7 @@ var CMS = window.CMS || {};
             if (e.keyCode === CMS.KEYS.SHIFT) {
                 doc.data('expandmode', false);
             }
-        }).on('click', '.cms-plugin a, a:has(.cms-plugin)', function (e) {
+        }).on('click.cms.plugin', '.cms-plugin a, a:has(.cms-plugin)', function (e) {
             // prevents single click from messing up the edit call
             // don't go to the link if there is custom js attached to it
             // or if it's clicked along with shift, ctrl, cmd
@@ -211,6 +211,9 @@ var CMS = window.CMS || {};
                     // required for both, click and touch
                     // otherwise propagation won't work to the nested plugin
                     e.stopPropagation();
+                    if (e.type === 'touchstart') {
+                        CMS.API.Tooltip._forceTouchOnce();
+                    }
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
                     CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
