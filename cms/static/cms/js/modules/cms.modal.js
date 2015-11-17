@@ -841,6 +841,7 @@ var CMS = window.CMS || {};
                 // attach load event for iframe to prevent flicker effects
                 iframe.on('load', function () {
                     var messages;
+                    var messagelist;
                     var contents;
                     var body;
                     var innerTitle;
@@ -880,13 +881,14 @@ var CMS = window.CMS || {};
                     CMS.API.Toolbar.hideLoader();
 
                     // show messages in toolbar if provided
+                    messagelist = $(iframe.contents().find('.messagelist');
                     messages = iframe.contents().find('.messagelist li');
                     if (messages.length) {
                         CMS.API.Messages.open({
                             message: messages.eq(0).text()
                         });
                     }
-                    messages.remove();
+                    messagelist.remove();
                     contents = iframe.contents();
                     body = contents.find('body');
 
