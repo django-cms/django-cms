@@ -60,31 +60,12 @@ Watch is sadly unlikely to provide a very good django CMS editing experience.
 Older devices will often lack the performance to support a usefully responsive frontend
 editing/administration interface.
 
-See :ref:`device-support` for information about devices that have been tested and confirmed to
-work well.
-
 There are some device-specific issues still to be resolved. Some of these relate to the CKEditor
 (the default django CMS text editor). We will continue to work on these and they will be addressed
 in a future release.
 
-
-General issues
---------------
-
-* Editing links that lack sufficient padding is currently difficult or impossible using
-  touch-screens.
-
-* Adding links is known to be problematic on some Android devices, because of the behaviour of the
-  keyboard.
-
-
-CKEditor issues
----------------
-
-Scrolling on narrow devices, especially when opening the keyboard inside the CKEditor, does not
-always work ideally - sometimes the keyboard can appear in the wrong place on-screen.
-
-Sometimes the CKEditor moves unexpectedly on-screen in use.
+See :ref:`device-support` for information about devices that have been tested and confirmed to
+work well, and about known issues.
 
 
 Feedback required

@@ -70,3 +70,34 @@ friendly towards multiple devices.
 Whether you use your own frontend code or a framework such as Bootstrap 3 or Foundation, be aware
 that problems in your CSS or markup can affect django CMS editing modes, and this will become
 especially apparent to users of mobile/hand-held devices.
+
+
+************
+Known issues
+************
+
+General issues
+--------------
+
+* Editing links that lack sufficient padding is currently difficult or impossible using
+  touch-screens.
+
+* Adding links is known to be problematic on some Android devices, because of the behaviour of the
+  keyboard.
+
+* On some devices, managing django CMS in the browser's *private* (also known as *incognito*)
+  mode can have significant performance implications.
+
+  This is because local storage is not available in this mode, and user state must be stored in a
+  Django session, which is much less efficient.
+
+  This is an unusual use case, and should not affect many users.
+
+
+CKEditor issues
+---------------
+
+* Scrolling on narrow devices, especially when opening the keyboard inside the CKEditor, does not
+  always work ideally - sometimes the keyboard can appear in the wrong place on-screen.
+
+* Sometimes the CKEditor moves unexpectedly on-screen in use.
