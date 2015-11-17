@@ -13,13 +13,19 @@ It's strongly recommended that you follow this tutorial step-by-step. It has
 been designed to introduce you to the system in a methodical way, and each
 step builds on the previous one.
 
+In the tutorial you'll build a website for a bicycle repair service, using a full range of django
+CMS functionality. You'll also learn how to manage information about such things as events, people,
+news, jobs and more, all using dedicated applications that have been designed to integrate with
+django CMS.
+
+
 .. toctree::
     :maxdepth: 2
 
     log-in
     create_page
-    page_settings
     structure-content-modes
+    people
 
 .. note:: **Touch-screen users**
 
