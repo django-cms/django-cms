@@ -535,12 +535,11 @@ var CMS = {
                 var didRunOnce = false;
 
                 return function () {
-                    if (!didRunOnce) {
-                        didRunOnce = true;
-                        result = fn.apply(this, arguments);
-                    }
                     if (didRunOnce) {
                         fn = undefined;
+                    } else {
+                        didRunOnce = true;
+                        result = fn.apply(this, arguments);
                     }
                     return result;
                 };
