@@ -41,36 +41,43 @@ var CMS = window.CMS || {};
                 this.domElem = this._pick();
 
                 this._checkTouch();
+                this._forceTouchOnce = CMS.API.Helpers.once(this._forceTouch);
             },
 
             /**
              * Checks for touch event and switches to touch tooltip if detected.
              *
-             * @method checkTouch
+             * @method _checkTouch
              * @private
              */
             _checkTouch: function () {
-                var that = this;
+                this.body.one('touchstart.cms', $.proxy(this._forceTouchOnce, this));
+            },
 
-                this.body.one('touchstart.cms', function () {
-                    that.isTouch = true;
-                    that.domElem = that._pick();
+            /**
+             * Force tooltip to be "touch".
+             *
+             * @method _forceTouch
+             * @private
+             */
+            _forceTouch: function () {
+                this.isTouch = true;
+                this.domElem = this._pick();
 
-                    // attach tooltip event for touch devices
-                    that.domElem.on('touchstart.cms', function () {
-                        var id = $(this).data('plugin_id');
-                        var plugin = $('.cms-plugin-' + id);
-                        // check if it is a normal plugin or a generic
-                        if (plugin.length) {
-                            plugin.trigger('dblclick.cms');
-                        } else {
-                            // generics are added through the content mode via special
-                            // template tags some generic element might be
-                            // cms-plugin-cms-page-changelist-x
-                            var generic = $('.cms-plugin[class*="cms-plugin-cms-"][class*="-' + id + '"]');
-                            generic.eq(0).trigger('dblclick.cms');
-                        }
-                    });
+                // attach tooltip event for touch devices
+                this.domElem.on('touchstart.cms', function () {
+                    var id = $(this).data('plugin_id');
+                    var plugin = $('.cms-plugin-' + id);
+                    // check if it is a normal plugin or a generic
+                    if (plugin.length) {
+                        plugin.trigger('dblclick.cms');
+                    } else {
+                        // generics are added through the content mode via special
+                        // template tags some generic element might be
+                        // cms-plugin-cms-page-changelist-x
+                        var generic = $('.cms-plugin[class*="cms-plugin-cms-"][class*="-' + id + '"]');
+                        generic.eq(0).trigger('dblclick.cms');
+                    }
                 });
             },
 

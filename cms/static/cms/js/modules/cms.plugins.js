@@ -211,6 +211,9 @@ var CMS = window.CMS || {};
                     // required for both, click and touch
                     // otherwise propagation won't work to the nested plugin
                     e.stopPropagation();
+                    if (e.type === 'touchstart') {
+                        CMS.API.Tooltip._forceTouchOnce();
+                    }
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
                     CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
