@@ -10,17 +10,17 @@
 #
 # Please keep the two sections below separate.
 
-#### entries that need to be checked ####
+#### entries that need to be checked for various different reasons ####
 
 api
+fallback
 fallbacks
 js
+practices
 rc
+regexps
 src
 url
-fallback
-
-regexps
 
 #### accepted entries ####
 
@@ -158,6 +158,7 @@ runserver
 runtime
 Saltvik
 sam
+Samsung
 Sass
 Schoen
 searchable
@@ -210,6 +211,7 @@ vstoykov
 whitespace
 Wohlwend
 workflows
+writeable
 xframe
 YouTube
 Zürich
