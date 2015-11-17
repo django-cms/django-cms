@@ -23,6 +23,7 @@
 
                 this.setupFunctions();
                 this.setupTreePublishing();
+                this.setupInfoTooltip();
                 this.setupUIHacks();
 
                 // load internal functions
@@ -117,6 +118,81 @@
                     return this.after(o).remove().end();
                 };
 
+            },
+
+            setupInfoTooltip: function () {
+                var tree = $('.tree');
+                var infoTrigger = '.col-info .info';
+                var infoTooltips = '.info-details';
+                var infoTimer = function () {};
+                var infoDelay = 100;
+                // workaround for the info tooltip on touch devices
+                var touchUsedInfoTooltip;
+
+                tree.delegate(infoTrigger, 'pointerover touchstart', function (e) {
+                    var tooltip = $(this).closest('.col-info').find('.info-details');
+
+                    // clear timer
+                    clearTimeout(infoTimer);
+
+                    // cancel if tooltip already visible
+                    if (tooltip.is(':visible') && !touchUsedInfoTooltip) {
+                        return false;
+                    }
+
+                    $(infoTooltips).hide();
+                    $(infoTrigger).removeClass('hover');
+                    $('.moveable').removeClass('hover');
+
+                    if (e.type === 'touchstart') {
+                        e.preventDefault();
+                        var target = $(e.target).closest(infoTrigger);
+                        touchUsedInfoTooltip = touchUsedInfoTooltip && touchUsedInfoTooltip.is(target) ? false : target;
+                        if (touchUsedInfoTooltip) {
+                            return;
+                        }
+                    }
+
+                    infoTimer = setTimeout(function () {
+                        tooltip.show();
+                        $(infoTrigger).addClass('hover');
+                        tooltip.closest('.moveable').addClass('hover');
+                    }, infoDelay);
+
+                });
+                // hide the tooltip when leaving the area
+                tree.delegate(infoTrigger, 'pointerout', function () {
+                    if (touchUsedInfoTooltip) {
+                        return;
+                    }
+
+                    // clear timer
+                    clearTimeout(infoTimer);
+                    // hide all elements
+                    infoTimer = setTimeout(function () {
+                        $(infoTooltips).hide();
+                        $('.moveable').removeClass('hover');
+                    }, infoDelay * 2);
+                });
+                // reset hiding when entering the tooltip itself
+                tree.delegate(infoTooltips, 'pointerover', function () {
+                    // clear timer
+                    clearTimeout(infoTimer);
+                });
+                tree.delegate(infoTooltips, 'pointerout', function () {
+                    // hide all elements
+                    infoTimer = setTimeout(function () {
+                        $(infoTooltips).hide();
+                        $('.moveable').removeClass('hover');
+                    }, infoDelay * 2);
+                });
+                $('html').on('touchend', function (e) {
+                    if (!$(e.target).hasClass('info')) {
+                        $(infoTooltips).hide();
+                        $(infoTrigger).removeClass('hover');
+                        $('.moveable').removeClass('hover');
+                    }
+                });
             },
 
             setupTreePublishing: function () {
