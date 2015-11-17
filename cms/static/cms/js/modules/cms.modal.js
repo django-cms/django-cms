@@ -882,7 +882,7 @@ var CMS = window.CMS || {};
 
                     // show messages in toolbar if provided
                     messageList = iframe.contents().find('.messagelist');
-                    messages = messageList.find ('li');
+                    messages = messageList.find('li');
                     if (messages.length) {
                         CMS.API.Messages.open({
                             message: messages.eq(0).text()
