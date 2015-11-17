@@ -522,12 +522,19 @@ var CMS = {
                 return root.trigger(_ns(eventName), [payload]);
             },
 
+            /**
+             * Returns a function that wraps the passed function so the wrapped function
+             * is executed only once, no matter how many times the wrapper function is executed.
+             *
+             * @method once
+             * @param {Function} fn function to be executed only once
+             * @return {Function}
+             */
             once: function once(fn) {
                 var result;
                 var didRunOnce = false;
 
                 return function () {
-                    console.log('running "once", did already run?', didRunOnce);
                     if (!didRunOnce) {
                         didRunOnce = true;
                         result = fn.apply(this, arguments);
