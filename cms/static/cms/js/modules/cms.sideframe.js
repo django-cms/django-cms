@@ -258,6 +258,8 @@ var CMS = window.CMS || {};
                     that._addToHistory(this.contentWindow.location.href);
                 });
 
+                // clear the frame (removes all the handlers)
+                holder.empty();
                 // inject iframe
                 holder.html(iframe);
             },
