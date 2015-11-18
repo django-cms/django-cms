@@ -82,6 +82,10 @@ General issues
 * Editing links that lack sufficient padding is currently difficult or impossible using
   touch-screens.
 
+* Similarly, other areas of a page where the visible content is composed entirely of links with
+  minimal padding around them can be difficult or impossible to open for editing by tapping. This
+  can affect the navigation menu (double-clicking on the navigation menu opens the page list).
+
 * Adding links is known to be problematic on some Android devices, because of the behaviour of the
   keyboard.
 
@@ -101,3 +105,8 @@ CKEditor issues
   always work ideally - sometimes the keyboard can appear in the wrong place on-screen.
 
 * Sometimes the CKEditor moves unexpectedly on-screen in use.
+
+* Sometimes in Safari on iOS devices, a rendering bug will apparently truncate or reposition
+  portions of the toolbar when the CKEditor is opened - even though sections may appear to missing
+  or moved, they can still be activated by touching the part of the screen where they should have
+  been found.
