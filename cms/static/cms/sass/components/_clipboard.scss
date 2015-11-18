@@ -20,6 +20,7 @@
         cursor: move;
     }
     .cms-draggable .cms-dragitem {
+        overflow: hidden;
         line-height: $structure-dragitem-fullheight;
         height: $structure-dragitem-fullheight;
         padding-left: $padding-large;
@@ -28,7 +29,11 @@
         display: none !important;
     }
     .cms-draggable .cms-dragitem-text {
+        display: inline-block;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: calc(100% - 40px);
     }
 
     .cms-plugins {
