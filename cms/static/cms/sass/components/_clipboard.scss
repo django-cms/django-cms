@@ -20,7 +20,6 @@
         cursor: move;
     }
     .cms-draggable .cms-dragitem {
-        overflow: hidden;
         line-height: $structure-dragitem-fullheight;
         height: $structure-dragitem-fullheight;
         padding-left: $padding-large;
