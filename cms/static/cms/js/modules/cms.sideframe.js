@@ -231,7 +231,7 @@ var CMS = window.CMS || {};
 
                     // add debug infos
                     if (CMS.config.debug) {
-                        iframe.contents().find('body').addClass('cms-debug');
+                        body.addClass('cms-debug');
                     }
 
                     // save url in settings
