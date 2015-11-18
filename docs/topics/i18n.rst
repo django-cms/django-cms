@@ -58,7 +58,7 @@ https://docs.djangoproject.com/en/dev/topics/i18n/translation/#how-django-discov
 When visiting a page that is only English and French with a German browser, the language from LANGUAGE_CODE will be used.
 If this is English, but the visitor only speaks French, the visitor will have to switch the language.
 Visiting the same page now again after some time, will show it in English again, because the browser session which was
-used to store the language selection doesn't exist anymore. To prevent this issue, a middleware exists which stores the
+used to store the language selection doesn't exist any more. To prevent this issue, a middleware exists which stores the
 language selection in a cookie. Add the following middleware to `MIDDLEWARE_CLASSES`:
 
     `cms.middleware.language.LanguageCookieMiddleware`

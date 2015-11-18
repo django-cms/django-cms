@@ -25,7 +25,7 @@ Bug Fixes
 * Fix an error in placeholder cache
 * Fix get_language_from_request if POST and GET exists
 * Minor documentation fixes
-* Revert whitespace cleanup on flash player to fix it
+* Revert whitespace clean-up on flash player to fix it
 * Correctly restore previous status of drag bars
 * Fix an issue related to "Empty all" Placeholder feature
 * Fix plugin sorting in Python 3

@@ -37,7 +37,7 @@ setting in your project's ``settings.py`` file::
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 You might consider using `django-filer`_ with `django filer CMS plugin`_ and its
@@ -161,7 +161,7 @@ it was placed in.
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 .. note:: In order to improve clarity, some Picture fields have been omitted in
@@ -196,7 +196,7 @@ settings in your project's ``settings.py`` file::
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media
@@ -258,7 +258,7 @@ default behaviour:
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media

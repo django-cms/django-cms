@@ -50,7 +50,8 @@ plugins.
     You don't need to save these changes manually - they are saved automatically as soon as you make
     them. However, they still need to be published in order for other users to see them.
 
-Each plugin in the structure board is available for editing double-clicking or selecting the edit icon.
+Each plugin in the structure board is available for editing by double-clicking or selecting the
+edit icon.
 
 .. image:: /user/tutorial/images/structure-board-with-two-plugins.png
    :alt: the structure board with two plugins

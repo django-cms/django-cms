@@ -21,5 +21,11 @@ step builds on the previous one.
     page_settings
     structure-content-modes
 
+.. note:: **Touch-screen users**
+
+    django CMS supports touch-screen interfaces, though there are currently some limitations in
+    support. You will be able to complete the tutorial using a touch-screen device, but please
+    consult :ref:`touch`, and see the notes on :ref:`device-support`.
+
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/
