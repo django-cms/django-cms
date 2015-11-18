@@ -78,7 +78,7 @@ New minimum requirements for dependencies
 Registering a list of plugins in the plugin pool
 ================================================
 This feature was deprecated in version 2.2 and removed in 2.3. Code like this
-will not work anymore::
+will not work any more::
 
     plugin_pool.register_plugin([FooPlugin, BarPlugin])
 

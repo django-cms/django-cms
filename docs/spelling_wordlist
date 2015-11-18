@@ -10,27 +10,37 @@
 #
 # Please keep the two sections below separate.
 
-#### entries that need to be checked ####
+#### entries that need to be checked for various different reasons ####
 
 api
+fallback
 fallbacks
 js
+practices
 rc
+regexps
 src
 url
 
 #### accepted entries ####
 
+
 addons
+Admin
+admin
 Aldryn
+Alvarado
+app
 apphook
 apphooked
 apphooks
+apps
 astagi
 backport
 backported
 backticks
 basilelegal
+blog
 boilerplates
 cacheable
 callables
@@ -45,6 +55,7 @@ counterintuitive
 CSS
 customisable
 Daniele
+Debian
 deprecations
 Deutsch
 dialogs
@@ -58,8 +69,10 @@ django-cms
 docstrings
 doctormo
 douwevandermeij
+draggable
 driesdesmet
 elpaso
+etc
 Fankhauser
 fieldset
 filenames
@@ -82,6 +95,8 @@ iframe
 ikudryavtsev
 Indices
 inline
+introspected
+iPad
 ipsum
 Japanisch
 JavaScript
@@ -96,7 +111,9 @@ Larghi
 Lauber
 ldgarcia
 lin
+linted
 linters
+linting
 localhost
 login
 logout
@@ -105,6 +122,7 @@ Lorem
 lowercased
 maqnouch
 Matteo
+max
 Mediaeval
 middleware
 minified
@@ -124,6 +142,9 @@ olarcheveque
 online
 Paulo
 peterfarrell
+Placeholder
+placeholder
+placeholders
 plugin
 plugins
 pre
@@ -137,6 +158,8 @@ runserver
 runtime
 Saltvik
 sam
+Samsung
+Sass
 Schoen
 searchable
 Sekizai
@@ -154,6 +177,8 @@ templating
 timgraham
 Todo
 tomwardill
+Toolbar
+toolbar
 toolbars
 tooltip
 transactional
@@ -161,6 +186,7 @@ treavis
 treebeard
 tuple
 tuples
+Ubuntu
 uncached
 unclosed
 uncomment
@@ -185,9 +211,14 @@ vstoykov
 whitespace
 Wohlwend
 workflows
+writeable
 xframe
 YouTube
 Zürich
 Øyvind
 日本語
+iOS
+Asus
+Xperia
+
 

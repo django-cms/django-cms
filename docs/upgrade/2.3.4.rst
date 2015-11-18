@@ -21,10 +21,10 @@ deprecated ``no`` code.
 
 If your site runs in Norwegian, you need to change your ``LANGUAGES`` settings!
 
-Added support for timezones
-===========================
+Added support for time zones
+============================
 
-On Django 1.4, and with ``USE_TZ=True`` the django CMS now uses timezone aware
+On Django 1.4, and with ``USE_TZ=True`` the django CMS now uses time zone aware
 date and time objects.
 
 Fixed slug clashing

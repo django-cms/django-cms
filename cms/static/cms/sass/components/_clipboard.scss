@@ -28,7 +28,11 @@
         display: none !important;
     }
     .cms-draggable .cms-dragitem-text {
+        display: block;
         overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 40px;
     }
 
     .cms-plugins {

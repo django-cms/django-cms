@@ -247,7 +247,7 @@ longer have separate apphooks for each language. A new ``application instance na
 field has been added.
 
 .. note::
-    The reverse id is not used for the namespace anymore. If you used
+    The reverse id is not used for the namespace any more. If you used
     namespaced apphooks before, be sure to update your pages and fill out the
     namespace fields.
 
@@ -278,7 +278,7 @@ when defining a model admin class containing a placeholder, now add
 ``PlaceholderAdminMixin`` to the list of parent classes, together with
 ``admin.ModelAdmin``.
 
-``PlaceholderAdmin`` doesn't have language tabs anymore and the plugin editor
+``PlaceholderAdmin`` doesn't have language tabs any more and the plugin editor
 is gone. The plugin API has changed and is now more consistent. ``PageAdmin``
 uses the same API as ``PlaceholderAdminMixin`` now. If your app talked with
 the Plugin API directly be sure to read the code and the changed parameters.
@@ -442,7 +442,7 @@ Start of by updating the cms' package::
 
 Next, you need to make the following changes in your ``settings.py``
 
-* settings.INSTALLED_APPS
+* ``settings.INSTALLED_APPS``
 
     * Remove ``cms.plugin.twitter``. This package has been deprecated, see :ref:`cmsplugin-twitter-removed`.
     * Rename all the other ``cms.plugins.X`` to ``djangocms_X``, see :ref:`ex-core-plugins`.
@@ -466,7 +466,7 @@ full list, but you probably don't need all of them::
 
 
 Also, please check your templates to make sure that you haven't put the ``{% cms_toolbar %}`` tag into a ``{% block %}``
-tag. This is not allowed in 3.0 anymore.
+tag. This is not allowed in 3.0 any more.
 
 To finish up, please update your database::
 
