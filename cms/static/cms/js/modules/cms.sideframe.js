@@ -215,6 +215,37 @@ var CMS = window.CMS || {};
                 var holder = this.ui.frame;
                 var contents;
                 var body;
+                var iOS = /iPhone|iPod|iPad/.test(navigator.userAgent);
+
+                /**
+                 * On iOS iframes do not respect the size set in css or attributes, and
+                 * is always matching the content. However, if you first load the page
+                 * with one amount of content (small) and then from there you'd go to a page
+                 * with lots of content (long, scroll requred) it won't be scrollable, because
+                 * iframe would retain the size of previous page. When this happens we
+                 * need to rerender the iframe (that's why we are animating the width here, so far
+                 * that was the only reliable way). But after that if you try to scroll the iframe
+                 * which height was just adjusted it will hide completely from the screen
+                 * (this is an iOS glitch, the content would still be there and in fact it would
+                 * be usable, but just not visible). To get rid of that we bring up the shim element
+                 * up and down again and this fixes the glitch. (same shim we use for resizing the sideframe)
+                 *
+                 * It is not recommended to expose it and use it on other devices rather than iOS ones.
+                 *
+                 * @function forceRerenderOnIOS
+                 * @private
+                 */
+                function forceRerenderOnIOS() {
+                    var w = that.ui.sideframe.width();
+                    that.ui.sideframe.animate({ 'width': w + 1 }, 0);
+                    setTimeout(function () {
+                        that.ui.sideframe.animate({ 'width': w }, 0);
+                        that.ui.shim.css('z-index', 20);
+                        setTimeout(function () {
+                            that.ui.shim.css('z-index', 1);
+                        }, 0);
+                    }, 0);
+                }
 
                 // attach load event to iframe
                 iframe.hide().on('load', function () {
@@ -228,6 +259,11 @@ var CMS = window.CMS || {};
                     that.ui.frame.removeClass('cms-loader');
                     // than show
                     iframe.show();
+
+                    // force style recalculation on iOS
+                    if (iOS) {
+                        forceRerenderOnIOS();
+                    }
 
                     // add debug infos
                     if (CMS.config.debug) {
