@@ -238,7 +238,8 @@ var CMS = window.CMS || {};
                     CMS.settings.sideframe.url = iframe.prop('src');
                     CMS.settings = that.setSettings(CMS.settings);
 
-                    // bind extra events
+                    // This essentially hides the toolbar dropdown when
+                    // click happens inside of a sideframe iframe
                     body.on(that.click, function () {
                         $(document).trigger(that.click);
                     });
