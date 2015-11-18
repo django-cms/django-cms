@@ -543,6 +543,30 @@ var CMS = {
                     }
                     return result;
                 };
+            },
+
+            /**
+             * Prevents scrolling with touch in an element.
+             *
+             * @method preventTouchScrolling
+             * @param {jQuery} element element where we are preventing the scroll
+             * @param {String} namespace so we don't mix events from two different places on the same element
+             */
+            preventTouchScrolling: function preventTouchScrolling(element, namespace) {
+                element.on('touchmove.cms.preventscroll.' + namespace, function (e) {
+                    e.preventDefault();
+                });
+            },
+
+            /**
+             * Allows scrolling with touch in an element.
+             *
+             * @method allowTouchScrolling
+             * @param {jQuery} element element where we are allowing the scroll again
+             * @param {String} namespace so we don't accidentally remove events from a different handler
+             */
+            allowTouchScrolling: function allowTouchScrolling(element, namespace) {
+                element.off('touchmove.cms.preventscroll.' + namespace);
             }
         };
 
