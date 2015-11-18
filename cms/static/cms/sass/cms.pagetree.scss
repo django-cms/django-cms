@@ -364,14 +364,8 @@ $row-height: 41px;
     }
 
     // info handling
-    .info-details {
-        display: none;
-    }
-    li .info:hover {
+    li .info.hover {
         position: relative;
-        .info-details {
-            display: block;
-        }
     }
 
     // remove backgrounds
