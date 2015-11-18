@@ -58,7 +58,7 @@ Do the same for a second person:
         Cyrus Henrik
 
     Role
-        Bicycle rescue driver
+        Bicycle rescue team leader
 
     Description
         Cyrus is on call night and day to rescue stranded cyclists.
@@ -85,8 +85,6 @@ We'll create a *People* page, add an apphook for the Aldryn People application t
 * add Apphook
 * publish page
 * view page with automatic list of people in it
-
-.. todo:: discussion of how you can continue to add/edit people
 
 
 ****************************
