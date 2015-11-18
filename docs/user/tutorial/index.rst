@@ -26,6 +26,8 @@ django CMS.
     create_page
     structure-content-modes
     people
+    news
+    admin
 
 .. note:: **Touch-screen users**
 
