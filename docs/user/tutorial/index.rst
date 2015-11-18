@@ -28,6 +28,7 @@ django CMS.
     people
     news
     admin
+    page-management
 
 .. note:: **Touch-screen users**
 
