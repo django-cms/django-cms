@@ -7,7 +7,7 @@
 {% if not is_popup %}{% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="../../">{% trans "Home" %}</a> &rsaquo;
-    <a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+    <a href="../">{% firstof cl.opts.app_config.verbose_name app_label|capfirst|escape %}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
     {% if request.REQUEST.q %}
     &rsaquo; {% trans "Search" %}
     {% endif %}
