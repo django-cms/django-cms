@@ -29,11 +29,11 @@
         display: none !important;
     }
     .cms-draggable .cms-dragitem-text {
-        display: inline-block;
+        display: block;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        width: calc(100% - 40px);
+        margin-right: 40px;
     }
 
     .cms-plugins {
