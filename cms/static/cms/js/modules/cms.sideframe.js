@@ -314,6 +314,7 @@ var CMS = window.CMS || {};
 
                 // disable scrolling for touch
                 this.ui.body.addClass('cms-prevent-scrolling');
+                this.preventTouchScrolling($(document), 'sideframe');
             },
 
             /**
@@ -367,6 +368,7 @@ var CMS = window.CMS || {};
 
                 // enable scrolling again
                 this.ui.body.removeClass('cms-prevent-scrolling');
+                this.allowTouchScrolling($(document), 'sideframe');
             },
 
             /**
