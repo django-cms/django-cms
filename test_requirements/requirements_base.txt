@@ -11,7 +11,7 @@ django-sekizai>=0.7
 argparse
 dj-database-url
 selenium
--e git+git://github.com/divio/djangocms-admin-style.git#egg=djangocms-admin-style
+djangocms-admin-style==0.2.7
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
