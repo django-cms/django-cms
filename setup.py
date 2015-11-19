@@ -41,7 +41,7 @@ setup(
         'html5lib>=0.90,!=0.9999,!=0.99999',
         'django-treebeard==3.0',
         'django-sekizai>=0.7',
-        'djangocms-admin-style<2.8.0'
+        'djangocms-admin-style'
     ],
     extras_require={
         'south': ['south>=1.0.0'],
