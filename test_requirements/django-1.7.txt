@@ -2,7 +2,7 @@
 django>=1.7,<1.8
 django-reversion>=1.8,<1.9
 django-classy-tags>=0.5
-django-formtools==1.0
+django-formtools
 django-sekizai>=0.7
 djangocms-text-ckeditor==2.7
 django-hvad==1.4
