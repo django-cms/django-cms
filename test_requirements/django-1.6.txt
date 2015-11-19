@@ -2,8 +2,8 @@
 django>=1.6,<1.7
 South==1.0.2
 django-reversion<1.8.3
--e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
-django-hvad>=1.0
 django-classy-tags>=0.5
 django-sekizai>=0.7
+djangocms-text-ckeditor==2.7
+django-hvad==1.3
 django-debug-toolbar<=1.3.2

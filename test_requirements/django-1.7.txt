@@ -1,9 +1,9 @@
 -r requirements_base.txt
 django>=1.7,<1.8
 django-reversion>=1.8,<1.9
--e git+git://github.com/divio/djangocms-text-ckeditor.git#egg=djangocms-text-ckeditor
-django-hvad>=1.1
 django-classy-tags>=0.5
 django-formtools==1.0
 django-sekizai>=0.7
-django-debug-toolbar
+djangocms-text-ckeditor==2.7
+django-hvad==1.4
+django-debug-toolbar<=1.4
