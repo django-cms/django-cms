@@ -22,6 +22,7 @@ var CMS = window.CMS || {};
         var clipboardPlugin = clipboard.find('.cms-plugin:first');
         var clickCounter = 0;
         var timer;
+        var anchor;
 
         doc.on('pointerup.cms.plugin', function () {
             // call it as a static method, because otherwise we trigger it the
@@ -47,7 +48,9 @@ var CMS = window.CMS || {};
             if (++clickCounter === 1) {
                 timer = setTimeout(function () {
                     clickCounter = 0;
-                    window.location.href = $(e.currentTarget).attr('href');
+                    anchor = $(e.currentTarget);
+                    // make sure that the target attribute is honoured on links
+                    window.open(anchor.attr('href'), anchor.attr('target') || '_self');
                 }, 300);
             } else {
                 clearTimeout(timer);
