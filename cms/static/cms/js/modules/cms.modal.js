@@ -706,6 +706,15 @@ var CMS = window.CMS || {};
                     }
                 });
                 var buttons = row.find('input, a, button');
+                // these are the buttons _inside_ the iframe
+                // we need to listen to this click event to support submitting
+                // a form by pressing enter inside of a field
+                // click is actually triggered by submit
+                buttons.on('click', function () {
+                    if ($(this).hasClass('default')) {
+                        that.hideFrame = true;
+                    }
+                });
 
                 // hide all submit-rows
                 iframe.contents().find('.submit-row').hide();
