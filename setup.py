@@ -43,7 +43,7 @@ setup(
         'html5lib>=0.90,!=0.9999,!=0.99999',
         'django-mptt>=0.6,<0.6.2',
         'django-sekizai>=0.7',
-        'djangocms-admin-style'
+        'djangocms-admin-style<2.8.0'
     ],
     tests_require=[
         'django-reversion==1.8.2',
