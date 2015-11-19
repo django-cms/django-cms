@@ -250,7 +250,7 @@ class ApplicationConfigSelect(Select):
 
     class Media:
         js = (
-            'cms/js/modules/jquery.noconflict.pre.js'
+            'cms/js/modules/jquery.noconflict.pre.js',
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/widgets/forms.apphookselect.js',
             'cms/js/modules/jquery.noconflict.post.js'
