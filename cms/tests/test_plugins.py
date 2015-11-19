@@ -786,7 +786,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         cache.clear()
         response = self.client.get(page.get_absolute_url())
         self.assertTrue(
-            'https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true' in response.content.decode('utf8').replace("&amp;", "&"))
+            'https://maps-api-ssl.google.com/maps/api/js?v=3' in response.content.decode('utf8').replace("&amp;", "&"))
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = api.create_page('page to inherit from',
@@ -1542,7 +1542,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 class PluginCopyRelationsTestCase(PluginsTestBaseCase):
     """Test the suggestions in the docs for copy_relations()"""
-    
+
     def setUp(self):
         self.super_user = self._create_user("test", True, True)
         self.FIRST_LANG = settings.LANGUAGES[0][0]
@@ -1556,7 +1556,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         self.page2 = api.create_page(**page_data2)
         self.placeholder1 = self.page1.placeholders.get(slot='body')
         self.placeholder2 = self.page2.placeholders.get(slot='body')
-    
+
     def test_copy_fk_from_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,
@@ -1579,7 +1579,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
             new_public_count,
             old_public_count + 1
         )
-    
+
     def test_copy_m2m_to_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,
