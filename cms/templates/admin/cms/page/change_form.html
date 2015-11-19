@@ -1,19 +1,13 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_static admin_modify cms_admin %}
+{% load i18n admin_urls admin_static admin_modify cms_admin %}
 
 {% block title %}{% trans "Change a page" %}{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    {% if has_change_permission %}
-        <a href="../../../">{% trans "Home" %}</a>
-        &rsaquo; <a href="../../">{% firstof opts.app_config.verbose_name app_label|capfirst|escape %}</a>
-        &rsaquo; <a href="../">{{ opts.verbose_name_plural|capfirst }}</a>
-    {% else %}
-        <a href="../../">{% trans "Home" %}</a>
-        &rsaquo; <a href="../">{% firstof opts.app_config.verbose_name app_label|capfirst|escape %}</a>
-        {{ opts.verbose_name_plural|capfirst }}
-    {% endif %}
+   <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; {% if has_change_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
     &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
 {% endblock %}
