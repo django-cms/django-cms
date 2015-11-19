@@ -696,7 +696,10 @@ var CMS = window.CMS || {};
                 var form = iframe.contents().find('form');
                 //avoids conflict between the browser's form validation and Django's validation
                 form.on('submit', function () {
-                    if (that.hideFrame) { // submit button was clicked
+                    // default submit button was clicked
+                    // meaning, if you have save - it should close the iframe,
+                    // if you hit save and continue editing it should be default form behaviour
+                    if (that.hideFrame) {
                         that.ui.modal.find('.cms-modal-frame iframe').hide();
                         // page has been saved, run checkup
                         that.saved = true;
