@@ -5,8 +5,16 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-    <a href="../../">{% trans "Home" %}</a> &rsaquo;
-    <a href="../">{% firstof opts.app_config.verbose_name app_label|capfirst|escape %}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+    {% if has_change_permission %}
+        <a href="../../../">{% trans "Home" %}</a>
+        &rsaquo; <a href="../../">{% firstof opts.app_config.verbose_name app_label|capfirst|escape %}</a>
+        &rsaquo; <a href="../">{{ opts.verbose_name_plural|capfirst }}</a>
+    {% else %}
+        <a href="../../">{% trans "Home" %}</a>
+        &rsaquo; <a href="../">{% firstof opts.app_config.verbose_name app_label|capfirst|escape %}</a>
+        {{ opts.verbose_name_plural|capfirst }}
+    {% endif %}
+    &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
 {% endblock %}
 
