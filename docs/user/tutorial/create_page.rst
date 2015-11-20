@@ -16,8 +16,10 @@ Page wizard* will open a new dialog box.
    :width: 400
    :align: center
 
-Select *Next*, and provide a *Title* and some basic text content for the new page (you'll be
-able to add formatting to this text in a moment), then hit **Create**.
+#.  Select *Next*.
+#.  Provide a *Title*.
+#.  Add some basic text *Content*.
+#.  Hit **Create**.
 
 .. tip::
 
@@ -31,23 +33,26 @@ able to add formatting to this text in a moment), then hit **Create**.
         cyclists. No job's too small or too large, and we can repair anything from a puncture to a
         cracked frame.
 
+.. todo:: update screenshot
 
 .. image:: /user/tutorial/images/add-title-and-content.png
    :alt: Add Title and Content
    :width: 400
    :align: center
 
-.. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
-   :alt: 'Publish page now'
-
 
 ==========
 Publishing
 ==========
 
+.. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
+   :alt: 'Publish page now'
+
 Your newly-created page is just a *draft*, and won't actually be published until you decide. As an
-editor, you can see drafts, but other visitors to your site will only see published pages. Hit
-|publish-page-now| to publish it.
+editor, you can see drafts, but other visitors to your site can only see pages that you have
+explicitly published.
+
+* Hit |publish-page-now| to publish the page.
 
 .. todo:: update screenshots with styling and content
 
@@ -65,13 +70,16 @@ Further editing
 .. |view-published| image:: /user/tutorial/images/view-published.png
    :alt: 'View published'
 
-At any time, you can make further changes to a page, by switching back into Edit mode, using the
+At any time, you can make further changes to a page, by switching back into *Edit mode*, using the
 |edit| button that appears, and return to the *published* version of the page using the
 |view-published| button.
 
-In editing mode, double-click (if you're using a pointer) or tap (if you're using a touch screen)
-on the paragraph of text to change it. This will open the Text plugin containing it. Make changes -
-perhaps break the text into paragraphs - and **Save** it again.
+In editing mode:
+
+#. Double-click (if you're using a pointer) or tap (if you're using a touch screen) on the
+   paragraph of text to open the Text plugin.
+#.  Make changes by breaking the text into paragraphs.
+#.  **Save** it again.
 
 .. note::
 
@@ -96,22 +104,25 @@ At the top of your page is the django CMS *toolbar*, with various useful tools i
 .. |create| image:: /user/tutorial/images/create.png
    :alt: 'Create'
 
-Hit |create| to create a second page. This opens the *Create page* wizard:
+#.  Hit |create| to create a second page. This opens the *Create page* wizard:
 
-.. image:: /user/tutorial/images/create-page-dialog.png
-   :alt: the 'Create page' dialog
+    .. image:: /user/tutorial/images/create-page-dialog.png
+      :alt: the 'Create page' dialog
 
-Select **New Page**, then **Next**, and once again, give the page a *Title* and some basic text
-content, then **Publish** it as you did previously.
+#.  Select **New Page**.
+#.  Hit **Next**.
+#.  Once again, give the page a *Title* and some basic text *Content*.
 
-.. tip::
+    .. tip::
 
-    Title
-        How to find us
+        Title
+            How to find us
 
-    Content
-        Our workshop is at Zollstrasse 53, Zürich. We're open 24 hours a day, seven days a week,
-        every day of the year.
+        Content
+            Our workshop is at Zollstrasse 53, Zürich. We're open 24 hours a day, seven days a week,
+            every day of the year.
 
-.. todo:: screen shot of page also showing navigation menu featuring both pages
+#.  Hit **Publish**.
+
+.. todo:: screen shot of page, also showing navigation menu featuring both pages
 

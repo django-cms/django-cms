@@ -12,33 +12,37 @@ Like Aldryn People, Aldryn News & Blog is a separate application that integrates
 Create some news items
 **********************
 
-Once more, hit Create, then select *New news/blog article*, followed by **Next**, and fill in the
-form to create the news item.
+To create a new News item:
 
-.. tip::
+#.  Hit **Create**
+#.  Select *New news/blog article*.
+#.  Hit **Next**.
+#.  Fill in the form to create the news item.
 
-    Name
-        Our 1000th rescue mission
+    .. tip::
 
-    Is published
-        ✓
+        Name
+            Our 1000th rescue mission
 
-    Description
-        Last week our lauded cycle rescue service attended to its 1000th customer. On a stormy
-        night Cyrus Henrik braved the elements once more, and out in the western suburbs he made
-        short work of a snapped chain.
+        Is published
+            ✓
 
-    Content
-        It was all in a night's work for Cyrus, but for the stranded rider far from home in the
-        cold and wet his swift arrival was warmly welcomed. Cyrus said: "It's been a pleasure to
-        perform this service over the past two years, and I never expected it to become so popular.
-        I hadn't even realised that this was going to be the 1000th call-out, but when I got back
-        to the workshop all the team were waiting for me with champagne to celebrate." 1000
-        missions is quite a milestone; we look forward to the next 1000!
+        Description
+            Last week our lauded cycle rescue service attended to its 1000th customer. On a stormy
+            night Cyrus Henrik braved the elements once more, and out in the western suburbs he made
+            short work of a snapped chain.
 
-.. todo:: screenshot of above
+        Content
+            It was all in a night's work for Cyrus, but for the stranded rider far from home in the
+            cold and wet his swift arrival was warmly welcomed. Cyrus said: "It's been a pleasure
+            to perform this service over the past two years, and I never expected it to become so
+            popular. I hadn't even realised that this was going to be the 1000th call-out, but when
+            I got back to the workshop all the team were waiting for me with champagne to
+            celebrate." 1000 missions is quite a milestone; we look forward to the next 1000!
 
-Hit **Create**.
+    .. todo:: screenshot of above
+
+#.  Hit **Create**.
 
 Do the same for a second item:
 

@@ -21,8 +21,15 @@ You've already used *Content* mode, in which you can double-click on content to 
 
 In *Structure* mode, you can manage the placement of content within the page structure.
 
-Switch to *Structure* mode. This reveals the *structure board* containing the *placeholders*
-available on the page, and the *plugins* in them:
+.. todo:: add a structure button image as structure-button.png
+
+.. |structure-button| image:: /user/tutorial/images/structure-button.png
+   :alt: 'structure'
+
+* Switch to *Structure* mode by hitting the |structure-button| button.
+
+This reveals the *structure board* containing the *placeholders* available on the page, and the
+*plugins* in them:
 
 .. image:: /user/tutorial/images/structure-board.png
      :align: right
@@ -41,29 +48,37 @@ Add a second plugin
 
 Let's add another plugin, containing a map.
 
-Select the **Add plugin** icon (**+**) and choose *Google Map* from the list of available plugin types.
+.. todo:: add the "Add plugin" icon as add-plugin.png
 
-.. todo:: replace the image, with one showing Google Map in the list
+.. |add-plugin-icon| image:: /user/tutorial/images/add-plugin-icon.png
+   :alt: 'add plugin'
 
-.. image:: /user/tutorial/images/text-plugin.png
-     :alt: the list of plugin types
-     :width: 165
+#.  Select the **Add plugin** icon |add-plugin-icon|.
+#.  Choose *Google Map* from the list of available plugin types.
 
-This will open a new dialog box, in which you can provide some basic details for your map. Add the details and **Save**.
+    .. todo:: replace the image, with one showing Google Map in the list
 
-.. tip::
+    .. image:: /user/tutorial/images/text-plugin.png
+         :alt: the list of plugin types
+         :width: 165
 
-    Map title
-        Our workshop
+    This will open a new dialog box, in which you can provide some basic details for your map.
 
-    Address
-        Zollstrasse 53
+#.  Add the details and **Save**.
 
-    Zip code
-        ??????????????? Dario can you check?
+    .. tip::
 
-    City
-        Zürich
+        Map title
+            Our workshop
+
+        Address
+            Zollstrasse 53
+
+        Zip code
+            ??????????????? Dario can you check?
+
+        City
+            Zürich
 
 
 Now in the structure board you'll see the new *Google Map* plugin - which you can move around
@@ -84,7 +99,7 @@ You can switch back to content mode to see the effect of your changes.
 
 .. todo:: screenshot of the page showing the map
 
-Finally **Publish** the page to make your new changes and the map public.
+* **Publish** the page to make your new changes and the map public.
 
 
 *************
