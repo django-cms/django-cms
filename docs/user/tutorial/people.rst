@@ -31,24 +31,27 @@ it, and re-use it wherever it's required. That's what Aldryn People is for.
 Create some people
 ******************
 
-Once more, hit Create, then select *New Person*, followed by **Next**.
+To create a new Person:
 
-Enter some details about the person.
+#.  Hit **Create**
+#.  Select *New Person*.
+#.  Hit **Next**.
+#.  Enter some details about the person.
 
-.. tip::
+    .. tip::
 
-    Name
-        Freda Meyer
+        Name
+            Freda Meyer
 
-    Role
-        Chief bicycle technician
+        Role
+            Chief bicycle technician
 
-    Description
-        Freda oversees all technical activities in our workshop.
+        Description
+            Freda oversees all technical activities in our workshop.
 
-.. todo:: screenshot of above
+    .. todo:: screenshot of above
 
-Hit **Create**.
+#.  Hit **Create**.
 
 Do the same for a second person:
 
@@ -75,7 +78,7 @@ By default, a django CMS page's content comes from the plugins you insert into i
 application has a django CMS apphook, this application can insert content into your page
 automatically.
 
-We'll create a *People* page, add an apphook for the Aldryn People application to it.
+We'll create a *People* page, and add an apphook for the Aldryn People application to it.
 
 .. todo:: screenshots of following steps (if they are new steps)
 
