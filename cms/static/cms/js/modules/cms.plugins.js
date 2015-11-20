@@ -26,7 +26,7 @@ var CMS = window.CMS || {};
         doc.on('pointerup.cms.plugin', function () {
             // call it as a static method, because otherwise we trigger it the
             // amount of times CMS.Plugin is instantiated,
-            // which does not make much sense
+            // which does not make much sense.
             CMS.Plugin._hideSettingsMenu();
         }).on('keydown.cms.plugin', function (e) {
             if (e.keyCode === CMS.KEYS.SHIFT) {
