@@ -696,13 +696,25 @@ var CMS = window.CMS || {};
                 var form = iframe.contents().find('form');
                 //avoids conflict between the browser's form validation and Django's validation
                 form.on('submit', function () {
-                    if (that.hideFrame) { // submit button was clicked
+                    // default submit button was clicked
+                    // meaning, if you have save - it should close the iframe,
+                    // if you hit save and continue editing it should be default form behaviour
+                    if (that.hideFrame) {
                         that.ui.modal.find('.cms-modal-frame iframe').hide();
                         // page has been saved, run checkup
                         that.saved = true;
                     }
                 });
                 var buttons = row.find('input, a, button');
+                // these are the buttons _inside_ the iframe
+                // we need to listen to this click event to support submitting
+                // a form by pressing enter inside of a field
+                // click is actually triggered by submit
+                buttons.on('click', function () {
+                    if ($(this).hasClass('default')) {
+                        that.hideFrame = true;
+                    }
+                });
 
                 // hide all submit-rows
                 iframe.contents().find('.submit-row').hide();
