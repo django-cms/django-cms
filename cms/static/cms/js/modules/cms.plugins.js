@@ -26,7 +26,7 @@ var CMS = window.CMS || {};
         doc.on('pointerup.cms.plugin', function () {
             // call it as a static method, because otherwise we trigger it the
             // amount of times CMS.Plugin is instantiated,
-            // which does not make much sense
+            // which does not make much sense.
             CMS.Plugin._hideSettingsMenu();
         }).on('keydown.cms.plugin', function (e) {
             if (e.keyCode === CMS.KEYS.SHIFT) {
@@ -46,8 +46,10 @@ var CMS = window.CMS || {};
             e.preventDefault();
             if (++clickCounter === 1) {
                 timer = setTimeout(function () {
+                    var anchor = $(e.currentTarget);
                     clickCounter = 0;
-                    window.location.href = $(e.currentTarget).attr('href');
+                    // make sure that the target attribute is honoured on links
+                    window.open(anchor.attr('href'), anchor.attr('target') || '_self');
                 }, 300);
             } else {
                 clearTimeout(timer);
