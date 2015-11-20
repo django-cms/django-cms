@@ -247,11 +247,20 @@ Upgrading django CMS 3.1 to 3.2
 
 Please note any changes that require action above, and take action accordingly.
 
-Otherwise django CMS 3.2 represents a fairly easy upgrade path. There are no new migrations in this
-release (however third-party applications that you update may have their own migrations, so as
-always, before upgrading, please make sure that your current database is consistent and in a
-healthy state, and **make a copy of the database before proceeding further.**
+A database migration is required (a new model, ``UrlconfRevision`` has been added as part of the
+apphook reload mechanism):
 
+Note also that any third-party applications you update may have their own migrations, so as always,
+before upgrading, please make sure that your current database is consistent and in a healthy state,
+and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate
+
+to migrate.
+
+Otherwise django CMS 3.2 represents a fairly easy upgrade path.
 
 ********************
 Pending deprecations

@@ -2,6 +2,7 @@
 
 - Added new wizard to improve content creation
 - Added Aldryn Apphook Reload https://github.com/aldryn/aldryn-apphook-reload/ into core
+- Added database migration creating ``UrlconfRevision`` for apphook reload.
 - Added tooltips for certain user interaction elements
 - Added full touch support and optimisations for mobile devices
 - Added gulp.js for linting, compressing and bundling
