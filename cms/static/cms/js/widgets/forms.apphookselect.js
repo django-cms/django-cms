@@ -14,7 +14,6 @@ var apphooks_configuration = window.apphooks_configuration || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
-
         var appHooks = $('#application_urls'),
             selected = appHooks.find('option:selected'),
             appNsRow = $('.form-row.application_namespace'),
@@ -41,7 +40,11 @@ var apphooks_configuration = window.apphooks_configuration || {};
                         '</option>'
                     );
                 }
-                appCfgsAdd.attr('href', window.apphooks_configuration_url[opt.val()]);
+                appCfgsAdd.attr('href', window.apphooks_configuration_url[opt.val()] +
+                    // Here we check if we are on django>=1.8 by checking if the method introduced in that version
+                    // exists, and if it does - we add `_popup` ourselves, because otherwise the popup with
+                    // apphook creation form will not be dismissed correctly
+                    (window.showRelatedObjectPopup ? '?_popup=1' : ''));
                 appCfgsRow.removeClass('hidden');
                 appNsRow.addClass('hidden');
             } else {
