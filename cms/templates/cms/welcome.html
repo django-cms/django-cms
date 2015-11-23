@@ -88,9 +88,11 @@
                 btn.trigger('click');
             });
         {% else %}
-            {# Django <= 1.6 doesn't provide a login URL handler. Rely on #}
-            {# it redirecting to the login page when attempting to access a #}
-            {# protected handler while not logged in. #}
+            {% comment %}
+            Django <= 1.6 doesn't provide a login URL handler. Rely on
+            it redirecting to the login page when attempting to access a
+            protected handler while not logged in.
+            {% endcomment %}
             {% url "admin:login" as login_url %}
             {% url "admin:index" as admin_index_url %}
             window.location.href = '{% firstof login_url admin_index_url %}?next=/{{ LANGUAGE_CODE }}/?{{ cms_edit_on }}';
