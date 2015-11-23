@@ -110,3 +110,10 @@ CKEditor issues
   portions of the toolbar when the CKEditor is opened - even though sections may appear to missing
   or moved, they can still be activated by touching the part of the screen where they should have
   been found.
+
+
+Django Admin issues
+-------------------
+
+* In the page tree first touch on the page would open the keyboard because
+  Django Admin automatically focuses the search form input.

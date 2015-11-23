@@ -50,8 +50,6 @@
 - Fixed edit and edit_off constants not being honoured in frontend code
 - Deprecate CMSPlugin.disable_child_plugin in favour of disable_child_plugins
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
-- Replaced search_form template from django admin with a custom one to stop
-  forcing focus on the search input
 
 
 === 3.1.4 (Unreleased) ===
