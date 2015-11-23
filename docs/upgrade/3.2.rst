@@ -230,6 +230,17 @@ A new startup mode makes it easier for new users to dive straight into editing w
 site. See the :ref:`user-tutorial` for more.
 
 
+************
+Known issues
+************
+
+The `sub-pages of a page with an apphook will be unreachable
+<https://github.com/divio/django-cms/issues/4758>`_ (``404 page not found``), due to internal URL
+resolution mechanisms in the CMS. Though it's unlikely that most users will need sub-pages of this
+kind (typically, an apphooked page will create its own sub-pages) this issue will be addressed in a
+forthcoming release.
+
+
 *****************************
 Backward-incompatible changes
 *****************************
