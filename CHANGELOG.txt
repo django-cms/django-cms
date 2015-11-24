@@ -1,4 +1,4 @@
-=== 3.2.0 (Unreleased) ===
+=== 3.2.0 (2015-11-24) ===
 
 - Added new wizard to improve content creation
 - Added Aldryn Apphook Reload https://github.com/aldryn/aldryn-apphook-reload/ into core
