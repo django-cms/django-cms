@@ -45,7 +45,8 @@ For general information about touch interface support, see the :ref:`touch scree
 
     These notes about touch interface support apply only to the **django CMS admin and editing
     interfaces**. The visitor-facing published site is **wholly independent** of this, and the
-    responsibility of the site developer.
+    responsibility of the site developer. A good site should already work well for its visitors,
+    whatever interface they use!
 
 Numerous aspects of the CMS and its interface have been updated to work well with touch-screen
 devices. There are some restrictions and warnings that need to be borne in mind.
@@ -65,7 +66,7 @@ There are some device-specific issues still to be resolved. Some of these relate
 in a future release.
 
 See :ref:`device-support` for information about devices that have been tested and confirmed to
-work well, and about known issues.
+work well, and about known issues affecting touch-screen device support.
 
 
 Feedback required
@@ -150,33 +151,6 @@ gulp.js
 We now use :ref:`gulp.js <js_linting>` for linting, compressing and bundling of frontend files.
 
 
-Various improvements have been implemented to make developing with and for django CMS easier. These
-include:
-
-* improvements to frontend code, to comply better with `aldryn-boilerplate-bootstrap3
-  <https://github.com/aldryn/aldryn-boilerplate-bootstrap3>`_
-
-* changes to directory structure for frontend related components such as JavaScript and SASS.
-
-* We no longer use ``develop.py``; we now use ``manage.py`` for all development tasks. See
-  :ref:`contributing_patch` for examples.
-
-* We've moved our ``widgets.py`` JavaScript to ``static/cms/js/widgets``.
-
-
-Code formatting
----------------
-
-We've switched from tabs (in some places) to four spaces *everywhere*. See :ref:`contributing-code`
-for more on formatting.
-
-
-gulp.js
--------
-
-We now use :ref:`gulp.js <js_linting>` for linting, compressing and bundling of frontend files.
-
-
 Sass-related changes
 --------------------
 
@@ -223,11 +197,11 @@ what has changed is merely the behaviour in the user's browser.
 In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
 
 
-New startup screen
-==================
+New startup page
+================
 
-A new startup mode makes it easier for new users to dive straight into editing when launching a new
-site. See the :ref:`user-tutorial` for more.
+A new startup mode makes it easier for users (especially new users) to dive straight into editing
+when launching a new site. See the :ref:`user-tutorial` for more.
 
 
 ************
