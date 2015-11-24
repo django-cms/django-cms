@@ -106,6 +106,7 @@ var CMS = window.CMS || {};
                 this.keyDown = 'keydown.cms.plugin';
                 this.mouseEvents = 'mousedown.cms.plugin mousemove.cms.plugin mouseup.cms.plugin';
                 this.touchStart = 'touchstart.cms.plugin';
+                this.touchEnd = 'touchend.cms.plugin';
 
                 // bind data element to the container
                 this.ui.container.data('settings', this.options);
@@ -1217,12 +1218,17 @@ var CMS = window.CMS || {};
                 }
 
                 // attach events to draggable
-                dragitem.find('> .cms-dragitem-text').on(this.click, function () {
-                    if (!dragitem.hasClass('cms-dragitem-collapsable')) {
-                        return;
-                    }
-                    that._toggleCollapsable(dragitem);
-                });
+                // debounce here required because on some devices click is not triggered,
+                // so we consolidate latest click and touch event to run the collapse only once
+                dragitem.find('> .cms-dragitem-text').on(
+                    this.touchEnd + ' ' + this.click,
+                    CMS.API.Helpers.debounce(function () {
+                        if (!dragitem.hasClass('cms-dragitem-collapsable')) {
+                            return;
+                        }
+                        that._toggleCollapsable(dragitem);
+                    }, 0)
+                );
 
                 // adds double click event
                 this.ui.draggable.on(this.doubleClick, function (e) {
