@@ -750,6 +750,11 @@ var CMS = window.CMS || {};
                         CMS.Plugin._hideSettingsMenu();
                         that._showSettingsMenu(trigger);
                     }
+                }).on(this.touchStart, function (e) {
+                    // required on some touch devices so
+                    // ui touch punch is not triggering mousemove
+                    // which in turn results in pep triggering pointercancel
+                    e.stopPropagation();
                 });
 
                 dropdown.on(this.mouseEvents, function (e) {
