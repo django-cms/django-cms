@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 10:16-0500\n"
-"PO-Revision-Date: 2015-11-05 15:12+0000\n"
+"POT-Creation-Date: 2015-11-11 18:31+0100\n"
+"PO-Revision-Date: 2015-11-12 11:09+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/digi604/django-cms/language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -180,8 +180,8 @@ msgstr "Pakeisti"
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/menu_item.html:67
-#: templates/cms/toolbar/dragitem.html:34
+#: templates/admin/cms/page/tree/menu_item.html:69
+#: templates/cms/toolbar/dragitem.html:37
 msgid "Delete"
 msgstr "Pašalinti"
 
@@ -382,8 +382,8 @@ msgstr "Egzistuoja tik vienas šio puslapio vertimas"
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Pavadinimas ir įskiepiai su %(language)s kalbomis buvo pašalinti"
 
-#: admin/pageadmin.py:1215 admin/placeholderadmin.py:607
-#: admin/placeholderadmin.py:651
+#: admin/pageadmin.py:1215 admin/placeholderadmin.py:612
+#: admin/placeholderadmin.py:656
 msgid "Are you sure?"
 msgstr "Ar jūs esate tikri?"
 
@@ -448,38 +448,38 @@ msgstr "Jūs neturite teisės redaguoti šio įskiepio"
 msgid "You have no permission to move this plugin"
 msgstr "Jūs neturite teisės perkelti šio įskiepio"
 
-#: admin/placeholderadmin.py:543
+#: admin/placeholderadmin.py:548
 msgid "parent must be in the same placeholder"
 msgstr "pradinis elementas turi buti toje pačioje rezervuotoje vietoje"
 
-#: admin/placeholderadmin.py:546
+#: admin/placeholderadmin.py:551
 msgid "parent must be in the same language as plugin_language"
 msgstr "pradinis elementas turi būti tos pačios kalbos kaip įskiepis_kalba"
 
-#: admin/placeholderadmin.py:580 admin/placeholderadmin.py:595
+#: admin/placeholderadmin.py:585 admin/placeholderadmin.py:600
 msgid "You do not have permission to delete this plugin"
 msgstr "Jūs neturite teisės pašalinti šio įskiepio"
 
-#: admin/placeholderadmin.py:599
+#: admin/placeholderadmin.py:604
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "Įskiepis %(name)s  \"%(obj)s\" buvo sėkmingai pašalintas."
 
-#: admin/placeholderadmin.py:605 admin/placeholderadmin.py:649
+#: admin/placeholderadmin.py:610 admin/placeholderadmin.py:654
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Negalima pašalinti %(name)s"
 
-#: admin/placeholderadmin.py:625 admin/placeholderadmin.py:641
+#: admin/placeholderadmin.py:630 admin/placeholderadmin.py:646
 msgid "You do not have permission to clear this placeholder"
 msgstr "Jūs neturite teisiės išvalyti šios rezervuotos vietos"
 
-#: admin/placeholderadmin.py:644
+#: admin/placeholderadmin.py:649
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "Rezervuota vieta \"%(obj)s\" buvo sėkmingai išvalyta."
 
-#: admin/placeholderadmin.py:654
+#: admin/placeholderadmin.py:659
 msgid "placeholder"
 msgstr "rezervuota vieta"
 
@@ -804,12 +804,12 @@ msgid "changed by"
 msgstr "redagavo"
 
 #: migrations/0001_initial.py:88 models/pagemodel.py:71
-#: templates/admin/cms/page/tree/menu_item.html:77
+#: templates/admin/cms/page/tree/menu_item.html:79
 msgid "publication date"
 msgstr "publikavimo data"
 
 #: migrations/0001_initial.py:89 models/pagemodel.py:73
-#: templates/admin/cms/page/tree/menu_item.html:80
+#: templates/admin/cms/page/tree/menu_item.html:82
 msgid "publication end date"
 msgstr "publikavimo pabaigos datą"
 
@@ -830,7 +830,7 @@ msgid "attached menu"
 msgstr "prikabintas meniu"
 
 #: migrations/0001_initial.py:94 models/pagemodel.py:86
-#: templates/admin/cms/page/tree/menu_item.html:87
+#: templates/admin/cms/page/tree/menu_item.html:89
 msgid "template"
 msgstr "šablonas"
 
@@ -1173,7 +1173,7 @@ msgid "Home"
 msgstr "Pagrindinis"
 
 #: templates/admin/cms/page/change_form.html:26
-#: templates/admin/cms/page/tree/menu_item.html:50
+#: templates/admin/cms/page/tree/menu_item.html:28
 msgid "View on site"
 msgstr "Žiūrėti puslapyje"
 
@@ -1294,6 +1294,7 @@ msgid "List of pages"
 msgstr "Puslapių sąrašas"
 
 #: templates/admin/cms/page/tree/base.html:12
+#: templates/admin/cms/page/tree/base.html:106
 msgid "Search"
 msgstr "Ieškoti"
 
@@ -1327,35 +1328,56 @@ msgstr "Pridėti %(name)s"
 msgid "Pages on:"
 msgstr "Paslapiuose:"
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:108
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s rezultatas"
+msgstr[1] "%(counter)s rezultatai"
+msgstr[2] "%(counter)s rezultatų"
+
+#: templates/admin/cms/page/tree/base.html:108
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "viso %(full_result_count)s"
+
+#: templates/admin/cms/page/tree/base.html:108
+msgid "Show all"
+msgstr "Rodyti viską"
+
+#: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
 msgstr "Filtruoti:"
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:123
 msgid "on"
 msgstr "įjungti"
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:123
 msgid "off"
 msgstr "išjungti"
 
-#: templates/admin/cms/page/tree/base.html:106
+#: templates/admin/cms/page/tree/base.html:125
 msgid "Filter"
 msgstr "Filtras"
 
-#: templates/admin/cms/page/tree/base_header.html:10
+#: templates/admin/cms/page/tree/base_header.html:8
+msgid "View"
+msgstr "Peržiūrėti"
+
+#: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
 msgstr "Meniu"
 
-#: templates/admin/cms/page/tree/base_header.html:11
+#: templates/admin/cms/page/tree/base_header.html:13
 msgid "Actions"
 msgstr "Veiksmai"
 
-#: templates/admin/cms/page/tree/base_header.html:12
+#: templates/admin/cms/page/tree/base_header.html:14
 msgid "Info"
 msgstr "Informacija"
 
-#: templates/admin/cms/page/tree/base_header.html:26
+#: templates/admin/cms/page/tree/base_header.html:28
 msgid ""
 "<em>There is no page around yet.</em><br /><a href=\"add/\" "
 "class=\"addlink\">Add page</a> now."
@@ -1373,14 +1395,6 @@ msgstr "Pasirinkite kopijavimo nustatymus"
 #: templates/cms/toolbar/toolbar.html:48 templates/cms/toolbar/toolbar.html:81
 msgid "Close"
 msgstr "Uždaryti"
-
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "select this page"
-msgstr "pasirinkti šį puslapį"
-
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "edit this page"
-msgstr "redaguoti šį puslapį"
 
 #: templates/admin/cms/page/tree/menu_item.html:18
 msgid "insert above"
@@ -1407,84 +1421,84 @@ msgstr "pradinis"
 msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu_item.html:30
+#: templates/admin/cms/page/tree/menu_item.html:33
 #, python-format
 msgid "Edit this page in %(language)s "
 msgstr "Redaguoti šį puslapį %(language)s  kalboje"
 
-#: templates/admin/cms/page/tree/menu_item.html:33
+#: templates/admin/cms/page/tree/menu_item.html:36
 msgid "Pick an action:"
 msgstr "Pasirinkite veiksmą:"
 
-#: templates/admin/cms/page/tree/menu_item.html:34
+#: templates/admin/cms/page/tree/menu_item.html:37
 msgid "Publish"
 msgstr "Publikuoti"
 
-#: templates/admin/cms/page/tree/menu_item.html:35
+#: templates/admin/cms/page/tree/menu_item.html:38
 msgid "Unpublish"
 msgstr "Anuliuoti publikavimą"
 
-#: templates/admin/cms/page/tree/menu_item.html:43
+#: templates/admin/cms/page/tree/menu_item.html:46
 msgid "in menu"
 msgstr "yra meniu"
 
-#: templates/admin/cms/page/tree/menu_item.html:43
+#: templates/admin/cms/page/tree/menu_item.html:46
 msgid "not in menu"
 msgstr "nesantis meniu"
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:54
 msgid "Page settings (SHIFT-click for advanced settings)"
 msgstr "Puslapio nustatymai (išplėstiniams parametrams spustelėkite klavišą SHIFT)"
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:54
 msgid "page settings"
 msgstr "puslapio nustatymai"
 
-#: templates/admin/cms/page/tree/menu_item.html:54
-#: templates/cms/toolbar/dragitem.html:27
+#: templates/admin/cms/page/tree/menu_item.html:56
+#: templates/cms/toolbar/dragitem.html:30
 msgid "Copy"
 msgstr "Kopijuoti"
 
-#: templates/admin/cms/page/tree/menu_item.html:54
+#: templates/admin/cms/page/tree/menu_item.html:56
 msgid "copy"
 msgstr "kopijuoti"
 
-#: templates/admin/cms/page/tree/menu_item.html:57
-#: templates/admin/cms/page/tree/menu_item.html:61
+#: templates/admin/cms/page/tree/menu_item.html:59
+#: templates/admin/cms/page/tree/menu_item.html:63
 msgid "Add Child"
 msgstr "Pridėti vidinį elemntą"
 
-#: templates/admin/cms/page/tree/menu_item.html:57
-#: templates/admin/cms/page/tree/menu_item.html:61
+#: templates/admin/cms/page/tree/menu_item.html:59
+#: templates/admin/cms/page/tree/menu_item.html:63
 msgid "add"
 msgstr "pridėti"
 
-#: templates/admin/cms/page/tree/menu_item.html:65
-#: templates/cms/toolbar/dragitem.html:26
+#: templates/admin/cms/page/tree/menu_item.html:67
+#: templates/cms/toolbar/dragitem.html:29
 msgid "Cut"
 msgstr "Iškirpti"
 
-#: templates/admin/cms/page/tree/menu_item.html:65
+#: templates/admin/cms/page/tree/menu_item.html:67
 msgid "cut"
 msgstr "iškirpti"
 
-#: templates/admin/cms/page/tree/menu_item.html:67
+#: templates/admin/cms/page/tree/menu_item.html:69
 msgid "delete"
 msgstr "pašalinti"
 
-#: templates/admin/cms/page/tree/menu_item.html:72
+#: templates/admin/cms/page/tree/menu_item.html:74
 msgid "info"
 msgstr "informacija"
 
-#: templates/admin/cms/page/tree/menu_item.html:74
+#: templates/admin/cms/page/tree/menu_item.html:76
 msgid "Information"
 msgstr "Informacija"
 
-#: templates/admin/cms/page/tree/menu_item.html:82
+#: templates/admin/cms/page/tree/menu_item.html:84
 msgid "is restricted"
 msgstr "yra apribotas"
 
-#: templates/admin/cms/page/tree/menu_item.html:84
+#: templates/admin/cms/page/tree/menu_item.html:86
 msgid "last change by"
 msgstr "paskutinis pakeitimas pagal"
 
@@ -1492,7 +1506,7 @@ msgstr "paskutinis pakeitimas pagal"
 msgid "Clipboard"
 msgstr "Iškarpinė"
 
-#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:11
+#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:14
 msgid "Add plugin"
 msgstr "Pridėti įskiepį"
 
@@ -1505,7 +1519,7 @@ msgid "Copy from"
 msgstr "Kopijuoti iš"
 
 #: templates/cms/toolbar/dragbar.html:15
-#: templates/cms/toolbar/dragitem.html:29
+#: templates/cms/toolbar/dragitem.html:32
 msgid "Paste"
 msgstr "Įkopijuoti"
 
@@ -1514,7 +1528,7 @@ msgid "Empty all"
 msgstr "Valyti visus"
 
 #: templates/cms/toolbar/dragbar.html:21
-#: templates/cms/toolbar/dragitem.html:40
+#: templates/cms/toolbar/dragitem.html:43
 msgid "Filter plugins..."
 msgstr "Filtruoti įskiepius..."
 
@@ -1530,29 +1544,29 @@ msgstr "Išskleisti visus"
 msgid "Collapse all"
 msgstr "Sutraukti visus"
 
-#: templates/cms/toolbar/dragitem.html:9
+#: templates/cms/toolbar/dragitem.html:12
 msgid "You cannot add plugins to this plugin."
 msgstr "Jūs negalite pridėti įskiepių į šį įskiepį."
 
-#: templates/cms/toolbar/dragitem.html:15
+#: templates/cms/toolbar/dragitem.html:18
 #: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
 #: templatetags/cms_tags.py:754
 msgid "Edit"
 msgstr "Redaguoti"
 
-#: templates/cms/toolbar/dragitem.html:19
-msgid "This plugin cannot be moved or edited outside of it's parent"
+#: templates/cms/toolbar/dragitem.html:22
+msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr "Šis įskiepis negali buti perkeltas ar redaguojamas už tėvinio įskiepio ribų"
 
-#: templates/cms/toolbar/dragitem.html:30
+#: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."
 msgstr "Iškarpinė yra tuščia."
 
-#: templates/cms/toolbar/dragitem.html:31
+#: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr "Šiame įskiepyje negali būti šio tipo vidinių įskiepių."
 
-#: templates/cms/toolbar/dragitem.html:32
+#: templates/cms/toolbar/dragitem.html:35
 msgid "This plugin cannot have nested plugins."
 msgstr "Šis įskiepis negali turėti vidinių įskiepių."
 
@@ -1992,6 +2006,10 @@ msgstr "Pakeisti kategoriją"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dėkojame už turiningai su tinklalapiu šiandien praleistą laiką."
 
+#: tests/test_templates.py:53 utils/conf.py:154
+msgid "Inherit the template of the nearest ancestor"
+msgstr "Paveldėti šabloną iš artimiausio tėvinio objekto"
+
 #: tests/test_wizards.py:70
 msgid "UserSettings"
 msgstr "Vartotojo nustatymai"
@@ -2031,7 +2049,7 @@ msgid ""
 "%(plugin_name)s plugins."
 msgstr "Ši rezervuota vieta  jau turi maksimalų skaičių (%(limit)s) leistinų %(plugin_name)s įskiepių."
 
-#: wizards/wizard_base.py:83
+#: wizards/wizard_base.py:94
 #, python-format
 msgid "Create a new %s instance."
 msgstr "Sukurti naują %s objektą."

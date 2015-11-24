@@ -22,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 10:16-0500\n"
-"PO-Revision-Date: 2015-11-05 15:10+0000\n"
-"Last-Translator: Martin Koistinen <mkoistinen@gmail.com>\n"
+"POT-Creation-Date: 2015-11-11 18:31+0100\n"
+"PO-Revision-Date: 2015-11-11 17:31+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Russian (http://www.transifex.com/digi604/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -192,8 +192,8 @@ msgstr "Изменить"
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/menu_item.html:67
-#: templates/cms/toolbar/dragitem.html:34
+#: templates/admin/cms/page/tree/menu_item.html:69
+#: templates/cms/toolbar/dragitem.html:37
 msgid "Delete"
 msgstr "Удалить"
 
@@ -394,8 +394,8 @@ msgstr "Для данной страницы создан только один 
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Заголовок и плагин на %(language)s удалён"
 
-#: admin/pageadmin.py:1215 admin/placeholderadmin.py:607
-#: admin/placeholderadmin.py:651
+#: admin/pageadmin.py:1215 admin/placeholderadmin.py:612
+#: admin/placeholderadmin.py:656
 msgid "Are you sure?"
 msgstr "Вы уверены?"
 
@@ -460,38 +460,38 @@ msgstr "У вас нет прав на редактирование данног
 msgid "You have no permission to move this plugin"
 msgstr "У вас нет прав на перемещение данного плагина"
 
-#: admin/placeholderadmin.py:543
+#: admin/placeholderadmin.py:548
 msgid "parent must be in the same placeholder"
 msgstr "родитель должен быть в той же именованной области"
 
-#: admin/placeholderadmin.py:546
+#: admin/placeholderadmin.py:551
 msgid "parent must be in the same language as plugin_language"
 msgstr "родитель должен быть на языке plugin_language "
 
-#: admin/placeholderadmin.py:580 admin/placeholderadmin.py:595
+#: admin/placeholderadmin.py:585 admin/placeholderadmin.py:600
 msgid "You do not have permission to delete this plugin"
 msgstr "У вас нет прав на удаление данного плагина"
 
-#: admin/placeholderadmin.py:599
+#: admin/placeholderadmin.py:604
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr "Плагин %(name)s \"%(obj)s\" был успешно удален."
 
-#: admin/placeholderadmin.py:605 admin/placeholderadmin.py:649
+#: admin/placeholderadmin.py:610 admin/placeholderadmin.py:654
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Не могу удалить %(name)s"
 
-#: admin/placeholderadmin.py:625 admin/placeholderadmin.py:641
+#: admin/placeholderadmin.py:630 admin/placeholderadmin.py:646
 msgid "You do not have permission to clear this placeholder"
 msgstr "У вас нет прав очистить содержимое этой именованной области"
 
-#: admin/placeholderadmin.py:644
+#: admin/placeholderadmin.py:649
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "Именованная область \"%(obj)s\" была успешно очищена."
 
-#: admin/placeholderadmin.py:654
+#: admin/placeholderadmin.py:659
 msgid "placeholder"
 msgstr "плэйсхолдер"
 
@@ -816,12 +816,12 @@ msgid "changed by"
 msgstr "изменён"
 
 #: migrations/0001_initial.py:88 models/pagemodel.py:71
-#: templates/admin/cms/page/tree/menu_item.html:77
+#: templates/admin/cms/page/tree/menu_item.html:79
 msgid "publication date"
 msgstr "дата публикации"
 
 #: migrations/0001_initial.py:89 models/pagemodel.py:73
-#: templates/admin/cms/page/tree/menu_item.html:80
+#: templates/admin/cms/page/tree/menu_item.html:82
 msgid "publication end date"
 msgstr "дата окончания публикации"
 
@@ -842,7 +842,7 @@ msgid "attached menu"
 msgstr "прикреплённое меню"
 
 #: migrations/0001_initial.py:94 models/pagemodel.py:86
-#: templates/admin/cms/page/tree/menu_item.html:87
+#: templates/admin/cms/page/tree/menu_item.html:89
 msgid "template"
 msgstr "шаблон"
 
@@ -1185,7 +1185,7 @@ msgid "Home"
 msgstr "Домой"
 
 #: templates/admin/cms/page/change_form.html:26
-#: templates/admin/cms/page/tree/menu_item.html:50
+#: templates/admin/cms/page/tree/menu_item.html:28
 msgid "View on site"
 msgstr "Посмотреть на сайте"
 
@@ -1307,6 +1307,7 @@ msgid "List of pages"
 msgstr "Список страниц"
 
 #: templates/admin/cms/page/tree/base.html:12
+#: templates/admin/cms/page/tree/base.html:106
 msgid "Search"
 msgstr "Поиск"
 
@@ -1340,35 +1341,57 @@ msgstr "Добавить %(name)s"
 msgid "Pages on:"
 msgstr "Страницы на:"
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:108
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: templates/admin/cms/page/tree/base.html:108
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base.html:108
+msgid "Show all"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
 msgstr "Фильтр:"
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:123
 msgid "on"
 msgstr "вкл"
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:123
 msgid "off"
 msgstr "выкл"
 
-#: templates/admin/cms/page/tree/base.html:106
+#: templates/admin/cms/page/tree/base.html:125
 msgid "Filter"
 msgstr "Фильтр"
 
-#: templates/admin/cms/page/tree/base_header.html:10
+#: templates/admin/cms/page/tree/base_header.html:8
+msgid "View"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
 msgstr "Меню"
 
-#: templates/admin/cms/page/tree/base_header.html:11
+#: templates/admin/cms/page/tree/base_header.html:13
 msgid "Actions"
 msgstr "Действия"
 
-#: templates/admin/cms/page/tree/base_header.html:12
+#: templates/admin/cms/page/tree/base_header.html:14
 msgid "Info"
 msgstr "Информация"
 
-#: templates/admin/cms/page/tree/base_header.html:26
+#: templates/admin/cms/page/tree/base_header.html:28
 msgid ""
 "<em>There is no page around yet.</em><br /><a href=\"add/\" "
 "class=\"addlink\">Add page</a> now."
@@ -1386,14 +1409,6 @@ msgstr "Выбрать параметры копирования"
 #: templates/cms/toolbar/toolbar.html:48 templates/cms/toolbar/toolbar.html:81
 msgid "Close"
 msgstr "Закрыть"
-
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "select this page"
-msgstr "выбрать эту страницу"
-
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "edit this page"
-msgstr "изменить эту страницу"
 
 #: templates/admin/cms/page/tree/menu_item.html:18
 msgid "insert above"
@@ -1420,84 +1435,84 @@ msgstr "Главная"
 msgid "Application: %(apphook)s"
 msgstr "Приложение: %(apphook)s"
 
-#: templates/admin/cms/page/tree/menu_item.html:30
+#: templates/admin/cms/page/tree/menu_item.html:33
 #, python-format
 msgid "Edit this page in %(language)s "
 msgstr "Редактировать страницу на %(language)s"
 
-#: templates/admin/cms/page/tree/menu_item.html:33
+#: templates/admin/cms/page/tree/menu_item.html:36
 msgid "Pick an action:"
 msgstr "Выберите действие:"
 
-#: templates/admin/cms/page/tree/menu_item.html:34
+#: templates/admin/cms/page/tree/menu_item.html:37
 msgid "Publish"
 msgstr "Опубликовать"
 
-#: templates/admin/cms/page/tree/menu_item.html:35
+#: templates/admin/cms/page/tree/menu_item.html:38
 msgid "Unpublish"
 msgstr "Отменить публикацию"
 
-#: templates/admin/cms/page/tree/menu_item.html:43
+#: templates/admin/cms/page/tree/menu_item.html:46
 msgid "in menu"
 msgstr "в меню"
 
-#: templates/admin/cms/page/tree/menu_item.html:43
+#: templates/admin/cms/page/tree/menu_item.html:46
 msgid "not in menu"
 msgstr "нет в меню"
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:54
 msgid "Page settings (SHIFT-click for advanced settings)"
 msgstr "Настройки страницы (SHIFT-клик для расширенных настроек)"
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:54
 msgid "page settings"
 msgstr "настройки страницы"
 
-#: templates/admin/cms/page/tree/menu_item.html:54
-#: templates/cms/toolbar/dragitem.html:27
+#: templates/admin/cms/page/tree/menu_item.html:56
+#: templates/cms/toolbar/dragitem.html:30
 msgid "Copy"
 msgstr "Копировать"
 
-#: templates/admin/cms/page/tree/menu_item.html:54
+#: templates/admin/cms/page/tree/menu_item.html:56
 msgid "copy"
 msgstr "копировать"
 
-#: templates/admin/cms/page/tree/menu_item.html:57
-#: templates/admin/cms/page/tree/menu_item.html:61
+#: templates/admin/cms/page/tree/menu_item.html:59
+#: templates/admin/cms/page/tree/menu_item.html:63
 msgid "Add Child"
 msgstr "Добавить потомка"
 
-#: templates/admin/cms/page/tree/menu_item.html:57
-#: templates/admin/cms/page/tree/menu_item.html:61
+#: templates/admin/cms/page/tree/menu_item.html:59
+#: templates/admin/cms/page/tree/menu_item.html:63
 msgid "add"
 msgstr "добавить"
 
-#: templates/admin/cms/page/tree/menu_item.html:65
-#: templates/cms/toolbar/dragitem.html:26
+#: templates/admin/cms/page/tree/menu_item.html:67
+#: templates/cms/toolbar/dragitem.html:29
 msgid "Cut"
 msgstr "Вырезать"
 
-#: templates/admin/cms/page/tree/menu_item.html:65
+#: templates/admin/cms/page/tree/menu_item.html:67
 msgid "cut"
 msgstr "вырезать"
 
-#: templates/admin/cms/page/tree/menu_item.html:67
+#: templates/admin/cms/page/tree/menu_item.html:69
 msgid "delete"
 msgstr "удалить"
 
-#: templates/admin/cms/page/tree/menu_item.html:72
+#: templates/admin/cms/page/tree/menu_item.html:74
 msgid "info"
 msgstr "информация"
 
-#: templates/admin/cms/page/tree/menu_item.html:74
+#: templates/admin/cms/page/tree/menu_item.html:76
 msgid "Information"
 msgstr "Информация"
 
-#: templates/admin/cms/page/tree/menu_item.html:82
+#: templates/admin/cms/page/tree/menu_item.html:84
 msgid "is restricted"
 msgstr "не для всех"
 
-#: templates/admin/cms/page/tree/menu_item.html:84
+#: templates/admin/cms/page/tree/menu_item.html:86
 msgid "last change by"
 msgstr "последнее изменение сделано"
 
@@ -1505,7 +1520,7 @@ msgstr "последнее изменение сделано"
 msgid "Clipboard"
 msgstr "Буфер обмена"
 
-#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:11
+#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:14
 msgid "Add plugin"
 msgstr "Добавить плагин"
 
@@ -1518,7 +1533,7 @@ msgid "Copy from"
 msgstr "Скопировать из"
 
 #: templates/cms/toolbar/dragbar.html:15
-#: templates/cms/toolbar/dragitem.html:29
+#: templates/cms/toolbar/dragitem.html:32
 msgid "Paste"
 msgstr "Вставить"
 
@@ -1527,7 +1542,7 @@ msgid "Empty all"
 msgstr "Очистить всё"
 
 #: templates/cms/toolbar/dragbar.html:21
-#: templates/cms/toolbar/dragitem.html:40
+#: templates/cms/toolbar/dragitem.html:43
 msgid "Filter plugins..."
 msgstr "Фильтруем плагины..."
 
@@ -1543,29 +1558,29 @@ msgstr "Развернуть все"
 msgid "Collapse all"
 msgstr "Свернуть все"
 
-#: templates/cms/toolbar/dragitem.html:9
+#: templates/cms/toolbar/dragitem.html:12
 msgid "You cannot add plugins to this plugin."
 msgstr "Вы не можете добавлять дочерние плагины в этот плагин."
 
-#: templates/cms/toolbar/dragitem.html:15
+#: templates/cms/toolbar/dragitem.html:18
 #: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
 #: templatetags/cms_tags.py:754
 msgid "Edit"
 msgstr "Изменить"
 
-#: templates/cms/toolbar/dragitem.html:19
-msgid "This plugin cannot be moved or edited outside of it's parent"
-msgstr "Этот плагин не может быть отредактирован или перемещен вне его родителя"
+#: templates/cms/toolbar/dragitem.html:22
+msgid "This plugin cannot be moved or edited outside of its parent"
+msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:30
+#: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."
 msgstr "Буфер обмена пустой"
 
-#: templates/cms/toolbar/dragitem.html:31
+#: templates/cms/toolbar/dragitem.html:34
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr "Это расширение не допускает вложенные расширения этого типа"
 
-#: templates/cms/toolbar/dragitem.html:32
+#: templates/cms/toolbar/dragitem.html:35
 msgid "This plugin cannot have nested plugins."
 msgstr "Это расширение не может иметь вложенные расширения"
 
@@ -2005,6 +2020,10 @@ msgstr "Изменить категорию"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Благодарим за время, проведенное сегодня на сайте."
 
+#: tests/test_templates.py:53 utils/conf.py:154
+msgid "Inherit the template of the nearest ancestor"
+msgstr "Наследовать шаблон от ближайшего предка"
+
 #: tests/test_wizards.py:70
 msgid "UserSettings"
 msgstr "Настройки пользователя"
@@ -2045,7 +2064,7 @@ msgid ""
 "%(plugin_name)s plugins."
 msgstr "Этот плейсхолдер уже имеет максимальное количество (%(limit)s) плагинов типа %(plugin_name)s."
 
-#: wizards/wizard_base.py:83
+#: wizards/wizard_base.py:94
 #, python-format
 msgid "Create a new %s instance."
 msgstr "Создать новый %s экземпляр."

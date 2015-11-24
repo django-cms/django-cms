@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 10:16-0500\n"
+"POT-Creation-Date: 2015-11-24 00:17-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,11 +30,11 @@ msgstr ""
 msgid "The current language of the content fields."
 msgstr ""
 
-#: admin/forms.py:71 forms/wizards.py:81
+#: admin/forms.py:71 forms/wizards.py:83
 msgid "Page type"
 msgstr ""
 
-#: admin/forms.py:72 forms/wizards.py:79
+#: admin/forms.py:72 forms/wizards.py:81
 msgid "Title"
 msgstr ""
 
@@ -163,8 +163,9 @@ msgid "Please select user or group first."
 msgstr ""
 
 #: admin/forms.py:513 admin/forms.py:520 admin/forms.py:524
-#: templates/admin/cms/usersettings/change_form.html:17
-#: templatetags/cms_tags.py:760
+#: templates/admin/cms/page/change_form.html:11
+#: templates/admin/cms/usersettings/change_form.html:24
+#: templatetags/cms_tags.py:762
 msgid "Add"
 msgstr ""
 
@@ -176,8 +177,8 @@ msgstr ""
 #: templates/admin/cms/extensions/change_form.html:8
 #: templates/admin/cms/page/plugin/submit_line.html:5
 #: templates/admin/cms/page/submit_row.html:7
-#: templates/admin/cms/page/tree/menu_item.html:67
-#: templates/cms/toolbar/dragitem.html:34
+#: templates/admin/cms/page/tree/menu_item.html:69
+#: templates/cms/toolbar/dragitem.html:40
 msgid "Delete"
 msgstr ""
 
@@ -282,7 +283,7 @@ msgid "Database error"
 msgstr ""
 
 #: admin/pageadmin.py:790 admin/pageadmin.py:809 admin/pageadmin.py:1103
-#: admin/pageadmin.py:1140
+#: admin/pageadmin.py:1139
 msgid "You do not have permission to change this page"
 msgstr ""
 
@@ -364,54 +365,54 @@ msgstr ""
 msgid "The page \"%s\" was successfully reverted."
 msgstr ""
 
-#: admin/pageadmin.py:1144
+#: admin/pageadmin.py:1143
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-#: admin/pageadmin.py:1150
+#: admin/pageadmin.py:1149
 msgid "There only exists one translation for this page"
 msgstr ""
 
-#: admin/pageadmin.py:1192
+#: admin/pageadmin.py:1191
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr ""
 
-#: admin/pageadmin.py:1215 admin/placeholderadmin.py:607
-#: admin/placeholderadmin.py:651
+#: admin/pageadmin.py:1214 admin/placeholderadmin.py:612
+#: admin/placeholderadmin.py:656
 msgid "Are you sure?"
 msgstr ""
 
-#: admin/pageadmin.py:1256
+#: admin/pageadmin.py:1255
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr ""
 
-#: admin/pageadmin.py:1278
+#: admin/pageadmin.py:1277
 msgid "Page Types"
 msgstr ""
 
-#: admin/pageadmin.py:1358
+#: admin/pageadmin.py:1357
 msgid "You do not have permission to edit this page"
 msgstr ""
 
-#: admin/permissionadmin.py:90
+#: admin/permissionadmin.py:100
 msgid "View restriction"
 msgstr ""
 
-#: admin/permissionadmin.py:91
+#: admin/permissionadmin.py:101
 msgid "View restrictions"
 msgstr ""
 
-#: admin/permissionadmin.py:148 models/permissionmodels.py:125
+#: admin/permissionadmin.py:158 models/permissionmodels.py:125
 msgid "Page permissions"
 msgstr ""
 
-#: admin/permissionadmin.py:149
+#: admin/permissionadmin.py:159
 msgid "User & Group permissions"
 msgstr ""
 
-#: admin/permissionadmin.py:150
+#: admin/permissionadmin.py:160
 msgid "Page permissions management"
 msgstr ""
 
@@ -444,38 +445,38 @@ msgstr ""
 msgid "You have no permission to move this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:543
+#: admin/placeholderadmin.py:548
 msgid "parent must be in the same placeholder"
 msgstr ""
 
-#: admin/placeholderadmin.py:546
+#: admin/placeholderadmin.py:551
 msgid "parent must be in the same language as plugin_language"
 msgstr ""
 
-#: admin/placeholderadmin.py:580 admin/placeholderadmin.py:595
+#: admin/placeholderadmin.py:585 admin/placeholderadmin.py:600
 msgid "You do not have permission to delete this plugin"
 msgstr ""
 
-#: admin/placeholderadmin.py:599
+#: admin/placeholderadmin.py:604
 #, python-format
 msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:605 admin/placeholderadmin.py:649
+#: admin/placeholderadmin.py:610 admin/placeholderadmin.py:654
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr ""
 
-#: admin/placeholderadmin.py:625 admin/placeholderadmin.py:641
+#: admin/placeholderadmin.py:630 admin/placeholderadmin.py:646
 msgid "You do not have permission to clear this placeholder"
 msgstr ""
 
-#: admin/placeholderadmin.py:644
+#: admin/placeholderadmin.py:649
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr ""
 
-#: admin/placeholderadmin.py:654
+#: admin/placeholderadmin.py:659
 msgid "placeholder"
 msgstr ""
 
@@ -501,7 +502,7 @@ msgstr ""
 msgid "Structure"
 msgstr ""
 
-#: cms_toolbars.py:94 forms/wizards.py:84
+#: cms_toolbars.py:94 forms/wizards.py:86
 msgid "Content"
 msgstr ""
 
@@ -665,27 +666,27 @@ msgstr ""
 msgid "Are you sure you want to revert to live?"
 msgstr ""
 
-#: cms_toolbars.py:573
+#: cms_toolbars.py:574
 msgid "Revert to live"
 msgstr ""
 
-#: cms_toolbars.py:576
+#: cms_toolbars.py:577
 msgid "View history"
 msgstr ""
 
-#: cms_wizards.py:84
+#: cms_wizards.py:85
 msgid "New page"
 msgstr ""
 
-#: cms_wizards.py:88
+#: cms_wizards.py:89
 msgid "Create a new page next to the current page."
 msgstr ""
 
-#: cms_wizards.py:92
+#: cms_wizards.py:93
 msgid "New sub page"
 msgstr ""
 
-#: cms_wizards.py:96
+#: cms_wizards.py:97
 msgid "Create a page below the current page."
 msgstr ""
 
@@ -697,20 +698,20 @@ msgstr ""
 msgid "Select a valid page"
 msgstr ""
 
-#: forms/widgets.py:275
+#: forms/widgets.py:281
 msgid "Add Another"
 msgstr ""
 
-#: forms/wizards.py:80
+#: forms/wizards.py:82
 msgid "Provide a title for the new page."
 msgstr ""
 
-#: forms/wizards.py:85
+#: forms/wizards.py:87
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 
-#: forms/wizards.py:178
+#: forms/wizards.py:180
 msgid "User does not have permission to add page."
 msgstr ""
 
@@ -799,12 +800,12 @@ msgid "changed by"
 msgstr ""
 
 #: migrations/0001_initial.py:88 models/pagemodel.py:71
-#: templates/admin/cms/page/tree/menu_item.html:77
+#: templates/admin/cms/page/tree/menu_item.html:79
 msgid "publication date"
 msgstr ""
 
 #: migrations/0001_initial.py:89 models/pagemodel.py:73
-#: templates/admin/cms/page/tree/menu_item.html:80
+#: templates/admin/cms/page/tree/menu_item.html:82
 msgid "publication end date"
 msgstr ""
 
@@ -825,7 +826,7 @@ msgid "attached menu"
 msgstr ""
 
 #: migrations/0001_initial.py:94 models/pagemodel.py:86
-#: templates/admin/cms/page/tree/menu_item.html:87
+#: templates/admin/cms/page/tree/menu_item.html:89
 msgid "template"
 msgstr ""
 
@@ -920,11 +921,11 @@ msgstr ""
 msgid "pages"
 msgstr ""
 
-#: models/pagemodel.py:887
+#: models/pagemodel.py:893
 msgid "Empty"
 msgstr ""
 
-#: models/pagemodel.py:1013
+#: models/pagemodel.py:1019
 msgid "default"
 msgstr ""
 
@@ -1109,7 +1110,7 @@ msgstr ""
 msgid "Generic"
 msgstr ""
 
-#: plugin_base.py:289
+#: plugin_base.py:290
 msgid "There are no further settings for this plugin. Please press save."
 msgstr ""
 
@@ -1125,11 +1126,11 @@ msgid ""
 msgstr ""
 
 #: templates/admin/cms/extensions/change_form.html:5
-#: templates/admin/cms/page/change_form.html:90
+#: templates/admin/cms/page/change_form.html:96
 #: templates/admin/cms/page/plugin/submit_line.html:3
 #: templates/admin/cms/page/submit_row.html:4
 #: templates/admin/cms/page/tree/copy_premissions.html:19
-#: templates/admin/cms/usersettings/change_form.html:25
+#: templates/admin/cms/usersettings/change_form.html:32
 msgid "Save"
 msgstr ""
 
@@ -1162,32 +1163,32 @@ msgstr ""
 #: templates/admin/cms/page/history/recover_header.html:12
 #: templates/admin/cms/page/history/revision_header.html:6
 #: templates/admin/cms/page/tree/base.html:9
-#: templates/admin/cms/usersettings/change_form.html:14
+#: templates/admin/cms/usersettings/change_form.html:21
 msgid "Home"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:26
-#: templates/admin/cms/page/tree/menu_item.html:50
+#: templates/admin/cms/page/change_form.html:32
+#: templates/admin/cms/page/tree/menu_item.html:28
 msgid "View on site"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:60
+#: templates/admin/cms/page/change_form.html:66
 #: templates/cms/wizards/create.html:14
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/admin/cms/page/change_form.html:78
+#: templates/admin/cms/page/change_form.html:84
 msgid "All permissions"
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:79
-#: templates/admin/cms/page/tree/base.html:76
+#: templates/admin/cms/page/change_form.html:85
+#: templates/admin/cms/page/tree/base.html:80
 msgid "Loading..."
 msgstr ""
 
-#: templates/admin/cms/page/change_form.html:91
+#: templates/admin/cms/page/change_form.html:97
 #: templates/admin/cms/page/plugin/submit_line.html:9
 #: templates/admin/cms/page/submit_row.html:16
 msgid "Save and continue editing"
@@ -1290,65 +1291,69 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:50
+#: templates/admin/cms/page/tree/base.html:53
 msgid "Successfully moved"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:51
+#: templates/admin/cms/page/tree/base.html:54
 msgid "Changes within the tree might require a refresh."
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:52
+#: templates/admin/cms/page/tree/base.html:55
 msgid "An error occured. Please reload the page"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:53
+#: templates/admin/cms/page/tree/base.html:56
 msgid "Are you sure you want to § this page?"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:69
+#: templates/admin/cms/page/tree/base.html:73
 #, python-format
 msgid "Recover deleted %(name)s"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:72
+#: templates/admin/cms/page/tree/base.html:76
 #, python-format
 msgid "Add %(name)s"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:84
+#: templates/admin/cms/page/tree/base.html:88
 msgid "Pages on:"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:109
 msgid "Filter:"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:109
 msgid "on"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:104
+#: templates/admin/cms/page/tree/base.html:109
 msgid "off"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base.html:106
+#: templates/admin/cms/page/tree/base.html:111
 msgid "Filter"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base_header.html:10
-msgid "Menu"
-msgstr ""
-
-#: templates/admin/cms/page/tree/base_header.html:11
-msgid "Actions"
+#: templates/admin/cms/page/tree/base_header.html:8
+msgid "View"
 msgstr ""
 
 #: templates/admin/cms/page/tree/base_header.html:12
+msgid "Menu"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base_header.html:13
+msgid "Actions"
+msgstr ""
+
+#: templates/admin/cms/page/tree/base_header.html:14
 msgid "Info"
 msgstr ""
 
-#: templates/admin/cms/page/tree/base_header.html:26
+#: templates/admin/cms/page/tree/base_header.html:28
 msgid ""
 "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink"
 "\">Add page</a> now."
@@ -1365,14 +1370,6 @@ msgstr ""
 #: templates/admin/cms/page/tree/copy_premissions.html:20
 #: templates/cms/toolbar/toolbar.html:48 templates/cms/toolbar/toolbar.html:81
 msgid "Close"
-msgstr ""
-
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "select this page"
-msgstr ""
-
-#: templates/admin/cms/page/tree/menu_item.html:7
-msgid "edit this page"
 msgstr ""
 
 #: templates/admin/cms/page/tree/menu_item.html:18
@@ -1400,84 +1397,84 @@ msgstr ""
 msgid "Application: %(apphook)s"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:30
+#: templates/admin/cms/page/tree/menu_item.html:33
 #, python-format
 msgid "Edit this page in %(language)s "
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:33
+#: templates/admin/cms/page/tree/menu_item.html:36
 msgid "Pick an action:"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:34
+#: templates/admin/cms/page/tree/menu_item.html:37
 msgid "Publish"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:35
+#: templates/admin/cms/page/tree/menu_item.html:38
 msgid "Unpublish"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:43
+#: templates/admin/cms/page/tree/menu_item.html:46
 msgid "in menu"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:43
+#: templates/admin/cms/page/tree/menu_item.html:46
 msgid "not in menu"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:54
 msgid "Page settings (SHIFT-click for advanced settings)"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:52
+#: templates/admin/cms/page/tree/menu_item.html:54
 msgid "page settings"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:54
-#: templates/cms/toolbar/dragitem.html:27
+#: templates/admin/cms/page/tree/menu_item.html:56
+#: templates/cms/toolbar/dragitem.html:33
 msgid "Copy"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:54
+#: templates/admin/cms/page/tree/menu_item.html:56
 msgid "copy"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:57
-#: templates/admin/cms/page/tree/menu_item.html:61
+#: templates/admin/cms/page/tree/menu_item.html:59
+#: templates/admin/cms/page/tree/menu_item.html:63
 msgid "Add Child"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:57
-#: templates/admin/cms/page/tree/menu_item.html:61
+#: templates/admin/cms/page/tree/menu_item.html:59
+#: templates/admin/cms/page/tree/menu_item.html:63
 msgid "add"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:65
-#: templates/cms/toolbar/dragitem.html:26
+#: templates/admin/cms/page/tree/menu_item.html:67
+#: templates/cms/toolbar/dragitem.html:32
 msgid "Cut"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:65
+#: templates/admin/cms/page/tree/menu_item.html:67
 msgid "cut"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:67
+#: templates/admin/cms/page/tree/menu_item.html:69
 msgid "delete"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:72
+#: templates/admin/cms/page/tree/menu_item.html:74
 msgid "info"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:74
+#: templates/admin/cms/page/tree/menu_item.html:76
 msgid "Information"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:82
+#: templates/admin/cms/page/tree/menu_item.html:84
 msgid "is restricted"
 msgstr ""
 
-#: templates/admin/cms/page/tree/menu_item.html:84
+#: templates/admin/cms/page/tree/menu_item.html:86
 msgid "last change by"
 msgstr ""
 
@@ -1485,7 +1482,7 @@ msgstr ""
 msgid "Clipboard"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:11
+#: templates/cms/toolbar/dragbar.html:6 templates/cms/toolbar/dragitem.html:17
 msgid "Add plugin"
 msgstr ""
 
@@ -1497,7 +1494,7 @@ msgstr ""
 msgid "Copy from"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:15 templates/cms/toolbar/dragitem.html:29
+#: templates/cms/toolbar/dragbar.html:15 templates/cms/toolbar/dragitem.html:35
 msgid "Paste"
 msgstr ""
 
@@ -1505,7 +1502,7 @@ msgstr ""
 msgid "Empty all"
 msgstr ""
 
-#: templates/cms/toolbar/dragbar.html:21 templates/cms/toolbar/dragitem.html:40
+#: templates/cms/toolbar/dragbar.html:21 templates/cms/toolbar/dragitem.html:46
 msgid "Filter plugins..."
 msgstr ""
 
@@ -1521,29 +1518,29 @@ msgstr ""
 msgid "Collapse all"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:9
+#: templates/cms/toolbar/dragitem.html:15
 msgid "You cannot add plugins to this plugin."
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:15
-#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:751
-#: templatetags/cms_tags.py:754
+#: templates/cms/toolbar/dragitem.html:21
+#: templates/cms/toolbar/items/live_draft.html:11 templatetags/cms_tags.py:753
+#: templatetags/cms_tags.py:756
 msgid "Edit"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:19
-msgid "This plugin cannot be moved or edited outside of it's parent"
+#: templates/cms/toolbar/dragitem.html:26
+msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:30
+#: templates/cms/toolbar/dragitem.html:36
 msgid "Clipboard is empty."
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:31
+#: templates/cms/toolbar/dragitem.html:37
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
 
-#: templates/cms/toolbar/dragitem.html:32
+#: templates/cms/toolbar/dragitem.html:38
 msgid "This plugin cannot have nested plugins."
 msgstr ""
 
@@ -1611,46 +1608,46 @@ msgstr ""
 msgid "It is being redirected to:"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:32
+#: templates/cms/toolbar/toolbar_javascript.html:29
 #, python-format
 msgid "Development version using django CMS %(cms_version)s"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:33
+#: templates/cms/toolbar/toolbar_javascript.html:30
 msgid "Cancel"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:34
+#: templates/cms/toolbar/toolbar_javascript.html:31
 msgid "The following error occured:"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:35
+#: templates/cms/toolbar/toolbar_javascript.html:32
 msgid "Action successfull... reloading."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:36
+#: templates/cms/toolbar/toolbar_javascript.html:33
 msgid "Are you sure you want to delete this plugin?"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:37
+#: templates/cms/toolbar/toolbar_javascript.html:34
 #, python-brace-format
 msgid "({1}) plugin is empty. Remove it?"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:38
+#: templates/cms/toolbar/toolbar_javascript.html:35
 msgid "Are you sure you want to publish this page?"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:39
+#: templates/cms/toolbar/toolbar_javascript.html:36
 msgid "Plugin will be added here"
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:57
+#: templates/cms/toolbar/toolbar_javascript.html:56
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
 
-#: templates/cms/toolbar/toolbar_javascript.html:58
+#: templates/cms/toolbar/toolbar_javascript.html:57
 msgid "This page has unpublished changes."
 msgstr ""
 
@@ -1990,6 +1987,10 @@ msgstr ""
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
 
+#: tests/test_templates.py:53 utils/conf.py:154
+msgid "Inherit the template of the nearest ancestor"
+msgstr ""
+
 #: tests/test_wizards.py:70
 msgid "UserSettings"
 msgstr ""
@@ -2027,7 +2028,7 @@ msgid ""
 "%(plugin_name)s plugins."
 msgstr ""
 
-#: wizards/wizard_base.py:83
+#: wizards/wizard_base.py:89
 #, python-format
 msgid "Create a new %s instance."
 msgstr ""
