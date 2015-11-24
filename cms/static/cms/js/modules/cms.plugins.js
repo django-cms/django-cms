@@ -943,6 +943,12 @@ var CMS = window.CMS || {};
             _setupActions: function _setupActions(nav) {
                 var that = this;
                 var items = '.cms-submenu-edit, .cms-submenu-item a';
+                nav.parent().find('.cms-submenu-edit').on(this.touchStart, function (e) {
+                    // required on some touch devices so
+                    // ui touch punch is not triggering mousemove
+                    // which in turn results in pep triggering pointercancel
+                    e.stopPropagation();
+                });
                 nav.parent().find(items).on(that.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
