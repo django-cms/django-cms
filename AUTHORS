@@ -20,7 +20,7 @@ Current and previous core designers:
 * Christian Bertschy
 
 
-Contributors (based on gitlog) (450):
+Contributors (based on gitlog) (477):
 
 * A. Bram Neijt
 * aaloy
@@ -64,6 +64,7 @@ Contributors (based on gitlog) (450):
 * Artis Avotins
 * Aymeric Augustin
 * Bashar Al-Abdulhadi
+* Basile LEGAL
 * Batiste Bieler
 * behrooz
 * Behrooz Nobakht
@@ -148,7 +149,7 @@ Contributors (based on gitlog) (450):
 * DZ
 * eged
 * Egor V. Nazarkin
-* Ekrem Seren
+* Ekrem SEREN
 * Elias Probst
 * Eric Amador
 * Eric Eldredge
@@ -272,7 +273,6 @@ Contributors (based on gitlog) (450):
 * marcor
 * Mark Rogers
 * Markus Holtermann
-* Markus Zapke-Gründemann
 * Markus Zapke-Gründemann
 * Marti Raudsepp
 * Martin
@@ -440,9 +440,11 @@ Contributors (based on gitlog) (450):
 * Tom de Simone
 * Tom S
 * Tom V
+* Tom Wardill
 * Ulrich Petri
 * unknown
 * User
+* Vadim Sikora
 * Vasil Vangelovski
 * Venelin Stoykov
 * Viktor Nagy
