@@ -20,7 +20,7 @@ Current and previous core designers:
 * Christian Bertschy
 
 
-Contributors (based on gitlog) (482):
+Contributors (based on gitlog) (515):
 
 * A. Bram Neijt
 * aaloy
@@ -65,6 +65,7 @@ Contributors (based on gitlog) (482):
 * Artis Avotins
 * Aymeric Augustin
 * Bashar Al-Abdulhadi
+* Basile LEGAL
 * Batiste Bieler
 * behrooz
 * Behrooz Nobakht
@@ -107,6 +108,7 @@ Contributors (based on gitlog) (482):
 * Chris Wesseling
 * Chris Wilson
 * Christian Bertschy
+* Christian Strappazzon
 * Christof Hagedorn
 * Christopher Grebs
 * Christos Kopanos
@@ -155,7 +157,7 @@ Contributors (based on gitlog) (482):
 * DZ
 * eged
 * Egor V. Nazarkin
-* Ekrem Seren
+* Ekrem SEREN
 * Elias Probst
 * Eric Amador
 * Eric Eldredge
@@ -196,6 +198,7 @@ Contributors (based on gitlog) (482):
 * Gregory Klupar
 * guandalino
 * Hamish Downer
+* Hans Andersen
 * hedberg
 * henning
 * Henning Spran
@@ -207,6 +210,7 @@ Contributors (based on gitlog) (482):
 * hysia
 * Iacopo Spalletti
 * Ian Lewis
+* ikudryavtsev
 * indexofire
 * Ionel Cristian Maries
 * Ionel Maries Cristian
@@ -220,8 +224,10 @@ Contributors (based on gitlog) (482):
 * Jameel Al-Aziz
 * James Richards
 * James Rutherford
+* Jana Deutschlaender
 * Jannis Leidel
 * Janusz Harkot
+* Jared Proffitt
 * Jason Brown
 * Jason Davies
 * Jason Jenkins
@@ -290,7 +296,6 @@ Contributors (based on gitlog) (482):
 * marcor
 * Mark Rogers
 * Markus Holtermann
-* Markus Zapke-Gründemann
 * Markus Zapke-Gründemann
 * Marti Raudsepp
 * Martin
@@ -399,6 +404,7 @@ Contributors (based on gitlog) (482):
 * Robert Feldbinder
 * Robert Pogorzelski
 * Roberto
+* Roberto Bampi
 * Roberto Lopez
 * Robin Lewis
 * robint
@@ -470,6 +476,7 @@ Contributors (based on gitlog) (482):
 * Tom de Simone
 * Tom S
 * Tom V
+* Tom Wardill
 * Ulrich Petri
 * unknown
 * User
@@ -490,6 +497,7 @@ Contributors (based on gitlog) (482):
 * wildermesser
 * Xavier Fernandez
 * Xavier Ordoquy
+* xie wei
 * xray7224
 * Yann Malet
 * yann.malet@gmail.com
