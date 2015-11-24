@@ -115,5 +115,5 @@ CKEditor issues
 Django Admin issues
 -------------------
 
-* In the page tree, the first touch on the page opens the keyboard which may be undesireable. This
+* In the page tree, the first touch on the page opens the keyboard which may be undesirable. This
   happens because Django automatically focuses the search form input.
