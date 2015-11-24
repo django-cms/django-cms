@@ -863,8 +863,12 @@ var CMS = window.CMS || {};
 
                 that._setupQuickSearch(plugins);
 
-                nav.on(this.touchStart, function () {
+                nav.on(this.touchStart, function (e) {
                     isTouching = true;
+                    // required on some touch devices so
+                    // ui touch punch is not triggering mousemove
+                    // which in turn results in pep triggering pointercancel
+                    e.stopPropagation();
                 }).on(this.pointerUp, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
