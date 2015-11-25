@@ -74,17 +74,20 @@ turn uses `pyenchant <https://pypi.python.org/pypi/pyenchant/>`_ and `enchant
 
 You need to check your spelling before submitting documentation.
 
+.. important::
+
+    We use British English rather than US English spellings. This means that we use *colour*
+    rather than *color*, *emphasise* rather than *emphasize* and so on.
+
 
 Install the spelling software
 =============================
 
-Install ``sphinxcontrib-spelling`` and ``pyenchant`` in your virtualenv::
+``sphinxcontrib-spelling`` and ``pyenchant`` are Python packages that will be installed in the
+virtualenv ``docs/env`` when you run ``make install`` (see above).
 
-    pip install sphinxcontrib-spelling
-    pip install pyenchant
-
-You will need to install ``enchant`` too, if it's not already installed. The easy way to check is
-to run ``make spelling`` from the ``docs`` directory. If it runs successfully, you don't need to do
+You will need to have ``enchant`` installed too, if it is not already. The easy way to check is to
+run ``make spelling`` from the ``docs`` directory. If it runs successfully, you don't need to do
 anything, but if not you will have to install ``enchant`` for your system. For example, on OS X::
 
     brew install enchant
@@ -97,16 +100,28 @@ or Debian Linux::
 Check spelling
 ==============
 
-``make spelling`` will report::
+Run::
 
-    build finished with problems.
-    make: *** [spelling] Error 1
+    ``make spelling``
 
-if any errors are found, and misspelt words will be listed in ``build/spelling/output.txt``
+in the ``docs`` directory to conduct the checks.
+
+.. note::
+
+    This script expects to find a virtualenv at ``docs/env``, as installed by ``make install`` (see
+    above).
 
 If no spelling errors have been detected, ``make spelling`` will report::
 
     build succeeded.
+
+Otherwise::
+
+    build finished with problems.
+    make: *** [spelling] Error 1
+
+It will list any errors in your shell. Misspelt words will be also be listed in
+``build/spelling/output.txt``
 
 Words that are not in the built-in dictionary can be added to ``docs/spelling_wordlist``. **If**
 you are certain that a word is incorrectly flagged as misspelt, add it to the ``spelling_wordlist``
@@ -117,6 +132,13 @@ If you find technical terms are being flagged, please check that you have capita
 correctly - ``javascript`` and ``css`` are **incorrect** spellings for example. Commands and
 special names (of classes, modules, etc) in double backticks - `````` - will mean that they are not
 caught by the spelling checker.
+
+.. important::
+
+    You may well find that some words that pass the spelling test on one system but not on another.
+    Dictionaries on different systems contain different words and even behave differently. The
+    important thing is that the spelling tests pass on `Travis
+    <https://travis-ci.org/divio/django-cms>`_ when you submit a pull request.
 
 
 *********************
