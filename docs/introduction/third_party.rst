@@ -26,7 +26,7 @@ Django settings
 
 Add the application and any of its requirements that are not there already to
 ``INSTALLED_APPS`` in ``settings.py``. Some *will* be already present; it's up
-to you to check them:
+to you to check them because you need to avoid duplication:
 
 .. code-block:: python
 
@@ -57,11 +57,12 @@ sophisticated image cropping. For this to work it needs its own thumbnail proces
 ``settings.py`` in place of ``easy_thumbnails.processors.scale_and_crop``:
 
 .. code-block:: python
+   :emphasize-lines: 4,5
 
     THUMBNAIL_PROCESSORS = (
         'easy_thumbnails.processors.colorspace',
         'easy_thumbnails.processors.autocrop',
-        # 'easy_thumbnails.processors.scale_and_crop',
+        # 'easy_thumbnails.processors.scale_and_crop',  # disable this one
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
@@ -82,13 +83,14 @@ for different CSS frameworks. We're using the Bootstrap 3 in this tutorial, so l
 ``STATICFILES_FINDERS``
 =======================
 
-Add the boilerplates static files finder to ``STATICFILES_FINDERS``:
+Add the boilerplates static files finder to ``STATICFILES_FINDERS``, *immediately before*
+``django.contrib.staticfiles.finders.AppDirectoriesFinder``:
 
 .. code-block:: python
+   :emphasize-lines: 3
 
     STATICFILES_FINDERS = [
         'django.contrib.staticfiles.finders.FileSystemFinder',
-        # important! place right before django.contrib.staticfiles.finders.AppDirectoriesFinder
         'aldryn_boilerplates.staticfile_finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     ]
@@ -97,32 +99,33 @@ If ``STATICFILES_FINDERS`` is not defined in your ``settings.py`` just copy and 
 above.
 
 
-``TEMPLATE_LOADERS``
-====================
+``TEMPLATES``
+=============
 
-Add the boilerplate template loader to ``TEMPLATE_LOADERS``:
+.. important::
+
+    In Django 1.8, the ``TEMPLATE_LOADERS`` and ``TEMPLATE_CONTEXT_PROCESSORS`` settings are
+    rolled into the ``TEMPLATES`` setting. We're assuming you're using Django 1.8 here.
+
 
 .. code-block:: python
+   :emphasize-lines: 7,11
 
-    TEMPLATE_LOADERS = (
-        'django.template.loaders.filesystem.Loader',
-        'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
-        'django.template.loaders.app_directories.Loader',
-        'django.template.loaders.eggs.Loader'
-    )
-
-
-``TEMPLATE_CONTEXT_PROCESSORS``
-===============================
-
-Add the boilerplates context processor to ``TEMPLATE_CONTEXT_PROCESSORS``:
-
-.. code-block:: python
-
-    TEMPLATE_CONTEXT_PROCESSORS = [
-        # ...
-        'aldryn_boilerplates.context_processors.boilerplate',
-    ]
+    TEMPLATES = [
+        {
+            # ...
+            'OPTIONS': {
+                'context_processors': [
+                    # ...
+                    'aldryn_boilerplates.context_processors.boilerplate',
+                    ],
+                'loaders': [
+                    # ...
+                    'aldryn_boilerplates.template_loaders.AppDirectoriesLoader',
+                    ],
+                },
+            },
+        ]
 
 
 ********************
