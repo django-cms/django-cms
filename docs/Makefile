@@ -89,7 +89,7 @@ doctest:
 	      "results in build/doctest/output.txt."
 
 spelling:
-	$(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) build/spelling
+	. $(VENV); $(SPHINXBUILD) -b spelling $(ALLSPHINXOPTS) build/spelling
 	@echo
 	@echo "Check finished. Wrong words can be found in " \
 		"build/spelling/output.txt."
@@ -99,11 +99,18 @@ VENV = env/bin/activate
 PORT = 8001
 # CORE COMMANDS
 install:
-	##### setup virtualenv
+	@echo "... setting up virtualenv"
 	virtualenv env
 	. $(VENV); pip install -r requirements.txt
 	. $(VENV); sphinx-build . build/html
-	##### done
+	@echo "\n" \
+	      "-------------------------------------------------------------------------------------------------- \n" \
+		    "* watch, build and serve the documentation: make run \n" \
+		    "* check spelling: make spelling \n" \
+		    "\n" \
+				"enchant must be installed in order for pyenchant (and therefore spelling checks) to work. See \n" \
+				"http://docs.django-cms.org/en/latest/contributing/documentation.html#install-the-spelling-software \n" \
+	      "-------------------------------------------------------------------------------------------------- \n" \
 
 run:
 	. $(VENV); sphinx-autobuild . build/html --host 0.0.0.0 --port $(PORT)

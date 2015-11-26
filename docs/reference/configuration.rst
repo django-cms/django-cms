@@ -939,7 +939,7 @@ default
 
 If defined, specifies the list of toolbar modifiers to be used to populate the
 toolbar as import paths. Otherwise, all available toolbars from both the CMS and
-the 3rd party apps will be loaded.
+the third-party apps will be loaded.
 
 Example::
 
@@ -949,7 +949,7 @@ Example::
         'cms.cms_toolbar.BasicToolbar',
         'cms.cms_toolbar.PageToolbar',
 
-        # 3rd Party Toolbar
+        # third-party Toolbar
         'aldryn_blog.cms_toolbar.BlogToolbar',
     ]
 

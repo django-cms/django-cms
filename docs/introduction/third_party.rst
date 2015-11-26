@@ -3,7 +3,7 @@ Integrating a third-party application
 #####################################
 
 We've already written our own django CMS plugins and apps, but now we want to
-extend our CMS with a third party application,
+extend our CMS with a third-party application,
 `Aldryn News & Blog <https://github.com/aldryn/aldryn-newsblog>`_.
 
 

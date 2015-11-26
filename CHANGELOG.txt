@@ -53,16 +53,16 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
-=== 3.1.4 (Unreleased) ===
+=== 3.1.4 ===
 
-- Fix use structure migration
-- Fix fix_tree command
-- Remove some warning for Django 1.9
-- Fix using scroll bar of plugin menu in Firefox & IE moves plugins
-- Fix JS error when using PageSelectWidget
-- Fix whitespace markup issues in draft mode
-- Detect plugin migrations layout in tests
-- Fix some treebeard corruption issues
+- Fixed a problem in ``0010_migrate_use_structure.py`` that broke some migration paths to Django 1.8
+- Fixed ``fix_tree`` command
+- Removed some warnings for Django 1.9
+- Fixed issue causing plugins to move when using scroll bar of plugin menu in Firefox & IE
+- Fixed JavaScript error when using ``PageSelectWidget``
+- Fixed whitespace markup issues in draft mode
+- Added plugin migrations layout detection in tests
+- Fixed some treebeard corruption issues
 
 
 === 3.1.3 (2015-09-01) ===
@@ -158,11 +158,11 @@
 - Add "Structure mode" permission
 
 
-=== 3.0.16 (Unreleased) ===
+=== 3.0.16 ===
 
-- Fix JS error when using PageSelectWidget
-- Fix whitespace markup issues in draft mode
-- Detect plugin migrations layout in tests
+- Fixed JavaScript error when using ``PageSelectWidget``
+- Fixed whitespace markup issues in draft mode
+- Added plugin migrations layout detection in tests
 
 
 === 3.0.15 (2015-09-01) ===
