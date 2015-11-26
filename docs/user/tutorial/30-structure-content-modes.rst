@@ -21,7 +21,7 @@ You've already used *Content* mode, in which you can double-click on content to 
 
 In *Structure* mode, you can manage the placement of content within the page structure.
 
-.. todo:: add a structure button image as structure-button.png
+.. todo:: add a structure button image, named structure-button.png
 
 .. |structure-button| image:: /user/tutorial/images/structure-button.png
    :alt: 'structure'
@@ -29,18 +29,13 @@ In *Structure* mode, you can manage the placement of content within the page str
 * Switch to *Structure* mode by hitting the |structure-button| button.
 
 This reveals the *structure board* containing the *placeholders* available on the page, and the
-*plugins* in them:
+*plugins* in them. Here you can see just one placeholder, called *Content*, containing one plugin -
+a text plugin that begins *Our workshop is at Zollstrasse 53...*.
+
+.. todo:: Provide an updated screenshot of the following image
 
 .. image:: /user/tutorial/images/structure-board.png
-     :align: right
      :alt: the structure board
-
-Here there is just one placeholder, called *Content*, containing one plugin - a text plugin that
-begins *Our workshop is at Zollstrasse 53...*.
-
-.. image:: /user/tutorial/images/add-plugin.png
-     :alt: the 'Add plugin' icon
-     :width: 308
 
 
 Add a second plugin
@@ -48,7 +43,7 @@ Add a second plugin
 
 Let's add another plugin, containing a map.
 
-.. todo:: add the "Add plugin" icon as add-plugin.png
+.. todo:: add the "Add plugin" icon as add-plugin-icon.png
 
 .. |add-plugin-icon| image:: /user/tutorial/images/add-plugin-icon.png
    :alt: 'add plugin'

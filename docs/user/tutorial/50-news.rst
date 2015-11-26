@@ -85,6 +85,8 @@ We'll create a *News* page, and add an apphook for the Aldryn News & Blog applic
 * view page with automatic list of news in it
 
 
+.. _use-news-plugin:
+
 *****************
 Use a news plugin
 *****************
