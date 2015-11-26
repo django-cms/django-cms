@@ -72,7 +72,7 @@ static_placeholder
 The static_placeholder template tag can be used anywhere in any template and is not bound to any
 page or model. It needs a name and it will create a placeholder that you can fill with plugins
 afterwards. The static_placeholder tag is normally used to display the same content on multiple
-locations or inside of apphooks or other 3rd party apps. Static_placeholder need to be published to
+locations or inside of apphooks or other third party apps. Static_placeholder need to be published to
 show up on live pages.
 
 Example::
