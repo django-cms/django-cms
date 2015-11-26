@@ -22,13 +22,14 @@ django CMS.
 .. toctree::
     :maxdepth: 2
 
-    log-in
-    create_page
-    structure-content-modes
-    people
-    news
-    admin
-    page-management
+    10-log-in
+    20-create_page
+    30-structure-content-modes
+    40-people
+    50-news
+    60-admin
+    70-page-management
+    80-site-wide-content
 
 .. note:: **Touch-screen users**
 
