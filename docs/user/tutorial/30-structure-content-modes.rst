@@ -44,20 +44,21 @@ Add a second plugin
 
 Let's add another plugin, containing a map.
 
-.. todo:: Daniele please check add the "Add plugin" icon as add-plugin-icon.png
+#.  Select the **Add plugin** icon.
 
-.. image:: /user/tutorial/images/add-plugin-icon.png
-   :alt: 'add plugin'
-   :width: 300
+    .. todo:: Daniele please check add the "Add plugin" icon as add-plugin-icon.png
 
-#.  Select the **Add plugin** icon |add-plugin-icon|.
+    .. image:: /user/tutorial/images/add-plugin-icon.png
+       :alt: 'add plugin'
+       :width: 300
+
 #.  Choose *Google Map* from the list of available plugin types.
 
     .. todo:: replace the image, with one showing Google Map in the list
 
     .. image:: /user/tutorial/images/google-map-plugin.png
          :alt: the list of plugin types
-         :width: 200
+         :width: 400
 
     This will open a new dialog box, in which you can provide some basic details for your map.
 
@@ -97,7 +98,7 @@ You can switch back to content mode to see the effect of your changes.
 .. todo:: Daniele please check screenshot of the page showing the map
 
 .. image:: /user/tutorial/images/page-with-google-map.png
-   :alt: the structure board with two plugins
+   :alt: the Google Maps plugins shows the workshop location
 
 * **Publish** the page to make your new changes and the map public.
 
