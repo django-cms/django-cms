@@ -49,7 +49,11 @@ To create a new Person:
         Description
             Freda oversees all technical activities in our workshop.
 
-    .. todo:: screenshot of above
+.. image:: /user/tutorial/images/create_new_person.png
+   :alt: Create new person
+   :width: 600
+   :align: center
+
 
 #.  Hit **Create**.
 
@@ -80,11 +84,40 @@ automatically.
 
 We'll create a *People* page, and add an apphook for the Aldryn People application to it.
 
-.. todo:: screenshots of following steps (if they are new steps)
-
 .. todo:: write up steps properly
 
-* create new page called People
-* add Apphook
-* publish page
-* view page with automatic list of people in it
+1. Create new page called People
+
+.. image:: /user/tutorial/images/create_people_page.png
+   :alt: Create new "people" page
+   :width: 600
+   :align: center
+
+2. Select advanced settings
+
+.. image:: /user/tutorial/images/select_advanced_settings.png
+   :alt: Select advanced settings
+   :width: 150
+   :align: center
+
+3. Add Apphook
+
+.. image:: /user/tutorial/images/select_people_app.png
+   :alt: Select people app
+   :width: 600
+   :align: center
+
+4. Publish page
+
+.. image:: /user/tutorial/images/publish_page.png
+   :alt: Publish the page
+   :width: 400
+   :align: center
+
+5. View page with automatic list of people in it
+
+.. image:: /user/tutorial/images/people_page_list.png
+   :alt: People page list
+   :width: 500
+   :align: center
+
