@@ -5,6 +5,29 @@ Adding plugins
 In this section we will edit the *How to find us* page to show a map, using a *plugin*.
 
 
+*************
+About plugins
+*************
+
+There are django CMS for all kinds of purposes, but whatever the content they place into your page
+the principle is the same: it allows you to publish and manage an almost infinite variety of
+content with a very simple interface.
+
+Plugins can publish:
+
+* a map
+* text
+* an image
+* a gallery
+* an automatic list of news or events items
+
+... and much, much more.
+
+The plugin architecture means that django CMS can be kept simple and lightweight, with the
+multitude of plugins being made available by other compatible applications that you can easily
+install if you want them.
+
+
 ***************************
 Structure and content modes
 ***************************
@@ -12,7 +35,7 @@ Structure and content modes
 .. image:: /user/tutorial/images/structure-content.png
      :align: right
      :alt: the 'Structure/Content' mode control
-     :width: 71
+     :width: 148
 
 The *Structure/Content* mode control in the toolbar lets you switch between two different editing
 modes.
@@ -23,7 +46,7 @@ In *Structure* mode, you can manage the placement of content within the page str
 
 .. |structure-button| image:: /user/tutorial/images/structure-button.png
    :alt: 'structure'
-   :width: 71
+   :width: 148
 
 * Switch to *Structure* mode by hitting the |structure-button| button.
 
@@ -71,9 +94,7 @@ Let's add another plugin, containing a map.
             Zürich
 
 
-Now in the structure board you'll see the new *Google Map* plugin - which you can move around
-within the structure by dragging, to re-order the plugins so that it comes before or after the
-*Text* plugin you created earlier.
+Now in the structure board you'll see the new *Google Map* plugin.
 
 Each plugin in the structure board is available for editing by double-clicking or by tapping the
 edit icon.
@@ -81,9 +102,12 @@ edit icon.
 .. image:: /user/tutorial/images/structure-board-with-two-plugins.png
    :alt: the structure board with two plugins
 
+You can move these plugins around to change their relative position, if you wish, or even to
+another placeholder, simply by dragging them.
+
 .. note::
 
-    As ever, any changes you make will need to be published in order for other users to see them.
+    Remember, any changes you make will need to be published in order for other users to see them.
 
 You can switch back to content mode to see the effect of your changes.
 
@@ -91,17 +115,3 @@ You can switch back to content mode to see the effect of your changes.
    :alt: the Google Maps plugins shows the workshop location
 
 * **Publish** the page to make your new changes and the map public.
-
-
-*************
-About plugins
-*************
-
-There are django CMS for all kinds of purposes, but whatever the content they place into your page
-(it could be a map, text, an image, a gallery, an automatic list of news or events items - and
-more), the principle is the same: it allows you to publish and manage an almost infinite variety of
-content with a very simple interface.
-
-The plugin architecture means that django CMS can be kept simple and lightweight, with the
-multitude of plugins being made available by other compatible applications that you can easily
-install if you want them.

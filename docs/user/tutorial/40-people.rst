@@ -50,7 +50,7 @@ To create a new Person:
             Freda oversees all technical activities in our workshop.
 
 .. image:: /user/tutorial/images/create_new_person.png
-   :alt: Create new person
+   :alt: Create a new Person
    :width: 600
    :align: center
 
@@ -84,40 +84,45 @@ automatically.
 
 We'll create a *People* page, and add an apphook for the Aldryn People application to it.
 
-.. todo:: write up steps properly
+#.  Create new page called ``People``.
 
-1. Create new page called People
+    .. image:: /user/tutorial/images/create_people_page.png
+       :alt: Create a new page called 'People'
+       :width: 600
+       :align: center
 
-.. image:: /user/tutorial/images/create_people_page.png
-   :alt: Create new "people" page
-   :width: 600
-   :align: center
+#.  Hit **Create**.
 
-2. Select advanced settings
+#.  In the toolbar, select *Page* > *Advanced settings...*
 
-.. image:: /user/tutorial/images/select_advanced_settings.png
-   :alt: Select advanced settings
-   :width: 150
-   :align: center
+    .. image:: /user/tutorial/images/select_advanced_settings.png
+       :alt: Select 'Advanced settings...'
+       :width: 150
+       :align: center
 
-3. Add Apphook
+#.  In the *Advanced settings*, select the *Application* field and from the menu of options, choose
+    *People*. This will 'hook' the People application into this page.
 
-.. image:: /user/tutorial/images/select_people_app.png
-   :alt: Select people app
-   :width: 600
-   :align: center
+    .. image:: /user/tutorial/images/select_people_app.png
+       :alt: Select 'People' from the 'Application' menu
+       :width: 600
+       :align: center
 
-4. Publish page
+#.  **Save** the page settings.
 
-.. image:: /user/tutorial/images/publish_page.png
-   :alt: Publish the page
-   :width: 400
-   :align: center
+    .. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
+       :alt: 'Publish page now'
 
-5. View page with automatic list of people in it
+    .. todo:: Create a new image of the "Publish changes" button, instead of "Publish page now"
 
-.. image:: /user/tutorial/images/people_page_list.png
-   :alt: People page list
-   :width: 500
-   :align: center
+#.  Hit |publish-page-now| to publish the page.
+
+.. todo:: That "ungrouped" doesn't look great - we should do something a bit different here.
+
+And here is the published page, with the people listed in it.
+
+    .. image:: /user/tutorial/images/people_page_list.png
+       :alt: People page list
+       :width: 500
+       :align: center
 
