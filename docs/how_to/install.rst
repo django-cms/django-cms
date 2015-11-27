@@ -412,23 +412,29 @@ Notice that django CMS v3.2 introduces a new middleware:
 ``cms.middleware.utils.ApphookReloadMiddleware``. This should be placed very
 near the top of your middleware classes tuple/list.
 
-You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
-
-    TEMPLATE_CONTEXT_PROCESSORS = (
-        'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages',
-        'django.core.context_processors.i18n',
-        'django.core.context_processors.request',
-        'django.core.context_processors.media',
-        'django.core.context_processors.static',
-        'sekizai.context_processors.sekizai',
-        'cms.context_processors.cms_settings',
-    )
-
 .. note::
 
-    This setting will be missing from automatically generated Django settings
-    files, so you will have to add it.
+    In Django 1.8, the ``TEMPLATE_DIRS``, ``TEMPLATE_LOADERS`` and ``TEMPLATE_CONTEXT_PROCESSORS``
+    settings are rolled into the ``TEMPLATES`` setting.
+
+    For earlier versions, put the ``context_processors`` and items listed into
+    ``TEMPLATE_CONTEXT_PROCESSORS``, the ``DIRS`` items into ``TEMPLATE_DIRS`` and so on.
+
+.. code-block:: python
+   :emphasize-lines: 7,8
+
+    TEMPLATES = [
+        {
+            'DIRS': [os.path.join(BASE_DIR, "templates"),],
+            'OPTIONS': {
+                'context_processors': [
+                    # ...
+                    'sekizai.context_processors.sekizai',
+                    'cms.context_processors.cms_settings',
+                    ],
+                },
+            },
+        ]
 
 .. warning::
 
@@ -450,7 +456,7 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
         * ``INSTALLED_APPS``: must contain ``'django.contrib.messages'``
         * ``MIDDLEWARE_CLASSES``: must contain ``'django.contrib.messages.middleware.MessageMiddleware'``
-        * ``TEMPLATE_CONTEXT_PROCESSORS``: must contain ``'django.contrib.messages.context_processors.messages'``
+        * ``TEMPLATES["OPTIONS"]["context_processors"]``: must contain ``'django.contrib.messages.context_processors.messages'``
 
 
 Point your :setting:`django:STATIC_ROOT` to where the static files should live
@@ -469,14 +475,6 @@ setting::
 
     Please make sure both the ``static`` and ``media`` sub-folders exist in your
     project and are writeable.
-
-Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
-
-    TEMPLATE_DIRS = (
-        # The docs say it should be absolute path: BASE_DIR is precisely one.
-        # Life is wonderful!
-        os.path.join(BASE_DIR, "templates"),
-    )
 
 Add at least one template to :setting:`CMS_TEMPLATES`; for example::
 

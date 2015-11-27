@@ -54,7 +54,7 @@ Run it to create a new Django project called ``mysite``::
 This means:
 
 * run the django CMS installer
-* install Django Filer too (``-f``)
+* install Django Filer too (``-f``) - **required for this tutorial**
 * use the current directory as the parent of the new project directory (``-p .``)
 * call the new project directory ``mysite``
 
