@@ -18,23 +18,25 @@ Using the Filer in the Django Admin
 
 In the Toolbar, select the *Site menu* and choose *Administration*.
 
-.. todo:: update for 3.2
+.. todo:: update for 3.2. -- 3.2 expands admin automatically
 
 .. image:: images/zoom_panel.png
    :alt: The zoom button
    :align: right
-   :width: 10%
+   :width: 50%
 
 This opens the django CMS *overlay*, which provides a quick view onto some extra control
 functionality.
 
-.. todo:: screenshot of the overlay
+.. image:: images/zoom_panel.png
+   :alt: Overlay of the admin
+   :align: right
+   :width: 100%
 
-.. todo:: update image below for 3.2 and empty folder
 
 .. image:: images/admin_site.png
    :alt: The admin site
-   :width: 40%
+   :width: 50%
 
 
 Add an image to the Filer
@@ -45,9 +47,28 @@ Add an image to the Filer
 .. todo:: write up steps properly
 
 * hit New folder in Filer, create folder called "People"
+
+.. image:: images/new_folder.png
+   :alt: create folder in filer
+   :width: 80%
+
 * open folder
+
+.. image:: images/open_folder.png
+   :alt: open the new folder
+   :width: 80%
+
 * hit upload button
+
+.. image:: images/upload_filer.png
+   :alt: hit the upload button
+   :width: 80%
+
 * hit Paste button
+
+.. image:: images/image_paste.png
+   :alt: paste button in the clipboard
+   :width: 80%
 
 
 
@@ -66,9 +87,20 @@ Moving items
 .. todo:: write up steps properly
 
 * move file to clipboard
+
+.. image:: images/move_image.png
+   :alt: move image to clipboard
+   :width: 80%
+
 * move up in folder hierarchy to root level
-* create a new folder "Staff"
-* paste file to new folder
+
+.. image:: images/back_to_root_file.png
+   :alt: move to root
+   :width: 80%
+
+* create a new folder "Staff" (I think we don't an image again. It repeats itself)
+
+* paste file to new folder (Same here)
 
 
 Editing items
@@ -81,9 +113,23 @@ Editing items
 You can edit a file's details by selecting it.
 
 * select one of the existing images
+
+.. image:: images/open_image.png
+   :alt: click on the image
+   :width: 80%
+
 * edit ``Name`` and ``Description``
+
+.. image:: images/image_description.png
+   :alt: Shows image information
+   :width: 80%
+
 * Choose the image's *focus point* - the point around which any cropping will occur - by dragging
   the red circle in the image pane
+
+.. image:: images/image_focus.png
+   :alt: red dot on image
+   :width: 80%
 
   This helps ensure for example that however a portrait is cropped, the subject's head will not be
   chopped off. If your image doesn't have a particular focus point, leave the circle in the middle
@@ -103,7 +149,17 @@ Using images from the Filer
 .. todo:: write up steps properly
 
 * close the admin pane
+
+.. image:: images/close_admin.png
+   :alt: close icon of the admin page
+   :width: 80%
+
 * go to People page
+
+.. image:: images/people_page.png
+   :alt: close icon of the admin page
+   :width: 80%
+
 * select People > Person list
 * choose a person
 * hit Select this file arrow
