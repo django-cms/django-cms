@@ -51,7 +51,7 @@ To create a new Person:
 
 .. image:: /user/tutorial/images/create_new_person.png
    :alt: Create new person
-   :width: 400
+   :width: 600
    :align: center
 
 
