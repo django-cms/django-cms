@@ -8,6 +8,40 @@ Blog* application.
 Like Aldryn People, Aldryn News & Blog is a separate application that integrates seamlessly with django CMS to provide new functionality for structured information. In this case the structured information is news articles.
 
 
+*********************
+Create an **apphook**
+*********************
+
+Just as we did with Aldryn People, we should create an apphook to create a landing page for the
+news items.
+
+We'll create a *News* page, and add an apphook for the Aldryn News & Blog application to it.
+
+* create and publish a new page called News
+* open page settings
+
+    .. image:: /user/tutorial/images/page-settings-button.png
+        :alt: 'page settings button'
+        :width: 170
+
+* go to advanced settigns
+
+    .. image:: /user/tutorial/images/advanced-settings-button.png
+        :alt: 'page settings button'
+        :width: 170
+
+* from dropdown menu choose previously created apphook
+
+    .. image:: /user/tutorial/images/advanced-settings-choose-apphook.png
+        :alt: 'page settings button'
+
+* publish page
+* view page with automatic list of news in it
+
+    .. image:: /user/tutorial/images/automatic-news-list.png
+        :alt: 'page settings button'
+
+
 **********************
 Create some news items
 **********************
@@ -27,7 +61,7 @@ To create a new News item:
         Is published
             ✓
 
-        Description
+        Lead-in
             Last week our lauded cycle rescue service attended to its 1000th customer. On a stormy
             night Cyrus Henrik braved the elements once more, and out in the western suburbs he made
             short work of a snapped chain.
@@ -40,7 +74,8 @@ To create a new News item:
             I got back to the workshop all the team were waiting for me with champagne to
             celebrate." 1000 missions is quite a milestone; we look forward to the next 1000!
 
-    .. todo:: screenshot of above
+    .. image:: /user/tutorial/images/create-news-blog-article.png
+        :alt: 'create new news/blog article modal'
 
 #.  Hit **Create**.
 
@@ -54,7 +89,7 @@ Do the same for a second item:
     Is published
         ✓
 
-    Description
+    Lead-in
         If there's something cyclists can't do without, it's coffee and cake - so we have opened a
         brand new café serving home-roasted coffee and home-made cakes and light meals, right next
         door to the workshop on Zollstrasse.
@@ -66,40 +101,20 @@ Do the same for a second item:
         ride.
 
 
-*********************
-Create an **apphook**
-*********************
-
-Just as we did with Aldryn People, we should create an apphook to create a landing page for the
-news items.
-
-We'll create a *News* page, and add an apphook for the Aldryn News & Blog application to it.
-
-.. todo:: screenshots of following steps (if they are new steps)
-
-.. todo:: write up steps properly
-
-* create and publish a new page called News
-* add Apphook
-* publish page
-* view page with automatic list of news in it
-
-
 .. _use-news-plugin:
 
 *****************
 Use a news plugin
 *****************
 
-.. todo:: screenshots of following steps (if they are new steps)
-
-.. todo:: write up steps properly
-
 * go to home page
 * switch to Edit mode
 * enter Structure mode
 * select **Add plugin** on *Content* placeholder
 * select *Latest articles* plugin from list
-* select the existing Apphook (hopefully we can get rid of this step)
+* select the existing Apphook
 * **Save**
 * see news articles inserted into home page
+
+    .. image:: /user/tutorial/images/home-page-news-articles.png
+        :alt: 'page settings button'
