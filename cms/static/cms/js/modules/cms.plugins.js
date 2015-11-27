@@ -106,6 +106,7 @@ var CMS = window.CMS || {};
                 this.keyDown = 'keydown.cms.plugin';
                 this.mouseEvents = 'mousedown.cms.plugin mousemove.cms.plugin mouseup.cms.plugin';
                 this.touchStart = 'touchstart.cms.plugin';
+                this.touchEnd = 'touchend.cms.plugin';
 
                 // bind data element to the container
                 this.ui.container.data('settings', this.options);
@@ -750,6 +751,11 @@ var CMS = window.CMS || {};
                         CMS.Plugin._hideSettingsMenu();
                         that._showSettingsMenu(trigger);
                     }
+                }).on(this.touchStart, function (e) {
+                    // required on some touch devices so
+                    // ui touch punch is not triggering mousemove
+                    // which in turn results in pep triggering pointercancel
+                    e.stopPropagation();
                 });
 
                 dropdown.on(this.mouseEvents, function (e) {
@@ -858,8 +864,12 @@ var CMS = window.CMS || {};
 
                 that._setupQuickSearch(plugins);
 
-                nav.on(this.touchStart, function () {
+                nav.on(this.touchStart, function (e) {
                     isTouching = true;
+                    // required on some touch devices so
+                    // ui touch punch is not triggering mousemove
+                    // which in turn results in pep triggering pointercancel
+                    e.stopPropagation();
                 }).on(this.pointerUp, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -934,6 +944,12 @@ var CMS = window.CMS || {};
             _setupActions: function _setupActions(nav) {
                 var that = this;
                 var items = '.cms-submenu-edit, .cms-submenu-item a';
+                nav.parent().find('.cms-submenu-edit').on(this.touchStart, function (e) {
+                    // required on some touch devices so
+                    // ui touch punch is not triggering mousemove
+                    // which in turn results in pep triggering pointercancel
+                    e.stopPropagation();
+                });
                 nav.parent().find(items).on(that.click, function (e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -1202,12 +1218,17 @@ var CMS = window.CMS || {};
                 }
 
                 // attach events to draggable
-                dragitem.find('> .cms-dragitem-text').on(this.click, function () {
-                    if (!dragitem.hasClass('cms-dragitem-collapsable')) {
-                        return;
-                    }
-                    that._toggleCollapsable(dragitem);
-                });
+                // debounce here required because on some devices click is not triggered,
+                // so we consolidate latest click and touch event to run the collapse only once
+                dragitem.find('> .cms-dragitem-text').on(
+                    this.touchEnd + ' ' + this.click,
+                    CMS.API.Helpers.debounce(function () {
+                        if (!dragitem.hasClass('cms-dragitem-collapsable')) {
+                            return;
+                        }
+                        that._toggleCollapsable(dragitem);
+                    }, 0)
+                );
 
                 // adds double click event
                 this.ui.draggable.on(this.doubleClick, function (e) {
