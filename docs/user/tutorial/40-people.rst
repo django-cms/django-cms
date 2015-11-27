@@ -89,35 +89,35 @@ We'll create a *People* page, and add an apphook for the Aldryn People applicati
 1. Create new page called People
 
 .. image:: /user/tutorial/images/create_people_page.png
-   :alt: Create new person
+   :alt: Create new "people" page
    :width: 600
    :align: center
 
 2. Select advanced settings
 
 .. image:: /user/tutorial/images/select_advanced_settings.png
-   :alt: Create new person
+   :alt: Select advanced settings
    :width: 150
    :align: center
 
 3. Add Apphook
 
 .. image:: /user/tutorial/images/select_people_app.png
-   :alt: Create new person
+   :alt: Select people app
    :width: 600
    :align: center
 
 4. Publish page
 
 .. image:: /user/tutorial/images/publish_page.png
-   :alt: Create new person
+   :alt: Publish the page
    :width: 400
    :align: center
 
 5. View page with automatic list of people in it
 
 .. image:: /user/tutorial/images/people_page_list.png
-   :alt: Create new person
+   :alt: People page list
    :width: 500
    :align: center
 
