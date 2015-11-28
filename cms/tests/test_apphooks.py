@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import sys
 
 from django.contrib.admin.models import CHANGE, LogEntry

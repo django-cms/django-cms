@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
 from django.core.urlresolvers import resolve, Resolver404, reverse

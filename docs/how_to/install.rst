@@ -21,7 +21,7 @@ integrated django CMS into your project, you should be able to follow the
 Requirements
 ************
 
-* `Python`_ 2.6, 2.7, 3.3 or 3.4.
+* `Python`_ 2.7, 3.3 or 3.4.
 * `Django`_ 1.7.x or 1.8.x
 * `django-classy-tags`_ 0.6.2 or higher
 * `django-treebeard`_ 3.0
@@ -218,7 +218,7 @@ See `Databases`_ below for more information and related links.
 Installing on Mac OSX
 =====================
 
-If you are using the system provided Python (2.6 or later), ensure you have
+If you are using the system provided Python (2.7 or later), ensure you have
 ``pip`` installed.
 
 .. code-block:: bash

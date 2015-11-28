@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from django.template import Template
 
 from cms.api import create_page

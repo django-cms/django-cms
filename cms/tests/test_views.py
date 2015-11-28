@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from copy import deepcopy
 import re
 import sys

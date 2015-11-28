@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from contextlib import contextmanager
 from unittest import skipIf, skipUnless
 

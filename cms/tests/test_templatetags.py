@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from copy import deepcopy
 import os
 from classytags.tests import DummyParser, DummyTokens

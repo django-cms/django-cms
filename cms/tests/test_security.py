@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from cms.utils.urlutils import admin_reverse
 
 from django.conf import settings

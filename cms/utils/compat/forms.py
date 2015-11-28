@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
+import importlib
+
 from django.apps import apps
 from django.conf import settings
-try:
-    import importlib
-except ImportError:
-    # Python < 2.7
-    from django.utils import importlib
 
 
 # overide with custom classes if they exist

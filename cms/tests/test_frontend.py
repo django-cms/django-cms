@@ -3,6 +3,7 @@ import datetime
 import os
 import sys
 import time
+from importlib import import_module
 try:
     from urllib.parse import urlparse
 except ImportError:
@@ -17,7 +18,6 @@ from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
 from django.utils import unittest
-from django.utils.importlib import import_module
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait

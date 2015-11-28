@@ -1,4 +1,3 @@
-from __future__ import with_statement
 import sys
 
 from django.contrib.auth import get_user_model

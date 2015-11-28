@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from cms.models.titlemodels import Title
 from cms.utils import get_language_from_request
 from cms.utils.i18n import force_language, hide_untranslated

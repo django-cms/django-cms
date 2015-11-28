@@ -1,16 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Python < 2.7
-    from django.utils.datastructures import SortedDict as OrderedDict
-try:
-    from importlib import import_module
-except ImportError:
-    # Python < 2.7
-    from django.utils.importlib import import_module
+from collections import OrderedDict
+from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sites.models import Site

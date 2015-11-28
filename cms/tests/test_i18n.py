@@ -1,8 +1,4 @@
-try:
-    from importlib import import_module
-except ImportError:
-    # Python < 2.7
-    from django.utils.importlib import import_module
+from importlib import import_module
 
 from django.conf import settings
 from django.test.utils import override_settings
