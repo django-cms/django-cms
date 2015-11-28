@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
-from django.test.utils import override_settings, override_system_checks
+from django.test.utils import override_settings
 from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
@@ -233,11 +233,6 @@ class ManagementTestCase(CMSTestCase):
         self.assertEqual(
             len(text_plugins_report["unsaved_instances"]),
             0)
-
-    # in Django 1.7 (but not in 1.8), call_command() runs system checks. This
-    # can be removed when support for 1.7 is dropped
-    if override_system_checks:
-        test_delete_orphaned_plugins = override_system_checks([])(test_delete_orphaned_plugins)
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()

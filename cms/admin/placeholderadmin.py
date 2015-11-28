@@ -35,7 +35,6 @@ from cms.utils import (
     get_language_from_request,
     permissions,
 )
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.i18n import get_language_list
 from cms.utils.plugins import (
     requires_reload,
@@ -585,12 +584,8 @@ class PlaceholderAdminMixin(object):
         opts = plugin_class._meta
         using = router.db_for_write(plugin_class)
         app_label = opts.app_label
-        if DJANGO_1_7:
-            deleted_objects, perms_needed, protected = get_deleted_objects(
-                [plugin], opts, request.user, self.admin_site, using)
-        else:
-            deleted_objects, __, perms_needed, protected = get_deleted_objects(
-                [plugin], opts, request.user, self.admin_site, using)
+        deleted_objects, __, perms_needed, protected = get_deleted_objects(
+            [plugin], opts, request.user, self.admin_site, using)
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
@@ -630,12 +625,8 @@ class PlaceholderAdminMixin(object):
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
-        if DJANGO_1_7:
-            deleted_objects, perms_needed, protected = get_deleted_objects(
-                plugins, opts, request.user, self.admin_site, using)
-        else:
-            deleted_objects, __, perms_needed, protected = get_deleted_objects(
-                plugins, opts, request.user, self.admin_site, using)
+        deleted_objects, __, perms_needed, protected = get_deleted_objects(
+            plugins, opts, request.user, self.admin_site, using)
 
         obj_display = force_text(placeholder)
         if request.POST:  # The user has already confirmed the deletion.

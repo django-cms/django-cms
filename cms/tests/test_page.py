@@ -32,7 +32,6 @@ from cms.templatetags.cms_tags import get_placeholder_content
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import installed_apps
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
@@ -51,9 +50,6 @@ class PageMigrationTestCase(CMSTestCase):
         Test correct content type is set for Page object
         """
         from django.contrib.contenttypes.models import ContentType
-        if DJANGO_1_7:
-            # obsolete test for an old bug, can be dropped at any time
-            self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
         self.assertEqual(ContentType.objects.filter(model='page', app_label='cms').count(), 1)
 
 

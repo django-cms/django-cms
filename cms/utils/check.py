@@ -13,7 +13,6 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import is_installed, get_app_paths
 
 
@@ -168,17 +167,11 @@ def check_sekizai(output):
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
-        if DJANGO_1_7:
-            if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
-                section.success("Sekizai template context processor is installed")
-            else:
-                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+        processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+        if 'sekizai.context_processors.sekizai' in processors:
+            section.success("Sekizai template context processor is installed")
         else:
-            processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
-            if 'sekizai.context_processors.sekizai' in processors:
-                section.success("Sekizai template context processor is installed")
-            else:
-                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
+            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -312,16 +305,10 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                if DJANGO_1_7:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.related.parent_model),
-                    ))
-                else:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        extension,
-                        rel.related,
-                    ))
+                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                    extension,
+                    rel.related,
+                ))
             for rel in extension._meta.get_all_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
@@ -355,10 +342,7 @@ def _load_all_templates(directory):
 @define_check
 def deprecations(output):
     # deprecated placeholder_tags scan (1 in 3.1)
-    if DJANGO_1_7:
-        templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
-    else:
-        templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
+    templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
     templates_dirs.extend(
         [os.path.join(path, 'templates') for path in get_app_paths()]
     )

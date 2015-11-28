@@ -5,8 +5,6 @@ import sys
 
 import app_manage
 
-from cms.utils.compat import DJANGO_1_7
-
 gettext = lambda s: s
 
 
@@ -85,56 +83,29 @@ if __name__ == '__main__':
         'better_test',
     ]
 
-    dynamic_configs = {}
-
-    if DJANGO_1_7:
-        dynamic_configs.update(dict(
-            TEMPLATE_CONTEXT_PROCESSORS=[
-                "django.contrib.auth.context_processors.auth",
-                'django.contrib.messages.context_processors.messages',
-                "django.core.context_processors.i18n",
-                "django.core.context_processors.debug",
-                "django.core.context_processors.request",
-                "django.core.context_processors.media",
-                'django.core.context_processors.csrf',
-                "cms.context_processors.cms_settings",
-                "sekizai.context_processors.sekizai",
-                "django.core.context_processors.static",
-            ],
-            TEMPLATE_LOADERS=(
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-                'django.template.loaders.eggs.Loader',
-            ),
-            TEMPLATE_DIRS=[
-                os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
-            ],
-            TEMPLATE_DEBUG=True
-        ))
-    else:
-        dynamic_configs['TEMPLATES'] = [
-            {
-                'NAME': 'django',
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'APP_DIRS': True,
-                'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
-                'OPTIONS': {
-                    'context_processors': [
-                        "django.contrib.auth.context_processors.auth",
-                        'django.contrib.messages.context_processors.messages',
-                        "django.template.context_processors.i18n",
-                        "django.template.context_processors.debug",
-                        "django.template.context_processors.request",
-                        "django.template.context_processors.media",
-                        'django.template.context_processors.csrf',
-                        "cms.context_processors.cms_settings",
-                        "sekizai.context_processors.sekizai",
-                        "django.template.context_processors.static",
-                    ],
-                    'debug': True,
-                }
+    dynamic_configs = {
+        'TEMPLATES': [{
+            'NAME': 'django',
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
+            'OPTIONS': {
+                'context_processors': [
+                    "django.contrib.auth.context_processors.auth",
+                    'django.contrib.messages.context_processors.messages',
+                    "django.template.context_processors.i18n",
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.template.context_processors.media",
+                    'django.template.context_processors.csrf',
+                    "cms.context_processors.cms_settings",
+                    "sekizai.context_processors.sekizai",
+                    "django.template.context_processors.static",
+                ],
+                'debug': True,
             }
-        ]
+        }],
+    }
 
     plugins = ('djangocms_column', 'djangocms_file', 'djangocms_flash', 'djangocms_googlemap',
                'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',

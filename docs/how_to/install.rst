@@ -22,7 +22,7 @@ Requirements
 ************
 
 * `Python`_ 2.7, 3.3 or 3.4.
-* `Django`_ 1.7.x or 1.8.x
+* `Django`_ 1.8.x
 * `django-classy-tags`_ 0.6.2 or higher
 * `django-treebeard`_ 3.0
 * `django-sekizai`_ 0.8.2 or higher
@@ -142,7 +142,7 @@ django CMS and its dependencies:
 
     # These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
-    Django>=1.7
+    Django>=1.8
 
     django-treebeard==3.0
     django-sekizai==0.8.2

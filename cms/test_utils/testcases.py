@@ -10,7 +10,8 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.template.context import Context, RequestContext
+from django.template import engines
+from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.timezone import now
@@ -386,14 +387,8 @@ class BaseCMSTestCase(object):
     assertWarns = failUnlessWarns
 
     def render_template_obj(self, template, context, request):
-        try:
-            from django.template import engines
-            template_obj = engines['django'].from_string(template)
-            return template_obj.render(context, request)
-        except ImportError:
-            from django.template import Template
-            template_obj = Template(template)
-            return template_obj.render(RequestContext(request, context))
+        template_obj = engines['django'].from_string(template)
+        return template_obj.render(context, request)
 
     def apphook_clear(self):
         from cms.apphook_pool import apphook_pool

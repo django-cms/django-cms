@@ -503,7 +503,8 @@ reversion_register(CMSPlugin)
 
 def get_plugin_media_path(instance, filename):
     """
-    Django 1.7 requires that unbound function used in fields' definitions are defined outside the parent class
+    Django requires that unbound function used in fields' definitions to be
+    defined outside the parent class.
      (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
     This function is used withing field definition:
 
