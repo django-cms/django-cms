@@ -65,13 +65,6 @@ class ExtensionsTestCase(TestCase):
         extension_pool.unregister(page_extension)
         extension_pool.unregister(title_extension)
 
-        try:
-            from django.apps import apps
-            del apps.all_models['cms']['testpageextension']
-            del apps.all_models['cms']['testtitleextension']
-        except (ImportError, KeyError):  # Django 1.6
-            pass
-
     def get_page_extension_class(self):
         from django.db import models
 

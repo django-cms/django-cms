@@ -12,16 +12,10 @@ from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
-try:
-    from django.contrib.admin.utils import get_deleted_objects
-except ImportError:
-    from django.contrib.admin.util import get_deleted_objects
+from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-try:
-    from django.contrib.sites.shortcuts import get_current_site
-except ImportError:
-    from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.db import router, transaction
 from django.db.models import Q

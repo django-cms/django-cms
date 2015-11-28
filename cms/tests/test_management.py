@@ -6,11 +6,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
-from django.test.utils import override_settings
-try:
-    from django.test.utils import override_system_checks
-except ImportError:
-    override_system_checks = None
+from django.test.utils import override_settings, override_system_checks
 from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title

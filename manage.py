@@ -5,7 +5,7 @@ import sys
 
 import app_manage
 
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_7
 
 gettext = lambda s: s
 
@@ -21,18 +21,17 @@ def install_auth_user_model(settings, value):
     settings['AUTH_USER_MODEL'] = value
 
 
-def _detect_migration_layout(apps):
-    SOUTH_MODULES = {}
-    DJANGO_MODULES = {}
-
+def _get_migration_modules(apps):
+    modules = {}
     for module in apps:
+        module_name = '%s.migrations_django' % module
         try:
-            __import__('%s.migrations_django' % module)
-            DJANGO_MODULES[module] = '%s.migrations_django' % module
-            SOUTH_MODULES[module] = '%s.migrations' % module
-        except Exception:
+            __import__(module_name)
+        except ImportError:
             pass
-    return DJANGO_MODULES, SOUTH_MODULES
+        else:
+            modules[module] = module_name
+    return modules
 
 
 if __name__ == '__main__':
@@ -141,31 +140,24 @@ if __name__ == '__main__':
                'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
                'djangocms_teaser', 'djangocms_video')
 
-    DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
-
     migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
     if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
         print('Both --migrate and --no-migrations have been provided. --no-migrations is in effect.')
     if '--migrate' in sys.argv:
         sys.argv.remove('--migrate')
 
-    if DJANGO_1_6:
-        INSTALLED_APPS.insert(0, 'south')
-        dynamic_configs['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
-        SOUTH_TESTS_MIGRATE = migrate
-    else:
-        dynamic_configs['MIGRATION_MODULES'] = DJANGO_MIGRATION_MODULES
-        if not dynamic_configs.get('TESTS_MIGRATE', migrate):
-            # Disable migrations for Django 1.7+
-            class DisableMigrations(object):
+    dynamic_configs['MIGRATION_MODULES'] = _get_migration_modules(plugins)
+    if not dynamic_configs.get('TESTS_MIGRATE', migrate):
+        # Disable migrations
+        class DisableMigrations(object):
 
-                def __contains__(self, item):
-                    return True
+            def __contains__(self, item):
+                return True
 
-                def __getitem__(self, item):
-                    return 'notmigrations'
+            def __getitem__(self, item):
+                return 'notmigrations'
 
-            dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
+        dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
 
     app_manage.main(
         ['cms', 'menus'],

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 from contextlib import contextmanager
+from unittest import skipIf, skipUnless
 
 import os
 import socket
@@ -16,7 +17,6 @@ except ImportError:
     enchant = None
 
 import cms
-from cms.test_utils.compat import skipIf, skipUnless
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
 

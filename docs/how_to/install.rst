@@ -22,8 +22,7 @@ Requirements
 ************
 
 * `Python`_ 2.6, 2.7, 3.3 or 3.4.
-* `Django`_ 1.6.9 or later, 1.7.x, 1.8.x
-* `South`_ 1.0.1 or higher (Only required up to Django 1.6)
+* `Django`_ 1.7.x or 1.8.x
 * `django-classy-tags`_ 0.6.2 or higher
 * `django-treebeard`_ 3.0
 * `django-sekizai`_ 0.8.2 or higher
@@ -37,7 +36,6 @@ Requirements
 
 .. _Python: https://www.python.org
 .. _Django: https://www.djangoproject.com
-.. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
@@ -84,10 +82,9 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ 1.8.X (with Django 1.6.X and Django 1.7.X) to support
-  versions of your content (If using a different Django version it is a good
-  idea to check the page `Compatible-Django-Versions`_ in the django-reversion
-  wiki in order to make sure that the package versions are compatible.)
+* `django-reversion`_ (Check the `Compatible Django Versions`_ page in the
+  django-reversion docs to find the version compatible with the version of
+  Django you're using.)
 
   .. note::
 
@@ -97,7 +94,7 @@ Revision management
     will cause your database size to increase.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
-.. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
+.. _Compatible Django Versions: http://django-reversion.readthedocs.org/en/latest/django-versions.html
 
 
 .. _installing-in-a-virtualenv-using-pip:
@@ -328,7 +325,6 @@ well as its dependencies and other highly recommended applications/libraries::
     'cms',  # django CMS itself
     'treebeard',  # utilities for implementing a tree
     'menus',  # helper for model independent hierarchical website navigation
-    'south',  # Only needed for Django < 1.7
     'sekizai',  # for JavaScript and CSS management
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
@@ -513,31 +509,6 @@ setting should look like::
     }
 
 
-django CMS, as well as its plugins, supports both Django 1.7 and Django 1.6 migrations.
-
-Since version 3.1, migrations are stored in modules compatible with Django 1.7 **and**
-South 1.0.2 without further configuration.
-
-django CMS plugins are being ported to the same structure; in the meantime,
-on Django 1.7, you may need to specify where the migrations are situated using the
-``MIGRATION_MODULES`` setting::
-
-    MIGRATION_MODULES = {
-        # Add also the following modules if you're using these plugins:
-        'djangocms_file': 'djangocms_file.migrations_django',
-        'djangocms_flash': 'djangocms_flash.migrations_django',
-        'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
-        'djangocms_inherit': 'djangocms_inherit.migrations_django',
-        'djangocms_link': 'djangocms_link.migrations_django',
-        'djangocms_picture': 'djangocms_picture.migrations_django',
-        'djangocms_snippet': 'djangocms_snippet.migrations_django',
-        'djangocms_teaser': 'djangocms_teaser.migrations_django',
-        'djangocms_video': 'djangocms_video.migrations_django',
-        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
-    }
-
-Please check each plugin configuration option to see how to configure Django 1.7 support.
-
 URL configuration
 =================
 
@@ -550,8 +521,6 @@ You need to include the ``'cms.urls'`` ``urlpatterns`` **at the end** of your
     from django.conf.urls.i18n import i18n_patterns
     from django.conf.urls.static import static
     from django.contrib import admin
-
-    admin.autodiscover() # Not required for Django 1.7.x+
 
     urlpatterns = i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
@@ -644,33 +613,22 @@ HTML tag.
 Initial database setup
 ======================
 
-django CMS uses Django 1.7's built-in support for database migrations to manage
-creating and altering database tables. django CMS still offers South-style
-migrations for users of Django up to 1.6 but as noted above, strictly requires
-South>=1.0.1 in this case.
+django CMS uses Django's built-in support for database migrations to manage
+creating and altering database tables.
 
 Fresh install
 -------------
 
-If you are using Django 1.7 or later run::
+Run::
 
     python manage.py migrate
     python manage.py createsuperuser
-
-If you are using Django 1.6.x run::
-
-    python manage.py syncdb --all
-    python manage.py migrate --fake
-
-The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and
-enter appropriate values.
 
 Upgrade
 -------
 
 If you are upgrading your installation of django CMS from a previous version run::
 
-    python manage.py syncdb # Django 1.6.x only
     python manage.py migrate
 
 

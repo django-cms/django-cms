@@ -2,7 +2,6 @@
 import json
 import sys
 import warnings
-from cms.utils.compat import DJANGO_1_6
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,7 +9,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse, clear_url_caches
+from django.core.urlresolvers import reverse
 from django.template.context import Context, RequestContext
 from django.test import testcases
 from django.test.client import RequestFactory
@@ -410,18 +409,3 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
-
-if DJANGO_1_6:
-    class ClearURLs(object):
-        @classmethod
-        def setUpClass(cls):
-            clear_url_caches()
-            super(ClearURLs, cls).setUpClass()
-
-        @classmethod
-        def tearDownClass(cls):
-            super(ClearURLs, cls).tearDownClass()
-            clear_url_caches()
-else:
-    class ClearURLs(object):
-        pass

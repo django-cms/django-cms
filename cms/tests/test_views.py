@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from cms.api import create_page, create_title, publish_page
 from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
-from cms.test_utils.testcases import CMSTestCase, ClearURLs
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
@@ -191,7 +191,7 @@ class ViewTests(CMSTestCase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
-class ContextTests(ClearURLs, CMSTestCase):
+class ContextTests(CMSTestCase):
 
     def test_context_current_page(self):
         """

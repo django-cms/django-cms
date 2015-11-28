@@ -4,10 +4,7 @@ import json
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib.admin.helpers import AdminForm
-try:
-    from django.contrib.admin.utils import get_deleted_objects
-except ImportError:
-    from django.contrib.admin.util import get_deleted_objects
+from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (

@@ -6,25 +6,24 @@ import dj_database_url
 import django
 from django.utils import six
 
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_7
 
 gettext = lambda s: s
 
 urlpatterns = []
 
 
-def _detect_migration_layout(apps):
-    SOUTH_MODULES = {}
-    DJANGO_MODULES = {}
-
+def _get_migration_modules(apps):
+    modules = {}
     for module in apps:
+        module_name = '%s.migrations_django' % module
         try:
-            __import__('%s.migrations_django' % module)
-            DJANGO_MODULES[module] = '%s.migrations_django' % module
-            SOUTH_MODULES[module] = '%s.migrations' % module
-        except Exception:
+            __import__(module_name)
+        except ImportError:
             pass
-    return DJANGO_MODULES, SOUTH_MODULES
+        else:
+            modules[module] = module_name
+    return modules
 
 
 def configure(db_url, **extra):
@@ -314,24 +313,18 @@ def configure(db_url, **extra):
                'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
                'djangocms_teaser', 'djangocms_video')
 
-    DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
+    defaults['MIGRATION_MODULES'] = _get_migration_modules(plugins)
+    if not defaults.get('TESTS_MIGRATE', False):
+        # Disable migrations
+        class DisableMigrations(object):
 
-    if DJANGO_1_6:
-        defaults['INSTALLED_APPS'].append('south')
-        defaults['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
-    else:
-        defaults['MIGRATION_MODULES'] = DJANGO_MIGRATION_MODULES
-        if not defaults.get('TESTS_MIGRATE', False):
-            # Disable migrations for Django 1.7+
-            class DisableMigrations(object):
+            def __contains__(self, item):
+                return True
 
-                def __contains__(self, item):
-                    return True
+            def __getitem__(self, item):
+                return "notmigrations"
 
-                def __getitem__(self, item):
-                    return "notmigrations"
-
-            defaults['MIGRATION_MODULES'] = DisableMigrations()
+        defaults['MIGRATION_MODULES'] = DisableMigrations()
 
     if 'AUTH_USER_MODEL' in extra:
         custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
@@ -350,12 +343,4 @@ def configure(db_url, **extra):
             defaults.update(loads(extra_settings))
 
     settings.configure(**defaults)
-    if DJANGO_1_6:
-        from south.management.commands import patch_for_test_db_setup
-
-        patch_for_test_db_setup()
-        from django.contrib import admin
-
-        admin.autodiscover()
-    else:
-        django.setup()
+    django.setup()

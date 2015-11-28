@@ -9,11 +9,7 @@ from django.db.models.query_utils import Q
 from django.template import TemplateSyntaxError, NodeList, Variable
 from django.template.base import VariableNode
 from django.template.loader import get_template
-from django.template.loader_tags import ExtendsNode, BlockNode
-try:
-    from django.template.loader_tags import ConstantIncludeNode as IncludeNode
-except ImportError:
-    from django.template.loader_tags import IncludeNode
+from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
 from django.utils.encoding import force_text
 

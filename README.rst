@@ -66,7 +66,7 @@ More information on `our website <http://www.django-cms.org>`_.
 Requirements
 ************
 
-django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+django CMS requires Django version 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
 
 *************
 Documentation

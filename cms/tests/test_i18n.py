@@ -6,11 +6,11 @@ except ImportError:
 
 from django.conf import settings
 from django.test.utils import override_settings
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import i18n
-from cms.utils.compat.dj import LANGUAGE_SESSION_KEY
 
 
 @override_settings(

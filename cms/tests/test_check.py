@@ -14,7 +14,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_7
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
@@ -64,16 +64,7 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_no_sekizai(self):
-        if DJANGO_1_6:
-            with self.settings(INSTALLED_APPS=['cms', 'menus']):
-                old_libraries = base.libraries
-                base.libraries = {}
-                old_templatetags_modules = base.templatetags_modules
-                base.templatetags_modules = []
-                self.assertRaises(TemplateSyntaxError, check, TestOutput())
-                base.libraries = old_libraries
-                base.templatetags_modules = old_templatetags_modules
-        elif DJANGO_1_7:
+        if DJANGO_1_7:
             from django.apps import apps
             apps.set_available_apps(['cms', 'menus'])
             old_libraries = base.libraries
