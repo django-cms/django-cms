@@ -548,10 +548,14 @@ class PageToolbar(CMSToolbar):
             history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
 
             if is_installed('reversion'):
-                import reversion
-                from reversion.models import Revision
+                try:
+                    from reversion import revisions
+                    versions = revisions.get_for_object(self.page)
+                except AttributeError:
+                    import reversion
+                    versions = reversion.get_for_object(self.page)
 
-                versions = reversion.get_for_object(self.page)
+                from reversion.models import Revision
                 if self.page.revision_id:
                     current_revision = Revision.objects.get(pk=self.page.revision_id)
                     has_undo = versions.filter(revision__pk__lt=current_revision.pk).exists()

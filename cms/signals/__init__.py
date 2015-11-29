@@ -99,6 +99,9 @@ if get_cms_setting('PERMISSION'):
 ###################### reversion #########################
 
 if is_installed('reversion'):
-    from reversion.models import post_revision_commit
+    try:
+        from reversion.signals import post_revision_commit
+    except ImportError:
+        from reversion.models import post_revision_commit
 
     post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')
