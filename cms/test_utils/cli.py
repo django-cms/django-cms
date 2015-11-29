@@ -49,7 +49,6 @@ def configure(db_url, **extra):
         },
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
-        TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES={
             'default': DB
@@ -285,15 +284,16 @@ def configure(db_url, **extra):
             TEMPLATE_DIRS=[
                 os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
             ],
+            TEMPLATE_DEBUG=True,
         ))
     else:
         defaults['TEMPLATES'] = [
             {
                 'NAME': 'django',
                 'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'APP_DIRS': True,
                 'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
                 'OPTIONS': {
+                    'debug': True,
                     'context_processors': [
                         "django.contrib.auth.context_processors.auth",
                         'django.contrib.messages.context_processors.messages',
@@ -306,6 +306,11 @@ def configure(db_url, **extra):
                         "sekizai.context_processors.sekizai",
                         "django.template.context_processors.static",
                     ],
+                    'loaders': (
+                        'django.template.loaders.filesystem.Loader',
+                        'django.template.loaders.app_directories.Loader',
+                        'django.template.loaders.eggs.Loader',
+                    )
                 }
             }
         ]
