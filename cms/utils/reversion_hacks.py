@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-import reversion
-from reversion.revisions import RegistrationError, VersionAdapter
+try:
+    from reversion.revisions import RegistrationError, VersionAdapter, default_revision_manager
+except ImportError as e:
+    from reversion import default_revision_manager
+    from reversion.revisions import RegistrationError, VersionAdapter
 
 
 def register_draft_only(model_class, fields, follow, format):
@@ -8,14 +11,13 @@ def register_draft_only(model_class, fields, follow, format):
     version of the reversion register function that only registers drafts and
     ignores public models
     """
-    revision_manager = reversion.revision
-    if revision_manager.is_registered(model_class):
+    if default_revision_manager.is_registered(model_class):
         raise RegistrationError(
             "%r has already been registered with Reversion." % model_class)
 
     # Ensure the parent model of proxy models is registered.
     if (model_class._meta.proxy and
-        not revision_manager.is_registered(list(model_class._meta.parents.keys())[0])): # turn KeysView into list
+        not default_revision_manager.is_registered(list(model_class._meta.parents.keys())[0])): # turn KeysView into list
         raise RegistrationError(
             '%r is a proxy model, and its parent has not been registered with'
             'Reversion.' % model_class)
@@ -33,9 +35,9 @@ def register_draft_only(model_class, fields, follow, format):
     registration_info.fields = fields
     registration_info.follow = follow
     registration_info.format = format
-    if hasattr(revision_manager, '_registration_key_for_model'):
-        model_key = revision_manager._registration_key_for_model(model_class)
+    if hasattr(default_revision_manager, '_registration_key_for_model'):
+        model_key = default_revision_manager._registration_key_for_model(model_class)
     else:
         model_key = model_class
-    revision_manager._registered_models[model_key] = registration_info
+    default_revision_manager._registered_models[model_key] = registration_info
     # Do not connect to the post save signal of the model.
