@@ -14,7 +14,7 @@ from sekizai.helpers import validate_template
 from cms import constants
 from cms.models import AliasPluginModel
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7
+from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
 from cms.utils.compat.dj import is_installed, get_app_paths
 
 
@@ -350,7 +350,10 @@ def _load_all_templates(directory):
             elif path.endswith('.html'):
                 with open(path, 'rb') as fobj:
                     source = fobj.read().decode(settings.FILE_CHARSET)
-                    lexer = Lexer(source, path)
+                    if DJANGO_1_8:
+                        lexer = Lexer(source, path)
+                    else:
+                        lexer = Lexer(source)
                     yield lexer.tokenize(), path
 
 @define_check

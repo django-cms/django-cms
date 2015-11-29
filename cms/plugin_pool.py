@@ -15,7 +15,6 @@ from cms.plugin_base import CMSPluginBase
 from cms.models import CMSPlugin
 from cms.utils.django_load import load
 from cms.utils.helpers import reversion_register, normalize_name
-from cms.utils.placeholder import get_placeholder_conf
 from cms.utils.compat.dj import is_installed
 
 
@@ -148,6 +147,8 @@ class PluginPool(object):
         self.patched = True
 
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
+        from cms.utils.placeholder import get_placeholder_conf
+
         self.discover_plugins()
         self.set_plugin_meta()
         plugins = sorted(self.plugins.values(), key=attrgetter('name'))
