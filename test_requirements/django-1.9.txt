@@ -5,3 +5,4 @@ djangocms-text-ckeditor>=2.8.1
 django-hvad==1.5
 django-formtools
 django-debug-toolbar
+https://github.com/rapilabs/django-treebeard/archive/1.9-empty_value_display.zip
