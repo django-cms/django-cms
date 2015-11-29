@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from collections import namedtuple
 import operator
 import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList, Variable
+from django.template import TemplateSyntaxError, NodeList, Variable, Context, Template
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import ExtendsNode, BlockNode
@@ -37,7 +36,10 @@ def _get_nodelist(tpl):
 
 def get_context():
     if engines is not None:
-        return namedtuple('Context', 'template')(namedtuple('Template', 'engine')(engines.all()[0]))
+        context = Context()
+        context.template = Template('')
+        return context
+#        return namedtuple('Context', 'template')(namedtuple('Template', 'engine')(engines.all()[0]))
     else:
         return {}
 
