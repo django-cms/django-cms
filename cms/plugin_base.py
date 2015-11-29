@@ -20,7 +20,6 @@ from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import SubClassNeededError, Deprecated
 from cms.models import CMSPlugin
 from cms.utils import get_cms_setting
-from cms.utils.placeholder import get_placeholder_conf
 
 
 class CMSPluginBaseMetaclass(ModelAdminMetaClass):
@@ -168,6 +167,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     @classmethod
     def get_require_parent(cls, slot, page):
+        from cms.utils.placeholder import get_placeholder_conf
+
         template = page and page.get_template() or None
 
         # config overrides..
@@ -247,13 +248,13 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         kwargs.setdefault('post_url_continue', post_url_continue)
         return super(CMSPluginBase, self).response_add(request, obj, **kwargs)
 
-    def log_addition(self, request, obj):
+    def log_addition(self, request, obj, bypass=None):
         pass
 
-    def log_change(self, request, obj, message):
+    def log_change(self, request, obj, message, bypass=None):
         pass
 
-    def log_deletion(self, request, obj, object_repr):
+    def log_deletion(self, request, obj, object_repr, bypass=None):
         pass
 
     def icon_src(self, instance):
@@ -294,6 +295,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return fieldsets
 
     def get_child_classes(self, slot, page):
+        from cms.utils.placeholder import get_placeholder_conf
+
         template = page and page.get_template() or None
 
         # config overrides..
@@ -306,6 +309,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         return [cls.__name__ for cls in installed_plugins]
 
     def get_parent_classes(self, slot, page):
+        from cms.utils.placeholder import get_placeholder_conf
+
         template = page and page.get_template() or None
 
         # config overrides..
