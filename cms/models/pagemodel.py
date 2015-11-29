@@ -20,8 +20,6 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, LanguageError, PublicVersionNeeded
 from cms.models.managers import PageManager, PagePermissionsPermissionManager
 from cms.models.metaclasses import PageMetaClass
-from cms.models.placeholdermodel import Placeholder
-from cms.models.pluginmodel import CMSPlugin
 from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
@@ -98,7 +96,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
 
     # Placeholders (plugins)
-    placeholders = models.ManyToManyField(Placeholder, editable=False)
+    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
 
     # Publisher fields
     publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
@@ -278,6 +276,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         # TODO: Make this into a "graceful" copy instead of deleting and overwriting
         # copy the placeholders (and plugins on those placeholders!)
+        from cms.models.pluginmodel import CMSPlugin
         from cms.plugin_pool import plugin_pool
 
         plugin_pool.set_plugin_meta()
@@ -340,6 +339,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         conflicting URLs as pages are copied unpublished.
         """
         from cms.extensions import extension_pool
+        from cms.models import Placeholder
 
         if not self.publisher_is_draft:
             raise PublicIsUnmodifiable("copy page is not allowed for public pages")
@@ -1248,6 +1248,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         Rescan and if necessary create placeholders in the current template.
         """
         # inline import to prevent circular imports
+        from cms.models.placeholdermodel import Placeholder
         from cms.utils.placeholder import get_placeholders
 
         placeholders = get_placeholders(self.get_template())
@@ -1344,7 +1345,9 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert to a specific revision
         """
+        from cms.models.pluginmodel import CMSPlugin
         from cms.utils.page_resolver import is_valid_url
+
         # Get current titles
         old_titles = list(self.title_set.all())
 

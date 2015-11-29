@@ -10,7 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import LanguageError
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
-from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 from cms.utils.urlutils import admin_reverse
 
 
@@ -53,6 +52,7 @@ class Placeholder(models.Model):
                 plugin.delete(no_mp=True)
 
     def get_label(self):
+        from cms.utils.placeholder import get_placeholder_conf
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
         name = _(name)
         return name
@@ -288,6 +288,8 @@ class Placeholder(models.Model):
 
     @property
     def actions(self):
+        from cms.utils.placeholder import PlaceholderNoAction
+
         if not hasattr(self, '_actions_cache'):
             field = self._get_attached_field()
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
