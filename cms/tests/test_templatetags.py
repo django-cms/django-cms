@@ -18,7 +18,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 import cms
 from cms.api import create_page, create_title, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models.pagemodel import Page, Placeholder
+from cms.models import Page, Placeholder
 from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
                                        _show_placeholder_for_page,
                                        _get_placeholder, RenderPlugin)

@@ -1433,7 +1433,7 @@ class AdminFormsTests(AdminTestsBase):
 
     def test_missmatching_site_parent_dotsite(self):
         site0 = Site.objects.create(domain='foo.com', name='foo.com')
-        site1 = Site.objects.create(domain='foo.com', name='foo.com')
+        site1 = Site.objects.create(domain='foo2.com', name='foo.com')
         parent_page = Page.objects.create(
             template='nav_playground.html',
             site=site0)
