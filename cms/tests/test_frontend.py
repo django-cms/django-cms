@@ -8,6 +8,10 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+try:
+    import unittest
+except ImportError:
+    from django.utils import unittest
 
 import django
 from django.conf import settings
@@ -17,7 +21,6 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
-from django.utils import unittest
 from django.utils.importlib import import_module
 from selenium import webdriver
 from selenium.webdriver.common.by import By
