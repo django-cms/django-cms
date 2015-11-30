@@ -197,7 +197,7 @@ For our poll plugin, we're going to write the following plugin class:
 
 
     class PollPluginPublisher(CMSPluginBase):
-        model = PollPlugin  # model where plugin data are saved
+        model = PollPluginModel  # model where plugin data are saved
         module = _("Polls")
         name = _("Poll Plugin")  # name of the plugin in the interface
         render_template = "djangocms_polls/poll_plugin.html"
