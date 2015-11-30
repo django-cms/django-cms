@@ -24,6 +24,7 @@ env:
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
     - FRONTEND=1 UNIT=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
+    - FRONTEND=1 LINT=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' MIGRATE_OPTION='--migrate'
 
 before_script:
   - pip freeze
@@ -51,6 +52,7 @@ install:
 
 script:
   - if [ "$FRONTEND" == 1 ] && [ $UNIT == 1 ]; then gulp tests:unit; fi;
+  - if [ "$FRONTEND" == 1 ] && [ $LINT == 1 ]; then gulp lint; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
