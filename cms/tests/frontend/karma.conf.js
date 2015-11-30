@@ -31,14 +31,30 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine', 'fixture'],
+        frameworks: ['jasmine', 'fixture', 'phantomjs-shim'],
 
         // list of files / patterns to load in the browser
         // tests/${path}
         files: [
             // these have to be specified in order since
             // dependency loading is not handled yet
-            // 'cms/static/cms/js#<{(||)}>#*.js',
+            'cms/static/cms/js/libs/jquery.min.js',
+            'cms/static/cms/js/libs/class.min.js',
+            'cms/static/cms/js/libs/pep.js',
+            'cms/static/cms/js/modules/jquery.ui.custom.js',
+            'cms/static/cms/js/modules/jquery.ui.touchpunch.js',
+            'cms/static/cms/js/modules/jquery.ui.nestedsortable.js',
+            'cms/static/cms/js/modules/cms.base.js',
+            'cms/static/cms/js/modules/jquery.transition.js',
+            'cms/static/cms/js/modules/cms.messages.js',
+            'cms/static/cms/js/modules/cms.modal.js',
+            'cms/static/cms/js/modules/cms.sideframe.js',
+            'cms/static/cms/js/modules/cms.clipboard.js',
+            'cms/static/cms/js/modules/cms.plugins.js',
+            'cms/static/cms/js/modules/cms.structureboard.js',
+            'cms/static/cms/js/modules/cms.navigation.js',
+            'cms/static/cms/js/modules/cms.toolbar.js',
+            'cms/static/cms/js/modules/cms.tooltip.js',
 
             // tests themselves
             'cms/tests/frontend/unit/*.js',
