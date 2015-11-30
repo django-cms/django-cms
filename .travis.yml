@@ -43,6 +43,7 @@ before_install:
 install:
   - pip install -r "test_requirements/django-$DJANGO.txt"
   - if [ $FRONTEND == 1 ]; then rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && source ~/.nvm/nvm.sh && nvm install 0.12); fi
+  - which npm
   - if [ $FRONTEND == 1 ]; then npm install -g npm@2; fi
   - if [ $FRONTEND == 1 ]; then npm install -g gulp@3.9.0; fi
   - if [ $FRONTEND == 1 ]; then npm install; fi
