@@ -16,8 +16,10 @@ addons:
 env:
   global:
     - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
+    # saucelabs username
     - secure: SqAFXKLgAjws9RNfQiaIaZ6OAFHD0Ebj1v8oE3oFqeSZgHVsW5SqvueljwczYBoL4/WPJKZ9AX8BQlZh+6bHxO0WQkq+IbP0JoHOXzC/DIpOcbTJkj/qVu4FKarmi1ZVk8qZ8yZJ4ZzL3YCJPMzIA7kedB6tkeUYUEyGlQs7X98=
-    - secure: Zos3su5QFeEwDCuibiE4nejeDgjgvw59IcEiWTw2L9tzZBBvaXe0plMDum7AeLIeNalYFericsIAegNoix/jfxOC92Nyq2Izh15vk08YvZCLFMUVjtg+ENb84/Km5018VVU6W+7HmfJDDN0fvHzdjHoBLN99BWSQ7XddHQWUs7g=
+    # saucelabs access token
+    - secure: g40WBtWZyN0sGwEZnBHZPKF3J9/e+y/ncftTI6U5iNM+pVa62dSVoZsyC9YDxZ7wbK+WMcYez5MNtYbbFQD+kjBLeUbpfJ9LnOwEtZU0bl3FOYhRJZmBfWXBKyWAIx7CIspkU64jaVGgC4F7dYptileC94rMGHsYzL3nqJ4XnUY=
   matrix:
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
     - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
