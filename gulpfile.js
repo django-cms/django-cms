@@ -145,11 +145,21 @@ gulp.task('lint:javascript', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
+gulp.task('tests', ['tests:unit']);
+
+// gulp tests:unit --tests=cms.base,cms.modal
 gulp.task('tests:unit', function (done) {
     var server = new KarmaServer({
         configFile: PROJECT_PATH.tests + '/karma.conf.js',
         singleRun: true
     }, done);
+    server.start();
+});
+
+gulp.task('tests:watch', function () {
+    var server = new KarmaServer({
+        configFile: PROJECT_PATH.tests + '/karma.conf.js'
+    });
     server.start();
 });
 

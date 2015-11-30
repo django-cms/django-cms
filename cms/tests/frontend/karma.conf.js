@@ -9,8 +9,15 @@
 // #############################################################################
 // CONFIGURATION
 var baseConf = require('./base.conf');
+var argv = require('minimist')(process.argv.slice(2));
 
 module.exports = function (config) {
+    var files = ['*'];
+    if (argv && argv.tests) {
+        files = argv.tests.split(',');
+        console.log('Running tests for ' + files.join(', '));
+    }
+
     var browsers = {
         'PhantomJS': 'used for local testing'
     };
@@ -56,14 +63,17 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.toolbar.js',
             'cms/static/cms/js/modules/cms.tooltip.js',
 
-            // tests themselves
-            'cms/tests/frontend/unit/*.js',
 
             // fixture patterns
             // {
                 // pattern: 'cms/tests/frontend/fixtures#<{(||)}>#*'
             // }
-        ],
+        ].concat(
+            // tests themselves
+            files.map(function (pattern) {
+                return 'cms/tests/frontend/unit/' + pattern + '.test.js';
+            })
+        ),
 
         // list of files to exclude
         exclude: [
