@@ -128,4 +128,3 @@ And here is the published page, with the people listed in it.
    :alt: People page list
    :width: 500
    :align: center
-

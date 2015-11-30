@@ -194,7 +194,7 @@ has been replaced by a simpler and more elegant *overlay* mechanism.
 The API documentation still refers to the ``sideframe``, because it is invoked in the same way, and
 what has changed is merely the behaviour in the user's browser.
 
-In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
+In other words, *sideframe* and *overlay* refer to different versions of the same thing.
 
 
 New startup page
