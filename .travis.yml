@@ -41,18 +41,18 @@ before_install:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/cucumber_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x8"
 
 install:
-  - if [ $FRONTEND != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; fi
-  # - if [ $FRONTEND == 1 ]; then rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && source ~/.nvm/nvm.sh && nvm install 0.12); fi
-  - if [ $FRONTEND == 1 ]; then npm install -g npm@2; fi
-  - if [ $FRONTEND == 1 ]; then npm install -g gulp@3.9.0; fi
-  - if [ $FRONTEND == 1 ]; then npm install; fi
-  - if [ $FRONTEND != 1 ] && [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
-  - if [ $FRONTEND != 1 ] && [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
+  - if [ "$FRONTEND" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; fi
+  # - if [ "$FRONTEND" == 1 ]; then rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && source ~/.nvm/nvm.sh && nvm install 0.12); fi
+  - if [ "$FRONTEND" == 1 ]; then npm install -g npm@2; fi
+  - if [ "$FRONTEND" == 1 ]; then npm install -g gulp@3.9.0; fi
+  - if [ "$FRONTEND" == 1 ]; then npm install; fi
+  - if [ "$FRONTEND" != 1 ] && [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
+  - if [ "$FRONTEND" != 1 ] && [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
 
 script:
-  - if [ $FRONTEND == 1 ] && [ $UNIT == 1 ]; then gulp tests:unit; fi;
-  - if [ $FRONTEND != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
-  - if [ $FRONTEND != 1 ]; then coverage combine; fi;
+  - if [ "$FRONTEND" == 1 ] && [ $UNIT == 1 ]; then gulp tests:unit; fi;
+  - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
+  - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
 after_success: coveralls
 
