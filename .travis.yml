@@ -43,9 +43,9 @@ before_install:
 install:
   - pip install -r "test_requirements/django-$DJANGO.txt"
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && source ~/.nvm/nvm.sh && nvm install 0.12
-  - npm install -g npm@2
-  - npm install -g gulp@3.9.0
-  - npm install
+  - if [ $FRONTEND == 1 ]; then npm install -g npm@2; fi
+  - if [ $FRONTEND == 1 ]; then npm install -g gulp@3.9.0; fi
+  - if [ $FRONTEND == 1 ]; then npm install; fi
   - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
   - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
 
