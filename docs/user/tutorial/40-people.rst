@@ -49,11 +49,10 @@ To create a new Person:
         Description
             Freda oversees all technical activities in our workshop.
 
-.. image:: /user/tutorial/images/create_new_person.png
-   :alt: Create a new Person
-   :width: 600
-   :align: center
-
+    .. image:: /user/tutorial/images/create_new_person.png
+       :alt: Create a new Person
+       :width: 600
+       :align: center
 
 #.  Hit **Create**.
 
@@ -117,12 +116,16 @@ We'll create a *People* page, and add an apphook for the Aldryn People applicati
 
 #.  Hit |publish-page-now| to publish the page.
 
-.. todo:: That "ungrouped" doesn't look great - we should do something a bit different here.
-
 And here is the published page, with the people listed in it.
 
-    .. image:: /user/tutorial/images/people_page_list.png
-       :alt: People page list
-       :width: 500
-       :align: center
+.. todo::
+
+    * That "ungrouped" doesn't look great - we should do something a bit different here.
+
+    * Perhaps a full page image would look better (not sure)
+
+.. image:: /user/tutorial/images/people_page_list.png
+   :alt: People page list
+   :width: 500
+   :align: center
 
