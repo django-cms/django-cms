@@ -51,9 +51,9 @@ install:
   # - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
 
 script:
-  - sh -c "if [ '$UNIT' == 1 ]; then gulp tests:unit; fi;"
-  - sh -c "if [ '$FRONTEND != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;"
-  - coverage combine
+  - if [ $UNIT == 1 ]; then gulp tests:unit; fi;
+  - if [ $FRONTEND != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
+  - if [ $FRONTEND != 1 ]; then coverage combine; fi;
 
 after_success: coveralls
 
