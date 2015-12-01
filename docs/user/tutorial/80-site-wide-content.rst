@@ -10,24 +10,42 @@ footer. So let's add both to our site.
 
 
 *************************************************
-Add a site-wide footer using a static placeholder
+Add a site-wide header using a static placeholder
 *************************************************
 
-.. todo:: we can't do this until the theme has a suitable header placeholder - need to discuss
-
-
-*************************************************
-Add a site-wide footer using a static placeholder
-*************************************************
+.. todo:: we need to add a "header" static placeholder to the template
 
 You can do this sort of thing with **Static placeholders**. You have already used placeholders, for
 example when you :ref:`added a News plugin <use-news-plugin>` to the home page. A static
 placeholder's contents will appear in every page, in the same place.
 
-On any page:
+We'll add an image to the top of every page on the site, by adding it to the *Header* static
+placeholder.
 
-* switch to *Edit* mode
-* select *Structure* view
+.. todo:: add image of "Head" static placeholder with tooltip "This is a static placeholder"
+
+.. todo:: We should provide a suitable example image
+
+Anything that is placed in there will be displayed at the top of every page. You can also edit it
+the placeholder on any page, so:
+
+#.  switch to *Edit* mode
+#.  select *Structure* view
+#.  Select the **Add plugin** icon |add-plugin-icon|.
+#.  Choose *Image* from the list of available plugin types.
+#.  Add a wide, short image that will function as a suitable header
+
+
+.. todo:: show result in Content mode
+
+
+*************************************************
+Add a site-wide footer using a static placeholder
+*************************************************
+
+
+We should also add a footer, in just the same way - this time, add something to the *Footer* static placeholder.
+
 
 .. todo:: add image of "Footer" static placeholder with tooltip "This is a static placeholder"
 
