@@ -463,6 +463,31 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
 
+    def get_action_urls(self):
+        data = {
+            'edit_url': self.get_edit_url(),
+            'add_url': self.get_add_url(),
+            'delete_url': self.get_delete_url(),
+            'move_url': self.get_move_url(),
+            'copy_url': self.get_copy_url(),
+        }
+        return data
+
+    def get_add_url(self):
+        return self.add_url or self.placeholder.get_add_url()
+
+    def get_edit_url(self):
+        return self.edit_url or self.placeholder.get_edit_url(self.pk)
+
+    def get_delete_url(self):
+        return self.delete_url or self.placeholder.get_delete_url(self.pk)
+
+    def get_move_url(self):
+        return self.move_url or self.placeholder.get_move_url()
+
+    def get_copy_url(self):
+        return self.copy_url or self.placeholder.get_copy_url()
+
     @property
     def add_url(self):
         """
