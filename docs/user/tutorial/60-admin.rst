@@ -23,16 +23,10 @@ In the Toolbar, select the *Site menu* and choose *Administration*.
 .. image:: images/zoom_panel.png
    :alt: The zoom button
    :align: right
-   :width: 50%
+   :width: 100%
 
 This opens the django CMS *overlay*, which provides a quick view onto some extra control
 functionality.
-
-.. image:: images/zoom_panel.png
-   :alt: Overlay of the admin
-   :align: right
-   :width: 100%
-
 
 .. image:: images/admin_site.png
    :alt: The admin site
@@ -45,6 +39,10 @@ Add an image to the Filer
 .. todo:: screenshots of following steps
 
 .. todo:: write up steps properly
+
+.. image:: images/new_folder_button.png
+   :alt: The new folder button
+   :width: 20%
 
 * hit New folder in Filer, create folder called "People"
 
@@ -64,13 +62,15 @@ Add an image to the Filer
    :alt: hit the upload button
    :width: 80%
 
+.. image:: images/upload_button.png
+   :alt: The upload button
+   :width: 20%
+
 * hit Paste button
 
 .. image:: images/image_paste.png
    :alt: paste button in the clipboard
    :width: 80%
-
-
 
 Now you have a resuable image in the Filer.
 
@@ -90,7 +90,7 @@ Moving items
 
 .. image:: images/move_image.png
    :alt: move image to clipboard
-   :width: 80%
+   :width: 10%
 
 * move up in folder hierarchy to root level
 
@@ -127,9 +127,9 @@ You can edit a file's details by selecting it.
 * Choose the image's *focus point* - the point around which any cropping will occur - by dragging
   the red circle in the image pane
 
-.. image:: images/image_focus.png
-   :alt: red dot on image
-   :width: 80%
+    .. image:: images/image_focus.png
+        :alt: red dot on image
+        :width: 80%
 
   This helps ensure for example that however a portrait is cropped, the subject's head will not be
   chopped off. If your image doesn't have a particular focus point, leave the circle in the middle
