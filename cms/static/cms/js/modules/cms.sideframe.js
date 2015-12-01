@@ -271,7 +271,6 @@ var CMS = window.CMS || {};
                     }
 
                     // save url in settings
-                    // FIXME iframe.prop('src') never changes
                     CMS.settings.sideframe.url = iframe.prop('src');
                     CMS.settings = that.setSettings(CMS.settings);
 
