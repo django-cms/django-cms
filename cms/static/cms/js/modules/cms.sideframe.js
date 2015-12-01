@@ -271,7 +271,7 @@ var CMS = window.CMS || {};
                     }
 
                     // save url in settings
-                    CMS.settings.sideframe.url = iframe.prop('src');
+                    CMS.settings.sideframe.url = iframe[0].contentWindow.location.href;
                     CMS.settings = that.setSettings(CMS.settings);
 
                     // This essentially hides the toolbar dropdown when
