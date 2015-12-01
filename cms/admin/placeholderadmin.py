@@ -571,7 +571,12 @@ class PlaceholderAdminMixin(object):
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
 
-        with force_language(request.toolbar.toolbar_language):
+        try:
+            language = request.toolbar.toolbar_language
+        except AttributeError:
+            language = get_language_from_request(request)
+
+        with force_language(language):
             plugin_urls = plugin.get_action_urls()
 
         json_response = {
