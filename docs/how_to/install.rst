@@ -67,7 +67,6 @@ Other Plugins
 * djangocms-grid
 * djangocms-oembed
 * djangocms-table
-* djangocms-flash
 
 
 File and image handling
@@ -337,7 +336,6 @@ Also add any (or all) of the following plugins, depending on your needs (see the
 :ref:`installed_apps` about ordering)::
 
     'djangocms_file',
-    'djangocms_flash',
     'djangocms_googlemap',
     'djangocms_inherit',
     'djangocms_picture',
@@ -525,7 +523,6 @@ on Django 1.7, you may need to specify where the migrations are situated using t
     MIGRATION_MODULES = {
         # Add also the following modules if you're using these plugins:
         'djangocms_file': 'djangocms_file.migrations_django',
-        'djangocms_flash': 'djangocms_flash.migrations_django',
         'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
         'djangocms_inherit': 'djangocms_inherit.migrations_django',
         'djangocms_link': 'djangocms_link.migrations_django',
