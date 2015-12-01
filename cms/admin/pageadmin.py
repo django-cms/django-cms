@@ -58,8 +58,12 @@ from cms.utils.urlutils import add_url_parameters, admin_reverse
 require_POST = method_decorator(require_POST)
 
 if is_installed('reversion'):
-    from reversion.admin import VersionAdmin as ModelAdmin
-    from reversion import create_revision
+    try:
+        from reversion.admin import VersionAdmin as ModelAdmin
+        from reversion.revisions import create_revision
+    except:
+        from reversion.admin import VersionAdmin as ModelAdmin
+        from reversion import create_revision
 else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
