@@ -11,12 +11,7 @@ from django.db import transaction
 from django.template.response import SimpleTemplateResponse
 from django.utils.translation import get_language_from_request
 
-try:
-    # This try/except block can be removed when we stop supporting Django 1.6
-    from django.contrib.formtools.wizard.views import SessionWizardView
-except ImportError:  # pragma: no cover
-    # This is fine from Django 1.7
-    from formtools.wizard.views import SessionWizardView
+from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
 

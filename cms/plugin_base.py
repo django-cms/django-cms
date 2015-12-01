@@ -10,11 +10,6 @@ from django.core.urlresolvers import reverse
 from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
 from django.utils.translation import ugettext_lazy as _
-try:  # Django 1.6, 1.7
-    from django.contrib.admin.options import (RenameBaseModelAdminMethods as
-        ModelAdminMetaClass)
-except:  # Django 1.8+
-    ModelAdminMetaClass = forms.MediaDefiningClass
 
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.exceptions import SubClassNeededError, Deprecated
@@ -23,7 +18,7 @@ from cms.utils import get_cms_setting
 from cms.utils.placeholder import get_placeholder_conf
 
 
-class CMSPluginBaseMetaclass(ModelAdminMetaClass):
+class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if
     they're not given.

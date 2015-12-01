@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import base64
 import datetime
 import json
@@ -1542,7 +1541,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 class PluginCopyRelationsTestCase(PluginsTestBaseCase):
     """Test the suggestions in the docs for copy_relations()"""
-    
+
     def setUp(self):
         self.super_user = self._create_user("test", True, True)
         self.FIRST_LANG = settings.LANGUAGES[0][0]
@@ -1556,7 +1555,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         self.page2 = api.create_page(**page_data2)
         self.placeholder1 = self.page1.placeholders.get(slot='body')
         self.placeholder2 = self.page2.placeholders.get(slot='body')
-    
+
     def test_copy_fk_from_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,
@@ -1579,7 +1578,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
             new_public_count,
             old_public_count + 1
         )
-    
+
     def test_copy_m2m_to_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,
@@ -1715,12 +1714,12 @@ class NoDatabasePluginTests(TestCase):
         self.assertTrue(link._render_meta.text_enabled)
 
     def test_db_table_hack(self):
-        # Plugin models has been moved away due to the Django 1.7 AppConfig
+        # Plugin models have been moved away due to Django's AppConfig
         from cms.test_utils.project.bunch_of_plugins.models import TestPlugin1
         self.assertEqual(TestPlugin1._meta.db_table, 'bunch_of_plugins_testplugin1')
 
     def test_db_table_hack_with_mixin(self):
-        # Plugin models has been moved away due to the Django 1.7 AppConfig
+        # Plugin models have been moved away due to Django's AppConfig
         from cms.test_utils.project.bunch_of_plugins.models import TestPlugin2
         self.assertEqual(TestPlugin2._meta.db_table, 'bunch_of_plugins_testplugin2')
 

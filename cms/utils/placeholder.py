@@ -6,22 +6,14 @@ import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList, Variable
+from django.template import TemplateSyntaxError, NodeList, Variable, engines
 from django.template.base import VariableNode
 from django.template.loader import get_template
-from django.template.loader_tags import ExtendsNode, BlockNode
-try:
-    from django.template.loader_tags import ConstantIncludeNode as IncludeNode
-except ImportError:
-    from django.template.loader_tags import IncludeNode
+from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
 from django.utils.encoding import force_text
 
-try:
-    from sekizai.helpers import get_varname, is_variable_extend_node, engines
-except ImportError:
-    from sekizai.helpers import get_varname, is_variable_extend_node
-    engines = None
+from sekizai.helpers import get_varname, is_variable_extend_node
 
 
 from cms.exceptions import DuplicatePlaceholderWarning
@@ -36,10 +28,7 @@ def _get_nodelist(tpl):
 
 
 def get_context():
-    if engines is not None:
-        return namedtuple('Context', 'template')(namedtuple('Template', 'engine')(engines.all()[0]))
-    else:
-        return {}
+    return namedtuple('Context', 'template')(namedtuple('Template', 'engine')(engines.all()[0]))
 
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
@@ -184,7 +173,6 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
         elif isinstance(node, IncludeNode):
             # if there's an error in the to-be-included template, node.template becomes None
             if node.template:
-                # This is required for Django 1.7 but works on older version too
                 # Check if it quacks like a template object, if not
                 # presume is a template path and get the object out of it
                 if not callable(getattr(node.template, 'render', None)):

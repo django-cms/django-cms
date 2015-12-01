@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from datetime import datetime
 
 from django.contrib.auth import get_user_model

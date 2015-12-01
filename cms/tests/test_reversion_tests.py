@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import shutil
 from os.path import join
 from cms.utils.conf import get_cms_setting

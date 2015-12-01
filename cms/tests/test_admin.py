@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import json
 import datetime
 from cms import api
@@ -36,7 +35,6 @@ from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 
 class AdminTestsBase(CMSTestCase):
@@ -458,12 +456,8 @@ class AdminTestCase(AdminTestsBase):
         page = create_page('test-page', 'nav_playground.html', 'en')
         url = admin_reverse('cms_page_get_permissions', args=(page.pk,))
         response = self.client.get(url)
-        if DJANGO_1_6:
-            self.assertEqual(response.status_code, 200)
-            self.assertTemplateUsed(response, 'admin/login.html')
-        else:
-            self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, '/en/admin/login/?next=/en/admin/cms/page/%s/permissions/' % page.pk)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/en/admin/login/?next=/en/admin/cms/page/%s/permissions/' % page.pk)
         admin_user = self.get_superuser()
         with self.login_user_context(admin_user):
             response = self.client.get(url)
@@ -1736,13 +1730,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 # expect that the pagesize gets influenced by the useramount of the system
                 self.assertTrue(page_size_grown, "Page size has not grown after user creation")
                 # usernames are only 2 times in content
-                if DJANGO_1_7:
-                    charset = response._charset
-                else:
-                    charset = response.charset
-
-                text = smart_str(response.content, charset)
-
+                text = smart_str(response.content, response.charset)
                 foundcount = text.count(USER_NAME)
                 # 2 forms contain usernames as options
                 self.assertEqual(foundcount, 2,

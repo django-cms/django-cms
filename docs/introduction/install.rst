@@ -8,7 +8,7 @@ We'll get started by setting up our environment.
 Requirements
 ************
 
-django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
 
 ************************
 Your working environment
@@ -80,14 +80,6 @@ Windows users may need to do a little extra to make sure Python files are associ
 For the purposes of this tutorial, it's recommended that you answer the
 installer's questions as follows (where we suggest something different from the default, it's
 indicated with an asterisk *****).
-
-.. warning:: Django security support
-
-    Django 1.6 support is provided as an interim measure only. In accordance with the `Django
-    Project's security policies <https://docs.djangoproject.com/en/dev/internals/security/>`_, 1.6
-    no longer receives security updates from the Django Project team. Projects running on Django
-    1.6 have known vulnerabilities, so don't choose to install this version unless you have a
-    particular need to.
 
 * Database configuration (in URL format): ``sqlite://localhost/project.db``
 * django CMS version: ``stable``
