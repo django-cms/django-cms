@@ -3,15 +3,24 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    var CMS = window.parent.CMS;
-    // we need to reload the parent window once "?reload_window" is defined and
-    // set the new url for the sideframe with the correct language specification
-    if (location.href.indexOf('reload_window') > -1 && CMS) {
-        // save url in settings
-        CMS.settings.sideframe.url = window.location.href.replace(/[?&]reload_window/, '');
-        CMS.settings = CMS.API.Helpers.setSettings(CMS.settings);
-        // reload everything
-        CMS.API.Helpers.reloadBrowser();
+    // we have to wait till the window is loaded, otherwise
+    // the sideframe code will override the url, because every time
+    // the iframe is loaded, it's current url is saved in the settings
+    window.onload = function () {
+        // we have to setTimeout here because the cms.sideframe load event
+        // fires after this one :(
+        setTimeout(function () {
+            var CMS = window.parent.CMS;
+            // we need to reload the parent window once "?reload_window" is defined and
+            // set the new url for the sideframe with the correct language specification
+            if (location.href.indexOf('reload_window') > -1 && CMS) {
+                // save url in settings
+                CMS.settings.sideframe.url = window.location.href.replace(/[?&]reload_window/, '');
+                CMS.settings = CMS.API.Helpers.setSettings(CMS.settings);
+                // reload everything
+                CMS.API.Helpers.reloadBrowser();
+            }
+        }, 0);
     }
 </script>
 {% endblock %}
