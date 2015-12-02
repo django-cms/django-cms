@@ -157,7 +157,7 @@ module.exports = function (config) {
         settings.sauceLabs = {
             testName: baseConf.formatTaskName('Unit')
         };
-        settings.captureTimeout = 240000;
+        settings.captureTimeout = 0; // rely on SL timeout, see karma-runner/karma-sauce-launcher#37
         settings.customLaunchers = browsers;
     }
 
