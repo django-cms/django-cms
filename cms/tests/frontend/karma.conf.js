@@ -1,9 +1,9 @@
-// jshint node: true
 /*
  * Copyright (c) 2013, Divio AG
  * Licensed under BSD
  * http://github.com/aldryn/aldryn-boilerplate-bootstrap3
  */
+// jshint node: true
 'use strict';
 
 var baseConf = require('./base.conf');
@@ -75,16 +75,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'cms/static/cms/js/modules/cms.base.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.messages.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.modal.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.sideframe.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.clipboard.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.plugins.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.structureboard.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.navigation.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.toolbar.js': ['coverage'],
-            'cms/static/cms/js/modules/cms.tooltip.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.*': ['coverage'],
             '**/*.html': ['html2js']
         },
 
