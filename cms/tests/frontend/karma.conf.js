@@ -139,7 +139,9 @@ module.exports = function (config) {
         singleRun: false
     };
 
-    if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
+    // saucelabs are disabled for the moment because there are numerous connection problems
+    // between travis and sauce labs
+    if (false && process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
         settings.sauceLabs = {
             testName: baseConf.formatTaskName('Unit')
         };
