@@ -37,7 +37,7 @@ the placeholder on any page, so:
 
 #.  Select *Structure* view |structure-button|
 
-    .. |structure-button| image:: /user/tutorial/images/structure-button.png
+    .. |structure-button| image:: /user/tutorial/images/structure-content.png
        :alt: 'Structure button'
        :width: 150px
 
