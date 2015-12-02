@@ -83,10 +83,16 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            // add specific files for coverage
-            // 'static/js/base.js': ['coverage'],
-            // 'static/js/addons/cl.utils.js': ['coverage'],
-            // for fixtures
+            'cms/static/cms/js/modules/cms.base.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.messages.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.modal.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.sideframe.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.clipboard.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.plugins.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.structureboard.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.navigation.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.toolbar.js': ['coverage'],
+            'cms/static/cms/js/modules/cms.tooltip.js': ['coverage'],
             '**/*.html': ['html2js'],
             'cms/tests/frontend/unit/**/*.js': ['babel'],
             // '*|)}>#*.json': ['json_fixtures']
@@ -122,7 +128,7 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage', 'saucelabs'],
+        reporters: ['progress', 'coverage', 'coveralls', 'saucelabs'],
 
         // web server port
         port: 9876,
