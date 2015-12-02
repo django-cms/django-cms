@@ -132,6 +132,7 @@ module.exports = function (config) {
                 return Infinity;
             }
         })(),
+        browserNoActivityTimeout: 50 * 1000,
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
