@@ -30,6 +30,7 @@ django CMS.
     60-admin
     70-page-management
     80-site-wide-content
+    90-styling-content
 
 .. note:: **Touch-screen users**
 
