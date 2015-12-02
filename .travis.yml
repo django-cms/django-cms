@@ -15,8 +15,6 @@ addons:
 
 env:
   global:
-    # coveralls divio
-    # - secure: NWiSBCHFB6LbTMget2qLIdqZlx0zeu3j+Y7Lsqb8kuYXyT2IUBGFVedcGWuGv/9Mzypb80EQWtVTokA3/3QIbesqr29uG95pMPHiYWLdnTO6UHcLMcNXiSzhBGdRDZ40iHSVv2dDHs4GNwGOH5+UCA0z3j7SWmChuFbNXh+Vsqw=
     # coveralls finalangel
     - secure: HhAmAArxQg4FEufv40M6nxwSnCz2BE3QkLln8ux8DxgZrs7ENDZEMHrcCeH3QXshAnowzpgmEMIiZXfQZ35tBC7uWyq4CUgVrbxv1SNPpjDmAgb21nFEZRJR88+erpkd9H6oYXm4JWOMc3f/FkR9JjugFCrcHiHc4zGLCsmLNNQ=
     # sauce labs username
