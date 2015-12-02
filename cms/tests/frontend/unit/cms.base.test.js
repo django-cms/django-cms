@@ -1,5 +1,5 @@
-describe('cms.base.js', () => {
-    it('creates CMS namespace', () => {
+describe('cms.base.js', function () {
+    it('creates CMS namespace', function () {
         expect(CMS).toBeDefined();
         expect(CMS).toEqual(jasmine.any(Object));
         expect(CMS.API).toEqual(jasmine.any(Object));

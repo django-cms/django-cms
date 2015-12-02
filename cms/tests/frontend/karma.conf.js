@@ -1,17 +1,16 @@
+// jshint node: true
 /*
  * Copyright (c) 2013, Divio AG
  * Licensed under BSD
  * http://github.com/aldryn/aldryn-boilerplate-bootstrap3
  */
-
 'use strict';
 
-// #############################################################################
-// CONFIGURATION
 var baseConf = require('./base.conf');
 var argv = require('minimist')(process.argv.slice(2));
 
 module.exports = function (config) {
+
     var files = ['*'];
     if (argv && argv.tests) {
         files = argv.tests.split(',');
@@ -41,7 +40,6 @@ module.exports = function (config) {
         frameworks: ['jasmine', 'fixture', 'phantomjs-shim'],
 
         // list of files / patterns to load in the browser
-        // tests/${path}
         files: [
             // these have to be specified in order since
             // dependency loading is not handled yet
@@ -61,13 +59,7 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.structureboard.js',
             'cms/static/cms/js/modules/cms.navigation.js',
             'cms/static/cms/js/modules/cms.toolbar.js',
-            'cms/static/cms/js/modules/cms.tooltip.js',
-
-
-            // fixture patterns
-            // {
-                // pattern: 'cms/tests/frontend/fixtures#<{(||)}>#*'
-            // }
+            'cms/static/cms/js/modules/cms.tooltip.js'
         ].concat(
             // tests themselves
             files.map(function (pattern) {
@@ -93,22 +85,7 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.navigation.js': ['coverage'],
             'cms/static/cms/js/modules/cms.toolbar.js': ['coverage'],
             'cms/static/cms/js/modules/cms.tooltip.js': ['coverage'],
-            '**/*.html': ['html2js'],
-            'cms/tests/frontend/unit/**/*.js': ['babel'],
-            // '*|)}>#*.json': ['json_fixtures']
-        },
-
-        babelPreprocessor: {
-            options: {
-                presets: ['es2015'],
-                sourceMap: 'inline'
-            },
-            filename: function (file) {
-                return file.originalPath.replace(/\.js$/, '.es5.js');
-            },
-            sourceFileName: function (file) {
-                return file.originalPath;
-            }
+            '**/*.html': ['html2js']
         },
 
         // optionally, configure the reporter
@@ -145,7 +122,6 @@ module.exports = function (config) {
         autoWatch: true,
 
         // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: Object.keys(browsers),
 
         concurrency: (function () {
