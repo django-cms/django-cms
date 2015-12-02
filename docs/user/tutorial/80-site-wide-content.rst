@@ -29,19 +29,17 @@ placeholder.
 Anything that is placed in there will be displayed at the top of every page. You can also edit it
 the placeholder on any page, so:
 
-#.  Switch to *Edit* mode.
+#.  Switch to *Edit* mode |Edit button|
 
-    .. image:: /user/tutorial/images/edit-button.png
+    .. |Edit button| image:: /user/tutorial/images/edit-button.png
        :alt: Edit button
        :width: 50px
-       :align: center
 
-#.  Select *Structure* view.
+#.  Select *Structure* view |structure-button|
 
-    .. image:: /user/tutorial/images/structure-button.png
-       :alt: Edit button
+    .. |structure-button| image:: /user/tutorial/images/structure-button.png
+       :alt: 'Structure button'
        :width: 150px
-       :align: center
 
 #.  Select the **Add plugin** icon.
 
