@@ -148,6 +148,15 @@ module.exports = function (config) {
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         browsers: Object.keys(browsers),
 
+        concurrency: (function () {
+            // travis
+            if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
+                return 3;
+            } else {
+                return Infinity;
+            }
+        })(),
+
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false
