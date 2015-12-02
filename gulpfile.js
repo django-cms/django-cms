@@ -16,6 +16,7 @@ var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
+var KarmaServer = require('karma').Server;
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -29,7 +30,8 @@ var PROJECT_PATH = {
     js: PROJECT_ROOT + '/js',
     sass: PROJECT_ROOT + '/sass',
     css: PROJECT_ROOT + '/css',
-    icons: PROJECT_ROOT + '/fonts'
+    icons: PROJECT_ROOT + '/fonts',
+    tests: __dirname + '/cms/tests/frontend'
 };
 
 var PROJECT_PATTERNS = {
@@ -141,6 +143,24 @@ gulp.task('lint:javascript', function () {
             }
         })
         .pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('tests', ['tests:unit']);
+
+// gulp tests:unit --tests=cms.base,cms.modal
+gulp.task('tests:unit', function (done) {
+    var server = new KarmaServer({
+        configFile: PROJECT_PATH.tests + '/karma.conf.js',
+        singleRun: true
+    }, done);
+    server.start();
+});
+
+gulp.task('tests:watch', function () {
+    var server = new KarmaServer({
+        configFile: PROJECT_PATH.tests + '/karma.conf.js'
+    });
+    server.start();
 });
 
 Object.keys(JS_BUNDLES).forEach(function (bundleName) {
