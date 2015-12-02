@@ -43,17 +43,20 @@ the placeholder on any page, so:
 
 #.  Select the **Add plugin** icon.
 
-    .. image:: /user/tutorial/images/add-plugin-icon.png
-       :alt: Add plugin
-       :width: 400px
-       :align: center
+    |add-plugin-icon|
+
+    .. |add-plugin-icon| image:: /user/tutorial/images/add-plugin-icon.png
+       :alt: 'Add plugin'
+       :width: 350px
 
 #.  Choose *Image* from the list of available plugin types.
 
-    .. image:: /user/tutorial/images/choose_image_plugin.png
-       :alt: Choose image plugin
-       :width: 100%
-       :align: center
+    |choose-image-plugin|
+
+    .. |choose-image-plugin| image:: /user/tutorial/images/choose_image_plugin.png
+       :alt: 'Choose image plugin'
+       :width: 50%
+
 
 #.  Add a wide, short image that will function as a suitable header.
 
@@ -71,10 +74,7 @@ We should also add a footer, in just the same way - this time, add something to 
 
 #.  Select the **Add plugin** icon.
 
-    .. image:: /user/tutorial/images/add-plugin-icon.png
-       :alt: Add plugin
-       :width: 400px
-       :align: center
+    |add-plugin-icon|
 
 #.  Choose *Text* from the list of available plugin types.
 
@@ -83,11 +83,11 @@ We should also add a footer, in just the same way - this time, add something to 
         Text
             City Bicycle Services, because bicycles need love and attention too.
 
+    |choose_text|
 
-    .. image:: /user/tutorial/images/choose_text.png
+    .. |choose_text| image:: /user/tutorial/images/choose_text.png
        :alt: Choose text
-       :width: 100%
-       :align: center
+       :width: 60%
 
 #.  Hit **Save**
 
