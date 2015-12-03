@@ -46,21 +46,14 @@ Add an image to the Filer
 
 * hit New folder in Filer, create folder called "People"
 
-.. image:: images/new_folder.png
-   :alt: create folder in filer
-   :width: 80%
 
 * open folder
 
 .. image:: images/open_folder.png
    :alt: open the new folder
-   :width: 80%
+   :width: 40%
 
 * hit upload button
-
-.. image:: images/upload_filer.png
-   :alt: hit the upload button
-   :width: 80%
 
 .. image:: images/upload_button.png
    :alt: The upload button
@@ -70,7 +63,7 @@ Add an image to the Filer
 
 .. image:: images/image_paste.png
    :alt: paste button in the clipboard
-   :width: 80%
+   :width: 20%
 
 Now you have a resuable image in the Filer.
 
@@ -96,7 +89,7 @@ Moving items
 
 .. image:: images/back_to_root_file.png
    :alt: move to root
-   :width: 80%
+   :width: 20%
 
 * create a new folder "Staff" (I think we don't an image again. It repeats itself)
 
@@ -116,7 +109,7 @@ You can edit a file's details by selecting it.
 
 .. image:: images/open_image.png
    :alt: click on the image
-   :width: 80%
+   :width: 50%
 
 * edit ``Name`` and ``Description``
 
@@ -129,7 +122,7 @@ You can edit a file's details by selecting it.
 
     .. image:: images/image_focus.png
         :alt: red dot on image
-        :width: 80%
+        :width: 60%
 
   This helps ensure for example that however a portrait is cropped, the subject's head will not be
   chopped off. If your image doesn't have a particular focus point, leave the circle in the middle
@@ -152,7 +145,7 @@ Using images from the Filer
 
 .. image:: images/close_admin.png
    :alt: close icon of the admin page
-   :width: 80%
+   :width: 10%
 
 * go to People page
 
