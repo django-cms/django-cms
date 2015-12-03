@@ -84,8 +84,11 @@
                     });
                     CMS.API.Toolbar.open();
                 });
-                // automatically trigger the modal
-                btn.trigger('click');
+
+                // automatically trigger the modal if sideframe isn't open
+                if (!CMS.settings.sideframe.url) {
+                    btn.trigger('click');
+                }
             });
         {% else %}
             {% comment %}
