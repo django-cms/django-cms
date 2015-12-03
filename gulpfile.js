@@ -159,14 +159,25 @@ gulp.task('tests:unit', function (done) {
     server.start();
 });
 
-// gulp tests:integration
+// gulp tests:integration --tests=base,base2
 gulp.task('tests:integration', function (done) {
-    var tests = [
-        PROJECT_PATH.tests + '/integration/base.js'
+    process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
+
+    var files = [
+        'base',
+        'base2'
     ];
 
-    process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
-    var casperChild = spawn('./node_modules/.bin/casperjs', ['test'].concat(tests));
+    if (argv && argv.tests) {
+        files = argv.tests.split(',');
+        gutil.log('Running tests for ' + files.join(', '));
+    }
+
+    var tests = files.map(function (file) {
+        return PROJECT_PATH.tests + '/integration/' + file + '.js'
+    });
+
+    var casperChild = spawn('./node_modules/.bin/casperjs',['test'].concat(tests));
 
     casperChild.stdout.on('data', function (data) {
         gutil.log('CasperJS:', data.toString().slice(0, -1));
