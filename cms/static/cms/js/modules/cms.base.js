@@ -317,7 +317,7 @@ var CMS = {
             var origin = url;
 
             // return url if there is no param
-            if (!(url.split('?').length <= 1 || window.JSON === undefined)) {
+            if (url.split('?').length > 1) {
                 // setup local vars
                 urlArray = url.split('?');
                 urlParams = urlArray[1].split('&');
