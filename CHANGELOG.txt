@@ -1,3 +1,8 @@
+=== 3.3.0 (Unreleased) ===
+
+* Removed support for Django 1.6, 1.7 and python 2.6
+* Set the default value of CMSPlugin.position to 0 instead of null
+
 === 3.2.1 (Unreleased) ===
 
 - Fixed an issue with refreshing the UI when switching CMS language
