@@ -30,7 +30,7 @@ functionality.
 
 .. image:: images/admin_site.png
    :alt: The admin site
-   :width: 50%
+   :width: 80%
 
 
 Add an image to the Filer
@@ -46,6 +46,9 @@ Add an image to the Filer
 
 * hit New folder in Filer, create folder called "People"
 
+  .. image:: images/new_folder_open.png
+   :alt: The new folder button
+   :width: 80%
 
 * open folder
 
