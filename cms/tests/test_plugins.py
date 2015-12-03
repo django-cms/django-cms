@@ -42,6 +42,7 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.i18n import force_language
 from cms.utils.plugins import get_plugins_for_page, get_plugins
 
 from djangocms_googlemap.models import GoogleMap
@@ -1077,10 +1078,17 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         source_placeholder = page.placeholders.get(slot='body')
         target_placeholder = page.placeholders.get(slot='right-column')
-        reload_expected = {'reload': True}
-        no_reload_expected = {'reload': False}
+
         plugin_1 = api.add_plugin(source_placeholder, ReloadDrivenPlugin, settings.LANGUAGES[0][0])
         plugin_2 = api.add_plugin(source_placeholder, NonReloadDrivenPlugin, settings.LANGUAGES[0][0])
+
+        with force_language('en'):
+            plugin_1_action_urls = plugin_1.get_action_urls()
+
+        reload_expected = {
+            'reload': True,
+            'urls': plugin_1_action_urls,
+        }
 
         # Test Plugin reload == True on Move
         post = {
@@ -1091,6 +1099,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(URL_CMS_PLUGIN_MOVE, post)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content.decode('utf8')), reload_expected)
+
+        with force_language('en'):
+            plugin_2_action_urls = plugin_2.get_action_urls()
+
+        no_reload_expected = {
+            'reload': False,
+            'urls': plugin_2_action_urls,
+        }
 
         # Test Plugin reload == False on Move
         post = {

@@ -626,6 +626,13 @@ var CMS = window.CMS || {};
                             CMS.API.Helpers.reloadBrowser();
                         }
 
+                        // set new url settings when moving #4803
+                        if (response.urls) {
+                            that._setSettings(options, {
+                                urls: response.urls
+                            });
+                        }
+
                         // enable actions again
                         CMS.API.locked = false;
 
@@ -655,7 +662,24 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Opens a modal to delete a plugin
+             * Changes the settings attributes on an initialised plugin.
+             *
+             * @method _setSettings
+             * @param {Object} oldSettings current settings
+             * @param {Object} newSettings new settings to be applied
+             * @private
+             */
+            _setSettings: function _setSettings(oldSettings, newSettings) {
+                var settings = $.extend(true, {}, oldSettings, newSettings);
+                var plugin = $('.cms-plugin-' + settings.plugin_id);
+
+                // set new setting on instance and plugin data
+                this.options = settings;
+                plugin.data('settings', settings);
+            },
+
+            /**
+             * Opens a modal to delete a plugin.
              *
              * @method deletePlugin
              * @param {String} url admin url for deleting a page
