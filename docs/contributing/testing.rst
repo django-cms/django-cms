@@ -139,7 +139,7 @@ Running Frontend Tests
 
 We have two types of frontend tests: unit tests and integration tests.
 For unit tests we are using `Karma <http://karma-runner.github.io/>`_ as a
-testrunner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
+test runner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
 
 Unit tests can be run like this::
 
@@ -150,14 +150,14 @@ the ``--tests`` parameter with comma separated file names, like this::
 
     gulp tests:unit --tests=cms.base,cms.modal
 
-If you want to run tests continuosly you can use the watch command::
+If you want to run tests continuously you can use the watch command::
 
     gulp tests:unit:watch
 
 This will rerun the suite whenever source or test file is changed.
-By default the tests are running on PhantomJS (headless webkit), but when running
-Karma in watch mode you can also visit the server it spawns with an actual
-browser.
+By default the tests are running on `PhantomJS <http://phantomjs.org/>`_, but
+when running Karma in watch mode you can also visit the server it spawns with an
+actual browser.
 
     INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
 
