@@ -36,6 +36,7 @@ from cms.test_utils import testcases as base
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
+from cms.utils.i18n import force_language
 from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 
@@ -845,7 +846,14 @@ class AdminTests(AdminTestsBase):
         source, target = list(page.placeholders.all())[:2]
         pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
         plugin_class = pageplugin.get_plugin_class_instance()
-        expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
+
+        with force_language('en'):
+            action_urls = pageplugin.get_action_urls()
+
+        expected = {
+            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
+            'urls': action_urls,
+        }
         placeholder = Placeholder.objects.all()[0]
         permless = self.get_permless()
         admin_user = self.get_admin()

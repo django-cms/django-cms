@@ -11,6 +11,7 @@ from cms.api import add_plugin
 from cms.constants import PLUGIN_MOVE_ACTION, PLUGIN_COPY_ACTION
 from cms.models import StaticPlaceholder, Placeholder, CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
+from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 
 
@@ -126,7 +127,14 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         static_placeholder_target = StaticPlaceholder.objects.create(name='foofoo', code='foofoo', site_id=1)
         sourceplugin = add_plugin(static_placeholder_source.draft, 'TextPlugin', 'en', body='test')
         plugin_class = sourceplugin.get_plugin_class_instance()
-        expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
+
+        with force_language('en'):
+            action_urls = sourceplugin.get_action_urls()
+
+        expected = {
+            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
+            'urls': action_urls,
+        }
         admin = self.get_admin()
 
         with self.login_user_context(admin):

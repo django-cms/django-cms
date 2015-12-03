@@ -12,6 +12,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
+from cms.utils.i18n import force_language
 from cms.utils.plugins import reorder_plugins
 
 
@@ -881,6 +882,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             pre_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEqual(pre_copy_placeholder_count, 6)
             superuser = self.get_superuser()
+
+            with force_language('en'):
+                action_urls = text_plugin_two.get_action_urls()
+
             with self.login_user_context(superuser):
                 # now move the parent text plugin to another placeholder
                 post_data = {
@@ -891,7 +896,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
                 }
                 plugin_class = text_plugin_two.get_plugin_class_instance()
-                expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
+                expected = {
+                    'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
+                    'urls': action_urls,
+                }
                 edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
