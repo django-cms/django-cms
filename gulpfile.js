@@ -145,7 +145,7 @@ gulp.task('lint:javascript', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('tests', ['tests:unit']);
+gulp.task('tests', ['tests:unit', 'tests:integration']);
 
 // gulp tests:unit --tests=cms.base,cms.modal
 gulp.task('tests:unit', function (done) {
@@ -154,6 +154,11 @@ gulp.task('tests:unit', function (done) {
         singleRun: true
     }, done);
     server.start();
+});
+
+// gulp tests:integration
+gulp.task('tests:integration', function () {
+
 });
 
 gulp.task('tests:watch', function () {
