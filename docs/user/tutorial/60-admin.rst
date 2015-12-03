@@ -3,13 +3,11 @@ The Django Admin
 ################
 
 ******************
-Using Django Filer
+The Admin overlay
 ******************
 
-Using the Filer in the Django Admin
-===================================
-
-.. todo:: update for 3.2
+Open the overlay
+================
 
 .. image:: images/admin_nav.png
    :alt: Navigating to the Django admin
@@ -18,145 +16,144 @@ Using the Filer in the Django Admin
 
 In the Toolbar, select the *Site menu* and choose *Administration*.
 
-.. todo:: update for 3.2. -- 3.2 expands admin automatically
-
-.. image:: images/zoom_panel.png
-   :alt: The zoom button
-   :align: right
-   :width: 100%
-
 This opens the django CMS *overlay*, which provides a quick view onto some extra control
 functionality.
 
-.. image:: images/admin_site.png
-   :alt: The admin site
-   :width: 80%
+Each application in the system has its own set of entries.
+
+.. image:: images/zoom_panel.png
+   :alt: The zoom button
+   :width: 100%
 
 
 Add an image to the Filer
 =============================
 
-.. todo:: screenshots of following steps
+#.  Find the *Django Filer* application in the list.
 
-.. todo:: write up steps properly
+    .. image:: images/admin_site.png
+       :alt: The admin site
 
-.. image:: images/new_folder_button.png
-   :alt: The new folder button
-   :width: 20%
+#.  Select *Folders*.
 
-* hit New folder in Filer, create folder called "People"
+    .. |new-folder| image:: images/new_folder_button.png
+       :alt: the 'New folder' button
 
-  .. image:: images/new_folder_open.png
-   :alt: The new folder button
-   :width: 80%
+#.  When the Filer opens, select |new-folder|.
 
-* open folder
+#.  Name the new folder *People*, and hit **Save**.
 
-.. image:: images/open_folder.png
-   :alt: open the new folder
-   :width: 40%
+#.  Find the new folder in the list and select it to open it.
 
-* hit upload button
+    .. |upload_button| image:: images/upload_button.png
+       :alt: The upload button
 
-.. image:: images/upload_button.png
-   :alt: The upload button
-   :width: 20%
+#.  Now we want to upload a new image: hit |upload_button|, and select a suitable image (JPEG,
+    PNG and GIF files are recommended) from your hard disk. The image(s) you upload will be placed
+    on the *clipboard*.
 
-* hit Paste button
+    .. todo:: please add image of clipboard (with a new image in it).
 
-.. image:: images/image_paste.png
-   :alt: paste button in the clipboard
-   :width: 20%
+    .. |image_paste| image:: images/image_paste.png
+       :alt: the 'Paste' icon
 
-Now you have a resuable image in the Filer.
+#.  Add the images to the folder, by selecting |image_paste|.
+
+Now you have a image in the Filer, that you can reuse anywhere you need to. If you change the image,
+every instance where you've used it will also be updated, potentially saving you a lot of time and
+effort when images need to be updated.
 
 
 **************************
 Managing files and folders
 **************************
 
-Moving items
-============
-
-.. todo:: screenshots of following steps
-
-.. todo:: write up steps properly
-
-* move file to clipboard
-
-.. image:: images/move_image.png
-   :alt: move image to clipboard
-   :width: 10%
-
-* move up in folder hierarchy to root level
-
-.. image:: images/back_to_root_file.png
-   :alt: move to root
-   :width: 20%
-
-* create a new folder "Staff" (I think we don't an image again. It repeats itself)
-
-* paste file to new folder (Same here)
-
-
 Editing items
 =============
 
-.. todo:: screenshots of following steps
+You can edit a file's details at any time by selecting it.
 
-.. todo:: write up steps properly
+#.  Select the image in the Filer that you want to edit.
 
-You can edit a file's details by selecting it.
+#.  Change its *Name* and *Description* and any other fields you'd like to edit.
 
-* select one of the existing images
+    .. image:: images/image_description.png
+       :alt: the Edit image dialog
 
-.. image:: images/open_image.png
-   :alt: click on the image
-   :width: 50%
-
-* edit ``Name`` and ``Description``
-
-.. image:: images/image_description.png
-   :alt: Shows image information
-   :width: 80%
-
-* Choose the image's *focus point* - the point around which any cropping will occur - by dragging
-  the red circle in the image pane
+#.  Select the image's *focus point* - the point around which any cropping will occur - by dragging
+    the red circle in the image pane.
 
     .. image:: images/image_focus.png
-        :alt: red dot on image
-        :width: 60%
+        :alt: the focus point control
+        :width: 40%
+        :align: center
 
-  This helps ensure for example that however a portrait is cropped, the subject's head will not be
-  chopped off. If your image doesn't have a particular focus point, leave the circle in the middle
-  of the image.
+    This helps ensure for example that however a portrait is cropped, the subject's head will not be
+    chopped off. If your image doesn't have a particular focus point, leave the circle in the middle
+    of the image.
 
-* **Save** the image.
+    Note that if you change the focus point, any examples of that image already in your pages will
+    change automatically.
 
-Note that if you change the focus point, any examples of that image already in your pages will
-change automatically.
+#.  **Save** your changes.
+
+
+Moving items
+============
+
+You can manage your images and files, by moving them around within folders, creating a folder structure that suits your needs and so on.
+
+Let's move a file.
+
+#.  Start by selecting the image you want to move.
+
+    .. |cut| image:: images/cut.png
+       :alt: the 'Cut' icon
+       :width: 48
+
+#.  Move it to the clipboard, using the |cut| icon.
+
+#.  Navigate back up the folder hierarchy to the *Root* folder, by using the *move back* icon in
+    the Filer. You can also select a folder in the path from the breadcrumb trail just above it.
+
+    .. todo:: can you include the breadcrumbs in the image below please
+
+    .. image:: images/back_to_root_file.png
+       :alt: Moving up in the folder hierarchy
+       :align: center
+
+#.  Create a new folder called *Staff*, as you did previous, and open it.
+
+#.  Once more, use |image_paste| to place the file in the new folder.
 
 
 Using images from the Filer
 ===========================
 
-.. todo:: screenshots of following steps
+Now that you have added an image to the Filer, it's easy to use it - and reuse it - whenever you
+need.
 
-.. todo:: write up steps properly
+.. |close_admin| image:: images/close_admin.png
+   :alt: the 'close' icon of the admin overlay
 
-* close the admin pane
+#.  Close the admin overlay, by hitting the |close_admin| icon in its top right-hand corner.
 
-.. image:: images/close_admin.png
-   :alt: close icon of the admin page
-   :width: 10%
+#.  Go to the *People* page on the site.
 
-* go to People page
+#.  From the django CMS toolbar, select *People* > *Person* list.
 
-.. image:: images/people_page.png
-   :alt: close icon of the admin page
-   :width: 80%
+    .. todo:: add an image of *People* > *Person* list please.
 
-* select People > Person list
-* choose a person
-* hit Select this file arrow
-* Save Person
+#.  Choose the Person you want to edit from the list.
+
+#.  Hit the "choose image" icon.
+
+    .. todo:: add an image of the choose image icon.
+
+#.  The Filer will open; find the image you want to use for this Person.
+
+#.  To apply the image to the Person, hit the "select this file"" icon
+
+    .. todo:: add an image of the "select this file" icon.
+
+#.  Save the Person, and see your changes.
