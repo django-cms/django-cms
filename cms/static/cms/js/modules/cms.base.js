@@ -359,7 +359,7 @@ var CMS = {
             });
             tmp = tmp.replace('&', '?');
             url = origin + tmp;
-            url = url.replace('&', '&amp;');
+            url = url.replace(/&/g, '&amp;');
 
             return url;
         },
