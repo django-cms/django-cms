@@ -907,7 +907,7 @@ var CMS = window.CMS || {};
                     );
 
                     modal.open({
-                        title: that.ui.container.data('settings').addPluginHelpTitle,
+                        title: that.options.addPluginHelpTitle,
                         html: pluginsCopy,
                         width: 530,
                         height: 400
