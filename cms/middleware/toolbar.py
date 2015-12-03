@@ -36,7 +36,8 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
             'rendered_content': rendered_content,
             'child_plugin_classes': child_plugin_classes,
         }
-        data.update(instance.get_action_urls())
+        # TODO: Remove js_compat once get_action_urls is refactored.
+        data.update(instance.get_action_urls(js_compat=False))
     original_context.update(data)
     plugin_class = instance.get_plugin_class()
     template = plugin_class.frontend_edit_template
