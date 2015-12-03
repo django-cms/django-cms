@@ -28,7 +28,7 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
                                                          detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
-                                      ClearURLs)
+                                      ClearURLs, URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
@@ -481,7 +481,7 @@ class ToolbarTests(ToolbarTestBase):
     def test_user_settings(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/admin/cms/usersettings/')
+            response = self.client.get(URL_CMS_USERSETTINGS)
             self.assertEqual(response.status_code, 200)
 
     def test_remove_lang(self):

@@ -12,9 +12,8 @@ from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
 from cms.models import Page
-from cms.test_utils.project.extensionapp.models import (MyPageExtension,
-                                                        MyTitleExtension)
-from cms.test_utils.testcases import CMSTestCase as TestCase
+from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
+from cms.test_utils.testcases import CMSTestCase as TestCase, URL_CMS_PAGE_ADD
 from cms.tests.test_admin import AdminTestsBase
 
 
@@ -254,8 +253,9 @@ class ExtensionAdminTestCase(AdminTestsBase):
             self.assertEqual(MyPageExtension.objects.all().count(), 1)
             self.assertEqual(MyTitleExtension.objects.all().count(), 1)
             self.client.post(
-                "/en/admin/cms/page/add/"
-                "?position=first-child&copy_target=%s&language=en" % self.page.pk,
+                "%s?position=first-child&copy_target=%s&language=en" % (
+                    URL_CMS_PAGE_ADD, self.page.pk
+                ),
                 data=page_data)
             # Check that page and its extensions have been copied
             self.assertEqual(Page.objects.all().count(), 3)
@@ -280,9 +280,10 @@ class ExtensionAdminTestCase(AdminTestsBase):
             self.assertEqual(MyPageExtension.objects.all().count(), 1)
             self.assertEqual(MyTitleExtension.objects.all().count(), 1)
             self.client.post(
-                "/en/admin/cms/page/add/"
-                "?target=%s&position=first-child&add_page_type=1"
-                "&copy_target=%s&language=en" % (page_types.pk, self.page.pk),
+                "%s?target=%s&position=first-child&add_page_type=1"
+                "&copy_target=%s&language=en" % (
+                    URL_CMS_PAGE_ADD, page_types.pk, self.page.pk
+                ),
                 data=page_data)
             # Check that new page type has extensions from source page
             self.assertEqual(Page.objects.all().count(), 4)
