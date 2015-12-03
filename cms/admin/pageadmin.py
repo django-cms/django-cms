@@ -5,6 +5,7 @@ import json
 import sys
 
 from django.utils.formats import localize
+from django.core.urlresolvers import reverse
 
 from cms.utils.compat import DJANGO_1_7
 
@@ -39,9 +40,12 @@ from django.views.decorators.http import require_POST
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
-                             PublicationDatesForm)
-from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
+from cms.admin.forms import (
+    PageForm, AdvancedSettingsForm, PagePermissionForm, PublicationDatesForm
+)
+from cms.admin.permissionadmin import (
+    PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
+)
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
@@ -442,7 +446,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context = self.update_language_tab_context(request, obj, context)
 
         tab_language = get_language_from_request(request)
-
         extra_context.update(self.get_unihandecode_context(tab_language))
 
         response = super(PageAdmin, self).change_view(
@@ -1278,8 +1281,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 helpers.make_revision_with_plugins(obj, request.user, message)
 
             if not self.has_change_permission(request, None):
-                return HttpResponseRedirect("../../../../")
-            return HttpResponseRedirect("../../")
+                return HttpResponseRedirect(reverse('admin:index'))
+            return HttpResponseRedirect(reverse('admin:cms_page_changelist'))
 
         context = {
             "title": _("Are you sure?"),
