@@ -1,11 +1,12 @@
-'use strict';
-
 // #############################################################################
 // CONFIGURATION
+
 var b2s = require('browserslist-saucelabs');
 
 module.exports = {
     formatTaskName: function formatTaskName(browserName) {
+        'use strict';
+
         return [
             'Test', browserName, 'for',
             process.env.TRAVIS_REPO_SLUG,

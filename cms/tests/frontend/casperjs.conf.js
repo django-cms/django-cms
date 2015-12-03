@@ -1,3 +1,5 @@
+/* jshint strict:false */
+
 // #############################################################################
 // CasperJS options
 
@@ -20,9 +22,6 @@ module.exports = {
     },
 
     timeout: function (timeout) {
-        var waitTimeout = timeout || 10000;
-
-        casper.echo('Default waitFor timeout is ' + waitTimeout + 'ms.', 'INFO');
-        casper.options.pageSettings.resourceTimeout = waitTimeout;
+        casper.options.pageSettings.resourceTimeout = timeout || 10000;
     }
 };

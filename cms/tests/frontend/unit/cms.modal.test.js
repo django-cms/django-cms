@@ -1,4 +1,6 @@
 describe('CMS.Modal', function () {
+    'use strict';
+
     it('is not defined at first', function () {
         expect(CMS.Modal).not.toBeDefined();
     });

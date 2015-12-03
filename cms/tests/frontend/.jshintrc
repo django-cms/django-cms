@@ -1,0 +1,12 @@
+{
+    "predef": [
+        "casper",
+        "module",
+        "process",
+        "it",
+        "CMS",
+        "expect",
+        "jasmine",
+        "describe"
+    ]
+}
