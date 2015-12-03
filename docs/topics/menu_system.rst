@@ -1,3 +1,5 @@
+.. _how_menus_work:
+
 #########################
 How the menu system works
 #########################

@@ -1,3 +1,5 @@
+.. _customising_navigation_menus:
+
 ############################
 Customising navigation menus
 ############################
