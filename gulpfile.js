@@ -163,7 +163,8 @@ gulp.task('tests:integration', function (done) {
         PROJECT_PATH.tests + '/integration/base.js'
     ];
 
-    var casperChild = spawn('casperjs', ['test'].concat(tests));
+    process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
+    var casperChild = spawn('./node_modules/.bin/casperjs', ['test'].concat(tests));
 
     casperChild.stdout.on('data', function (data) {
         gutil.log('CasperJS:', data.toString().slice(0, -1));
