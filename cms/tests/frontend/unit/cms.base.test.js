@@ -1,6 +1,6 @@
-describe('cms.base.js', function () {
-    'use strict';
+'use strict';
 
+describe('cms.base.js', function () {
     it('creates CMS namespace', function () {
         expect(CMS).toBeDefined();
         expect(CMS).toEqual(jasmine.any(Object));

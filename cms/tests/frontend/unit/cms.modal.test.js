@@ -1,6 +1,8 @@
-describe('CMS.Modal', function () {
-    'use strict';
+/* globals $ */
 
+'use strict';
+
+describe('CMS.Modal', function () {
     it('is not defined at first', function () {
         expect(CMS.Modal).not.toBeDefined();
     });

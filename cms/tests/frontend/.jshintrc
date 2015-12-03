@@ -1,12 +1,13 @@
 {
+    "node": true,
     "predef": [
-        "casper",
         "module",
         "process",
         "it",
         "CMS",
         "expect",
         "jasmine",
-        "describe"
+        "describe",
+        "casper"
     ]
 }
