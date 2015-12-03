@@ -17,9 +17,9 @@ env:
   global:
     # coveralls finalangel
     - secure: HhAmAArxQg4FEufv40M6nxwSnCz2BE3QkLln8ux8DxgZrs7ENDZEMHrcCeH3QXshAnowzpgmEMIiZXfQZ35tBC7uWyq4CUgVrbxv1SNPpjDmAgb21nFEZRJR88+erpkd9H6oYXm4JWOMc3f/FkR9JjugFCrcHiHc4zGLCsmLNNQ=
-    sauce labs username
+    # sauce labs username
     - secure: g40WBtWZyN0sGwEZnBHZPKF3J9/e+y/ncftTI6U5iNM+pVa62dSVoZsyC9YDxZ7wbK+WMcYez5MNtYbbFQD+kjBLeUbpfJ9LnOwEtZU0bl3FOYhRJZmBfWXBKyWAIx7CIspkU64jaVGgC4F7dYptileC94rMGHsYzL3nqJ4XnUY=
-    sauce labs access token
+    # sauce labs access token
     - secure: Zos3su5QFeEwDCuibiE4nejeDgjgvw59IcEiWTw2L9tzZBBvaXe0plMDum7AeLIeNalYFericsIAegNoix/jfxOC92Nyq2Izh15vk08YvZCLFMUVjtg+ENb84/Km5018VVU6W+7HmfJDDN0fvHzdjHoBLN99BWSQ7XddHQWUs7g=
   matrix:
     - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
