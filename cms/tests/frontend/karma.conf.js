@@ -17,13 +17,21 @@ module.exports = function (config) {
         console.log('Running tests for ' + files.join(', '));
     }
 
+    var useSauceLabs = function () {
+        var val = process.env.SKIP_SAUCE_LABS;
+        return val !== undefined &&
+            val === '0' &&
+            process.env.SAUCE_USERNAME &&
+            process.env.SAUCE_ACCESS_KEY;
+    };
+
     var browsers = {
         'PhantomJS': 'used for local testing'
     };
 
     // Browsers to run on Sauce Labs
     // Check out https://saucelabs.com/platforms for all browser/OS combos
-    if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
+    if (useSauceLabs()) {
         browsers = baseConf.sauceLabsBrowsers.reduce(function (browsers, capability) {
             browsers[JSON.stringify(capability)] = capability;
             browsers[JSON.stringify(capability)].base = 'SauceLabs';
@@ -96,7 +104,7 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage', 'coveralls', 'saucelabs'],
+        reporters: ['progress', 'coverage', 'saucelabs'].concat(process.env.CI ? ['coveralls'] : []),
 
         // web server port
         port: 9876,
@@ -117,7 +125,7 @@ module.exports = function (config) {
 
         concurrency: (function () {
             // travis
-            if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
+            if (useSauceLabs()) {
                 return 3;
             } else {
                 return Infinity;
@@ -132,7 +140,7 @@ module.exports = function (config) {
 
     // saucelabs are disabled for the moment because there are numerous connection problems
     // between travis and sauce labs
-    if (false && process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
+    if (useSauceLabs()) {
         settings.sauceLabs = {
             testName: baseConf.formatTaskName('Unit')
         };

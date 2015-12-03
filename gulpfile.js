@@ -159,6 +159,13 @@ gulp.task('tests:unit', function (done) {
     server.start();
 });
 
+gulp.task('tests:unit:watch', function () {
+    var server = new KarmaServer({
+        configFile: PROJECT_PATH.tests + '/karma.conf.js'
+    });
+    server.start();
+});
+
 // gulp tests:integration --tests=base,base2
 gulp.task('tests:integration', function (done) {
     process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
@@ -174,10 +181,10 @@ gulp.task('tests:integration', function (done) {
     }
 
     var tests = files.map(function (file) {
-        return PROJECT_PATH.tests + '/integration/' + file + '.js'
+        return PROJECT_PATH.tests + '/integration/' + file + '.js';
     });
 
-    var casperChild = spawn('./node_modules/.bin/casperjs',['test'].concat(tests));
+    var casperChild = spawn('./node_modules/.bin/casperjs', ['test'].concat(tests));
 
     casperChild.stdout.on('data', function (data) {
         gutil.log('CasperJS:', data.toString().slice(0, -1));
@@ -186,13 +193,6 @@ gulp.task('tests:integration', function (done) {
     casperChild.on('close', function (code) {
         done(code);
     });
-});
-
-gulp.task('tests:watch', function () {
-    var server = new KarmaServer({
-        configFile: PROJECT_PATH.tests + '/karma.conf.js'
-    });
-    server.start();
 });
 
 Object.keys(JS_BUNDLES).forEach(function (bundleName) {
