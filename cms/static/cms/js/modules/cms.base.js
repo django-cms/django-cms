@@ -320,7 +320,7 @@ var CMS = {
             if (url.split('?').length > 1) {
                 // setup local vars
                 urlArray = url.split('?');
-                urlParams = urlArray[1].split('&');
+                urlParams = urlArray[1].replace(/&(?:amp;)/g, '&').split('&');
                 origin = urlArray[0];
             }
 
