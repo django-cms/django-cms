@@ -156,7 +156,7 @@ gulp.task('tests:unit', function (done) {
     server.start();
 });
 
-gulp.task('tests:watch', function () {
+gulp.task('tests:unit:watch', function () {
     var server = new KarmaServer({
         configFile: PROJECT_PATH.tests + '/karma.conf.js'
     });
