@@ -24,14 +24,15 @@ env:
     # sauce labs access token
     # - secure: Zos3su5QFeEwDCuibiE4nejeDgjgvw59IcEiWTw2L9tzZBBvaXe0plMDum7AeLIeNalYFericsIAegNoix/jfxOC92Nyq2Izh15vk08YvZCLFMUVjtg+ENb84/Km5018VVU6W+7HmfJDDN0fvHzdjHoBLN99BWSQ7XddHQWUs7g=
   matrix:
-    - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
-    - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+    # - DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
+    # - DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
+    # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='emailuserapp.EmailUser'
+    # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
+    - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=0 MIGRATE_OPTION='--migrate'
 
 before_script:
   - pip freeze
@@ -49,17 +50,17 @@ before_install:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/cucumber_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x8"
 
 install:
-  - if [ "$FRONTEND" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; fi
-  # - if [ "$FRONTEND" == 1 ]; then rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && source ~/.nvm/nvm.sh && nvm install 0.12); fi
+  - if [ "$UNIT" != 1 ] || [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g npm@2; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g gulp@3.9.0; fi
   - if [ "$FRONTEND" == 1 ]; then npm install; fi
-  - if [ "$FRONTEND" != 1 ] && [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
-  - if [ "$FRONTEND" != 1 ] && [ "$DATABASE_URL" == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
+  - if [[ "$UNIT" != 1 ] || [ "$LINT" !=1 ]] && [ "$DATABASE_URL" == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip install psycopg2 ; fi
+  - if [[ "$UNIT" != 1 ] || [ "$LINT" !=1 ]] && [ "$DATABASE_URL" == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install mysqlclient ; fi
 
 script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ]; then gulp lint; fi;
+  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then gulp tests:integration; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
