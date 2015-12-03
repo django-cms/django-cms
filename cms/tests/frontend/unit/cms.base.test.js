@@ -37,10 +37,6 @@ describe('cms.base.js', function () {
         });
 
         describe('.makeURL()', function () {
-            it('exists', function () {
-                expect(CMS.API.Helpers.makeURL).toEqual(jasmine.any(Function));
-            });
-
             it('outputs the same url when no additional params passed', function () {
                 var url = CMS.API.Helpers.makeURL('test');
                 expect(url).toEqual('test');
