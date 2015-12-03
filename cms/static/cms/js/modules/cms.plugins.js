@@ -621,33 +621,16 @@ var CMS = window.CMS || {};
                     url: options.urls.move_plugin,
                     data: data,
                     success: function (response) {
-                        var dataDump;
-
                         // if response is reload
                         if (response.reload) {
                             CMS.API.Helpers.reloadBrowser();
                         }
 
-                        // TODO remove this before merge
-                        console.log('current urls: ', that.options.urls);
-                        console.log('new urls: ', response.urls);
-
                         // set new url settings when moving #4803
                         if (response.urls) {
-                            dataDump = plugin.data();
-                            // we need to modify the instance options
-                            that.options = $.extend(true, {}, that.options, {
+                            that._setSettings(options, {
                                 urls: response.urls
                             });
-                            // and next the stored data
-                            dataDump = $.extend(true, {}, dataDump.settings, {
-                                urls: response.urls
-                            });
-                            plugin.data(dataDump);
-
-                            // TODO remove this before merge
-                            console.log('set options: ', dataDump);
-                            console.log('set data: ', dataDump);
                         }
 
                         // enable actions again
@@ -679,7 +662,24 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Opens a modal to delete a plugin
+             * Changes the settings attributes on an initialised plugin.
+             *
+             * @method _setSettings
+             * @param {Object} oldSettings current settings
+             * @param {Object} newSettings new settings to be applied
+             * @private
+             */
+            _setSettings: function _setSettings(oldSettings, newSettings) {
+                var settings = $.extend(true, {}, oldSettings, newSettings);
+                var plugin = $('.cms-plugin-' + settings.plugin_id);
+
+                // set new setting on instance and plugin data
+                this.options = settings;
+                plugin.data('settings', settings);
+            },
+
+            /**
+             * Opens a modal to delete a plugin.
              *
              * @method deletePlugin
              * @param {String} url admin url for deleting a page
@@ -799,16 +799,6 @@ var CMS = window.CMS || {};
                     .on([this.pointerUp, this.click, this.doubleClick].join(' '), function (e) {
                     e.stopPropagation();
                 });
-            },
-
-            /**
-             * Changes the settings attributes on an initialised plugin
-             *
-             * @method _setSettings
-             * @private
-             */
-            _setSettings: function _setSettings() {
-
             },
 
             /**
