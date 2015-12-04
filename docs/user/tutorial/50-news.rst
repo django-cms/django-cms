@@ -12,6 +12,8 @@ Like Aldryn People, Aldryn News & Blog is a separate application that integrates
 Create an **apphook**
 *********************
 
+.. todo:: text needs updating
+
 Just as we did with Aldryn People, we should create an apphook to create a landing page for the
 news items.
 
@@ -24,7 +26,7 @@ We'll create a *News* page, and add an apphook for the Aldryn News & Blog applic
         :alt: 'page settings button'
         :width: 170
 
-* go to advanced settigns
+* go to advanced settings
 
     .. image:: /user/tutorial/images/advanced-settings-button.png
         :alt: 'page settings button'
