@@ -1,3 +1,5 @@
+/* globals jQuery */
+
 'use strict';
 
 describe('cms.base.js', function () {

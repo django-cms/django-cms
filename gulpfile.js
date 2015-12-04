@@ -166,7 +166,7 @@ gulp.task('tests:unit:watch', function () {
     server.start();
 });
 
-// gulp tests:integration --tests=base,base2
+// gulp tests:integration --tests=login,base
 gulp.task('tests:integration', function (done) {
     process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
 
