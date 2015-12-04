@@ -1,3 +1,7 @@
+/* globals $ */
+
+'use strict';
+
 describe('CMS.Modal', function () {
     it('creates a Modal class when document is ready', function (done) {
         $(function () {
