@@ -226,7 +226,7 @@ describe('cms.base.js', function () {
                 }, 20);
             });
 
-            it('should use correct "this" value', function () {
+            it('should use correct `this` value', function () {
                 var actual = [];
                 var object = {
                     method: CMS.API.Helpers.throttle(function () {
