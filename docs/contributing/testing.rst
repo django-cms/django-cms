@@ -144,7 +144,7 @@ Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are
 built using `CasperJS <http://casperjs.org/>`_.
 
 Linting runs against the test files as well with ``gulp tests:lint``. In order
-to run linting continuously, run::
+to run linting continuously, do::
 
     gulp watch
 
