@@ -38,6 +38,7 @@ Add an image to the Filer
 
     .. |new-folder| image:: images/new_folder_button.png
        :alt: the 'New folder' button
+       :width: 130px
 
 #.  When the Filer opens, select |new-folder|.
 
@@ -52,7 +53,8 @@ Add an image to the Filer
     PNG and GIF files are recommended) from your hard disk. The image(s) you upload will be placed
     on the *clipboard*.
 
-    .. todo:: please add image of clipboard (with a new image in it).
+    .. image:: images/image_clipboard.png
+    :alt: the clipboard
 
     .. |image_paste| image:: images/image_paste.png
        :alt: the 'Paste' icon
@@ -116,7 +118,8 @@ Let's move a file.
 #.  Navigate back up the folder hierarchy to the *Root* folder, by using the *move back* icon in
     the Filer. You can also select a folder in the path from the breadcrumb trail just above it.
 
-    .. todo:: can you include the breadcrumbs in the image below please
+    .. image:: images/breadcrumb.png
+       :alt: Breadcrumb
 
     .. image:: images/back_to_root_file.png
        :alt: Moving up in the folder hierarchy
@@ -142,18 +145,21 @@ need.
 
 #.  From the django CMS toolbar, select *People* > *Person* list.
 
-    .. todo:: add an image of *People* > *Person* list please.
+    .. image:: images/person_list.png
+       :alt: showing person list
 
 #.  Choose the Person you want to edit from the list.
 
 #.  Hit the "choose image" icon.
 
-    .. todo:: add an image of the choose image icon.
+    .. image:: images/choose_image.png
+       :alt: showing person list
 
 #.  The Filer will open; find the image you want to use for this Person.
 
 #.  To apply the image to the Person, hit the "select this file"" icon
 
-    .. todo:: add an image of the "select this file" icon.
+    .. image:: images/select_file.png
+       :alt: showing person list
 
 #.  Save the Person, and see your changes.
