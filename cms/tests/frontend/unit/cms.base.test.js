@@ -80,7 +80,67 @@ describe('cms.base.js', function () {
         });
 
         describe('.debounce()', function () {
+            it('debounces the function', function (done) {
+                var count = 0;
+                var fn = function () {
+                    count++;
+                };
 
+                var debounced = CMS.API.Helpers.debounce(fn, 10);
+
+                debounced();
+                debounced();
+                debounced();
+
+                setTimeout(function () {
+                    expect(count).toEqual(1);
+                    done();
+                }, 20);
+            });
+
+            it('should support `immediate` option', function (done) {
+                var withImmediateCount = 0;
+                var withoutImmediateCount = 0;
+                var withImmediate = CMS.API.Helpers.debounce(function () {
+                    withImmediateCount++;
+                }, 10, { immediate: true });
+                var withoutImmediate = CMS.API.Helpers.debounce(function () {
+                    withoutImmediateCount++;
+                }, 10, { immediate: false });
+
+                withImmediate();
+                withImmediate();
+                expect(withImmediateCount).toEqual(1);
+
+                withoutImmediate();
+                withoutImmediate();
+
+                setTimeout(function () {
+                    expect(withImmediateCount).toEqual(1);
+                    expect(withoutImmediateCount).toEqual(1);
+                    withImmediate();
+                    expect(withImmediateCount).toEqual(2);
+
+                    done();
+                }, 20);
+            });
+
+            it('should use correct `this` value', function (done) {
+                var actual = [];
+                var object = {
+                    method: CMS.API.Helpers.debounce(function () {
+                        actual.push(this);
+                    }, 10)
+                };
+
+                object.method();
+                object.method();
+
+                setTimeout(function () {
+                    expect([object]).toEqual(actual);
+                    done();
+                }, 20);
+            });
         });
 
         describe('.throttle()', function () {
