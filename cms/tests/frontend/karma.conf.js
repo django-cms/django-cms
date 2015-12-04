@@ -70,7 +70,11 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.tooltip.js',
 
             // test helpers
-            'cms/tests/frontend/unit/helpers/mock-ajax.js'
+            'cms/tests/frontend/unit/helpers/mock-ajax.js',
+            'cms/tests/frontend/unit/helpers/jasmine-jquery.js',
+
+            // fixtures
+            'cms/tests/frontend/unit/fixtures/**/*.html'
         ].concat(
             // tests themselves
             files.map(function (pattern) {
