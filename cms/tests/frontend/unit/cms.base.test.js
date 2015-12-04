@@ -1,4 +1,4 @@
-/* globals jQuery */
+/* globals jQuery, Class, $ */
 
 'use strict';
 
