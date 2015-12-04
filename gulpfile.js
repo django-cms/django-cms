@@ -17,6 +17,7 @@ var jscs = require('gulp-jscs');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var KarmaServer = require('karma').Server;
+var spawn = require('child_process').spawn;
 
 var argv = require('minimist')(process.argv.slice(2));
 
@@ -39,6 +40,8 @@ var PROJECT_PATTERNS = {
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/widgets/*.js',
         PROJECT_PATH.js + '/gulpfile.js',
+        PROJECT_PATH.tests + '/**/*.js',
+        '!' + PROJECT_PATH.tests + '/coverage/**/*.js',
         '!' + PROJECT_PATH.js + '/modules/jquery.ui.*.js',
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
@@ -145,7 +148,7 @@ gulp.task('lint:javascript', function () {
         .pipe(jshint.reporter('jshint-stylish'));
 });
 
-gulp.task('tests', ['tests:unit']);
+gulp.task('tests', ['tests:unit', 'tests:integration']);
 
 // gulp tests:unit --tests=cms.base,cms.modal
 gulp.task('tests:unit', function (done) {
@@ -161,6 +164,35 @@ gulp.task('tests:unit:watch', function () {
         configFile: PROJECT_PATH.tests + '/karma.conf.js'
     });
     server.start();
+});
+
+// gulp tests:integration --tests=login,base
+gulp.task('tests:integration', function (done) {
+    process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
+
+    var files = [
+        'base',
+        'base2'
+    ];
+
+    if (argv && argv.tests) {
+        files = argv.tests.split(',');
+        gutil.log('Running tests for ' + files.join(', '));
+    }
+
+    var tests = files.map(function (file) {
+        return PROJECT_PATH.tests + '/integration/' + file + '.js';
+    });
+
+    var casperChild = spawn('./node_modules/.bin/casperjs', ['test'].concat(tests));
+
+    casperChild.stdout.on('data', function (data) {
+        gutil.log('CasperJS:', data.toString().slice(0, -1));
+    });
+
+    casperChild.on('close', function (code) {
+        done(code);
+    });
 });
 
 Object.keys(JS_BUNDLES).forEach(function (bundleName) {

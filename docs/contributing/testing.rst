@@ -14,7 +14,7 @@ behave as it expected, and help identify what's going wrong if something breaks
 it.
 
 Not insisting on good tests when code is committed is like letting a gang of
-teenagers without a driving licence borrow your car on a Friday night, even if
+teenagers without a driving license borrow your car on a Friday night, even if
 you think they are very nice teenagers and they really promise to be careful.
 
 We certainly do want your contributions and fixes, but we need your tests with
@@ -101,7 +101,7 @@ and it should then run without errors.
 Advanced testing options
 ========================
 
-Run ``manage.py test --help`` for full list of advanced options.
+Run ``manage.py test --help`` for the full list of advanced options.
 
 Use ``--parallel`` to distribute the test cases across your CPU cores.
 
@@ -139,7 +139,18 @@ Running Frontend Tests
 
 We have two types of frontend tests: unit tests and integration tests.
 For unit tests we are using `Karma <http://karma-runner.github.io/>`_ as a
-testrunner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
+test runner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
+Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are
+built using `CasperJS <http://casperjs.org/>`_.
+
+Linting runs against the test files as well with ``gulp tests:lint``. In order
+to run linting continuously, do::
+
+    gulp watch
+
+
+Unit tests
+----------
 
 Unit tests can be run like this::
 
@@ -150,12 +161,12 @@ the ``--tests`` parameter with comma separated file names, like this::
 
     gulp tests:unit --tests=cms.base,cms.modal
 
-If you want to run tests continuosly you can use the watch command::
+If you want to run tests continuously you can use the watch command::
 
     gulp tests:unit:watch
 
 This will rerun the suite whenever source or test file is changed.
-By default the tests are running on PhantomJS (headless webkit), but when running
+By default, the tests are running on PhantomJS (headless WebKit), but when running
 Karma in watch mode you can also visit the server it spawns with an actual
 browser.
 
@@ -165,13 +176,28 @@ browser.
 
     Describe Saucelabs integration, which is currently disabled.
 
+
+Integration tests
+-----------------
+
+In order to run integration tests you can do::
+
+    gulp tests:integration
+
+While debugging you can use the ``--tests`` parameter as well in order to run test
+suites separately. Note, that usually in order to perform any action you'll need to
+login first, so the login suite should precede the one you want to run::
+
+    gulp tests:integration --tests=login,base
+
+
 *************
 Writing tests
 *************
 
 Contributing tests is widely regarded as a very prestigious contribution (you're
 making everybody's future work much easier by doing so). We'll always accept contributions of
-test without code, but not code without test - which should give you an idea of how important
+a test without code, but not code without a test - which should give you an idea of how important
 tests are.
 
 

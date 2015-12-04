@@ -2,6 +2,7 @@
 
 // #############################################################################
 // CONFIGURATION
+
 var b2s = require('browserslist-saucelabs');
 
 module.exports = {

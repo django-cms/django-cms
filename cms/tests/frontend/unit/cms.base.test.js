@@ -1,3 +1,7 @@
+/* globals jQuery */
+
+'use strict';
+
 describe('cms.base.js', function () {
     it('creates CMS namespace', function () {
         expect(CMS).toBeDefined();
