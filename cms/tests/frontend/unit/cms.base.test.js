@@ -84,7 +84,101 @@ describe('cms.base.js', function () {
         });
 
         describe('.throttle()', function () {
+            it('should throttle a function', function (done) {
+                var count = 0;
+                var fn = function () {
+                    count++;
+                };
 
+                var throttled = CMS.API.Helpers.throttle(fn, 10);
+
+                throttled();
+                throttled();
+                throttled();
+
+                expect(count).toEqual(1);
+                setTimeout(function () {
+                    expect(count).toEqual(2);
+                    done();
+                }, 35);
+            });
+
+            it('subsequent calls should return the result of the first call', function () {
+                var fn = function (param) {
+                    return param;
+                };
+
+                var throttled = CMS.API.Helpers.throttle(fn, 10);
+                var result = [throttled('a'), throttled('b')];
+
+                expect(result).toEqual(['a', 'a']);
+            });
+
+            it('should not trigger a trailing call when invoked once', function (done) {
+                var count = 0;
+                var fn = function () {
+                    count++;
+                };
+
+                var throttled = CMS.API.Helpers.throttle(fn, 10);
+
+                throttled();
+
+                expect(count).toEqual(1);
+                setTimeout(function () {
+                    expect(count).toEqual(1);
+                    done();
+                }, 35);
+            });
+
+            it('should support a leading option', function () {
+                var fn = function (param) {
+                    return param;
+                };
+                var withLeading = CMS.API.Helpers.throttle(fn, 10, { leading: true });
+                var withoutLeading = CMS.API.Helpers.throttle(fn, 10, { leading: false });
+                expect(withLeading('a')).toEqual('a');
+                expect(withoutLeading('a')).toEqual(undefined);
+            });
+
+            it('should support a trailing option', function (done) {
+                var withCount = 0;
+                var withoutCount = 0;
+                var withTrailing = CMS.API.Helpers.throttle(function (param) {
+                    withCount++;
+                    return param;
+                }, 10, { trailing: true });
+                var withoutTrailing = CMS.API.Helpers.throttle(function (param) {
+                    withoutCount++;
+                    return param;
+                }, 10, { trailing: false });
+
+                expect(withTrailing('a')).toEqual('a');
+                expect(withTrailing('b')).toEqual('a');
+
+                expect(withoutTrailing('a')).toEqual('a');
+                expect(withoutTrailing('b')).toEqual('a');
+
+                setTimeout(function () {
+                    expect(withCount).toEqual(2);
+                    expect(withoutCount).toEqual(1);
+                    done();
+                }, 20);
+            });
+
+            it('should use correct "this" value', function () {
+                var actual = [];
+                var object = {
+                    method: CMS.API.Helpers.throttle(function () {
+                        actual.push(this);
+                    }, 10)
+                };
+
+                object.method();
+                object.method();
+
+                expect([object]).toEqual(actual);
+            });
         });
 
         describe('.secureConfirm()', function () {
