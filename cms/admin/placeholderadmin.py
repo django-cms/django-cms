@@ -35,7 +35,7 @@ from cms.utils import (
     get_language_from_request,
     permissions,
 )
-from cms.utils.i18n import get_language_list
+from cms.utils.i18n import get_language_list, force_language
 from cms.utils.plugins import (
     requires_reload,
     has_reached_plugin_limit,
