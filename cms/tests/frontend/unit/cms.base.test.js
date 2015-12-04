@@ -25,7 +25,25 @@ describe('cms.base.js', function () {
         });
 
         describe('.csrf()', function () {
+            it('should set csrf token on ajax requests', function () {
+                var token = 'csrf';
+                var request;
 
+                jasmine.Ajax.install();
+                $.ajax('/test');
+                request = jasmine.Ajax.requests.mostRecent();
+                expect(request.requestHeaders['X-CSRFToken']).toEqual(undefined);
+
+                spyOn($, 'ajaxSetup').and.callThrough();
+                CMS.API.Helpers.csrf(token);
+                expect($.ajaxSetup).toHaveBeenCalled();
+                expect($.ajaxSetup.calls.count()).toEqual(1);
+
+                $.ajax('/test');
+                request = jasmine.Ajax.requests.mostRecent();
+                expect(request.requestHeaders['X-CSRFToken']).toEqual(token);
+                jasmine.Ajax.uninstall();
+            });
         });
 
         describe('.setSettings()', function () {
