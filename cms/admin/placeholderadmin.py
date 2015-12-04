@@ -566,9 +566,20 @@ class PlaceholderAdminMixin(object):
         reorder_plugins(placeholder, parent_id, language, order)
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
+
+        try:
+            language = request.toolbar.toolbar_language
+        except AttributeError:
+            language = get_language_from_request(request)
+
+        with force_language(language):
+            plugin_urls = plugin.get_action_urls()
+
         json_response = {
+            'urls': plugin_urls,
             'reload': move_a_copy or requires_reload(
-                PLUGIN_MOVE_ACTION, [plugin])}
+                PLUGIN_MOVE_ACTION, [plugin])
+        }
         return HttpResponse(
             json.dumps(json_response), content_type='application/json')
 

@@ -839,7 +839,14 @@ class AdminTests(AdminTestsBase):
         source, target = list(page.placeholders.all())[:2]
         pageplugin = add_plugin(source, 'TextPlugin', 'en', body='test')
         plugin_class = pageplugin.get_plugin_class_instance()
-        expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
+
+        with force_language('en'):
+            action_urls = pageplugin.get_action_urls()
+
+        expected = {
+            'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
+            'urls': action_urls,
+        }
         placeholder = Placeholder.objects.all()[0]
         permless = self.get_permless()
         admin_user = self.get_admin()
