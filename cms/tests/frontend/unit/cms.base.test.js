@@ -21,7 +21,44 @@ describe('cms.base.js', function () {
         });
 
         describe('.preventSubmit()', function () {
+            var markup;
+            beforeEach(function () {
+                fixture.setBase('cms/tests/frontend/unit/fixtures');
+                markup = fixture.load('toolbar_form.html');
+            });
 
+            afterEach(function () {
+                fixture.cleanup();
+            });
+
+            it('should prevent forms from being submitted when one form is submitted', function (done) {
+                CMS.API.Toolbar = CMS.API.Toolbar || { showLoader: jasmine.createSpy('spy') };
+                var submitCallback = jasmine.createSpy().and.returnValue(false);
+
+                $(function () {
+                    CMS.API.Helpers.preventSubmit();
+                    var form = $('.cms-toolbar #form1');
+                    var input1 = $('input[type=submit]').eq(0);
+                    var input2 = $('input[type=submit]').eq(1);
+                    form.submit(submitCallback);
+                    form.find('input').trigger('click');
+
+                    expect(input1).toHaveCss({ opacity: '0.5' });
+                    expect(input2).toHaveCss({ opacity: '0.5' });
+
+                    spyOnEvent(input1, 'click');
+                    spyOnEvent(input2, 'click');
+
+                    input1.trigger('click');
+                    input2.trigger('click');
+
+                    expect('click').toHaveBeenPreventedOn(input1);
+                    expect('click').toHaveBeenPreventedOn(input2);
+                    expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
+                    expect(submitCallback).toHaveBeenCalled();
+                    done();
+                });
+            });
         });
 
         describe('.csrf()', function () {
