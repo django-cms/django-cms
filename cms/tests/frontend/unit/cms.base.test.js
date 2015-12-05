@@ -3,6 +3,8 @@
 'use strict';
 
 describe('cms.base.js', function () {
+    fixture.setBase('cms/tests/frontend/unit/fixtures');
+
     it('creates CMS namespace', function () {
         expect(CMS).toBeDefined();
         expect(CMS).toEqual(jasmine.any(Object));
@@ -27,7 +29,6 @@ describe('cms.base.js', function () {
         describe('.preventSubmit()', function () {
             var markup;
             beforeEach(function () {
-                fixture.setBase('cms/tests/frontend/unit/fixtures');
                 markup = fixture.load('toolbar_form.html');
             });
 
@@ -305,15 +306,140 @@ describe('cms.base.js', function () {
         });
 
         describe('.addEventListener()', function () {
+            beforeEach(function () {
+                fixture.load('cms_root.html');
+            });
 
+            afterEach(function () {
+                fixture.cleanup();
+            });
+
+            it('adds an event', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+                    CMS.API.Helpers.addEventListener('my-event', $.noop);
+
+                    expect($('#cms-top')).toHandle('cms-my-event');
+
+                    done();
+                });
+            });
+            it('adds multiple events', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+                    CMS.API.Helpers.addEventListener('my-event my-other-event', $.noop);
+
+                    expect($('#cms-top')).toHandle('cms-my-event');
+                    expect($('#cms-top')).toHandle('cms-my-other-event');
+
+                    done();
+                });
+            });
         });
 
         describe('.removeEventListener()', function () {
+            beforeEach(function () {
+                fixture.load('cms_root.html');
+            });
 
+            afterEach(function () {
+                fixture.cleanup();
+            });
+            it('removes an event', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+
+                    CMS.API.Helpers.addEventListener('my-event', $.noop);
+                    CMS.API.Helpers.removeEventListener('my-event');
+
+                    expect($('#cms-top')).not.toHandle('cms-my-event');
+
+                    done();
+                });
+            });
+
+            it('removes an event with correct handler', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+                    var fn = function () {
+                        expect(true).toEqual(true);
+                    };
+
+                    CMS.API.Helpers.addEventListener('my-event', $.noop);
+                    CMS.API.Helpers.addEventListener('my-event', fn);
+                    CMS.API.Helpers.removeEventListener('my-event', $.noop);
+
+                    expect($('#cms-top')).toHandleWith('cms-my-event', fn);
+                    expect($('#cms-top')).not.toHandleWith('cms-my-event', $.noop);
+
+                    done();
+                });
+            });
+
+            it('removes multiple events', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+
+                    CMS.API.Helpers.addEventListener('my-event my-other-event', $.noop);
+                    CMS.API.Helpers.removeEventListener('my-event my-other-event');
+
+                    expect($('#cms-top')).not.toHandle('cms-my-event');
+                    expect($('#cms-top')).not.toHandle('cms-my-other-event');
+
+                    done();
+                });
+            });
         });
 
         describe('.dispatchEvent()', function () {
+            beforeEach(function () {
+                fixture.load('cms_root.html');
+            });
 
+            afterEach(function () {
+                fixture.cleanup();
+            });
+            it('dispatches an event', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+                    var fn = jasmine.createSpy();
+                    CMS.API.Helpers.addEventListener('my-event', fn);
+                    CMS.API.Helpers.dispatchEvent('my-event');
+                    expect(fn).toHaveBeenCalled();
+                    done();
+                });
+            });
+
+            it('does not dispatch multiple events', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+                    var fn1 = jasmine.createSpy();
+                    var fn2 = jasmine.createSpy();
+
+                    CMS.API.Helpers.addEventListener('my-event', fn1);
+                    CMS.API.Helpers.addEventListener('my-another-event', fn2);
+                    CMS.API.Helpers.dispatchEvent('my-event my-another-event');
+                    expect(fn1).not.toHaveBeenCalled();
+                    expect(fn2).not.toHaveBeenCalled();
+                    done();
+                });
+            });
+
+            it('can attach payload to event', function (done) {
+                $(function () {
+                    CMS._eventRoot = $('#cms-top');
+                    var fn = jasmine.createSpy();
+
+                    CMS.API.Helpers.addEventListener('my-event', fn);
+                    CMS.API.Helpers.dispatchEvent('my-event', {
+                        payload: 'djangoCMS'
+                    });
+                    expect(fn).toHaveBeenCalledWith(jasmine.any(Object), {
+                        payload: 'djangoCMS'
+                    });
+                    done();
+                });
+            });
         });
 
         describe('.once()', function () {
