@@ -317,7 +317,35 @@ describe('cms.base.js', function () {
         });
 
         describe('.once()', function () {
+            it('executes given function only once', function () {
+                var count = 0;
+                var fn = function () {
+                    count++;
+                };
+                var onced = CMS.API.Helpers.once(fn);
 
+                onced();
+                onced();
+                onced();
+                onced();
+
+                expect(count).toEqual(1);
+            });
+
+            it('should use correct `this` value', function () {
+                var actual = [];
+                var object = {
+                    method: CMS.API.Helpers.once(function () {
+                        actual.push(this);
+                    })
+                };
+
+                object.method();
+                object.method();
+                object.method();
+
+                expect([object]).toEqual(actual);
+            });
         });
 
         describe('.preventTouchScrolling()', function () {
