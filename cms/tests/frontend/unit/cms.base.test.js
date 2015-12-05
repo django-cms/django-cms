@@ -1,4 +1,4 @@
-/* globals jQuery, Class, $ */
+/* globals jQuery, Class, $, document */
 
 'use strict';
 
@@ -475,11 +475,26 @@ describe('cms.base.js', function () {
         });
 
         describe('.preventTouchScrolling()', function () {
-
+            it('prevents touch move on an element', function () {
+                CMS.API.Helpers.preventTouchScrolling($(document), 'tests');
+                expect($(document)).toHandle('touchmove');
+                expect($(document)).toHandle('touchmove.cms.preventscroll.tests');
+                var event = spyOnEvent(document, 'touchmove');
+                $(document).trigger('touchmove');
+                expect(event).toHaveBeenPrevented();
+            });
         });
 
+        // depends on the previous one
         describe('.allowTouchScrolling()', function () {
-
+            it('allows touch move on an element', function () {
+                expect($(document)).toHandle('touchmove');
+                expect($(document)).toHandle('touchmove.cms.preventscroll.tests');
+                CMS.API.Helpers.allowTouchScrolling($(document), 'tests');
+                var event = spyOnEvent(document, 'touchmove');
+                $(document).trigger('touchmove');
+                expect(event).not.toHaveBeenPrevented();
+            });
         });
     });
 });
