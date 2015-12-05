@@ -73,8 +73,8 @@ var CMS = {
      * @return {String} string containing space separated namespaced event names
      */
     var _ns = function nameSpaceEvent(events) {
-        return events.split(/\s+/g).map(function (className) {
-            return 'cms-' + className;
+        return events.split(/\s+/g).map(function (eventName) {
+            return 'cms-' + eventName;
         }).join(' ');
     };
 
