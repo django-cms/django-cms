@@ -44,6 +44,7 @@ def make_revision_with_plugins(obj, user=None, message=None):
     # we can safely import reversion - calls here always check for
     # reversion in installed_applications first
     from cms.utils.reversion_hacks import revision_context,  revision_manager
+
     cls = obj.__class__
     if hasattr(revision_manager, '_registration_key_for_model'):
         model_key = revision_manager._registration_key_for_model(cls)

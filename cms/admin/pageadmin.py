@@ -216,9 +216,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             new = True
         obj.save()
 
-        if 'recover' in request.path_info or 'history' in request.path_info:
-            revert_plugins(request, obj.version.pk, obj)
-
         if target is not None and position is not None:
             try:
                 target = self.model.objects.get(pk=target)
@@ -472,7 +469,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
     def _get_site_languages(self, obj=None):
-        site_id = None
         if obj:
             site_id = obj.site_id
         else:
@@ -500,6 +496,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         # save the object again, so all the related changes to page model
         # can be published if required
+        print("hange", request.method)
         obj.save()
         return super(PageAdmin, self).response_change(request, obj)
 
@@ -765,6 +762,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         extra_context = self.update_language_tab_context(request, None, extra_context)
         request.original_version_id = version_id
         response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
+        if request.method == 'POST':
+            if 'recover' in request.path_info or 'history' in request.path_info:
+                version = get_object_or_404(Version, pk=version_id)
+                obj = get_object_or_404(Page, pk=version.object_id)
+                revert_plugins(request, version_id, obj)
+                return HttpResponseRedirect(reverse('admin:cms_page_change', args=(object_id,)))
         return response
 
     def history_view(self, request, object_id, extra_context=None):

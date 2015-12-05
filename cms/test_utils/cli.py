@@ -96,8 +96,6 @@ def configure(db_url, **extra):
             'djangocms_text_ckeditor',
             'djangocms_column',
             'djangocms_picture',
-            'djangocms_file',
-            'djangocms_flash',
             'djangocms_googlemap',
             'djangocms_teaser',
             'djangocms_video',
@@ -315,12 +313,13 @@ def configure(db_url, **extra):
             }
         ]
 
-    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_flash', 'djangocms_googlemap',
+    plugins = ('djangocms_column', 'djangocms_googlemap',
                'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
                'djangocms_teaser', 'djangocms_video')
 
     DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
 
+    print(defaults)
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
         defaults['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES

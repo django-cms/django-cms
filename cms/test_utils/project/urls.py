@@ -33,10 +33,10 @@ urlpatterns += i18n_patterns('',
         kwargs={'authentication_form': LoginForm}),
     url(r'^sample/login3/$', login,
         kwargs={'authentication_form': LoginForm3}),
-    url(r'^admin/', include(admin.site.urls)),
+    #url(r'^admin/', include(admin.site.urls)),
     url(r'^example/$', example_view),
     url(r'^plain_view/$', plain_view),
-    url(r'^', include('cms.urls')),
+    #url(r'^', include('cms.urls')),
 )
 
 

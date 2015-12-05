@@ -13,9 +13,12 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
-from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
+from cms.test_utils.testcases import (
+    CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD,
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
+)
 from cms.utils.reversion_hacks import Revision, reversion, Version
+
 
 class BasicReversionTestCase(CMSTestCase):
     def setUp(self):
@@ -267,6 +270,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             recover_url += "%s/" % version.pk
             response = self.client.get(recover_url)
             self.assertEqual(response.status_code, 200)
+            print(recover_url)
             response = self.client.post(recover_url, page_data2)
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page2_pk)
             self.assertEqual(Page.objects.all().count(), 5)
