@@ -65,7 +65,6 @@ var CMS = {
 // CMS.API
 (function ($) {
     'use strict';
-    var root;
     /**
      * @function _ns
      * @private
@@ -496,7 +495,7 @@ var CMS = {
          * @param {Function} fn callback to run when the event happens
          */
         addEventListener: function addEventListener(eventName, fn) {
-            return root.on(_ns(eventName), fn);
+            return CMS._eventRoot.on(_ns(eventName), fn);
         },
 
         /**
@@ -507,7 +506,7 @@ var CMS = {
          * @param {Function} [fn] specific callback to be removed
          */
         removeEventListener: function removeEventListener(eventName, fn) {
-            return root.off(_ns(eventName), fn);
+            return CMS._eventRoot.off(_ns(eventName), fn);
         },
 
         /**
@@ -517,7 +516,7 @@ var CMS = {
          * @param {Object} payload whatever payload required for the consumer
          */
         dispatchEvent: function dispatchEvent(eventName, payload) {
-            return root.trigger(_ns(eventName), [payload]);
+            return CMS._eventRoot.trigger(_ns(eventName), [payload]);
         },
 
         /**
@@ -570,7 +569,7 @@ var CMS = {
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        root = $('#cms-top');
+        CMS._eventRoot = $('#cms-top');
         // autoinits
         CMS.API.Helpers.preventSubmit();
     });
