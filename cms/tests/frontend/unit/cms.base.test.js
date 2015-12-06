@@ -1,4 +1,4 @@
-/* globals jQuery, Class, $, document */
+/* globals jQuery, Class, $, document, window */
 
 'use strict';
 
@@ -302,7 +302,33 @@ describe('cms.base.js', function () {
         });
 
         describe('.secureConfirm()', function () {
+            it('returns true if confirm is prevented', function () {
+                spyOn(window, 'confirm').and.callFake(function (message) {
+                    expect(message).toEqual('message');
+                    return false;
+                });
+                expect(CMS.API.Helpers.secureConfirm('message')).toEqual(true);
+            });
 
+            it('returns actual value if confirm is not prevented', function () {
+                jasmine.clock().install();
+                jasmine.clock().mockDate();
+                spyOn(window, 'confirm').and.callFake(function () {
+                    jasmine.clock().tick(15);
+                    return false;
+                });
+
+                expect(CMS.API.Helpers.secureConfirm('cms')).toEqual(false);
+
+                window.confirm.and.callFake(function () {
+                    jasmine.clock().tick(15);
+                    return true;
+                });
+
+                expect(CMS.API.Helpers.secureConfirm('cms')).toEqual(true);
+
+                jasmine.clock().uninstall();
+            });
         });
 
         describe('.addEventListener()', function () {

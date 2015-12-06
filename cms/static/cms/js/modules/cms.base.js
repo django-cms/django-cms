@@ -483,6 +483,7 @@ var CMS = {
                 localStorage.removeItem(mod);
                 return true;
             } catch (e) {
+                // istanbul ignore next
                 return false;
             }
         }()),
