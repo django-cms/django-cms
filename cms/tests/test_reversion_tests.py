@@ -9,7 +9,7 @@ from djangocms_text_ckeditor.models import Text
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
-import reversion
+from reversion import revisions as reversion
 from reversion.models import Revision, Version
 
 from cms.models import Page, Title, Placeholder
