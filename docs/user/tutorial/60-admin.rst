@@ -53,6 +53,7 @@ Add an image to the Filer
 
     .. image:: images/image_clipboard.png
         :alt: the clipboard
+        :align: center
 
     .. |image_paste| image:: images/image_paste.png
        :alt: the 'Paste' icon
@@ -157,6 +158,9 @@ need.
     .. |file-select| image:: images/file-select.png
         :alt: the 'File selection' icon
 
+    .. image:: images/choose_image.png
+       :alt: showing person list
+
 #.  The Filer will open; find the image you want to use for this Person.
 
 #.  To apply the image to the Person, hit the |use-this-file| (use this file) icon.
@@ -164,5 +168,8 @@ need.
     .. |use-this-file| image:: images/select_file.png
        :alt: 'use this file'
 
+
+    .. image:: images/select_file.png
+       :alt: showing person list
 
 #.  Save the Person, and see your changes.
