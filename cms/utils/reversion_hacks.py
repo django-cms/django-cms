@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import reversion
+from reversion import revisions as reversion
 from reversion.revisions import RegistrationError, VersionAdapter
 
 

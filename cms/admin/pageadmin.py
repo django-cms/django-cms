@@ -59,7 +59,7 @@ require_POST = method_decorator(require_POST)
 
 if is_installed('reversion'):
     from reversion.admin import VersionAdmin as ModelAdmin
-    from reversion import create_revision
+    from reversion.revisions import create_revision
 else:  # pragma: no cover
     from django.contrib.admin import ModelAdmin
 
