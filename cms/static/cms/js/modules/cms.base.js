@@ -281,7 +281,7 @@ var CMS = {
                     },
                     error: function (jqXHR) {
                         CMS.API.Messages.open({
-                            message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                            message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
                     }
