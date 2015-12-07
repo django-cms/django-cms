@@ -187,7 +187,8 @@ var CMS = {
         /**
          * Sends or retrieves a JSON from localStorage
          * or the session (through synchronous ajax request)
-         * if localStorage is not available.
+         * if localStorage is not available. Does not merge with
+         * previous setSettings calls.
          *
          * @method setSettings
          * @param settings
@@ -229,7 +230,7 @@ var CMS = {
                     },
                     error: function (jqXHR) {
                         CMS.API.Messages.open({
-                            message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                            message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
                     }
