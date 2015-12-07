@@ -2,29 +2,26 @@
 Managing pages
 ##############
 
-Our menu of pages is growing.
+Our menu of pages is growing:
 
-.. todo:: image of pages in navigation (not admin) menu
+.. image:: /user/tutorial/images/menu_multiple_items.png
+   :alt: the navigation menu
 
-We can see this list of pages in the admin too.
+As we continue adding pages, we're going to start running out of space in our navigation menu. There's room for three, but there won't be for 30.
 
-From the toolbar, choose *Pages* from the **site menu**.
+We can see this list of pages in the admin too, by selecting *Pages* from the **site menu** in the toolbar:
 
 .. image:: /user/tutorial/images/site-menu.png
-    :alt: the site menu
-    :width: 435
-    :align: center
+   :alt: the site menu
+   :align: center
 
-This will show the page list in the overlay.
+This will show the **page list** in the overlay.
 
 .. image:: /user/tutorial/images/page_tree_growing.png
    :alt: the page tree in the admin
-   :width: 600
+   :align: center
 
-As we continue adding pages, we're going to start running out of space in our navigation menu at
-the top of each page. There's room for three, but there won't be for 30.
-
-The solution is to *nest* pages, in a hierarchy, so that rather than::
+The solution to the space problem is to *nest* pages, in a hierarchy, so that rather than::
 
     Home
     How to find us
@@ -37,6 +34,11 @@ it becomes::
         How to find us
         People
 
+
+***************************************
+Create a new *Contact information* page
+***************************************
+
 So let's add a *Contact information* page and move the other two within it.
 
 #.  Add a new page by selecting |add_page_from_tree|.
@@ -48,31 +50,75 @@ So let's add a *Contact information* page and move the other two within it.
 
     .. image:: /user/tutorial/images/name_of_parent_page.png
        :alt: Enter title of parent page
-       :width: 100%
 
 #.  |save_button| the page.
 
     .. |save_button| image:: /user/tutorial/images/save_button.png
        :alt: Save
 
-    .. todo:: doesn't the page need to be published too?
 
-#.  Now move the *How to find us* and *People* pages, by dragging them over the *Contact
-    information* page - you'll see a little **+** symbol light up when you're in the right place..
+***********************
+Rearrange the hierarchy
+***********************
+
+#.  Now move the *How to find us*, by dragging it over the *Contact
+    information* page - you'll see a little "**+**" symbol light up when you're in the right place..
 
     .. image:: /user/tutorial/images/drag_drop_subpage.png
        :alt: Drag and drop subpage
+
+#.  Do the same for the *People* page.
+
+The page list should now look like this:
+
+.. image:: /user/tutorial/images/page_tree_clean.png
+   :alt: 'Page tree clean'
+   :align: center
+
+
+**************************************
+Publish the *Contact information* page
+**************************************
+
+.. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
+   :alt: 'Publish page now'
+
+*Contact information* is a new page and hasn't yet been published.
+
+You can see that in both its *language columns*, *en* and *de*, it has a grey dot, indictating that
+it is not published in either of those languages.
+
+You've previously :ref:`published pages <publishing_pages>` using the |publish-page-now| button,
+but we'll show you a new way to do it:
+
+#.  Find the *Contact information* page in the tree. Tap (if you're using a touch-screen) or hover
+    over the publishing status indicator (|grey-dot|) in the *en* column next to its page name to
+    reveal the options.
+
+    .. |grey-dot| image:: /user/tutorial/images/grey-dot.png
+       :alt: publishing status indicator icon
+       :width: 38
+
+#.  Select |publish| from the options.
+
+    .. |publish| image:: /user/tutorial/images/publish.png
+       :alt: Publish
+       :width: 79
+
+    .. image:: /user/tutorial/images/publish_page_from_page_tree.png
+       :alt: Publish page from page tree
        :width: 400px
 
-    The page list should now look like this:
+.. important::
 
-    .. |page_tree_clean| image:: /user/tutorial/images/page_tree_clean.png
-       :alt: 'Page tree clean'
-       :width: 600
+    If you don't publish the aprent page, *Contact information*, then none of its children will be
+    accessible, even if they are themselves published.
 
 And here's the result when you switch back to *Content* mode:
 
-.. todo:: screenshot of new menu with extended *Contact information* node
+.. image:: /user/tutorial/images/contact_info_menu_extended.png
+   :alt: Contact information extended menu
+   :align: center
 
 .. note::
 

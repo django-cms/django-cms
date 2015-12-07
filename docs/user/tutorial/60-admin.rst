@@ -53,8 +53,8 @@ Add an image to the Filer
     PNG and GIF files are recommended) from your hard disk. The image(s) you upload will be placed
     on the *clipboard*.
 
-    .. image:: images/clipboard.png
-      :alt: the clipboard
+    .. image:: images/image_clipboard.png
+    :alt: the clipboard
 
     .. |image_paste| image:: images/image_paste.png
        :alt: the 'Paste' icon

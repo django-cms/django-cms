@@ -41,7 +41,8 @@ Page wizard* will open a new dialog box.
    :align: center
 
 
-==========
+.. publishing_pages:
+
 Publishing
 ==========
 
@@ -60,7 +61,6 @@ explicitly published.
    :alt: Newly-created page
 
 
-===============
 Further editing
 ===============
 
