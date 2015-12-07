@@ -23,7 +23,215 @@ describe('cms.base.js', function () {
         });
 
         describe('.reloadBrowser()', function () {
+            beforeEach(function () {
+                window._originalParent = window.parent;
+                window.parent = {
+                    location: {
+                        href: '',
+                        reload: jasmine.createSpy()
+                    },
+                    CMS: {
+                        config: {
+                            request: {
+                                model: 'model',
+                                pk: 'pk'
+                            }
+                        },
+                        API: {}
+                    },
+                    setTimeout: jasmine.createSpy().and.callFake(function (cb, timeout) {
+                        expect(timeout).toEqual(0);
+                        cb();
+                    })
+                };
+            });
 
+            afterEach(function () {
+                window.parent = window;
+            });
+
+            it('reloads the browser if no `ajax` and `url` was passed', function () {
+                CMS.API.Helpers.reloadBrowser(false, false, false);
+
+                expect(window.parent.location.reload).toHaveBeenCalled();
+            });
+
+            it('redirects the browser to an url if no `ajax`, but `url` was passed', function () {
+                CMS.API.Helpers.reloadBrowser('/url', false, false);
+
+                expect(window.parent.location.href).toEqual('/url');
+                expect(window.parent.location.reload).not.toHaveBeenCalled();
+            });
+
+            it('makes a request when `ajax` and `url` is passed', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser('/url', false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(window.parent.CMS.API.locked).toEqual(false);
+                expect(window.parent.location.reload).not.toHaveBeenCalled();
+            });
+
+            it('calls itself with the url if `ajax` and `url` is passed', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser('/url', false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
+                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual(['/url']);
+                expect(window.parent.CMS.API.locked).toEqual(false);
+                expect(window.parent.location.reload).not.toHaveBeenCalled();
+            });
+
+            it('does nothing if `ajax` is passed but `url` is not and response from server is empty', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser(false, false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(1);
+                expect(window.parent.CMS.API.locked).toEqual(false);
+                expect(window.parent.location.reload).not.toHaveBeenCalled();
+            });
+
+            it('calls itself with the url that comes from server if `ajax` and `url` is passed', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('/url-from-server');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser('/url', false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
+                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual(['/url-from-server']);
+                expect(window.parent.CMS.API.locked).toEqual(false);
+                expect(window.parent.location.reload).not.toHaveBeenCalled();
+            });
+
+            it('calls itself with the url that comes from server if `ajax` is passed and `url` is not', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('/url-from-server');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser(false, false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
+                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual(['/url-from-server']);
+                expect(window.parent.CMS.API.locked).toEqual(false);
+                expect(window.parent.location.reload).not.toHaveBeenCalled();
+            });
+
+            it('calls itself if url is REFRESH_PAGE and there is no response from server', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser('REFRESH_PAGE', false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
+                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual([]);
+                expect(window.parent.CMS.API.locked).toEqual(false);
+                expect(window.parent.location.reload).toHaveBeenCalled();
+            });
+
+            it('uses correct timeout', function () {
+                window.parent.CMS.config.request.url = '/my-url';
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                window.parent.setTimeout = jasmine.createSpy().and.callFake(function (cb, timeout) {
+                    expect(timeout).toEqual(50);
+                    cb();
+                });
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser('/new-url', 50, false)).toEqual(undefined);
+                expect($.ajax).not.toHaveBeenCalled();
+                expect(window.parent.location.href).toEqual('/new-url');
+            });
         });
 
         describe('.preventSubmit()', function () {
