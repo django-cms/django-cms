@@ -4,10 +4,7 @@ import json
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib.admin.helpers import AdminForm
-try:
-    from django.contrib.admin.utils import get_deleted_objects
-except ImportError:
-    from django.contrib.admin.util import get_deleted_objects
+from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (
@@ -599,12 +596,8 @@ class PlaceholderAdminMixin(object):
         opts = plugin_class._meta
         using = router.db_for_write(plugin_class)
         app_label = opts.app_label
-        if DJANGO_1_7:
-            deleted_objects, perms_needed, protected = get_deleted_objects(
-                [plugin], opts, request.user, self.admin_site, using)
-        else:
-            deleted_objects, __, perms_needed, protected = get_deleted_objects(
-                [plugin], opts, request.user, self.admin_site, using)
+        deleted_objects, __, perms_needed, protected = get_deleted_objects(
+            [plugin], opts, request.user, self.admin_site, using)
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
@@ -644,12 +637,8 @@ class PlaceholderAdminMixin(object):
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         app_label = opts.app_label
-        if DJANGO_1_7:
-            deleted_objects, perms_needed, protected = get_deleted_objects(
-                plugins, opts, request.user, self.admin_site, using)
-        else:
-            deleted_objects, __, perms_needed, protected = get_deleted_objects(
-                plugins, opts, request.user, self.admin_site, using)
+        deleted_objects, __, perms_needed, protected = get_deleted_objects(
+            plugins, opts, request.user, self.admin_site, using)
 
         obj_display = force_text(placeholder)
         if request.POST:  # The user has already confirmed the deletion.

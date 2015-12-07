@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from cms.utils.compat import DJANGO_1_7
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models
@@ -99,7 +98,7 @@ class Placeholder(models.Model):
         Generic method to check the permissions for a request for a given key,
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
-          * 'add' and 'change' permissions on placeholder need either on add or change 
+          * 'add' and 'change' permissions on placeholder need either on add or change
             permission on attached object to be granted.
           * 'delete' need either on add, change or delete
         """
@@ -165,10 +164,7 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
@@ -185,20 +181,14 @@ class Placeholder(models.Model):
             relations = self._meta.get_all_related_objects()
 
             for rel in relations:
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent == Page or parent == StaticPlaceholder:
                     relations.insert(0, relations.pop(relations.index(rel)))
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:

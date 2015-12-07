@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import urlutils
 

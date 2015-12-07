@@ -10,7 +10,6 @@ from django.utils.encoding import smart_str
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 from cms.models import Page, GlobalPagePermission
 from cms.utils import get_language_from_request, get_language_list, get_cms_setting
-from cms.utils.compat import DJANGO_1_7
 
 NOT_FOUND_RESPONSE = "NotFound"
 
@@ -21,10 +20,7 @@ def jsonify_request(response):
          * status: original response status code
          * content: original response content
     """
-    if DJANGO_1_7:
-        content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
-    else:
-        content = {'status': response.status_code, 'content': smart_str(response.content, response.charset)}
+    content = {'status': response.status_code, 'content': smart_str(response.content, response.charset)}
     return HttpResponse(json.dumps(content), content_type="application/json")
 
 

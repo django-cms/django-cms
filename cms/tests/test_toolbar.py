@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import datetime
 from operator import attrgetter
 import re
@@ -27,8 +26,7 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
-                                      ClearURLs)
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
@@ -93,7 +91,7 @@ class ToolbarTestBase(CMSTestCase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
-class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
+class ToolbarMiddlewareTest(ToolbarTestBase):
     @override_settings(CMS_APP_NAME=None)
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
