@@ -1,126 +1,145 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_static admin_list cms_admin cms_js_tags %}
+{% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags %}
 
+{# admin_list admin_urls cms_admin cms_js_tags #}
+
+{# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
-
-{% if not is_popup %}{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="../../">{% trans "Home" %}</a> &rsaquo;
-    <a href="../">{% firstof cl.opts.app_config.verbose_name app_label|capfirst|escape %}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
-    {% if request.REQUEST.q %}
-    &rsaquo; {% trans "Search" %}
-    {% endif %}
-</div>
-{% endblock %}{% endif %}
-
 {% block coltype %}flex{% endblock %}
+{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
+{% block pagination %}{% endblock %}
+
 {% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" type="text/css" />
-<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" type="text/css" />
-<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" type="text/css" />
-{% if cl.is_filtered %}
-<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" type="text/css" />
-{% endif %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'cms/css/cms.base.css' %}">
+    <link rel="stylesheet" href="{% static 'cms/css/cms.pagetree.css' %}">
+    <link rel="stylesheet" href="{% static 'cms/js/jstree/tree_component.css' %}">
+    {# TODO why? #}
+    {% if cl.is_filtered %}
+        <link rel="stylesheet" href="{% static 'cms/js/libs/jstree/themes/default/style.min.css' %}">
+    {% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
-{{ block.super }}
-{% block jquery %}{% endblock %}
-{# load nonconflict pre and post files to fix conflict if there is another jQuery loaded #}
-{# the code is included by a external file because the code has to be loaded into a python file where the wizard is loaded as well #}
-<script src="{% static "cms/js/modules/jquery.noconflict.pre.js" %}" type="text/javascript"></script>
-<script src="{% static "cms/js/dist/bundle.admin.base.min.js" %}" type="text/javascript"></script>
-{# load changelist and jstree #}
-<script src="{% static "cms/js/dist/bundle.admin.changelist.min.js" %}" type="text/javascript"></script>
-<script>
-(function($) {
-// CMS.$ will be passed for $
-$(document).ready(function () {
-    // bind csrf token to the header
-    CMS.API.Helpers.csrf('{{ csrf_token }}');
-
-    // initialize tree
-    new CMS.TreeManager({
-        'settings': {
-            'staticPath': '{{ STATIC_URL }}',
-            'permission': {{ CMS_PERMISSION|bool }},
-            'debug': {{ DEBUG|bool }},
-            'filtered': {{ cl.is_filtered|bool }}
-        },
-        'lang': {
-            'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
-            'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
-            'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
-            'publish': '{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}'
-        }
-    });
-});
-})(CMS.$);
-</script>
-<script src="{% static "cms/js/modules/jquery.noconflict.post.js" %}" type="text/javascript"></script>
+    {{ block.super }}
+    <script src="{% static 'cms/js/modules/jquery.noconflict.pre.js' %}"></script>
+    <script src="{% static 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
+    <script src="{% static 'cms/js/libs/jstree/jstree.min.js' %}"></script>
+    <script src="{% static 'cms/js/modules/cms.pagetree.js' %}"></script>
+    <script src="{% static 'cms/js/modules/jquery.noconflict.post.js' %}"></script>
 {% endblock extrahead %}
 
-{% block content %}
-
-<div id="content-main"{% if cl.is_filtered %} class="activ-filter"{% endif %}>
+{% if not is_popup %}
+    {% block breadcrumbs %}
+        <div class="breadcrumbs">
+            <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+            <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
+            {{ opts.verbose_name_plural|capfirst|escape }}
+            {# TODO might remove this or add reset #}
+            {% if request.REQUEST.q %}
+            &rsaquo; {% trans "Search" %}
+            {% endif %}
+        </div>
+    {% endblock %}
+{% endif %}
 
 {% block object-tools %}
-
     <ul class="object-tools">
         {% if has_recover_permission %}
-            <li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
+            <li>
+                <a href="{% url opts|admin_urlname:'recoverlist' %}" class="recoverlink">
+                    {% blocktrans with cl.opts.verbose_name_plural|escape as name %}
+                        Recover deleted {{ name }}
+                    {% endblocktrans %}
+                </a>
+            </li>
         {% endif %}
         {% if has_add_permission %}
-        <li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
+            <li>
+                <a href="{% url opts|admin_urlname:'add' %}" class="addlink">
+                    {% blocktrans with cl.opts.verbose_name as name %}
+                        Add {{ name }}
+                    {% endblocktrans %}
+                </a>
+            </li>
         {% endif %}
     </ul>
+{% endblock object-tools %}
 
-    <div id="loader-message">{% trans "Loading..." %}</div>
-
-{% endblock %}
-<div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
 {% block search %}
+    {# TODO needs markup comparison #}
+    {# TODO integrate site selector #}
+    {# TODO standard search form #}
+    {# search_form cl #}
+    <form action="." method="get" hidden="hidden">
+        <label for="field-search">{% trans "Search" %}</label>
+        <input type="text" name="q" id="field-search" value="{{ request.GET.q }}">
 
-<form action="." method="post">
-{% if cl.has_access_to_multiple_sites %}
-    <div id="site-selector">{% trans "Pages on:" %}
-        <select id="site-select" name="site__exact">
+        <label for="field-search-site">{% trans "Pages on:" %}</label>
+        <select name="site__exact" id="field-search-site">
             {% for site in cl.sites %}
-            <option {% if site.pk == cl.current_site.pk %}selected {% endif %}value="{{ site.pk }}">{{ site.name }}</option>
+            <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected="selected"{% endif %}>{{ site.name }}</option>
             {% endfor %}
         </select>
-        <input type="hidden" id="site-copy" name="copy" />
+
+        <input type="submit" value="{% trans "Search" %}">
+        <input type="hidden" name="copy">
         {% csrf_token %}
-    </div>
-{% else %}
-    <input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
-{% endif %}
-</form>
-
-{% search_form cl %}
-
+    </form>
 {% endblock %}
-{% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
 {% block filters %}
-{% if cl.has_filters %}
-<a href="#" id="changelist-filter-button">{% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}</a>
-<div id="changelist-filter" style="display:none;">
-<h2>{% trans 'Filter' %}</h2>
-{% for spec in cl.filter_specs %}
-    {% clean_admin_list_filter cl spec %}
-{% endfor %}
-</div>
-{% endif %}
+    {# TODO this should be untouched #}
+    {% if cl.has_filters %}
+        <a href="#" id="changelist-filter-button">
+            {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
+        </a>
+        <div id="changelist-filter" hidden="hidden">
+            <h2>{% trans "Filter" %}</h2>
+            {% for spec in cl.filter_specs %}
+                {% clean_admin_list_filter cl spec %}
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}
 
-{% include "admin/cms/page/tree/base_header.html" %}
+{% block result_list %}
+    <div class="clear"></div>
+    <p>Page Tree</p>
 
-</div>
-</div>
+    <div class="cms-pagetree js-cms-pagetree" data-json='{
+        "csrf": "{{ csrf_token }}",
+        "static": "{{ STATIC_URL }}",
+        "permission": "{{ CMS_PERMISSION|bool }}",
+        "debug": "{{ DEBUG|bool }}",
+        "filtered": "{{ cl.is_filtered|bool }}",
+        "lang": {
+            "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
+            "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
+            "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
+            "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
+            "loading": "{% trans "Loading..." %}"
+        }
+    }'>
+        <p>Pagetree</p>
+    </div>
 
-<div id="dialogs"></div>
+    {# TODO there are dialogs loaded for the persmission checks #}
+    <div id="dialogs"></div>
 
-{% endblock %}
+    {# is loading from TODO #}
+    {% for page in cl.get_items %}
+        {% show_admin_menu page %}
+    {% endfor %}
+
+    {# add default if there is no page #}
+    {% if not cl.get_items %}
+        {% url opts|admin_urlname:'add' as add_url %}
+        {% blocktrans %}
+            <em>There is no page around yet.</em>
+            <br>
+            <a href="{{ add_url }}" class="addlink">Add page</a> now.
+        {% endblocktrans %}
+    {% endif %}
+{% endblock result_list %}
