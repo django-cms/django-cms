@@ -51,8 +51,6 @@ Add an image to the Filer
     PNG and GIF files are recommended) from your hard disk. The image(s) you upload will be placed
     on the *clipboard*.
 
-    .. todo:: add missing image
-
     .. image:: images/image_clipboard.png
         :alt: the clipboard
 
