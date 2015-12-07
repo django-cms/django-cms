@@ -12,7 +12,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from menus.menu_pool import menu_pool
 
-from cms.api import _generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page, publish_page
+from cms.api import generate_valid_slug, create_page, _verify_plugin_type, assign_user_to_page, publish_page
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
@@ -42,7 +42,7 @@ class PythonAPITests(TestCase):
         title = "Hello Title"
         expected_slug = "hello-title"
         # empty db, it should just slugify
-        slug = _generate_valid_slug(title, None, 'en')
+        slug = generate_valid_slug(title, None, 'en')
         self.assertEqual(slug, expected_slug)
 
     def test_generage_valid_slug_check_existing(self):
@@ -50,7 +50,7 @@ class PythonAPITests(TestCase):
         create_page(title, 'nav_playground.html', 'en')
         # second time with same title, it should append -1
         expected_slug = "hello-title-1"
-        slug = _generate_valid_slug(title, None, 'en')
+        slug = generate_valid_slug(title, None, 'en')
         self.assertEqual(slug, expected_slug)
 
     def test_generage_valid_slug_check_parent(self):
@@ -58,7 +58,7 @@ class PythonAPITests(TestCase):
         page = create_page(title, 'nav_playground.html', 'en')
         # second time with same title, it should append -1
         expected_slug = "hello-title"
-        slug = _generate_valid_slug(title, page, 'en')
+        slug = generate_valid_slug(title, page, 'en')
         self.assertEqual(slug, expected_slug)
 
     def test_generage_valid_slug_check_parent_existing(self):
@@ -67,7 +67,7 @@ class PythonAPITests(TestCase):
         create_page(title, 'nav_playground.html', 'en', parent=page)
         # second time with same title, it should append -1
         expected_slug = "hello-title-1"
-        slug = _generate_valid_slug(title, page, 'en')
+        slug = generate_valid_slug(title, page, 'en')
         self.assertEqual(slug, expected_slug)
 
     def test_invalid_apphook_type(self):
