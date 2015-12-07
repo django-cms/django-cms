@@ -2,38 +2,35 @@
 Log in
 ######
 
-The fastest way to setup a pre-configured django-cms website is using Aldryn.
-
-.. image:: /user/tutorial/images/aldryn-vertical_black.png
-    :alt: Aldryn logo
-    :align: center
-    :width: 260px
-
 .. note::
 
-    **Aldryn**
+    .. image:: /user/tutorial/images/aldryn-vertical_black.png
+        :alt: Aldryn logo
+        :align: right
+        :width: 260px
 
-    Aldryn is an easy-to-use and developer-friendly content management platform.
-    Aldryn has been designed to meet the needs of:
-        - **web content creators**, who require an efficient and reliable way to produce content
-        - **agencies**, who work with multiple clients and content creators, and need to manage them all
-        - **web developers**, who implement designs and create applications, and need a low-friction workflow for their deployment
+    In this tutorial, we use a pre-configured django CMS website on `Aldryn
+    <https://aldryn.com/>`_, that includes a number of integrated applications give you a full
+    introduction not just to the core CMS, but also to a realistic implementation of it as part of
+    a complete website.
 
-    For more details, please check http://aldryn.com
+    All the functionality and applications in the tutorial are available even if you don't use
+    Aldryn for your django CMS sites, and using Aldryn for the tutorial is completely free.
 
 
-.. note::
 
-    **How to use Aldryn**
+#.  Visit http://demo.django-cms.org/, and select *Get
+    your free Aldryn account*.
 
-    In this tutorial we are not going to cover how to use Aldryn.
-    For this purpose Aldryn provides a help section with plenty of tutorials.
+    If you already have one, you'll be taken to the Control Panel, and you can skip to the next
+    step.
 
-    Please visit: http://aldryn.com/help
+    Otherwise it will only take a few minutes to set up your new account. Simply follow the steps.
 
-Please proceed with the following steps once the project has been setup and deployed.
+#.  In the Control Panel, select a *Add a new Project*, and when prompted opt for *Start with a
+    theme and content*. Follow the steps, until your new site has been deployed.
 
-1. To login to your new website, hit the |open-site| link on the dashboard.
+#.  To login to your new website, hit the |open-site| link on the dashboard.
 
     .. |open-site| image:: /user/tutorial/images/open_site.png
        :alt: Open site
@@ -41,19 +38,23 @@ Please proceed with the following steps once the project has been setup and depl
     .. image:: /user/tutorial/images/aldryn_dashboard.png
        :alt: Aldryn Dashboard
 
-2. Click on *sign in with Aldryn*
+#.  Select *Sign in with Aldryn*
 
     .. image:: /user/tutorial/images/aldryn_signin.png
        :alt: Aldryn Sign in
 
-3. Fill out the form with your credentials and hit *sign in*
+You should now be logged in and ready to start with the django CMS tutorial, with *Welcome to django CMS in front of you*:
 
-    .. image:: /user/tutorial/images/aldryn_signin_form.png
-       :alt: Aldryn Sign in Button
+.. image:: /user/tutorial/images/welcome.png
+   :alt: The 'Create Page' wizard
+   :width: 400
+   :align: center
 
-.. note::
+.. important::
 
-    **Failed to login**
+    **If you run into problems**
 
-    If it fails to login due to various reasons, please make use of the Aldryn live support to ask for help.
-    You can find it in the lower right corner of the website.
+    If you run into any problems getting started with Aldryn, just ask for help, using the
+    Intercom tool at the bottom of each Aldryn page.
+
+    .. todo:: Can we have an image of the Intercom widget please?

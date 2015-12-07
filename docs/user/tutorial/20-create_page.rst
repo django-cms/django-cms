@@ -12,7 +12,7 @@ Because this is a brand new site, when you visit it as a site administrator, dja
 Page wizard* will open a new dialog box.
 
 .. image:: /user/tutorial/images/welcome.png
-   :alt: The 'Create Page wizard'
+   :alt: The 'Create Page' wizard
    :width: 400
    :align: center
 
