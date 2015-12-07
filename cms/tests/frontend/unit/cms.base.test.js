@@ -1,4 +1,4 @@
-/* globals jQuery, Class, $, document, window */
+/* globals jQuery, Class, $, document, window, localStorage */
 
 'use strict';
 
@@ -89,7 +89,133 @@ describe('cms.base.js', function () {
         });
 
         describe('.setSettings()', function () {
+            beforeEach(function () {
+                CMS.API.Helpers._isStorageSupported = true;
+                localStorage.clear();
+                jasmine.Ajax.install();
 
+                jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
+                    status: 200,
+                    contentType: 'text/plain',
+                    responseText: "{\"serverSetting\":true}"
+                });
+
+                jasmine.Ajax.stubRequest('/my-settings-url-with-empty-response').andReturn({
+                    status: 200,
+                    contentType: 'text/plain',
+                    responseText: ''
+                });
+
+                jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
+                    status: 200,
+                    contentType: 'text/plain',
+                    responseText: "{\"serverSetting\":true}"
+                });
+
+                jasmine.Ajax.stubRequest('/my-broken-settings-url').andReturn({
+                    status: 500,
+                    responseText: 'Fail'
+                });
+            });
+
+            afterEach(function () {
+                jasmine.Ajax.uninstall();
+            });
+
+            it('should put settings in localStorage if it is available', function () {
+                CMS.config = {
+                    settings: {}
+                };
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
+                expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ mySetting: true });
+                expect(localStorage.getItem('cms_cookie')).toEqual('{"mySetting":true}');
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+
+                CMS.config.settings = { mySetting: false };
+                expect(CMS.API.Helpers.setSettings({ anotherSetting: true })).toEqual({
+                    mySetting: false,
+                    anotherSetting: true
+                });
+                expect(localStorage.getItem('cms_cookie')).toEqual('{"mySetting":false,"anotherSetting":true}');
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(2);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(2);
+
+                expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({
+                    mySetting: true
+                });
+                expect(localStorage.getItem('cms_cookie')).toEqual('{"mySetting":true}');
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(3);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(3);
+            });
+
+            it('makes a synchronous request to the session url if localStorage is not available', function () {
+                CMS.API.Helpers._isStorageSupported = false;
+                CMS.config = {
+                    urls: {
+                        settings: '/my-settings-url'
+                    }
+                };
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
+                expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ serverSetting: true });
+
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+            });
+
+            it('uses default settings if response is empty', function () {
+                CMS.API.Helpers._isStorageSupported = false;
+                CMS.config = {
+                    settings: {
+                        defaultSetting: true
+                    },
+                    urls: {
+                        settings: '/my-settings-url-with-empty-response'
+                    }
+                };
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
+                expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ defaultSetting: true });
+
+                expect(CMS.API.Toolbar.showLoader.calls.count()).toEqual(1);
+                expect(CMS.API.Toolbar.hideLoader.calls.count()).toEqual(1);
+            });
+
+            it('makes a synchronous request which can fail', function () {
+                CMS.API.Helpers._isStorageSupported = false;
+                CMS.config = {
+                    urls: {
+                        settings: '/my-broken-settings-url'
+                    }
+                };
+                CMS.API.Messages = {
+                    open: jasmine.createSpy()
+                };
+                CMS.API.Toolbar = {
+                    showLoader: jasmine.createSpy(),
+                    hideLoader: jasmine.createSpy()
+                };
+
+                expect(CMS.API.Helpers.setSettings({ mySetting: true })).toEqual({ mySetting: true });
+
+                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
+                expect(CMS.API.Toolbar.hideLoader).not.toHaveBeenCalled();
+                expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                    message: 'Fail | 500 error',
+                    error: true
+                });
+            });
         });
 
         describe('.getSettings()', function () {
