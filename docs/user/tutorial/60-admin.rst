@@ -54,7 +54,7 @@ Add an image to the Filer
     on the *clipboard*.
 
     .. image:: images/image_clipboard.png
-    :alt: the clipboard
+       :alt: the clipboard
 
     .. |image_paste| image:: images/image_paste.png
        :alt: the 'Paste' icon
