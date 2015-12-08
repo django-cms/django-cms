@@ -1,4 +1,4 @@
-/* globals jQuery, Class, $, document, window, localStorage, pending */
+/* globals jQuery, Class, $, document, window, localStorage */
 
 'use strict';
 
