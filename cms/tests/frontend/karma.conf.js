@@ -74,7 +74,8 @@ module.exports = function (config) {
             'cms/tests/frontend/unit/helpers/jasmine-jquery.js',
 
             // fixtures
-            'cms/tests/frontend/unit/fixtures/**/*.html'
+            'cms/tests/frontend/unit/fixtures/**/*.html',
+            'cms/tests/frontend/unit/html/**/*.html'
         ].concat(
             // tests themselves
             files.map(function (pattern) {
@@ -91,7 +92,7 @@ module.exports = function (config) {
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
             'cms/static/cms/js/modules/cms.*': ['coverage'],
-            '**/*.html': ['html2js']
+            'cms/tests/frontend/unit/fixtures/**/*.html': ['html2js']
         },
 
         // optionally, configure the reporter
