@@ -29,16 +29,6 @@ module.exports = function (config) {
         'PhantomJS': 'used for local testing'
     };
 
-    // Browsers to run on Sauce Labs
-    // Check out https://saucelabs.com/platforms for all browser/OS combos
-    if (useSauceLabs()) {
-        browsers = baseConf.sauceLabsBrowsers.reduce(function (browsers, capability) {
-            browsers[JSON.stringify(capability)] = capability;
-            browsers[JSON.stringify(capability)].base = 'SauceLabs';
-            return browsers;
-        }, {});
-    }
-
     var settings = {
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '../../..',
@@ -133,15 +123,8 @@ module.exports = function (config) {
         // start these browsers
         browsers: Object.keys(browsers),
 
-        concurrency: (function () {
-            // travis
-            if (useSauceLabs()) {
-                return 3;
-            } else {
-                return Infinity;
-            }
-        })(),
-        browserNoActivityTimeout: 50 * 1000,
+        concurrency: Infinity,
+        browserNoActivityTimeout: 2 * 60 * 1000,
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
@@ -151,8 +134,22 @@ module.exports = function (config) {
     // saucelabs are disabled for the moment because there are numerous connection problems
     // between travis and sauce labs
     if (useSauceLabs()) {
+
+        // Browsers to run on Sauce Labs
+        // Check out https://saucelabs.com/platforms for all browser/OS combos
+        browsers = baseConf.sauceLabsBrowsers.reduce(function (browsers, capability) {
+            browsers[JSON.stringify(capability)] = capability;
+            browsers[JSON.stringify(capability)].base = 'SauceLabs';
+            return browsers;
+        }, {});
+
+        settings.browsers = Object.keys(browsers);
+
+        settings.concurrency = 3;
+
         settings.sauceLabs = {
-            testName: baseConf.formatTaskName('Unit')
+            testName: baseConf.formatTaskName('Unit'),
+            tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER || Math.random()
         };
         settings.captureTimeout = 0; // rely on SL timeout, see karma-runner/karma-sauce-launcher#37
         settings.customLaunchers = browsers;
