@@ -5,7 +5,9 @@ Add a news section
 In this section we will add a News page and some news items to the site using, the *Aldryn News &
 Blog* application.
 
-Like Aldryn People, Aldryn News & Blog is a separate application that integrates seamlessly with django CMS to provide new functionality for structured information. In this case the structured information is news articles.
+Like Aldryn People, Aldryn News & Blog is a separate application that integrates seamlessly with
+django CMS to provide new functionality for structured information. In this case the structured
+information is news articles.
 
 
 *********************
@@ -19,33 +21,35 @@ news items.
 
 We'll create a *News* page, and add an apphook for the Aldryn News & Blog application to it.
 
-* create and publish a new page called News
-* open page settings
+#.  Create and publish a new page called News.
+#.  Open the page settings - *Page* > *Page settings* from the toolbar:
 
     .. image:: /user/tutorial/images/page-settings-button.png
-        :alt: 'page settings button'
+        :alt: 'Page settings' can be found in the 'Page' menu
         :width: 170
 
-* go to advanced settings
+#.  Select *Advanced Settings*:
 
     .. image:: /user/tutorial/images/advanced-settings-button.png
-        :alt: 'page settings button'
+        :alt: the 'Advanced Settings' button
         :width: 170
 
-* from dropdown menu choose previously created apphook
+#.  Find the *Application* field, which offers you a menu of options, and choose *Newsblog /
+    Apphook_news*:
 
     .. image:: /user/tutorial/images/advanced-settings-choose-apphook.png
-        :alt: 'page settings button'
+        :alt: select 'Newsblog / Apphook_news'
 
-* publish page
-* view page with automatic list of news in it
+#.  **Save** your changes, and then **Publish** the page.
+
+The page will now automatically display news items here - of course it's still empty at the moment, so let's continue by adding some news items.
 
     .. image:: /user/tutorial/images/automatic-news-list.png
-        :alt: 'page settings button'
+        :alt: the empty news page
 
 
 **********************
-Create some news items
+Creating news items
 **********************
 
 To create a new News item:
@@ -109,14 +113,23 @@ Do the same for a second item:
 Use a news plugin
 *****************
 
-* go to home page
-* switch to Edit mode
-* enter Structure mode
-* select **Add plugin** on *Content* placeholder
-* select *Latest articles* plugin from list
-* select the existing Apphook
-* **Save**
-* see news articles inserted into home page
+django CMS's plugin architecture means that we can re-use content very easily. For example, as well
+as having our *News* page, we can show news items automatically, *in any page on the site*.
+
+Typically, if your site has news, you will often choose to display some top news stories on the
+home page too. So let's do that.
+
+#.  Go back to the *Home* page.
+#.  Switch to *Edit* mode, then *Structure* mode.
+#.  Select **Add plugin** on the *Content* placeholder, just as you did when you :ref:`added a Map
+    plugin <add_plugin>` to the *How to find us* page.
+#.  Select the *News & Blog* > *Latest articles* plugin from the list that appears.
+#.  You'll have to configure the plugin now; in the *App Config* field, select the Apphook you
+    created earlier.
+#.  **Save** the plugin.
+
+The news articles will now be listed in your home page too, and this list will be always be kept
+up-to-date with a selection of latest news items.
 
     .. image:: /user/tutorial/images/home-page-news-articles.png
         :alt: 'page settings button'

@@ -52,11 +52,13 @@ In *Structure* mode, you can manage the placement of content within the page str
 
 This reveals the *structure board* containing the *placeholders* available on the page, and the
 *plugins* in them. Here you can see just one placeholder, called *Content*, containing one plugin -
-a text plugin that begins *Our workshop is at Zollstrasse 53...*.
+a text plugin that begins *Our workshop is at Zollstrasse 53...*. (This plugin was created
+for you automatically when you first created the page.)
 
 .. image:: /user/tutorial/images/structure-board.png
      :alt: the structure board
 
+.. _add_plugin:
 
 Add a second plugin
 ===================

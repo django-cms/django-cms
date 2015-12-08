@@ -85,7 +85,7 @@ Publish the *Contact information* page
 
 *Contact information* is a new page and hasn't yet been published.
 
-You can see that in both its *language columns*, *en* and *de*, it has a grey dot, indictating that
+You can see that in both its *language columns*, *en* and *de*, it has a grey dot, indicating that
 it is not published in either of those languages.
 
 You've previously :ref:`published pages <publishing_pages>` using the |publish-page-now| button,
@@ -111,7 +111,7 @@ but we'll show you a new way to do it:
 
 .. important::
 
-    If you don't publish the aprent page, *Contact information*, then none of its children will be
+    If you don't publish the parent page, *Contact information*, then none of its children will be
     accessible, even if they are themselves published.
 
 And here's the result when you switch back to *Content* mode:

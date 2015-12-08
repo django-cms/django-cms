@@ -59,4 +59,5 @@ You should now be logged in and ready to start with the django CMS tutorial, wit
 
     .. image:: /user/tutorial/images/intercom_messenger.png
        :alt: Intercom Messenger
+       :align: center
 
