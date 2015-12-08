@@ -321,7 +321,7 @@ describe('CMS.Modal', function () {
             modal.minimize();
 
             var css = modal.ui.modal.data('css');
-            expect(css).toEqual(jasmine.any(Object))
+            expect(css).toEqual(jasmine.any(Object));
             expect(Object.keys(css)).toContain('margin-left');
             expect(Object.keys(css)).toContain('margin-top');
             expect(Object.keys(css)).toContain('top');
