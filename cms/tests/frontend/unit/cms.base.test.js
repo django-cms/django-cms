@@ -1,9 +1,21 @@
-/* globals jQuery, Class, $, document, window, localStorage */
+/* globals jQuery, Class, $, document, window, localStorage, pending */
 
 'use strict';
 
 describe('cms.base.js', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
+
+    var _isLocalStorageSupported = (function () {
+        var mod = 'modernizr';
+        try {
+            localStorage.setItem(mod, mod);
+            localStorage.removeItem(mod);
+            return true;
+        } catch (e) {
+            // istanbul ignore next
+            return false;
+        }
+    })();
 
     it('creates CMS namespace', function () {
         expect(CMS).toBeDefined();
@@ -299,7 +311,9 @@ describe('cms.base.js', function () {
         describe('.setSettings()', function () {
             beforeEach(function () {
                 CMS.API.Helpers._isStorageSupported = true;
-                localStorage.clear();
+                if (_isLocalStorageSupported) {
+                    localStorage.clear();
+                }
                 jasmine.Ajax.install();
 
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
@@ -331,6 +345,10 @@ describe('cms.base.js', function () {
             });
 
             it('should put settings in localStorage if it is available', function () {
+                if (!_isLocalStorageSupported) {
+                    pending('Localstorage is not supported, skipping');
+                }
+
                 CMS.config = {
                     settings: {}
                 };
@@ -429,7 +447,9 @@ describe('cms.base.js', function () {
         describe('.getSettings()', function () {
             beforeEach(function () {
                 CMS.API.Helpers._isStorageSupported = true;
-                localStorage.clear();
+                if (_isLocalStorageSupported) {
+                    localStorage.clear();
+                }
                 jasmine.Ajax.install();
 
                 jasmine.Ajax.stubRequest('/my-settings-url').andReturn({
@@ -461,6 +481,10 @@ describe('cms.base.js', function () {
             });
 
             it('should get settings from localStorage', function () {
+                if (!_isLocalStorageSupported) {
+                    pending('Localstorage is not supported, skipping');
+                }
+
                 localStorage.setItem('cms_cookie', JSON.stringify({ presetSetting: true }));
                 CMS.settings = {};
                 CMS.config = {
@@ -478,6 +502,10 @@ describe('cms.base.js', function () {
             });
 
             it('should first set settings from CMS.config is there are no settings in localstorage', function () {
+                if (!_isLocalStorageSupported) {
+                    pending('Localstorage is not supported, skipping');
+                }
+
                 CMS.settings = {};
                 CMS.config = {
                     settings: {
