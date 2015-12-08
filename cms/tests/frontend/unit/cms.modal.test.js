@@ -81,6 +81,7 @@ describe('CMS.Modal', function () {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
                 hideLoader: jasmine.createSpy()
             };
@@ -235,6 +236,33 @@ describe('CMS.Modal', function () {
             expect(modal.ui.resize).toBeVisible();
             expect(modal.ui.minimizeButton).toBeVisible();
             expect(modal.ui.maximizeButton).toBeVisible();
+        });
+
+        it('resets minimizaed state if the modal was already minimized', function () {
+            var modal = new CMS.Modal();
+
+            modal.open({ html: '<div></div>' });
+            modal.minimize();
+            expect(modal.minimized).toEqual(true);
+
+            spyOn(modal, 'minimize').and.callThrough();
+
+            modal.open({ html: '<span></span>' });
+            expect(modal.minimized).toEqual(false);
+            expect(modal.minimize).toHaveBeenCalled();
+            expect(modal.minimize.calls.count()).toEqual(1);
+        });
+
+        it('clears breadcrumbs and buttons if they exist', function () {
+            var modal = new CMS.Modal();
+            modal.ui.modal.addClass('cms-modal-has-breadcrumb');
+            modal.ui.modalButtons.html('<div>button</div>');
+            modal.ui.breadcrumb.html('<div>breadcrumbs</div>');
+
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-has-breadcrumb');
+            expect(modal.ui.modalButtons).toBeEmpty();
+            expect(modal.ui.breadcrumb).toBeEmpty();
         });
     });
 });
