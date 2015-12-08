@@ -1053,5 +1053,11 @@ describe('cms.base.js', function () {
                 expect(event).not.toHaveBeenPrevented();
             });
         });
+
+        describe('._getWindow()', function () {
+            it('returns window', function () {
+                expect(CMS.API.Helpers._getWindow()).toEqual(window);
+            });
+        });
     });
 });
