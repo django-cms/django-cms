@@ -140,6 +140,7 @@ Running Frontend Tests
 We have two types of frontend tests: unit tests and integration tests.
 For unit tests we are using `Karma <http://karma-runner.github.io/>`_ as a
 test runner and `Jasmine <http://jasmine.github.io/>`_ as a test framework.
+
 Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are
 built using `CasperJS <http://casperjs.org/>`_.
 
@@ -166,9 +167,9 @@ If you want to run tests continuously you can use the watch command::
     gulp tests:unit:watch
 
 This will rerun the suite whenever source or test file is changed.
-By default, the tests are running on PhantomJS (headless WebKit), but when running
-Karma in watch mode you can also visit the server it spawns with an actual
-browser.
+By default the tests are running on `PhantomJS <http://phantomjs.org/>`_, but
+when running Karma in watch mode you can also visit the server it spawns with an
+actual browser.
 
     INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
 

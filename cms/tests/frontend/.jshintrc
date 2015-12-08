@@ -8,6 +8,11 @@
         "expect",
         "jasmine",
         "describe",
-        "casper"
+        "casper",
+        "beforeEach",
+        "afterEach",
+        "spyOn",
+        "spyOnEvent",
+        "fixture"
     ]
 }

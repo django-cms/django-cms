@@ -67,7 +67,14 @@ module.exports = function (config) {
             'cms/static/cms/js/modules/cms.structureboard.js',
             'cms/static/cms/js/modules/cms.navigation.js',
             'cms/static/cms/js/modules/cms.toolbar.js',
-            'cms/static/cms/js/modules/cms.tooltip.js'
+            'cms/static/cms/js/modules/cms.tooltip.js',
+
+            // test helpers
+            'cms/tests/frontend/unit/helpers/mock-ajax.js',
+            'cms/tests/frontend/unit/helpers/jasmine-jquery.js',
+
+            // fixtures
+            'cms/tests/frontend/unit/fixtures/**/*.html'
         ].concat(
             // tests themselves
             files.map(function (pattern) {
@@ -104,7 +111,7 @@ module.exports = function (config) {
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage', 'saucelabs'].concat(process.env.CI ? ['coveralls'] : []),
+        reporters: ['dots', 'coverage', 'saucelabs'].concat(process.env.CI ? ['coveralls'] : []),
 
         // web server port
         port: 9876,
