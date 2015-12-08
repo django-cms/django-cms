@@ -33,11 +33,9 @@ Page wizard* will open a new dialog box.
         cyclists. No job's too small or too large, and we can repair anything from a puncture to a
         cracked frame.
 
-.. todo:: update screenshot
-
-.. image:: /user/tutorial/images/add-title-and-content.png
+.. image:: /user/tutorial/images/create_new_page.png
    :alt: Add Title and Content
-   :width: 400
+   :width: 600
    :align: center
 
 
@@ -55,9 +53,7 @@ explicitly published.
 
 * Hit |publish-page-now| to publish the page.
 
-.. todo:: update screenshots with styling and content
-
-.. image:: /user/tutorial/images/newly-created.png
+.. image:: /user/tutorial/images/city_bicycle_services_page.png
    :alt: Newly-created page
 
 
@@ -99,7 +95,8 @@ workshop.
 
 At the top of your page is the django CMS *toolbar*, with various useful tools in it.
 
-.. todo:: screenshot of toolbar
+.. image:: /user/tutorial/images/toolbar.png
+   :alt: django-CMS toolbar
 
 .. |create| image:: /user/tutorial/images/create.png
    :alt: 'Create'
@@ -124,5 +121,5 @@ At the top of your page is the django CMS *toolbar*, with various useful tools i
 
 #.  Hit **Publish**.
 
-.. todo:: screen shot of page, also showing navigation menu featuring both pages
-
+.. image:: /user/tutorial/images/how_to_find_us_page.png
+   :alt: How to find us
