@@ -127,6 +127,7 @@ describe('CMS.Modal', function () {
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
+            jasmine.clock().install(); // stop timeout that does initialStates
             CMS.API.Toolbar = new CMS.Toolbar();
             CMS._newPlugin = {
                 delete: '/delete-url',
@@ -155,6 +156,7 @@ describe('CMS.Modal', function () {
                 callback: jasmine.any(Function)
             });
             jasmine.Ajax.uninstall();
+            jasmine.clock().uninstall();
         });
 
         it('should be chainable', function () {
@@ -238,7 +240,7 @@ describe('CMS.Modal', function () {
             expect(modal.ui.maximizeButton).toBeVisible();
         });
 
-        it('resets minimizaed state if the modal was already minimized', function () {
+        it('resets minimized state if the modal was already minimized', function () {
             var modal = new CMS.Modal();
 
             modal.open({ html: '<div></div>' });
@@ -269,6 +271,9 @@ describe('CMS.Modal', function () {
     describe('.minimize()', function () {
         beforeEach(function (done) {
             fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
@@ -280,14 +285,50 @@ describe('CMS.Modal', function () {
         });
 
         afterEach(function () {
-            fixture.clear();
+            fixture.cleanup();
         });
 
-        it('minimizes the modal');
+        it('minimizes the modal', function () {
+            var modal = new CMS.Modal();
 
-        it('opens the toolbar');
+            expect(modal.minimized).toEqual(false);
+            modal.open({ html: '<div></div>' });
+            modal.minimize();
 
-        it('stores the css data to be able to restore a modal');
+            expect(modal.minimized).toEqual(true);
+            expect(modal.ui.body).toHaveClass('cms-modal-minimized');
+            expect(modal.ui.modal).toHaveCss({
+                left: '50px'
+            });
+
+            modal.minimize(); // restore
+        });
+
+        it('opens the toolbar', function () {
+            var modal = new CMS.Modal();
+
+            modal.open({ html: '<div></div>' });
+            modal.minimize();
+
+            expect(CMS.API.Toolbar.open).toHaveBeenCalled();
+            modal.minimize(); // restore
+        });
+
+        it('stores the css data to be able to restore a modal', function () {
+            var modal = new CMS.Modal();
+
+            modal.open({ html: '<div></div>' });
+            modal.minimize();
+
+            var css = modal.ui.modal.data('css');
+            expect(css).toEqual(jasmine.any(Object))
+            expect(Object.keys(css)).toContain('margin-left');
+            expect(Object.keys(css)).toContain('margin-top');
+            expect(Object.keys(css)).toContain('top');
+            expect(Object.keys(css)).toContain('left');
+
+            modal.minimize(); // restore
+        });
 
         it('doesnt minimize maximized modal');
 
