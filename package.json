@@ -26,7 +26,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-phantomjs-launcher": "^0.2.1",
     "karma-phantomjs-shim": "^1.1.2",
-    "karma-sauce-launcher": "^0.3.0",
+    "karma-sauce-launcher": "0.2.14",
     "minimist": "1.1.1",
     "phantomjs": "^1.9.19",
     "casperjs": "^1.1.0-beta3"
