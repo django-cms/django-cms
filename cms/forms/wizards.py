@@ -17,6 +17,8 @@ from cms.utils import permissions
 
 from cms.utils.conf import get_cms_setting
 
+from djangocms_text_ckeditor.widgets import TextEditorWidget
+
 
 def user_has_view_permission(user, page=None):
     """
@@ -89,7 +91,7 @@ class BaseCMSPageForm(forms.Form):
     page_type = forms.ChoiceField(
         label=_(u'Page type'), required=False, widget=PageTypeSelect())
     content = forms.CharField(
-        label=_(u'Content'), widget=forms.Textarea, required=False,
+        label=_(u'Content'), widget=TextEditorWidget, required=False,
         help_text=_(u"Optional. If supplied, will be automatically added "
                     u"within a new text plugin."))
 
