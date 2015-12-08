@@ -145,7 +145,7 @@ module.exports = function (config) {
 
         settings.browsers = Object.keys(browsers);
 
-        settings.concurrency = 3;
+        settings.concurrency = 1;
 
         settings.sauceLabs = {
             testName: baseConf.formatTaskName('Unit'),
