@@ -109,22 +109,14 @@ We'll create a *People* page, and add an apphook for the Aldryn People applicati
 
 #.  **Save** the page settings.
 
-    .. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
-       :alt: 'Publish page now'
+    .. |publish-changes| image:: /user/tutorial/images/publish_changes.png
+       :alt: 'Publish changes'
 
-    .. todo:: Create a new image of the "Publish changes" button, instead of "Publish page now"
-
-#.  Hit |publish-page-now| to publish the page.
+#.  Hit |publish-changes| to publish the page.
 
 And here is the published page, with the people listed in it.
 
-.. todo::
-
-    * That "ungrouped" doesn't look great - we should do something a bit different here.
-
-    * Perhaps a full page image would look better (not sure)
-
-.. image:: /user/tutorial/images/people_page_list.png
+.. image:: /user/tutorial/images/mechanics_people_group.png
    :alt: People page list
    :width: 500
    :align: center
