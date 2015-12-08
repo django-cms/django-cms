@@ -5,8 +5,9 @@
 
 module.exports = {
     init: function () {
-        this.viewportSize();
-        this.timeout();
+        this
+            .viewportSize()
+            .timeout();
     },
 
     viewportSize: function (width, height) {
@@ -19,6 +20,8 @@ module.exports = {
             width: viewportWidth,
             height: viewportHeight
         };
+
+        return this;
     },
 
     timeout: function (timeout) {

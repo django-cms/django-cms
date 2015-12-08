@@ -171,9 +171,11 @@ gulp.task('tests:integration', function (done) {
     process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
 
     var files = [
-        'login',
+        'loginToolbar',
         'toolbar',
-        'logout'
+        'addFirstPage',
+        'logout',
+        'loginAdmin'
     ];
 
     if (argv && argv.tests) {

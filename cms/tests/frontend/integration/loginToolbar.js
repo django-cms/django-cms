@@ -6,19 +6,21 @@
 require('./../casperjs.conf').init();
 
 // #############################################################################
-// User login
+// User login via the CMS toolbar
 
-var globals = require('/settings/globals.js');
-var messages = require('/settings/messages.js').login;
+var globals = require('./settings/globals');
+var messages = require('./settings/messages').login;
 
-casper.test.begin('User Login', function (test) {
+casper.test.begin('User Login (via Toolbar)', function (test) {
     casper
         .start(globals.baseUrl, function () {
-            test.assertTitle('home - example.com', messages.cmsAvailable);
-            test.assertDoesntExist('.cms-toolbar', messages.toolbalMissing);
+            var titleRegExp = new RegExp(globals.websiteName, 'g');
+
+            test.assertTitleMatch(titleRegExp, messages.cmsAvailable);
+            test.assertDoesntExist('.cms-toolbar', messages.toolbarMissing);
         })
         .thenOpen(globals.editUrl, function () {
-            test.assertExists('.cms-toolbar', messages.toolbalAvailable);
+            test.assertExists('.cms-toolbar', messages.toolbarAvailable);
 
             casper.fill('.cms-form-login', globals.credentials, true);
         })

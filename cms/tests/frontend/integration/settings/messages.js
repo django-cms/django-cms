@@ -12,10 +12,15 @@ module.exports = {
     },
     toolbar: {
         logoUrlCorrect: 'The django CMS logo redirects to homepage',
-        toolbarOpened: 'Toolbar can be opened',
-        toolbarClosed: 'Toolbar can be closed'
+        toolbarOpened: 'Toolbar can be opened on trigger click',
+        toolbarClosed: 'Toolbar can be closed on trigger click'
     },
     logout: {
+        logoutOk: 'Logout via toolbar',
+        toolbarOpened: 'Toolbar opened by appending /?edit to the url',
+        toolbarClosed: 'Toolbar closed by appending /?edit_off to the url'
+    },
+    page: {
 
     }
 };

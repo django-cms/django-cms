@@ -3,8 +3,8 @@
 // #############################################################################
 // Toolbar behaviour
 
-var globals = require('/settings/globals.js');
-var messages = require('/settings/messages.js').toolbar;
+var globals = require('./settings/globals');
+var messages = require('./settings/messages').toolbar;
 
 casper.test.begin('Toolbar Visibility', function (test) {
     casper
