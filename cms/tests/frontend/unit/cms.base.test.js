@@ -565,8 +565,12 @@ describe('cms.base.js', function () {
 
         describe('.makeURL()', function () {
             it('outputs the same url when no additional params passed', function () {
-                var url = CMS.API.Helpers.makeURL('test');
+                var url;
+                url = CMS.API.Helpers.makeURL('test');
                 expect(url).toEqual('test');
+
+                url = CMS.API.Helpers.makeURL('https://google.com');
+                expect(url).toEqual('https://google.com');
             });
 
             it('outputs new url when additional params passed', function () {
