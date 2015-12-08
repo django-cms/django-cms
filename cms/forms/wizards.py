@@ -17,7 +17,12 @@ from cms.utils import permissions
 
 from cms.utils.conf import get_cms_setting
 
-from djangocms_text_ckeditor.widgets import TextEditorWidget
+try:
+    # djangocms_text_ckeditor is not guaranteed to be available
+    from djangocms_text_ckeditor.widgets import TextEditorWidget
+    text_widget = TextEditorWidget
+except ImportError:
+    text_widget = forms.Textarea
 
 
 def user_has_view_permission(user, page=None):
@@ -91,7 +96,7 @@ class BaseCMSPageForm(forms.Form):
     page_type = forms.ChoiceField(
         label=_(u'Page type'), required=False, widget=PageTypeSelect())
     content = forms.CharField(
-        label=_(u'Content'), widget=TextEditorWidget, required=False,
+        label=_(u'Content'), widget=text_widget, required=False,
         help_text=_(u"Optional. If supplied, will be automatically added "
                     u"within a new text plugin."))
 
