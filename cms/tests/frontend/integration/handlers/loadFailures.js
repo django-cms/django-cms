@@ -5,7 +5,7 @@
 
 module.exports = {
     bind: function () {
-        casper.on('load.failed', function(error) {
+        casper.on('load.failed', function (error) {
             casper.echo(JSON.stringify(error));
         });
     }
