@@ -76,11 +76,13 @@ describe('CMS.Modal', function () {
     describe('.open()', function () {
         beforeEach(function (done) {
             fixture.load('modal.html');
+            delete CMS._newPlugin;
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
-                showLoader: jasmine.createSpy()
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
             };
             $(function () {
                 done();
@@ -152,6 +154,87 @@ describe('CMS.Modal', function () {
                 callback: jasmine.any(Function)
             });
             jasmine.Ajax.uninstall();
+        });
+
+        it('should be chainable', function () {
+            var modal = new CMS.Modal();
+
+            expect(modal.open({ html: '<div></div>' })).toEqual(modal);
+        });
+
+        it('hides the tooltip', function () {
+            var modal = new CMS.Modal();
+
+            modal.open({ html: '<div></div>' });
+            expect(CMS.API.Tooltip.hide).toHaveBeenCalled();
+        });
+
+        it('triggers load events on instance and the DOM node', function () {
+            var modal = new CMS.Modal();
+
+            spyOn(modal, 'trigger');
+            var spyEvent = spyOnEvent(modal.ui.modal, 'cms.modal.load');
+            modal.open({ html: '<div></div>' });
+
+            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.load');
+            expect(spyEvent).toHaveBeenTriggered();
+            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.loaded');
+        });
+
+        it('sets CMS._newPlugin if we are opening a plugin creation modal', function () {
+            var modal = new CMS.Modal({
+                newPlugin: {
+                    something: true
+                }
+            });
+
+            modal.open({ html: '<div></div>' });
+            expect(CMS._newPlugin).toEqual({ something: true });
+        });
+
+        it('applies correct state to modal controls', function () {
+            var modal;
+            modal = new CMS.Modal();
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).toBeVisible();
+            expect(modal.ui.minimizeButton).toBeVisible();
+            expect(modal.ui.maximizeButton).toBeVisible();
+
+            modal = new CMS.Modal({ resizable: false });
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).not.toBeVisible();
+            expect(modal.ui.minimizeButton).toBeVisible();
+            expect(modal.ui.maximizeButton).toBeVisible();
+
+            modal = new CMS.Modal({ resizable: true });
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).toBeVisible();
+            expect(modal.ui.minimizeButton).toBeVisible();
+            expect(modal.ui.maximizeButton).toBeVisible();
+
+            modal = new CMS.Modal({ minimizable: false });
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).toBeVisible();
+            expect(modal.ui.minimizeButton).not.toBeVisible();
+            expect(modal.ui.maximizeButton).toBeVisible();
+
+            modal = new CMS.Modal({ minimizable: true });
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).toBeVisible();
+            expect(modal.ui.minimizeButton).toBeVisible();
+            expect(modal.ui.maximizeButton).toBeVisible();
+
+            modal = new CMS.Modal({ maximizable: false });
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).toBeVisible();
+            expect(modal.ui.minimizeButton).toBeVisible();
+            expect(modal.ui.maximizeButton).not.toBeVisible();
+
+            modal = new CMS.Modal({ maximizable: true });
+            modal.open({ html: '<div></div>' });
+            expect(modal.ui.resize).toBeVisible();
+            expect(modal.ui.minimizeButton).toBeVisible();
+            expect(modal.ui.maximizeButton).toBeVisible();
         });
     });
 });

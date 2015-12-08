@@ -49,6 +49,8 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
+            'cms/static/cms/css/cms.base.css',
+
             // these have to be specified in order since
             // dependency loading is not handled yet
             'cms/static/cms/js/libs/jquery.min.js',
