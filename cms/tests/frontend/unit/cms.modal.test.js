@@ -265,4 +265,40 @@ describe('CMS.Modal', function () {
             expect(modal.ui.breadcrumb).toBeEmpty();
         });
     });
+
+    describe('.minimize()', function () {
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.clear();
+        });
+
+        it('minimizes the modal');
+
+        it('opens the toolbar');
+
+        it('stores the css data to be able to restore a modal');
+
+        it('doesnt minimize maximized modal');
+
+        it('restores modal if it was already minimized');
+    });
+
+    describe('.maximize()', function () {
+
+    });
+
+    describe('.close()', function () {
+
+    });
 });
