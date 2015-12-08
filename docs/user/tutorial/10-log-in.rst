@@ -57,4 +57,6 @@ You should now be logged in and ready to start with the django CMS tutorial, wit
     If you run into any problems getting started with Aldryn, just ask for help, using the
     Intercom tool at the bottom of each Aldryn page.
 
-    .. todo:: Can we have an image of the Intercom widget please?
+    .. image:: /user/tutorial/images/intercom_messenger.png
+       :alt: Intercom Messenger
+
