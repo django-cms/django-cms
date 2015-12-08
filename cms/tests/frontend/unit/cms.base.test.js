@@ -32,52 +32,70 @@ describe('cms.base.js', function () {
         it('exists', function () {
             expect(CMS.API.Helpers).toEqual(jasmine.any(Object));
             // this expectation is here so no one ever forgets to add a test
-            expect(Object.keys(CMS.API.Helpers).length).toEqual(16);
+            expect(Object.keys(CMS.API.Helpers).length).toEqual(17);
         });
 
         describe('.reloadBrowser()', function () {
-            beforeEach(function () {
-                window._originalParent = window.parent;
-                window.parent = {
-                    location: {
-                        href: '',
-                        reload: jasmine.createSpy()
-                    },
-                    CMS: {
-                        config: {
-                            request: {
-                                model: 'model',
-                                pk: 'pk'
-                            }
+            function createFakeWindow() {
+                return {
+                    parent: {
+                        location: {
+                            href: '',
+                            reload: jasmine.createSpy()
                         },
-                        API: {}
-                    },
-                    setTimeout: jasmine.createSpy().and.callFake(function (cb, timeout) {
-                        expect(timeout).toEqual(0);
-                        cb();
-                    })
+                        CMS: {
+                            config: {
+                                request: {
+                                    model: 'model',
+                                    pk: 'pk'
+                                }
+                            },
+                            API: {}
+                        },
+                        setTimeout: jasmine.createSpy().and.callFake(function (cb, timeout) {
+                            expect(timeout).toEqual(0);
+                            cb();
+                        })
+                    }
                 };
-            });
-
-            afterEach(function () {
-                window.parent = window;
-            });
+            }
+            function createWindowSpy(win) {
+                spyOn(CMS.API.Helpers, '_getWindow').and.callFake(function () {
+                    return win;
+                });
+            }
 
             it('reloads the browser if no `ajax` and `url` was passed', function () {
+                var win = createFakeWindow();
+                createWindowSpy(win);
                 CMS.API.Helpers.reloadBrowser(false, false, false);
 
-                expect(window.parent.location.reload).toHaveBeenCalled();
+                expect(win.parent.location.reload).toHaveBeenCalled();
             });
 
             it('redirects the browser to an url if no `ajax`, but `url` was passed', function () {
+                var win = createFakeWindow();
+                createWindowSpy(win);
                 CMS.API.Helpers.reloadBrowser('/url', false, false);
 
-                expect(window.parent.location.href).toEqual('/url');
-                expect(window.parent.location.reload).not.toHaveBeenCalled();
+                expect(win.parent.location.href).toEqual('/url');
+                expect(win.parent.location.reload).not.toHaveBeenCalled();
             });
 
             it('makes a request when `ajax` and `url` is passed', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                $.extend(true, win, {
+                    parent: {
+                        CMS: {
+                            config: {
+                                request: {
+                                    url: '/my-url'
+                                }
+                            }
+                        }
+                    }
+                });
+                createWindowSpy(win);
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
                 spyOn($, 'ajax').and.callFake(function (opts) {
@@ -95,12 +113,15 @@ describe('cms.base.js', function () {
                     }
                 }));
 
-                expect(window.parent.CMS.API.locked).toEqual(false);
-                expect(window.parent.location.reload).not.toHaveBeenCalled();
+                // console.log(JSON.stringify(win.parent, null, 4));
+                expect(win.parent.CMS.API.locked).toEqual(false);
+                expect(win.parent.location.reload).not.toHaveBeenCalled();
             });
 
             it('calls itself with the url if `ajax` and `url` is passed', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                createWindowSpy(win);
+                win.parent.CMS.config.request.url = '/my-url';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
@@ -121,12 +142,14 @@ describe('cms.base.js', function () {
 
                 expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
                 expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual(['/url']);
-                expect(window.parent.CMS.API.locked).toEqual(false);
-                expect(window.parent.location.reload).not.toHaveBeenCalled();
+                expect(win.parent.CMS.API.locked).toEqual(false);
+                expect(win.parent.location.reload).not.toHaveBeenCalled();
             });
 
             it('does nothing if `ajax` is passed but `url` is not and response from server is empty', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                createWindowSpy(win);
+                win.parent.CMS.config.request.url = '/my-url';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
@@ -146,12 +169,14 @@ describe('cms.base.js', function () {
                 }));
 
                 expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(1);
-                expect(window.parent.CMS.API.locked).toEqual(false);
-                expect(window.parent.location.reload).not.toHaveBeenCalled();
+                expect(win.parent.CMS.API.locked).toEqual(false);
+                expect(win.parent.location.reload).not.toHaveBeenCalled();
             });
 
             it('calls itself with the url that comes from server if `ajax` and `url` is passed', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                createWindowSpy(win);
+                win.parent.CMS.config.request.url = '/my-url';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
@@ -172,12 +197,14 @@ describe('cms.base.js', function () {
 
                 expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
                 expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual(['/url-from-server']);
-                expect(window.parent.CMS.API.locked).toEqual(false);
-                expect(window.parent.location.reload).not.toHaveBeenCalled();
+                expect(win.parent.CMS.API.locked).toEqual(false);
+                expect(win.parent.location.reload).not.toHaveBeenCalled();
             });
 
             it('calls itself with the url that comes from server if `ajax` is passed and `url` is not', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                createWindowSpy(win);
+                win.parent.CMS.config.request.url = '/my-url';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
@@ -198,12 +225,14 @@ describe('cms.base.js', function () {
 
                 expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
                 expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual(['/url-from-server']);
-                expect(window.parent.CMS.API.locked).toEqual(false);
-                expect(window.parent.location.reload).not.toHaveBeenCalled();
+                expect(win.parent.CMS.API.locked).toEqual(false);
+                expect(win.parent.location.reload).not.toHaveBeenCalled();
             });
 
             it('calls itself if url is REFRESH_PAGE and there is no response from server', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                createWindowSpy(win);
+                win.parent.CMS.config.request.url = '/my-url';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
@@ -224,14 +253,16 @@ describe('cms.base.js', function () {
 
                 expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
                 expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual([]);
-                expect(window.parent.CMS.API.locked).toEqual(false);
-                expect(window.parent.location.reload).toHaveBeenCalled();
+                expect(win.parent.CMS.API.locked).toEqual(false);
+                expect(win.parent.location.reload).toHaveBeenCalled();
             });
 
             it('uses correct timeout', function () {
-                window.parent.CMS.config.request.url = '/my-url';
+                var win = createFakeWindow();
+                createWindowSpy(win);
+                win.parent.CMS.config.request.url = '/my-url';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
-                window.parent.setTimeout = jasmine.createSpy().and.callFake(function (cb, timeout) {
+                win.parent.setTimeout = jasmine.createSpy().and.callFake(function (cb, timeout) {
                     expect(timeout).toEqual(50);
                     cb();
                 });
@@ -243,7 +274,7 @@ describe('cms.base.js', function () {
 
                 expect(CMS.API.Helpers.reloadBrowser('/new-url', 50, false)).toEqual(undefined);
                 expect($.ajax).not.toHaveBeenCalled();
-                expect(window.parent.location.href).toEqual('/new-url');
+                expect(win.parent.location.href).toEqual('/new-url');
             });
         });
 
