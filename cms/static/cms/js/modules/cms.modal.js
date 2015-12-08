@@ -15,14 +15,14 @@ var CMS = window.CMS || {};
     'use strict';
 
     /**
-        * The modal is triggered via API calls from the backend either
-        * through the toolbar navigation or from plugins. The APIs allow to
-        * open content from a url (iframe) or inject html directly.
-        *
-        * @class Modal
-        * @namespace CMS
-        * @uses CMS.API.Helpers
-        */
+     * The modal is triggered via API calls from the backend either
+     * through the toolbar navigation or from plugins. The APIs allow to
+     * open content from a url (iframe) or inject html directly.
+     *
+     * @class Modal
+     * @namespace CMS
+     * @uses CMS.API.Helpers
+     */
     CMS.Modal = new CMS.Class({
 
         implement: [CMS.API.Helpers],
@@ -60,11 +60,11 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Setup event pubsub mechanism for the instance.
-            *
-            * @private
-            * @method _setupEventEmitter
-            */
+         * Setup event pubsub mechanism for the instance.
+         *
+         * @private
+         * @method _setupEventEmitter
+         */
         _setupEventEmitter: function _setupEventEmitter() {
             var that = this;
             var bus = $({});
@@ -83,11 +83,11 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Stores all jQuery references within `this.ui`.
-            *
-            * @method _setupUI
-            * @private
-            */
+         * Stores all jQuery references within `this.ui`.
+         *
+         * @method _setupUI
+         * @private
+         */
         _setupUI: function _setupUI() {
             var modal = $('.cms-modal');
             this.ui = {
@@ -111,11 +111,11 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Sets up all the event handlers, such as maximize/minimize and resizing.
-            *
-            * @method _events
-            * @private
-            */
+         * Sets up all the event handlers, such as maximize/minimize and resizing.
+         *
+         * @method _events
+         * @private
+         */
         _events: function _events() {
             var that = this;
 
@@ -162,19 +162,19 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Opens the modal either in an iframe or renders markup.
-            *
-            * @method open
-            * @chainable
-            * @param {Object} opts either `opts.url` or `opts.html` are required
-            * @param {Object[]} [opts.breadcrumbs] collection of breadcrumb items
-            * @param {String|HTMLNode|jQuery} [opts.html] html markup to render
-            * @param {String} [opts.title] modal window main title (bold)
-            * @param {String} [opts.subtitle] modal window secondary title (normal)
-            * @param {String} [opts.url] url to render iframe, takes precedence over `opts.html`
-            * @param {Number} [opts.width] sets the width of the modal
-            * @param {Number} [opts.height] sets the height of the modal
-            */
+         * Opens the modal either in an iframe or renders markup.
+         *
+         * @method open
+         * @chainable
+         * @param {Object} opts either `opts.url` or `opts.html` are required
+         * @param {Object[]} [opts.breadcrumbs] collection of breadcrumb items
+         * @param {String|HTMLNode|jQuery} [opts.html] html markup to render
+         * @param {String} [opts.title] modal window main title (bold)
+         * @param {String} [opts.subtitle] modal window secondary title (normal)
+         * @param {String} [opts.url] url to render iframe, takes precedence over `opts.html`
+         * @param {Number} [opts.width] sets the width of the modal
+         * @param {Number} [opts.height] sets the height of the modal
+         */
         open: function open(opts) {
             // setup internals
             if (!(opts && opts.url || opts && opts.html)) {
@@ -257,14 +257,14 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Calculates coordinates and dimensions for modal placement
-            *
-            * @method _calculateNewPosition
-            * @private
-            * @param {Object} [opts]
-            * @param {Number} [opts.width] desired width of the modal
-            * @param {Number} [opts.height] desired height of the modal
-            */
+         * Calculates coordinates and dimensions for modal placement
+         *
+         * @method _calculateNewPosition
+         * @private
+         * @param {Object} [opts]
+         * @param {Number} [opts.width] desired width of the modal
+         * @param {Number} [opts.height] desired height of the modal
+         */
         _calculateNewPosition: function (opts) {
             // lets set the modal width and height to the size of the browser
             var widthOffset = 300; // adds margin left and right
@@ -317,17 +317,17 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Animation helper for opening the sideframe.
-            *
-            * @method _show
-            * @private
-            * @param {Object} opts
-            * @param {Number} opts.width width of the modal
-            * @param {Number} opts.height height of the modal
-            * @param {Number} opts.left left in px of the center of the modal
-            * @param {Number} opts.top top in px of the center of the modal
-            * @param {Number} opts.duration speed of opening, ms (not really used yet)
-            */
+         * Animation helper for opening the sideframe.
+         *
+         * @method _show
+         * @private
+         * @param {Object} opts
+         * @param {Number} opts.width width of the modal
+         * @param {Number} opts.height height of the modal
+         * @param {Number} opts.left left in px of the center of the modal
+         * @param {Number} opts.top top in px of the center of the modal
+         * @param {Number} opts.duration speed of opening, ms (not really used yet)
+         */
         _show: function _show(opts) {
             // we need to position the modal in the center
             var that = this;
@@ -388,10 +388,10 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Closes the current instance.
-            *
-            * @method close
-            */
+         * Closes the current instance.
+         *
+         * @method close
+         */
         close: function close() {
             // handle refresh option
             if (this.options.onClose) {
@@ -411,13 +411,13 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Animation helper for closing the iframe.
-            *
-            * @method _hide
-            * @private
-            * @param {Object} opts
-            * @param {Number} [opts.duration=this.options.modalDuration] animation duration
-            */
+         * Animation helper for closing the iframe.
+         *
+         * @method _hide
+         * @private
+         * @param {Object} opts
+         * @param {Number} [opts.duration=this.options.modalDuration] animation duration
+         */
         _hide: function _hide(opts) {
             var that = this;
             var duration = this.options.modalDuration;
@@ -448,10 +448,10 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Minimizes the modal onto the toolbar.
-            *
-            * @method minimize
-            */
+         * Minimizes the modal onto the toolbar.
+         *
+         * @method minimize
+         */
         minimize: function minimize() {
             // cancel action if maximized
             if (this.maximized) {
@@ -484,10 +484,10 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Maximizes the window according to the browser size.
-            *
-            * @method maximize
-            */
+         * Maximizes the window according to the browser size.
+         *
+         * @method maximize
+         */
         maximize: function maximize() {
             // cancel action when minimized
             if (this.minimized) {
@@ -516,12 +516,12 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Initiates the start move event from `_events`.
-            *
-            * @method _startMove
-            * @private
-            * @param {Object} pointerEvent passes starting event
-            */
+         * Initiates the start move event from `_events`.
+         *
+         * @method _startMove
+         * @private
+         * @param {Object} pointerEvent passes starting event
+         */
         _startMove: function _startMove(pointerEvent) {
             // cancel if maximized or minimized
             if (this.maximized || this.minimized) {
@@ -552,11 +552,11 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Initiates the stop move event from `_startResize`.
-            *
-            * @method _stopMove
-            * @private
-            */
+         * Initiates the stop move event from `_startResize`.
+         *
+         * @method _stopMove
+         * @private
+         */
         _stopMove: function _stopMove() {
             this.ui.shim.hide();
             this.ui.body
@@ -565,12 +565,12 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Initiates the start resize event from `_events`.
-            *
-            * @method _startResize
-            * @private
-            * @param {Object} pointerEvent passes starting event
-            */
+         * Initiates the start resize event from `_events`.
+         *
+         * @method _startResize
+         * @private
+         * @param {Object} pointerEvent passes starting event
+         */
         _startResize: function _startResize(pointerEvent) {
             // cancel if in fullscreen
             if (this.maximized) {
@@ -621,11 +621,11 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Initiates the stop resize event from `_startResize`.
-            *
-            * @method _stopResize
-            * @private
-            */
+         * Initiates the stop resize event from `_startResize`.
+         *
+         * @method _stopResize
+         * @private
+         */
         _stopResize: function _stopResize() {
             this.ui.shim.hide();
             this.ui.body
@@ -634,12 +634,12 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Sets the breadcrumb inside the modal.
-            *
-            * @method _setBreadcrumb
-            * @private
-            * @param {Object[]} breadcrumbs renderes breadcrumb on modal
-            */
+         * Sets the breadcrumb inside the modal.
+         *
+         * @method _setBreadcrumb
+         * @private
+         * @param {Object[]} breadcrumbs renderes breadcrumb on modal
+         */
         _setBreadcrumb: function _setBreadcrumb(breadcrumbs) {
             var crumb = '';
             var template = '<a href="{1}" class="{2}"><span>{3}</span></a>';
@@ -671,12 +671,12 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Sets the buttons inside the modal.
-            *
-            * @method _setButtons
-            * @private
-            * @param {jQuery} iframe loaded iframe element
-            */
+         * Sets the buttons inside the modal.
+         *
+         * @method _setButtons
+         * @private
+         * @param {jQuery} iframe loaded iframe element
+         */
         _setButtons: function _setButtons(iframe) {
             var djangoSuit = iframe.contents().find('.suit-columns').length > 0;
             var that = this;
@@ -806,15 +806,15 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Version where the modal loads an iframe.
-            *
-            * @method _loadIframe
-            * @private
-            * @param {Object} opts
-            * @param {String} opts.url url to render iframe, takes presedence over opts.html
-            * @param {Object[]} [opts.breadcrumbs] collection of breadcrumb items
-            * @param {String} [opts.title] modal window main title (bold)
-            */
+         * Version where the modal loads an iframe.
+         *
+         * @method _loadIframe
+         * @private
+         * @param {Object} opts
+         * @param {String} opts.url url to render iframe, takes presedence over opts.html
+         * @param {Object[]} [opts.breadcrumbs] collection of breadcrumb items
+         * @param {String} [opts.title] modal window main title (bold)
+         */
         _loadIframe: function _loadIframe(opts) {
             var that = this;
 
@@ -976,12 +976,12 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Version where the modal loads an url within an iframe.
-            *
-            * @method _changeIframe
-            * @private
-            * @param {jQuery} el originated element
-            */
+         * Version where the modal loads an url within an iframe.
+         *
+         * @method _changeIframe
+         * @private
+         * @param {jQuery} el originated element
+         */
         _changeIframe: function _changeIframe(el) {
             if (el.hasClass('active')) {
                 return false;
@@ -1000,15 +1000,15 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * Version where the modal loads html markup.
-            *
-            * @method _loadMarkup
-            * @private
-            * @param {Object} opts
-            * @param {String|HTMLNode|jQuery} opts.html html markup to render
-            * @param {String} opts.title modal window main title (bold)
-            * @param {String} [opts.subtitle] modal window secondary title (normal)
-            */
+         * Version where the modal loads html markup.
+         *
+         * @method _loadMarkup
+         * @private
+         * @param {Object} opts
+         * @param {String|HTMLNode|jQuery} opts.html html markup to render
+         * @param {String} opts.title modal window main title (bold)
+         * @param {String} [opts.subtitle] modal window secondary title (normal)
+         */
         _loadMarkup: function _loadMarkup(opts) {
             this.ui.modal.removeClass('cms-modal-iframe');
             this.ui.modal.addClass('cms-modal-markup');
@@ -1022,17 +1022,17 @@ var CMS = window.CMS || {};
         },
 
         /**
-            * _deletePlugin removes a plugin once created when clicking
-            * on delete or the close item. If we don't do this, an empty
-            * plugin is generated
-            * https://github.com/divio/django-cms/pull/4381 will eventually
-            * provide a better solution
-            *
-            * @method _deletePlugin
-            * @private
-            * @param {Object} [opts] general objects element that holds settings
-            * @param {Boolean} [opts.hideAfter] hides the modal after the ajax requests succeeds
-            */
+         * _deletePlugin removes a plugin once created when clicking
+         * on delete or the close item. If we don't do this, an empty
+         * plugin is generated
+         * https://github.com/divio/django-cms/pull/4381 will eventually
+         * provide a better solution
+         *
+         * @method _deletePlugin
+         * @private
+         * @param {Object} [opts] general objects element that holds settings
+         * @param {Boolean} [opts.hideAfter] hides the modal after the ajax requests succeeds
+         */
         _deletePlugin: function _deletePlugin(opts) {
             var that = this;
             var data = CMS._newPlugin;
@@ -1059,17 +1059,17 @@ var CMS = window.CMS || {};
     });
 
     /**
-        * Sets up keyup/keydown listeners so you're able to save whatever you're
-        * editing inside of an iframe by pressing `ctrl + enter` on windows and `cmd + enter` on mac.
-        *
-        * It only works with default button (e.g. action), not the `delete` button,
-        * even though sometimes it's the only actionable button in the modal.
-        *
-        * @method _setupCtrlEnterSave
-        * @private
-        * @static
-        * @param {HTMLElement} document document element (iframe or parent window);
-        */
+     * Sets up keyup/keydown listeners so you're able to save whatever you're
+     * editing inside of an iframe by pressing `ctrl + enter` on windows and `cmd + enter` on mac.
+     *
+     * It only works with default button (e.g. action), not the `delete` button,
+     * even though sometimes it's the only actionable button in the modal.
+     *
+     * @method _setupCtrlEnterSave
+     * @private
+     * @static
+     * @param {HTMLElement} document document element (iframe or parent window);
+     */
     CMS.Modal._setupCtrlEnterSave = function _setupCtrlEnterSave(doc) {
         var cmdPressed = false;
         var mac = (navigator.platform.toLowerCase().indexOf('mac') + 1);
