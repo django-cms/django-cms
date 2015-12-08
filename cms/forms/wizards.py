@@ -82,7 +82,7 @@ class BaseCMSPageForm(forms.Form):
     title = forms.CharField(
         label=_(u'Title'), max_length=255,
         help_text=_(u"Provide a title for the new page."))
-    slug = forms.CharField(
+    slug = forms.SlugField(
         label=_(u'Slug'), max_length=255, required=False,
         help_text=_(u"Leave empty for automatic slug, or override as required.")
     )
