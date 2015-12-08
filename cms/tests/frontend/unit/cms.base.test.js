@@ -5,6 +5,7 @@
 describe('cms.base.js', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
+    // same implementation as in CMS.API.Helpers._isStorageSupported
     var _isLocalStorageSupported = (function () {
         var mod = 'modernizr';
         try {
