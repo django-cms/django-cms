@@ -199,7 +199,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div class="cms-submenu-item cms-submenu-item-title"><span>Generic</span>')
 
-    def test_markup_flash_custom_module(self):
+    def test_markup_link_custom_module(self):
         superuser = self.get_superuser()
         create_page("toolbar-page", "col_two.html", "en", published=True)
         with self.login_user_context(superuser):
