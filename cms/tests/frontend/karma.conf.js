@@ -145,11 +145,13 @@ module.exports = function (config) {
 
         settings.browsers = Object.keys(browsers);
 
-        settings.concurrency = 1;
+        if (process.env.CI) {
+            settings.concurrency = 5;
+        }
 
         settings.sauceLabs = {
             testName: baseConf.formatTaskName('Unit'),
-            tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER || Math.random()
+            tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER || String(Math.random())
         };
         settings.captureTimeout = 0; // rely on SL timeout, see karma-runner/karma-sauce-launcher#37
         settings.customLaunchers = browsers;
