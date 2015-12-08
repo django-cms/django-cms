@@ -146,11 +146,12 @@ module.exports = function (config) {
         settings.browsers = Object.keys(browsers);
 
         if (process.env.CI) {
-            settings.concurrency = 1;
+            settings.concurrency = 5;
         }
 
         settings.sauceLabs = {
             testName: baseConf.formatTaskName('Unit'),
+            build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
             tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER || String(Math.random())
         };
         settings.logLevel = config.LOG_ERROR;

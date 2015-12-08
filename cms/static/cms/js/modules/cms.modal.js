@@ -873,7 +873,7 @@ var CMS = window.CMS || {};
                     CMS.Modal._setupCtrlEnterSave(iframe[0].contentWindow.document);
                 }
                 // for ckeditor we need to go deeper
-                if (iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
+                if (iframe[0].contentWindow && iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
                     $(iframe[0].contentWindow.document).ready(function () {
                         // setTimeout is required to battle CKEditor initialisation
                         setTimeout(function () {
