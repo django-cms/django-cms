@@ -189,57 +189,61 @@ describe('CMS.Modal', function () {
 
         it('applies correct state to modal controls 1', function () {
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).toBeVisible();
-            expect(modal.ui.minimizeButton).toBeVisible();
-            expect(modal.ui.maximizeButton).toBeVisible();
+            // here and in others we cannot use `.toBeVisible` matcher,
+            // because it uses jQuery's `:visible` selector which relies
+            // on an element having offsetWidth/offsetHeight, but
+            // Safari reports it to be 0 if an element is scaled with transform
+            expect(modal.ui.resize).toHaveCss({ display: 'block' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'block' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
         it('applies correct state to modal controls 2', function () {
             modal = new CMS.Modal({ resizable: false });
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).not.toBeVisible();
-            expect(modal.ui.minimizeButton).toBeVisible();
-            expect(modal.ui.maximizeButton).toBeVisible();
+            expect(modal.ui.resize).toHaveCss({ display: 'none' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'block' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
         it('applies correct state to modal controls 3', function () {
             modal = new CMS.Modal({ resizable: true });
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).toBeVisible();
-            expect(modal.ui.minimizeButton).toBeVisible();
-            expect(modal.ui.maximizeButton).toBeVisible();
+            expect(modal.ui.resize).toHaveCss({ display: 'block' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'block' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
         it('applies correct state to modal controls 4', function () {
             modal = new CMS.Modal({ minimizable: false });
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).toBeVisible();
-            expect(modal.ui.minimizeButton).not.toBeVisible();
-            expect(modal.ui.maximizeButton).toBeVisible();
+            expect(modal.ui.resize).toHaveCss({ display: 'block' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'none' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
         it('applies correct state to modal controls 5', function () {
             modal = new CMS.Modal({ minimizable: true });
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).toBeVisible();
-            expect(modal.ui.minimizeButton).toBeVisible();
-            expect(modal.ui.maximizeButton).toBeVisible();
+            expect(modal.ui.resize).toHaveCss({ display: 'block' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'block' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
         it('applies correct state to modal controls 6', function () {
             modal = new CMS.Modal({ maximizable: false });
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).toBeVisible();
-            expect(modal.ui.minimizeButton).toBeVisible();
-            expect(modal.ui.maximizeButton).not.toBeVisible();
+            expect(modal.ui.resize).toHaveCss({ display: 'block' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'block' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'none' });
         });
 
         it('applies correct state to modal controls 7', function () {
             modal = new CMS.Modal({ maximizable: true });
             modal.open({ html: '<div></div>' });
-            expect(modal.ui.resize).toBeVisible();
-            expect(modal.ui.minimizeButton).toBeVisible();
-            expect(modal.ui.maximizeButton).toBeVisible();
+            expect(modal.ui.resize).toHaveCss({ display: 'block' });
+            expect(modal.ui.minimizeButton).toHaveCss({ display: 'block' });
+            expect(modal.ui.maximizeButton).toHaveCss({ display: 'block' });
         });
 
         it('resets minimized state if the modal was already minimized', function () {
