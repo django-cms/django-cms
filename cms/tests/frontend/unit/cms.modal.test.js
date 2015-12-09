@@ -350,6 +350,7 @@ describe('CMS.Modal', function () {
             modal.minimize();
 
             expect(modal.minimized).toEqual(false);
+            expect(modal.ui.modal).toHaveCss(modal.ui.modal.data('css'));
             expect(modal.ui.body).not.toHaveClass('cms-modal-minimized');
         });
     });
