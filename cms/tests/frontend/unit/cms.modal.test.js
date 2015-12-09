@@ -436,9 +436,9 @@ describe('CMS.Modal', function () {
             modal.open({ html: '<div></div>' });
 
             CMS.API.Helpers.addEventListener('modal-restored', function (e, data) {
+                CMS.API.Helpers.removeEventListener('modal-restored');
                 expect(true).toEqual(true);
                 expect(data.instance).toEqual(modal);
-                CMS.API.Helpers.removeEventListener('modal-maximized');
                 done();
             });
 
