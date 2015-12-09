@@ -131,6 +131,8 @@ module.exports = function (config) {
         browsers: Object.keys(browsers),
 
         concurrency: Infinity,
+
+        // we need at least 2 minutes because things are a bit slow
         browserNoActivityTimeout: 2 * 60 * 1000,
 
         // Continuous Integration mode
