@@ -498,6 +498,7 @@ describe('CMS.Modal', function () {
             expect(modal.close()).toEqual(undefined);
             setTimeout(function () {
                 expect(modal._deletePlugin).toHaveBeenCalled();
+                expect(modal.ui.modal).toHaveClass('cms-modal-open');
                 done();
             }, 10);
             delete CMS._newPlugin;
