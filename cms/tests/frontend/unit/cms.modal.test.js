@@ -356,7 +356,99 @@ describe('CMS.Modal', function () {
     });
 
     describe('.maximize()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal();
+                done();
+            });
+        });
 
+        afterEach(function () {
+            modal.close();
+            fixture.cleanup();
+        });
+
+        it('maximizes the modal', function () {
+            modal.open({ html: '<div></div>' });
+
+            modal.maximize();
+            expect(modal.ui.body).toHaveClass('cms-modal-maximized');
+            expect(modal.maximized).toEqual(true);
+            modal.maximize(); // restore
+        });
+
+        it('stores the css data to be able to restore a modal', function () {
+            modal.open({ html: '<div></div>' });
+            modal.maximize();
+
+            var css = modal.ui.modal.data('css');
+            expect(css).toEqual(jasmine.any(Object));
+            expect(Object.keys(css)).toContain('margin-left');
+            expect(Object.keys(css)).toContain('margin-top');
+            expect(Object.keys(css)).toContain('width');
+            expect(Object.keys(css)).toContain('height');
+            expect(Object.keys(css)).toContain('top');
+            expect(Object.keys(css)).toContain('left');
+
+            modal.maximize(); // restore
+        });
+
+        it('dispatches the modal-maximized event', function (done) {
+            modal.open({ html: '<div></div>' });
+
+            CMS.API.Helpers.addEventListener('modal-maximized', function (e, data) {
+                expect(data.instance).toEqual(modal);
+                CMS.API.Helpers.removeEventListener('modal-maximized');
+                done();
+            });
+
+            modal.maximize();
+            modal.maximize(); // restore
+        });
+
+        it('does not maximize minimized modal', function () {
+            modal.open({ html: '<div></div>' });
+            modal.minimize();
+
+            expect(modal.maximize()).toEqual(false);
+            expect(modal.maximized).toEqual(false);
+            expect(modal.minimized).toEqual(true);
+            modal.minimize(); // restore
+        });
+
+        it('restores modal if it was already maximized', function () {
+            modal.open({ html: '<div></div>' });
+
+            modal.maximize();
+            modal.maximize(); // restore
+            expect(modal.ui.body).not.toHaveClass('cms-modal-maximized');
+            expect(modal.ui.modal).toHaveCss(modal.ui.modal.data('css'));
+            expect(modal.maximized).toEqual(false);
+        });
+
+        it('dispatches modal-restored event when it restores the modal', function (done) {
+            modal.open({ html: '<div></div>' });
+
+            CMS.API.Helpers.addEventListener('modal-restored', function (e, data) {
+                expect(true).toEqual(true);
+                expect(data.instance).toEqual(modal);
+                CMS.API.Helpers.removeEventListener('modal-maximized');
+                done();
+            });
+
+            modal.maximize();
+            modal.maximize(); // restore
+        });
     });
 
     describe('.close()', function () {
