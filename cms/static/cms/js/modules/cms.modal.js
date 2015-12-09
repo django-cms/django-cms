@@ -866,6 +866,7 @@ var CMS = window.CMS || {};
                         error: true
                     });
                     that.close();
+                    return;
                 }
 
                 CMS.Modal._setupCtrlEnterSave(document);
