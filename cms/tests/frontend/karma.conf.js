@@ -67,7 +67,13 @@ module.exports = function (config) {
 
             // fixtures
             'cms/tests/frontend/unit/fixtures/**/*.html',
-            'cms/tests/frontend/unit/html/**/*.html'
+            'cms/tests/frontend/unit/html/**/*.html',
+
+            // other static assets
+            { pattern: 'cms/static/cms/**/*.gif', watched: false, included: false, served: true },
+            { pattern: 'cms/static/cms/**/*.woff', watched: false, included: false, served: true },
+            { pattern: 'cms/static/cms/**/*.ttf', watched: false, included: false, served: true },
+            { pattern: 'cms/static/cms/**/*.eot', watched: false, included: false, served: true }
         ].concat(
             // tests themselves
             files.map(function (pattern) {
