@@ -23,6 +23,9 @@ Page wizard* will open a new dialog box.
 
 .. tip::
 
+    You can provide any text and other content you like in this site, but if you'd like to use our
+    examples, just copy them from these **Tip** boxes.
+
     Title
         Home
 

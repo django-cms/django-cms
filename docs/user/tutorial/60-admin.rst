@@ -168,8 +168,4 @@ need.
     .. |use-this-file| image:: images/select_file.png
        :alt: 'use this file'
 
-
-    .. image:: images/select_file.png
-       :alt: showing person list
-
 #.  Save the Person, and see your changes.

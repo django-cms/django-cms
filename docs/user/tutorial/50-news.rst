@@ -14,12 +14,10 @@ information is news articles.
 Create an **apphook**
 *********************
 
-.. todo:: text needs updating
+Just as we did with Aldryn People, we should :ref:`create an apphook <create_an_apphook>` to create
+a landing page for the news items.
 
-Just as we did with Aldryn People, we should create an apphook to create a landing page for the
-news items.
-
-We'll create a *News* page, and add an apphook for the Aldryn News & Blog application to it.
+We'll create a *News* page, and add an apphook for the Aldryn News & Blog application to it:
 
 #.  Create and publish a new page called News.
 #.  Open the page settings - *Page* > *Page settings* from the toolbar:

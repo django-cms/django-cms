@@ -69,6 +69,7 @@ Do the same for a second person:
     Description
         Cyrus is on call night and day to rescue stranded cyclists.
 
+.. _create_an_apphook:
 
 *********************
 Create an **apphook**
@@ -114,9 +115,37 @@ We'll create a *People* page, and add an apphook for the Aldryn People applicati
 
 #.  Hit |publish-changes| to publish the page.
 
-And here is the published page, with the people listed in it.
+.. image:: /user/tutorial/images/people_page_list.png
+   :alt: the People page list
+   :width: 500
+   :align: center
+
+
+******************
+Create a Group
+******************
+
+Let's improve the list of People by putting them in a Group (a Group corresponds to a company
+department or section, for example).
+
+#.  From the toolbar, select *People* > *Add new Group*.
+#.  Provide a *Name* for the group, and if you like, some optional additional information.
+#.  **Save** the Group.
+
+Now you can add your People to this Group:
+
+#.  From the toolbar, select *People* > *Person list*.
+#.  Select a Person to edit, and choose the Group to which they belong.
+
+    ..todo::  screenshot required
+
+#.  **Save**
+
+Note that a Person can be a member of multiple Groups if required.
+
+And here is the published page, with the newly-created group.
 
 .. image:: /user/tutorial/images/mechanics_people_group.png
-   :alt: People page list
+   :alt: People page list, with a group
    :width: 500
    :align: center
