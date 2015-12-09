@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 from django.db.models import F
+from django.conf import settings
 
 from treebeard.numconv import NumConv
 
@@ -126,6 +127,9 @@ class MP_AddChildHandler(MP_AddHandler):
 
 
 def move_to_mp(apps, schema_editor):
+    if not schema_editor.connection.alias == getattr(settings, 'CMS_DATABASE_NAME', 'default'):
+        return
+
     Page = apps.get_model("cms", "Page")
     CMSPlugin = apps.get_model("cms", "CMSPlugin")
     pages = Page.objects.all().order_by('tree_id', 'level', 'lft')
