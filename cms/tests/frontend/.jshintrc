@@ -13,6 +13,7 @@
         "afterEach",
         "spyOn",
         "spyOnEvent",
-        "fixture"
+        "fixture",
+        "pending"
     ]
 }

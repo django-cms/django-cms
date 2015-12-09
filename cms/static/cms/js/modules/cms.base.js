@@ -101,7 +101,8 @@ var CMS = {
         reloadBrowser: function (url, timeout, ajax) {
             var that = this;
             // is there a parent window?
-            var parent = (window.parent) ? window.parent : window;
+            var win = this._getWindow();
+            var parent = (win.parent) ? win.parent : win;
 
             // if there is an ajax reload, prioritize
             if (ajax) {
@@ -566,7 +567,19 @@ var CMS = {
         */
         allowTouchScrolling: function allowTouchScrolling(element, namespace) {
             element.off('touchmove.cms.preventscroll.' + namespace);
+        },
+
+        /**
+         * Returns window object.
+         *
+         * @method _getWindow
+         * @private
+         * @returns {Window}
+         */
+        _getWindow: function () {
+            return window;
         }
+
     };
 
     // shorthand for jQuery(document).ready();
