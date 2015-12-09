@@ -72,6 +72,7 @@ module.exports = function (config) {
             // other static assets
             { pattern: 'cms/static/cms/**/*.gif', watched: false, included: false, served: true },
             { pattern: 'cms/static/cms/**/*.woff', watched: false, included: false, served: true },
+            { pattern: 'cms/static/cms/**/*.woff2', watched: false, included: false, served: true },
             { pattern: 'cms/static/cms/**/*.ttf', watched: false, included: false, served: true },
             { pattern: 'cms/static/cms/**/*.eot', watched: false, included: false, served: true }
         ].concat(
