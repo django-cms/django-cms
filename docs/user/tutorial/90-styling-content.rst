@@ -8,23 +8,65 @@ The Contact page
 
 Our Contact page has some useful content, but it's not very well laid-out.
 
-.. todo::
-
-    image of Contact page with:
-
-    * header created in 80-site-wide-content
-    * content:
-
-        Our workshop is at Zollstrasse 53, Zürich. We're open 24 hours a day, seven days a week,
-        every day of the year.
-
-        The map we added in 30-structure-content-modes
-
-    * footer created in 80-site-wide-content
+.. image:: /user/tutorial/images/entire_contact_page.png
+   :alt: Entire contact page
 
 We'll use the *columns* functionality to place the text and the map side-by-side, in columns.
 
-.. todo:: Please create screenshots of steps required to place the existing content into two columns
+1. Switch to structure mode |structure-switch| and add a new *Row* plugin.
+
+.. |structure-switch| image:: /user/tutorial/images/structure-button.png
+   :alt: Switch to structure mode
+   :width: 160
+
+.. image:: /user/tutorial/images/row_plugin.png
+   :alt: Select Row plugin
+   :align: center
+   :width: 350
+
+2. Select the amount of columns you want to add and define which amount of the screen they should take.
+
+.. note::
+    The whole grid consists of 24 columns. If we want to split the content in half, which means half of the width of the container, we need to split the 24 columns in equal parts. In this case it would be 12 columns each.
+
+    Please find a more detailed explanation here below.
+
+.. image:: /user/tutorial/images/define_grid.png
+   :alt: Define columns
+
+3. Once you defined the amount of columns and the size of them, hit |save-button|
+
+.. |save-button| image:: /user/tutorial/images/save_button.png
+   :alt: Save button
+   :width: 50
+
+4. Now you will find your row including the columns below your content.
+
+.. image:: /user/tutorial/images/row_created_content_not_moved.png
+   :alt: Row empty
+   :align: center
+   :width: 500
+
+5. Drag & drop the text plugin in once column and the map plugin in the other.
+
+.. image:: /user/tutorial/images/drag_content_to_column.png
+   :alt: Drag content
+   :align: center
+   :width: 500
+
+6. Now it should look like this in structure mode:
+
+.. image:: /user/tutorial/images/content_moved.png
+   :alt: Content moved
+   :align: center
+   :width: 500
+
+This is how the final content looks like:
+
+.. image:: /user/tutorial/images/row_result_contactpage.png
+   :alt: Contact Page
+   :align: center
+
 
 This is a very basic example of styling.
 
