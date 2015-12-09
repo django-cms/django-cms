@@ -1,6 +1,6 @@
-##############
-Adding plugins
-##############
+###########
+Add plugins
+###########
 
 In this section we will edit the *How to find us* page to show a map, using a *plugin*.
 
@@ -32,6 +32,10 @@ install if you want them.
 Structure and content modes
 ***************************
 
+* In *Content* mode, which you have been using so far, you can double-click on content to edit it.
+
+* In *Structure* mode, you can manage the placement of content within the page structure.
+
 .. image:: /user/tutorial/images/structure-content.png
      :align: right
      :alt: the 'Structure/Content' mode control
@@ -40,15 +44,11 @@ Structure and content modes
 The *Structure/Content* mode control in the toolbar lets you switch between two different editing
 modes.
 
-You've already used *Content* mode, in which you can double-click on content to edit it.
-
-In *Structure* mode, you can manage the placement of content within the page structure.
-
 .. |structure-button| image:: /user/tutorial/images/structure-button.png
    :alt: 'structure'
    :width: 148
 
-* Switch to *Structure* mode by hitting the |structure-button| button.
+*   Switch to *Structure* mode by hitting the |structure-button| button.
 
 This reveals the *structure board* containing the *placeholders* available on the page, and the
 *plugins* in them. Here you can see just one placeholder, called *Content*, containing one plugin -
@@ -111,7 +111,7 @@ another placeholder, simply by dragging them.
 
     Remember, any changes you make will need to be published in order for other users to see them.
 
-You can switch back to content mode to see the effect of your changes.
+You can switch back to *Content mode* to see the effect of your changes.
 
 .. image:: /user/tutorial/images/page-with-google-map.png
    :alt: the Google Maps plugins shows the workshop location

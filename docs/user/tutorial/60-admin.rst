@@ -1,6 +1,6 @@
-################
-The Django Admin
-################
+####################
+Use the Django admin
+####################
 
 ******************
 The Admin overlay
@@ -163,7 +163,7 @@ need.
 
 #.  The Filer will open; find the image you want to use for this Person.
 
-#.  To apply the image to the Person, hit the |use-this-file| (use this file) icon.
+#.  To apply the image to the Person, hit the |use-this-file| (*use this file*) icon.
 
     .. |use-this-file| image:: images/select_file.png
        :alt: 'use this file'

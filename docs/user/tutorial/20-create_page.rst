@@ -89,9 +89,9 @@ In editing mode:
 You can continue making and previewing changes privately until you are ready to publish them.
 
 
-*********************
-Create a contact page
-*********************
+***************************
+Add a *How to find us* page
+***************************
 
 Now we should create a second page, with contact information, so that customers can find our
 workshop.

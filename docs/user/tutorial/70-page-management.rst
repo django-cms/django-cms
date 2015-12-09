@@ -1,6 +1,6 @@
-##############
-Managing pages
-##############
+############
+Manage pages
+############
 
 Our menu of pages is growing:
 

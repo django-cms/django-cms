@@ -4,14 +4,19 @@
 Tutorial
 ########
 
-.. note:: This is a new section in the django CMS documentation, and a priority
-          for the project. If you'd like to contribute to it, we'd love to hear
-          from you - join us on the #django-cms IRC channel on `freenode`_ or
-          the `django-cms-developers`_ email list.
+.. note::
 
-It's strongly recommended that you follow this tutorial step-by-step. It has
-been designed to introduce you to the system in a methodical way, and each
-step builds on the previous one.
+    This is a new section in the django CMS documentation. Your feedback is very helpful to us. -
+    join us on the #django-cms IRC channel on `freenode`_ or the `django-cms-developers`_ email
+    list.
+
+**It's strongly recommended that you follow this tutorial step-by-step.**
+
+In each step you will do a practical task or tasks that reflect real-life steps in building a site,
+and each task introduces you to a key feature or functionality that you will use again and again.
+
+The tutorial has been designed to introduce you to the system in a methodical way, and each step
+builds on the previous one.
 
 In the tutorial you'll build a website for a bicycle repair service, using a full range of django
 CMS functionality. You'll also learn how to manage information about such things as events, people,

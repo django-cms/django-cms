@@ -1,6 +1,6 @@
-#################
-Site-wide content
-#################
+########################
+Adding site-wide content
+########################
 
 So far, we have been able to add content to particular parts of the site, and in some cases, re-use
 it with plugins.
@@ -56,7 +56,6 @@ the placeholder on any page, so:
        :alt: 'Choose image plugin'
        :width: 50%
 
-
 #.  Add a wide, short image that will function as a suitable header.
 
     .. image:: /user/tutorial/images/home_overview.png
@@ -64,10 +63,10 @@ the placeholder on any page, so:
        :width: 100%
        :align: center
 
+
 *************************************************
 Add a site-wide footer using a static placeholder
 *************************************************
-
 
 We should also add a footer, in just the same way - this time, add something to the *Footer* static placeholder.
 

@@ -1,8 +1,13 @@
-#########################
-Adding people to the site
-#########################
+######################
+Add people to the site
+######################
 
 In this section we will add some people to the website using the *Aldryn People* application.
+
+
+**********************************
+About integrated django CMS addons
+**********************************
 
 Aldryn People is not part of django CMS, it's a separate application, that is designed to integrate
 with it and extend its functionality. It adds new concepts (of people and groups of people) to
@@ -125,7 +130,7 @@ We'll create a *People* page, and add an apphook for the Aldryn People applicati
 Create a Group
 ******************
 
-Let's improve the list of People by putting them in a Group (a Group corresponds to a company
+Let's improve the list of People by putting them in a **Group** (a Group corresponds to a company
 department or section, for example).
 
 #.  From the toolbar, select *People* > *Add new Group*.
