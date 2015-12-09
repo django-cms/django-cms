@@ -63,7 +63,7 @@ script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ]; then gulp lint; fi;
   - sh -c "if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then
-      djangocms-helper cms --cms server 2>&1 &
+      sh cms/tests/frontend/integration/run_testserver.sh
       sleep 30;
       gulp tests:integration;
     fi"
