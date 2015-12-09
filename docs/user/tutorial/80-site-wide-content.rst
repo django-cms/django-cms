@@ -13,7 +13,6 @@ footer. So let's add both to our site.
 Add a site-wide header using a static placeholder
 *************************************************
 
-
 You can do this sort of thing with **Static placeholders**. You have already used placeholders, for
 example when you :ref:`added a News plugin <use-news-plugin>` to the home page. A static
 placeholder's contents will appear in every page, in the same place.
@@ -21,10 +20,10 @@ placeholder's contents will appear in every page, in the same place.
 We'll add an image to the top of every page on the site, by adding it to the *Header* static
 placeholder.
 
-    .. image:: /user/tutorial/images/header_static_placeholder.png
-       :alt: Header static placeholder
-       :width: 100%
-       :align: center
+.. image:: /user/tutorial/images/header_static_placeholder.png
+   :alt: Header static placeholder
+   :width: 100%
+   :align: center
 
 Anything that is placed in there will be displayed at the top of every page. You can also edit it
 the placeholder on any page, so:

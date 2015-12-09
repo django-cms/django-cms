@@ -47,9 +47,9 @@ Publishing
 .. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
    :alt: 'Publish page now'
 
-Your newly-created page is just a *draft*, and won't actually be published until you decide. As an
-editor, you can see drafts, but other visitors to your site can only see pages that you have
-explicitly published.
+Your newly-created page is just a *draft*, and won't actually be published until you decide to
+publish it. As an editor, you can see drafts, but other visitors to your site can only see pages
+that you have explicitly published.
 
 * Hit |publish-page-now| to publish the page.
 
