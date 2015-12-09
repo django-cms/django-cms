@@ -402,9 +402,10 @@ describe('CMS.Modal', function () {
         it('dispatches the modal-maximized event', function (done) {
             modal.open({ html: '<div></div>' });
 
+            CMS._eventRoot = $('#cms-top');
             CMS.API.Helpers.addEventListener('modal-maximized', function (e, data) {
-                expect(data.instance).toEqual(modal);
                 CMS.API.Helpers.removeEventListener('modal-maximized');
+                expect(data.instance).toEqual(modal);
                 done();
             });
 
@@ -435,10 +436,11 @@ describe('CMS.Modal', function () {
         it('dispatches modal-restored event when it restores the modal', function (done) {
             modal.open({ html: '<div></div>' });
 
+            CMS._eventRoot = $('#cms-top');
             CMS.API.Helpers.addEventListener('modal-restored', function (e, data) {
+                CMS.API.Helpers.removeEventListener('modal-restored');
                 expect(true).toEqual(true);
                 expect(data.instance).toEqual(modal);
-                CMS.API.Helpers.removeEventListener('modal-maximized');
                 done();
             });
 
@@ -448,6 +450,72 @@ describe('CMS.Modal', function () {
     });
 
     describe('.close()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                done();
+            });
+        });
 
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('closes the modal', function (done) {
+            modal.open({ html: '<div></div>' });
+
+            spyOn(modal, '_hide').and.callThrough();
+
+            setTimeout(function () {
+                modal.close();
+                expect(modal._hide).toHaveBeenCalled();
+                setTimeout(function () {
+                    expect(modal.ui.modal).not.toHaveClass('cms-modal-open');
+                    expect(modal.ui.modal).toHaveCss({ display: 'none' });
+                    done();
+                }, 10);
+            }, 10);
+        });
+
+        it('does not close if there is a plugin creation in process', function (done) {
+            modal.open({ html: '<div></div>' });
+            CMS._newPlugin = true;
+            spyOn(modal, '_deletePlugin').and.callFake(function (arg) {
+                expect(arg).toEqual({ hideAfter: true });
+                return false;
+            });
+
+            expect(modal.close()).toEqual(undefined);
+            setTimeout(function () {
+                expect(modal._deletePlugin).toHaveBeenCalled();
+                expect(modal.ui.modal).toHaveClass('cms-modal-open');
+                done();
+            }, 10);
+            delete CMS._newPlugin;
+        });
+
+        it('reloads the browser if onClose is provided', function (done) {
+            modal = new CMS.Modal({ onClose: '/this-url' });
+            modal.open({ html: '<div></div>' });
+            spyOn(modal, 'reloadBrowser').and.callFake(function (url, timeout, ajax) {
+                expect(url).toEqual('/this-url');
+                expect(timeout).toEqual(false);
+                expect(ajax).toEqual(true);
+                done();
+            });
+            modal.close();
+        });
     });
 });
