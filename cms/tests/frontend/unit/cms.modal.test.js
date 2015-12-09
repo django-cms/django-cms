@@ -448,6 +448,46 @@ describe('CMS.Modal', function () {
     });
 
     describe('.close()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                done();
+            });
+        });
 
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('closes the modal', function (done) {
+            modal.open({ html: '<div></div>' });
+
+            spyOn(modal, '_hide').and.callThrough();
+
+            setTimeout(function () {
+                modal.close();
+                expect(modal._hide).toHaveBeenCalled();
+                setTimeout(function () {
+                    expect(modal.ui.modal).not.toHaveClass('cms-modal-open');
+                    expect(modal.ui.modal).toHaveCss({ display: 'none' });
+                    done();
+                }, 10);
+            }, 10);
+        });
+
+        it('does not close if there is a plugin creation in process');
+        it('reloads the browser if onClose is provided');
     });
 });
