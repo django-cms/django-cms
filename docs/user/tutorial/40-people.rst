@@ -115,10 +115,10 @@ We'll create a *People* page, and add an apphook for the Aldryn People applicati
 
 #.  Hit |publish-changes| to publish the page.
 
-    .. image:: /user/tutorial/images/people_page_list.png
-       :alt: the People page list
-       :width: 500
-       :align: center
+.. image:: /user/tutorial/images/people_page_list.png
+   :alt: the People page list
+   :width: 500
+   :align: center
 
 
 ******************
@@ -133,7 +133,6 @@ department or section, for example).
     .. image:: /user/tutorial/images/add_new_group_toolbar.png
        :alt: Add new group
        :align: center
-
 
 #.  Provide a *Name* for the group, and if you like, some optional additional information.
 
@@ -163,6 +162,6 @@ Note that a Person can be a member of multiple Groups if required.
 
 And here is the published page, with the newly-created group.
 
-    .. image:: /user/tutorial/images/mechanics_people_group.png
-       :alt: People page list, with a group
-       :align: center
+.. image:: /user/tutorial/images/mechanics_people_group.png
+   :alt: People page list, with a group
+   :align: center
