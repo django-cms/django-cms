@@ -74,6 +74,7 @@ describe('CMS.Modal', function () {
     });
 
     describe('.open()', function () {
+        var modal;
         beforeEach(function (done) {
             fixture.load('modal.html');
             delete CMS._newPlugin;
@@ -86,6 +87,7 @@ describe('CMS.Modal', function () {
                 hideLoader: jasmine.createSpy()
             };
             $(function () {
+                modal = new CMS.Modal();
                 done();
             });
         });
@@ -95,8 +97,6 @@ describe('CMS.Modal', function () {
         });
 
         it('throws an error when no url or html options were passed', function () {
-            var modal = new CMS.Modal();
-
             expect(modal.open.bind(modal, {})).toThrowError(
                 Error, 'The arguments passed to "open" were invalid.'
             );
@@ -113,7 +113,6 @@ describe('CMS.Modal', function () {
         });
 
         it('does not open if there is a plugin creation in process', function () {
-            var modal = new CMS.Modal();
             CMS._newPlugin = true;
             spyOn(modal, '_deletePlugin').and.callFake(function () {
                 return false;
@@ -123,7 +122,6 @@ describe('CMS.Modal', function () {
         });
 
         it('confirms if the user wants to remove freshly created plugin when opening new modal', function () {
-            var modal = new CMS.Modal();
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
@@ -160,21 +158,15 @@ describe('CMS.Modal', function () {
         });
 
         it('should be chainable', function () {
-            var modal = new CMS.Modal();
-
             expect(modal.open({ html: '<div></div>' })).toEqual(modal);
         });
 
         it('hides the tooltip', function () {
-            var modal = new CMS.Modal();
-
             modal.open({ html: '<div></div>' });
             expect(CMS.API.Tooltip.hide).toHaveBeenCalled();
         });
 
         it('triggers load events on instance and the DOM node', function () {
-            var modal = new CMS.Modal();
-
             spyOn(modal, 'trigger');
             var spyEvent = spyOnEvent(modal.ui.modal, 'cms.modal.load');
             modal.open({ html: '<div></div>' });
@@ -185,7 +177,7 @@ describe('CMS.Modal', function () {
         });
 
         it('sets CMS._newPlugin if we are opening a plugin creation modal', function () {
-            var modal = new CMS.Modal({
+            modal = new CMS.Modal({
                 newPlugin: {
                     something: true
                 }
@@ -195,44 +187,54 @@ describe('CMS.Modal', function () {
             expect(CMS._newPlugin).toEqual({ something: true });
         });
 
-        it('applies correct state to modal controls', function () {
-            var modal;
-            modal = new CMS.Modal();
+        it('applies correct state to modal controls 1', function () {
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toBeVisible();
             expect(modal.ui.minimizeButton).toBeVisible();
             expect(modal.ui.maximizeButton).toBeVisible();
+        });
 
+        it('applies correct state to modal controls 2', function () {
             modal = new CMS.Modal({ resizable: false });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).not.toBeVisible();
             expect(modal.ui.minimizeButton).toBeVisible();
             expect(modal.ui.maximizeButton).toBeVisible();
+        });
 
+        it('applies correct state to modal controls 3', function () {
             modal = new CMS.Modal({ resizable: true });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toBeVisible();
             expect(modal.ui.minimizeButton).toBeVisible();
             expect(modal.ui.maximizeButton).toBeVisible();
+        });
 
+        it('applies correct state to modal controls 4', function () {
             modal = new CMS.Modal({ minimizable: false });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toBeVisible();
             expect(modal.ui.minimizeButton).not.toBeVisible();
             expect(modal.ui.maximizeButton).toBeVisible();
+        });
 
+        it('applies correct state to modal controls 5', function () {
             modal = new CMS.Modal({ minimizable: true });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toBeVisible();
             expect(modal.ui.minimizeButton).toBeVisible();
             expect(modal.ui.maximizeButton).toBeVisible();
+        });
 
+        it('applies correct state to modal controls 6', function () {
             modal = new CMS.Modal({ maximizable: false });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toBeVisible();
             expect(modal.ui.minimizeButton).toBeVisible();
             expect(modal.ui.maximizeButton).not.toBeVisible();
+        });
 
+        it('applies correct state to modal controls 7', function () {
             modal = new CMS.Modal({ maximizable: true });
             modal.open({ html: '<div></div>' });
             expect(modal.ui.resize).toBeVisible();
@@ -241,8 +243,6 @@ describe('CMS.Modal', function () {
         });
 
         it('resets minimized state if the modal was already minimized', function () {
-            var modal = new CMS.Modal();
-
             modal.open({ html: '<div></div>' });
             modal.minimize();
             expect(modal.minimized).toEqual(true);
@@ -256,7 +256,6 @@ describe('CMS.Modal', function () {
         });
 
         it('clears breadcrumbs and buttons if they exist', function () {
-            var modal = new CMS.Modal();
             modal.ui.modal.addClass('cms-modal-has-breadcrumb');
             modal.ui.modalButtons.html('<div>button</div>');
             modal.ui.breadcrumb.html('<div>breadcrumbs</div>');
@@ -269,6 +268,7 @@ describe('CMS.Modal', function () {
     });
 
     describe('.minimize()', function () {
+        var modal;
         beforeEach(function (done) {
             fixture.load('modal.html');
             CMS.API.Tooltip = {
@@ -280,6 +280,7 @@ describe('CMS.Modal', function () {
                 hideLoader: jasmine.createSpy()
             };
             $(function () {
+                modal = new CMS.Modal();
                 done();
             });
         });
@@ -289,8 +290,6 @@ describe('CMS.Modal', function () {
         });
 
         it('minimizes the modal', function () {
-            var modal = new CMS.Modal();
-
             expect(modal.minimized).toEqual(false);
             modal.open({ html: '<div></div>' });
             modal.minimize();
@@ -305,8 +304,6 @@ describe('CMS.Modal', function () {
         });
 
         it('opens the toolbar', function () {
-            var modal = new CMS.Modal();
-
             modal.open({ html: '<div></div>' });
             modal.minimize();
 
@@ -315,8 +312,6 @@ describe('CMS.Modal', function () {
         });
 
         it('stores the css data to be able to restore a modal', function () {
-            var modal = new CMS.Modal();
-
             modal.open({ html: '<div></div>' });
             modal.minimize();
 
@@ -331,8 +326,6 @@ describe('CMS.Modal', function () {
         });
 
         it('doesnt minimize maximized modal', function () {
-            var modal = new CMS.Modal();
-
             modal.maximized = true;
             expect(modal.minimize()).toEqual(false);
             expect(CMS.API.Toolbar.open).not.toHaveBeenCalled();
@@ -340,7 +333,6 @@ describe('CMS.Modal', function () {
         });
 
         it('restores modal if it was already minimized', function () {
-            var modal = new CMS.Modal();
             modal.open({ html: '<div></div>' });
             modal.minimize();
 
