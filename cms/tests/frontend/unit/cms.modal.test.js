@@ -330,9 +330,28 @@ describe('CMS.Modal', function () {
             modal.minimize(); // restore
         });
 
-        it('doesnt minimize maximized modal');
+        it('doesnt minimize maximized modal', function () {
+            var modal = new CMS.Modal();
 
-        it('restores modal if it was already minimized');
+            modal.maximized = true;
+            expect(modal.minimize()).toEqual(false);
+            expect(CMS.API.Toolbar.open).not.toHaveBeenCalled();
+            expect(modal.ui.body).not.toHaveClass('cms-modal-minimized');
+        });
+
+        it('restores modal if it was already minimized', function () {
+            var modal = new CMS.Modal();
+            modal.open({ html: '<div></div>' });
+            modal.minimize();
+
+            expect(modal.minimized).toEqual(true);
+            expect(modal.ui.body).toHaveClass('cms-modal-minimized');
+
+            modal.minimize();
+
+            expect(modal.minimized).toEqual(false);
+            expect(modal.ui.body).not.toHaveClass('cms-modal-minimized');
+        });
     });
 
     describe('.maximize()', function () {
