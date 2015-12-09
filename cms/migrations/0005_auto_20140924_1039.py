@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations
+from django.db import migrations, DEFAULT_DB_ALIAS
 from django.db.models import F
 from django.conf import settings
 
@@ -127,7 +127,7 @@ class MP_AddChildHandler(MP_AddHandler):
 
 
 def move_to_mp(apps, schema_editor):
-    if not schema_editor.connection.alias == getattr(settings, 'CMS_DATABASE_NAME', 'default'):
+    if not schema_editor.connection.alias == getattr(settings, 'CMS_DATABASE_NAME', DEFAULT_DB_ALIAS):
         return
 
     Page = apps.get_model("cms", "Page")
