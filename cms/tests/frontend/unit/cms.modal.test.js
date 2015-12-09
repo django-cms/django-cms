@@ -487,7 +487,32 @@ describe('CMS.Modal', function () {
             }, 10);
         });
 
-        it('does not close if there is a plugin creation in process');
-        it('reloads the browser if onClose is provided');
+        it('does not close if there is a plugin creation in process', function (done) {
+            modal.open({ html: '<div></div>' });
+            CMS._newPlugin = true;
+            spyOn(modal, '_deletePlugin').and.callFake(function (arg) {
+                expect(arg).toEqual({ hideAfter: true });
+                return false;
+            });
+
+            expect(modal.close()).toEqual(undefined);
+            setTimeout(function () {
+                expect(modal._deletePlugin).toHaveBeenCalled();
+                done();
+            }, 10);
+            delete CMS._newPlugin;
+        });
+
+        it('reloads the browser if onClose is provided', function (done) {
+            modal = new CMS.Modal({ onClose: '/this-url' });
+            modal.open({ html: '<div></div>' });
+            spyOn(modal, 'reloadBrowser').and.callFake(function (url, timeout, ajax) {
+                expect(url).toEqual('/this-url');
+                expect(timeout).toEqual(false);
+                expect(ajax).toEqual(true);
+                done();
+            });
+            modal.close();
+        });
     });
 });
