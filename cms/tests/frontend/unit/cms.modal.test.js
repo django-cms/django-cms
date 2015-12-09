@@ -402,9 +402,10 @@ describe('CMS.Modal', function () {
         it('dispatches the modal-maximized event', function (done) {
             modal.open({ html: '<div></div>' });
 
+            CMS._eventRoot = $('#cms-top');
             CMS.API.Helpers.addEventListener('modal-maximized', function (e, data) {
-                expect(data.instance).toEqual(modal);
                 CMS.API.Helpers.removeEventListener('modal-maximized');
+                expect(data.instance).toEqual(modal);
                 done();
             });
 
@@ -435,6 +436,7 @@ describe('CMS.Modal', function () {
         it('dispatches modal-restored event when it restores the modal', function (done) {
             modal.open({ html: '<div></div>' });
 
+            CMS._eventRoot = $('#cms-top');
             CMS.API.Helpers.addEventListener('modal-restored', function (e, data) {
                 CMS.API.Helpers.removeEventListener('modal-restored');
                 expect(true).toEqual(true);
