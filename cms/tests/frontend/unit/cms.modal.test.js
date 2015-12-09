@@ -329,7 +329,7 @@ describe('CMS.Modal', function () {
             modal.minimize(); // restore
         });
 
-        it('doesnt minimize maximized modal', function () {
+        it('does not minimize maximized modal', function () {
             modal.maximized = true;
             expect(modal.minimize()).toEqual(false);
             expect(CMS.API.Toolbar.open).not.toHaveBeenCalled();
