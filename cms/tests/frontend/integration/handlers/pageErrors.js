@@ -6,7 +6,7 @@
 module.exports = {
     bind: function () {
         casper.on('page.error', function (msg) {
-            casper.echo('Error on page: ' + msg);
+            casper.echo('Error on page: ' + msg, 'ERROR');
         });
     }
 };
