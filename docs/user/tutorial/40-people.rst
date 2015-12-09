@@ -129,15 +129,32 @@ Let's improve the list of People by putting them in a Group (a Group corresponds
 department or section, for example).
 
 #.  From the toolbar, select *People* > *Add new Group*.
+
+    .. image:: /user/tutorial/images/add_new_group_toolbar.png
+       :alt: Add new group
+       :align: center
+
 #.  Provide a *Name* for the group, and if you like, some optional additional information.
+
+    .. image:: /user/tutorial/images/add_group_name.png
+       :alt: Add new group title
+       :align: center
+
 #.  **Save** the Group.
 
 Now you can add your People to this Group:
 
 #.  From the toolbar, select *People* > *Person list*.
+
+    .. image:: /user/tutorial/images/assign_group_toolbar.png
+       :alt: Assign group - Toolbar
+       :align: center
+
 #.  Select a Person to edit, and choose the Group to which they belong.
 
-    ..todo::  screenshot required
+    .. image:: /user/tutorial/images/choose_groups.png
+       :alt: Choose groups
+       :align: center
 
 #.  **Save**
 
@@ -147,5 +164,4 @@ And here is the published page, with the newly-created group.
 
 .. image:: /user/tutorial/images/mechanics_people_group.png
    :alt: People page list, with a group
-   :width: 500
    :align: center
