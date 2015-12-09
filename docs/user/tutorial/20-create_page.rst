@@ -24,7 +24,7 @@ Page wizard* will open a new dialog box.
 .. tip::
 
     Title
-        City Bicycle Services
+        Home
 
     Content
         We're proud to be the first and best 24-hour bicycle repair service in the city. Whatever
@@ -53,7 +53,7 @@ that you have explicitly published.
 
 * Hit |publish-page-now| to publish the page.
 
-.. image:: /user/tutorial/images/city_bicycle_services_page.png
+.. image:: /user/tutorial/images/new_home_page.png
    :alt: Newly-created page
 
 
