@@ -180,7 +180,17 @@ browser.
 Integration tests
 -----------------
 
-In order to run integration tests you can do::
+In order to run integration tests you'll have to install at least the verison
+of django CMS from the current directory and djangocms-helper into into your virtualenv::
+
+    pip install -e .
+    pip install djangocms-helper
+
+Then you'll be able to run a test server with a clean db::
+
+    rm -f testdb.sqlite; DATABASE_URL='sqlite://localhost/testdb.sqlite' djangocms-helper cms --cms server
+
+The integration test suite itself can be run against the test server in a separate shell::
 
     gulp tests:integration
 
