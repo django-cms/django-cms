@@ -88,7 +88,7 @@ Do the same for a second item:
 .. tip::
 
     Name
-        The City Bicycle Services Café opens
+        The Bruno Bicycle Services Café opens
 
     Is published
         ✓
@@ -129,5 +129,5 @@ home page too. So let's do that.
 The news articles will now be listed in your home page too, and this list will be always be kept
 up-to-date with a selection of latest news items.
 
-    .. image:: /user/tutorial/images/home-page-news-articles.png
-        :alt: 'page settings button'
+    .. image:: /user/tutorial/images/news_entire_page.png
+        :alt: the news page
