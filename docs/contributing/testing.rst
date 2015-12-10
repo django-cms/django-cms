@@ -181,7 +181,13 @@ Integration tests
 -----------------
 
 In order to run integration tests you'll have to install at least the verison
-of django CMS from the current directory and djangocms-helper into into your virtualenv::
+of django CMS from the current directory and djangocms-helper into into your virtualenv.
+If you do not have virtualenv yet, create and activate it first::
+
+    virtualenv env
+    . env/bin/activate
+
+Then install minimum required dependencies::
 
     pip install -e .
     pip install djangocms-helper
