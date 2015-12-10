@@ -213,22 +213,24 @@ Adding four columns to the home page
 
 We're going to add four new points of information [example: https://www.dropbox.com/s/oisgwq6a9y485wd/Screenshot%202015-12-02%2008.33.23.png?dl=0.]
 
-.. todo::
+#.  As you have done previously, switch to *Edit* |edit-button| mode and then *Structure* |structure-button| mode.
 
-    illustrate the following steps. No need to show every single step, just
-    the first time we do it (as indicated).
 
-#.  As you have done previously, switch to *Edit* mode and then *Structure* mode.
+.. |edit-button| image:: /user/tutorial/images/edit-button.png
+   :alt: 'edit'
+   :width: 45
+
+.. |structure-button| image:: /user/tutorial/images/structure-button.png
+   :alt: 'structure'
+   :width: 148
 
 #.  Add a *Row* plugin to the *Content* placeholder. Provide this *Row* plugin with settings as
     follows:
 
-    .. todo:: we need a new image here
-
-    .. image:: /user/tutorial/images/define_grid_four_cols.png
+    .. image:: /user/tutorial/images/4_col_12_6.png
        :alt: Define columns
        :align: right
-       :width: 170
+       :width: 250
 
     *Create columns*
         4
@@ -240,23 +242,51 @@ We're going to add four new points of information [example: https://www.dropbox.
         6
 
     You can leave all the other values blank.
+|
+|
+|
 
-#.  **Save**
+#.  Hit **Save** |save-button|
 
-#.  Inside the first *Column* plugin, add a new *Text* plugin, containing: [show plugin being added *inside* column]
+.. |save-button| image:: /user/tutorial/images/save_button.png
+   :alt: 'save'
+   :width: 60
 
-    *   Font awesome icon [show icon plugin]
-    *   Set yourself free [large text]
+#.  Inside the first *Column* plugin, add a new *Text* plugin, containing:
+
+    .. image:: /user/tutorial/images/add_text_plugin.png
+       :alt: Add text plugin
+       :align: center
+|
+
+    *   Font awesome icon
+
+    .. image:: /user/tutorial/images/fontawesome_icon.png
+        :alt: Fontawesome Icon
+        :width: 400
+        :align: center
+|
+
+    *   Set yourself free [heading3]
     *   Never worry again about a bicycle malfunction - we're here for you
+|
 
 #.  Now, rather than go though the steps above three more times for the next three columns, let's
     save some effort by copy and pasting the *Text* plugin.
 
     #.  From the *plugin command menu* for the *Text* plugin, select *Copy*.
-        .. todo:: imclude image of menu
+
+    .. image:: /user/tutorial/images/copy_plugin.png
+        :alt: Copy plugin
+        :align: center
 
     #.  Select the next (empty) *Column* plugin.
     #.  Select *Paste* from the menu.
+
+    .. image:: /user/tutorial/images/paste_plugin.png
+        :alt: Paste plugin
+        :align: center
+
 
     You can then quickly change the text in the three copies:
 
@@ -269,7 +299,10 @@ We're going to add four new points of information [example: https://www.dropbox.
     The Café
         Enjoy home-roasted coffee and home-made cakes in our cosy café next-door
 
-.. todo:: show final result
+.. image:: /user/tutorial/images/services_row_columns_example.png
+    :alt: Services
+    :align: center
+
 
 
 *************************************
