@@ -1,1 +1,1 @@
-djangocms-helper cms --cms server 2>&1 &
+python testserver.py 2>&1 &
