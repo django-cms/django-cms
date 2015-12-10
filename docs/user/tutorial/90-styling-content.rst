@@ -2,142 +2,83 @@
 Styling content
 ###############
 
-****************
-The Contact page
-****************
-
-Our Contact page has some useful content, but it's not very well laid-out.
+Our pages have some useful content, but they are not very well laid-out. For example, here's the
+*How to find us* page:
 
 .. image:: /user/tutorial/images/entire_contact_page.png
-   :alt: Entire contact page
+    :alt: Entire contact page
 
-We'll use the *columns* functionality to place the text and the map side-by-side, in columns.
+django CMS makes it easy possible to manage page layout as well as content. It doesn't really
+matter whether you start by adding your content and then decide how to lay it out, or set up the
+layout before you add the content.
 
-1. Switch to structure mode |structure-switch| and add a new *Row* plugin.
 
-.. |structure-switch| image:: /user/tutorial/images/structure-button.png
-   :alt: Switch to structure mode
-   :width: 160
+******************************
+The *Contact information* page
+******************************
 
-.. image:: /user/tutorial/images/row_plugin.png
-   :alt: Select Row plugin
-   :align: center
-   :width: 350
+We'll start by improving the layout of the *Contact information* page, where we'll use the
+*columns* functionality to place the text and the map side-by-side, in columns.
 
-2. Select the amount of columns you want to add and define which amount of the screen they should take.
+#.  Switch to structure mode using |structure-switch| and add a new *Row* plugin.
 
-.. note::
-    The whole grid consists of 24 columns. If we want to split the content in half, which means half of the width of the container, we need to split the 24 columns in equal parts. In this case it would be 12 columns each.
+    .. |structure-switch| image:: /user/tutorial/images/structure-button.png
+       :alt: the
+       :width: 160
 
-    Please find a more detailed explanation here below.
+    .. image:: /user/tutorial/images/row_plugin.png
+       :alt: Select Row plugin
+       :align: center
+       :width: 350
 
-.. image:: /user/tutorial/images/define_grid.png
-   :alt: Define columns
+#.  When you create a *Row* plugin, it will ask about the columns you want it to contain - how
+    many of them, and their widths at different browser window sizes.
 
-3. Once you defined the amount of columns and the size of them, hit |save-button|
+    .. image:: /user/tutorial/images/define_grid.png
+       :alt: Define columns
+       :align: right
+       :width: 170
 
-.. |save-button| image:: /user/tutorial/images/save_button.png
-   :alt: Save button
-   :width: 50
+    *Create columns*
+        2
 
-4. Now you will find your row including the columns below your content.
+    *col-sm*
+        24
 
-.. image:: /user/tutorial/images/row_created_content_not_moved.png
-   :alt: Row empty
-   :align: center
-   :width: 500
+    *col-md*
+        12
 
-5. Drag & drop the text plugin in once column and the map plugin in the other.
+    You can leave all the other values blank.
 
-.. image:: /user/tutorial/images/drag_content_to_column.png
-   :alt: Drag content
-   :align: center
-   :width: 500
+    If what this means isn't obvious to you, don't worry, we'll explain it all in a a moment.
 
-6. Now it should look like this in structure mode:
+#.  Expand the row to reveal the two columns.
+
+#.  Drag and drop the *Text* plugin *Bruno Bicycle Services...* into its the first *Column*.
+
+#.   Do the same for the *Google Map* plugin, dropping it into the second *Column*.
+
+    .. image:: /user/tutorial/images/drag_content_to_column.png
+       :alt: drag the original plugins into the new columns
+       :align: center
+       :width: 500
+
+The final result in *Structure mode*:
 
 .. image:: /user/tutorial/images/content_moved.png
-   :alt: Content moved
+   :alt: the final column plugin arrangement
    :align: center
    :width: 500
 
-This is how the final content looks like:
+And in *Content mode*:
 
 .. image:: /user/tutorial/images/row_result_contactpage.png
    :alt: Contact Page
    :align: center
 
+Here we have two columns - but try narrowing the browser window; when you get to a certain point, the layout will respond and display the two columns as rows instead:
 
-This is a very basic example of styling.
-
-
-****************
-The Home page
-****************
-
-Let's do something a bit more ambitious with the *Home* page of the site.
-
-Here we have various items of content.
-
-.. todo::
-
-    show image of home page with:
-
-
-    *   Some text from 20-create-page:
-
-            We're proud to be the first and best 24-hour bicycle repair service in the city.
-
-            Whatever your bicycle repair needs, you can rely on us to provide a top-quality service
-            at very reasonable prices. We also operate a unique call-out service to come to the aid
-            of stranded cyclists.
-
-            No job's too small or too large, and we can repair anything from
-            a puncture to a cracked frame.
-
-    *   a news plugin from 50-news
-
-
-.. _adding_four_columns:
-
-*******************
-Adding four columns
-*******************
-
-We're going to add four new points of information [example: https://www.dropbox.com/s/oisgwq6a9y485wd/Screenshot%202015-12-02%2008.33.23.png?dl=0.]
-
-.. todo::
-
-    illustrate the following steps. No need to show every single step, just
-    the first time we do it (as indicated).
-
-#.  As you have done previously, switch to *Edit* mode and then *Structure* mode.
-#.  Add a *Row* plugin to the *Content* placeholder. [image]
-#.  Add *Column* plugin to the *Row* plugin - that is, the *Column* is now inside the *Row*. [show plugin being added *inside* row; show settings] https://www.dropbox.com/s/qh1febdw37wz15t/Screenshot%202015-12-02%2008.35.26.png?dl=0
-#.  Inside the *Column* plugin, add a *Text* plugin, containing: [show plugin being added *inside* column]
-
-    *   Font awesome icon [show icon plugin]
-    *   Set yourself free [large text]
-    *   Never worry again about a bicycle malfunction - we're here for you
-#.  **Save** [show completed plugin]
-#.  Add 2nd Column plugin to the row just like the first one:
-#.  Add a Text plugin, containing:
-
-    *   Font awesome icon
-    *   24 hour service [large text]
-    *   Day or night, round the clock, when you break down, we'll be there
-#.  **Save**
-#.  Add 3rd Column plugin in just the same way, with:
-
-    *   Workshop service [large text]
-    *   Don't wait until you break down - keep your bike in top condition with a service
-
-#.  And a 4th Column plugin:
-
-    *   The Café [large text]
-    *   Enjoy home-roasted coffee and home-made cakes in our cosy café next-door
-
-.. todo:: show final result
+.. todo:: we need an image of this.
 
 
 **************
@@ -148,19 +89,24 @@ Bootstrap
 =========
 
 We're taking advantage of the `Bootstrap 3 <http://getbootstrap.com>`_ frontend framework that's
-built into this site (through the `Aldryn Boilerplate Bootstrap 3 addon
-<http://aldryn-boilerplate-bootstrap3.readthedocs.org>`_).
+built into this site (through the `Aldryn Boilerplate Bootstrap 3
+<http://aldryn-boilerplate-bootstrap3.readthedocs.org>`_), a complete and ready-to-use
+implementation of various integrated frontend tools (see `What's inside
+<http://aldryn-boilerplate-bootstrap3.readthedocs.org/en/latest/general/whatsinside.html>`_ for
+more details).
 
-It provides a responsive frontend - try resizing the browser window to see how your pages respond -
-and is an excellent starting point for implementing web designs that don't re-invent the wheel and
-can be guaranteed to work on a vast range of platforms and devices.
+Bootstrap 3 provides a responsive frontend - try resizing the browser window to see how your pages
+respond - and is an excellent starting point for implementing web designs that don't re-invent the
+wheel and can be guaranteed to work on a vast range of platforms and devices.
 
 Bootstrap includes a row/column system. When we arrange columns within a row, as in the example
 above, Bootstrap will display them in a row if the browser's of suitable width. If not, it will
 collapse the row into fewer columns so that they do fit properly.
 
-The `Aldryn Bootstrap 3 <https://github.com/aldryn/aldryn-bootstrap3/>`_ provides django CMS
-plugins that can make use of the Bootstrap framework.
+The `Aldryn Bootstrap 3 <https://github.com/aldryn/aldryn-bootstrap3/>`_ addons provides django CMS
+plugins that can make use of the Bootstrap framework. It's designed to work with Aldryn Boilerplate
+Bootstrap 3, but can be used independently of it, so you can use it with your own implementation of
+the Bootstrap framework.
 
 Bootstrap is not the only frontend framework of this sort, it's simply a popular one, and one that
 several popular django CMS addons support out-of-the-box, and is also supported by a rich set of
@@ -170,15 +116,15 @@ plugins.
 The column system and responsive layouts
 ========================================
 
-.. note:: If this is already familiar to you, you can skip to :ref:`more_work_on_home_page` below.
+.. note:: If this is already familiar to you, you can skip to :ref:`adding_four_columns` below.
 
-Many such frameworks work in the same way: they're based on a column layout that's usually twelve
+Many such frameworks work in the same way: they're based on a column layout that's usually 12
 units wide, and you can specify how many units each column occupies (including at different browser
 window widths). It's beyond the scope of this document to explain how these systems work in detail,
 but there are plenty of other useful resources.
 
-In our tutorial site, we have adopted 24 column units for the page. So, a column of 12 units will
-be half a page wide, of 6 units a quarter of a page and so on::
+In our tutorial site, we have adopted 24 rather than 12 column units for the page. So, a column of
+12 units will be half a page wide, of 6 units a quarter of a page and so on::
 
     [----------24----------]
     [----12----][----12----]
@@ -194,21 +140,22 @@ Each column needs to be given a width in units (if no width is given, then the c
 entire available width of the row, but its behaviour may be unpredicatable - similarly if you get
 your addition wrong and the widths don't add up to 24!).
 
-The problem is that a layout of four or six or even eight columns might look excellent on a wide
-display, but on a mobile phone, each one of those columns will be uselessly narrow.
+The problem is that a layout of columns (especially if you are dealing with more than two columns)
+might look excellent on a wide display, but on a mobile phone, each one of those columns will be
+uselessly narrow.
 
 We can solve the problem by adopting *responsive* layouts.
 
-Our layout is four columns wide in a window on a desktop display::
+If we have a layout that is *four* columns wide in a window on a desktop display::
 
     [--6-][--6-][--6-][--6-]
 
-but becomes two rows of two columns on a smaller display::
+then it can become *two rows of two columns* on a smaller display::
 
     [----12----][----12----]
     [----12----][----12----]
 
-and four rows of one column on something like a mobile phone::
+and *four rows of one column* on something like a mobile phone::
 
     [----------24----------]
     [----------24----------]
@@ -216,8 +163,8 @@ and four rows of one column on something like a mobile phone::
     [----------24----------]
 
 
-Applying this to our column plugins
------------------------------------
+Applying this to column plugins
+-------------------------------
 
 We can set this behaviour in the column plugin:
 
@@ -252,66 +199,101 @@ If we set *col-sm* to ``12`` and *col-md* to ``6``, this means:
 * on a typical tablet, display them in two rows of two columns
 * on anything larger, display them in one row of four columns
 
-... which is exactly :ref:`what we did above <adding_four_columns>`.
+... which is exactly what we're going to do next for the home page.
 
 
+.. _adding_four_columns:
+
+************************************
+Adding four columns to the home page
+************************************
+
+We're going to add four new points of information [example: https://www.dropbox.com/s/oisgwq6a9y485wd/Screenshot%202015-12-02%2008.33.23.png?dl=0.]
+
+.. todo::
+
+    illustrate the following steps. No need to show every single step, just
+    the first time we do it (as indicated).
+
+#.  As you have done previously, switch to *Edit* mode and then *Structure* mode.
+
+#.  Add a *Row* plugin to the *Content* placeholder. Provide this *Row* plugin with settings as
+    follows:
+
+    .. todo:: we need a new image here
+
+    .. image:: /user/tutorial/images/define_grid_four_cols.png
+       :alt: Define columns
+       :align: right
+       :width: 170
+
+    *Create columns*
+        4
+
+    *col-sm*
+        12
+
+    *col-md*
+        6
+
+    You can leave all the other values blank.
+
+#.  **Save**
+
+#.  Inside the first *Column* plugin, add a new *Text* plugin, containing: [show plugin being added *inside* column]
+
+    *   Font awesome icon [show icon plugin]
+    *   Set yourself free [large text]
+    *   Never worry again about a bicycle malfunction - we're here for you
+
+#.  Now, rather than go though the steps above three more times for the next three columns, let's
+    save some effort by copy and pasting the *Text* plugin.
+
+    #.  From the *plugin command menu* for the *Text* plugin, select *Copy*.
+        .. todo:: imclude image of menu
+
+    #.  Select the next (empty) *Column* plugin.
+    #.  Select *Paste* from the menu.
+
+    You can then quickly change the text in the three copies:
+
+    24 hour service
+        Day or night, round the clock, when you break down, we'll be there
+
+    Workshop service
+        Don't wait until you break down - keep your bike in top condition with a service
+
+    The Café
+        Enjoy home-roasted coffee and home-made cakes in our cosy café next-door
+
+.. todo:: show final result
+
+
+*************************************
+Further improvements to the home page
+*************************************
+
+Also on the home page, we have a *Text* plugin and a *Latest articles* plugin.
+
+.. todo::
+
+    show image of home page with:
+
+
+    *   Some text from 20-create-page:
+
+            We're proud to be the first and best 24-hour bicycle repair service in the city.
+
+            Whatever your bicycle repair needs, you can rely on us to provide a top-quality service
+            at very reasonable prices. We also operate a unique call-out service to come to the aid
+            of stranded cyclists.
+
+            No job's too small or too large, and we can repair anything from
+            a puncture to a cracked frame.
+
+    *   a news plugin from 50-news
+
+We don't need to repeat all the steps, but it's easy now to place these two plugins into separate *Column* plugins, just as you did for the content on the *How to find us* page.
 .. _more_work_on_home_page:
 
-**************************
-More work on the home page
-**************************
 
-To improve the home page further, let's put the original content into a row of two columns, with
-the introductory text in the first column and the list of news items in the second.
-
-This time, we'll arrange it thus for any browser window larger than that of a typical tablet::
-
-    [--------18------][--6-]
-
-... like this for a tablet::
-
-    [----12----][----12----]
-
-... and like this for a phone::
-
-    [----------24----------]
-    [----------24----------]
-
-So the values you'll need to enter for the column plugins are:
-
-first column:
-    *col-xs*
-        leave blank
-
-    *col-sm*
-        ``12``
-
-    *col-md*
-        ``18``
-
-    *col-lg*
-        leave blank
-
-second column
-    *col-xs*
-        leave blank
-
-    *col-sm*
-        ``12``
-
-    *col-md*
-        ``6``
-
-    *col-lg*
-        leave blank
-
-Let's create the necessary plugins.
-
-#.  Create a new *Row* plugin.
-#.  Inside it, create the first *Column* plugin (using the settings above).
-#.  Add the second *Column* plugin and its settings.
-#.  Drag and drop the *Text* plugin *We're proud to be...* into its new *Column*, and do the same
-    for the *Map* plugin.
-
-Now you can switch back to *Content* mode to admire your handiwork, and the way your home page
-responds to different browser window widths.
