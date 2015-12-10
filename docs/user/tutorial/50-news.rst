@@ -130,4 +130,4 @@ The news articles will now be listed in your home page too, and this list will b
 up-to-date with a selection of latest news items.
 
     .. image:: /user/tutorial/images/news_entire_page.png
-        :alt: 'Entire news page'
+        :alt: the news page
