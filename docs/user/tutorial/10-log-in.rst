@@ -17,8 +17,6 @@ Log in
     All the functionality and applications in the tutorial are available even if you don't use
     Aldryn for your django CMS sites, and using Aldryn for the tutorial is completely free.
 
-
-
 #.  Visit http://demo.django-cms.org/, and select *Get
     your free Aldryn account*.
 
@@ -27,16 +25,20 @@ Log in
 
     Otherwise it will only take a few minutes to set up your new account. Simply follow the steps.
 
-#.  In the Control Panel, select a *Add a new Project*, and when prompted opt for *Start with a
-    theme and content*. Follow the steps, until your new site has been deployed.
+#.  .. todo:: until the tutorial site is available, ask Dario for a link to a copy of it.
+
+    In the Control Panel, select a *Add a new Project*, and when prompted opt for *xxxxx*. Follow
+    the steps, until your new site has been deployed.
 
 #.  To login to your new website, hit the |open-site| link on the dashboard.
 
     .. |open-site| image:: /user/tutorial/images/open_site.png
        :alt: Open site
+       :width: 96
 
     .. image:: /user/tutorial/images/aldryn_dashboard.png
        :alt: Aldryn Dashboard
+       :width: 1065
 
 #.  Select *Sign in with Aldryn*
 

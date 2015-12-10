@@ -131,6 +131,8 @@ Let's move a file.
 #.  Once more, use |image_paste| to place the file in the new folder.
 
 
+.. _using_filer_files:
+
 ***************************
 Using images from the Filer
 ***************************

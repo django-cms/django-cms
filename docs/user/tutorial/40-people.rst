@@ -170,3 +170,4 @@ And here is the published page, with the newly-created group.
 .. image:: /user/tutorial/images/mechanics_people_group.png
    :alt: People page list, with a group
    :align: center
+   :width: 1184
