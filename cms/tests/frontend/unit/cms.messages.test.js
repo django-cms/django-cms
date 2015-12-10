@@ -25,11 +25,12 @@ describe('CMS.Messages', function () {
 
         it('has ui', function () {
             expect(messages.ui).toEqual(jasmine.any(Object));
-            expect(Object.keys(messages.ui)).toContain('container');
-            expect(Object.keys(messages.ui)).toContain('body');
-            expect(Object.keys(messages.ui)).toContain('toolbar');
-            expect(Object.keys(messages.ui)).toContain('messages');
-            expect(Object.keys(messages.ui).length).toEqual(4);
+            var keys = Object.keys(messages.ui);
+            expect(keys).toContain('container');
+            expect(keys).toContain('body');
+            expect(keys).toContain('toolbar');
+            expect(keys).toContain('messages');
+            expect(keys.length).toEqual(4);
         });
 
         it('has options', function () {
