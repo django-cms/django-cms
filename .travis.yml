@@ -30,9 +30,9 @@ env:
     # - DJANGO=1.8 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
-    - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
     # 1.9 is broken for the moment
-    # - FRONTEND=1 INTEGTATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+    # - FRONTEND=1 INTEGRATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
 before_script:
   - pip freeze
@@ -52,7 +52,7 @@ before_install:
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[use saucelabs\]'; export SKIP_SAUCE_LABS=$?; true
 
 install:
-  - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; fi
+  - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; pip freeze; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g npm@2; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g gulp@3.9.0; fi
   - if [ "$FRONTEND" == 1 ]; then npm install; fi
@@ -62,7 +62,7 @@ install:
 script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ]; then gulp lint; fi;
-  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then gulp tests:integration; fi;
+  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; pip freeze; sh cms/tests/frontend/integration/run_testserver.sh; sleep 30; gulp tests:integration; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
@@ -108,18 +108,18 @@ matrix:
       env: FRONTEND=1 LINT=1
 
     - python: 3.3
-      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
     - python: 3.4
-      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
     - python: 3.5
-      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/:memory:' SELENIUM=0 MIGRATE_OPTION='--migrate'
+      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
 
     - python: 3.3
-      env: FRONTEND=1 INTEGTATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 3.4
-      env: FRONTEND=1 INTEGTATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 3.5
-      env: FRONTEND=1 INTEGTATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+      env: FRONTEND=1 INTEGRATION=1 DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
 
   allow_failures:
     - python: 2.7

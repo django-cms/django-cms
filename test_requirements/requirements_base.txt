@@ -25,4 +25,5 @@ sphinx
 sphinxcontrib-spelling
 pyflakes
 pyenchant
-
+# required to run the server for integration tests
+djangocms-helper
