@@ -188,7 +188,7 @@ While debugging you can use the ``--tests`` parameter as well in order to run te
 suites separately. Note, that usually in order to perform any action you'll need to
 login first, so the login suite should precede the one you want to run::
 
-    gulp tests:integration --tests=login,base
+    gulp tests:integration --tests=loginAdmin,toolbar
 
 
 *************
