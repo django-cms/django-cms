@@ -78,7 +78,10 @@ And in *Content mode*:
 
 Here we have two columns - but try narrowing the browser window; when you get to a certain point, the layout will respond and display the two columns as rows instead:
 
-.. todo:: we need an image of this.
+.. image:: /user/tutorial/images/responsive.png
+   :alt: Responsive Webdesign
+   :align: center
+
 
 
 **************
