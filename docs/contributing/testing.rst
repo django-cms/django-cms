@@ -196,11 +196,11 @@ Then install minimum required dependencies::
 
 Now you'll be able to run a test server with this command::
 
-    python testserver.py
+    rm -f testdb.sqlite; python testserver.py
 
-Note, that the last command would remove SQLite database and run migrations on
-the new one. Take a look inside `testserver.py` or `travis.yml` if you need to
-customize the test server settings.
+Note, that the last command would take over your shell and remove SQLite
+database and run migrations on the new one. Take a look inside `testserver.py`
+or `travis.yml` if you need to customize the test server settings.
 
 The integration test suite itself can be run against the test server in a separate shell::
 

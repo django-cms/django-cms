@@ -55,12 +55,6 @@ def run():
 
     os.environ.setdefault('DATABASE_URL', 'sqlite://localhost/testdb.sqlite')
 
-    # remvove the test DB file if we use sqlite
-    db_url = os.environ.get('DATABASE_URL')
-    db_file = os.path.split(db_url)[-1]
-    if db_url.startswith('sqlite://localhost') and os.path.exists(db_file):
-        os.remove(db_file)
-
     # we use '.runner()', not '.cms()' nor '.run()' because it does not
     # add 'test' argument implicitly
     runner.runner([sys.argv[0], 'cms', '--cms', 'server'])
