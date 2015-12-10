@@ -52,7 +52,7 @@ before_install:
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[use saucelabs\]'; export SKIP_SAUCE_LABS=$?; true
 
 install:
-  - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; fi
+  - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; pip freeze; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g npm@2; fi
   - if [ "$FRONTEND" == 1 ]; then npm install -g gulp@3.9.0; fi
   - if [ "$FRONTEND" == 1 ]; then npm install; fi
@@ -62,7 +62,7 @@ install:
 script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ]; then gulp lint; fi;
-  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; sh cms/tests/frontend/integration/run_testserver.sh; sleep 30; gulp tests:integration; fi;
+  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; pip freeze; sh cms/tests/frontend/integration/run_testserver.sh; sleep 30; gulp tests:integration; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
