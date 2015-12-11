@@ -46,7 +46,10 @@ HELPER_SETTINGS = dict(
             'public': True,
             'hide_untranslated': False,
         }
-    }
+    },
+    INSTALLED_APPS=[
+        'djangocms_text_ckeditor',
+    ]
 )
 
 
