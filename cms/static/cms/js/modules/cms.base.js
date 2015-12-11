@@ -1,6 +1,6 @@
 /*!
  * CMS.API.Helpers
- * Multiple helpers used accross all CMS features
+ * Multiple helpers used across all CMS features
  */
 
 //##############################################################################

@@ -60,6 +60,7 @@ var PROJECT_PATTERNS = {
  */
 var JS_BUNDLES = {
     'bundle.admin.base.min.js': [
+        PROJECT_PATH.js + '/polyfills/bind.js',
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
         PROJECT_PATH.js + '/libs/class.min.js',
@@ -75,6 +76,7 @@ var JS_BUNDLES = {
         PROJECT_PATH.js + '/jstree/tree_component.js'
     ],
     'bundle.toolbar.min.js': [
+        PROJECT_PATH.js + '/polyfills/bind.js',
         PROJECT_PATH.js + '/libs/jquery.min.js',
         PROJECT_PATH.js + '/libs/class.min.js',
         PROJECT_PATH.js + '/libs/pep.js',
@@ -167,7 +169,7 @@ gulp.task('tests:unit:watch', function () {
     server.start();
 });
 
-// gulp tests:integration --tests=login,base
+// gulp tests:integration --tests=loginAdmin,toolbar
 gulp.task('tests:integration', function (done) {
     process.env.PHANTOMJS_EXECUTABLE = './node_modules/.bin/phantomjs';
 
