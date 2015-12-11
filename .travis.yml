@@ -49,7 +49,7 @@ before_install:
   # xvfb is started in this way to ensure the screen size is 1280x1024x8
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/cucumber_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x8"
   - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
-  - echo "$TRAVIS_COMMIT_MSG" | grep '\[use saucelabs\]'; export SKIP_SAUCE_LABS=$?; true
+  - echo "$TRAVIS_COMMIT_MSG" | grep '\[skip saucelabs\]'; export USE_SAUCE_LABS=$?; true
 
 install:
   - if [ "$UNIT" != 1 ] && [ "$LINT" != 1 ]; then pip install -r "test_requirements/django-$DJANGO.txt"; pip freeze; fi

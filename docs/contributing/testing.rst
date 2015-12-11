@@ -173,9 +173,10 @@ actual browser.
 
     INFO [karma]: Karma v0.13.15 server started at http://localhost:9876/
 
-.. todo
-
-    Describe Saucelabs integration, which is currently disabled.
+On Travis CI we are using SauceLabs integration to run tests in a set of
+different real browsers, but you can opt out of running them on saucelabs using
+``[skip saucelabs]`` marker in the commit message, similar to how you would skip
+the build entirely using ``[skip ci]``.
 
 
 Integration tests
