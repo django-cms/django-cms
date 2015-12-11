@@ -5,6 +5,5 @@ django-classy-tags>=0.6.1
 djangocms-text-ckeditor==2.7
 django-hvad==1.5
 django-formtools
-django-classy-tags>=0.6.1
 django-sekizai>=0.8.2
 django-debug-toolbar
