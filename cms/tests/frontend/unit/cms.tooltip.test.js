@@ -87,9 +87,61 @@ describe('CMS.Messages', function () {
     });
 
     describe('.show()', function () {
-        it('shows the tooltip');
-        it('attaches event listener to move plugin after the cursor');
-        it('allows touching the tooltip to edit the plugin');
+        var tooltip;
+        beforeEach(function (done) {
+            fixture.load('tooltip.html');
+            $(function () {
+                tooltip = new CMS.Tooltip();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            tooltip.body.off('mousemove.cms');
+            fixture.cleanup();
+        });
+
+        it('shows the tooltip', function () {
+            spyOn(tooltip, 'position').and.callFake(function () {});
+            tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
+            expect(tooltip.domElem).toHaveCss({ 'visibility': 'visible' });
+            expect(tooltip.domElem).toBeVisible();
+            expect(tooltip.domElem.data('plugin_id')).toEqual(1);
+            expect(tooltip.domElem.find('span')).toHaveText('AwesomePlugin');
+        });
+
+        it('attaches event listener to move plugin after the cursor', function () {
+            spyOn(tooltip, 'position').and.callFake(function () {});
+            tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
+            expect(tooltip.body).toHandle('mousemove');
+            expect(tooltip.position.calls.count()).toEqual(1);
+            tooltip.body.trigger('mousemove');
+            expect(tooltip.position.calls.count()).toEqual(2);
+        });
+
+        it('allows touching the tooltip to edit the plugin', function () {
+            tooltip._forceTouch();
+            spyOn(tooltip, 'position').and.callFake(function () {});
+            tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
+            expect(tooltip.body).not.toHandle('mousemove');
+            expect(tooltip.position.calls.count()).toEqual(1);
+            expect(tooltip.domElem).toHandle('touchstart');
+            var dblclick = spyOnEvent('.cms-plugin-1', 'dblclick.cms');
+            tooltip.domElem.trigger('touchstart');
+            expect(dblclick).toHaveBeenTriggered();
+        });
+
+        it('allows touching the tooltip to edit the "generic"', function () {
+            tooltip._forceTouch();
+            spyOn(tooltip, 'position').and.callFake(function () {});
+            tooltip.show({ originalEvent: 'Event' }, 'AwesomeGeneric', 33);
+            expect(tooltip.body).not.toHandle('mousemove');
+            expect(tooltip.position.calls.count()).toEqual(1);
+            expect(tooltip.domElem).toHandle('touchstart');
+            var dblclick = spyOnEvent('.cms-plugin-cms-page-changelist-33', 'dblclick.cms');
+            tooltip.domElem.trigger('touchstart');
+            expect(dblclick).toHaveBeenTriggered();
+        });
     });
 
     describe('.position()', function () {
