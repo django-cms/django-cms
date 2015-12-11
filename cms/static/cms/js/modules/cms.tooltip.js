@@ -116,7 +116,7 @@ var CMS = window.CMS || {};
                 // attaches move event
                 // this sets the correct position for the edit tooltip
                 that.position(e.originalEvent, tooltip);
-                this.body.on('mousemove.cms', function (e) {
+                this.body.on('mousemove.cms.tooltip', function (e) {
                     that.position(e, tooltip);
                 });
             }
@@ -133,7 +133,7 @@ var CMS = window.CMS || {};
 
             // unbind events
             if (!this.isTouch) {
-                this.body.off('mousemove.cms');
+                this.body.off('mousemove.cms.tooltip');
             }
         },
 
