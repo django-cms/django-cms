@@ -1,6 +1,7 @@
 {
     "node": true,
     "predef": [
+        "$",
         "module",
         "process",
         "it",
