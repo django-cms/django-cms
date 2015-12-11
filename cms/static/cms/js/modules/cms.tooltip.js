@@ -38,8 +38,8 @@ var CMS = window.CMS || {};
              */
             this.domElem = this._pick();
 
-            this._checkTouch();
             this._forceTouchOnce = CMS.API.Helpers.once(this._forceTouch);
+            this._checkTouch();
         },
 
         /**
@@ -152,7 +152,6 @@ var CMS = window.CMS || {};
          * Positions tooltip next to the pointer event coordinates.
          *
          * @method position
-         * @private
          * @param {Object} e event object
          * @param {jQuery} tooltip element
          */
