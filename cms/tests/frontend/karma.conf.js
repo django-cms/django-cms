@@ -19,7 +19,7 @@ module.exports = function (config) {
 
     var useSauceLabs = function () {
         var val = process.env.USE_SAUCE_LABS;
-        return val === undefined || val !== '0' || !process.env.SAUCE_USERNAME || !process.env.SAUCE_ACCESS_KEY;
+        return (val === undefined || val !== '0') && process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY;
     };
 
     var browsers = {
