@@ -52,8 +52,38 @@ describe('CMS.Messages', function () {
     });
 
     describe('.displayToggle()', function () {
-        it('delegates to show()');
-        it('delegates to hide()');
+        var tooltip;
+        beforeEach(function (done) {
+            fixture.load('tooltip.html');
+            $(function () {
+                tooltip = new CMS.Tooltip();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('delegates to show()', function (done) {
+            spyOn(tooltip, 'show').and.callFake(function (e, name, id) {
+                expect(e).toEqual({ event: 'yes' });
+                expect(name).toEqual('AwesomePlugin');
+                expect(id).toEqual(1);
+                done();
+            });
+
+            tooltip.displayToggle(true, { event: 'yes' }, 'AwesomePlugin', 1);
+        });
+
+        it('delegates to hide()', function (done) {
+            spyOn(tooltip, 'hide').and.callFake(function () {
+                expect(arguments.length).toEqual(0);
+                done();
+            });
+
+            tooltip.displayToggle(false);
+        });
     });
 
     describe('.show()', function () {
