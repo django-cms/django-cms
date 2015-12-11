@@ -160,10 +160,12 @@ describe('CMS.Messages', function () {
         });
 
         it('positions the tooltip correctly based on mouse position', function () {
-            tooltip.show({ originalEvent: {
-                pageX: 20,
-                pageY: 20
-            } }, 'AwesomePlugin', 1);
+            tooltip.show({
+                originalEvent: {
+                    pageX: 20,
+                    pageY: 20
+                }
+            }, 'AwesomePlugin', 1);
 
             var parentOffset = tooltip.domElem.offsetParent().offset();
             expect(tooltip.domElem).toBeVisible();
@@ -176,10 +178,12 @@ describe('CMS.Messages', function () {
         it('position the tooltip correctly based on mouse position', function () {
             var boundary = $(window).width();
             var offset = 20;
-            tooltip.show({ originalEvent: {
-                pageX: 0,
-                pageY: 0
-            } }, 'AwesomePlugin', 1);
+            tooltip.show({
+                originalEvent: {
+                    pageX: 0,
+                    pageY: 0
+                }
+            }, 'AwesomePlugin', 1);
 
             var parentOffset = tooltip.domElem.offsetParent().offset();
             var tooltipWidth = tooltip.domElem.outerWidth(true);
