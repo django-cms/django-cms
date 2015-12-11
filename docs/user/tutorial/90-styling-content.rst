@@ -230,7 +230,7 @@ We're going to add four new points of information [example: https://www.dropbox.
     .. image:: /user/tutorial/images/4_col_12_6.png
        :alt: Define columns
        :align: right
-       :width: 250
+       :width: 180
 
     *Create columns*
         4
@@ -242,9 +242,6 @@ We're going to add four new points of information [example: https://www.dropbox.
         6
 
     You can leave all the other values blank.
-|
-|
-|
 
 #.  Hit **Save** |save-button|
 
