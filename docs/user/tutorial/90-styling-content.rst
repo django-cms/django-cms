@@ -311,23 +311,9 @@ Further improvements to the home page
 
 Also on the home page, we have a *Text* plugin and a *Latest articles* plugin.
 
-.. todo::
-
-    show image of home page with:
-
-
-    *   Some text from 20-create-page:
-
-            We're proud to be the first and best 24-hour bicycle repair service in the city.
-
-            Whatever your bicycle repair needs, you can rely on us to provide a top-quality service
-            at very reasonable prices. We also operate a unique call-out service to come to the aid
-            of stranded cyclists.
-
-            No job's too small or too large, and we can repair anything from
-            a puncture to a cracked frame.
-
-    *   a news plugin from 50-news
+.. image:: /user/tutorial/images/styled_home_with_plugins.png
+    :alt: Styled home with plugins
+    :align: center
 
 We don't need to repeat all the steps, but it's easy now to place these two plugins into separate *Column* plugins, just as you did for the content on the *How to find us* page.
 .. _more_work_on_home_page:
