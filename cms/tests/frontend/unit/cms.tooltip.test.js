@@ -9,12 +9,46 @@ describe('CMS.Messages', function () {
         expect(CMS.Tooltip).toBeDefined();
     });
 
-    it('has public API');
+    it('has public API', function () {
+        expect(CMS.Tooltip.prototype.displayToggle).toEqual(jasmine.any(Function));
+        expect(CMS.Tooltip.prototype.show).toEqual(jasmine.any(Function));
+        expect(CMS.Tooltip.prototype.position).toEqual(jasmine.any(Function));
+        expect(CMS.Tooltip.prototype.hide).toEqual(jasmine.any(Function));
+    });
 
     describe('instance', function () {
-        it('does not have options');
-        it('has ui');
-        it('picks correct dom node to show if touch enabled device');
+        var tooltip;
+        beforeEach(function (done) {
+            fixture.load('tooltip.html');
+            $(function () {
+                tooltip = new CMS.Tooltip();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('does not have options', function () {
+            expect(tooltip.options).not.toBeDefined();
+        });
+
+        it('has ui', function () {
+            expect(tooltip.body).toBeDefined();
+            expect(tooltip.domElem).toBeDefined();
+        });
+
+        it('picks correct dom node to show if touch enabled device', function () {
+            expect(tooltip.domElem).toBeMatchedBy('.cms-tooltip');
+            expect(tooltip.isTouch).toEqual(false);
+
+            tooltip.body.trigger('touchstart');
+
+            expect(tooltip.isTouch).toEqual(true);
+            expect(tooltip.domElem).not.toBeMatchedBy('.cms-tooltip');
+            expect(tooltip.domElem).toBeMatchedBy('.cms-tooltip-touch');
+        });
     });
 
     describe('.displayToggle()', function () {
