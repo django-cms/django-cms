@@ -24,9 +24,9 @@ module.exports = {
         toolbarClosed: 'Toolbar can be closed on trigger click'
     },
     logout: {
-        logoutOk: 'Logout via toolbar',
-        toolbarOpened: 'Toolbar opened by appending /?edit to the url',
-        toolbarClosed: 'Toolbar closed by appending /?edit_off to the url'
+        toolbarEditOn: 'Toolbar opened by appending /?edit to the url',
+        toolbarEditOff: 'Toolbar closed by appending /?edit_off to the url',
+        logoutOk: 'Logout via the toolbar done'
     },
     page: {
 
