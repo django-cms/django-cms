@@ -149,8 +149,35 @@ describe('CMS.Messages', function () {
     });
 
     describe('.hide()', function () {
-        it('hides the tooltip');
-        it('unbinds the mousemove events');
+        var tooltip;
+        beforeEach(function (done) {
+            fixture.load('tooltip.html');
+            $(function () {
+                tooltip = new CMS.Tooltip();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('hides the tooltip', function () {
+            spyOn(tooltip, 'position').and.callFake(function () {});
+            tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
+            expect(tooltip.domElem).toBeVisible();
+            tooltip.hide();
+            expect(tooltip.domElem).toHaveCss({ 'visibility': 'hidden' });
+            expect(tooltip.domElem).not.toBeVisible();
+        });
+
+        it('unbinds the mousemove events', function () {
+            spyOn(tooltip, 'position').and.callFake(function () {});
+            tooltip.show({ originalEvent: 'Event' }, 'AwesomePlugin', 1);
+            expect(tooltip.body).toHandle('mousemove');
+            tooltip.hide();
+            expect(tooltip.body).not.toHandle('mousemove');
+        });
     });
 
 });
