@@ -1,4 +1,4 @@
-/* globals $ */
+/* globals $, window */
 
 'use strict';
 
@@ -97,7 +97,7 @@ describe('CMS.Messages', function () {
         });
 
         afterEach(function () {
-            tooltip.body.off('mousemove.cms');
+            tooltip.body.off('mousemove.cms.tooltip');
             fixture.cleanup();
         });
 
@@ -145,7 +145,73 @@ describe('CMS.Messages', function () {
     });
 
     describe('.position()', function () {
-        it('positions the tooltip correctly based on mouse position');
+        var tooltip;
+        beforeEach(function (done) {
+            fixture.load('tooltip.html');
+            $(function () {
+                tooltip = new CMS.Tooltip();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            tooltip.body.off('mousemove.cms.tooltip');
+            fixture.cleanup();
+        });
+
+        it('positions the tooltip correctly based on mouse position', function () {
+            tooltip.show({ originalEvent: {
+                pageX: 20,
+                pageY: 20
+            } }, 'AwesomePlugin', 1);
+
+            var parentOffset = tooltip.domElem.offsetParent().offset();
+            expect(tooltip.domElem).toBeVisible();
+            expect(tooltip.domElem).toHaveCss({
+                'left': (-parentOffset.left + 20 + 20) + 'px',
+                'top': (-parentOffset.top + 20 - 12) + 'px'
+            });
+        });
+
+        it('position the tooltip correctly based on mouse position', function () {
+            var boundary = $(window).width();
+            var offset = 20;
+            tooltip.show({ originalEvent: {
+                pageX: 0,
+                pageY: 0
+            } }, 'AwesomePlugin', 1);
+
+            var parentOffset = tooltip.domElem.offsetParent().offset();
+            var tooltipWidth = tooltip.domElem.outerWidth(true);
+
+            // left side
+            var xFromLeft = [10, 20, boundary - offset - tooltipWidth - 1];
+            xFromLeft.forEach(function (x) {
+                tooltip.position({
+                    pageX: x,
+                    pageY: 20
+                }, tooltip.domElem);
+
+                expect(tooltip.domElem).toHaveCss({
+                    'left': (-parentOffset.left + offset + x) + 'px',
+                    'top': (-parentOffset.top + 20 - 12) + 'px'
+                });
+            });
+
+            // right side
+            var xFromRight = [10, 20, tooltipWidth, tooltipWidth + offset - 1, tooltipWidth + offset];
+            xFromRight.forEach(function (x) {
+                tooltip.position({
+                    pageX: boundary - x,
+                    pageY: 20
+                }, tooltip.domElem);
+
+                expect(tooltip.domElem).toHaveCss({
+                    'left': (-parentOffset.left + (boundary - x) - tooltipWidth - offset) + 'px',
+                    'top': (-parentOffset.top + 20 - 12) + 'px'
+                });
+            });
+        });
     });
 
     describe('.hide()', function () {
