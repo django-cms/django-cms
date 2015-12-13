@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block title %}{% page_attribute "page_title" %}{% endblock title %}
+
+{% block content %}
+    <div class="jumbotron">
+        {% placeholder "feature" %}
+    </div>
+    <div>
+	{% with "?edit" as teste %} 
+	<a href = " {{ teste }}"> Click here to Login as Administrator</a>
+	{% endwith %}
+	<br/>
+	{% with "admin/" as teste2 %}
+	<a href = " {{ teste2 }}"> Click here to display a different Administrator view.</a>
+	{% endwith %}
+
+	
+        {% placeholder "content" %}
+    </div>
+{% endblock content %}
