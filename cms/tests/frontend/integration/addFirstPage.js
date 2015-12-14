@@ -23,7 +23,7 @@ casper.test.begin('Add First Page', function (test) {
 
             this.click('.cms-modal-buttons .cms-btn-action');
         })
-        .withFrame(0, function() {
+        .withFrame(0, function () {
             test.assertExists('#id_1-title', messages.wizard.formAvailable);
 
             this.fill('.cms-content-wizard form', {
