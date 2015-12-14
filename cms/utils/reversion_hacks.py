@@ -1,6 +1,26 @@
 # -*- coding: utf-8 -*-
-from reversion import revisions as reversion
-from reversion.revisions import RegistrationError, VersionAdapter
+
+try:
+    from reversion import revisions as reversion
+    from reversion.admin import VersionAdmin as ModelAdmin, RollBackRevisionView  # NOQA
+    from reversion.models import Revision, Version  # NOQA
+    from reversion.revisions import create_revision, RegistrationError, VersionAdapter  # NOQA
+    from reversion.signals import post_revision_commit  # NOQA
+
+    revision_manager = reversion.default_revision_manager
+    revision_context = reversion.revision_context_manager
+except ImportError:
+    import reversion
+    from reversion import create_revision  # NOQA
+    from reversion.admin import VersionAdmin as ModelAdmin  # NOQA
+    from reversion.models import Revision, Version, post_revision_commit  # NOQA
+    from reversion.revisions import RegistrationError, VersionAdapter  # NOQA
+
+    revision_manager = reversion.revision
+    revision_context = reversion.revision_context_manager
+
+    class RollBackRevisionView(Exception):
+        pass
 
 
 def register_draft_only(model_class, fields, follow, format):
@@ -8,7 +28,7 @@ def register_draft_only(model_class, fields, follow, format):
     version of the reversion register function that only registers drafts and
     ignores public models
     """
-    revision_manager = reversion.revision
+
     if revision_manager.is_registered(model_class):
         raise RegistrationError(
             "%r has already been registered with Reversion." % model_class)
