@@ -104,11 +104,31 @@ Do the same for a second item:
         cosy and warm place to sit and relax while your bike's being seen to at the end of long
         ride.
 
+and a third:
+
+.. tip::
+
+    Name
+        Repairing is caring
+
+    Is published
+        ✓
+
+    Lead-in
+        Every cyclist should own a basic toolkit to deal with possible breakdowns.
+
+    Content
+        Don't find yourself caught out by the small things. Pack a spare tube, a small pump, tyre
+        levers and some patches, and you'll be equipped to deal with the major cause of cycling
+        breakdowns - punctures.
+
 The news articles will now be listed here, and this list will be always be kept up-to-date with a
 selection of latest news items.
 
-.. image:: /user/tutorial/images/news_entire_page.png
+.. image:: /user/tutorial/images/three_articles.png
     :alt: the news page
+    :width: 434
+    :align: center
 
 .. _use-news-plugin:
 
@@ -132,4 +152,5 @@ home page too. So let's do that.
     created earlier.
 #.  **Save** the plugin.
 
-.. todo:: need an image of the news articles plugin in the home page
+.. image:: /user/tutorial/images/home_with_news_plugin.png
+    :alt: the news plugin

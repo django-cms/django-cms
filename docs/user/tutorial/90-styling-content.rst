@@ -40,7 +40,7 @@ columns.
     .. image:: /user/tutorial/images/define_grid.png
        :alt: Define columns
        :align: right
-       :width: 190
+       :width: 220
 
     *Create columns*
         2
@@ -227,15 +227,5 @@ most cases you won't. You also generally don't need to specify column arrangemen
 larger than *col-md*, in which case you can leave *col-lg* blank too.
 
 In practice, in most cases, specifying *col-sm* and - if you need it - *col-md* is enough.
-
-Implementing this layout
-------------------------
-
-We can implement this behaviour in the row/columm system. First, we add a row with four columns, and then specify the column widths:
-
-.. image:: /user/tutorial/images/column_settings.png
-   :alt: the column width settings dialog
-   :width: 120
-   :align: right
 
 We'll implement this layout in the next section.
