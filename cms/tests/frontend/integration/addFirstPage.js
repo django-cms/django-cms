@@ -33,8 +33,19 @@ casper.test.begin('Add First Page', function (test) {
         })
         .waitForSelector('.cms-ready', function () {
             test.assertSelectorHasText('.cms-plugin-1', content.text, messages.created);
+
+            // handles confirm popup
+            this.setFilter('page.confirm', function () {
+                return true;
+            });
+
+            this.click('.cms-btn-publish');
+        })
+        .waitForSelector('.cms-btn-switch-edit', function () {
+            test.assertExists('.cms-btn-switch-edit', messages.published);
         })
         .run(function () {
+            this.removeAllFilters('page.confirm');
             test.done();
         });
 });

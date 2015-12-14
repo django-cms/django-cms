@@ -12,9 +12,7 @@ module.exports = {
             loginOk: 'Login via the admin form done'
         },
         toolbar: {
-            cmsAvailable: ' and page title is correct',
-            toolbarMissing: 'Toolbar isn\'t originally available',
-            toolbarAvailable: 'Toolbar opened by appending /?edit to the url',
+            toolbarAvailable: 'The toolbar login form is available',
             loginOk: 'Login via the toolbar form'
         }
     },
@@ -31,6 +29,7 @@ module.exports = {
     page: {
         creation: {
             created: 'The new page has been created and its content is correct',
+            published: 'The new page has been published',
             wizard: {
                 opened: 'The wizard pop up is opened',
                 closed: 'The wizard pop up is closed',
