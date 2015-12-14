@@ -14,7 +14,7 @@ casper.test.begin('User Logout', function (test) {
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
             this.click('.cms-toolbar-item-navigation-hover ul li:last-child a');
         })
-        .waitForSelector('.login', function () {
+        .waitForSelector('.nav', function () {
             test.assertDoesntExist('.cms-toolbar', messages.logoutOk);
         })
         .run(function () {
