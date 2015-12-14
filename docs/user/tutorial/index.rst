@@ -36,6 +36,7 @@ django CMS.
     70-page-management
     80-site-wide-content
     90-styling-content
+    95-styling-content2
     100-exploring-plugins-bootstrap
 
 .. note:: **Touch-screen users**

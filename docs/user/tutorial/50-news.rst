@@ -104,8 +104,14 @@ Do the same for a second item:
         cosy and warm place to sit and relax while your bike's being seen to at the end of long
         ride.
 
+The news articles will now be listed here, and this list will be always be kept up-to-date with a
+selection of latest news items.
+
+.. image:: /user/tutorial/images/news_entire_page.png
+    :alt: the news page
 
 .. _use-news-plugin:
+
 
 *****************
 Use a news plugin
@@ -126,8 +132,4 @@ home page too. So let's do that.
     created earlier.
 #.  **Save** the plugin.
 
-The news articles will now be listed in your home page too, and this list will be always be kept
-up-to-date with a selection of latest news items.
-
-    .. image:: /user/tutorial/images/news_entire_page.png
-        :alt: the news page
+.. todo:: need an image of the news articles plugin in the home page

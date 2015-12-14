@@ -1,6 +1,6 @@
-###############
-Styling content
-###############
+####################################################
+Styling content - introduction to responsive columns
+####################################################
 
 Our pages have some useful content, but they are not very well laid-out. For example, here's the
 *How to find us* page:
@@ -17,8 +17,11 @@ layout before you add the content.
 The *Contact information* page
 ******************************
 
-We'll start by improving the layout of the *Contact information* page, where we'll use the
-*columns* functionality to place the text and the map side-by-side, in columns.
+We'll start by doing something quite simple. We'll take the *Contact information* page, and use the
+*columns* functionality to improve its layout by placing the text and the map side-by-side, in
+columns.
+
+**Don't worry** if you don't understand exactly what we're doing - all will be explained.
 
 #.  Switch to structure mode using |structure-switch| and add a new *Row* plugin.
 
@@ -31,32 +34,35 @@ We'll start by improving the layout of the *Contact information* page, where we'
        :align: center
        :width: 350
 
-#.  When you create a *Row* plugin, it will ask about the columns you want it to contain - how
-    many of them, and their widths at different browser window sizes.
+#.  When you create a *Row* plugin, it will ask about the columns you want it to contain - *how
+    many* of them you want, and what their *widths* at different browser window sizes should be.
 
     .. image:: /user/tutorial/images/define_grid.png
        :alt: Define columns
        :align: right
-       :width: 170
+       :width: 190
 
     *Create columns*
         2
 
+    *col-xs*
+        leave blank
+
     *col-sm*
-        24
+        leave blank
 
     *col-md*
         12
 
-    You can leave all the other values blank.
+    *col-lg*
+        leave blank
 
-    If what this means isn't obvious to you, don't worry, we'll explain it all in a a moment.
 
-#.  Expand the row to reveal the two columns.
+#.  Expand the *Row* plugin to reveal the two *Column* plugins within it.
 
-#.  Drag and drop the *Text* plugin *Bruno Bicycle Services...* into its the first *Column*.
+#.  Drag and drop the existing *Text* plugin *Bruno Bicycle Services...* into the first *Column*.
 
-#.   Do the same for the *Google Map* plugin, dropping it into the second *Column*.
+#.  Do the same for the *Google Map* plugin, dropping it into the second *Column*.
 
     .. image:: /user/tutorial/images/drag_content_to_column.png
        :alt: drag the original plugins into the new columns
@@ -73,15 +79,14 @@ The final result in *Structure mode*:
 And in *Content mode*:
 
 .. image:: /user/tutorial/images/row_result_contactpage.png
-   :alt: Contact Page
+   :alt: the result in content mode
    :align: center
 
 Here we have two columns - but try narrowing the browser window; when you get to a certain point, the layout will respond and display the two columns as rows instead:
 
 .. image:: /user/tutorial/images/responsive.png
-   :alt: Responsive Webdesign
+   :alt: the layout works on small and large displays
    :align: center
-
 
 
 **************
@@ -140,7 +145,7 @@ And you can mix and match column widths, as long as each row contains 24 units::
     [-4][-4][---8--][---8--]
 
 Each column needs to be given a width in units (if no width is given, then the column will span the
-entire available width of the row, but its behaviour may be unpredicatable - similarly if you get
+entire available width of the row, but its behaviour may be unpredictable - similarly if you get
 your addition wrong and the widths don't add up to 24!).
 
 The problem is that a layout of columns (especially if you are dealing with more than two columns)
@@ -148,6 +153,41 @@ might look excellent on a wide display, but on a mobile phone, each one of those
 uselessly narrow.
 
 We can solve the problem by adopting *responsive* layouts.
+
+
+Example: a two-column layout
+-----------------------------
+
+Here's the layout we created above for the *How to find us* page in a wider browser window::
+
+    [----12----][----12----]
+
+and in a narrower one::
+
+    [----------24----------]
+    [----------24----------]
+
+
+Implementation
+^^^^^^^^^^^^^^
+
+*col-xs*
+    the width value for *extra-small* displays (such as phones) - leave blank to imply ``24``
+
+*col-sm*
+    the width value for *small* displays (such as tablets) - leave blank to inherit from
+    *col-xs*
+
+*col-md*
+    12
+
+*col-lg*
+    the width value for *large* displays (such as a wide desktop display) - leave blank to
+    inherit from *col-md*
+
+
+Example: a four-column layout
+------------------------------
 
 If we have a layout that is *four* columns wide in a window on a desktop display::
 
@@ -166,184 +206,36 @@ and *four rows of one column* on something like a mobile phone::
     [----------24----------]
 
 
-Applying this to column plugins
--------------------------------
-
-We can set this behaviour in the column plugin:
+Implementation
+^^^^^^^^^^^^^^
 
 *col-xs*
     the width value for *extra-small* displays (such as phones) - leave blank to imply ``24``
 
 *col-sm*
-    the width value for *small* displays (such as tablets) - leave blank to inherit from ``col-xs``
+    12
 
 *col-md*
-    the width value for *medium* displays (such as a modest desktop display) - leave blank to
-    inherit from *col-sm*
+    6
 
 *col-lg*
-     the width value for *large* displays (such as a wide desktop display) - leave blank to inherit
-     from *col-md*
+    the width value for *large* displays (such as a wide desktop display) - leave blank to
+    inherit from *col-md*
 
 You can leave *col-xs* blank unless you want multiple columns even on mobile phone displays. In
 most cases you won't. You also generally don't need to specify column arrangements for displays
 larger than *col-md*, in which case you can leave *col-lg* blank too.
 
-This means that in most cases, specifying *col-sm* and - if you need it - *col-md* is enough.
+In practice, in most cases, specifying *col-sm* and - if you need it - *col-md* is enough.
+
+Implementing this layout
+------------------------
+
+We can implement this behaviour in the row/columm system. First, we add a row with four columns, and then specify the column widths:
 
 .. image:: /user/tutorial/images/column_settings.png
    :alt: the column width settings dialog
    :width: 120
    :align: right
 
-If we set *col-sm* to ``12`` and *col-md* to ``6``, this means:
-
-* on a mobile phone, display the items in this row in a single column
-* on a typical tablet, display them in two rows of two columns
-* on anything larger, display them in one row of four columns
-
-... which is exactly what we're going to do next for the home page.
-
-
-.. _adding_four_columns:
-
-************************************
-Adding four columns to the home page
-************************************
-
-We're going to add four new points of information [example: https://www.dropbox.com/s/oisgwq6a9y485wd/Screenshot%202015-12-02%2008.33.23.png?dl=0.]
-
-#.  As you have done previously, switch to *Edit* |edit-button| mode and then *Structure* |structure-button| mode.
-
-
-.. |edit-button| image:: /user/tutorial/images/edit-button.png
-   :alt: 'edit'
-   :width: 45
-
-.. |structure-button| image:: /user/tutorial/images/structure-button.png
-   :alt: 'structure'
-   :width: 148
-
-#.  Add a *Row* plugin to the *Content* placeholder. Provide this *Row* plugin with settings as
-    follows:
-
-    .. image:: /user/tutorial/images/4_col_12_6.png
-       :alt: Define columns
-       :align: right
-       :width: 180
-
-    *Create columns*
-        4
-
-    *col-sm*
-        12
-
-    *col-md*
-        6
-
-    You can leave all the other values blank.
-
-#.  Hit **Save** |save-button|
-
-.. |save-button| image:: /user/tutorial/images/save_button.png
-   :alt: 'save'
-   :width: 60
-
-#.  Inside the first *Column* plugin, add a new *Text* plugin, containing:
-
-    .. image:: /user/tutorial/images/add_text_plugin.png
-       :alt: Add text plugin
-       :align: center
-|
-
-    *   Font awesome icon
-
-    .. image:: /user/tutorial/images/fontawesome_icon.png
-        :alt: Fontawesome Icon
-        :width: 400
-        :align: center
-|
-
-    *   Set yourself free [heading3]
-    *   Never worry again about a bicycle malfunction - we're here for you
-|
-
-#.  Now, rather than go though the steps above three more times for the next three columns, let's
-    save some effort by copy and pasting the *Text* plugin.
-
-    #.  From the *plugin command menu* for the *Text* plugin, select *Copy*.
-
-    .. image:: /user/tutorial/images/copy_plugin.png
-        :alt: Copy plugin
-        :align: center
-
-    #.  Select the next (empty) *Column* plugin.
-    #.  Select *Paste* from the menu.
-
-    .. image:: /user/tutorial/images/paste_plugin.png
-        :alt: Paste plugin
-        :align: center
-
-
-    You can then quickly change the text in the three copies:
-
-    24 hour service
-        Day or night, round the clock, when you break down, we'll be there
-
-    Workshop service
-        Don't wait until you break down - keep your bike in top condition with a service
-
-    The Café
-        Enjoy home-roasted coffee and home-made cakes in our cosy café next-door
-
-.. image:: /user/tutorial/images/services_row_columns_example.png
-    :alt: Services
-    :align: center
-
-
-
-*************************************
-Further improvements to the home page
-*************************************
-
-Also on the home page, we have a *Text* plugin and a *Latest articles* plugin.
-
-.. image:: /user/tutorial/images/styled_home_with_plugins.png
-    :alt: Styled home with plugins
-    :align: center
-
-We don't need to repeat all the steps, but it's easy now to place these two plugins into separate *Column* plugins, just as you did for the content on the *How to find us* page.
-
-This is how the content placeholder looks in the structure mode.
-
-.. image:: /user/tutorial/images/styled_home_structure_mode.png
-    :alt: Styled home structure mode
-    :align: center
-
-Seems like a lot, but it is actually pretty simple to achieve. Follow these steps:
-
-1. Add a new row plugin with *2 columns* and set both to *col-sm-12*.
-
-2. After they have been created, doubleclick on the first one and change the column width to *col-sm-16*. Open the second column and set that to *col-sm-8*.
-
-3. Accordingly take the text plugin you firstly created on the homepage and drop it in the first column.
-
-4. For the second column, chose the *image* plugin. Select a nice picute or upload one and hit *save*.
-
-5. You might notice that that it does't align the top of the image to the text on the left. To make sure it looks nice, we're gonna add a new plugin to make some space.
-
-    .. image:: /user/tutorial/images/bad_alignment.png
-        :alt: Bad alignment and space
-        :align: center
-
-6. The spacer plugin helps to keep the white space between the elements and also to align them correctly. Just play around with the different options you have and select the one that fits the most.
-
-    .. image:: /user/tutorial/images/spacer_plugin.png
-        :alt: Spacer plugin
-        :align: center
-
-The same spacer plugin is used between the different sections.
-
-
-
-
+We'll implement this layout in the next section.
