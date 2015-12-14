@@ -88,7 +88,9 @@ class ToolbarMiddleware(object):
         if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
             request.session['cms_toolbar_disabled'] = False
 
-        if request.user.is_staff or (anonymous_on and request.user.is_anonymous()):
+        if not request.session.get('cms_toolbar_disabled', False) and (
+                request.user.is_staff or (anonymous_on and request.user.is_anonymous())
+        ):
             if edit_on in request.GET and not request.session.get('cms_edit', False):
                 if not request.session.get('cms_edit', False):
                     menu_pool.clear()
