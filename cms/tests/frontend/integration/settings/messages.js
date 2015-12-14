@@ -29,6 +29,13 @@ module.exports = {
         logoutOk: 'Logout via the toolbar done'
     },
     page: {
-
+        creation: {
+            created: 'The new page has been created and its content is correct',
+            wizard: {
+                opened: 'The wizard pop up is opened',
+                closed: 'The wizard pop up is closed',
+                formAvailable: 'The page creation wizard form is available'
+            }
+        }
     }
 };
