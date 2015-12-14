@@ -350,9 +350,9 @@ The same spacer plugin is used between the different sections.
 Adding a gallery plugin
 *************************************
 
-Next, we are going to add a gallery with the help of the boostrap *carausel* plugin.
+Next, we are going to add a gallery with the help of the boostrap *carousel* plugin.
 
-1. As the carousel will be responsive, we will again make use of the grid plugin. This time we ad a row and following columns::
+1. As the carousel will be responsive, we will again make use of the grid plugin. This time we add a row and following columns::
 
     [-4-][--16--][-4-]
 
@@ -386,6 +386,5 @@ The result should look like this:
     .. image:: /user/tutorial/images/bootstrap_carousel.gif
         :alt: Bootstrap Carousel example
         :align: center
-
 
 
