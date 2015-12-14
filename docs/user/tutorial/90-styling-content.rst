@@ -344,6 +344,48 @@ Seems like a lot, but it is actually pretty simple to achieve. Follow these step
 
 The same spacer plugin is used between the different sections.
 
+|
+|
+*************************************
+Adding a gallery plugin
+*************************************
+
+Next, we are going to add a gallery with the help of the boostrap *carausel* plugin.
+
+1. As the carousel will be responsive, we will again make use of the grid plugin. This time we ad a row and following columns::
+
+    [-4-][--16--][-4-]
+
+2. Accordingly we are going to use the bootstrap carousel plugin:
+
+    .. image:: /user/tutorial/images/carousel_plugin.png
+        :alt: Carousel plugin
+        :align: center
+        :width: 450
+
+3. You can define a bunch of options for the carousel. Make sure you select the transition effect to create a smooth user experience
+
+
+    .. image:: /user/tutorial/images/transition_effect.png
+        :alt: Transition effect
+        :align: center
+
+4. Now we add the images by adding the *slide plugin* on the just created carousel plugin.
+
+    .. image:: /user/tutorial/images/slide_plugin.png
+        :alt: Slide plugin
+        :align: center
+        :width: 450
+
+5. You will have to select an image from the filer plugin or upload a news one. Repeat this step for all slides you want to add.
+
+6. Once you're done, dont' forget to publish your changes.
+
+The result should look like this:
+
+    .. image:: /user/tutorial/images/bootstrap_carousel.gif
+        :alt: Bootstrap Carousel example
+        :align: center
 
 
 
