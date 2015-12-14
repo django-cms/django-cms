@@ -24,7 +24,7 @@ casper.test.begin('Add First Page', function (test) {
             this.click('.cms-modal-buttons .cms-btn-action');
         })
         .withFrame(0, function() {
-            test.assertExists('form #id_1-title', messages.wizard.formAvailable);
+            test.assertExists('#id_1-title', messages.wizard.formAvailable);
 
             this.fill('.cms-content-wizard form', {
                 '1-title': content.title,

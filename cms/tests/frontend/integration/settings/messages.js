@@ -35,6 +35,9 @@ module.exports = {
                 opened: 'The wizard pop up is opened',
                 closed: 'The wizard pop up is closed',
                 formAvailable: 'The page creation wizard form is available'
+            },
+            admin: {
+
             }
         }
     }
