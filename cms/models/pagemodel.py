@@ -957,7 +957,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             from cms.models.titlemodels import Title
 
             if version_id:
-                from reversion.models import Version
+                from cms.utils.reversion_hacks import Version
 
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
@@ -1290,12 +1290,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the previous revision
         """
-        from reversion import revisions as reversion
+        from cms.utils.reversion_hacks import reversion, Revision
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
         if self.revision_id:
-            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+            current_revision = Revision.objects.get(pk=self.revision_id)
         else:
             try:
                 current_version = versions[0]
@@ -1317,12 +1317,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the next revision
         """
-        from reversion import revisions as reversion
+        from cms.utils.reversion_hacks import reversion, Revision
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
         if self.revision_id:
-            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+            current_revision = Revision.objects.get(pk=self.revision_id)
         else:
             try:
                 current_version = versions[0]

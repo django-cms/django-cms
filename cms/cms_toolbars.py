@@ -548,8 +548,7 @@ class PageToolbar(CMSToolbar):
             history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
 
             if is_installed('reversion'):
-                from reversion import revisions as reversion
-                from reversion.models import Revision
+                from cms.utils.reversion_hacks import reversion, Revision
 
                 versions = reversion.get_for_object(self.page)
                 if self.page.revision_id:
