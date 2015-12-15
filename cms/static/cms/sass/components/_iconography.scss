@@ -50,59 +50,65 @@
     @if $filename == close {
         $char: "E008";
     }
-    @if $filename == copy {
+    @if $filename == cogs {
         $char: "E009";
     }
-    @if $filename == eye {
+    @if $filename == copy {
         $char: "E00A";
     }
-    @if $filename == forbidden {
+    @if $filename == eye {
         $char: "E00B";
     }
-    @if $filename == handler {
+    @if $filename == forbidden {
         $char: "E00C";
     }
-    @if $filename == home {
+    @if $filename == handler {
         $char: "E00D";
     }
-    @if $filename == loader {
+    @if $filename == home {
         $char: "E00E";
     }
-    @if $filename == lock {
+    @if $filename == info {
         $char: "E00F";
     }
-    @if $filename == logo {
+    @if $filename == loader {
         $char: "E010";
     }
-    @if $filename == menu {
+    @if $filename == lock {
         $char: "E011";
     }
-    @if $filename == minimize {
+    @if $filename == logo {
         $char: "E012";
     }
-    @if $filename == minus {
+    @if $filename == menu {
         $char: "E013";
     }
-    @if $filename == paste {
+    @if $filename == minimize {
         $char: "E014";
     }
-    @if $filename == pencil {
+    @if $filename == minus {
         $char: "E015";
     }
-    @if $filename == pin {
+    @if $filename == paste {
         $char: "E016";
     }
-    @if $filename == plus {
+    @if $filename == pencil {
         $char: "E017";
     }
-    @if $filename == scissors {
+    @if $filename == pin {
         $char: "E018";
     }
-    @if $filename == search {
+    @if $filename == plus {
         $char: "E019";
     }
-    @if $filename == window {
+    @if $filename == scissors {
         $char: "E01A";
+    }
+    @if $filename == search {
+        $char: "E01B";
+    }
+    @if $filename == window {
+        $char: "E01C";
     }
 
     @return $char;
@@ -156,6 +162,10 @@
     @include icon(close);
 }
 
+.cms-icon-cogs {
+    @include icon(cogs);
+}
+
 .cms-icon-copy {
     @include icon(copy);
 }
@@ -174,6 +184,10 @@
 
 .cms-icon-home {
     @include icon(home);
+}
+
+.cms-icon-info {
+    @include icon(info);
 }
 
 .cms-icon-loader {
