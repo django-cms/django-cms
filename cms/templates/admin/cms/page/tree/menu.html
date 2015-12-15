@@ -6,8 +6,18 @@
     "
     data-colview='
         <div class="cms-tree-data">
-            <div class="cms-tree-data-group">
-                {% if page.is_home %}yes{% else %}no{% endif %}
+            <div class="cms-tree-item cms-tree-icons">
+                {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
+                {% if page.soft_root %}
+                    <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                        <span class="cms-icon cms-icon-sitemap" title="{% trans 'softroot' %}">
+                    </a>
+                {% endif %}
+                {% if page.application_urls %}
+                    <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                        <span class="cms-icon cms-icon-puzzle" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}">
+                    </a>
+                {% endif %}
             </div>
         </div>
     '
@@ -81,6 +91,42 @@
                 <a href="#" class="cms-tree-item">copy</a>
             </div>
             {% endcomment %}
+        </div>
+    '
+    data-colinfo='
+        <div class="cms-tree-data">
+            <div class="cms-tree-item cms-tree-item-info">
+                <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
+                    class="cms-tree-info-container js-cms-tree-tooltip-trigger">
+                    <span class="cms-icon cms-icon-info"></span>
+                </a>
+
+                <div class="cms-tree-tooltip-container js-cms-tree-tooltip-container">
+                    <h3>{% trans "Information:" %}</h3>
+                    <div class="cms-tree-tooltip-wrapper">
+                        {% if page.publication_date %}
+                        <p><strong>{% trans "publication date" %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
+                        {% endif %}
+                        {% if page.publication_end_date %}
+                            <p><strong>{% trans "publication end date" %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
+                        {% endif %}
+                        <p>
+                            <strong>{% trans "is restricted" %}:</strong>
+                            {% if page|is_restricted:request %}
+                                {% trans "Yes" %}
+                            {% else %}
+                                {% trans "No" %}
+                            {% endif %}
+                        </p>
+                        {% if page.changed_by %}
+                            <p><strong>{% trans "last change by" %}:</strong> {{ page.changed_by }}</p>
+                        {% endif %}
+                        {% if page.get_template_display %}
+                            <p><strong>{% trans "template" %}:</strong> {{ page.get_template_display }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
     '
     >

@@ -105,8 +105,9 @@
 
 {% block result_list %}
     <div class="clear"></div>
-    <p>Page Tree</p>
+    <h2>{% trans "Pages" %}</h2>
 
+    {# INFO: javascript is loaded from cms.pagetree.js #}
     <div class="cms-pagetree js-cms-pagetree" data-json='{
         "csrf": "{{ csrf_token }}",
         "static": "{{ STATIC_URL }}",
@@ -135,6 +136,9 @@
         }, {% endfor %} {
             "title": "{% trans 'Menu' %}",
             "key": "menu"
+        }, {
+            "title": "{% trans 'Info' %}",
+            "key": "info"
         }]
     }'>
         <ul>
