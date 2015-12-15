@@ -21,6 +21,11 @@ module.exports = {
         toolbarOpened: 'Toolbar can be opened on trigger click',
         toolbarClosed: 'Toolbar can be closed on trigger click'
     },
+    sideframe: {
+        sideframeRemainsOpen: 'The sideframe remains open on page reload',
+        sideframeOpened: 'The sideframe has been opened',
+        sideframeClosed: 'The sideframe has been closed'
+    },
     logout: {
         toolbarEditOn: 'Toolbar opened by appending /?edit to the url',
         toolbarEditOff: 'Toolbar closed by appending /?edit_off to the url',
@@ -45,5 +50,7 @@ module.exports = {
             filteredPluginAvailable: 'There is text plugin available by filter: text',
             newPluginVisible: 'Newly created text plugin can be seen on page'
         }
+    },
+    users: {
     }
 };
