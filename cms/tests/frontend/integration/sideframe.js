@@ -12,10 +12,10 @@ casper.test.begin('Sideframe', function (test) {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover a[href="/en/admin/"]');
+            this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/"]');
         })
         .waitUntilVisible('.cms-sideframe-frame', function () {
-            test.assertVisible('.cms-sideframe-frame', messages.sideframeClosed);
+            test.assertVisible('.cms-sideframe-frame', messages.sideframeOpened);
 
             this.click('.cms-sideframe .cms-icon-close');
         })
