@@ -23,7 +23,7 @@ var CMS = window.CMS || {};
 
             // what happens when redrawing
             this.redraw_node = function (obj, deep, callback, force_draw) {
-                // default draw ,ethod
+                // default draw method
                 obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
 
                 // we need to append the options bar after the <li> as additional
