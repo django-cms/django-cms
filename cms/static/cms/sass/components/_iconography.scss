@@ -101,14 +101,20 @@
     @if $filename == plus {
         $char: "E019";
     }
-    @if $filename == scissors {
+    @if $filename == puzzle {
         $char: "E01A";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E01B";
     }
-    @if $filename == window {
+    @if $filename == search {
         $char: "E01C";
+    }
+    @if $filename == sitemap {
+        $char: "E01D";
+    }
+    @if $filename == window {
+        $char: "E01E";
     }
 
     @return $char;
@@ -230,12 +236,20 @@
     @include icon(plus);
 }
 
+.cms-icon-puzzle {
+    @include icon(puzzle);
+}
+
 .cms-icon-scissors {
     @include icon(scissors);
 }
 
 .cms-icon-search {
     @include icon(search);
+}
+
+.cms-icon-sitemap {
+    @include icon(sitemap);
 }
 
 .cms-icon-window {
