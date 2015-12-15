@@ -129,7 +129,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
             pat(r'^([0-9]+)/change_template/$', self.change_template),
-            pat(r'^([0-9]+)/([a-z\-]+)/descendants/$', self.descendants),  # menu html for page descendants
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -138,6 +137,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^add-page-type/$', self.add_page_type),
             pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
+            url(r'^get-tree/$', self.get_tree, name="get_tree"),
         ]
 
         if plugin_pool.get_all_plugins():
@@ -1254,17 +1254,34 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return admin_utils.render_admin_menu_item(request, page, language=language)
         return HttpResponseForbidden(force_text(_("You do not have permission to change this page's in_navigation status")))
 
-    def descendants(self, request, page_id, language):
+    def get_tree(self, request):
         """
-        Get html for descendants of given page
+        Get html for descendants of given page or if no page_id is provided, the
+        whole tree.
+
         Used for lazy loading pages in cms.changelist.js
 
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
-        page = get_object_or_404(self.model, pk=page_id)
-        return admin_utils.render_admin_menu_item(request, page,
-                                                  template="admin/cms/page/tree/lazy_menu.html", language=language)
+        page_id = request.GET.get('pageId', None)
+        language = request.GET.get('language', None)
+
+        if language is None:
+            language = request.GET.get('language') or get_language()
+
+        if page_id:
+            pages = [get_object_or_404(self.model, pk=int(page_id))]
+        else:
+            pages = Page.get_root_nodes().filter(publisher_is_draft=False)
+
+        template = "admin/cms/page/tree/lazy_menu.html"
+        response = u""
+        for page in pages:
+            response += admin_utils.render_admin_menu_item(request, page,
+                                                           template=template,
+                                                           language=language)
+        return HttpResponse(response)
 
     def add_page_type(self, request):
         site = Site.objects.get_current()
