@@ -12,7 +12,7 @@ $pagetree-tooltip-min-width: 130px;
     }
 }
 
-.cms-tree-data {
+.cms-tree-col {
     height: 24px;
 }
 
@@ -94,19 +94,23 @@ $pagetree-tooltip-min-width: 130px;
 //###########################################################
 // ICONS
 // used for the sitemap and apphook icons
-.cms-tree-icons {
+.cms-tree-item-icons {
     position: relative;
     top: $pagetree-icon-offset;
 
     span:before {
         color: $gray-light;
     }
+
+    &-dark span:before {
+        color: $gray-darker;
+    }
 }
 
 //###########################################################
 // PREVIEW
 // shows preview eye icon
-.cms-tree-preview {
+.cms-tree-item-preview {
     position: relative;
     top: 1px;
 
@@ -185,7 +189,7 @@ $pagetree-tooltip-min-width: 130px;
 //###########################################################
 // LANGUAGE
 // shows language bubbles
-.cms-tree-menu {
+.cms-tree-item-menu {
     position: relative;
     top: $pagetree-icon-offset;
 

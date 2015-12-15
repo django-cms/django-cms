@@ -87,7 +87,7 @@ var CMS = window.CMS || {};
                 this._setTooltips();
 
                 // make sure ajax post requests are working
-                this._setAjaxPost($('.js-cms-tree-menu a'));
+                this._setAjaxPost($('.js-cms-tree-item-menu a'));
                 this._setAjaxPost($('.js-cms-tree-lang-trigger'));
             },
 

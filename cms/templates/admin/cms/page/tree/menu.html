@@ -5,8 +5,8 @@
     {% if page.get_descendant_count %}jstree-children{% endif %}
     "
     data-colview='
-        <div class="cms-tree-data">
-            <div class="cms-tree-item cms-tree-icons">
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-icons">
                 {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
                 {% if page.soft_root %}
                     <a href="{% url 'admin:cms_page_advanced' page.id %}">
@@ -22,8 +22,8 @@
         </div>
     '
     data-colpreview='
-        <div class="cms-tree-data">
-            <div class="cms-tree-item cms-tree-preview
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %}>
@@ -34,7 +34,7 @@
     '
     {% for lang in site_languages %}
     data-col{{ lang|lower }}='
-        <div class="cms-tree-data">
+        <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
                 {% if has_change_permission and has_publish_permission %}
                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
@@ -67,9 +67,9 @@
     '
     {% endfor %}
     data-colmenu='
-        <div class="cms-tree-data">
+        <div class="cms-tree-col">
             {% if has_change_permission %}
-                <div class="cms-tree-item cms-tree-menu js-cms-tree-menu">
+                <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
                     <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                         {% if page.in_navigation %}
                             <span class="cms-icon cms-icon-forbidden" title="{% trans "not in menu" %}"></span>
@@ -79,22 +79,29 @@
                     </a>
                 </div>
             {% endif %}
-            {% comment %}
-            <div class="cms-tree-item">
-                <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child" class="cms-tree-item">add</a>
-                <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" class="cms-tree-item">edit</a>
-                <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}" class="cms-tree-item">delete</a>
+        </div>
+    '
+    data-coloptions='
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
             </div>
-            <div class="cms-tree-item">
-                <a href="#" class="cms-tree-item cms-tree-item-move">move</a>
-                <a href="#" class="cms-tree-item">cut</a>
-                <a href="#" class="cms-tree-item">copy</a>
+            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <a href=""><span class="cms-icon cms-icon-copy"></span></a>
             </div>
-            {% endcomment %}
+            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
+            </div>
+            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <a href=""><span class="cms-icon cms-icon-scissors"></span></a>
+            </div>
+            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-bin"></span></a>
+            </div>
         </div>
     '
     data-colinfo='
-        <div class="cms-tree-data">
+        <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-info">
                 <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
                     class="cms-tree-info-container js-cms-tree-tooltip-trigger">
