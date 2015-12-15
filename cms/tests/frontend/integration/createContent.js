@@ -13,11 +13,22 @@ casper.test.begin('User Add Content', function (test) {
         })
         .waitUntilVisible('.cms-structure', function () {
             test.assertExists('.cms-submenu-add [data-tooltip="Add plugin"]', messages.active);
-            casper.capture('test.png');
             this.click('.cms-submenu-add [data-tooltip="Add plugin"]');
         })
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
-            this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
+            this.sendKeys('.cms-quicksearch input', ' ');
+            this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
+                test.assertNotVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', 'No possibility to add text plugin');
+                this.capture('test_before.png');
+                this.sendKeys('.cms-quicksearch input', 'text', { reset: true });
+            });
+            this.waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
+                test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', 'No possibility to add text plugin');
+                this.capture('test_after.png');
+            });
+            this.then(function () {
+                this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
+            });
             // ensure previous content has been changed
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
@@ -32,6 +43,12 @@ casper.test.begin('User Add Content', function (test) {
         })
         .then(function () {
             this.click('.cms-modal-buttons .cms-btn-action.default');
+        })
+        .then(function () {
+            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
+        })
+        .waitUntilVisible('.cms-plugin', function () {
+            test.assertSelectorHasText('.cms-plugin p', 'some random text');
         })
         .run(function () {
             test.done();
