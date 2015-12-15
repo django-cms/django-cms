@@ -1,0 +1,198 @@
+//##############################################################################
+// PAGETREE
+
+$pagetree-icon-size: 18px;
+$pagetree-lang-size: 14px;
+$pagetree-tooltip-min-width: 130px;
+
+.cms-tree {
+    .cms-icon {
+        font-family: django-cms-iconfont;
+    }
+}
+
+.cms-tree-data {
+    height: 24px;
+}
+
+.cms-tree-item {
+    display: inline-block;
+}
+
+//###########################################################
+// TOOLTIP
+// handles tooltip styling
+.cms-tree-tooltip-container {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: -5px;
+    z-index: 100;
+    border-radius: $border-radius-base;
+    background: $white;
+    border: 1px solid $gray-lighter;
+
+    // icon on the right
+    &:before {
+        content: "";
+        position: absolute;
+        left: 100%;
+        top: 7px;
+        z-index: 1;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        transform: rotate(45deg);
+        box-shadow: $dropdown-shadow;
+        background-color: $submenu-dropdown-bgcolor;
+    }
+
+    h3 {
+        position: relative;
+        z-index: 10;
+        color: $gray-light;
+        font-size: $font-size-small;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: 2px 10px;
+        margin: 0 !important;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
+    }
+
+    a {
+        display: block;
+        padding: 10px;
+        min-width: $pagetree-tooltip-min-width;
+        text-transform: none;
+        border-bottom: 1px solid $gray-lighter;
+
+        &:hover,
+        &:link:hover {
+            color: darken($color-primary, 10%) !important;
+        }
+        &:last-child {
+            border: none;
+        }
+    }
+
+    .cms-icon {
+        position: relative;
+        top: 3px;
+        left: -1px;
+    }
+}
+.cms-tree-tooltip-container-open {
+    display: block;
+}
+
+//###########################################################
+// PREVIEW
+// shows preview eye icon
+.cms-tree-preview {
+    position: relative;
+    top: 1px;
+}
+.cms-tree-preview a {
+    @extend %icon;
+    @include icon(eye);
+    font-size: $pagetree-icon-size;
+
+    &:before {
+        color: $gray-darker;
+    }
+    &:hover:before {
+        color: $black;
+    }
+
+    span {
+        display: inline-block;
+        @include hide-content();
+    }
+}
+// active state for current selected page
+.cms-tree-preview-active a:before {
+    color: $black;
+}
+
+//###########################################################
+// LANGUAGE
+// shows language bubbles
+.cms-tree-item-lang {
+    // required for tooltip
+    position: relative;
+    top: 4px;
+}
+.cms-tree-lang-container span {
+    display: inline-block;
+    width: $pagetree-lang-size;
+    height: $pagetree-lang-size;
+    border-radius: 100%;
+    // will change according to states
+    border: 1px solid $white;
+    background: $white;
+    &.empty {
+        border-color: $gray-light;
+        background-color: $white;
+    }
+    &.unpublished,
+    &.unpublishedparent {
+        border-color: $gray-light;
+        background-color: $gray-light;
+    }
+    &.published {
+        border-color: $color-success;
+        background-color: $color-success;
+    }
+    &.dirty {
+        animation: pulsate 2.5s ease-out infinite;
+        border-color: $color-primary;
+        background-color: $color-primary;
+    }
+}
+
+// animation for publishing
+@keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+//###########################################################
+// LANGUAGE
+// shows language bubbles
+.cms-tree-menu {
+    position: relative;
+    top: 4px;
+
+    .cms-icon:before {
+        font-size: $pagetree-icon-size;
+        color: $gray-light;
+    }
+    .cms-icon-check:before {
+        color: $gray-darker;
+    }
+}
+
+//###########################################################
+// TREE HACKS (temporary)
+.jstree-grid-column,
+.jstree-grid-cell {
+    overflow: visible !important;
+}
+.jstree-grid-header {
+    font-size: $font-size-small;
+    text-align: center;
+}
+.jstree-grid-column-0 .jstree-grid-header {
+    text-align: left;
+}
+.jstree-grid-cell {
+    padding: 0 10px !important;
+}
