@@ -2,6 +2,7 @@
 // PAGETREE
 
 $pagetree-icon-size: 18px;
+$pagetree-icon-offset: 4px;
 $pagetree-lang-size: 14px;
 $pagetree-tooltip-min-width: 130px;
 
@@ -81,9 +82,25 @@ $pagetree-tooltip-min-width: 130px;
         top: 3px;
         left: -1px;
     }
+    // open state
+    &-open {
+        display: block;
+    }
 }
-.cms-tree-tooltip-container-open {
-    display: block;
+.cms-tree-tooltip-wrapper {
+    padding: 10px;
+}
+
+//###########################################################
+// ICONS
+// used for the sitemap and apphook icons
+.cms-tree-icons {
+    position: relative;
+    top: $pagetree-icon-offset;
+
+    span:before {
+        color: $gray-light;
+    }
 }
 
 //###########################################################
@@ -122,7 +139,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item-lang {
     // required for tooltip
     position: relative;
-    top: 4px;
+    top: $pagetree-icon-offset;
 }
 .cms-tree-lang-container span {
     display: inline-block;
@@ -170,7 +187,7 @@ $pagetree-tooltip-min-width: 130px;
 // shows language bubbles
 .cms-tree-menu {
     position: relative;
-    top: 4px;
+    top: $pagetree-icon-offset;
 
     .cms-icon:before {
         font-size: $pagetree-icon-size;
@@ -178,6 +195,28 @@ $pagetree-tooltip-min-width: 130px;
     }
     .cms-icon-check:before {
         color: $gray-darker;
+    }
+}
+
+//###########################################################
+// INFO
+// icon used at the end to display additional help
+.cms-tree-item-info {
+    position: relative;
+    top: $pagetree-icon-offset;
+
+    .cms-icon:before {
+        font-size: $pagetree-icon-size;
+    }
+
+    p {
+        color: $gray-darkest;
+        padding: 0;
+        margin: 0;
+    }
+    strong {
+        color: $gray-light;
+        font-weight: normal;
     }
 }
 
