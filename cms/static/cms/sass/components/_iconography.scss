@@ -41,59 +41,68 @@
     @if $filename == bin {
         $char: "E005";
     }
-    @if $filename == check {
+    @if $filename == check-o {
         $char: "E006";
     }
-    @if $filename == close {
+    @if $filename == check {
         $char: "E007";
     }
-    @if $filename == copy {
+    @if $filename == close {
         $char: "E008";
     }
-    @if $filename == handler {
+    @if $filename == copy {
         $char: "E009";
     }
-    @if $filename == home {
+    @if $filename == eye {
         $char: "E00A";
     }
-    @if $filename == loader {
+    @if $filename == forbidden {
         $char: "E00B";
     }
-    @if $filename == lock {
+    @if $filename == handler {
         $char: "E00C";
     }
-    @if $filename == logo {
+    @if $filename == home {
         $char: "E00D";
     }
-    @if $filename == menu {
+    @if $filename == loader {
         $char: "E00E";
     }
-    @if $filename == minimize {
+    @if $filename == lock {
         $char: "E00F";
     }
-    @if $filename == minus {
+    @if $filename == logo {
         $char: "E010";
     }
-    @if $filename == paste {
+    @if $filename == menu {
         $char: "E011";
     }
-    @if $filename == pencil {
+    @if $filename == minimize {
         $char: "E012";
     }
-    @if $filename == pin {
+    @if $filename == minus {
         $char: "E013";
     }
-    @if $filename == plus {
+    @if $filename == paste {
         $char: "E014";
     }
-    @if $filename == scissors {
+    @if $filename == pencil {
         $char: "E015";
     }
-    @if $filename == search {
+    @if $filename == pin {
         $char: "E016";
     }
-    @if $filename == window {
+    @if $filename == plus {
         $char: "E017";
+    }
+    @if $filename == scissors {
+        $char: "E018";
+    }
+    @if $filename == search {
+        $char: "E019";
+    }
+    @if $filename == window {
+        $char: "E01A";
     }
 
     @return $char;
@@ -135,6 +144,10 @@
     @include icon(bin);
 }
 
+.cms-icon-check-o {
+    @include icon(check-o);
+}
+
 .cms-icon-check {
     @include icon(check);
 }
@@ -145,6 +158,14 @@
 
 .cms-icon-copy {
     @include icon(copy);
+}
+
+.cms-icon-eye {
+    @include icon(eye);
+}
+
+.cms-icon-forbidden {
+    @include icon(forbidden);
 }
 
 .cms-icon-handler {

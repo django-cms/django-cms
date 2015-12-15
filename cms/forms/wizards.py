@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
+from cms.api import generate_valid_slug
 from cms.constants import PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
@@ -15,6 +16,13 @@ from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
 
 from cms.utils.conf import get_cms_setting
+
+try:
+    # djangocms_text_ckeditor is not guaranteed to be available
+    from djangocms_text_ckeditor.widgets import TextEditorWidget
+    text_widget = TextEditorWidget
+except ImportError:
+    text_widget = forms.Textarea
 
 
 def user_has_view_permission(user, page=None):
@@ -78,12 +86,17 @@ class PageTypeSelect(forms.widgets.Select):
 
 
 class BaseCMSPageForm(forms.Form):
-    title = forms.CharField(label=_(u'Title'), max_length=255,
-                            help_text=_(u"Provide a title for the new page."))
-    page_type = forms.ChoiceField(label=_(u'Page type'), required=False,
-                                  widget=PageTypeSelect())
+    title = forms.CharField(
+        label=_(u'Title'), max_length=255,
+        help_text=_(u"Provide a title for the new page."))
+    slug = forms.CharField(
+        label=_(u'Slug'), max_length=255, required=False,
+        help_text=_(u"Leave empty for automatic slug, or override as required.")
+    )
+    page_type = forms.ChoiceField(
+        label=_(u'Page type'), required=False, widget=PageTypeSelect())
     content = forms.CharField(
-        label=_(u'Content'), widget=forms.Textarea, required=False,
+        label=_(u'Content'), widget=text_widget, required=False,
         help_text=_(u"Optional. If supplied, will be automatically added "
                     u"within a new text plugin."))
 
@@ -147,6 +160,33 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             return None
 
+    def clean_slug(self):
+        """
+        Validates that either the slug is provided, or that slugification from
+        `title` produces a valid slug.
+        :return:
+        """
+        if 'sub_page' in self.cleaned_data:
+            sub_page = self.cleaned_data['sub_page']
+        else:
+            sub_page = False
+
+        if self.page:
+            if sub_page:
+                parent = self.page
+            else:
+                parent = self.page.parent
+        else:
+            parent = None
+
+        slug = self.cleaned_data['slug']
+        if not slug:
+            title = self.cleaned_data['title']
+            slug = generate_valid_slug(title, parent, self.language_code)
+        if not slug:
+            raise forms.ValidationError("Please provide a valid slug.")
+        return slug
+
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
         from cms.cms_wizards import user_has_page_add_permission
@@ -179,9 +219,9 @@ class CreateCMSPageForm(BaseCMSPageForm):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
 
-        title = self.cleaned_data['title']
         page = create_page(
-            title=title,
+            title=self.cleaned_data['title'],
+            slug=self.cleaned_data['slug'],
             template=get_cms_setting('WIZARD_DEFAULT_TEMPLATE'),
             language=self.language_code,
             created_by=smart_text(self.user),

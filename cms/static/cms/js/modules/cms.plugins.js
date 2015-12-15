@@ -219,6 +219,14 @@ var CMS = window.CMS || {};
                     }
                     var name = that.options.plugin_name;
                     var id = that.options.plugin_id;
+
+                    var placeholderId = that._getId(that.ui.dragitem.closest('.cms-dragarea'));
+                    var placeholder = $('.cms-placeholder-' + placeholderId);
+
+                    if (placeholder.length && placeholder.data('settings')) {
+                        name = placeholder.data('settings').name + ': ' + name;
+                    }
+
                     CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
                 });
 

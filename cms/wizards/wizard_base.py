@@ -84,9 +84,13 @@ class Wizard(WizardBase):
         """
         if self.description:
             return self.description
-        elif self.model:
-            model_name = self.model._meta.verbose_name
-            self.description = _(u"Create a new %s instance.") % model_name
+
+        model = self.get_model()
+        if model:
+            model_name = model._meta.verbose_name
+            return _(u"Create a new %s instance.") % model_name
+
+        return ""
 
     def __str__(self):
         return self.title
