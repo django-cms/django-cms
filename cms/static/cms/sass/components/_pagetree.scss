@@ -7,7 +7,7 @@ $pagetree-tooltip-min-width: 130px;
 
 .cms-tree {
     .cms-icon {
-        font-family: django-cms-iconfont;
+        font-family: "django-cms-iconfont";
     }
 }
 
@@ -190,9 +190,9 @@ $pagetree-tooltip-min-width: 130px;
 .jstree-grid-header {
     font-size: $font-size-small;
     text-align: center;
-}
-.jstree-grid-column-0 .jstree-grid-header {
-    text-align: left;
+    .jstree-grid-column-0 & {
+        text-align: left;
+    }
 }
 .jstree-grid-cell {
     padding: 0 10px !important;
