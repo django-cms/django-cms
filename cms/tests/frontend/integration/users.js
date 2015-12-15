@@ -12,17 +12,14 @@ casper.test.begin('Users Creation', function (test) {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/"]');
+            this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/auth/user/"]');
         })
         .waitUntilVisible('.cms-sideframe-frame')
         .withFrame(0, function () {
             casper
-                .waitForSelector('.cms-admin-sideframe', function(){
-                    test.assertExists('.model-user', messages.adminPanelOpened);
-
-                    this.click('.model-user .changelink');
-                })
                 .waitForSelector('#changelist-form', function () {
+                    test.assertExists('.column-first_name', messages.usersListOpened);
+
                     this.click('.field-username a[href$="/user/1/"]');
                 })
                 .waitForSelector('#user_form', function () {
