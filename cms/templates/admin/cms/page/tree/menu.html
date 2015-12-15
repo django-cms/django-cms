@@ -1,8 +1,10 @@
 {% load i18n cms_admin admin_urls %}
 
 {# INFO: columns are defined in base.html options #}
-<li class="cms-tree-node
-    {% if page.get_descendant_count %}jstree-children{% endif %}
+<li class="cms-tree-node {{ css_class }}
+    {# TODO maybe not required #}
+    {% if page.get_descendant_count %} jstree-children{% endif %}
+    {% if page.reverse_id == "page_types" %} cms-tree-node-pagetype{% endif %}
     "
     data-colview='
         <div class="cms-tree-col">
@@ -39,6 +41,8 @@
                 {% if has_change_permission and has_publish_permission %}
                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
                         class="cms-tree-lang-container js-cms-tree-tooltip-trigger"
+                        title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"
+                        {# TODO implement alt click to advanced settings #}
                         {# INFO: delegate click event to parent window when in sideframe #}
                         {% if lang in page.languages %} target="_top"{% endif %}>
                         {# INFO: renders <span class="{cls}" title="{title}"></span> #}
@@ -68,36 +72,48 @@
     {% endfor %}
     data-colmenu='
         <div class="cms-tree-col">
-            {% if has_change_permission %}
-                <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
+            <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
+                {% if has_change_permission %}
                     <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
-                        {% if page.in_navigation %}
-                            <span class="cms-icon cms-icon-forbidden" title="{% trans "not in menu" %}"></span>
-                        {% else %}
-                            <span class="cms-icon cms-icon-check" title="{% trans "in menu" %}"></span>
-                        {% endif %}
+                {% endif %}
+                    {% if page.in_navigation %}
+                        <span class="cms-icon cms-icon-forbidden" title="{% trans "not in menu" %}"></span>
+                    {% else %}
+                        <span class="cms-icon cms-icon-check" title="{% trans "in menu" %}"></span>
+                    {% endif %}
+                {% if has_change_permission %}
                     </a>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     '
     data-coloptions='
         <div class="cms-tree-col">
-            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
-            </div>
-            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                <a href=""><span class="cms-icon cms-icon-copy"></span></a>
-            </div>
-            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
-            </div>
-            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                <a href=""><span class="cms-icon cms-icon-scissors"></span></a>
-            </div>
-            <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-bin"></span></a>
-            </div>
+            {% if has_change_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
+                </div>
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
+                </div>
+            {% endif %}
+            {% if has_add_permission and has_add_page_permission and has_add_on_same_level_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
+                </div>
+            {% else %}
+                {# TODO there should be something else #}
+            {% endif %}
+            {% if has_move_page_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="#"><span class="cms-icon cms-icon-scissors"></span></a>
+                </div>
+            {% endif %}
+            {% if has_delete_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-bin"></span></a>
+                </div>
+            {% endif %}
         </div>
     '
     data-colinfo='
@@ -138,7 +154,9 @@
     '
     >
 
-    {{ page.get_admin_tree_title }}
+    {% language preview_language %}
+        {{ page.get_admin_tree_title }}
+    {% endlanguage %}
 </li>
 
 {# CHILDREN RENDERING #}
