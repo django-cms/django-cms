@@ -92,27 +92,28 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-preview {
     position: relative;
     top: 1px;
-}
-.cms-tree-preview a {
-    @extend %icon;
-    @include icon(eye);
-    font-size: $pagetree-icon-size;
 
-    &:before {
-        color: $gray-darker;
-    }
-    &:hover:before {
-        color: $black;
-    }
+    a {
+        @extend %icon;
+        @include icon(eye);
+        font-size: $pagetree-icon-size;
 
+        &:before {
+            color: $gray-darker;
+        }
+        &:hover:before {
+            color: $black;
+        }
+    }
     span {
         display: inline-block;
         @include hide-content();
     }
-}
-// active state for current selected page
-.cms-tree-preview-active a:before {
-    color: $black;
+
+    // active state for current selected page
+    &-active a:before {
+        color: $black;
+    }
 }
 
 //###########################################################

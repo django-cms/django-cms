@@ -203,8 +203,8 @@ var CMS = window.CMS || {};
                     e.preventDefault();
                     e.stopImmediatePropagation();
 
-                    containers.removeClass('cms-tree-tooltip-container-open');
-                    containers.eq(triggers.index(this))
+                    containers.removeClass('cms-tree-tooltip-container-open')
+                        .eq(triggers.index(this))
                         .addClass('cms-tree-tooltip-container-open');
 
                     that.document.on('click.pagetree', function () {
