@@ -22,5 +22,9 @@ module.exports = {
             title: 'First page',
             text: 'First page content'
         }
+    },
+    user: {
+        // TODO add more data for the new user profile
+        firstName: 'test-first-name'
     }
 };

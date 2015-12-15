@@ -46,5 +46,8 @@ module.exports = {
         }
     },
     users: {
+        adminPanelOpened: 'Admin panel opened in sideframe',
+        editPageOpened: 'The admin profile edit page has been opened',
+        firstNameChanged: 'The admin first name has been updated'
     }
 };
