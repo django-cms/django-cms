@@ -126,6 +126,13 @@ Bootstrap is not the only frontend framework of this sort, it's simply a popular
 several popular django CMS addons support out-of-the-box, and is also supported by a rich set of
 plugins.
 
+In summary:
+
+* Bootstrap 3: a frontend framework
+* Aldryn Bootstrap 3: a django CMS package that provides a set of Bootstrap-compatible plugins
+* Aldryn Boilerplate Bootstrap 3: a complete implementation of the Bootstrap frontend, also
+  including various frontend tools
+
 
 The column system and responsive layouts
 ========================================

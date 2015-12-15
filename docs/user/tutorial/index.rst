@@ -38,7 +38,9 @@ django CMS.
     90-styling-content
     95-styling-content2
     97-styling-content3
-    100-exploring-plugins-bootstrap
+    100-key-plugins
+    105-more-plugins
+    110-more-applications
 
 .. note:: **Touch-screen users**
 

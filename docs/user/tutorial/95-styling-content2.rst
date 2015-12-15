@@ -1,7 +1,7 @@
 .. _adding_four_columns:
 
 ####################################################
-Complex layouts
+Responsive layouts 2
 ####################################################
 
 In this section you will learn how to:

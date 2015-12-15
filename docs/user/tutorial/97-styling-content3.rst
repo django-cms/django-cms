@@ -1,5 +1,5 @@
 ####################################################
-Styling content - yet more work with columns
+Responsive layouts 3
 ####################################################
 
 In this section you will learn how to:

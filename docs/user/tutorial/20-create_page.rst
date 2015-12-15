@@ -134,3 +134,36 @@ At the top of your page is the django CMS *toolbar*, with various useful tools i
 
 .. image:: /user/tutorial/images/how_to_find_us_page.png
    :alt: How to find us
+
+
+**********************
+Some key Page settings
+**********************
+
+Open the page settings - *Page* > *Page settings* from the toolbar:
+
+.. image:: /user/tutorial/images/page-settings-button.png
+    :alt: 'Page settings' can be found in the 'Page' menu
+    :width: 170
+
+Slug
+    The page's *slug* is used to form its URL. For example, a page *Lenses* that is a sub-page of
+    *Photography* might have a URL that ends ``photography/lenses``. You can change the
+    automatically-generated slug of a page if you wish to. Keep slugs short and meaningful, as they
+    are useful to human beings and search engines alike. You can
+
+Menu Title
+    If you have a page called *Photography: theory and practice*, you might not want the whole
+    title to appear in menus - shortening it to *Photography* would make more sense.
+
+Page Title
+    By default, a page's ``<title>`` element is taken from the *Title*, but you can override this
+    here. The ``<title>`` element isn't displayed on the page, but is used by search engines and
+    web browsers - as far as they are concerned, it's the page's real title.
+
+Description meta tag
+    A short piece of text that will be used by search engines (and displayed
+    in lists of search results) and other indexing systems.
+
+There are also some *Advanced Settings*, but you don't need to be concerned about these right now.
+
