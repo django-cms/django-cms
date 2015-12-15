@@ -16,4 +16,4 @@ module.exports.randomString = function (length, onlyDigits) {
     }
 
     return randomString;
-}
+};

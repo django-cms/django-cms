@@ -63,7 +63,7 @@ casper.test.begin('User Add Content', function (test) {
             casper.waitUntilVisible('#text_form', function () {
                 // explicitly put text to ckeditor
                 this.evaluate(function (contentData) {
-                    CMS.CKEditor.editor.setData(contentData)
+                    CMS.CKEditor.editor.setData(contentData);
                 }, randomText);
             });
         })
