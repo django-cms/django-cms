@@ -9,8 +9,7 @@ var messages = require('./settings/messages').page.creation;
 
 casper.test.begin('Add First Page', function (test) {
     casper
-        .start(globals.editUrl)
-        .waitUntilVisible('.cms-modal', function () {
+        .start(globals.editUrl, function () {
             this.click('.cms-modal-close');
         })
         .waitWhileVisible('.cms-modal', function () {
