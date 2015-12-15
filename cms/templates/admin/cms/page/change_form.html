@@ -25,8 +25,7 @@
 
 {% block content_title %}
     {% if title %}<h1>{{ title }}</h1>{% endif %}
-    {# TODO need to test that "view site" is disabled on revision #}
-    {% if not popup and not opts.app_label %}
+    {% if not popup %}
         <ul class="object-tools hide-in-modal">
             <li>
                 {% url 'admin:cms_page_preview_page' page.id language as admin_url %}
