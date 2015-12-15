@@ -1,8 +1,12 @@
-######################
-Add people to the site
-######################
+#######################################
+Integrated applications - Aldryn People
+#######################################
 
-In this section we will add some people to the website using the *Aldryn People* application.
+In this section you will learn how to:
+
+* use an **integrated application** (**Aldryn People**)
+* manage and publish structured information using Aldryn People
+* create an **apphook**
 
 
 **********************************
@@ -77,7 +81,7 @@ Do the same for a second person:
 .. _create_an_apphook:
 
 *********************
-Create an **apphook**
+Create an apphook
 *********************
 
 We now have some people in the system, the next job is to display them - and we want to display them

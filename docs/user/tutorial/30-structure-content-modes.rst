@@ -1,8 +1,12 @@
-###########
-Add plugins
-###########
+##########################
+Plugins and placeholders
+##########################
 
-In this section we will edit the *How to find us* page to show a map, using a *plugin*.
+In this section you will learn how to:
+
+* use **Structure mode**
+* insert **plugins** into **placeholders**
+* use the **Google Map** plugin
 
 
 *************
@@ -58,10 +62,12 @@ for you automatically when you first created the page.)
 .. image:: /user/tutorial/images/structure-board.png
      :alt: the structure board
 
+
 .. _add_plugin:
 
-Add a second plugin
-===================
+***************
+Insert a plugin
+***************
 
 Let's add another plugin, containing a map.
 

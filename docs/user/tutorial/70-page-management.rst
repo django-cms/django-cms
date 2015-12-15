@@ -1,6 +1,12 @@
-############
-Manage pages
-############
+###############
+Page management
+###############
+
+In this section you will learn how to:
+
+* **rearrange pages** using the **page tree**
+* manage the **page hierarchy**
+
 
 Our menu of pages is growing:
 

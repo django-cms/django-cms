@@ -1,6 +1,12 @@
-####################################################
-Styling content - introduction to responsive columns
-####################################################
+##################
+Responsive layouts
+##################
+
+In this section you will learn how to:
+
+* use **Bootstrap** to create **responsive layouts**
+* use the **Row** and **Column** plugins
+* **drag and drop plugins** in structure mode
 
 Our pages have some useful content, but they are not very well laid-out. For example, here's the
 *How to find us* page:
@@ -14,7 +20,7 @@ layout before you add the content.
 
 
 ******************************
-The *Contact information* page
+Improve a layout
 ******************************
 
 We'll start by doing something quite simple. We'll take the *Contact information* page, and use the
@@ -228,4 +234,4 @@ larger than *col-md*, in which case you can leave *col-lg* blank too.
 
 In practice, in most cases, specifying *col-sm* and - if you need it - *col-md* is enough.
 
-We'll implement this layout in the next section.
+We'll implement a four-column layout in the next section.

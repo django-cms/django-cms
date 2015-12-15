@@ -1,22 +1,27 @@
-####################################################
-Styling content - more work with columns
-####################################################
-
 .. _adding_four_columns:
 
-************************************
-Adding four columns to the home page
-************************************
+####################################################
+Complex layouts
+####################################################
+
+In this section you will learn how to:
+
+* **copy and paste plugins** to work more efficiently
+* use the **Icon plugin**
+
 
 We're going to add four things that we offer to our home page, like this, in just a few steps.
+
+.. todo:: version of image with "What we offer" heading required
 
 .. image:: /user/tutorial/images/services.png
     :alt: a list of four services
     :align: center
 
 
-Creating the columns
-====================
+**************
+Add a heading
+**************
 
 #.  As you have done previously, switch to |edit-button| mode and then, using |structure-button|,
     to *Structure* mode.
@@ -28,6 +33,18 @@ Creating the columns
     .. |structure-button| image:: /user/tutorial/images/structure-button.png
        :alt: the 'Structure' toggle
        :width: 148
+
+#.  Add a *Text* plugin to the *Content* placeholder, containing the text *What we offer*. Make it
+    a *Heading 2* - i.e. an HTML ``<h2>`` - and centre it.
+
+#.  Drag this new plugin so that it's *above* the existing *Latest articles* plugin.
+
+.. note:: You **will** need to drag plugins around like this to their final places for these steps.
+
+
+****************************
+Create the row and columns
+****************************
 
 #.  Add a *Row* plugin to the *Content* placeholder. Provide this *Row* plugin with settings as
     follows:
@@ -50,7 +67,7 @@ Creating the columns
         6
 
     *col-lg*
-        leave blkank
+        leave blank
 
     You can leave all the other values blank.
 
@@ -67,10 +84,10 @@ Creating the columns
        :width: 60
 
 
-Creating the four items
+Create the first item
 =======================
 
-#.  Select the  the first *Column* plugin, and add a new plugin:
+#.  Select the first *Column* plugin, and add a new plugin:
 
     .. image:: /user/tutorial/images/add-plugin-to-column.png
        :alt: add a plugin inside the column
@@ -102,12 +119,19 @@ Creating the four items
 
 #.  **Save** the *Icon* plugin.
 
-#.  Add some text below the icon, and apply some styling to it:
+#.  Add some text below the icon:
 
-        Set yourself free
+        *Set yourself free* (make this a *Heading 3* - i.e. an HTML ``<h3>``)
 
-        Never worry again about a bicycle malfunction - we're here for you.
+        *Never worry again about a bicycle malfunction - we're here for you.*
 
+#.  Centre all the text in the editor.
+
+#.  **Save** the plugin.
+
+
+Copy and paste the plugin
+=========================
 
 #.  Now, rather than go though the steps above three more times for the next three columns, let's
     save some effort by copy and pasting the *Text* plugin into each one.

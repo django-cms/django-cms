@@ -1,12 +1,18 @@
-#############
-Create a page
-#############
+#####################
+Basic page operations
+#####################
+
+In this section you will learn how to:
+
+* **create** and **publish** pages
+* use **Edit mode** to modify existing content
+
 
 .. _create-first-page:
 
-********************
-Create the home page
-********************
+*********************
+Create the first page
+*********************
 
 Because this is a brand new site, when you visit it as a site administrator, django CMS's *Create
 Page wizard* will open a new dialog box.
@@ -42,10 +48,11 @@ Page wizard* will open a new dialog box.
    :align: center
 
 
-.. publishing_pages:
+.. _publishing_pages:
 
-Publishing
-==========
+**************
+Publish a page
+**************
 
 .. |publish-page-now| image:: /user/tutorial/images/publish-page-now.png
    :alt: 'Publish page now'
@@ -60,8 +67,9 @@ that you have explicitly published.
    :alt: Newly-created page
 
 
-Further editing
-===============
+*********************
+Edit existing content
+*********************
 
 .. |edit| image:: /user/tutorial/images/edit-button.png
    :alt: 'Edit'
@@ -76,7 +84,7 @@ At any time, you can make further changes to a page, by switching back into *Edi
 In editing mode:
 
 #. Double-click (if you're using a pointer) or tap (if you're using a touch screen) on the
-   paragraph of text to open the Text plugin.
+   paragraph of text to open it for editing.
 #.  Make changes by breaking the text into paragraphs.
 #.  **Save** it again.
 
@@ -89,9 +97,9 @@ In editing mode:
 You can continue making and previewing changes privately until you are ready to publish them.
 
 
-***************************
-Add a *How to find us* page
-***************************
+**************
+Add a new page
+**************
 
 Now we should create a second page, with contact information, so that customers can find our
 workshop.

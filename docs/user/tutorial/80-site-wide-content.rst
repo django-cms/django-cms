@@ -1,6 +1,11 @@
 ########################
-Adding site-wide content
+Static placeholders
 ########################
+
+In this section you will learn how to:
+
+* use **static placeholders** to create a **site-wide header and footer**
+* use the **Image plugin**
 
 So far, we have been able to add content to particular parts of the site, and in some cases, re-use
 it with plugins.
@@ -10,7 +15,7 @@ footer. So let's add both to our site.
 
 
 *************************************************
-Add a site-wide header using a static placeholder
+Create a site-wide header
 *************************************************
 
 You can do this sort of thing with **Static placeholders**. You have already used placeholders, for
@@ -65,7 +70,7 @@ the placeholder on any page, so:
 
 
 *************************************************
-Add a site-wide footer using a static placeholder
+Create a site-wide footer
 *************************************************
 
 We should also add a footer, in just the same way - this time, add something to the *Footer* static placeholder.

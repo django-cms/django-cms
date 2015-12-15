@@ -2,48 +2,92 @@
 Styling content - yet more work with columns
 ####################################################
 
-*************************************
-Further improvements to the home page
-*************************************
+In this section you will learn how to:
 
-Also on the home page, we have a *Text* plugin and a *Latest articles* plugin.
+* create **asymmetric column layouts**
+* use the **Spacer plugin** to create whitespace
 
-.. image:: /user/tutorial/images/styled_home_with_plugins.png
-    :alt: Styled home with plugins
-    :align: center
 
-We don't need to repeat all the steps, but it's easy now to place these two plugins into separate *Column* plugins, just as you did for the content on the *How to find us* page.
+***************************
+Creating asymmetric columns
+***************************
 
-This is how the content placeholder looks in the structure mode.
+Also on the home page, we have a *Text* plugin and a *Latest articles* plugin. Let's add an image,
+next to the *Text* plugin (i.e. in the same row).
 
-.. image:: /user/tutorial/images/styled_home_structure_mode.png
-    :alt: Styled home structure mode
-    :align: center
+You already know how to create a *Row* plugin, and how to add:
 
-Seems like a lot, but it is actually pretty simple to achieve. Follow these steps:
+* existing plugins
+* new plugins
 
-1. Add a new row plugin with *2 columns* and set both to *col-sm-12*.
+to its *Columns* - so let's do that now:
 
-2. After they have been created, doubleclick on the first one and change the column width to *col-sm-16*. Open the second column and set that to *col-sm-8*.
+#.  Create a new row, of two plugins. We'll want it to look like this on wider displays::
 
-3. Accordingly take the text plugin you firstly created on the homepage and drop it in the first column.
+        [------16------][---8--]
 
-4. For the second column, chose the *image* plugin. Select a nice picute or upload one and hit *save*.
+    and like this on narrower ones::
 
-5. You might notice that that it does't align the top of the image to the text on the left. To make sure it looks nice, we're gonna add a new plugin to make some space.
+        [----------24----------]
+        [----------24----------]
+
+    Setting the *col-sm* value for the columns to ``16`` (for the wider one) and ``8`` (for the
+    narrower one) will achieve this.
+
+    .. note::
+
+        As the two values are different, you will need to apply them separately to each *Column*
+        plugin - you can't just set them for all *Rows* as before.
+
+#.  Drag and drop the existing *Text* plugin into the first *Column*.
+
+#.  Add an *Image* plugin to the second *Column* (select one of the existing images in the Filer or
+    upload your own, as before).
 
     .. image:: /user/tutorial/images/bad_alignment.png
-        :alt: Bad alignment and space
+        :alt: text and image in columns
         :align: center
 
-6. The spacer plugin helps to keep the white space between the elements and also to align them correctly. Just play around with the different options you have and select the one that fits the most.
+
+***************************
+Adding whitespace
+***************************
+
+In the example above, the alignment of the text and image is poor. We can fix that with
+*Spacer* plugin, which simply adds whitespace.
+
+There are also some other places where additional vertical space would be an improvement.
+
+#.  Add a *Spacer* plugin above the *Image* plugin, in the same *Column*. Remember you can drag
+    plugins to re-order them.
+
+#.  Choose the appropriate size of spacer, and **Save**.
 
     .. image:: /user/tutorial/images/spacer_plugin.png
         :alt: Spacer plugin
         :align: center
 
-The same spacer plugin is used between the different sections.
+#.  Add a *Spacer* between the *Text* plugin *What we offer* and the *Row* of four columns.
 
+#.  Add a *Spacer* between the *Text* plugin *What we offer* and the *Row* of four columns.
 
+#.  Add one after the four columns and the text that follows.
 
+.. todo:: we need a new version of the image of the page.
 
+.. image:: /user/tutorial/images/styled_home_with_plugins.png
+    :alt: Styled home with plugins
+    :align: center
+
+.. image:: /user/tutorial/images/styled_home_structure_mode.png
+    :alt: Styled home structure mode
+    :align: right
+    :width: 200
+
+For your reference, here is the complete tree structure of the page (select it to see it at full
+size).
+
+Don't be overwhelmed by it; it's just a map, and you don't need to take it all in at once.
+
+Once you become familiar with how they work, the django CMS page structure representations are
+easy to understand and navigate.

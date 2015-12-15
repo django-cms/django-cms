@@ -1,9 +1,10 @@
-##################
-Add a news section
-##################
+############################################
+Integrated applications - Aldryn News & Blog
+############################################
 
-In this section we will add a News page and some news items to the site using, the *Aldryn News &
-Blog* application.
+In this section you will learn how to:
+
+* manage and publish structured information using **Aldryn News & Blog**
 
 Like Aldryn People, Aldryn News & Blog is a separate application that integrates seamlessly with
 django CMS to provide new functionality for structured information. In this case the structured
@@ -11,7 +12,7 @@ information is news articles.
 
 
 *********************
-Create an **apphook**
+Create an apphook
 *********************
 
 Just as we did with Aldryn People, we should :ref:`create an apphook <create_an_apphook>` to create

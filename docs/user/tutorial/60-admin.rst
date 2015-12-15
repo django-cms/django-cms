@@ -1,13 +1,17 @@
 ####################
-Use the Django admin
+The Django admin
 ####################
+
+In this section you will learn how to:
+
+* use the **Django admin** via the django CMS **admin overlay**
+* use **Django Filer** to **manage files**
+* **re-use uploaded files**
+
 
 ******************
 The Admin overlay
 ******************
-
-Open the overlay
-================
 
 .. image:: images/admin_nav.png
    :alt: navigating to the Django admin
@@ -23,6 +27,10 @@ Each application in the system has its own set of entries.
 .. image:: images/zoom_panel.png
    :alt: The zoom button
 
+
+************
+Django Filer
+************
 
 Add an image to the Filer
 =============================
@@ -64,10 +72,6 @@ Now you have a image in the Filer, that you can reuse anywhere you need to. If y
 every instance where you've used it will also be updated, potentially saving you a lot of time and
 effort when images need to be updated.
 
-
-**************************
-Managing files and folders
-**************************
 
 Editing items
 =============
