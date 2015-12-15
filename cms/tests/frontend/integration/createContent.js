@@ -7,6 +7,7 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.addContent;
 var randomString = require('./helpers/randomString').randomString;
 
+// random text string for filtering and content purposes
 var randomText = randomString(10);
 
 casper.test.begin('User Add Content', function (test) {
@@ -15,15 +16,12 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
         .waitUntilVisible('.cms-structure', function () {
-            test.assertExists('.cms-submenu-add [data-tooltip="Add plugin"]', messages.active);
             this.click('.cms-submenu-add [data-tooltip="Add plugin"]');
         })
 
-        // -----------
-        // cancel part
+        // cancel plugin creation and ensure no empty plugin
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
-            // ensure previous content has been changed
         })
         .waitUntilVisible('.cms-modal-open', function () {
             this.setFilter('page.confirm', function () {
@@ -36,24 +34,24 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })
         .waitWhileVisible('.cms-structure', function () {
-            test.assertSelectorDoesntHaveText('.cms-plugin p', randomText);
+            test.assertSelectorDoesntHaveText('.cms-plugin p', randomText, messages.noEmptyPlugin);
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
-        // cancel part
-        // -----------
 
+        // full plugin creation process
         .waitUntilVisible('.cms-structure', function () {
-            test.assertExists('.cms-submenu-add [data-tooltip="Add plugin"]', messages.active);
             this.click('.cms-submenu-add [data-tooltip="Add plugin"]');
         })
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
-            this.sendKeys('.cms-quicksearch input', ' ');
+            this.sendKeys('.cms-quicksearch input', randomText);
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
-                test.assertNotVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', 'No possibility to add text plugin');
+                test.assertNotVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
+                    messages.noFilteredResults);
                 this.sendKeys('.cms-quicksearch input', 'text', { reset: true });
             });
             this.waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
-                test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', 'There is possibility to add text plugin');
+                test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
+                    messages.filteredPluginAvailable);
             });
             this.then(function () {
                 this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
@@ -63,7 +61,6 @@ casper.test.begin('User Add Content', function (test) {
         })
         .withFrame(0, function () {
             casper.waitUntilVisible('#text_form', function () {
-                test.assertExists('#text_form', 'Text form exists');
                 // explicitly put text to ckeditor
                 this.evaluate(function (contentData) {
                     CMS.CKEditor.editor.setData(contentData)
@@ -77,7 +74,7 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })
         .waitUntilVisible('.cms-plugin', function () {
-            test.assertSelectorHasText('.cms-plugin p', randomText);
+            test.assertSelectorHasText('.cms-plugin p', randomText, messages.newPluginVisible);
         })
         .run(function () {
             test.done();

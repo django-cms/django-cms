@@ -38,6 +38,12 @@ module.exports = {
             admin: {
 
             }
+        },
+        addContent: {
+            noEmptyPlugin: 'Empty plugin haven\'t been created',
+            noFilteredResults: 'No filtered results for random string',
+            filteredPluginAvailable: 'There is text plugin available by filter: text',
+            newPluginVisible: 'Newly created text plugin can be seen on page'
         }
     }
 };
