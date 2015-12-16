@@ -97,8 +97,8 @@ Create the row and columns
     <adding_four_columns>`.
 
 
-Add the *Carousel*
-==================
+The Carousel
+============
 
 #.  Add a *Carousel* plugin to the middle *Column* plugin you just created.
 
@@ -107,6 +107,10 @@ Add the *Carousel*
 #.  Add three *Carousel slide* plugins - they are the only kind you can add to a *Carousel* plugin -
     inside it. For each one, choose an image from the Filer :ref:`as you did previously
     <using_filer_files>`.
+
+    .. note::
+
+        As you did previously, *copy and paste* the plugin items to speed up your work.
 
 #.  .. note::
 
@@ -119,3 +123,49 @@ Add the *Carousel*
 .. image:: /user/tutorial/images/bootstrap_carousel.gif
     :alt: Bootstrap Carousel example
     :align: center
+
+
+*********
+Accordion
+*********
+
+An accordion is a handy way of presenting related pieces of information in a single, shared space.
+It's a web widget that collapses and expands, hence the name, to reveal its contents).
+
+The *Accordion* plugin works in a similar way to the *Carousel* - you add the *Accordion* plugin to
+a placeholder in the usual fashion, then add *Accordion item* plugins to the *Accordion*.
+
+Here's the example we're going to create (in the new article *Repairing is caring*):
+
+.. todo:: animated gif of accordion
+
+Just as we did for the *Carousel* above, we'll place the *Carousel* in the centre column of a
+``[-4-][--16--][-4-]`` layout for those greater (*col-sm* and wider) widths, and let it use the
+full width (24) at *col-xs*.
+
+Create the row and columns exactly as you did for the Carousel, in the news article's *Content*
+placeholder.
+
+#.  Add a *Accordion* plugin to the the middle *Column* plugin you just created. Add a title (*243g
+    of peace of mind*) to it, and **Save**.
+
+#.  Add a *Accordion item* plugins to the *Accordion*, giving it a title (see below for
+    suggestions), and placing an *Image*
+    plugin inside it.
+
+#.  To each *Accordion item*, add an image plugin.
+
+.. note::
+
+    As you did previously, *copy and paste* the plugin items to speed up your work.
+
+.. tip::
+
+    243g of peace of mind
+        * Inner tube: 120g
+
+        * Pump: 105g
+
+        * Tyre levers: 10g
+
+        * Set of pre-glued patches: 8g

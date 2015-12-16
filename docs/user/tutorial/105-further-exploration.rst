@@ -22,54 +22,6 @@ used several of these already - but you'll find many others listed there too. An
 are numerous other plugins from other applications to explore.
 
 
-Accordion
-================
-
-.. todo:: add image of Accordion with one item expanded
-
-The *Accordion* (an *Accordion* is a web widget that collapses and expands, hence the name, to
-reveal its contents) plugin works in a similar way - you add the *Accordion* plugin to a
-placeholder in the usual fashion, then add *Accordion item* plugins to the *Accordion*.
-
-An *Accordion item* plugin itself contains other plugins; these are the items that can be shown and
-hidden.
-
-#.  Add an *Accordion* plugin to a placeholder on any page. Add a title to it, and **Save**.
-#.  Add some *Accordion item* plugins to the *Accordion*.
-#.  To each *Accordion item*, add another plugin - perhaps some *Text* or an *Image*.
-
-
-Blockquote
-==========
-
-.. todo:: add brief description
-
-Label
-=====
-
-.. todo:: add brief description
-
-well
-====
-
-.. todo:: add brief description
-
-alert
-=====
-
-.. todo:: add brief description
-
-accordion
-=========
-
-.. todo:: add brief description
-
-list group
-==========
-
-.. todo:: add brief description
-
-
 *************
 Other plugins
 *************
@@ -77,15 +29,28 @@ Other plugins
 Style
 =====
 
-A container plugin.
+A container plugin that wraps whatever plugins you place inside it with a ``div`` (or other element
+of your choice) with various class or other attributes that you specify.
 
-.. todo:: add brief description
+Obviously, this requires some understanding of the way your site's CSS works; in our case, it's
+standard Bootstrap 3 CSS.
+
 
 Disqus
 ======
 
-.. todo:: add brief description
+Add comment thread functionality courtesy of `Disqus <https://disqus.com>`_.
 
+.. todo:: Add image of a page with comments
+
+.. note::
+
+    The Disqus plugin requires that you have a Disqus account. One is provided and already
+    configured with this tutorial site, but you would need your own account if you were using
+    Disqus on a site of your own.
+
+The Disqus plugin is an example of the many django CMS plugins that are able to use the APIs of
+external services to add functionality to your django CMS sites.
 
 ***************************
 Other applications
@@ -158,7 +123,8 @@ available in the *Aldryn Forms* application in the Django admin.
 Aldryn Categories
 -----------------
 
-Aldryn Categories is a utility Addon that provides your other applications with hierarchical categories.
+Aldryn Categories is a utility addon that provides your other applications with hierarchical
+categories.
 
 The categories you define in Aldryn Categories can be re-used by any Categories-aware application,
 including News & Blog, Events, People, Jobs and FAQ.
