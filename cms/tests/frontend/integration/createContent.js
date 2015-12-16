@@ -13,7 +13,7 @@ var randomText = randomString(10);
 casper.test.begin('User Add Content', function (test) {
     casper
         .start(globals.editUrl)
-        .wait(globals.toolbarTransitionTime, function () {
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
         .waitUntilVisible('.cms-structure', function () {

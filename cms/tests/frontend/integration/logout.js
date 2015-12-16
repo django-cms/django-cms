@@ -9,7 +9,7 @@ var messages = require('./settings/messages').logout;
 casper.test.begin('User Logout', function (test) {
     casper
         .start(globals.editUrl)
-        .wait(globals.toolbarTransitionTime, function () {
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {

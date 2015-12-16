@@ -6,7 +6,6 @@
 
 module.exports = {
     adminTitle: 'Log in | Django site admin',
-    toolbarTransitionTime: 200,
     // TODO:
     // - configure languages with djangocms-helper
     // - remove hardcoded host, port, language values

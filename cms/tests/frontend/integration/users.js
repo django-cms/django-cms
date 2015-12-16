@@ -7,11 +7,9 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').users;
 
 casper.test.begin('Users Management', function (test) {
-    var toolbarTransitionTime = 200;
-
     casper
         .start(globals.baseUrl)
-        .wait(toolbarTransitionTime, function () {
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
