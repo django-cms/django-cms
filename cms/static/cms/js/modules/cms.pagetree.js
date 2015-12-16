@@ -113,7 +113,14 @@ var CMS = window.CMS || {};
                 };
             },
 
-            _setup: function () {
+            /**
+             * Setting up the jstree and the related columns.
+             *
+             * @method _setup
+             * @private
+             */
+            _setup: function _setup() {
+                var that = this;
                 var columns = [];
 
                 // setup column headings
@@ -143,9 +150,7 @@ var CMS = window.CMS || {};
                         animation: 0,
                         // core setting to allow actions
                         check_callback: true,
-                        // TODO need to add proper data delegation
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
-
                         data: {
                             url: 'get-tree/',
                             data: {
@@ -153,7 +158,6 @@ var CMS = window.CMS || {};
                                 language: 'en'
                             }
                         },
-
                         // strings used within jstree that are called using `get_string`
                         strings: {
                             'Loading ...': 'Loading ...',
@@ -161,8 +165,7 @@ var CMS = window.CMS || {};
                             'nodes': 'nodes'
                         },
                         error: function (error) {
-                            // TODO need to trigger an error
-                            alert(error.reason);
+                            that.showError(error.reason);
                         }
                         // TODO need to add theme capabilities
                     },
@@ -209,7 +212,13 @@ var CMS = window.CMS || {};
                 // TODO implement search filtering
             },
 
-            _setTooltips: function () {
+            /**
+             * Sets up general tooltips that can have a list of links or content.
+             *
+             * @method _setTooltips
+             * @private
+             */
+            _setTooltips: function _setTooltips() {
                 var that = this;
                 var triggerCls = '.js-cms-tree-tooltip-trigger';
                 var containerCls = '.js-cms-tree-tooltip-container';
@@ -240,7 +249,14 @@ var CMS = window.CMS || {};
                 });
             },
 
-            _setAjaxPost: function (trigger) {
+            /**
+             * Triggers the links `href` as ajax post request.
+             *
+             * @method _setAjaxPost
+             * @private
+             * @param {jQuery} trigger jQuery link target
+             */
+            _setAjaxPost: function _setAjaxPost(trigger) {
                 var that = this;
 
                 this.ui.container.on(this.click, trigger, function (e) {
@@ -248,16 +264,22 @@ var CMS = window.CMS || {};
                     $.post($(this).attr('href')).done(function () {
                         window.location.reload();
                     }).error(function (error) {
-                        that.showError(error);
+                        that.showError(error.statusText);
                     });
                 });
             },
 
-            showError: function (message) {
+            /**
+             * Displays an error within the django UI.
+             *
+             * @method showError
+             * @param {String} message string message to display
+             */
+            showError: function showError(message) {
                 var messages = $('.messagelist');
                 var breadcrumb = $('.breadcrumbs');
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
-                var msg = tpl.replace('{msg}', message.statusText);
+                var msg = tpl.replace('{msg}', message);
 
                 if (messages.length) {
                     messages.replaceWith(msg);
