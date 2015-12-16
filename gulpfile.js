@@ -177,11 +177,12 @@ gulp.task('tests:integration', function (done) {
         'loginAdmin',
         'toolbar',
         'addFirstPage',
-        'logout',
-        'loginToolbar',
-        'createContent',
         'sideframe',
-        'users'
+        'createContent',
+        'users',
+        'newPage',
+        'logout',
+        'loginToolbar'
     ];
 
     if (argv && argv.tests) {

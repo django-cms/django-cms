@@ -12,7 +12,7 @@ var randomText = randomString(10);
 
 casper.test.begin('User Add Content', function (test) {
     casper
-        .start(globals.baseUrl, function () {
+        .start(globals.editUrl, function () {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
         .waitUntilVisible('.cms-structure', function () {

@@ -6,7 +6,7 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').users;
 
-casper.test.begin('Users Creation', function (test) {
+casper.test.begin('Users Management', function (test) {
     casper
         .start(globals.baseUrl, function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
@@ -34,6 +34,9 @@ casper.test.begin('Users Creation', function (test) {
                         messages.firstNameChanged
                     );
                 });
+        })
+        .then(function () {
+            this.click('.cms-sideframe .cms-icon-close');
         })
         .run(function () {
             test.done();
