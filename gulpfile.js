@@ -179,6 +179,7 @@ gulp.task('tests:integration', function (done) {
         'addFirstPage',
         'logout',
         'loginToolbar',
+        'createContent',
         'sideframe',
         'users'
     ];
