@@ -146,26 +146,30 @@ full width (24) at *col-xs*.
 Create the row and columns exactly as you did for the Carousel, in the news article's *Content*
 placeholder.
 
-#.  Add a *Accordion* plugin to the the middle *Column* plugin you just created. Add a title (*243g
-    of peace of mind*) to it, and **Save**.
+#.  First, create a *Text* plugin, in the middle column you just created:
 
-#.  Add a *Accordion item* plugins to the *Accordion*, giving it a title (see below for
-    suggestions), and placing an *Image*
-    plugin inside it.
+        *Peace of mind: 243g* (make this a *Heading 3* - i.e. an HTML ``<h3>``)
 
-#.  To each *Accordion item*, add an image plugin.
+#.  Below the *Text* plugin, add an *Accordion* plugin to the the middle *Column* plugin.
+
+#.  Add four *Accordion item* plugins to the *Accordion*, giving each a title (see below for
+    suggestions), and placing an *Image* plugin inside it.
+
+    The accordion items:
+
+    .. tip::
+
+        243g of peace of mind
+            * Inner tube: 120g
+
+            * Pump: 105g
+
+            * Tyre levers: 10g
+
+            * Set of pre-glued patches: 8g
+
 
 .. note::
 
     As you did previously, *copy and paste* the plugin items to speed up your work.
 
-.. tip::
-
-    243g of peace of mind
-        * Inner tube: 120g
-
-        * Pump: 105g
-
-        * Tyre levers: 10g
-
-        * Set of pre-glued patches: 8g
