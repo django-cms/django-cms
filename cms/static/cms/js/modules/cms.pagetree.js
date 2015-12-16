@@ -213,7 +213,6 @@ var CMS = window.CMS || {};
                         // core setting to allow actions
                         check_callback: true,
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
-                        /*
                         data: {
                             url: 'get-tree/',
                             data: {
@@ -221,7 +220,6 @@ var CMS = window.CMS || {};
                                 language: 'en'
                             }
                         },
-                        */
                         // strings used within jstree that are called using `get_string`
                         strings: {
                             'Loading ...': 'Loading ...',
