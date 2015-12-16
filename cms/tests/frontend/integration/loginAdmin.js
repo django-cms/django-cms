@@ -24,7 +24,7 @@ casper.test.begin('User Login (via Admin Panel)', function (test) {
             // we explicitly kill the session id cookie to reset the ui state (sideframe, toolbar, etc)
             this.page.deleteCookie('sessionid');
 
-            this.echo(JSON.stringify(this.page.cookies), 'INFO');
+            this.echo('The currently set cookies are: ' + JSON.stringify(this.page.cookies), 'INFO');
         })
         .then(function () {
             var titleRegExp = new RegExp(globals.adminTitle, 'g');
