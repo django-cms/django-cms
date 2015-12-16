@@ -73,22 +73,44 @@ var CMS = window.CMS || {};
 
             implement: [CMS.API.Helpers],
 
-            initialize: function initialize() {
-                this.container = $('.js-cms-pagetree');
-                this.options = this.container.data('json');
-                this.document = $(document);
+            initialize: function initialize(options) {
+                // options are loaded from the pagetree html node
+                this.options = $('.js-cms-pagetree').data('json');
+                this.options = $.extend(true, {}, this.options, options);
+
+                // elements
+                this._setupUI();
+
+                // states and events
+                this.click = 'click.cms.pagetree';
 
                 // make sure that ajax request send the csrf token
                 this.csrf(this.options.csrf);
 
+                // setup functionality
                 this._setup();
                 this._events();
                 this._setFilter();
                 this._setTooltips();
 
                 // make sure ajax post requests are working
-                this._setAjaxPost($('.js-cms-tree-item-menu a'));
-                this._setAjaxPost($('.js-cms-tree-lang-trigger'));
+                this._setAjaxPost('.js-cms-tree-item-menu a');
+                this._setAjaxPost('.js-cms-tree-lang-trigger');
+            },
+
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
+            _setupUI: function _setupUI() {
+                var pagetree = $('.cms-pagetree-container');
+                this.ui = {
+                    container: pagetree,
+                    document: $(document),
+                    tree: pagetree.find('.js-cms-pagetree')
+                };
             },
 
             _setup: function () {
@@ -115,7 +137,7 @@ var CMS = window.CMS || {};
                 });
 
                 // bind options to the jstree instance
-                this.container.jstree({
+                this.ui.tree.jstree({
                     core: {
                         // disable open/close animations
                         animation: 0,
@@ -128,7 +150,7 @@ var CMS = window.CMS || {};
                             url: 'get-tree/',
                             data: {
                                 //pageId: 90,
-                                language: 'en',
+                                language: 'en'
                             }
                         },
 
@@ -158,21 +180,21 @@ var CMS = window.CMS || {};
             _events: function () {
                 var that = this;
 
-                this.container.on('click', '.cms-tree-item-move', function (e) {
+                this.ui.container.on('click', '.cms-tree-item-move', function (e) {
                     that._getNode($(e.target));
                 });
 
-                this.document.on('dnd_stop.vakata', function () {
+                this.ui.document.on('dnd_stop.vakata', function () {
                     console.log('stop drag&drop');
                 });
 
-                this.container.on('changed.jstree', function () {
+                this.ui.container.on('changed.jstree', function () {
                     console.log('trigger open');
                 });
             },
 
             _getNode: function (element) {
-                var tree = this.container.jstree();
+                var tree = this.ui.container.jstree();
                 var el = element.closest('li');
                 var obj = tree.get_node(el);
 
@@ -189,32 +211,37 @@ var CMS = window.CMS || {};
 
             _setTooltips: function () {
                 var that = this;
-                var triggers = $('.js-cms-tree-tooltip-trigger');
-                var containers = $('.js-cms-tree-tooltip-container');
+                var triggerCls = '.js-cms-tree-tooltip-trigger';
+                var containerCls = '.js-cms-tree-tooltip-container';
+                var triggers;
+                var containers;
 
                 // attach event to the trigger
-                triggers.on('click.pagetree', function (e) {
+                this.ui.container.on(this.click, triggerCls, function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
+
+                    triggers = $(triggerCls);
+                    containers = $(containerCls);
 
                     containers.removeClass('cms-tree-tooltip-container-open')
                         .eq(triggers.index(this))
                         .addClass('cms-tree-tooltip-container-open');
 
-                    that.document.on('click.pagetree', function () {
+                    that.ui.document.on(that.click, function () {
                         containers.removeClass('cms-tree-tooltip-container-open');
-                        that.document.off('click.pagetree');
+                        that.ui.document.off(that.click);
                     });
                 });
 
                 // stop propagnation on the element
-                containers.on('click', function (e) {
+                this.ui.container.on(this.click, containerCls, function (e) {
                     e.stopImmediatePropagation();
                 });
             },
 
             _setAjaxPost: function (trigger) {
-                trigger.on('click', function (e) {
+                this.ui.container.on(this.click, trigger, function (e) {
                     e.preventDefault();
                     $.post($(this).attr('href')).done(function () {
                         window.location.reload();
