@@ -45,9 +45,9 @@ module.exports = {
             }
         },
         addContent: {
-            noEmptyPlugin: 'Empty plugin haven\'t been created',
+            noEmptyPlugin: 'Empty plugin hasn\'t been created',
             noFilteredResults: 'No filtered results for random string',
-            filteredPluginAvailable: 'There is text plugin available by filter: text',
+            filteredPluginAvailable: 'There is text plugin available by the filter: text',
             newPluginVisible: 'Newly created text plugin can be seen on page'
         }
     },
