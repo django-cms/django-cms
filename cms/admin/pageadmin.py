@@ -1273,7 +1273,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if page_id:
             pages = [get_object_or_404(self.model, pk=int(page_id))]
         else:
-            pages = Page.get_root_nodes().filter(publisher_is_draft=False)
+            pages = Page.get_root_nodes().filter(publisher_is_draft=True)
 
         template = "admin/cms/page/tree/lazy_menu.html"
         response = u""
