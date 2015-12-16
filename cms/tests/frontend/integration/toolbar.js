@@ -8,12 +8,13 @@ var messages = require('./settings/messages').toolbar;
 
 casper.test.begin('Toolbar Visibility', function (test) {
     var toolbarOffset = 0;
-    var transitionTime = 200;
+    var transitionTime = globals.toolbarTransitionTime;
 
     // The toolbar is hidden with negative margin and casper considers it visible at all times
     // in order to check visibility the suite has to grab margin value
     casper
-        .start(globals.baseUrl, function () {
+        .start(globals.baseUrl)
+        .wait(transitionTime, function () {
             test.assertEquals(
                 this.getElementAttribute('.cms-toolbar-item-logo a', 'href'), '/', messages.logoUrlCorrect
             );

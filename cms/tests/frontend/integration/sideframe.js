@@ -8,7 +8,8 @@ var messages = require('./settings/messages').sideframe;
 
 casper.test.begin('Sideframe', function (test) {
     casper
-        .start(globals.baseUrl, function () {
+        .start(globals.baseUrl)
+        .wait(200, function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
@@ -22,7 +23,8 @@ casper.test.begin('Sideframe', function (test) {
         .waitForSelector('.cms-ready', function () {
             test.assertVisible('.cms-sideframe-frame', messages.sideframeRemainsOpen);
         })
-        .thenOpen(globals.baseUrl, function () {
+        .thenOpen(globals.baseUrl)
+        .wait(globals.toolbarTransitionTime, function () {
             test.assertNotVisible('.cms-sideframe-frame', messages.sideframeClosed);
         })
         .run(function () {

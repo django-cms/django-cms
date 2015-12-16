@@ -12,7 +12,8 @@ var randomText = randomString(10);
 
 casper.test.begin('User Add Content', function (test) {
     casper
-        .start(globals.editUrl, function () {
+        .start(globals.editUrl)
+        .wait(globals.toolbarTransitionTime, function () {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
         .waitUntilVisible('.cms-structure', function () {
@@ -60,12 +61,13 @@ casper.test.begin('User Add Content', function (test) {
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
         .withFrame(0, function () {
-            casper.waitUntilVisible('#text_form', function () {
-                // explicitly put text to ckeditor
-                this.evaluate(function (contentData) {
-                    CMS.CKEditor.editor.setData(contentData);
-                }, randomText);
-            });
+            casper
+                .waitUntilVisible('#text_form', function () {
+                    // explicitly put text to ckeditor
+                    this.evaluate(function (contentData) {
+                        CMS.CKEditor.editor.setData(contentData);
+                    }, randomText);
+                });
         })
         .then(function () {
             this.click('.cms-modal-buttons .cms-btn-action.default');
