@@ -123,21 +123,15 @@ var CMS = window.CMS || {};
                         check_callback: true,
                         // TODO need to add proper data delegation
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
-                        /*
+
                         data: {
-                            url: function (node) {
-                                if (node.id === '#') {
-                                    return './?ajax=true';
-                                } else {
-                                    return node.id + '/en/descendants/'
-                                }
-                            },
-                            data: function (node) {
-                                console.log(node);
-                                return undefined;
+                            url: 'get-tree/',
+                            data: {
+                                //pageId: 90,
+                                language: 'en',
                             }
                         },
-                        */
+
                         // strings used within jstree that are called using `get_string`
                         strings: {
                             'Loading ...': 'Loading ...',
