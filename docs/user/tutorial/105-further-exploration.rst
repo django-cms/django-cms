@@ -1,13 +1,95 @@
 ###########################################################
-Exploring applications
+Further exploration
 ###########################################################
 
 In this section you will learn about:
 
-* applications in the **Aldryn Essentials collection**
-* **Aldryn Forms** and **Aldryn Categories**
+* plugins in the **Aldryn Bootstrap 3** collection
+* some other plugins included in the tutorial site
+* other applications in the **Aldryn Essentials collection**, **Aldryn Forms** and **Aldryn
+  Categories**
 * the **Aldryn Marketplace** and **django CMS addons**
 * finding other addons
+
+
+**************************
+Aldryn Bootstrap 3 plugins
+**************************
+
+There's a raft of plugins available for you to experiment with in the tutorial site. They include
+the `Aldryn Bootstrap 3 addon <https://github.com/aldryn/aldryn-bootstrap3/wiki>`_ plugins - you've
+used several of these already - but you'll find many others listed there too. And of course, there
+are numerous other plugins from other applications to explore.
+
+
+Accordion
+================
+
+.. todo:: add image of Accordion with one item expanded
+
+The *Accordion* (an *Accordion* is a web widget that collapses and expands, hence the name, to
+reveal its contents) plugin works in a similar way - you add the *Accordion* plugin to a
+placeholder in the usual fashion, then add *Accordion item* plugins to the *Accordion*.
+
+An *Accordion item* plugin itself contains other plugins; these are the items that can be shown and
+hidden.
+
+#.  Add an *Accordion* plugin to a placeholder on any page. Add a title to it, and **Save**.
+#.  Add some *Accordion item* plugins to the *Accordion*.
+#.  To each *Accordion item*, add another plugin - perhaps some *Text* or an *Image*.
+
+
+Blockquote
+==========
+
+.. todo:: add brief description
+
+Label
+=====
+
+.. todo:: add brief description
+
+well
+====
+
+.. todo:: add brief description
+
+alert
+=====
+
+.. todo:: add brief description
+
+accordion
+=========
+
+.. todo:: add brief description
+
+list group
+==========
+
+.. todo:: add brief description
+
+
+*************
+Other plugins
+*************
+
+Style
+=====
+
+A container plugin.
+
+.. todo:: add brief description
+
+Disqus
+======
+
+.. todo:: add brief description
+
+
+***************************
+Other applications
+***************************
 
 We've already explored a number of applications, including of course django CMS itself, and also:
 
@@ -23,9 +105,8 @@ Many other applications have been created for django CMS, for all kinds of purpo
 includes just a few of them.
 
 
-***************************
 Aldryn Essential Collection
-***************************
+===========================
 
 Aldryn News & Blog and Aldryn People are part of the *Essential Collection*, a suite of applications
 designed to work in similar ways and provide common patterns and interfaces.
@@ -48,15 +129,14 @@ Typically, you'll use them in the same way you used News & Blog and People:
 #.  If you wish, use plugins to re-use the content from these applications in other contexts.
 
 
-******************
 Other applications
-******************
+==================
 
 Other applications of note available in this site include:
 
 
 Aldryn Forms
-============
+------------
 
 Place forms on your pages, and collect responses.
 
@@ -76,7 +156,7 @@ available in the *Aldryn Forms* application in the Django admin.
 
 
 Aldryn Categories
-=================
+-----------------
 
 Aldryn Categories is a utility Addon that provides your other applications with hierarchical categories.
 
@@ -86,9 +166,8 @@ including News & Blog, Events, People, Jobs and FAQ.
 This means that the same hierarchies of categories can be available across your site's applications.
 
 
-****************************************
 Aldryn Marketplace and django CMS Addons
-****************************************
+========================================
 
 The `Aldryn Marketplace <http://www.aldryn.com/en/marketplace/aldryn-categories/>`_ and `django CMS
 Addons <http://www.django-cms.org/en/addons/>`_ pages are curated lists of applications that have
@@ -103,9 +182,8 @@ or whoever is responsible for deploying your site, will have to install and conf
 manually.
 
 
-******************
-Other applications
-******************
+Applications from other sources
+===============================
 
 There is also a vast range of applications that have been designed to integrate and inter-operate
 with django CMS. Most of them are also free open source packages.
@@ -116,3 +194,6 @@ tucked away into the obscurer corners of the web.
 
 Some of them are more complete and polished than others; some will be of general interest, and some
 will be of very specialised (legal, scientific, management, etc) interest.
+
+Again, you'll need to research these appropriately, and invest some time in them if they interest
+you.

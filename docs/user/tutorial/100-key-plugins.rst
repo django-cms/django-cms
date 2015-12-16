@@ -63,7 +63,7 @@ You've already used nested plugins, when you worked with *Rows* and *Columns*. T
 plugin works in a similar way: each *Carousel* contains a number of slides, that can contain images
 (and optionally, text).
 
-On smaller displays, the *Carousel* can occupy the full width; on larger ones, we want it centered.
+On smaller displays, the *Carousel* can occupy the full width; on larger ones, we want it centred.
 with some white space either side.
 
 We'll place the *Carousel* in in the centre column of a ``[-4-][--16--][-4-]`` layout for those
