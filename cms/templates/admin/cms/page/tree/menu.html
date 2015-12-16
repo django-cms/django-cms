@@ -3,8 +3,10 @@
 {# INFO: columns are defined in base.html options #}
 <li class="cms-tree-node {{ css_class }}
     {# TODO maybe not required #}
-    {% if page.get_descendant_count %} jstree-children{% endif %}
+    {% if page.get_descendant_count %} jstree-children cms-tree-node-haschildren{% endif %}
     {% if page.reverse_id == "page_types" %} cms-tree-node-pagetype{% endif %}
+    {% if page.level == 0 %} cms-tree-node-top{% endif %}
+    {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
     "
     data-colview='
         <div class="cms-tree-col">
@@ -146,6 +148,12 @@
                         {% endif %}
                         {% if page.get_template_display %}
                             <p><strong>{% trans "template" %}:</strong> {{ page.get_template_display }}</p>
+                        {% endif %}
+                        {% if metadata %}
+                            <p><strong>{% trans "meta" %}:</strong> {{ metadata }}</p>
+                        {% endif %}
+                        {% if page.site %}
+                            <p><strong>{% trans "site" %}:</strong> {{ page.site }}</p>
                         {% endif %}
                     </div>
                 </div>
