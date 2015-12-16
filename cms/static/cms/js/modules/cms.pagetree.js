@@ -40,13 +40,6 @@ var CMS = window.CMS || {};
             };
         };
 
-        /**
-         * TODO
-         *
-         * @class PageTree
-         * @namespace CMS
-         * @uses CMS.API.Helpers
-         */
         // TODO col sync needs to be implemented when resizing
         // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
@@ -69,6 +62,15 @@ var CMS = window.CMS || {};
         *  'cms/page/' + item_id + '/move-page/
         *  > { position: position, target: target_id, site: site }
         */
+
+        /**
+         * The pagetree is loaded via `/admin/cms/page` and has a custom admin
+         * templates stored within `templates/admin/cms/page/tree`.
+         *
+         * @class PageTree
+         * @namespace CMS
+         * @uses CMS.API.Helpers
+         */
         CMS.PageTree = new CMS.Class({
 
             implement: [CMS.API.Helpers],
