@@ -131,7 +131,8 @@ var CMS = window.CMS || {};
                         // the first row is already populated, to avoid overwrites
                         // just leave the "key" param empty
                         columns.push({
-                            header: obj.title
+                            header: obj.title,
+                            width: obj.width || '1%'
                         });
                     } else {
                         columns.push({
@@ -140,7 +141,8 @@ var CMS = window.CMS || {};
                                 // it needs to have the "colde" format and not "col-de"
                                 // as jstree will convert "col-de" to "colDe"
                                 return node.data['col' + obj.key];
-                            }
+                            },
+                            width: obj.width || '1%'
                         });
                     }
                 });
@@ -178,6 +180,7 @@ var CMS = window.CMS || {};
                     // https://github.com/deitch/jstree-grid
                     grid: {
                         // columns are provided from base.html options
+                        width: '100%',
                         columns: columns,
                         resizable: true
                     }

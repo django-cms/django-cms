@@ -6,11 +6,8 @@ $pagetree-icon-offset: 4px;
 $pagetree-lang-size: 14px;
 $pagetree-tooltip-min-width: 130px;
 
-.cms-tree {
-    .cms-icon {
-        font-family: "django-cms-iconfont";
-    }
-}
+.cms-pagetree-container,
+.cms-pagetree {}
 
 .cms-tree-col {
     height: 24px;
@@ -239,4 +236,9 @@ $pagetree-tooltip-min-width: 130px;
 }
 .jstree-grid-cell {
     padding: 0 10px !important;
+}
+.jstree-grid-wrapper {
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
