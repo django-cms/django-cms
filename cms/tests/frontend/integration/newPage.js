@@ -10,7 +10,6 @@ casper.test.begin('New Page Creation', function (test) {
     casper
         .start(globals.editUrl)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-
         })
         .run(function () {
             test.done();

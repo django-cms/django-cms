@@ -1,3 +1,4 @@
+/* globals localStorage */
 'use strict';
 
 // #############################################################################
@@ -24,7 +25,7 @@ casper.test.begin('User Login (via Admin Panel)', function (test) {
             // we explicitly kill the session id cookie to reset the login state
             // and localstorage data to reset the ui state (sideframe, toolbar, etc)
             this.page.deleteCookie('sessionid');
-            this.evaluate(function(){
+            this.evaluate(function () {
                 localStorage.clear();
             });
 

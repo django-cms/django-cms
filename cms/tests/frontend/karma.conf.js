@@ -3,7 +3,8 @@
  * Licensed under BSD
  * http://github.com/aldryn/aldryn-boilerplate-bootstrap3
  */
-// jshint node: true
+
+/* jshint node: true */
 'use strict';
 
 var baseConf = require('./base.conf');
