@@ -241,16 +241,29 @@ var CMS = window.CMS || {};
             },
 
             _setAjaxPost: function (trigger) {
+                var that = this;
+
                 this.ui.container.on(this.click, trigger, function (e) {
                     e.preventDefault();
                     $.post($(this).attr('href')).done(function () {
                         window.location.reload();
                     }).error(function (error) {
-                        // TODO implement proper errors
-                        alert('there was an error');
-                        console.log(error);
+                        that.showError(error);
                     });
                 });
+            },
+
+            showError: function (message) {
+                var messages = $('.messagelist');
+                var breadcrumb = $('.breadcrumbs');
+                var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
+                var msg = tpl.replace('{msg}', message.statusText);
+
+                if (messages.length) {
+                    messages.replaceWith(msg);
+                } else {
+                    breadcrumb.append(msg);
+                }
             }
 
         });
