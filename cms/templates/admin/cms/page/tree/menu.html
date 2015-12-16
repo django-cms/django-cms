@@ -1,12 +1,16 @@
 {% load i18n cms_admin admin_urls %}
 
 {# INFO: columns are defined in base.html options #}
-<li class="cms-tree-node
-    {% if page.get_descendant_count %}jstree-children{% endif %}
+<li class="cms-tree-node {{ css_class }}
+    {# TODO maybe not required #}
+    {% if page.get_descendant_count %} jstree-children cms-tree-node-haschildren{% endif %}
+    {% if page.reverse_id == "page_types" %} cms-tree-node-pagetype{% endif %}
+    {% if page.level == 0 %} cms-tree-node-top{% endif %}
+    {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
     "
     data-colview='
-        <div class="cms-tree-data">
-            <div class="cms-tree-item cms-tree-icons">
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-icons">
                 {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
                 {% if page.soft_root %}
                     <a href="{% url 'admin:cms_page_advanced' page.id %}">
@@ -22,8 +26,8 @@
         </div>
     '
     data-colpreview='
-        <div class="cms-tree-data">
-            <div class="cms-tree-item cms-tree-preview
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %}>
@@ -34,11 +38,13 @@
     '
     {% for lang in site_languages %}
     data-col{{ lang|lower }}='
-        <div class="cms-tree-data">
+        <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
                 {% if has_change_permission and has_publish_permission %}
                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
                         class="cms-tree-lang-container js-cms-tree-tooltip-trigger"
+                        title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"
+                        {# TODO implement alt click to advanced settings #}
                         {# INFO: delegate click event to parent window when in sideframe #}
                         {% if lang in page.languages %} target="_top"{% endif %}>
                         {# INFO: renders <span class="{cls}" title="{title}"></span> #}
@@ -67,34 +73,53 @@
     '
     {% endfor %}
     data-colmenu='
-        <div class="cms-tree-data">
-            {% if has_change_permission %}
-                <div class="cms-tree-item cms-tree-menu js-cms-tree-menu">
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
+                {% if has_change_permission %}
                     <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
-                        {% if page.in_navigation %}
-                            <span class="cms-icon cms-icon-forbidden" title="{% trans "not in menu" %}"></span>
-                        {% else %}
-                            <span class="cms-icon cms-icon-check" title="{% trans "in menu" %}"></span>
-                        {% endif %}
+                {% endif %}
+                    {% if page.in_navigation %}
+                        <span class="cms-icon cms-icon-forbidden" title="{% trans "not in menu" %}"></span>
+                    {% else %}
+                        <span class="cms-icon cms-icon-check" title="{% trans "in menu" %}"></span>
+                    {% endif %}
+                {% if has_change_permission %}
                     </a>
+                {% endif %}
+            </div>
+        </div>
+    '
+    data-coloptions='
+        <div class="cms-tree-col">
+            {% if has_change_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
+                </div>
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
                 </div>
             {% endif %}
-            {% comment %}
-            <div class="cms-tree-item">
-                <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child" class="cms-tree-item">add</a>
-                <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" class="cms-tree-item">edit</a>
-                <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}" class="cms-tree-item">delete</a>
-            </div>
-            <div class="cms-tree-item">
-                <a href="#" class="cms-tree-item cms-tree-item-move">move</a>
-                <a href="#" class="cms-tree-item">cut</a>
-                <a href="#" class="cms-tree-item">copy</a>
-            </div>
-            {% endcomment %}
+            {% if has_add_permission and has_add_page_permission and has_add_on_same_level_permission %}
+                {# TODO something else has to happen here #}
+            {% else %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
+                </div>
+            {% endif %}
+            {% if has_move_page_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="#"><span class="cms-icon cms-icon-scissors"></span></a>
+                </div>
+            {% endif %}
+            {% if has_delete_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-bin"></span></a>
+                </div>
+            {% endif %}
         </div>
     '
     data-colinfo='
-        <div class="cms-tree-data">
+        <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-info">
                 <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
                     class="cms-tree-info-container js-cms-tree-tooltip-trigger">
@@ -124,6 +149,12 @@
                         {% if page.get_template_display %}
                             <p><strong>{% trans "template" %}:</strong> {{ page.get_template_display }}</p>
                         {% endif %}
+                        {% if metadata %}
+                            <p><strong>{% trans "meta" %}:</strong> {{ metadata }}</p>
+                        {% endif %}
+                        {% if page.site %}
+                            <p><strong>{% trans "site" %}:</strong> {{ page.site }}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -131,7 +162,9 @@
     '
     >
 
-    {{ page.get_admin_tree_title }}
+    {% language preview_language %}
+        {{ page.get_admin_tree_title }}
+    {% endlanguage %}
 </li>
 
 {# CHILDREN RENDERING #}
