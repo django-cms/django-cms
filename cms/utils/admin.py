@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
 
+from django.template.loader import render_to_string
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.utils.encoding import smart_str
 
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
@@ -73,6 +73,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site_id)
     context = {
+        'request': request,
         'page': page,
         'site': site,
         'lang': lang,
@@ -110,4 +111,4 @@ def render_admin_menu_item(request, page, template=None, language=None):
     }
     filtered = 'filtered' in request.GET or 'filtered' in request.POST
     context.update(get_admin_menu_item_context(request, page, filtered, language))
-    return render(request, template, context)
+    return render_to_string(template, context)

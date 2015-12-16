@@ -133,10 +133,3 @@
 
     {{ page.get_admin_tree_title }}
 </li>
-
-{# CHILDREN RENDERING #}
-{% if page.childrens and page.id in open_menu_trees %}
-    {% for child in page.childrens %}
-        {% show_admin_menu child %}
-    {% endfor %}
-{% endif %}
