@@ -160,12 +160,7 @@
     <p>Page Types</p>
     {# allow multiple trees #}
     <div class="cms-pagetree js-cms-pagetree">
-        <ul>
-            {# loading the tree elements #}
-            {% for page in cl.get_items %}
-                {% show_admin_menu page %}
-            {% endfor %}
-        </ul>
+        <ul></ul>
     </div>
     {% endcomment %}
 
