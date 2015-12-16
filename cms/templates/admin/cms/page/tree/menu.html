@@ -100,11 +100,11 @@
                 </div>
             {% endif %}
             {% if has_add_permission and has_add_page_permission and has_add_on_same_level_permission %}
+                {# TODO something else has to happen here #}
+            {% else %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
                     <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
                 </div>
-            {% else %}
-                {# TODO there should be something else #}
             {% endif %}
             {% if has_move_page_permission %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
