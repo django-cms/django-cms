@@ -56,10 +56,10 @@
                         <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %}>
                             <span class="cms-icon cms-icon-eye" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}"></span> {% trans "Preview" %}
                         </a>
-                        <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}&amp;redirect_page_id={{ request.GET.page_id }}" class="js-cms-tree-lang-trigger">
+                        <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
                             <span class="cms-icon cms-icon-check-o"></span> {% trans "Publish" %}
                         </a>
-                        <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}&amp;redirect_page_id={{ request.GET.page_id }}" class="js-cms-tree-lang-trigger">
+                        <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
                             <span class="cms-icon cms-icon-forbidden"></span> {% trans "Unpublish" %}
                         </a>
                     </div>
