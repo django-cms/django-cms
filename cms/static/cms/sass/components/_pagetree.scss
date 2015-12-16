@@ -7,7 +7,12 @@ $pagetree-lang-size: 14px;
 $pagetree-tooltip-min-width: 130px;
 
 .cms-pagetree-container,
-.cms-pagetree {}
+.cms-pagetree {
+    // helper classes
+    .hidden {
+        display: none !important;
+    }
+}
 
 .cms-tree-col {
     height: 24px;
@@ -16,6 +21,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item {
     display: inline-block;
 }
+
 
 //###########################################################
 // TOOLTIP

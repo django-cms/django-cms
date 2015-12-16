@@ -17,30 +17,88 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(function () {
 
-        // shifts options element inside the node
-        $.jstree.plugins.options = function (options, parent) {
-            var buttons = '.cms-tree-data';
+        /**
+         * JSTree plugin used to synchronise the column width depending on the
+         * screen size. Hides rows from right to left and displays an additional
+         * menu row.
+         */
+        $.jstree.plugins.gridResize = function (options, parent) {
+            var that = this;
 
-            // what happens when redrawing
-            this.redraw_node = function (obj, deep, callback, force_draw) {
-                // default draw method
-                obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
+            this.ui = {
+                window: $(window)
+            };
+            this.timeout = 100;
 
-                // we need to append the options bar after the <li> as additional
-                // options cannot be rendered within an anchor
-                if (obj) {
-                    var el = $(obj);
-                    var tmp = el.find(buttons);
+            // this is how we register event handlers on jstree plugins
+            this.bind = function () {
+                parent.bind.call(this);
+                // load `synchronise` on first load
+                this.element.on('ready.jstree', function () {
+                    that.ui.cols = $('.jstree-grid-column');
+                    that.ui.container = $('.jstree-grid-wrapper');
+                    that.ui.inner = $('.jstree-grid-midwrapper');
+                    that.breakpoints = [];
+                    that.processed = [];
+                    // trigger first `synchronise`
+                    that.ui.window.trigger('resize.jstree');
+                });
+                // TODO attach events on drag&drop or open&close
+            };
 
-                    el.append(tmp);
+            function synchronise() {
+                var containerWidth = that.ui.container.outerWidth(true);
+                var wrapperWidth = that.ui.inner.outerWidth(true);
+                // we do not now the smallest size possible at this stage,
+                // the "pages" section is automatically adapted to 100% to fill
+                // the screen. In order to get the correct breakpoints, we need
+                // to make a snapshot at the lowest point
+                if (!that.breakpoints.length && (containerWidth < wrapperWidth)) {
+                    that.breakpoints = createSnapshot();
+                }
+                // these vars are available after breakpoints is triggered
+                var breakpointSum = that.breakpoints.reduce(function(pv, cv) { return pv + cv; }, 0);
+                var colsFiltered = that.ui.cols.filter(':visible');
+                var index = colsFiltered.length - 1;
+
+                // hide or show elements according to their sum
+
+                console.clear();
+                console.log(that.breakpoints);
+
+                console.log(that.breakpoints[index] || 0);
+                console.log(breakpointSum, containerWidth);
+
+                if (containerWidth < breakpointSum) {
+                    that.processed.push(that.breakpoints.pop());
                 }
 
-                // return the object
-                return obj;
-            };
+                console.log(that.processed);
+
+                /*
+                if (wrapper.outerWidth(true) < colsWidth) {
+                    cols.eq(colsIndex).addClass('hidden');
+                } else if (false) {
+                    //cols.removeClass('hidden');
+                    //colsArray.pop();
+                }
+                */
+            }
+
+            function createSnapshot() {
+                var array = [];
+                // we need to get the real size of all visible columns added
+                that.ui.cols.each(function () {
+                    array.push($(this).outerWidth(true));
+                });
+                return array;
+            }
+
+            // bind resize event
+            this.ui.window.on('resize.jstree',
+                CMS.API.Helpers.throttle(synchronise, this.timeout));
         };
 
-        // TODO col sync needs to be implemented when resizing
         // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
         // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
@@ -176,13 +234,12 @@ var CMS = window.CMS || {};
                         // TODO need to add theme capabilities
                     },
                     // activate drag and drop plugin
-                    plugins : ['dnd', 'search', 'grid', 'options'],
+                    plugins : ['dnd', 'search', 'grid', 'gridResize'],
                     // https://github.com/deitch/jstree-grid
                     grid: {
                         // columns are provided from base.html options
                         width: '100%',
-                        columns: columns,
-                        resizable: true
+                        columns: columns
                     }
                 });
             },
