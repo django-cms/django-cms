@@ -33,7 +33,9 @@ mode. We'll show this with another example:
 
 #.  In the text editor, select *Link/Button* from the *CMSPlugins* menu.
 
-    .. todo:: add image
+.. image:: /user/tutorial/images/link_button_selection.png
+    :alt: Select link plugin
+    :align: center
 
 #.  Provide some details.
 
@@ -47,9 +49,15 @@ mode. We'll show this with another example:
 
 #.  Save the *Link/Button* plugin.
 
-    ..  todo:: image of the link in the text
+.. image:: /user/tutorial/images/linkplugin_in_textplugin.png
+    :alt: Link plugin in Text plugin
+    :align: center
 
 #.  Save the *Text* plugin.
+
+.. image:: /user/tutorial/images/link_content_mode.png
+    :alt: Link on content mode
+    :align: center
 
 The other options are self-explanatory, so feel free to experiment with them. Try turning the link
 into a button, or add a link to another page within the site.
@@ -137,7 +145,11 @@ a placeholder in the usual fashion, then add *Accordion item* plugins to the *Ac
 
 Here's the example we're going to create (in the new article *Repairing is caring*):
 
-.. todo:: animated gif of accordion
+.. image:: /user/tutorial/images/repairing_is_caring_tools.gif
+    :alt: Bootstrap Accordion example
+    :align: center
+    :width: 75%
+
 
 Just as we did for the *Carousel* above, we'll place the *Carousel* in the centre column of a
 ``[-4-][--16--][-4-]`` layout for those greater (*col-sm* and wider) widths, and let it use the
