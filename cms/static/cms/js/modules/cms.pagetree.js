@@ -284,7 +284,7 @@ var CMS = window.CMS || {};
                 if (messages.length) {
                     messages.replaceWith(msg);
                 } else {
-                    breadcrumb.append(msg);
+                    breadcrumb.after(msg);
                 }
             }
 
