@@ -922,7 +922,8 @@ CMS_TOOLBAR_HIDE
 default
     ``False``
 
-If True, the toolbar is hidden in the pages out django CMS.
+If ``True``, the toolbar is hidden, even on CMS pages.
+
 To determine the internal url of django cms, you need to assign CMS_APP_NAME to use when you include ``'cms.urls'``
 
 Example::
