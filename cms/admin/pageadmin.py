@@ -1009,7 +1009,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # create a new publish reversion
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
@@ -1110,7 +1110,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         # TODO: This should never fail, but it may be a POF
         path = page.get_absolute_url(language=language)
@@ -1253,7 +1253,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if page.has_change_permission(request):
             page.toggle_in_navigation()
             language = request.GET.get('language') or get_language_from_request(request)
-            return admin_utils.render_admin_menu_item(request, page, language=language)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page, language=language))
         return HttpResponseForbidden(force_text(_("You do not have permission to change this page's in_navigation status")))
 
     def get_tree(self, request):
@@ -1270,7 +1270,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         language = request.GET.get('language', None)
 
         if language is None:
-            language = request.GET.get('language') or get_language()
+            language = request.GET.get('language') or get_language_from_request(request)
 
         if page_id:
             pages = [get_object_or_404(self.model, pk=int(page_id))]
