@@ -23,21 +23,24 @@ casper.test.begin('Switch language', function (test) {
         })
         // no page should be here (warning message instead)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview', messages.noContentPreview);
+            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview',
+                messages.noContentPreview);
             this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
         })
         // add german translation
         .waitUntilVisible('.cms-toolbar-item-navigation > li:nth-child(4) > ul', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href*="?language=de"]');
         })
-        // open Change pane modal
-        .waitUntilVisible('.cms-modal-open', function () {
-            this.page.switchToChildFrame(0);
+        // open Change pane modal and fill with data
+        .waitUntilVisible('.cms-modal-open')
+        .withFrame(0, function () {
             this.fill('#page_form', {
                 'title': randomText,
                 'slug': randomText
             });
-            this.page.switchToParentFrame();
+        })
+        // submit Change pane modal
+        .then(function () {
             this.click('.cms-modal-open .cms-modal-item-buttons .cms-btn-action')
         })
         // check if german version appears
@@ -58,7 +61,8 @@ casper.test.begin('Switch language', function (test) {
         })
         // make sure translation has been deleted
         .waitWhileVisible('.cms-modal-open', function () {
-            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview', messages.noContentPreview);
+            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview',
+                messages.noContentPreview);
         })
         .run(function () {
             test.done();
