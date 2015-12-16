@@ -4,7 +4,7 @@
 // Switch language via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.addContent;
+var messages = require('./settings/messages').page.switchLanguage;
 var randomString = require('./helpers/randomString').randomString;
 
 // random text string for filtering and content purposes
@@ -23,7 +23,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // no page should be here (warning message instead)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview');
+            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview', messages.noContentPreview);
             this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
         })
         // add german translation
@@ -42,7 +42,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // check if german version appears
         .waitWhileVisible('.cms-modal-open', function () {
-            test.assertSelectorHasText('ul.nav > .child > a[href="/de/"]', randomText);
+            test.assertSelectorHasText('ul.nav > .child > a[href="/de/"]', randomText, messages.newContentAvailable);
         })
         // click on language bar
         .waitUntilVisible('.cms-toolbar-expanded', function () {
@@ -58,7 +58,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // make sure translation has been deleted
         .waitWhileVisible('.cms-modal-open', function () {
-            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview');
+            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview', messages.noContentPreview);
         })
         .run(function () {
             test.done();
