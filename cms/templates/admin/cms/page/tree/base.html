@@ -75,12 +75,14 @@
         <label for="field-search">{% trans "Search" %}</label>
         <input type="text" name="q" id="field-search" value="{{ request.GET.q }}">
 
-        <label for="field-search-site">{% trans "Pages on:" %}</label>
-        <select name="site__exact" id="field-search-site">
-            {% for site in cl.sites %}
-            <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected="selected"{% endif %}>{{ site.name }}</option>
-            {% endfor %}
-        </select>
+        {% if cl.sites.count > 1 %}
+            <label for="field-search-site">{% trans "Pages on:" %}</label>
+            <select name="site__exact" id="field-search-site">
+                {% for site in cl.sites %}
+                    <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected="selected"{% endif %}>{{ site.name }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
 
         <input type="submit" value="{% trans "Search" %}">
         <input type="hidden" name="copy">
