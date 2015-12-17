@@ -276,12 +276,24 @@ var CMS = window.CMS || {};
             },
 
             _setFilter: function () {
+                var that = this;
                 var trigger = $('.js-cms-tree-filter-trigger');
                 var container = $('.js-cms-tree-filter-container');
 
-                trigger.on('click', function (e) {
-                    e.preventDefalt();
+                trigger.on(this.click, function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
                     container.toggleClass('hidden');
+
+                    that.ui.document.on(that.click, function () {
+                        container.addClass('hidden');
+                        that.ui.document.off(that.click);
+                    });
+                });
+
+                container.on(that.click, function (e) {
+                    e.stopImmediatePropagation();
                 });
             },
 

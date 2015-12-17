@@ -71,7 +71,7 @@
     {# TODO integrate site selector #}
     {# TODO standard search form #}
     {# search_form cl #}
-    <form action="." method="get" hidden="hidden">
+    <form action="." method="get" class="cms-tree-search" id="changelist-search">
         <label for="field-search">{% trans "Search" %}</label>
         <input type="text" name="q" id="field-search" value="{{ request.GET.q }}">
 
@@ -89,16 +89,17 @@
 {% endblock %}
 
 {% block filters %}
-    {# TODO this should be untouched #}
     {% if cl.has_filters %}
-        <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
-            {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
-        </a>
-        <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
-            <h2>{% trans "Filter" %}</h2>
-            {% for spec in cl.filter_specs %}
-                {% clean_admin_list_filter cl spec %}
-            {% endfor %}
+        <div class="cms-tree-filters">
+            <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
+                {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
+            </a>
+            <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
+                <h2>{% trans "Filter" %}</h2>
+                {% for spec in cl.filter_specs %}
+                    {% clean_admin_list_filter cl spec %}
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
 {% endblock %}
