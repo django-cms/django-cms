@@ -110,54 +110,62 @@
     <div class="clear"></div>
     <h2>{% trans "Pages" %}</h2>
 
-    {# INFO: javascript is loaded from cms.pagetree.js #}
     {% if cl.get_items %}
-    <div class="cms-pagetree-container">
-        <div class="cms-pagetree js-cms-pagetree" data-json='{
-            "csrf": "{{ csrf_token }}",
-            "static": "{{ STATIC_URL }}",
-            "permission": "{{ CMS_PERMISSION|bool }}",
-            "debug": "{{ DEBUG|bool }}",
-            "filtered": "{{ cl.is_filtered|bool }}",
-            "lang": {
-                "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
-                "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
-                "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
-                "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
-                "loading": "{% trans "Loading..." %}"
-            },
-            "columns": [{
-                "title": "{% trans 'Pages' %}",
-                "key": "",
-                "width": "100%"
-            }, {
-                "title": "&nbsp;",
-                "key": "view"
-            }, {
-                "title": "{% trans 'View' %}",
-                "key": "preview"
-            }, {% for lang in site_languages %}{
-                "title": "{{ lang|upper }}",
-                "key": "{{ lang }}"
-            }, {% endfor %} {
-                "title": "{% trans 'Menu' %}",
-                "key": "menu"
-            }, {
-                "title": "{% trans 'Options' %}",
-                "key": "options"
-            }, {
-                "title": "{% trans 'Info' %}",
-                "key": "info"
-            }]
-        }'>
-            <ul>
-                {# loading the tree elements #}
-                {% for page in cl.get_items %}
-                    {% show_admin_menu page %}
-                {% endfor %}
-            </ul>
+        {# INFO: javascript is loaded from cms.pagetree.js #}
+        <div class="cms-pagetree-container">
+            <div class="cms-pagetree js-cms-pagetree" data-json='{
+                "csrf": "{{ csrf_token }}",
+                "static": "{{ STATIC_URL }}",
+                "permission": "{{ CMS_PERMISSION|bool }}",
+                "debug": "{{ DEBUG|bool }}",
+                "filtered": "{{ cl.is_filtered|bool }}",
+                "lang": {
+                    "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
+                    "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
+                    "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
+                    "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
+                    "loading": "{% trans "Loading..." %}"
+                },
+                "columns": [{
+                    "title": "{% trans 'Pages' %}",
+                    "key": "",
+                    "width": "100%"
+                }, {
+                    "title": "&nbsp;",
+                    "key": "view"
+                }, {
+                    "title": "{% trans 'View' %}",
+                    "key": "preview"
+                }, {% for lang in site_languages %}{
+                    "title": "{{ lang|upper }}",
+                    "key": "{{ lang }}"
+                }, {% endfor %} {
+                    "title": "{% trans 'Menu' %}",
+                    "key": "menu"
+                }, {
+                    "title": "{% trans 'Options' %}",
+                    "key": "options"
+                }, {
+                    "title": "{% trans 'Info' %}",
+                    "key": "info"
+                }]
+            }'>
+                <ul>
+                    {# loading the tree elements #}
+                    {% for page in cl.get_items %}
+                        {% show_admin_menu page %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
+    {% else %}
+        {# INFO: ask to add a page if tree is empty #}
+        {% url opts|admin_urlname:'add' as add_url %}
+        {% blocktrans %}
+            <em>There is no page around yet.</em>
+            <br>
+            <a href="{{ add_url }}" class="addlink">Add page</a> now.
+        {% endblocktrans %}
     {% endif %}
 
     {% comment %}
@@ -177,13 +185,4 @@
     {# TODO there are dialogs loaded for the persmission checks #}
     <div id="dialogs"></div>
 
-    {# add default if there is no page #}
-    {% if not cl.get_items %}
-        {% url opts|admin_urlname:'add' as add_url %}
-        {% blocktrans %}
-            <em>There is no page around yet.</em>
-            <br>
-            <a href="{{ add_url }}" class="addlink">Add page</a> now.
-        {% endblocktrans %}
-    {% endif %}
 {% endblock result_list %}
