@@ -143,7 +143,7 @@ It's a web widget that collapses and expands, hence the name, to reveal its cont
 The *Accordion* plugin works in a similar way to the *Carousel* - you add the *Accordion* plugin to
 a placeholder in the usual fashion, then add *Accordion item* plugins to the *Accordion*.
 
-Here's the example we're going to create (in the new article *Repairing is caring*):
+Here's the example we're going to create, in the news article *Repairing is caring*:
 
 .. image:: /user/tutorial/images/repairing_is_caring_tools.gif
     :alt: Bootstrap Accordion example
@@ -158,7 +158,9 @@ full width (24) at *col-xs*.
 Create the row and columns exactly as you did for the Carousel, in the news article's *Content*
 placeholder.
 
-#.  First, create a *Text* plugin, in the middle column you just created:
+#.  Find the news article, and switch to *Edit* mode.
+
+#.  Create a *Text* plugin, in the middle column you just created:
 
         *Peace of mind: 243g* (make this a *Heading 3* - i.e. an HTML ``<h3>``)
 

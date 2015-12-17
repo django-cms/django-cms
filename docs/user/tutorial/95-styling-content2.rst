@@ -1,8 +1,8 @@
 .. _adding_four_columns:
 
-####################################################
-Responsive layouts 2
-####################################################
+#############
+Page layout 2
+#############
 
 In this section you will learn how to:
 
@@ -11,8 +11,6 @@ In this section you will learn how to:
 
 
 We're going to add four things that we offer to our home page, like this, in just a few steps.
-
-.. todo:: version of image with "What we offer" heading required
 
 .. image:: /user/tutorial/images/services.png
     :alt: a list of four services

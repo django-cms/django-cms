@@ -1,6 +1,6 @@
-####################################################
-Responsive layouts 3
-####################################################
+#############
+Page layout 3
+#############
 
 In this section you will learn how to:
 
@@ -56,8 +56,6 @@ Adding whitespace
 In the example above, the alignment of the text and image is poor. We can fix that with
 *Spacer* plugin, which simply adds whitespace.
 
-There are also some other places where additional vertical space would be an improvement.
-
 #.  Add a *Spacer* plugin above the *Image* plugin, in the same *Column*. Remember you can drag
     plugins to re-order them.
 
@@ -67,13 +65,16 @@ There are also some other places where additional vertical space would be an imp
         :alt: Spacer plugin
         :align: center
 
-#.  Add a *Spacer* between the *Text* plugin *What we offer* and the *Row* of four columns.
+#.  There are also some other places where additional vertical space would be an improvement. So,
+    let's add some *Spacers* between the *Rows* in the page:
+
+    * after the *Row 2 columns*
+    * after the *What we offer* *Text* plugin
+    * after the *Row 4 columns*
 
 #.  Add a *Spacer* between the *Text* plugin *What we offer* and the *Row* of four columns.
 
 #.  Add one after the four columns and the text that follows.
-
-.. todo:: we need a new version of the image of the page.
 
 .. image:: /user/tutorial/images/styled_home_with_plugins.png
     :alt: Styled home with plugins

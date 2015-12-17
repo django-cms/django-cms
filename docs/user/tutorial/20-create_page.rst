@@ -77,14 +77,16 @@ Edit existing content
 .. |view-published| image:: /user/tutorial/images/view-published.png
    :alt: 'View published'
 
-At any time, you can make further changes to a page, by switching back into *Edit mode*, using the
-|edit| button that appears, and return to the *published* version of the page using the
-|view-published| button.
+.. note::
 
-In editing mode:
+    At any time, you can make further changes to a page, by switching back into *Edit mode*, using
+    the |edit| button that appears, and return to the *published* version of the page using the
+    |view-published| button.
 
-#. Double-click (if you're using a pointer) or tap (if you're using a touch screen) on the
-   paragraph of text to open it for editing.
+#.  Switch back into |edit| mode.
+
+#.  Double-click (if you're using a pointer) or tap (if you're using a touch screen) on the
+    paragraph of text to open it for editing.
 #.  Make changes by breaking the text into paragraphs.
 #.  **Save** it again.
 
@@ -132,8 +134,20 @@ At the top of your page is the django CMS *toolbar*, with various useful tools i
 
 #.  Hit **Publish**.
 
+#.  As before, go back into *Edit mode*, using the |edit| button, and double-click (or tap) on the
+    *Our workshop...* text to edit it.
+
+#.  Add a new paragraph, to serve as a heading: *Bruno Bicycle Services*.
+
+#.  Apply a *Heading 2* (i.e. an HTML ``<h2>``) to the new paragraph, and **Save** the text once
+    more.
+
+    .. image:: /user/tutorial/images/apply-heading.png
+       :alt: select Heading 3 from the Format menu
+       :align: center
+
 .. image:: /user/tutorial/images/how_to_find_us_page.png
-   :alt: How to find us
+   :alt: the 'How to find us' section
 
 
 **********************

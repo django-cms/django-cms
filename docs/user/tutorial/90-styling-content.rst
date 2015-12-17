@@ -1,6 +1,6 @@
-##################
-Responsive layouts
-##################
+#############
+Page layout 1
+#############
 
 In this section you will learn how to:
 
