@@ -19,15 +19,14 @@ var CMS = window.CMS || {};
 
         /**
          * JSTree plugin used to synchronise the column width depending on the
-         * screen size. Hides rows from right to left and displays an additional
-         * menu row.
+         * screen size. Hides rows from right to left.
          */
         $.jstree.plugins.gridResize = function (options, parent) {
             var that = this;
             // this is how we register event handlers on jstree plugins
             this.bind = function () {
                 parent.bind.call(this);
-                // load `synchronise` on first load
+                // store elements after jstree is loaded and trigger initial states
                 this.element.on('ready.jstree', function () {
                     that.ui = {
                         window: $(window),
@@ -67,19 +66,22 @@ var CMS = window.CMS || {};
                     // without incorporating the very first column
                     for (var i = 1; i < that.snapshot.length; i++) {
                         var calc = 0;
+                        var condition1;
+                        var condition2;
+                        var idx = that.snapshot.length - i;
 
                         for (var x = 1; x < i; x++) {
                             calc = calc + that.snapshot.array[that.snapshot.length - x] || 0;
                         }
 
-                        if (
-                            (containerWidth < (that.snapshot.width - calc)) &&
-                            (index <= (that.snapshot.length - i + 1))
-                        ) {
-                            that.ui.cols.eq(that.snapshot.length - i).addClass('hidden');
-                            index = that.snapshot.length - i;
+                        condition1 = containerWidth < (that.snapshot.width - calc);
+                        condition2 = index <= (idx + 1);
+
+                        if (condition1 && condition2) {
+                            that.ui.cols.eq(idx).addClass('hidden');
+                            index = idx;
                         } else {
-                            that.ui.cols.eq(that.snapshot.length - i).removeClass('hidden');
+                            that.ui.cols.eq(idx).removeClass('hidden');
                         }
                     }
                 }
@@ -347,11 +349,9 @@ var CMS = window.CMS || {};
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
                 var msg = tpl.replace('{msg}', message);
 
-                if (messages.length) {
-                    messages.replaceWith(msg);
-                } else {
-                    breadcrumb.after(msg);
-                }
+                messages.length
+                    ? messages.replaceWith(msg)
+                    : breadcrumb.after(msg);
             }
 
         });
