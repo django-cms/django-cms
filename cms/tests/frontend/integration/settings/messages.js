@@ -58,6 +58,11 @@ module.exports = {
         switchLanguage: {
             noContentPreview: 'This page isn\'t available',
             newContentAvailable: 'New translation page appears'
+        },
+        editMode: {
+            editOff: 'The page is on edit off mode',
+            editOnByEditButton: 'The page is in edit mode after clicking on edit button',
+            editOnByNav: 'The page is in edit mode after clicking Page -> Edit this Page'
         }
     },
     users: {
