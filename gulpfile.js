@@ -181,6 +181,7 @@ gulp.task('tests:integration', function (done) {
         'createContent',
         'users',
         'newPage',
+        'switchLanguage',
         'logout',
         'loginToolbar'
     ];

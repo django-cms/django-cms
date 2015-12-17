@@ -49,6 +49,10 @@ module.exports = {
             noFilteredResults: 'No filtered results for random string',
             filteredPluginAvailable: 'There is text plugin available by the filter: text',
             newPluginVisible: 'Newly created text plugin can be seen on page'
+        },
+        switchLanguage: {
+            noContentPreview: 'This page isn\'t available',
+            newContentAvailable: 'New translation page appears'
         }
     },
     users: {
