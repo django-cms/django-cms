@@ -108,48 +108,51 @@
     <h2>{% trans "Pages" %}</h2>
 
     {# INFO: javascript is loaded from cms.pagetree.js #}
-    <div class="cms-pagetree js-cms-pagetree" data-json='{
-        "csrf": "{{ csrf_token }}",
-        "static": "{{ STATIC_URL }}",
-        "permission": "{{ CMS_PERMISSION|bool }}",
-        "debug": "{{ DEBUG|bool }}",
-        "filtered": "{{ cl.is_filtered|bool }}",
-        "lang": {
-            "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
-            "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
-            "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
-            "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
-            "loading": "{% trans "Loading..." %}"
-        },
-        "columns": [{
-            "title": "{% trans 'Pages' %}",
-            "key": ""
-        }, {
-            "title": "&nbsp;",
-            "key": "view"
-        }, {
-            "title": "{% trans 'View' %}",
-            "key": "preview"
-        }, {% for lang in site_languages %}{
-            "title": "{{ lang|upper }}",
-            "key": "{{ lang }}"
-        }, {% endfor %} {
-            "title": "{% trans 'Menu' %}",
-            "key": "menu"
-        }, {
-            "title": "{% trans 'Options' %}",
-            "key": "options"
-        }, {
-            "title": "{% trans 'Info' %}",
-            "key": "info"
-        }]
-    }'>
-        <ul>
-            {# loading the tree elements #}
-            {% for page in cl.get_items %}
-                {% show_admin_menu page %}
-            {% endfor %}
-        </ul>
+    <div class="cms-pagetree-container">
+        <div class="cms-pagetree js-cms-pagetree" data-json='{
+            "csrf": "{{ csrf_token }}",
+            "static": "{{ STATIC_URL }}",
+            "permission": "{{ CMS_PERMISSION|bool }}",
+            "debug": "{{ DEBUG|bool }}",
+            "filtered": "{{ cl.is_filtered|bool }}",
+            "lang": {
+                "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
+                "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
+                "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
+                "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
+                "loading": "{% trans "Loading..." %}"
+            },
+            "columns": [{
+                "title": "{% trans 'Pages' %}",
+                "key": "",
+                "width": "100%"
+            }, {
+                "title": "&nbsp;",
+                "key": "view"
+            }, {
+                "title": "{% trans 'View' %}",
+                "key": "preview"
+            }, {% for lang in site_languages %}{
+                "title": "{{ lang|upper }}",
+                "key": "{{ lang }}"
+            }, {% endfor %} {
+                "title": "{% trans 'Menu' %}",
+                "key": "menu"
+            }, {
+                "title": "{% trans 'Options' %}",
+                "key": "options"
+            }, {
+                "title": "{% trans 'Info' %}",
+                "key": "info"
+            }]
+        }'>
+            <ul>
+                {# loading the tree elements #}
+                {% for page in cl.get_items %}
+                    {% show_admin_menu page %}
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
     {% comment %}

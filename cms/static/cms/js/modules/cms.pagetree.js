@@ -17,37 +17,92 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(function () {
 
-        // shifts options element inside the node
-        $.jstree.plugins.options = function (options, parent) {
-            var buttons = '.cms-tree-data';
+        /**
+         * JSTree plugin used to synchronise the column width depending on the
+         * screen size. Hides rows from right to left.
+         */
+        $.jstree.plugins.gridResize = function (options, parent) {
+            var that = this;
+            // this is how we register event handlers on jstree plugins
+            this.bind = function () {
+                parent.bind.call(this);
+                // store elements after jstree is loaded and trigger initial states
+                this.element.on('ready.jstree', function () {
+                    that.ui = {
+                        window: $(window),
+                        cols: $('.jstree-grid-column'),
+                        container: $('.jstree-grid-wrapper'),
+                        inner: $('.jstree-grid-midwrapper')
+                    };
+                    that.timeout = 100;
+                    that.snapshot = [];
 
-            // what happens when redrawing
-            this.redraw_node = function (obj, deep, callback, force_draw) {
-                // default draw method
-                obj = parent.redraw_node.call(this, obj, deep, callback, force_draw);
-
-                // we need to append the options bar after the <li> as additional
-                // options cannot be rendered within an anchor
-                if (obj) {
-                    var el = $(obj);
-                    var tmp = el.find(buttons);
-
-                    el.append(tmp);
-                }
-
-                // return the object
-                return obj;
+                    // bind resize event and trigger
+                    that.ui.window.on('resize.jstree',
+                        CMS.API.Helpers.throttle(synchronise, that.timeout))
+                        .trigger('resize.jstree');
+                });
+                // reload snapshot when nodes are updated
+                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function (e) {
+                    that.snapshot = [];
+                });
             };
+
+            function synchronise() {
+                var containerWidth = that.ui.container.outerWidth(true);
+                var wrapperWidth = that.ui.inner.outerWidth(true);
+                // we do not now the smallest size possible at this stage,
+                // the "pages" section is automatically adapted to 100% to fill
+                // the screen. In order to get the correct breakpoints, we need
+                // to make a snapshot at the lowest point
+                if (!that.snapshot.length && (containerWidth < wrapperWidth)) {
+                    // store the current breakpoints
+                    that.snapshot = createSnapshot();
+                }
+                // only recalculate once the snapshot is available to save memory
+                if (that.snapshot.length) {
+                    var index = that.snapshot.length;
+                    // loops from most the most right to the most left column
+                    // without incorporating the very first column
+                    for (var i = 1; i < that.snapshot.length; i++) {
+                        var calc = 0;
+                        var condition1;
+                        var condition2;
+                        var idx = that.snapshot.length - i;
+
+                        for (var x = 1; x < i; x++) {
+                            calc = calc + that.snapshot.array[that.snapshot.length - x] || 0;
+                        }
+
+                        condition1 = containerWidth < (that.snapshot.width - calc);
+                        condition2 = index <= (idx + 1);
+
+                        if (condition1 && condition2) {
+                            that.ui.cols.eq(idx).addClass('hidden');
+                            index = idx;
+                        } else {
+                            that.ui.cols.eq(idx).removeClass('hidden');
+                        }
+                    }
+                }
+            }
+
+            function createSnapshot() {
+                var array = [];
+                // we need to get the real size of all visible columns added
+                that.ui.cols.each(function () {
+                    array.push($(this).outerWidth(true));
+                });
+                return {
+                    array: array,
+                    length: array.length,
+                    width: array.reduce(function (pv, cv) {
+                        return pv + cv;
+                    }, 0)
+                };
+            }
         };
 
-        /**
-         * TODO
-         *
-         * @class PageTree
-         * @namespace CMS
-         * @uses CMS.API.Helpers
-         */
-        // TODO col sync needs to be implemented when resizing
         // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
         // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
@@ -69,29 +124,67 @@ var CMS = window.CMS || {};
         *  'cms/page/' + item_id + '/move-page/
         *  > { position: position, target: target_id, site: site }
         */
+
+        /**
+         * The pagetree is loaded via `/admin/cms/page` and has a custom admin
+         * templates stored within `templates/admin/cms/page/tree`.
+         *
+         * @class PageTree
+         * @namespace CMS
+         * @uses CMS.API.Helpers
+         */
         CMS.PageTree = new CMS.Class({
 
             implement: [CMS.API.Helpers],
 
-            initialize: function initialize() {
-                this.container = $('.js-cms-pagetree');
-                this.options = this.container.data('json');
-                this.document = $(document);
+            initialize: function initialize(options) {
+                // options are loaded from the pagetree html node
+                this.options = $('.js-cms-pagetree').data('json');
+                this.options = $.extend(true, {}, this.options, options);
+
+                // elements
+                this._setupUI();
+
+                // states and events
+                this.click = 'click.cms.pagetree';
 
                 // make sure that ajax request send the csrf token
                 this.csrf(this.options.csrf);
 
+                // setup functionality
                 this._setup();
                 this._events();
                 this._setFilter();
                 this._setTooltips();
 
                 // make sure ajax post requests are working
-                this._setAjaxPost($('.js-cms-tree-item-menu a'));
-                this._setAjaxPost($('.js-cms-tree-lang-trigger'));
+                this._setAjaxPost('.js-cms-tree-item-menu a');
+                this._setAjaxPost('.js-cms-tree-lang-trigger');
             },
 
-            _setup: function () {
+            /**
+             * Stores all jQuery references within `this.ui`.
+             *
+             * @method _setupUI
+             * @private
+             */
+            _setupUI: function _setupUI() {
+                var pagetree = $('.cms-pagetree-container');
+                this.ui = {
+                    container: pagetree,
+                    document: $(document),
+                    tree: pagetree.find('.js-cms-pagetree')
+                };
+            },
+
+            /**
+             * Setting up the jstree and the related columns.
+             *
+             * @method _setup
+             * @private
+             */
+            _setup: function _setup() {
+                var that = this;
                 var columns = [];
 
                 // setup column headings
@@ -100,7 +193,8 @@ var CMS = window.CMS || {};
                         // the first row is already populated, to avoid overwrites
                         // just leave the "key" param empty
                         columns.push({
-                            header: obj.title
+                            header: obj.title,
+                            width: obj.width || '1%'
                         });
                     } else {
                         columns.push({
@@ -109,32 +203,26 @@ var CMS = window.CMS || {};
                                 // it needs to have the "colde" format and not "col-de"
                                 // as jstree will convert "col-de" to "colDe"
                                 return node.data['col' + obj.key];
-                            }
+                            },
+                            width: obj.width || '1%'
                         });
                     }
                 });
 
                 // bind options to the jstree instance
-                this.container.jstree({
+                this.ui.tree.jstree({
                     core: {
                         // disable open/close animations
                         animation: 0,
                         // core setting to allow actions
                         check_callback: true,
-                        // TODO need to add proper data delegation
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                         /*
                         data: {
-                            url: function (node) {
-                                if (node.id === '#') {
-                                    return './?ajax=true';
-                                } else {
-                                    return node.id + '/en/descendants/'
-                                }
-                            },
-                            data: function (node) {
-                                console.log(node);
-                                return undefined;
+                            url: 'get-tree/',
+                            data: {
+                                //pageId: 90,
+                                language: 'en'
                             }
                         },
                         */
@@ -145,18 +233,17 @@ var CMS = window.CMS || {};
                             'nodes': 'nodes'
                         },
                         error: function (error) {
-                            // TODO need to trigger an error
-                            alert(error.reason);
+                            that.showError(error.reason);
                         }
                         // TODO need to add theme capabilities
                     },
                     // activate drag and drop plugin
-                    plugins : ['dnd', 'search', 'grid', 'options'],
+                    plugins : ['dnd', 'search', 'grid', 'gridResize'],
                     // https://github.com/deitch/jstree-grid
                     grid: {
                         // columns are provided from base.html options
-                        columns: columns,
-                        resizable: true
+                        width: '100%',
+                        columns: columns
                     }
                 });
             },
@@ -164,21 +251,21 @@ var CMS = window.CMS || {};
             _events: function () {
                 var that = this;
 
-                this.container.on('click', '.cms-tree-item-move', function (e) {
+                this.ui.container.on('click', '.cms-tree-item-move', function (e) {
                     that._getNode($(e.target));
                 });
 
-                this.document.on('dnd_stop.vakata', function () {
+                this.ui.document.on('dnd_stop.vakata', function () {
                     console.log('stop drag&drop');
                 });
 
-                this.container.on('changed.jstree', function () {
+                this.ui.container.on('changed.jstree', function () {
                     console.log('trigger open');
                 });
             },
 
             _getNode: function (element) {
-                var tree = this.container.jstree();
+                var tree = this.ui.container.jstree();
                 var el = element.closest('li');
                 var obj = tree.get_node(el);
 
@@ -193,43 +280,78 @@ var CMS = window.CMS || {};
                 // TODO implement search filtering
             },
 
-            _setTooltips: function () {
+            /**
+             * Sets up general tooltips that can have a list of links or content.
+             *
+             * @method _setTooltips
+             * @private
+             */
+            _setTooltips: function _setTooltips() {
                 var that = this;
-                var triggers = $('.js-cms-tree-tooltip-trigger');
-                var containers = $('.js-cms-tree-tooltip-container');
+                var triggerCls = '.js-cms-tree-tooltip-trigger';
+                var containerCls = '.js-cms-tree-tooltip-container';
+                var triggers;
+                var containers;
 
                 // attach event to the trigger
-                triggers.on('click.pagetree', function (e) {
+                this.ui.container.on(this.click, triggerCls, function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
+
+                    triggers = $(triggerCls);
+                    containers = $(containerCls);
 
                     containers.removeClass('cms-tree-tooltip-container-open')
                         .eq(triggers.index(this))
                         .addClass('cms-tree-tooltip-container-open');
 
-                    that.document.on('click.pagetree', function () {
+                    that.ui.document.on(that.click, function () {
                         containers.removeClass('cms-tree-tooltip-container-open');
-                        that.document.off('click.pagetree');
+                        that.ui.document.off(that.click);
                     });
                 });
 
                 // stop propagnation on the element
-                containers.on('click', function (e) {
+                this.ui.container.on(this.click, containerCls, function (e) {
                     e.stopImmediatePropagation();
                 });
             },
 
-            _setAjaxPost: function (trigger) {
-                trigger.on('click', function (e) {
+            /**
+             * Triggers the links `href` as ajax post request.
+             *
+             * @method _setAjaxPost
+             * @private
+             * @param {jQuery} trigger jQuery link target
+             */
+            _setAjaxPost: function _setAjaxPost(trigger) {
+                var that = this;
+
+                this.ui.container.on(this.click, trigger, function (e) {
                     e.preventDefault();
                     $.post($(this).attr('href')).done(function () {
                         window.location.reload();
                     }).error(function (error) {
-                        // TODO implement proper errors
-                        alert('there was an error');
-                        console.log(error);
+                        that.showError(error.statusText);
                     });
                 });
+            },
+
+            /**
+             * Displays an error within the django UI.
+             *
+             * @method showError
+             * @param {String} message string message to display
+             */
+            showError: function showError(message) {
+                var messages = $('.messagelist');
+                var breadcrumb = $('.breadcrumbs');
+                var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
+                var msg = tpl.replace('{msg}', message);
+
+                messages.length
+                    ? messages.replaceWith(msg)
+                    : breadcrumb.after(msg);
             }
 
         });
