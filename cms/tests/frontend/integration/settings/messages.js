@@ -63,6 +63,12 @@ module.exports = {
             editOff: 'The page is on edit off mode',
             editOnByEditButton: 'The page is in edit mode after clicking on edit button',
             editOnByNav: 'The page is in edit mode after clicking Page -> Edit this Page'
+        },
+        editContent: {
+            contentUpdatedDoubleClick: 'Content has been updated by double click within the Content mode',
+            previousDoesntExist: 'Previous plugin content doesn\'t exist on page',
+            modalAppearsAfterEditButton: 'Modal window appears after Edit button click in the Structure mode',
+            contentUpdatedDoubleClickStructure: 'Content has been updated by double click within the Structure mode'
         }
     },
     users: {
