@@ -8,7 +8,8 @@ var messages = require('./settings/messages').users;
 
 casper.test.begin('Users Management', function (test) {
     casper
-        .start(globals.baseUrl, function () {
+        .start(globals.baseUrl)
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {

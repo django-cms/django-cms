@@ -40,6 +40,11 @@ module.exports = {
                 closed: 'The wizard pop up is closed',
                 formAvailable: 'The page creation wizard form is available'
             },
+            toolbar: {
+                modalOpened: 'The modal to add page is available',
+                addFail: 'Error message shows up if no data has been entered',
+                addOk: 'The new page has been created'
+            },
             admin: {
 
             }

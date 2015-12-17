@@ -9,8 +9,9 @@ var messages = require('./settings/messages').page.creation;
 
 casper.test.begin('Add First Page', function (test) {
     casper
-        .start(globals.editUrl, function () {
-            this.click('.cms-modal-close');
+        .start(globals.editUrl)
+        .waitUntilVisible('.cms-modal', function () {
+            this.click('.cms-modal .cms-modal-close');
         })
         .waitWhileVisible('.cms-modal', function () {
             test.assertNotVisible('.cms-modal', messages.wizard.closed);

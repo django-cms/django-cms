@@ -46,7 +46,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // submit Change pane modal
         .then(function () {
-            this.click('.cms-modal-open .cms-modal-item-buttons .cms-btn-action')
+            this.click('.cms-modal-open .cms-modal-item-buttons .cms-btn-action');
         })
         // check if german version appears
         .waitWhileVisible('.cms-modal-open', function () {
@@ -62,7 +62,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // submit translation deletion
         .waitUntilVisible('.cms-modal-open', function () {
-            this.click('.cms-modal-open .cms-modal-item-buttons .cms-btn.deletelink')
+            this.click('.cms-modal-open .cms-modal-item-buttons .cms-btn.deletelink');
         })
         // make sure translation has been deleted
         .waitWhileVisible('.cms-modal-open', function () {

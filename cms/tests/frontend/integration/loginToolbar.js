@@ -8,7 +8,8 @@ var messages = require('./settings/messages').login.toolbar;
 
 casper.test.begin('User Login (via Toolbar)', function (test) {
     casper
-        .start(globals.editUrl, function () {
+        .start(globals.editUrl)
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertExists('.cms-toolbar .cms-form-login', messages.toolbarAvailable);
 
             this.fill('.cms-form-login', globals.credentials, true);
