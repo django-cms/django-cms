@@ -6,9 +6,11 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.switchLanguage;
 var randomString = require('./helpers/randomString').randomString;
-
 // random text string for filtering and content purposes
 var randomText = randomString(10);
+// No Preview Template text
+var noPreviewText = 'This page has no preview';
+
 
 casper.test.begin('Switch language', function (test) {
     casper
@@ -23,8 +25,11 @@ casper.test.begin('Switch language', function (test) {
         })
         // no page should be here (warning message instead)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview',
-                messages.noContentPreview);
+            test.assertSelectorHasText(
+                '.cms-screenblock-inner h1',
+                noPreviewText,
+                messages.noContentPreview
+            );
             this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
         })
         // add german translation
@@ -61,8 +66,11 @@ casper.test.begin('Switch language', function (test) {
         })
         // make sure translation has been deleted
         .waitWhileVisible('.cms-modal-open', function () {
-            test.assertSelectorHasText('.cms-screenblock-inner h1', 'This page has no preview',
-                messages.noContentPreview);
+            test.assertSelectorHasText(
+                '.cms-screenblock-inner h1',
+                noPreviewText,
+                messages.noContentPreview
+            );
         })
         .run(function () {
             test.done();
