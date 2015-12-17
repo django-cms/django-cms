@@ -22,84 +22,84 @@ var CMS = window.CMS || {};
          * screen size. Hides rows from right to left and displays an additional
          * menu row.
          */
-$.jstree.plugins.gridResize = function (options, parent) {
-    var that = this;
-    // this is how we register event handlers on jstree plugins
-    this.bind = function () {
-        parent.bind.call(this);
-        // load `synchronise` on first load
-        this.element.on('ready.jstree', function () {
-            that.ui = {
-                window: $(window),
-                cols: $('.jstree-grid-column'),
-                container: $('.jstree-grid-wrapper'),
-                inner: $('.jstree-grid-midwrapper')
+        $.jstree.plugins.gridResize = function (options, parent) {
+            var that = this;
+            // this is how we register event handlers on jstree plugins
+            this.bind = function () {
+                parent.bind.call(this);
+                // load `synchronise` on first load
+                this.element.on('ready.jstree', function () {
+                    that.ui = {
+                        window: $(window),
+                        cols: $('.jstree-grid-column'),
+                        container: $('.jstree-grid-wrapper'),
+                        inner: $('.jstree-grid-midwrapper')
+                    };
+                    that.timeout = 100;
+                    that.snapshot = [];
+
+                    // bind resize event and trigger
+                    that.ui.window.on('resize.jstree',
+                        CMS.API.Helpers.throttle(synchronise, that.timeout))
+                        .trigger('resize.jstree');
+                });
+                // reload snapshot when nodes are updated
+                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function (e) {
+                    that.snapshot = [];
+                });
             };
-            that.timeout = 100;
-            that.snapshot = [];
 
-            // bind resize event and trigger
-            that.ui.window.on('resize.jstree',
-                CMS.API.Helpers.throttle(synchronise, that.timeout))
-                .trigger('resize.jstree');
-        });
-        // reload snapshot when nodes are updated
-        this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function (e) {
-            that.snapshot = [];
-        });
-    };
-
-    function synchronise() {
-        var containerWidth = that.ui.container.outerWidth(true);
-        var wrapperWidth = that.ui.inner.outerWidth(true);
-        // we do not now the smallest size possible at this stage,
-        // the "pages" section is automatically adapted to 100% to fill
-        // the screen. In order to get the correct breakpoints, we need
-        // to make a snapshot at the lowest point
-        if (!that.snapshot.length && (containerWidth < wrapperWidth)) {
-            // store the current breakpoints
-            that.snapshot = createSnapshot();
-        }
-        // only recalculate once the snapshot is available to save memory
-        if (that.snapshot.length) {
-            var index = that.snapshot.length;
-            // loops from most the most right to the most left column
-            // without incorporating the very first column
-            for (var i = 1; i < that.snapshot.length; i++) {
-                var calc = 0;
-
-                for (var x = 1; x < i; x++) {
-                    calc = calc + that.snapshot.array[that.snapshot.length - x] || 0;
+            function synchronise() {
+                var containerWidth = that.ui.container.outerWidth(true);
+                var wrapperWidth = that.ui.inner.outerWidth(true);
+                // we do not now the smallest size possible at this stage,
+                // the "pages" section is automatically adapted to 100% to fill
+                // the screen. In order to get the correct breakpoints, we need
+                // to make a snapshot at the lowest point
+                if (!that.snapshot.length && (containerWidth < wrapperWidth)) {
+                    // store the current breakpoints
+                    that.snapshot = createSnapshot();
                 }
+                // only recalculate once the snapshot is available to save memory
+                if (that.snapshot.length) {
+                    var index = that.snapshot.length;
+                    // loops from most the most right to the most left column
+                    // without incorporating the very first column
+                    for (var i = 1; i < that.snapshot.length; i++) {
+                        var calc = 0;
 
-                if (
-                    (containerWidth < (that.snapshot.width - calc)) &&
-                    (index <= (that.snapshot.length - i + 1))
-                ) {
-                    that.ui.cols.eq(that.snapshot.length - i).addClass('hidden');
-                    index = that.snapshot.length - i;
-                } else {
-                    that.ui.cols.eq(that.snapshot.length - i).removeClass('hidden');
+                        for (var x = 1; x < i; x++) {
+                            calc = calc + that.snapshot.array[that.snapshot.length - x] || 0;
+                        }
+
+                        if (
+                            (containerWidth < (that.snapshot.width - calc)) &&
+                            (index <= (that.snapshot.length - i + 1))
+                        ) {
+                            that.ui.cols.eq(that.snapshot.length - i).addClass('hidden');
+                            index = that.snapshot.length - i;
+                        } else {
+                            that.ui.cols.eq(that.snapshot.length - i).removeClass('hidden');
+                        }
+                    }
                 }
             }
-        }
-    }
 
-    function createSnapshot() {
-        var array = [];
-        // we need to get the real size of all visible columns added
-        that.ui.cols.each(function () {
-            array.push($(this).outerWidth(true));
-        });
-        return {
-            array: array,
-            length: array.length,
-            width: array.reduce(function (pv, cv) {
-                return pv + cv;
-            }, 0)
+            function createSnapshot() {
+                var array = [];
+                // we need to get the real size of all visible columns added
+                that.ui.cols.each(function () {
+                    array.push($(this).outerWidth(true));
+                });
+                return {
+                    array: array,
+                    length: array.length,
+                    width: array.reduce(function (pv, cv) {
+                        return pv + cv;
+                    }, 0)
+                };
+            }
         };
-    }
-};
 
         // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
