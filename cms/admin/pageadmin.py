@@ -1258,8 +1258,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def get_tree(self, request):
         """
-        Get html for descendants of given page or if no page_id is provided, the
-        whole tree.
+        Get html for the descendants (only) of given page or if no page_id is
+        provided, all the root nodes.
 
         Used for lazy loading pages in cms.changelist.js
 
@@ -1268,13 +1268,14 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         page_id = request.GET.get('pageId', None)
         language = request.GET.get('language', None)
-        open_nodes = request.GET.get('openNodes', [])
+        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
 
         if language is None:
             language = (request.GET.get('language') or
                         get_language_from_request(request))
         if page_id:
-            pages = [get_object_or_404(self.model, pk=int(page_id))]
+            page = get_object_or_404(self.model, pk=int(page_id))
+            pages = list(page.get_descendants(include_self=False))
         else:
             pages = Page.get_root_nodes().filter(publisher_is_draft=True)
 
