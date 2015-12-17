@@ -1268,10 +1268,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         page_id = request.GET.get('pageId', None)
         language = request.GET.get('language', None)
+        open_nodes = request.GET.get('openNodes', [])
 
         if language is None:
-            language = request.GET.get('language') or get_language_from_request(request)
-
+            language = (request.GET.get('language') or
+                        get_language_from_request(request))
         if page_id:
             pages = [get_object_or_404(self.model, pk=int(page_id))]
         else:
@@ -1280,9 +1281,12 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         template = "admin/cms/page/tree/lazy_menu.html"
         response = u""
         for page in pages:
-            response += admin_utils.render_admin_menu_item(request, page,
-                                                           template=template,
-                                                           language=language)
+            response += admin_utils.render_admin_menu_item(
+                request, page,
+               template=template,
+               language=language,
+               open_nodes=open_nodes,
+           )
         return HttpResponse(response)
 
     def add_page_type(self, request):

@@ -91,7 +91,8 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
     return context
 
 
-def render_admin_menu_item(request, page, template=None, language=None):
+def render_admin_menu_item(request, page, template=None, language=None,
+                           open_nodes=()):
     """
     Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
@@ -108,6 +109,7 @@ def render_admin_menu_item(request, page, template=None, language=None):
     context = {
         'has_add_permission': permissions.has_page_add_permission(request),
         'site_languages': languages,
+        'open_nodes': open_nodes,
     }
     filtered = 'filtered' in request.GET or 'filtered' in request.POST
     context.update(get_admin_menu_item_context(request, page, filtered, language))

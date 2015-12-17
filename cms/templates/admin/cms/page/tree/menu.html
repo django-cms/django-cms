@@ -168,7 +168,7 @@
     {% endlanguage %}
 
     {# INFO render children #}
-    {% if children %}
+    {% if page.pk in open_nodes and children %}
         <ul>
             {% for child in children %}
                 {% show_lazy_admin_menu child %}
