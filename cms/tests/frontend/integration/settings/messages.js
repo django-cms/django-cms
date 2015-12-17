@@ -53,6 +53,12 @@ module.exports = {
         switchLanguage: {
             noContentPreview: 'This page isn\'t available',
             newContentAvailable: 'New translation page appears'
+        },
+        editContent: {
+            contentUpdatedDoubleClick: 'Content has been updated by double click within the Content mode',
+            previousDoesntExist: 'Previous plugin content doesn\'t exist on page',
+            modalAppearsAfterEditButton: 'Modal window appears after Edit button click in the Structure mode',
+            contentUpdatedDoubleClickStructure: 'Content has been updated by double click within the Structure mode',
         }
     },
     users: {
