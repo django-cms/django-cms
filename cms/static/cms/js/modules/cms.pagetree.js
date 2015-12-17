@@ -103,7 +103,6 @@ var CMS = window.CMS || {};
             }
         };
 
-        // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
         // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
         // TODO make sure static path is not hard coded
@@ -277,7 +276,13 @@ var CMS = window.CMS || {};
             },
 
             _setFilter: function () {
-                // TODO implement search filtering
+                var trigger = $('.js-cms-tree-filter-trigger');
+                var container = $('.js-cms-tree-filter-container');
+
+                trigger.on('click', function (e) {
+                    e.preventDefalt();
+                    container.toggleClass('hidden');
+                });
             },
 
             /**

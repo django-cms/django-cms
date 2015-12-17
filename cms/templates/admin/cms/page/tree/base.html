@@ -91,10 +91,10 @@
 {% block filters %}
     {# TODO this should be untouched #}
     {% if cl.has_filters %}
-        <a href="#" id="changelist-filter-button">
+        <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
             {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
         </a>
-        <div id="changelist-filter" hidden="hidden">
+        <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
             <h2>{% trans "Filter" %}</h2>
             {% for spec in cl.filter_specs %}
                 {% clean_admin_list_filter cl spec %}
@@ -108,6 +108,7 @@
     <h2>{% trans "Pages" %}</h2>
 
     {# INFO: javascript is loaded from cms.pagetree.js #}
+    {% if cl.get_items %}
     <div class="cms-pagetree-container">
         <div class="cms-pagetree js-cms-pagetree" data-json='{
             "csrf": "{{ csrf_token }}",
@@ -154,6 +155,7 @@
             </ul>
         </div>
     </div>
+    {% endif %}
 
     {% comment %}
     {# CREATING MULTIPLE TREES IS POSSIBLE #}
