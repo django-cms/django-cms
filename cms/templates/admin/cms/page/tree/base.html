@@ -120,6 +120,7 @@
                 "debug": "{{ DEBUG|bool }}",
                 "filtered": "{{ cl.is_filtered|bool }}",
                 "lang": {
+                    "code": "{{ LANGUAGE_CODE|lower }}",
                     "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
                     "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
                     "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",

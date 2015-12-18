@@ -185,6 +185,10 @@ var CMS = window.CMS || {};
             _setup: function _setup() {
                 var that = this;
                 var columns = [];
+                var obj = {
+                    language: this.options.lang.code,
+                    openNodes: []
+                };
 
                 // setup column headings
                 $.each(this.options.columns, function (index, obj) {
@@ -218,10 +222,22 @@ var CMS = window.CMS || {};
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                         data: {
                             url: 'get-tree/',
-                            data: {
-                                //pageId: 116,
-                                //openNodes: [119],
-                                language: 'en'
+                            data: function (node) {
+                                // '#' is rendered if its the root node, there we only
+                                // care about `obj.openNodes`, in the following case
+                                // we are requesting a specific node
+                                if (node.id !== '#') {
+                                    obj.pageId = that._setNode(node.data.id);
+                                }
+
+                                // we need to store the opened items inside the localstorage
+                                // as we have to load the pagetree with the previous opened
+                                // state
+                                if (localStorage.getItem('cms_test_storage')) {
+                                    obj.openNodes = that._getNodes();
+                                }
+
+                                return obj;
                             }
                         },
                         // strings used within jstree that are called using `get_string`
@@ -249,29 +265,57 @@ var CMS = window.CMS || {};
             _events: function () {
                 var that = this;
 
-                this.ui.container.on('click', '.cms-tree-item-move', function (e) {
-                    that._getNode($(e.target));
+                this.ui.tree.on('after_close.jstree', function (e, el) {
+                    that._removeNode(el.node.data.id);
                 });
-
-                this.ui.document.on('dnd_stop.vakata', function () {
-                    console.log('stop drag&drop');
-                });
-
-                this.ui.container.on('changed.jstree', function () {
-                    console.log('trigger open');
+                this.ui.tree.on('after_open.jstree', function (e, el) {
+                    that._setNode(el.node.data.id);
                 });
             },
 
-            _getNode: function (element) {
-                var tree = this.ui.container.jstree();
-                var el = element.closest('li');
-                var obj = tree.get_node(el);
+            /**
+             * Stores a node id in local storage.
+             *
+             * @method _setNode
+             * @param {String} id to be stored
+             * @returns {String} id to be stored
+             * @private
+             */
+            _setNode: function _setNode(id) {
+                // TODO make this more dynamic using cms settings
+                var storage = localStorage.getItem('cms_test_storage');
+                storage = (storage) ? storage.split(',') : [];
+                if (storage.indexOf(id) === -1) {
+                    storage.push(id.toString());
+                }
+                localStorage.setItem('cms_test_storage', storage);
+                return id;
+            },
 
-                // TODO move capabilities
-                console.log(obj);
+            /**
+             * Removes a node id in local storage.
+             *
+             * @method _setNode
+             * @param {String} id to be stored
+             * @returns {String} id to be stored
+             * @private
+             */
+            _removeNode: function (id) {
+                var storage = localStorage.getItem('cms_test_storage');
+                storage = (storage) ? storage.split(',') : [];
+                storage = storage.splice(storage.indexOf(id), 1);
+                localStorage.setItem('cms_test_storage', storage);
+                return id;
+            },
 
-                // mock node
-                tree.move_node(obj, tree.get_node(el.prev()), 'last');
+            /**
+             * Retreives nodes from local storage.
+             *
+             * @method _getNodes
+             * @private
+             */
+            _getNodes: function _getNodes() {
+                return localStorage.getItem('cms_test_storage').split(',');
             },
 
             /**

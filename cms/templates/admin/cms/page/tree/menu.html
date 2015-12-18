@@ -8,6 +8,7 @@
     {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
     {% if not CMS_PERMISSION or has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     "
+    data-id="{{ page.id }}"
     data-colview='
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-icons">
