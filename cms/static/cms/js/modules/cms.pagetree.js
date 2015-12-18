@@ -43,7 +43,7 @@ var CMS = window.CMS || {};
                         .trigger('resize.jstree');
                 });
                 // reload snapshot when nodes are updated
-                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function (e) {
+                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function () {
                     that.snapshot = [];
                 });
             };
@@ -366,9 +366,7 @@ var CMS = window.CMS || {};
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
                 var msg = tpl.replace('{msg}', message);
 
-                messages.length
-                    ? messages.replaceWith(msg)
-                    : breadcrumb.after(msg);
+                messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
             }
 
         });
