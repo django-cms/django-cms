@@ -39,11 +39,13 @@ standard Bootstrap 3 CSS.
 Disqus
 ======
 
-Add comment thread functionality courtesy of `Disqus <https://disqus.com>`_.
+Adds comment thread functionality to any page in your site, courtesy of `Disqus
+<https://disqus.com>`_.
 
 .. image:: /user/tutorial/images/disqus_plugin.png
-    :alt: Disqus plugin
+    :alt: the Disqus plugin allows users to comment on your pages
     :align: center
+    :width: 619
 
 .. note::
 
