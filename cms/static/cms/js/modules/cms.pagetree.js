@@ -153,6 +153,7 @@ var CMS = window.CMS || {};
                 // setup functionality
                 this._setup();
                 this._events();
+                this._setCopy();
                 this._setFilter();
                 this._setTooltips();
 
@@ -221,7 +222,7 @@ var CMS = window.CMS || {};
                         check_callback: true,
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                         data: {
-                            url: 'get-tree/',
+                            url: this.options.url,
                             data: function (node) {
                                 // '#' is rendered if its the root node, there we only
                                 // care about `obj.openNodes`, in the following case
@@ -240,14 +241,16 @@ var CMS = window.CMS || {};
                         },
                         // strings used within jstree that are called using `get_string`
                         strings: {
-                            'Loading ...': 'Loading ...',
-                            'New node': 'New node',
-                            'nodes': 'nodes'
+                            'Loading ...': this.options.lang.loading,
+                            'New node': this.options.lang.newNode,
+                            'nodes': this.options.lang.nodes
                         },
                         error: function (error) {
                             that.showError(error.reason);
+                        },
+                        themes: {
+                            name: 'default'
                         }
-                        // TODO need to add theme capabilities
                     },
                     // activate drag and drop plugin
                     plugins : ['dnd', 'search', 'grid', 'gridResize'],
@@ -263,6 +266,7 @@ var CMS = window.CMS || {};
             _events: function () {
                 var that = this;
 
+                // set events for the nodeId updates
                 this.ui.tree.on('after_close.jstree', function (e, el) {
                     that._removeNode(el.node.data.id);
                 });
@@ -409,6 +413,11 @@ var CMS = window.CMS || {};
                         that.showError(error.statusText);
                     });
                 });
+            },
+
+            // TODO add title
+            _setCopy: function () {
+
             },
 
             /**

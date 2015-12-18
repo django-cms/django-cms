@@ -1,8 +1,6 @@
 {% extends "admin/change_list.html" %}
 {% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags %}
 
-{# admin_list admin_urls cms_admin cms_js_tags #}
-
 {# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
@@ -71,7 +69,7 @@
     {# TODO integrate site selector #}
     {# TODO standard search form #}
     {# search_form cl #}
-    <form action="." method="get" class="cms-tree-search" id="changelist-search">
+    <form method="get" class="cms-tree-search" id="changelist-search">
         <label for="field-search">{% trans "Search" %}</label>
         <input type="text" name="q" id="field-search" value="{{ request.GET.q }}">
 
@@ -114,6 +112,7 @@
         {# INFO: javascript is loaded from cms.pagetree.js #}
         <div class="cms-pagetree-container">
             <div class="cms-pagetree js-cms-pagetree" data-json='{
+                "url": "{% url 'admin:get_tree' %}",
                 "csrf": "{{ csrf_token }}",
                 "static": "{{ STATIC_URL }}",
                 "permission": "{{ CMS_PERMISSION|bool }}",
@@ -125,7 +124,9 @@
                     "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
                     "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
                     "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
-                    "loading": "{% trans "Loading..." %}"
+                    "loading": "{% trans "Loading..." %}",
+                    "newNode": "{% trans 'New node' %}",
+                    "nodes": "{% trans 'nodes' %}"
                 },
                 "columns": [{
                     "title": "{% trans 'Pages' %}",
