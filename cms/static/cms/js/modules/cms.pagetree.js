@@ -272,6 +272,19 @@ var CMS = window.CMS || {};
             },
 
             /**
+             * Retreives a list of nodes from local storage.
+             *
+             * @method _getNodes
+             * @private
+             * @return {Array} list of ids
+             */
+            _getNodes: function _getNodes() {
+                var storage = localStorage.getItem('cms_test_storage');
+
+                return (storage) ? storage.split(',') : [];
+            },
+
+            /**
              * Stores a node in local storage.
              *
              * @method _setNode
@@ -289,7 +302,6 @@ var CMS = window.CMS || {};
 
                 localStorage.setItem('cms_test_storage', storage);
 
-                console.log(storage);
                 return number;
             },
 
@@ -304,27 +316,16 @@ var CMS = window.CMS || {};
             _removeNode: function (id) {
                 var number = id.toString();
                 var storage = this._getNodes();
+                var index = storage.indexOf(number);
+
                 // remove given id from storage
-                storage = storage.splice(storage.indexOf(number), 1);
+                if (index !== -1) {
+                    storage.splice(index, 1);
+                }
 
                 localStorage.setItem('cms_test_storage', storage);
 
-                console.log(storage);
                 return number;
-            },
-
-            /**
-             * Retreives a list of nodes from local storage.
-             *
-             * @method _getNodes
-             * @private
-             * @return {Array} list of ids
-             */
-            _getNodes: function _getNodes() {
-                var storage = localStorage.getItem('cms_test_storage');
-
-                console.log(storage);
-                return (storage) ? storage.split(',') : [];
             },
 
             /**
