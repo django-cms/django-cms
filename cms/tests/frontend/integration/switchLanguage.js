@@ -7,7 +7,7 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.switchLanguage;
 var randomString = require('./helpers/randomString').randomString;
 // random text string for filtering and content purposes
-var randomText = randomString({ length:50, withWhitespaces: true });
+var randomText = randomString({ length: 50, withWhitespaces: true });
 // No Preview Template text
 var noPreviewText = 'This page has no preview';
 
