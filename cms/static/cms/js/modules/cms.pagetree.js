@@ -233,9 +233,7 @@ var CMS = window.CMS || {};
                                 // we need to store the opened items inside the localstorage
                                 // as we have to load the pagetree with the previous opened
                                 // state
-                                if (localStorage.getItem('cms_test_storage')) {
-                                    obj.openNodes = that._getNodes();
-                                }
+                                obj.openNodes = that._getNodes();
 
                                 return obj;
                             }
@@ -274,48 +272,59 @@ var CMS = window.CMS || {};
             },
 
             /**
-             * Stores a node id in local storage.
+             * Stores a node in local storage.
              *
              * @method _setNode
-             * @param {String} id to be stored
-             * @returns {String} id to be stored
              * @private
+             * @param {String} id to be stored
+             * @return {String} id that has been stored
              */
             _setNode: function _setNode(id) {
-                // TODO make this more dynamic using cms settings
-                var storage = localStorage.getItem('cms_test_storage');
-                storage = (storage) ? storage.split(',') : [];
-                if (storage.indexOf(id) === -1) {
-                    storage.push(id.toString());
+                var number = id.toString();
+                var storage = this._getNodes();
+                // store value only if it isn't there yet
+                if (storage.indexOf(number) === -1) {
+                    storage.push(number);
                 }
+
                 localStorage.setItem('cms_test_storage', storage);
-                return id;
+
+                console.log(storage);
+                return number;
             },
 
             /**
-             * Removes a node id in local storage.
+             * Removes a node in local storage.
              *
              * @method _setNode
-             * @param {String} id to be stored
-             * @returns {String} id to be stored
              * @private
+             * @param {String} id to be stored
+             * @return {String} id that has been removed
              */
             _removeNode: function (id) {
-                var storage = localStorage.getItem('cms_test_storage');
-                storage = (storage) ? storage.split(',') : [];
-                storage = storage.splice(storage.indexOf(id), 1);
+                var number = id.toString();
+                var storage = this._getNodes();
+                // remove given id from storage
+                storage = storage.splice(storage.indexOf(number), 1);
+
                 localStorage.setItem('cms_test_storage', storage);
-                return id;
+
+                console.log(storage);
+                return number;
             },
 
             /**
-             * Retreives nodes from local storage.
+             * Retreives a list of nodes from local storage.
              *
              * @method _getNodes
              * @private
+             * @return {Array} list of ids
              */
             _getNodes: function _getNodes() {
-                return localStorage.getItem('cms_test_storage').split(',');
+                var storage = localStorage.getItem('cms_test_storage');
+
+                console.log(storage);
+                return (storage) ? storage.split(',') : [];
             },
 
             /**
