@@ -43,7 +43,7 @@ var CMS = window.CMS || {};
                         .trigger('resize.jstree');
                 });
                 // reload snapshot when nodes are updated
-                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function (e) {
+                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function () {
                     that.snapshot = [];
                 });
             };
@@ -103,7 +103,6 @@ var CMS = window.CMS || {};
             }
         };
 
-        // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
         // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
         // TODO make sure static path is not hard coded
@@ -276,8 +275,31 @@ var CMS = window.CMS || {};
                 tree.move_node(obj, tree.get_node(el.prev()), 'last');
             },
 
-            _setFilter: function () {
-                // TODO implement search filtering
+            /**
+             * Handles filter button display (Filter: Off).
+             *
+             * @method _setFilter
+             * @private
+             */
+            _setFilter: function _setFilter() {
+                var that = this;
+                var trigger = $('.js-cms-tree-filter-trigger');
+                var container = $('.js-cms-tree-filter-container');
+
+                trigger.on(this.click, function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    container.toggleClass('hidden');
+
+                    that.ui.document.one(that.click, function () {
+                        container.addClass('hidden');
+                    });
+                });
+
+                container.on(that.click, function (e) {
+                    e.stopImmediatePropagation();
+                });
             },
 
             /**
@@ -305,9 +327,8 @@ var CMS = window.CMS || {};
                         .eq(triggers.index(this))
                         .addClass('cms-tree-tooltip-container-open');
 
-                    that.ui.document.on(that.click, function () {
+                    that.ui.document.one(that.click, function () {
                         containers.removeClass('cms-tree-tooltip-container-open');
-                        that.ui.document.off(that.click);
                     });
                 });
 
@@ -349,9 +370,7 @@ var CMS = window.CMS || {};
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
                 var msg = tpl.replace('{msg}', message);
 
-                messages.length
-                    ? messages.replaceWith(msg)
-                    : breadcrumb.after(msg);
+                messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
             }
 
         });
