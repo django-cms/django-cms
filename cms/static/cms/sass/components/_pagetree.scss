@@ -228,6 +228,39 @@ $pagetree-tooltip-min-width: 130px;
 }
 
 //###########################################################
+// SEARCH & FILTERING
+// searchform or filtering
+.cms-tree-search {
+    float: left;
+    input[type="text"],
+    select {
+        width: auto !important;
+    }
+    input[type="submit"] {
+        margin-left: 0 !important;
+    }
+    label {
+        display: none;
+    }
+}
+
+.cms-tree-filters {
+    float: right;
+    .js-cms-tree-filter-trigger {
+        position: absolute;
+        top: 0;
+        right: 0;
+        line-height: 30px;
+        width: 175px;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    h2 {
+        display: none;
+    }
+}
+
+
+//###########################################################
 // TREE HACKS (temporary)
 .jstree-grid-column,
 .jstree-grid-cell {

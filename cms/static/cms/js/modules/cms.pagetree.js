@@ -19,31 +19,33 @@ var CMS = window.CMS || {};
 
         /**
          * JSTree plugin used to synchronise the column width depending on the
-         * screen size. Hides rows from right to left and displays an additional
-         * menu row.
+         * screen size. Hides rows from right to left.
          */
         $.jstree.plugins.gridResize = function (options, parent) {
             var that = this;
-
-            this.ui = {
-                window: $(window)
-            };
-            this.timeout = 100;
-
             // this is how we register event handlers on jstree plugins
             this.bind = function () {
                 parent.bind.call(this);
-                // load `synchronise` on first load
+                // store elements after jstree is loaded and trigger initial states
                 this.element.on('ready.jstree', function () {
-                    that.ui.cols = $('.jstree-grid-column');
-                    that.ui.container = $('.jstree-grid-wrapper');
-                    that.ui.inner = $('.jstree-grid-midwrapper');
-                    that.breakpoints = [];
-                    that.processed = [];
-                    // trigger first `synchronise`
-                    that.ui.window.trigger('resize.jstree');
+                    that.ui = {
+                        window: $(window),
+                        cols: $('.jstree-grid-column'),
+                        container: $('.jstree-grid-wrapper'),
+                        inner: $('.jstree-grid-midwrapper')
+                    };
+                    that.timeout = 100;
+                    that.snapshot = [];
+
+                    // bind resize event and trigger
+                    that.ui.window.on('resize.jstree',
+                        CMS.API.Helpers.throttle(synchronise, that.timeout))
+                        .trigger('resize.jstree');
                 });
-                // TODO attach events on drag&drop or open&close
+                // reload snapshot when nodes are updated
+                this.element.on('redraw.jstree after_open.jstree after_close.jstree dnd_stop.vakata', function () {
+                    that.snapshot = [];
+                });
             };
 
             function synchronise() {
@@ -53,36 +55,36 @@ var CMS = window.CMS || {};
                 // the "pages" section is automatically adapted to 100% to fill
                 // the screen. In order to get the correct breakpoints, we need
                 // to make a snapshot at the lowest point
-                if (!that.breakpoints.length && (containerWidth < wrapperWidth)) {
-                    that.breakpoints = createSnapshot();
+                if (!that.snapshot.length && (containerWidth < wrapperWidth)) {
+                    // store the current breakpoints
+                    that.snapshot = createSnapshot();
                 }
-                // these vars are available after breakpoints is triggered
-                var breakpointSum = that.breakpoints.reduce(function(pv, cv) { return pv + cv; }, 0);
-                var colsFiltered = that.ui.cols.filter(':visible');
-                var index = colsFiltered.length - 1;
+                // only recalculate once the snapshot is available to save memory
+                if (that.snapshot.length) {
+                    var index = that.snapshot.length;
+                    // loops from most the most right to the most left column
+                    // without incorporating the very first column
+                    for (var i = 1; i < that.snapshot.length; i++) {
+                        var calc = 0;
+                        var condition1;
+                        var condition2;
+                        var idx = that.snapshot.length - i;
 
-                // hide or show elements according to their sum
+                        for (var x = 1; x < i; x++) {
+                            calc = calc + that.snapshot.array[that.snapshot.length - x] || 0;
+                        }
 
-                console.clear();
-                console.log(that.breakpoints);
+                        condition1 = containerWidth < (that.snapshot.width - calc);
+                        condition2 = index <= (idx + 1);
 
-                console.log(that.breakpoints[index] || 0);
-                console.log(breakpointSum, containerWidth);
-
-                if (containerWidth < breakpointSum) {
-                    that.processed.push(that.breakpoints.pop());
+                        if (condition1 && condition2) {
+                            that.ui.cols.eq(idx).addClass('hidden');
+                            index = idx;
+                        } else {
+                            that.ui.cols.eq(idx).removeClass('hidden');
+                        }
+                    }
                 }
-
-                console.log(that.processed);
-
-                /*
-                if (wrapper.outerWidth(true) < colsWidth) {
-                    cols.eq(colsIndex).addClass('hidden');
-                } else if (false) {
-                    //cols.removeClass('hidden');
-                    //colsArray.pop();
-                }
-                */
             }
 
             function createSnapshot() {
@@ -91,15 +93,16 @@ var CMS = window.CMS || {};
                 that.ui.cols.each(function () {
                     array.push($(this).outerWidth(true));
                 });
-                return array;
+                return {
+                    array: array,
+                    length: array.length,
+                    width: array.reduce(function (pv, cv) {
+                        return pv + cv;
+                    }, 0)
+                };
             }
-
-            // bind resize event
-            this.ui.window.on('resize.jstree',
-                CMS.API.Helpers.throttle(synchronise, this.timeout));
         };
 
-        // TODO we need to implement the hover filtering
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
         // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
         // TODO make sure static path is not hard coded
@@ -271,8 +274,31 @@ var CMS = window.CMS || {};
                 tree.move_node(obj, tree.get_node(el.prev()), 'last');
             },
 
-            _setFilter: function () {
-                // TODO implement search filtering
+            /**
+             * Handles filter button display (Filter: Off).
+             *
+             * @method _setFilter
+             * @private
+             */
+            _setFilter: function _setFilter() {
+                var that = this;
+                var trigger = $('.js-cms-tree-filter-trigger');
+                var container = $('.js-cms-tree-filter-container');
+
+                trigger.on(this.click, function (e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    container.toggleClass('hidden');
+
+                    that.ui.document.one(that.click, function () {
+                        container.addClass('hidden');
+                    });
+                });
+
+                container.on(that.click, function (e) {
+                    e.stopImmediatePropagation();
+                });
             },
 
             /**
@@ -300,9 +326,8 @@ var CMS = window.CMS || {};
                         .eq(triggers.index(this))
                         .addClass('cms-tree-tooltip-container-open');
 
-                    that.ui.document.on(that.click, function () {
+                    that.ui.document.one(that.click, function () {
                         containers.removeClass('cms-tree-tooltip-container-open');
-                        that.ui.document.off(that.click);
                     });
                 });
 
@@ -344,11 +369,7 @@ var CMS = window.CMS || {};
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
                 var msg = tpl.replace('{msg}', message);
 
-                if (messages.length) {
-                    messages.replaceWith(msg);
-                } else {
-                    breadcrumb.after(msg);
-                }
+                messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
             }
 
         });

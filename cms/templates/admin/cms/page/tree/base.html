@@ -71,16 +71,18 @@
     {# TODO integrate site selector #}
     {# TODO standard search form #}
     {# search_form cl #}
-    <form action="." method="get" hidden="hidden">
+    <form action="." method="get" class="cms-tree-search" id="changelist-search">
         <label for="field-search">{% trans "Search" %}</label>
         <input type="text" name="q" id="field-search" value="{{ request.GET.q }}">
 
-        <label for="field-search-site">{% trans "Pages on:" %}</label>
-        <select name="site__exact" id="field-search-site">
-            {% for site in cl.sites %}
-            <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected="selected"{% endif %}>{{ site.name }}</option>
-            {% endfor %}
-        </select>
+        {% if cl.sites.count > 1 %}
+            <label for="field-search-site">{% trans "Pages on:" %}</label>
+            <select name="site__exact" id="field-search-site">
+                {% for site in cl.sites %}
+                    <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected="selected"{% endif %}>{{ site.name }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
 
         <input type="submit" value="{% trans "Search" %}">
         <input type="hidden" name="copy">
@@ -89,16 +91,17 @@
 {% endblock %}
 
 {% block filters %}
-    {# TODO this should be untouched #}
     {% if cl.has_filters %}
-        <a href="#" id="changelist-filter-button">
-            {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
-        </a>
-        <div id="changelist-filter" hidden="hidden">
-            <h2>{% trans "Filter" %}</h2>
-            {% for spec in cl.filter_specs %}
-                {% clean_admin_list_filter cl spec %}
-            {% endfor %}
+        <div class="cms-tree-filters">
+            <a href="#" class="js-cms-tree-filter-trigger" id="changelist-filter-button">
+                {% trans "Filter:" %} {% if cl.is_filtered %}{% trans "on" %}{% else %}{% trans "off" %}{% endif %}
+            </a>
+            <div class="js-cms-tree-filter-container hidden" id="changelist-filter">
+                <h2>{% trans "Filter" %}</h2>
+                {% for spec in cl.filter_specs %}
+                    {% clean_admin_list_filter cl spec %}
+                {% endfor %}
+            </div>
         </div>
     {% endif %}
 {% endblock %}
@@ -153,7 +156,15 @@
                 {# endfor #}
             </ul>
         </div>
-    </div>
+    {% else %}
+        {# INFO: ask to add a page if tree is empty #}
+        {% url opts|admin_urlname:'add' as add_url %}
+        {% blocktrans %}
+            <em>There is no page around yet.</em>
+            <br>
+            <a href="{{ add_url }}" class="addlink">Add page</a> now.
+        {% endblocktrans %}
+    {% endif %}
 
     {% comment %}
     {# CREATING MULTIPLE TREES IS POSSIBLE #}
@@ -167,13 +178,4 @@
     {# TODO there are dialogs loaded for the persmission checks #}
     <div id="dialogs"></div>
 
-    {# add default if there is no page #}
-    {% if not cl.get_items %}
-        {% url opts|admin_urlname:'add' as add_url %}
-        {% blocktrans %}
-            <em>There is no page around yet.</em>
-            <br>
-            <a href="{{ add_url }}" class="addlink">Add page</a> now.
-        {% endblocktrans %}
-    {% endif %}
 {% endblock result_list %}
