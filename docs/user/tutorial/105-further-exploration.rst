@@ -41,7 +41,9 @@ Disqus
 
 Add comment thread functionality courtesy of `Disqus <https://disqus.com>`_.
 
-.. todo:: Add image of a page with comments
+.. image:: /user/tutorial/images/disqus_plugin.png
+    :alt: Disqus plugin
+    :align: center
 
 .. note::
 
