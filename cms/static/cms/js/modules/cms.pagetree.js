@@ -275,7 +275,13 @@ var CMS = window.CMS || {};
                 tree.move_node(obj, tree.get_node(el.prev()), 'last');
             },
 
-            _setFilter: function () {
+            /**
+             * Handles filter button display (Filter: Off).
+             *
+             * @method _setFilter
+             * @private
+             */
+            _setFilter: function _setFilter() {
                 var that = this;
                 var trigger = $('.js-cms-tree-filter-trigger');
                 var container = $('.js-cms-tree-filter-container');
