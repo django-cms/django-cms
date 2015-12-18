@@ -46,12 +46,6 @@ casper.test.begin('Edit content', function (test) {
                 randomText,
                 messages.contentUpdatedDoubleClick
             );
-            // ensure we're getting rid of previous content
-            test.assertSelectorDoesntHaveText(
-                '.cms-lugin:last-child',
-                previousContentText,
-                messages.previousDoesntExist
-            );
         })
         // go to the Structure mode
         .then(function () {
