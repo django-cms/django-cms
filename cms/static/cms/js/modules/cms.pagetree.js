@@ -286,9 +286,8 @@ var CMS = window.CMS || {};
 
                     container.toggleClass('hidden');
 
-                    that.ui.document.on(that.click, function () {
+                    that.ui.document.one(that.click, function () {
                         container.addClass('hidden');
-                        that.ui.document.off(that.click);
                     });
                 });
 
@@ -322,9 +321,8 @@ var CMS = window.CMS || {};
                         .eq(triggers.index(this))
                         .addClass('cms-tree-tooltip-container-open');
 
-                    that.ui.document.on(that.click, function () {
+                    that.ui.document.one(that.click, function () {
                         containers.removeClass('cms-tree-tooltip-container-open');
-                        that.ui.document.off(that.click);
                     });
                 });
 
