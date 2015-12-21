@@ -7,7 +7,7 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.creation.toolbar;
 var randomString = require('./helpers/randomString').randomString;
 
-var newPageTitle = randomString(10);
+var newPageTitle = randomString({ length: 50, withWhitespaces: true });
 
 casper.test.begin('New Page Creation', function (test) {
     casper

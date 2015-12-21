@@ -7,7 +7,7 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.editContent;
 var randomString = require('./helpers/randomString').randomString;
 // random text string for filtering and content purposes
-var randomText = randomString(10);
+var randomText = randomString({ length: 50, withWhitespaces: true });
 
 
 casper.test.begin('Edit content', function (test) {
