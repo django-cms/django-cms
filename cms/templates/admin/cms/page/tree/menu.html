@@ -11,6 +11,9 @@
     data-id="{{ page.pk }}"
     data-colview='
         <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
+                <a href="#" data-id="{{ page.pk }}"><span class="cms-icon cms-icon-alias"></span> {% trans "Paste" %}</a>
+            </div>
             <div class="cms-tree-item cms-tree-item-icons">
                 {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
                 {% if page.soft_root %}
@@ -96,7 +99,7 @@
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
                     <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
                 </div>
-                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy" data-id="{{ page.pk }}">
                     <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
                 </div>
             {% endif %}

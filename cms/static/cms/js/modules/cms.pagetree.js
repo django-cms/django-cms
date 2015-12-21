@@ -78,10 +78,10 @@ var CMS = window.CMS || {};
                         condition2 = index <= (idx + 1);
 
                         if (condition1 && condition2) {
-                            that.ui.cols.eq(idx).addClass('hidden');
+                            that.ui.cols.eq(idx).addClass('cms-hidden');
                             index = idx;
                         } else {
-                            that.ui.cols.eq(idx).removeClass('hidden');
+                            that.ui.cols.eq(idx).removeClass('cms-hidden');
                         }
                     }
                 }
@@ -112,8 +112,6 @@ var CMS = window.CMS || {};
         *  > loaded for first initialization
         *  > need to pass "data.fitlered = 1"
         *  > might need to consider site: { 1: 1 }
-        *  'cms/page/' + pageId + '/' + language + '/descendants/'
-        *  > loading decendents of a closed item
         *  'cms/page/' + item_id + '/dialog/copy/'
         *  > triggers the permission conform dialog
         *  > copy an item into new ancestor with
@@ -153,7 +151,7 @@ var CMS = window.CMS || {};
                 // setup functionality
                 this._setup();
                 this._events();
-                this._setCopy();
+                this._setCopyPaste();
                 this._setFilter();
                 this._setTooltips();
 
@@ -173,7 +171,8 @@ var CMS = window.CMS || {};
                 this.ui = {
                     container: pagetree,
                     document: $(document),
-                    tree: pagetree.find('.js-cms-pagetree')
+                    tree: pagetree.find('.js-cms-pagetree'),
+                    dialog: $('.js-cms-tree-dialog')
                 };
             },
 
@@ -222,7 +221,7 @@ var CMS = window.CMS || {};
                         check_callback: true,
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                         data: {
-                            url: this.options.url,
+                            url: this.options.urls.tree,
                             data: function (node) {
                                 // '#' is rendered if its the root node, there we only
                                 // care about `obj.openNodes`, in the following case
@@ -272,6 +271,13 @@ var CMS = window.CMS || {};
                 });
                 this.ui.tree.on('after_open.jstree', function (e, el) {
                     that._setNode(el.node.data.id);
+                });
+
+                // drag and dropping items and saving their states
+                $(document).on('dnd_stop.vakata', function (e, el, more) {
+                    console.log(e);
+                    console.log(el);
+                    console.log(that.ui.tree.jstree('get_json', el.element));
                 });
             },
 
@@ -415,9 +421,93 @@ var CMS = window.CMS || {};
                 });
             },
 
-            // TODO add title
-            _setCopy: function () {
+            /**
+             * Copies a node into another node.
+             *
+             * @method _setCopyPaste
+             * @private
+             */
+            _setCopyPaste: function _setCopyPaste() {
+                var that = this;
+                var copy = '.js-cms-tree-item-copy';
+                var paste = '.cms-tree-item-helpers a';
+                var dialogContainer = '.js-cms-tree-dialog';
+                var dialog = '.js-cms-dialog';
+                var id = null;
+                var target = null;
 
+                // when clicking on copy, we shot the "paste" helper
+                // to determine where we want the item to be copied
+                this.ui.container.on(this.click, copy, function (e) {
+                    e.preventDefault();
+                    id = $(this).data().id;
+                    that._toggleHelpers();
+                });
+
+                // once we select the target through the "paste" helper
+                // we open a dialog to select further copy options (permissions)
+                this.ui.container.on(this.click, paste, function (e) {
+                    e.preventDefault();
+
+                    target = $(this).data().id;
+
+                    $.ajax({
+                        method: 'post',
+                        url: that.options.urls.copyPermission.replace('{id}', id),
+                        data: {
+                            position: 'left',
+                            target: target/*,
+                            site: //TODO
+                            */
+                        }
+                    // the dialog is loaded via the ajax respons originating from
+                    // `templates/admin/cms/page/tree/copy_premissions.html`
+                    }).done(function (data) {
+                        that.ui.dialog.append(data);
+                        that._toggleHelpers();
+                    }).error(function (error) {
+                        that.showError(error.statusText);
+                    });
+                });
+
+                // the dialog is injected into the dom, now we register the
+                // cancel and submit events for user interaction
+                $(dialogContainer).on(this.click, '.cancel', function (e) {
+                    e.preventDefault();
+                    $(dialog).remove();
+                }).on(this.click, '.submit', function (e) {
+                    e.preventDefault();
+                    var form = $(this).closest('form');
+                    var data = form.serialize();
+
+                    // add cached values
+                    data = data + '&target=' + target + '&position=left';
+
+                    // TODO we might want to update this over jstree copy
+                    console.log(that.options.urls.copy.replace('{id}', id));
+                    // send the real ajax request for copying the plugin
+                    $.ajax({
+                        method: 'post',
+                        url: that.options.urls.copy.replace('{id}', id),
+                        data: data/*,
+                        callback: form.data().callback*/
+                    }).done(function (data) {
+                        console.log('success');
+                        $(dialog).remove();
+                    }).error(function (error) {
+                        that.showError(error.statusText);
+                    });
+                });
+            },
+
+            /**
+             * Shows and hides paste helpers.
+             *
+             * @method _toggleHelpers
+             * @private
+             */
+            _toggleHelpers: function _toggleHelpers() {
+                $('.cms-tree-item-helpers').toggleClass('cms-hidden');
             },
 
             /**

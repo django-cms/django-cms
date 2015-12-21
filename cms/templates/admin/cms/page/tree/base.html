@@ -112,7 +112,12 @@
         {# INFO: javascript is loaded from cms.pagetree.js #}
         <div class="cms-pagetree-container">
             <div class="cms-pagetree js-cms-pagetree" data-json='{
-                "url": "{% url 'admin:get_tree' %}",
+                "urls": {
+                    "tree": "{% url 'admin:get_tree' %}",
+                    "move": "./{id}/move-page/",
+                    "copy": "./{id}/copy-page/",
+                    "copyPermission": "./{id}/dialog/copy/"
+                },
                 "csrf": "{{ csrf_token }}",
                 "static": "{{ STATIC_URL }}",
                 "permission": "{{ CMS_PERMISSION|bool }}",
@@ -170,16 +175,6 @@
         {% endblocktrans %}
     {% endif %}
 
-    {% comment %}
-    {# CREATING MULTIPLE TREES IS POSSIBLE #}
-    <p>Page Types</p>
-    {# allow multiple trees #}
-    <div class="cms-pagetree js-cms-pagetree">
-        <ul></ul>
-    </div>
-    {% endcomment %}
-
-    {# TODO there are dialogs loaded for the persmission checks #}
-    <div id="dialogs"></div>
-
+    {# INFO: used when copying nodes #}
+    <div class="cms-tree-dialog js-cms-tree-dialog"></div>
 {% endblock result_list %}
