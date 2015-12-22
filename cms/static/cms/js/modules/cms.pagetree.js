@@ -358,9 +358,8 @@ var CMS = window.CMS || {};
                     url: that.options.urls.move.replace('{id}', obj.id),
                     data: {
                         position: obj.position,
-                        target: obj.target/*,
-                        // TODO reimplement
-                        site: that.options.site*/
+                        target: obj.target,
+                        site: that.options.site
                     }
                 }).done(function () {
                     console.log('success');
@@ -528,9 +527,8 @@ var CMS = window.CMS || {};
                         url: that.options.urls.copyPermission.replace('{id}', obj.id),
                         data: {
                             position: obj.position,
-                            target: obj.target/*,
+                            target: obj.target,
                             site: that.options.site
-                            */
                         }
                     // the dialog is loaded via the ajax respons originating from
                     // `templates/admin/cms/page/tree/copy_premissions.html`
