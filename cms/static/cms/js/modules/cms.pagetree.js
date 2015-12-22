@@ -124,7 +124,7 @@ var CMS = window.CMS || {};
 
                 // states and events
                 this.click = 'click.cms.pagetree';
-                this.cache = {};
+                this.cache = undefined;
                 this.cacheType = '';
 
                 // elements
@@ -370,13 +370,15 @@ var CMS = window.CMS || {};
                     url: that.options.urls.move.replace('{id}', obj.id),
                     data: {
                         position: obj.position,
-                        target: obj.target,
-                        site: that.options.site
+                        target: obj.target
                     }
                 }).done(function () {
-                    that.ui.tree.jstree('move_node',
-                        that.ui.tree.find('li[data-id="' + obj.id + '"]'),
-                        that.ui.tree.find('li[data-id="' + obj.target + '"]'));
+                    if (that.cache) {
+                        that.ui.tree.jstree('move_node',
+                            that.ui.tree.find('li[data-id="' + obj.id + '"]'),
+                            that.ui.tree.find('li[data-id="' + obj.target + '"]'));
+                        that.cache = undefined;
+                    }
                 }).error(function (error) {
                     that.showError(error.statusText);
                 });
