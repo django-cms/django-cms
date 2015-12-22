@@ -865,7 +865,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
 
-        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
+        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page)))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(self.model, id=page_id)
