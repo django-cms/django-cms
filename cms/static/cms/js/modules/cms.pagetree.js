@@ -261,9 +261,13 @@ var CMS = window.CMS || {};
                 });
 
                 // set event for cut and paste
-                this.ui.container.on(this.click, '.js-cms-tree-item-cut', function () {
+                this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function () {
                     that.cache = that._getNodeData(that._getNodeId($(this)));
-                    that.cacheType = 'cut';
+                    if ($(this).hasClass('js-cms-tree-item-cut')) {
+                        that.cacheType = 'cut';
+                    } else {
+                        that.cacheType = 'copy';
+                    }
                     that._toggleHelpers();
                 });
 
@@ -274,21 +278,21 @@ var CMS = window.CMS || {};
                         target: target.id,
                         position: 'last-child',
                         id: that.cache.id
-                    }
+                    };
 
                     that._toggleHelpers();
 
                     if (that.cacheType === 'cut') {
                         that._moveNode(obj);
                     }
+                    if (that.cacheType === 'copy') {
+                        that._copyNode(obj);
+                    }
                 });
 
                 // additional event handlers
                 this._setFilter();
                 this._setTooltips();
-
-                // setup functionality
-                // this._setCopyPaste();
 
                 // make sure ajax post requests are working
                 this._setAjaxPost('.js-cms-tree-item-menu a');
@@ -364,23 +368,71 @@ var CMS = window.CMS || {};
              */
             _moveNode: function _moveNode(obj) {
                 var that = this;
+                obj.site = that.options.site;
 
                 $.ajax({
                     method: 'post',
                     url: that.options.urls.move.replace('{id}', obj.id),
-                    data: {
-                        position: obj.position,
-                        target: obj.target
-                    }
+                    data: obj
                 }).done(function () {
                     if (that.cache) {
                         that.ui.tree.jstree('move_node',
                             that.ui.tree.find('li[data-id="' + obj.id + '"]'),
                             that.ui.tree.find('li[data-id="' + obj.target + '"]'));
-                        that.cache = undefined;
                     }
+                    that.cache = undefined;
                 }).error(function (error) {
                     that.showError(error.statusText);
+                });
+            },
+
+            /**
+             * Copies a node into the selected node.
+             *
+             * @method _copyNode
+             * @param {Object} [opts]
+             * @param {Number} [opts.id] current element id for url matching
+             * @param {Number} [opts.target] target sibling or parent
+             * @param {Number} [opts.position] either `left`, `right` or `last-child`
+             * @private
+             */
+            _copyNode: function _copyNode(obj) {
+                var that = this;
+                obj.site = that.options.site;
+
+                $.ajax({
+                    method: 'post',
+                    url: that.options.urls.copyPermission.replace('{id}', obj.id),
+                    data: obj
+                // the dialog is loaded via the ajax respons originating from
+                // `templates/admin/cms/page/tree/copy_premissions.html`
+                }).done(function (data) {
+                    that.ui.dialog.append(data);
+                }).error(function (error) {
+                    that.showError(error.statusText);
+                });
+
+                // attach events to the permission dialog
+                this.ui.dialog.off(this.click, '.cancel').on(this.click, '.cancel', function (e) {
+                    e.preventDefault();
+                    $('.js-cms-dialog').remove();
+                }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
+                    e.preventDefault();
+                    var data = $(this).closest('form').serialize().split('&');
+                    // loop through form data and attach to obj
+                    for (var i = 0; i < data.length; i++) {
+                        obj[data[i].split('=')[0]] = data[i].split('=')[1];
+                    }
+                    // send the real ajax request for copying the plugin
+                    $.ajax({
+                        method: 'post',
+                        url: that.options.urls.copy.replace('{id}', obj.id),
+                        data: obj
+                    }).done(function () {
+                        that.reloadBrowser();
+                    }).error(function (error) {
+                        that.showError(error.statusText);
+                    });
                 });
             },
 
@@ -415,8 +467,6 @@ var CMS = window.CMS || {};
                 var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
                 var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
                 var parentDom = this.ui.tree.jstree('get_node', parent);
-                var target;
-                var position;
 
                 // last-child if there is only one element (nested)
                 // left if it can be placed before the get_next_dom (current sibling level)
@@ -513,95 +563,6 @@ var CMS = window.CMS || {};
                     e.preventDefault();
                     $.post($(this).attr('href')).done(function () {
                         window.location.reload();
-                    }).error(function (error) {
-                        that.showError(error.statusText);
-                    });
-                });
-            },
-
-            /**
-             * Copies a node into another node.
-             *
-             * @method _setCopyPaste
-             * @private
-             */
-            //*  'cms/page/' + item_id + '/dialog/copy/'
-            //*  > triggers the permission conform dialog
-            //*  > copy an item into new ancestor with
-            //*  > { position: position, target: target_id, site: site }
-            //*  'cms/page/' + item_id + '/copy-page/
-            //*  > same as above but triggers the actual move
-            _setCopyPaste: function _copyNode() {
-                var that = this;
-                var copy = '.js-cms-tree-item-copy';
-                var paste = '.cms-tree-item-helpers a';
-                var dialogContainer = '.js-cms-tree-dialog';
-                var dialog = '.js-cms-dialog';
-                var id = null;
-                var target = null;
-
-                // when clicking on copy, we shot the "paste" helper
-                // to determine where we want the item to be copied
-                this.ui.container.on(this.click, copy, function (e) {
-                    e.preventDefault();
-                    id = $(this).data().id;
-                    that._toggleHelpers();
-                });
-
-                // once we select the target through the "paste" helper
-                // we open a dialog to select further copy options (permissions)
-                this.ui.container.on(this.click, paste, function (e) {
-                    e.preventDefault();
-
-                    var el = $(this).closest('.jstree-grid-cell')
-                        .attr('class')
-                        .split(' ')[0]
-                        .replace('jsgrid_', '')
-                        .replace('_col', '');
-                    var obj = that._getNodeData(el);
-
-                    $.ajax({
-                        method: 'post',
-                        url: that.options.urls.copyPermission.replace('{id}', obj.id),
-                        data: {
-                            position: obj.position,
-                            target: obj.target,
-                            site: that.options.site
-                        }
-                    // the dialog is loaded via the ajax respons originating from
-                    // `templates/admin/cms/page/tree/copy_premissions.html`
-                    }).done(function (data) {
-                        that.ui.dialog.append(data);
-                        that._toggleHelpers();
-                    }).error(function (error) {
-                        that.showError(error.statusText);
-                    });
-                });
-
-                // the dialog is injected into the dom, now we register the
-                // cancel and submit events for user interaction
-                $(dialogContainer).on(this.click, '.cancel', function (e) {
-                    e.preventDefault();
-                    $(dialog).remove();
-                }).on(this.click, '.submit', function (e) {
-                    e.preventDefault();
-                    var form = $(this).closest('form');
-                    var data = form.serialize();
-
-                    // add cached values
-                    data = data + '&target=' + target + '&position=left';
-
-                    // TODO we might want to update this over jstree copy
-                    console.log(that.options.urls.copy.replace('{id}', id));
-                    // send the real ajax request for copying the plugin
-                    $.ajax({
-                        method: 'post',
-                        url: that.options.urls.copy.replace('{id}', id),
-                        data: data/*,
-                        callback: form.data().callback*/
-                    }).done(function () {
-                        console.log('success');
-                        $(dialog).remove();
                     }).error(function (error) {
                         that.showError(error.statusText);
                     });
