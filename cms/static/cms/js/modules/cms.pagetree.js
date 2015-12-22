@@ -104,21 +104,6 @@ var CMS = window.CMS || {};
         };
 
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
-        // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
-        // TODO make sure static path is not hard coded
-        // TODO implement dialog for copy permissions
-        /* TODO avialable ajax requests:
-        *  'cms/page/' + pageId + '/change-navigation/?language=' + language (used for filtering)
-        *  > loaded for first initialization
-        *  > need to pass "data.fitlered = 1"
-        *  > might need to consider site: { 1: 1 }
-        *  'cms/page/' + item_id + '/dialog/copy/'
-        *  > triggers the permission conform dialog
-        *  > copy an item into new ancestor with
-        *  > { position: position, target: target_id, site: site }
-        *  'cms/page/' + item_id + '/copy-page/
-        *  > same as above but triggers the actual move
-        */
 
         /**
          * The pagetree is loaded via `/admin/cms/page` and has a custom admin
@@ -493,6 +478,12 @@ var CMS = window.CMS || {};
              * @method _setCopyPaste
              * @private
              */
+            //*  'cms/page/' + item_id + '/dialog/copy/'
+            //*  > triggers the permission conform dialog
+            //*  > copy an item into new ancestor with
+            //*  > { position: position, target: target_id, site: site }
+            //*  'cms/page/' + item_id + '/copy-page/
+            //*  > same as above but triggers the actual move
             _setCopyPaste: function _setCopyPaste() {
                 var that = this;
                 var copy = '.js-cms-tree-item-copy';
@@ -590,7 +581,7 @@ var CMS = window.CMS || {};
                 var messages = $('.messagelist');
                 var breadcrumb = $('.breadcrumbs');
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
-                var msg = tpl.replace('{msg}', message);
+                var msg = tpl.replace('{msg}', this.options.lang.error + ' – ' + message);
 
                 messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
             }
