@@ -118,8 +118,6 @@ var CMS = window.CMS || {};
         *  > { position: position, target: target_id, site: site }
         *  'cms/page/' + item_id + '/copy-page/
         *  > same as above but triggers the actual move
-        *  'cms/page/' + item_id + '/move-page/
-        *  > { position: position, target: target_id, site: site }
         */
 
         /**
@@ -274,10 +272,50 @@ var CMS = window.CMS || {};
                 });
 
                 // drag and dropping items and saving their states
-                $(document).on('dnd_stop.vakata', function (e, el, more) {
-                    console.log(e);
-                    console.log(el);
-                    console.log(that.ui.tree.jstree('get_json', el.element));
+                $(document).on('dnd_stop.vakata', function (e, el) {
+                    var element = that.ui.tree.jstree('get_node', el.element);
+                    var parent = that.ui.tree.jstree('get_parent', element);
+                    var nextDom = that.ui.tree.jstree('get_next_dom', element, true);
+                    var prevDom = that.ui.tree.jstree('get_prev_dom', element, true);
+                    var parentDom = that.ui.tree.jstree('get_node', parent);
+                    var target;
+                    var position;
+
+                    // last-child if there is only one element (nested)
+                    // left if it can be placed before the get_next_dom (current sibling level)
+                    // right if it can be placed after the get_prev_dom (current sibling level)
+                    if (nextDom) {
+                        position = 'left';
+                        target = nextDom.data().id;
+                    } else if (prevDom) {
+                        position = 'right';
+                        target = prevDom.data().id;
+                    } else {
+                        position = 'last-child';
+                        target = parentDom.data.id;
+                    }
+
+                    that._moveNode(element.data.id, target, position);
+                });
+            },
+
+            //*  'cms/page/' + item_id + '/move-page/
+            //*  > { position: position, target: target_id, site: site }
+            _moveNode: function (element, target, position) {
+                var that = this;
+
+                $.ajax({
+                    method: 'post',
+                    url: that.options.urls.move.replace('{id}', element),
+                    data: {
+                        target: target,
+                        position: position/*,
+                        site: that.options.site*/
+                    }
+                }).done(function () {
+                    console.log('success');
+                }).error(function (error) {
+                    that.showError(error.statusText);
                 });
             },
 
@@ -457,7 +495,7 @@ var CMS = window.CMS || {};
                         data: {
                             position: 'left',
                             target: target/*,
-                            site: //TODO
+                            site: that.options.site
                             */
                         }
                     // the dialog is loaded via the ajax respons originating from
@@ -491,7 +529,7 @@ var CMS = window.CMS || {};
                         url: that.options.urls.copy.replace('{id}', id),
                         data: data/*,
                         callback: form.data().callback*/
-                    }).done(function (data) {
+                    }).done(function () {
                         console.log('success');
                         $(dialog).remove();
                     }).error(function (error) {

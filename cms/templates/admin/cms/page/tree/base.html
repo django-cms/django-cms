@@ -123,6 +123,7 @@
                 "permission": "{{ CMS_PERMISSION|bool }}",
                 "debug": "{{ DEBUG|bool }}",
                 "filtered": "{{ cl.is_filtered|bool }}",
+                "site": "{{ cl.sites.0.pk }}",
                 "lang": {
                     "code": "{{ LANGUAGE_CODE|lower }}",
                     "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
