@@ -260,7 +260,13 @@ var CMS = window.CMS || {};
                 });
             },
 
-            _events: function () {
+            /**
+             * Sets up all the event handlers, such as opening and moving.
+             *
+             * @method _events
+             * @private
+             */
+            _events: function _events() {
                 var that = this;
 
                 // set events for the nodeId updates
@@ -296,26 +302,6 @@ var CMS = window.CMS || {};
                     }
 
                     that._moveNode(element.data.id, target, position);
-                });
-            },
-
-            //*  'cms/page/' + item_id + '/move-page/
-            //*  > { position: position, target: target_id, site: site }
-            _moveNode: function (element, target, position) {
-                var that = this;
-
-                $.ajax({
-                    method: 'post',
-                    url: that.options.urls.move.replace('{id}', element),
-                    data: {
-                        target: target,
-                        position: position/*,
-                        site: that.options.site*/
-                    }
-                }).done(function () {
-                    console.log('success');
-                }).error(function (error) {
-                    that.showError(error.statusText);
                 });
             },
 
@@ -374,6 +360,34 @@ var CMS = window.CMS || {};
                 localStorage.setItem('cms_test_storage', storage);
 
                 return number;
+            },
+
+            /**
+             * Moves a node after drag & drop.
+             *
+             * @method _moveNode
+             * @param {Number} element current element id for url matching
+             * @param {Number} target target sibling or parent
+             * @param {Number} position either `left`, `right` or `last-child`
+             * @private
+             */
+            _moveNode: _moveNodefunction (element, target, position) {
+                var that = this;
+
+                $.ajax({
+                    method: 'post',
+                    url: that.options.urls.move.replace('{id}', element),
+                    data: {
+                        target: target,
+                        position: position/*,
+                        // TODO reimplement
+                        site: that.options.site*/
+                    }
+                }).done(function () {
+                    console.log('success');
+                }).error(function (error) {
+                    that.showError(error.statusText);
+                });
             },
 
             /**
