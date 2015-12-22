@@ -122,25 +122,15 @@ var CMS = window.CMS || {};
                 this.options = $('.js-cms-pagetree').data('json');
                 this.options = $.extend(true, {}, this.options, options);
 
-                // elements
-                this._setupUI();
-
                 // states and events
                 this.click = 'click.cms.pagetree';
+                this.cache = {};
+                this.cacheType = '';
 
-                // make sure that ajax request send the csrf token
-                this.csrf(this.options.csrf);
-
-                // setup functionality
+                // elements
+                this._setupUI();
                 this._setup();
                 this._events();
-                this._setCopyPaste();
-                this._setFilter();
-                this._setTooltips();
-
-                // make sure ajax post requests are working
-                this._setAjaxPost('.js-cms-tree-item-menu a');
-                this._setAjaxPost('.js-cms-tree-lang-trigger');
             },
 
             /**
@@ -172,6 +162,9 @@ var CMS = window.CMS || {};
                     language: this.options.lang.code,
                     openNodes: []
                 };
+
+                // make sure that ajax request send the csrf token
+                this.csrf(this.options.csrf);
 
                 // setup column headings
                 $.each(this.options.columns, function (index, obj) {
@@ -266,6 +259,40 @@ var CMS = window.CMS || {};
                 $(document).on('dnd_stop.vakata', function (e, el) {
                     that._moveNode(that._getNodeData(el.element));
                 });
+
+                // set event for cut and paste
+                this.ui.container.on(this.click, '.js-cms-tree-item-cut', function () {
+                    that.cache = that._getNodeData(that._getNodeId($(this)));
+                    that.cacheType = 'cut';
+                    that._toggleHelpers();
+                });
+
+                // attach events to paste
+                this.ui.container.on(this.click, '.cms-tree-item-helpers a', function () {
+                    var target = that._getNodeData(that._getNodeId($(this)));
+                    var obj = {
+                        target: target.id,
+                        position: 'last-child',
+                        id: that.cache.id
+                    }
+
+                    that._toggleHelpers();
+
+                    if (that.cacheType === 'cut') {
+                        that._moveNode(obj);
+                    }
+                });
+
+                // additional event handlers
+                this._setFilter();
+                this._setTooltips();
+
+                // setup functionality
+                // this._setCopyPaste();
+
+                // make sure ajax post requests are working
+                this._setAjaxPost('.js-cms-tree-item-menu a');
+                this._setAjaxPost('.js-cms-tree-lang-trigger');
             },
 
             /**
@@ -347,10 +374,28 @@ var CMS = window.CMS || {};
                         site: that.options.site
                     }
                 }).done(function () {
-                    console.log('success');
+                    that.ui.tree.jstree('move_node',
+                        that.ui.tree.find('li[data-id="' + obj.id + '"]'),
+                        that.ui.tree.find('li[data-id="' + obj.target + '"]'));
                 }).error(function (error) {
                     that.showError(error.statusText);
                 });
+            },
+
+            /**
+             * Returns element from any sub nodes.
+             *
+             * @method _getElement
+             * @private
+             * @param {jQuery} el jQuery node form where to search
+             * @return {String} jsTree node element id
+             */
+            _getNodeId: function _getElement(el) {
+                return el.closest('.jstree-grid-cell')
+                    .attr('class')
+                    .split(' ')[0]
+                    .replace('jsgrid_', '')
+                    .replace('_col', '');
             },
 
             /**
@@ -484,7 +529,7 @@ var CMS = window.CMS || {};
             //*  > { position: position, target: target_id, site: site }
             //*  'cms/page/' + item_id + '/copy-page/
             //*  > same as above but triggers the actual move
-            _setCopyPaste: function _setCopyPaste() {
+            _setCopyPaste: function _copyNode() {
                 var that = this;
                 var copy = '.js-cms-tree-item-copy';
                 var paste = '.cms-tree-item-helpers a';
