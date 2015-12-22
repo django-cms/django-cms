@@ -279,29 +279,7 @@ var CMS = window.CMS || {};
 
                 // drag and dropping items and saving their states
                 $(document).on('dnd_stop.vakata', function (e, el) {
-                    var element = that.ui.tree.jstree('get_node', el.element);
-                    var parent = that.ui.tree.jstree('get_parent', element);
-                    var nextDom = that.ui.tree.jstree('get_next_dom', element, true);
-                    var prevDom = that.ui.tree.jstree('get_prev_dom', element, true);
-                    var parentDom = that.ui.tree.jstree('get_node', parent);
-                    var target;
-                    var position;
-
-                    // last-child if there is only one element (nested)
-                    // left if it can be placed before the get_next_dom (current sibling level)
-                    // right if it can be placed after the get_prev_dom (current sibling level)
-                    if (nextDom) {
-                        position = 'left';
-                        target = nextDom.data().id;
-                    } else if (prevDom) {
-                        position = 'right';
-                        target = prevDom.data().id;
-                    } else {
-                        position = 'last-child';
-                        target = parentDom.data.id;
-                    }
-
-                    that._moveNode(element.data.id, target, position);
+                    that._moveNode(that._getNodeData(el.element));
                 });
             },
 
@@ -366,20 +344,21 @@ var CMS = window.CMS || {};
              * Moves a node after drag & drop.
              *
              * @method _moveNode
-             * @param {Number} element current element id for url matching
-             * @param {Number} target target sibling or parent
-             * @param {Number} position either `left`, `right` or `last-child`
+             * @param {Object} [opts]
+             * @param {Number} [opts.id] current element id for url matching
+             * @param {Number} [opts.target] target sibling or parent
+             * @param {Number} [opts.position] either `left`, `right` or `last-child`
              * @private
              */
-            _moveNode: function _moveNode(element, target, position) {
+            _moveNode: function _moveNode(obj) {
                 var that = this;
 
                 $.ajax({
                     method: 'post',
-                    url: that.options.urls.move.replace('{id}', element),
+                    url: that.options.urls.move.replace('{id}', obj.id),
                     data: {
-                        target: target,
-                        position: position/*,
+                        position: obj.position,
+                        target: obj.target/*,
                         // TODO reimplement
                         site: that.options.site*/
                     }
@@ -388,6 +367,42 @@ var CMS = window.CMS || {};
                 }).error(function (error) {
                     that.showError(error.statusText);
                 });
+            },
+
+            /**
+             * Sets up all the event handlers, such as opening and moving.
+             *
+             * @method _getNodeData
+             * @private
+             * @param {jQuery} el node to be evaluated
+             * @return {Object} evaluated object with params
+             */
+            _getNodeData: function _getNodeData(el) {
+                var obj = {};
+                var element = this.ui.tree.jstree('get_node', el);
+                var parent = this.ui.tree.jstree('get_parent', element);
+                var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
+                var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
+                var parentDom = this.ui.tree.jstree('get_node', parent);
+                var target;
+                var position;
+
+                // last-child if there is only one element (nested)
+                // left if it can be placed before the get_next_dom (current sibling level)
+                // right if it can be placed after the get_prev_dom (current sibling level)
+                if (nextDom) {
+                    obj.position = 'left';
+                    obj.target = nextDom.data().id;
+                } else if (prevDom) {
+                    obj.position = 'right';
+                    obj.target = prevDom.data().id;
+                } else {
+                    obj.position = 'last-child';
+                    obj.target = parentDom.data.id;
+                }
+                obj.id = element.data.id;
+
+                return obj;
             },
 
             /**
@@ -501,14 +516,19 @@ var CMS = window.CMS || {};
                 this.ui.container.on(this.click, paste, function (e) {
                     e.preventDefault();
 
-                    target = $(this).data().id;
+                    var el = $(this).closest('.jstree-grid-cell')
+                        .attr('class')
+                        .split(' ')[0]
+                        .replace('jsgrid_', '')
+                        .replace('_col', '');
+                    var obj = that._getNodeData(el);
 
                     $.ajax({
                         method: 'post',
-                        url: that.options.urls.copyPermission.replace('{id}', id),
+                        url: that.options.urls.copyPermission.replace('{id}', obj.id),
                         data: {
-                            position: 'left',
-                            target: target/*,
+                            position: obj.position,
+                            target: obj.target/*,
                             site: that.options.site
                             */
                         }
