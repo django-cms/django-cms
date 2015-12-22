@@ -31,7 +31,7 @@ from .forms import (
 class WizardViewMixin(object):
     language_code = None
 
-    @transaction.atomic()
+    @transaction.atomic
     def dispatch(self, request, *args, **kwargs):
         self.language_code = get_language_from_request(request, check_path=True)
         response = super(WizardViewMixin, self).dispatch(
