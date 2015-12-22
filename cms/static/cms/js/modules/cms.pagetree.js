@@ -347,7 +347,7 @@ var CMS = window.CMS || {};
              * @param {String} id to be stored
              * @return {String} id that has been removed
              */
-            _removeNode: function (id) {
+            _removeNode: function _removeNode(id) {
                 var number = id.toString();
                 var storage = this._getNodes();
                 var index = storage.indexOf(number);
@@ -371,7 +371,7 @@ var CMS = window.CMS || {};
              * @param {Number} position either `left`, `right` or `last-child`
              * @private
              */
-            _moveNode: _moveNodefunction (element, target, position) {
+            _moveNode: function _moveNode(element, target, position) {
                 var that = this;
 
                 $.ajax({
