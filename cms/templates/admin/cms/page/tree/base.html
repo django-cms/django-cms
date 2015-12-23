@@ -102,71 +102,71 @@
     <h2>{% trans "Pages" %}</h2>
 
     {# INFO: javascript is loaded from cms.pagetree.js #}
-    <div class="cms-pagetree-container">
-        <div class="cms-pagetree js-cms-pagetree" data-json='{
-            "urls": {
-                "tree": "{% url 'admin:get_tree' %}",
-                "move": "./{id}/move-page/",
-                "copy": "./{id}/copy-page/",
-                "copyPermission": "./{id}/dialog/copy/"
-            },
-            "csrf": "{{ csrf_token }}",
-            "static": "{{ STATIC_URL }}",
-            "permission": "{{ CMS_PERMISSION|bool }}",
-            "debug": "{{ DEBUG|bool }}",
-            "filtered": "{% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %}",
-            "site": "{{ cl.sites.0.pk }}",
-            "lang": {
-                "code": "{{ LANGUAGE_CODE|lower }}",
-                "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
-                "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
-                "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
-                "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
-                "loading": "{% trans "Loading..." %}",
-                "newNode": "{% trans 'New node' %}",
-                "nodes": "{% trans 'nodes' %}"
-            },
-            "columns": [{
-                "title": "{% trans 'Pages' %}",
-                "key": "",
-                "width": "100%"
-            }, {
-                "title": "&nbsp;",
-                "key": "view"
-            }, {
-                "title": "{% trans 'View' %}",
-                "key": "preview"
-            }, {% for lang in site_languages %}{
-                "title": "{{ lang|upper }}",
-                "key": "{{ lang }}"
-            }, {% endfor %} {
-                "title": "{% trans 'Menu' %}",
-                "key": "menu"
-            }, {
-                "title": "{% trans 'Options' %}",
-                "key": "options"
-            }, {
-                "title": "{% trans 'Info' %}",
-                "key": "info"
-            }]
-        }'>
-            <ul>
-                {% if cl.is_filtered or request.GET.q %}
-                    {# INFO: load html data source when filtering #}
-                    {% for page in cl.get_items %}
-                        {% show_admin_menu page %}
-                    {% empty %}
-                        <li class="cms-tree-node cms-tree-empty">
-                            {% trans "your search did not match any results." %}
-                        </li>
-                    {% endfor %}
-                {% endif %}
-            </ul>
+    {% if cl.get_items or cl.get_items and cl.is_filtered %}
+        <div class="cms-pagetree-container">
+            <div class="cms-pagetree js-cms-pagetree" data-json='{
+                "urls": {
+                    "tree": "{% url 'admin:get_tree' %}",
+                    "move": "./{id}/move-page/",
+                    "copy": "./{id}/copy-page/",
+                    "copyPermission": "./{id}/dialog/copy/"
+                },
+                "csrf": "{{ csrf_token }}",
+                "static": "{{ STATIC_URL }}",
+                "permission": "{{ CMS_PERMISSION|bool }}",
+                "debug": "{{ DEBUG|bool }}",
+                "filtered": "{% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %}",
+                "site": "{{ cl.sites.0.pk }}",
+                "lang": {
+                    "code": "{{ LANGUAGE_CODE|lower }}",
+                    "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
+                    "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
+                    "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
+                    "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
+                    "loading": "{% trans "Loading..." %}",
+                    "newNode": "{% trans 'New node' %}",
+                    "nodes": "{% trans 'nodes' %}"
+                },
+                "columns": [{
+                    "title": "{% trans 'Pages' %}",
+                    "key": "",
+                    "width": "100%"
+                }, {
+                    "title": "&nbsp;",
+                    "key": "view"
+                }, {
+                    "title": "{% trans 'View' %}",
+                    "key": "preview"
+                }, {% for lang in site_languages %}{
+                    "title": "{{ lang|upper }}",
+                    "key": "{{ lang }}"
+                }, {% endfor %} {
+                    "title": "{% trans 'Menu' %}",
+                    "key": "menu"
+                }, {
+                    "title": "{% trans 'Options' %}",
+                    "key": "options"
+                }, {
+                    "title": "{% trans 'Info' %}",
+                    "key": "info"
+                }]
+            }'>
+                <ul>
+                    {% if cl.is_filtered or request.GET.q %}
+                        {# INFO: load html data source when filtering #}
+                        {% for page in cl.get_items %}
+                            {% show_admin_menu page %}
+                        {% empty %}
+                            <li class="cms-tree-node cms-tree-empty">
+                                {% trans "your search did not match any results." %}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
-
-    {# INFO: show add a page button when there are no items #}
-    {% if not cl.get_items and not cl.is_filtered %}
+    {% else %}
+        {# INFO: show add a page button when there are no items #}
         {% url opts|admin_urlname:'add' as add_url %}
         {% blocktrans %}
             <em>There is no page around yet.</em>

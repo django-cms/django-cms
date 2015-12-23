@@ -127,6 +127,11 @@ var CMS = window.CMS || {};
                 this.cache = undefined;
                 this.cacheType = '';
 
+                // cancel if pagtree is not available
+                if ($.isEmptyObject(this.options)) {
+                    return false;
+                }
+
                 // elements
                 this._setupUI();
                 this._setup();
