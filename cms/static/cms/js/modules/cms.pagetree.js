@@ -586,7 +586,10 @@ var CMS = window.CMS || {};
 
                 this.ui.container.on(this.click, trigger, function (e) {
                     e.preventDefault();
-                    $.post($(this).attr('href')).done(function () {
+                    $.ajax({
+                        method: 'post',
+                        url: $(this).attr('href')
+                    }).done(function () {
                         window.location.reload();
                     }).error(function (error) {
                         that.showError(error.statusText);
