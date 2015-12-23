@@ -232,18 +232,23 @@ $pagetree-tooltip-min-width: 130px;
 // searchform or filtering
 .cms-tree-search {
     float: left;
-    input[type="text"],
-    select {
-        width: auto !important;
+    margin-right: 5px;
+    label {
+        display: none !important;
     }
-    input[type="submit"] {
+    select {
+        position: relative;
+        top: 2px;
+        width: 175px !important;
+    }
+    // need to overwrite djangocms-admin-theme
+    #toolbar form#changelist-search input[type="submit"] {
         margin-left: 0 !important;
     }
-    label {
-        display: none;
+    #toolbar form#changelist-search #searchbar {
+        width: 175px !important;
     }
 }
-
 .cms-tree-filters {
     float: right;
     .js-cms-tree-filter-trigger {

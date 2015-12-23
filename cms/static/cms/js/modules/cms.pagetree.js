@@ -162,6 +162,7 @@ var CMS = window.CMS || {};
                     language: this.options.lang.code,
                     openNodes: []
                 };
+                var data = (this.options.filtered === 'true') ? false : true;
 
                 // make sure that ajax request send the csrf token
                 this.csrf(this.options.csrf);
@@ -188,6 +189,28 @@ var CMS = window.CMS || {};
                     }
                 });
 
+                // prepare data
+                if (data) {
+                    data = {
+                        url: this.options.urls.tree,
+                        data: function (node) {
+                            // '#' is rendered if its the root node, there we only
+                            // care about `obj.openNodes`, in the following case
+                            // we are requesting a specific node
+                            if (node.id !== '#') {
+                                obj.pageId = that._setNode(node.data.id);
+                            }
+
+                            // we need to store the opened items inside the localstorage
+                            // as we have to load the pagetree with the previous opened
+                            // state
+                            obj.openNodes = that._getNodes();
+
+                            return obj;
+                        }
+                    }
+                }
+
                 // bind options to the jstree instance
                 this.ui.tree.jstree({
                     core: {
@@ -196,24 +219,7 @@ var CMS = window.CMS || {};
                         // core setting to allow actions
                         check_callback: true,
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
-                        data: {
-                            url: this.options.urls.tree,
-                            data: function (node) {
-                                // '#' is rendered if its the root node, there we only
-                                // care about `obj.openNodes`, in the following case
-                                // we are requesting a specific node
-                                if (node.id !== '#') {
-                                    obj.pageId = that._setNode(node.data.id);
-                                }
-
-                                // we need to store the opened items inside the localstorage
-                                // as we have to load the pagetree with the previous opened
-                                // state
-                                obj.openNodes = that._getNodes();
-
-                                return obj;
-                            }
-                        },
+                        data: data,
                         // strings used within jstree that are called using `get_string`
                         strings: {
                             'Loading ...': this.options.lang.loading,
@@ -261,7 +267,8 @@ var CMS = window.CMS || {};
                 });
 
                 // set event for cut and paste
-                this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function () {
+                this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
+                    e.preventDefault();
                     that.cache = that._getNodeData(that._getNodeId($(this)));
                     if ($(this).hasClass('js-cms-tree-item-cut')) {
                         that.cacheType = 'cut';
@@ -272,7 +279,8 @@ var CMS = window.CMS || {};
                 });
 
                 // attach events to paste
-                this.ui.container.on(this.click, '.cms-tree-item-helpers a', function () {
+                this.ui.container.on(this.click, '.cms-tree-item-helpers a', function (e) {
+                    e.preventDefault();
                     var target = that._getNodeData(that._getNodeId($(this)));
                     var obj = {
                         target: target.id,
@@ -510,6 +518,11 @@ var CMS = window.CMS || {};
 
                 container.on(that.click, function (e) {
                     e.stopImmediatePropagation();
+                });
+
+                // attach event for site filtering
+                $('.js-cms-tree-search-site select').on('change', function () {
+                    $(this).closest('form').submit();
                 });
             },
 
