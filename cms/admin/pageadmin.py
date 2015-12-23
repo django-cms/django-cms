@@ -22,7 +22,8 @@ try:
     from django.contrib.sites.shortcuts import get_current_site
 except ImportError:
     from django.contrib.sites.models import get_current_site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist,
+                                    PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
@@ -128,8 +129,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
+            # Deprecated in 3.2.1, please use ".../change-template/..." instead
             pat(r'^([0-9]+)/change_template/$', self.change_template),
-            pat(r'^([0-9]+)/([a-z\-]+)/descendants/$', self.descendants),  # menu html for page descendants
+            pat(r'^([0-9]+)/change-template/$', self.change_template),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -138,6 +140,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^add-page-type/$', self.add_page_type),
             pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
+            url(r'^get-tree/$', self.get_tree, name="get_tree"),
         ]
 
         if plugin_pool.get_all_plugins():
@@ -863,7 +866,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
 
-        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
+        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page)))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(self.model, id=page_id)
@@ -1007,7 +1010,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # create a new publish reversion
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
@@ -1108,7 +1111,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         # TODO: This should never fail, but it may be a POF
         path = page.get_absolute_url(language=language)
@@ -1251,20 +1254,52 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if page.has_change_permission(request):
             page.toggle_in_navigation()
             language = request.GET.get('language') or get_language_from_request(request)
-            return admin_utils.render_admin_menu_item(request, page, language=language)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page, language=language))
         return HttpResponseForbidden(force_text(_("You do not have permission to change this page's in_navigation status")))
 
-    def descendants(self, request, page_id, language):
+    def get_tree(self, request):
         """
-        Get html for descendants of given page
+        Get html for the descendants (only) of given page or if no page_id is
+        provided, all the root nodes.
+
         Used for lazy loading pages in cms.changelist.js
 
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
-        page = get_object_or_404(self.model, pk=page_id)
-        return admin_utils.render_admin_menu_item(request, page,
-                                                  template="admin/cms/page/tree/lazy_menu.html", language=language)
+        page_id = request.GET.get('pageId', None)
+        site_id = request.GET.get('site', None)
+        language = request.GET.get('language', None)
+        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
+
+        try:
+            site_id = int(site_id)
+            site = Site.objects.get(id=site_id)
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if language is None:
+            language = (request.GET.get('language') or
+                        get_language_from_request(request))
+
+        if page_id:
+            page = get_object_or_404(self.model, pk=int(page_id))
+            pages = list(page.get_children())
+        else:
+            pages = Page.get_root_nodes().filter(site=site,
+                                                 publisher_is_draft=True)
+
+        template = "admin/cms/page/tree/lazy_menu.html"
+        response = u""
+        for page in pages:
+            response += admin_utils.render_admin_menu_item(
+                request, page,
+               template=template,
+               language=language,
+               open_nodes=open_nodes,
+           )
+        return HttpResponse(response)
 
     def add_page_type(self, request):
         site = Site.objects.get_current()

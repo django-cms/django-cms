@@ -78,10 +78,10 @@ var CMS = window.CMS || {};
                         condition2 = index <= (idx + 1);
 
                         if (condition1 && condition2) {
-                            that.ui.cols.eq(idx).addClass('hidden');
+                            that.ui.cols.eq(idx).addClass('cms-hidden');
                             index = idx;
                         } else {
-                            that.ui.cols.eq(idx).removeClass('hidden');
+                            that.ui.cols.eq(idx).removeClass('cms-hidden');
                         }
                     }
                 }
@@ -104,25 +104,6 @@ var CMS = window.CMS || {};
         };
 
         // TODO implement success feedback when moving a tree item (that.options.lang.success)
-        // TODO implement error handling when tree couldnt be moved (that.options.lang.error)
-        // TODO make sure static path is not hard coded
-        // TODO implement dialog for copy permissions
-        /* TODO avialable ajax requests:
-        *  'cms/page/' + pageId + '/change-navigation/?language=' + language (used for filtering)
-        *  > loaded for first initialization
-        *  > need to pass "data.fitlered = 1"
-        *  > might need to consider site: { 1: 1 }
-        *  'cms/page/' + pageId + '/' + language + '/descendants/'
-        *  > loading decendents of a closed item
-        *  'cms/page/' + item_id + '/dialog/copy/'
-        *  > triggers the permission conform dialog
-        *  > copy an item into new ancestor with
-        *  > { position: position, target: target_id, site: site }
-        *  'cms/page/' + item_id + '/copy-page/
-        *  > same as above but triggers the actual move
-        *  'cms/page/' + item_id + '/move-page/
-        *  > { position: position, target: target_id, site: site }
-        */
 
         /**
          * The pagetree is loaded via `/admin/cms/page` and has a custom admin
@@ -141,24 +122,19 @@ var CMS = window.CMS || {};
                 this.options = $('.js-cms-pagetree').data('json');
                 this.options = $.extend(true, {}, this.options, options);
 
-                // elements
-                this._setupUI();
-
                 // states and events
                 this.click = 'click.cms.pagetree';
+                this.cache = undefined;
+                this.cacheType = '';
 
-                // make sure that ajax request send the csrf token
-                this.csrf(this.options.csrf);
-
-                // setup functionality
-                this._setup();
+                // elements
+                this._setupUI();
                 this._events();
-                this._setFilter();
-                this._setTooltips();
 
-                // make sure ajax post requests are working
-                this._setAjaxPost('.js-cms-tree-item-menu a');
-                this._setAjaxPost('.js-cms-tree-lang-trigger');
+                // cancel if pagtree is not available
+                if (!$.isEmptyObject(this.options)) {
+                    this._setup();
+                }
             },
 
             /**
@@ -172,7 +148,8 @@ var CMS = window.CMS || {};
                 this.ui = {
                     container: pagetree,
                     document: $(document),
-                    tree: pagetree.find('.js-cms-pagetree')
+                    tree: pagetree.find('.js-cms-pagetree'),
+                    dialog: $('.js-cms-tree-dialog')
                 };
             },
 
@@ -185,6 +162,14 @@ var CMS = window.CMS || {};
             _setup: function _setup() {
                 var that = this;
                 var columns = [];
+                var obj = {
+                    language: this.options.lang.code,
+                    openNodes: []
+                };
+                var data = (this.options.filtered === 'true') ? false : true;
+
+                // make sure that ajax request send the csrf token
+                this.csrf(this.options.csrf);
 
                 // setup column headings
                 $.each(this.options.columns, function (index, obj) {
@@ -208,6 +193,31 @@ var CMS = window.CMS || {};
                     }
                 });
 
+                // prepare data
+                if (data) {
+                    data = {
+                        url: this.options.urls.tree,
+                        data: function (node) {
+                            // '#' is rendered if its the root node, there we only
+                            // care about `obj.openNodes`, in the following case
+                            // we are requesting a specific node
+                            if (node.id !== '#') {
+                                obj.pageId = that._setNode(node.data.id);
+                            }
+
+                            // we need to store the opened items inside the localstorage
+                            // as we have to load the pagetree with the previous opened
+                            // state
+                            obj.openNodes = that._getNodes();
+
+                            // we need to set the site id to get the correct tree
+                            obj.site = that.options.site;
+
+                            return obj;
+                        }
+                    }
+                }
+
                 // bind options to the jstree instance
                 this.ui.tree.jstree({
                     core: {
@@ -216,25 +226,19 @@ var CMS = window.CMS || {};
                         // core setting to allow actions
                         check_callback: true,
                         // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
-                        /*
-                        data: {
-                            url: 'get-tree/',
-                            data: {
-                                //pageId: 90,
-                                language: 'en'
-                            }
-                        },
-                        */
+                        data: data,
                         // strings used within jstree that are called using `get_string`
                         strings: {
-                            'Loading ...': 'Loading ...',
-                            'New node': 'New node',
-                            'nodes': 'nodes'
+                            'Loading ...': this.options.lang.loading,
+                            'New node': this.options.lang.newNode,
+                            'nodes': this.options.lang.nodes
                         },
                         error: function (error) {
                             that.showError(error.reason);
+                        },
+                        themes: {
+                            name: 'default'
                         }
-                        // TODO need to add theme capabilities
                     },
                     // activate drag and drop plugin
                     plugins : ['dnd', 'search', 'grid', 'gridResize'],
@@ -247,32 +251,255 @@ var CMS = window.CMS || {};
                 });
             },
 
-            _events: function () {
+            /**
+             * Sets up all the event handlers, such as opening and moving.
+             *
+             * @method _events
+             * @private
+             */
+            _events: function _events() {
                 var that = this;
 
-                this.ui.container.on('click', '.cms-tree-item-move', function (e) {
-                    that._getNode($(e.target));
+                // set events for the nodeId updates
+                this.ui.tree.on('after_close.jstree', function (e, el) {
+                    that._removeNode(el.node.data.id);
+                });
+                this.ui.tree.on('after_open.jstree', function (e, el) {
+                    that._setNode(el.node.data.id);
                 });
 
-                this.ui.document.on('dnd_stop.vakata', function () {
-                    console.log('stop drag&drop');
+                // drag and dropping items and saving their states
+                $(document).on('dnd_stop.vakata', function (e, el) {
+                    that._moveNode(that._getNodeData(el.element));
                 });
 
-                this.ui.container.on('changed.jstree', function () {
-                    console.log('trigger open');
+                // set event for cut and paste
+                this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
+                    e.preventDefault();
+                    that.cache = that._getNodeData(that._getNodeId($(this)));
+                    that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
+                    that._toggleHelpers();
+                });
+
+                // attach events to paste
+                this.ui.container.on(this.click, '.cms-tree-item-helpers a', function (e) {
+                    e.preventDefault();
+                    var target = that._getNodeData(that._getNodeId($(this)));
+                    var obj = {
+                        target: target.id,
+                        position: 'last-child',
+                        id: that.cache.id
+                    };
+
+                    that._toggleHelpers();
+
+                    if (that.cacheType === 'cut') {
+                        that._moveNode(obj);
+                    }
+                    if (that.cacheType === 'copy') {
+                        that._copyNode(obj);
+                    }
+                });
+
+                // additional event handlers
+                this._setFilter();
+                this._setTooltips();
+
+                // make sure ajax post requests are working
+                this._setAjaxPost('.js-cms-tree-item-menu a');
+                this._setAjaxPost('.js-cms-tree-lang-trigger');
+            },
+
+            /**
+             * Retreives a list of nodes from local storage.
+             *
+             * @method _getNodes
+             * @private
+             * @return {Array} list of ids
+             */
+            _getNodes: function _getNodes() {
+                var storage = localStorage.getItem('cms_test_storage');
+
+                return (storage) ? storage.split(',') : [];
+            },
+
+            /**
+             * Stores a node in local storage.
+             *
+             * @method _setNode
+             * @private
+             * @param {String} id to be stored
+             * @return {String} id that has been stored
+             */
+            _setNode: function _setNode(id) {
+                var number = id.toString();
+                var storage = this._getNodes();
+                // store value only if it isn't there yet
+                if (storage.indexOf(number) === -1) {
+                    storage.push(number);
+                }
+
+                localStorage.setItem('cms_test_storage', storage);
+
+                return number;
+            },
+
+            /**
+             * Removes a node in local storage.
+             *
+             * @method _setNode
+             * @private
+             * @param {String} id to be stored
+             * @return {String} id that has been removed
+             */
+            _removeNode: function _removeNode(id) {
+                var number = id.toString();
+                var storage = this._getNodes();
+                var index = storage.indexOf(number);
+
+                // remove given id from storage
+                if (index !== -1) {
+                    storage.splice(index, 1);
+                }
+
+                localStorage.setItem('cms_test_storage', storage);
+
+                return number;
+            },
+
+            /**
+             * Moves a node after drag & drop.
+             *
+             * @method _moveNode
+             * @param {Object} [opts]
+             * @param {Number} [opts.id] current element id for url matching
+             * @param {Number} [opts.target] target sibling or parent
+             * @param {Number} [opts.position] either `left`, `right` or `last-child`
+             * @private
+             */
+            _moveNode: function _moveNode(obj) {
+                var that = this;
+                obj.site = that.options.site;
+
+                $.ajax({
+                    method: 'post',
+                    url: that.options.urls.move.replace('{id}', obj.id),
+                    data: obj
+                }).done(function () {
+                    if (that.cache) {
+                        that.ui.tree.jstree('move_node',
+                            that.ui.tree.find('li[data-id="' + obj.id + '"]'),
+                            that.ui.tree.find('li[data-id="' + obj.target + '"]'));
+                    }
+                    that.cache = undefined;
+                }).error(function (error) {
+                    that.showError(error.statusText);
                 });
             },
 
-            _getNode: function (element) {
-                var tree = this.ui.container.jstree();
-                var el = element.closest('li');
-                var obj = tree.get_node(el);
+            /**
+             * Copies a node into the selected node.
+             *
+             * @method _copyNode
+             * @param {Object} [opts]
+             * @param {Number} [opts.id] current element id for url matching
+             * @param {Number} [opts.target] target sibling or parent
+             * @param {Number} [opts.position] either `left`, `right` or `last-child`
+             * @private
+             */
+            _copyNode: function _copyNode(obj) {
+                var that = this;
+                obj.site = that.options.site;
 
-                // TODO move capabilities
-                console.log(obj);
+                $.ajax({
+                    method: 'post',
+                    url: that.options.urls.copyPermission.replace('{id}', obj.id),
+                    data: obj
+                // the dialog is loaded via the ajax respons originating from
+                // `templates/admin/cms/page/tree/copy_premissions.html`
+                }).done(function (data) {
+                    that.ui.dialog.append(data);
+                }).error(function (error) {
+                    that.showError(error.statusText);
+                });
 
-                // mock node
-                tree.move_node(obj, tree.get_node(el.prev()), 'last');
+                // attach events to the permission dialog
+                this.ui.dialog.off(this.click, '.cancel').on(this.click, '.cancel', function (e) {
+                    e.preventDefault();
+                    $('.js-cms-dialog').remove();
+                }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
+                    e.preventDefault();
+                    var data = $(this).closest('form').serialize().split('&');
+                    // loop through form data and attach to obj
+                    for (var i = 0; i < data.length; i++) {
+                        obj[data[i].split('=')[0]] = data[i].split('=')[1];
+                    }
+                    // send the real ajax request for copying the plugin
+                    $.ajax({
+                        method: 'post',
+                        url: that.options.urls.copy.replace('{id}', obj.id),
+                        data: obj
+                    }).done(function () {
+                        that.reloadBrowser();
+                    }).error(function (error) {
+                        that.showError(error.statusText);
+                    });
+                });
+            },
+
+            /**
+             * Returns element from any sub nodes.
+             *
+             * @method _getElement
+             * @private
+             * @param {jQuery} el jQuery node form where to search
+             * @return {String} jsTree node element id
+             */
+            _getNodeId: function _getElement(el) {
+                return el.closest('.jstree-grid-cell')
+                    .attr('class')
+                    .split(' ')[0]
+                    .replace('jsgrid_', '')
+                    .replace('_col', '');
+            },
+
+            /**
+             * Sets up all the event handlers, such as opening and moving.
+             *
+             * @method _getNodeData
+             * @private
+             * @param {jQuery} el node to be evaluated
+             * @return {Object} evaluated object with params
+             */
+            _getNodeData: function _getNodeData(el) {
+                var obj = {};
+                var element = this.ui.tree.jstree('get_node', el);
+                var parent = this.ui.tree.jstree('get_parent', element);
+                var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
+                var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
+                var parentDom = this.ui.tree.jstree('get_node', parent);
+
+                // last-child if there is only one element (nested)
+                // left if it can be placed before the get_next_dom (current sibling level)
+                // right if it can be placed after the get_prev_dom (current sibling level)
+                if (nextDom) {
+                    obj.position = 'left';
+                    obj.target = nextDom.data().id;
+                } else if (prevDom) {
+                    obj.position = 'right';
+                    obj.target = prevDom.data().id;
+                } else if(parentDom) {
+                    obj.position = 'last-child';
+                    obj.target = parentDom.data.id;
+                } else {
+                    obj.position = 'last-child';
+                }
+
+                if (element.data) {
+                    obj.id = element.data.id;
+                }
+
+                return obj;
             },
 
             /**
@@ -299,6 +526,11 @@ var CMS = window.CMS || {};
 
                 container.on(that.click, function (e) {
                     e.stopImmediatePropagation();
+                });
+
+                // attach event for site filtering
+                $('.js-cms-tree-search-site select').on('change', function () {
+                    $(this).closest('form').submit();
                 });
             },
 
@@ -350,12 +582,25 @@ var CMS = window.CMS || {};
 
                 this.ui.container.on(this.click, trigger, function (e) {
                     e.preventDefault();
-                    $.post($(this).attr('href')).done(function () {
+                    $.ajax({
+                        method: 'post',
+                        url: $(this).attr('href')
+                    }).done(function () {
                         window.location.reload();
                     }).error(function (error) {
                         that.showError(error.statusText);
                     });
                 });
+            },
+
+            /**
+             * Shows and hides paste helpers.
+             *
+             * @method _toggleHelpers
+             * @private
+             */
+            _toggleHelpers: function _toggleHelpers() {
+                $('.cms-tree-item-helpers').toggleClass('cms-hidden');
             },
 
             /**
@@ -368,7 +613,7 @@ var CMS = window.CMS || {};
                 var messages = $('.messagelist');
                 var breadcrumb = $('.breadcrumbs');
                 var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
-                var msg = tpl.replace('{msg}', message);
+                var msg = tpl.replace('{msg}', this.options.lang.error + ' – ' + message);
 
                 messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
             }

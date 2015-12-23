@@ -63,8 +63,7 @@ class TreePublishRow(Tag):
                 cls = "published"
                 text = _("published")
         else:
-
-            if language in page.languages:
+            if language in list(page.languages):
                 public_pending = page.publisher_public_id and page.publisher_public.get_publisher_state(
                         language) == PUBLISHER_STATE_PENDING
                 if public_pending or page.get_publisher_state(

@@ -25,6 +25,16 @@
         margin: $padding-normal 0;
         padding: $padding-normal 0;
         border-top: 1px solid $gray-lighter;
+        label {
+            display: inline;
+        }
+        input[type="checkbox"] {
+            position: relative;
+            top: -3px;
+        }
+        p {
+            padding: $padding-normal 0;
+        }
     }
 
     @media (max-width: ($dialog-width + 2 * $padding-large)) {

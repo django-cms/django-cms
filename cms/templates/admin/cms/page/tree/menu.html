@@ -2,14 +2,18 @@
 
 {# INFO: columns are defined in base.html options #}
 <li class="cms-tree-node {{ css_class }}
-    {# TODO maybe not required #}
-    {% if page.get_descendant_count %} jstree-children cms-tree-node-haschildren{% endif %}
-    {% if page.reverse_id == "page_types" %} cms-tree-node-pagetype{% endif %}
+    {% if page.pk in open_nodes %} jstree-open{% elif children %} jstree-closed{% endif %}
+    {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
     {% if page.level == 0 %} cms-tree-node-top{% endif %}
     {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
+    {% if not CMS_PERMISSION or has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     "
+    data-id="{{ page.pk }}"
     data-colview='
         <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
+                <a href="#" data-id="{{ page.pk }}"><span class="cms-icon cms-icon-alias"></span> {% trans "Paste" %}</a>
+            </div>
             <div class="cms-tree-item cms-tree-item-icons">
                 {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
                 {% if page.soft_root %}
@@ -95,19 +99,17 @@
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
                     <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
                 </div>
-                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy" data-id="{{ page.pk }}">
                     <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
                 </div>
             {% endif %}
-            {% if has_add_permission and has_add_page_permission and has_add_on_same_level_permission %}
-                {# TODO something else has to happen here #}
-            {% else %}
+            {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
                     <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
                 </div>
             {% endif %}
             {% if has_move_page_permission %}
-                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-cut">
                     <a href="#"><span class="cms-icon cms-icon-scissors"></span></a>
                 </div>
             {% endif %}
@@ -165,11 +167,13 @@
     {% language preview_language %}
         {{ page.get_admin_tree_title }}
     {% endlanguage %}
-</li>
 
-{# CHILDREN RENDERING #}
-{% if page.childrens and page.id in open_menu_trees %}
-    {% for child in page.childrens %}
-        {% show_admin_menu child %}
-    {% endfor %}
-{% endif %}
+    {# INFO render children #}
+    {% if page.pk in open_nodes and children %}
+        <ul>
+            {% for child in children %}
+                {% show_lazy_admin_menu child %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>

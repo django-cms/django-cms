@@ -1,8 +1,6 @@
 {% extends "admin/change_list.html" %}
 {% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags %}
 
-{# admin_list admin_urls cms_admin cms_js_tags #}
-
 {# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
@@ -17,10 +15,6 @@
     <link rel="stylesheet" href="{% static 'cms/css/cms.pagetree.css' %}">
     <link rel="stylesheet" href="{% static 'cms/js/jstree/tree_component.css' %}">
     <link rel="stylesheet" href="{% static 'cms/js/libs/jstree/themes/default/style.min.css' %}">
-    {# TODO why? #}
-    {% if cl.is_filtered %}
-        <link rel="stylesheet" href="{% static 'cms/js/libs/jstree/themes/default/style.css' %}">
-    {% endif %}
     <script src="{% static 'cms/js/modules/jquery.noconflict.pre.js' %}"></script>
     <script src="{% static 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
     <script src="{% static 'cms/js/libs/jstree/jstree.js' %}"></script>
@@ -67,27 +61,24 @@
 {% endblock object-tools %}
 
 {% block search %}
-    {# TODO needs markup comparison #}
-    {# TODO integrate site selector #}
-    {# TODO standard search form #}
-    {# search_form cl #}
-    <form action="." method="get" class="cms-tree-search" id="changelist-search">
-        <label for="field-search">{% trans "Search" %}</label>
-        <input type="text" name="q" id="field-search" value="{{ request.GET.q }}">
-
-        {% if cl.sites.count > 1 %}
-            <label for="field-search-site">{% trans "Pages on:" %}</label>
-            <select name="site__exact" id="field-search-site">
+    <form method="post" class="cms-tree-search cms-tree-search-site js-cms-tree-search-site">
+        {% if cl.has_access_to_multiple_sites %}
+            <label for="field-site-select">{% trans "Pages on:" %}</label>
+            <select id="field-site-select" name="site__exact">
                 {% for site in cl.sites %}
-                    <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected="selected"{% endif %}>{{ site.name }}</option>
+                    <option value="{{ site.pk }}"{% if site.pk == cl.current_site.pk %} selected{% endif %}>{{ site.name }}</option>
                 {% endfor %}
             </select>
+            <input type="hidden" name="copy">
+            {% csrf_token %}
+        {% else %}
+            <input type="hidden" value="{{ cl.sites.0.pk }}">
         {% endif %}
-
-        <input type="submit" value="{% trans "Search" %}">
-        <input type="hidden" name="copy">
-        {% csrf_token %}
     </form>
+
+    <div class="cms-tree-search">
+        {% search_form cl %}
+    </div>
 {% endblock %}
 
 {% block filters %}
@@ -110,21 +101,31 @@
     <div class="clear"></div>
     <h2>{% trans "Pages" %}</h2>
 
-    {% if cl.get_items %}
-        {# INFO: javascript is loaded from cms.pagetree.js #}
+    {# INFO: javascript is loaded from cms.pagetree.js #}
+    {% if cl.get_items or cl.get_items and cl.is_filtered %}
         <div class="cms-pagetree-container">
             <div class="cms-pagetree js-cms-pagetree" data-json='{
+                "urls": {
+                    "tree": "{% url 'admin:get_tree' %}",
+                    "move": "./{id}/move-page/",
+                    "copy": "./{id}/copy-page/",
+                    "copyPermission": "./{id}/dialog/copy/"
+                },
                 "csrf": "{{ csrf_token }}",
                 "static": "{{ STATIC_URL }}",
                 "permission": "{{ CMS_PERMISSION|bool }}",
                 "debug": "{{ DEBUG|bool }}",
-                "filtered": "{{ cl.is_filtered|bool }}",
+                "filtered": "{% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %}",
+                "site": "{{ cl.current_site.pk }}",
                 "lang": {
+                    "code": "{{ LANGUAGE_CODE|lower }}",
                     "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
                     "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
                     "error": "{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}",
                     "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
-                    "loading": "{% trans "Loading..." %}"
+                    "loading": "{% trans "Loading..." %}",
+                    "newNode": "{% trans 'New node' %}",
+                    "nodes": "{% trans 'nodes' %}"
                 },
                 "columns": [{
                     "title": "{% trans 'Pages' %}",
@@ -151,15 +152,17 @@
                 }]
             }'>
                 <ul>
-                    {# loading the tree elements #}
-                    {% for page in cl.get_items %}
-                        {% show_admin_menu page %}
-                    {% endfor %}
+                    {% if cl.is_filtered or request.GET.q %}
+                        {# INFO: load html data source when filtering #}
+                        {% for page in cl.get_items %}
+                            {% show_admin_menu page %}
+                        {% endfor %}
+                    {% endif %}
                 </ul>
             </div>
         </div>
     {% else %}
-        {# INFO: ask to add a page if tree is empty #}
+        {# INFO: show add a page button when there are no items #}
         {% url opts|admin_urlname:'add' as add_url %}
         {% blocktrans %}
             <em>There is no page around yet.</em>
@@ -168,21 +171,11 @@
         {% endblocktrans %}
     {% endif %}
 
-    {% comment %}
-    {# CREATING MULTIPLE TREES IS POSSIBLE #}
-    <p>Page Types</p>
-    {# allow multiple trees #}
-    <div class="cms-pagetree js-cms-pagetree">
-        <ul>
-            {# loading the tree elements #}
-            {% for page in cl.get_items %}
-                {% show_admin_menu page %}
-            {% endfor %}
-        </ul>
-    </div>
-    {% endcomment %}
+    {# INFO: show reset button when filtering is active #}
+    {% if cl.is_filtered or request.GET.q %}
+        <a href="{% url opts|admin_urlname:'changelist' %}" class="reset">{% trans "Reset filter" %}</a>
+    {% endif %}
 
-    {# TODO there are dialogs loaded for the persmission checks #}
-    <div id="dialogs"></div>
-
+    {# INFO: used when copying nodes #}
+    <div class="cms-tree-dialog js-cms-tree-dialog"></div>
 {% endblock result_list %}
