@@ -22,7 +22,8 @@ try:
     from django.contrib.sites.shortcuts import get_current_site
 except ImportError:
     from django.contrib.sites.models import get_current_site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist,
+                                    PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
@@ -1267,17 +1268,27 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         which is called by admin_utils.render_admin_menu_item.
         """
         page_id = request.GET.get('pageId', None)
+        site_id = request.GET.get('site', None)
         language = request.GET.get('language', None)
         open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
+
+        try:
+            site_id = int(site_id)
+            site = Site.objects.get(id=site_id)
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
 
         if language is None:
             language = (request.GET.get('language') or
                         get_language_from_request(request))
+
         if page_id:
             page = get_object_or_404(self.model, pk=int(page_id))
             pages = list(page.get_children())
         else:
-            pages = Page.get_root_nodes().filter(publisher_is_draft=True)
+            pages = Page.get_root_nodes().filter(site=site,
+                                                 publisher_is_draft=True)
 
         template = "admin/cms/page/tree/lazy_menu.html"
         response = u""
