@@ -480,6 +480,13 @@ var CMS = window.CMS || {};
                 var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
                 var parentDom = this.ui.tree.jstree('get_node', parent);
 
+                console.log('origin: ', el);
+                console.log('element: ', element);
+                console.log('parent: ', parent);
+                console.log('nextDom: ', nextDom);
+                console.log('prevDom: ', prevDom);
+                console.log('parentDom: ', parentDom);
+
                 // last-child if there is only one element (nested)
                 // left if it can be placed before the get_next_dom (current sibling level)
                 // right if it can be placed after the get_prev_dom (current sibling level)
@@ -489,12 +496,16 @@ var CMS = window.CMS || {};
                 } else if (prevDom) {
                     obj.position = 'right';
                     obj.target = prevDom.data().id;
+                } else if(parentDom) {
+                    obj.position = 'last-child';
+                    obj.target = parentDom.data.id;
                 } else {
                     obj.position = 'last-child';
-                    console.log(parentDom);
-                    obj.target = parentDom.data.id;
                 }
-                obj.id = element.data.id;
+
+                if (element.data) {
+                    obj.id = element.data.id;
+                }
 
                 return obj;
             },
