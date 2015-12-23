@@ -480,13 +480,6 @@ var CMS = window.CMS || {};
                 var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
                 var parentDom = this.ui.tree.jstree('get_node', parent);
 
-                console.log('origin: ', el);
-                console.log('element: ', element);
-                console.log('parent: ', parent);
-                console.log('nextDom: ', nextDom);
-                console.log('prevDom: ', prevDom);
-                console.log('parentDom: ', parentDom);
-
                 // last-child if there is only one element (nested)
                 // left if it can be placed before the get_next_dom (current sibling level)
                 // right if it can be placed after the get_prev_dom (current sibling level)
