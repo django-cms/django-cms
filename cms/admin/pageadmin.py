@@ -1275,7 +1275,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                         get_language_from_request(request))
         if page_id:
             page = get_object_or_404(self.model, pk=int(page_id))
-            pages = list(page.get_descendants(include_self=False))
+            pages = list(page.get_children())
         else:
             pages = Page.get_root_nodes().filter(publisher_is_draft=True)
 
