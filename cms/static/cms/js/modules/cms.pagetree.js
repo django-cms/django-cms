@@ -210,6 +210,9 @@ var CMS = window.CMS || {};
                             // state
                             obj.openNodes = that._getNodes();
 
+                            // we need to set the site id to get the correct tree
+                            obj.site = that.options.site;
+
                             return obj;
                         }
                     }
