@@ -277,11 +277,7 @@ var CMS = window.CMS || {};
                 this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
                     e.preventDefault();
                     that.cache = that._getNodeData(that._getNodeId($(this)));
-                    if ($(this).hasClass('js-cms-tree-item-cut')) {
-                        that.cacheType = 'cut';
-                    } else {
-                        that.cacheType = 'copy';
-                    }
+                    that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
                     that._toggleHelpers();
                 });
 
