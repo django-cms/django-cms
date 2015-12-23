@@ -167,7 +167,6 @@
 
     {# INFO: show add a page button when there are no items #}
     {% if not cl.get_items and not cl.is_filtered %}
-        {# INFO: ask to add a page if tree is empty #}
         {% url opts|admin_urlname:'add' as add_url %}
         {% blocktrans %}
             <em>There is no page around yet.</em>
