@@ -48,8 +48,19 @@ HELPER_SETTINGS = dict(
         }
     },
     INSTALLED_APPS=[
-        'djangocms_text_ckeditor',
-    ]
+       'djangocms_text_ckeditor',
+       'djangocms_grid'
+    ],
+    TEMPLATE_DIRS=(
+        os.path.join(
+            os.path.dirname(__file__),
+            'cms', 'test_utils', 'project', 'templates'),
+    ),
+    CMS_TEMPLATES=(
+        ('fullwidth.html', 'Fullwidth'),
+        ('page.html', 'Normal page'),
+        ('col_three.html', 'Col three'),
+    )
 )
 
 
