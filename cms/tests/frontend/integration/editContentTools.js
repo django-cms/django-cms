@@ -69,7 +69,6 @@ casper.test.begin('Edit utils page content', function (test) {
         .waitUntilVisible('.cms-modal-open', function () {
             this.click('.cms-modal-buttons .deletelink');
         })
-        // check if number of content plugins decreased
         .waitWhileVisible('.cms-modal-open', function () {
             test.assertElementCount('.cms-draggables .cms-draggable', contentNumber, messages.deleteSuccessful);
         })
