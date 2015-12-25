@@ -8,7 +8,7 @@ var messages = require('./settings/messages').page.addContent;
 var randomString = require('./helpers/randomString').randomString;
 
 // random text string for filtering and content purposes
-var randomText = randomString({ length: 50, withWhitespaces: true });
+var randomText = randomString({ length: 50, withWhitespaces: false });
 
 casper.test.begin('User Add Content', function (test) {
     casper
