@@ -21,8 +21,10 @@
     <ul class="nav">
         {% show_menu 0 100 100 100 %}
     </ul>
-    {% block content %}
-    {% endblock content %}
+    {% block content %}{% endblock content %}
+</div>
+<div class="additional-content">
+    {% block additional_content %}{% endblock %}
 </div>
 {% render_block "js" %}
 {% with_data "js-script" as jsset %}

@@ -54,7 +54,6 @@ HELPER_SETTINGS = dict(
     TEMPLATE_DIRS=(
         os.path.join(
             os.path.dirname(__file__),
-            'cms', 'test_utils', 'project', 'templates',
             'cms', 'test_utils', 'project', 'templates', 'integration'),
     ),
     CMS_TEMPLATES=(
