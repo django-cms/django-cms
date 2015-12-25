@@ -48,6 +48,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount('.cms-draggables .cms-draggable', contentNumber + 1, messages.copySuccessful);
         })
 
+        .wait(1000)
         // CHECK DELETE UTIL
         // click settings for last content plugin
         .then(function () {
@@ -58,15 +59,13 @@ casper.test.begin('Edit utils page content', function (test) {
             // click settings for last content plugin
             this.click('.cms-structure .cms-draggable:last-child .cms-submenu-settings');
         })
-        // select copy button from dropdown list
-        .waitUntilVisible(
-            '.cms-structure .cms-draggable:last-child .cms-submenu-item a[data-rel="delete"]',
-            function () {
-                this.click('.cms-structure .cms-draggable:last-child .cms-submenu-item a[data-rel="delete"]');
-            }
-        )
+        // select delete button from dropdown list
+        .then(function () {
+            this.click('.cms-structure .cms-draggable:last-child .cms-submenu-item a[data-rel="delete"]');
+        })
         // wait for modal window appearance and submit plugin deletion
         .waitUntilVisible('.cms-modal-open', function () {
+            test.assertVisible('.cms-modal-open');
             this.click('.cms-modal-buttons .deletelink');
         })
         .waitWhileVisible('.cms-modal-open', function () {
