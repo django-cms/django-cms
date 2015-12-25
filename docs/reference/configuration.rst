@@ -771,6 +771,9 @@ performance.
           limit.  Unfortunately, this means that non-superusers won't see any
           benefit from this setting.
 
+.. versionchanged:: 3.2.1: CMS_RAW_ID_USERS also applies to
+                           :class:`cms.model.GlobalPagePermission`` admin.
+
 
 .. setting:: CMS_PUBLIC_FOR
 
