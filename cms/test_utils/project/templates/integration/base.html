@@ -28,7 +28,7 @@
 </div>
 {% render_block "js" %}
 {% with_data "js-script" as jsset %}
-        {% for js in jsset %}<script type="text/javascript" src="{% static js %}"></script>{% endfor %}
+    {% for js in jsset %}<script type="text/javascript" src="{% static js %}"></script>{% endfor %}
 {% end_with_data %}
 {% render_block "js_end" %}
 </body>
