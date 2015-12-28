@@ -2,6 +2,7 @@
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
+from cms import __version__
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.utils import get_cms_setting
 from cms.utils.admin import get_admin_menu_item_context
@@ -252,6 +253,9 @@ def admin_static_url():
     """
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
 
+@register.simple_tag
+def get_cms_version():
+    return __version__
 
 class CMSAdminIconBase(Tag):
     name = 'cms_admin_icon_base'
