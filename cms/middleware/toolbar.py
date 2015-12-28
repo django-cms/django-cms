@@ -138,7 +138,6 @@ class ToolbarMiddleware(object):
             request.session['cms_build'] = False
             request.session['cms_edit'] = False
             request.session['cms_toolbar_disabled'] = True
-            # menu_pool.clear()
 
         if request.user.is_staff:
             try:
