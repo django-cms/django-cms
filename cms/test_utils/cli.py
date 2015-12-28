@@ -94,7 +94,6 @@ def configure(db_url, **extra):
             'djangocms_column',
             'djangocms_picture',
             'djangocms_file',
-            'djangocms_flash',
             'djangocms_googlemap',
             'djangocms_teaser',
             'djangocms_video',
@@ -202,12 +201,12 @@ def configure(db_url, **extra):
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'MultiColumnPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
             'col_left': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
                             'MultiColumnPlugin', 'StylePlugin', 'EmptyPlugin'),
                 'name': gettext("left column"),
@@ -219,9 +218,9 @@ def configure(db_url, **extra):
                 },
             },
             'col_right': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin',
-                            'StylePlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {
@@ -281,9 +280,9 @@ def configure(db_url, **extra):
         }
     ]
 
-    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_flash', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
-               'djangocms_teaser', 'djangocms_video')
+    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture',
+               'djangocms_style', 'djangocms_teaser', 'djangocms_video')
 
     defaults['MIGRATION_MODULES'] = _get_migration_modules(plugins)
     if not defaults.get('TESTS_MIGRATE', False):

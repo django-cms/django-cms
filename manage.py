@@ -58,7 +58,6 @@ if __name__ == '__main__':
         'djangocms_column',
         'djangocms_picture',
         'djangocms_file',
-        'djangocms_flash',
         'djangocms_googlemap',
         'djangocms_teaser',
         'djangocms_video',
@@ -107,9 +106,9 @@ if __name__ == '__main__':
         }],
     }
 
-    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_flash', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
-               'djangocms_teaser', 'djangocms_video')
+    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture',
+               'djangocms_style', 'djangocms_teaser', 'djangocms_video')
 
     migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
     if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
@@ -272,13 +271,14 @@ if __name__ == '__main__':
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
             'col_left': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("left column"),
                 'plugin_modules': {
                     'LinkPlugin': 'Different Grouper'
@@ -288,8 +288,9 @@ if __name__ == '__main__':
                 },
             },
             'col_right': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {
