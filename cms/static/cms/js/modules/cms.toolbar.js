@@ -377,9 +377,6 @@ var CMS = window.CMS || {};
                     message: CMS.config.publisher,
                     dir: 'right'
                 });
-                setInterval(function () {
-                    CMS.$('.cms-toolbar-item-switch').toggleClass('cms-toolbar-item-switch-highlight');
-                }, CMS.API.Messages.messageDelay);
             }
 
             // open sideframe if it was previously opened
