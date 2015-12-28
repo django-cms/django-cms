@@ -61,13 +61,22 @@ describe('CMS.Toolbar', function () {
             });
         });
 
-        it('initializes the states', function () {
-            spyOn(CMS.Toolbar.prototype, '_initialStates');
+        // this spec can be thoroughly expanded, but for the moment just checking for the
+        // class and event is sufficient
+        it('initializes the states', function (done) {
+            spyOn(CMS.Toolbar.prototype, '_initialStates').and.callThrough();
+            CMS.settings = { sideframe: {}, version: 'fake' };
+            CMS.config = { settings: { version: 'fake' }, auth: true };
             jasmine.clock().install();
             toolbar = new CMS.Toolbar();
+            toolbar.ui.document.on('cms-ready', function () {
+                // expect this to happen
+                done();
+            });
             expect(toolbar._initialStates).not.toHaveBeenCalled();
             jasmine.clock().tick(200);
             expect(toolbar._initialStates).toHaveBeenCalled();
+            expect(toolbar.ui.body).toHaveClass('cms-ready');
             jasmine.clock().uninstall();
         });
 
