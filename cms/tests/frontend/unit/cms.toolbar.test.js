@@ -21,6 +21,9 @@ describe('CMS.Toolbar', function () {
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             $(function () {
+                spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
+                    return {};
+                });
                 toolbar = new CMS.Toolbar();
                 done();
             });
@@ -85,6 +88,9 @@ describe('CMS.Toolbar', function () {
                 CMS.settings = {
                     toolbar: 'collapsed'
                 };
+                spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
+                    return {};
+                });
                 toolbar = new CMS.Toolbar();
                 done();
             });
@@ -103,7 +109,7 @@ describe('CMS.Toolbar', function () {
         });
 
         it('delegates to `close()`', function () {
-            CMS.settings.toolbar = 'open'
+            CMS.settings.toolbar = 'expanded';
             spyOn(toolbar, 'open');
             spyOn(toolbar, 'close');
             toolbar.toggle();
@@ -113,13 +119,98 @@ describe('CMS.Toolbar', function () {
     });
 
     describe('.open', function () {
-        it('opens toolbar');
+        var toolbar;
+        beforeEach(function (done) {
+            fixture.load('toolbar.html');
+            CMS.config = {};
+            CMS.settings = {
+                toolbar: 'collapsed'
+            };
+            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
+                return {};
+            });
+            $(function () {
+                toolbar = new CMS.Toolbar();
+                done();
+            });
+        });
 
-        it('animates toolbar to correct position if debug is true');
+        afterEach(function () {
+            fixture.cleanup();
+        });
 
-        it('turns the disclosure triangle into correct position');
+        it('opens toolbar and remembers the state', function () {
+            expect(CMS.settings.toolbar).toEqual('collapsed');
+            spyOn(toolbar, '_show');
+            toolbar.open();
+            expect(toolbar._show).toHaveBeenCalled();
+            expect(CMS.settings.toolbar).toEqual('expanded');
+        });
 
-        it('remembers toolbar state');
+        it('animates toolbar with correct duration', function () {
+            spyOn($.fn, 'css').and.callThrough();
+            toolbar.open();
+            expect($.fn.css).toHaveBeenCalledWith({
+                'transition': 'margin-top 200ms',
+                'margin-top': 0
+            });
+
+            toolbar.open({ duration: 10 });
+            expect($.fn.css).toHaveBeenCalledWith({
+                'transition': 'margin-top 10ms',
+                'margin-top': 0
+            });
+        });
+
+        it('animates toolbar to correct position', function () {
+            spyOn($.fn, 'css').and.callThrough();
+            spyOn($.fn, 'animate').and.callThrough();
+
+            toolbar.open();
+            expect($.fn.css).toHaveBeenCalledWith({
+                'transition': 'margin-top 200ms',
+                'margin-top': 0
+            });
+            expect($.fn.animate).toHaveBeenCalledWith(
+                jasmine.any(Object),
+                200,
+                'linear'
+            );
+            // here we have to use toBeCloseTo because different browsers report different values
+            // e.g. FF reports 45.16666
+            expect($.fn.animate.calls.mostRecent().args[0]['margin-top']).toBeCloseTo(45, 0);
+        });
+
+        it('animates toolbar to correct position if debug is true', function () {
+            spyOn($.fn, 'css').and.callThrough();
+            spyOn($.fn, 'animate').and.callThrough();
+
+            $('<div class="cms-debug-bar"></div>').css({
+                height: '5px'
+            }).prependTo('#cms-top');
+
+            toolbar.open();
+            expect($.fn.css).toHaveBeenCalledWith({
+                'transition': 'margin-top 200ms',
+                'margin-top': 0
+            });
+            expect($.fn.animate).toHaveBeenCalledWith(
+                jasmine.any(Object),
+                200,
+                'linear'
+            );
+            // here we have to use toBeCloseTo because different browsers report different values
+            // e.g. FF reports 45.16666
+            expect($.fn.animate.calls.mostRecent().args[0]['margin-top']).toBeCloseTo(50, 0);
+        });
+
+        it('turns the disclosure triangle into correct position', function () {
+            toolbar.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+            toolbar.ui.body.removeClass('cms-toolbar-expanded');
+            toolbar.open();
+            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
+            expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
+        });
     });
 
     describe('.close()', function () {
