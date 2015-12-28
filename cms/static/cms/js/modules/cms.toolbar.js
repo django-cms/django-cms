@@ -496,7 +496,7 @@ var CMS = window.CMS || {};
          * @method openAjax
          * @param {Object} opts
          * @param {String} opts.url url where the ajax points to
-         * @param {Object} [opts.post] post data to be passed
+         * @param {String} [opts.post] post data to be passed (must be stringified JSON)
          * @param {String} [opts.text] message to be displayed
          * @param {Function} [opts.callback] custom callback instead of reload
          * @param {String} [opts.onSuccess] reload and display custom message
@@ -523,7 +523,7 @@ var CMS = window.CMS || {};
             return $.ajax({
                 type: 'POST',
                 url: url,
-                data: (post) ? JSON.parse(post) : {}
+                data: JSON.parse(post)
             }).done(function (response) {
                 CMS.API.locked = false;
 

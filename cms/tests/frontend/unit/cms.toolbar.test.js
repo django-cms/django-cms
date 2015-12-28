@@ -353,7 +353,35 @@ describe('CMS.Toolbar', function () {
     });
 
     describe('.openAjax()', function () {
-        it('makes the request');
+        var toolbar;
+        beforeEach(function (done) {
+            fixture.load('toolbar.html');
+            CMS.config = {};
+            CMS.settings = {
+                toolbar: 'expanded'
+            };
+            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
+                return {};
+            });
+            jasmine.Ajax.install();
+            $(function () {
+                toolbar = new CMS.Toolbar();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            jasmine.Ajax.uninstall();
+            fixture.cleanup();
+        });
+
+        it('makes the request', function () {
+            expect(toolbar.openAjax({ url: '/url' })).toEqual(jasmine.any(Object));
+            var request = jasmine.Ajax.requests.mostRecent();
+            expect(request.url).toEqual('/url');
+        });
+
+        it('shows and hides loader after request succeeds');
 
         it('unlocks the toolbar after request succeeds');
 
