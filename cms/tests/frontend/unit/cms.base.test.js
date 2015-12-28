@@ -280,41 +280,41 @@ describe('cms.base.js', function () {
 
         describe('.preventSubmit()', function () {
             var markup;
-            beforeEach(function () {
+            beforeEach(function (done) {
                 markup = fixture.load('toolbar_form.html');
+                $(function () {
+                    done();
+                });
             });
 
             afterEach(function () {
                 fixture.cleanup();
             });
 
-            it('should prevent forms from being submitted when one form is submitted', function (done) {
+            it('should prevent forms from being submitted when one form is submitted', function () {
                 CMS.API.Toolbar = CMS.API.Toolbar || { showLoader: jasmine.createSpy('spy') };
                 var submitCallback = jasmine.createSpy().and.returnValue(false);
 
-                $(function () {
-                    CMS.API.Helpers.preventSubmit();
-                    var form = $('.cms-toolbar #form1');
-                    var input1 = $('input[type=submit]').eq(0);
-                    var input2 = $('input[type=submit]').eq(1);
-                    form.submit(submitCallback);
-                    form.find('input').trigger('click');
+                CMS.API.Helpers.preventSubmit();
+                var form = $('.cms-toolbar #form1');
+                var input1 = $('input[type=submit]').eq(0);
+                var input2 = $('input[type=submit]').eq(1);
+                form.submit(submitCallback);
+                form.find('input').trigger('click');
 
-                    expect(input1).toHaveCss({ opacity: '0.5' });
-                    expect(input2).toHaveCss({ opacity: '0.5' });
+                expect(input1).toHaveCss({ opacity: '0.5' });
+                expect(input2).toHaveCss({ opacity: '0.5' });
 
-                    spyOnEvent(input1, 'click');
-                    spyOnEvent(input2, 'click');
+                spyOnEvent(input1, 'click');
+                spyOnEvent(input2, 'click');
 
-                    input1.trigger('click');
-                    input2.trigger('click');
+                input1.trigger('click');
+                input2.trigger('click');
 
-                    expect('click').toHaveBeenPreventedOn(input1);
-                    expect('click').toHaveBeenPreventedOn(input2);
-                    expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
-                    expect(submitCallback).toHaveBeenCalled();
-                    done();
-                });
+                expect('click').toHaveBeenPreventedOn(input1);
+                expect('click').toHaveBeenPreventedOn(input2);
+                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalled();
+                expect(submitCallback).toHaveBeenCalled();
             });
         });
 
@@ -863,138 +863,118 @@ describe('cms.base.js', function () {
         });
 
         describe('.addEventListener()', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 fixture.load('cms_root.html');
+                $(function () {
+                    done();
+                });
             });
 
             afterEach(function () {
                 fixture.cleanup();
             });
 
-            it('adds an event', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
-                    CMS.API.Helpers.addEventListener('my-event', $.noop);
+            it('adds an event', function () {
+                CMS._eventRoot = $('#cms-top');
+                CMS.API.Helpers.addEventListener('my-event', $.noop);
 
-                    expect($('#cms-top')).toHandle('cms-my-event');
-
-                    done();
-                });
+                expect($('#cms-top')).toHandle('cms-my-event');
             });
-            it('adds multiple events', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
-                    CMS.API.Helpers.addEventListener('my-event my-other-event', $.noop);
+            it('adds multiple events', function () {
+                CMS._eventRoot = $('#cms-top');
+                CMS.API.Helpers.addEventListener('my-event my-other-event', $.noop);
 
-                    expect($('#cms-top')).toHandle('cms-my-event');
-                    expect($('#cms-top')).toHandle('cms-my-other-event');
-
-                    done();
-                });
+                expect($('#cms-top')).toHandle('cms-my-event');
+                expect($('#cms-top')).toHandle('cms-my-other-event');
             });
         });
 
         describe('.removeEventListener()', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 fixture.load('cms_root.html');
+                $(function () {
+                    done();
+                });
             });
 
             afterEach(function () {
                 fixture.cleanup();
             });
-            it('removes an event', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
+            it('removes an event', function () {
+                CMS._eventRoot = $('#cms-top');
 
-                    CMS.API.Helpers.addEventListener('my-event', $.noop);
-                    CMS.API.Helpers.removeEventListener('my-event');
+                CMS.API.Helpers.addEventListener('my-event', $.noop);
+                CMS.API.Helpers.removeEventListener('my-event');
 
-                    expect($('#cms-top')).not.toHandle('cms-my-event');
-
-                    done();
-                });
+                expect($('#cms-top')).not.toHandle('cms-my-event');
             });
 
-            it('removes an event with correct handler', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
-                    var fn = function () {
-                        expect(true).toEqual(true);
-                    };
+            it('removes an event with correct handler', function () {
+                CMS._eventRoot = $('#cms-top');
+                var fn = function () {
+                    expect(true).toEqual(true);
+                };
 
-                    CMS.API.Helpers.addEventListener('my-event', $.noop);
-                    CMS.API.Helpers.addEventListener('my-event', fn);
-                    CMS.API.Helpers.removeEventListener('my-event', $.noop);
+                CMS.API.Helpers.addEventListener('my-event', $.noop);
+                CMS.API.Helpers.addEventListener('my-event', fn);
+                CMS.API.Helpers.removeEventListener('my-event', $.noop);
 
-                    expect($('#cms-top')).toHandleWith('cms-my-event', fn);
-                    expect($('#cms-top')).not.toHandleWith('cms-my-event', $.noop);
-
-                    done();
-                });
+                expect($('#cms-top')).toHandleWith('cms-my-event', fn);
+                expect($('#cms-top')).not.toHandleWith('cms-my-event', $.noop);
             });
 
-            it('removes multiple events', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
+            it('removes multiple events', function () {
+                CMS._eventRoot = $('#cms-top');
 
-                    CMS.API.Helpers.addEventListener('my-event my-other-event', $.noop);
-                    CMS.API.Helpers.removeEventListener('my-event my-other-event');
+                CMS.API.Helpers.addEventListener('my-event my-other-event', $.noop);
+                CMS.API.Helpers.removeEventListener('my-event my-other-event');
 
-                    expect($('#cms-top')).not.toHandle('cms-my-event');
-                    expect($('#cms-top')).not.toHandle('cms-my-other-event');
-
-                    done();
-                });
+                expect($('#cms-top')).not.toHandle('cms-my-event');
+                expect($('#cms-top')).not.toHandle('cms-my-other-event');
             });
         });
 
         describe('.dispatchEvent()', function () {
-            beforeEach(function () {
+            beforeEach(function (done) {
                 fixture.load('cms_root.html');
+                $(function () {
+                    done();
+                });
             });
 
             afterEach(function () {
                 fixture.cleanup();
             });
-            it('dispatches an event', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
-                    var fn = jasmine.createSpy();
-                    CMS.API.Helpers.addEventListener('my-event', fn);
-                    CMS.API.Helpers.dispatchEvent('my-event');
-                    expect(fn).toHaveBeenCalled();
-                    done();
-                });
+            it('dispatches an event', function () {
+                CMS._eventRoot = $('#cms-top');
+                var fn = jasmine.createSpy();
+                CMS.API.Helpers.addEventListener('my-event', fn);
+                CMS.API.Helpers.dispatchEvent('my-event');
+                expect(fn).toHaveBeenCalled();
             });
 
-            it('does not dispatch multiple events', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
-                    var fn1 = jasmine.createSpy();
-                    var fn2 = jasmine.createSpy();
+            it('does not dispatch multiple events', function () {
+                CMS._eventRoot = $('#cms-top');
+                var fn1 = jasmine.createSpy();
+                var fn2 = jasmine.createSpy();
 
-                    CMS.API.Helpers.addEventListener('my-event', fn1);
-                    CMS.API.Helpers.addEventListener('my-another-event', fn2);
-                    CMS.API.Helpers.dispatchEvent('my-event my-another-event');
-                    expect(fn1).not.toHaveBeenCalled();
-                    expect(fn2).not.toHaveBeenCalled();
-                    done();
-                });
+                CMS.API.Helpers.addEventListener('my-event', fn1);
+                CMS.API.Helpers.addEventListener('my-another-event', fn2);
+                CMS.API.Helpers.dispatchEvent('my-event my-another-event');
+                expect(fn1).not.toHaveBeenCalled();
+                expect(fn2).not.toHaveBeenCalled();
             });
 
-            it('can attach payload to event', function (done) {
-                $(function () {
-                    CMS._eventRoot = $('#cms-top');
-                    var fn = jasmine.createSpy();
+            it('can attach payload to event', function () {
+                CMS._eventRoot = $('#cms-top');
+                var fn = jasmine.createSpy();
 
-                    CMS.API.Helpers.addEventListener('my-event', fn);
-                    CMS.API.Helpers.dispatchEvent('my-event', {
-                        payload: 'djangoCMS'
-                    });
-                    expect(fn).toHaveBeenCalledWith(jasmine.any(Object), {
-                        payload: 'djangoCMS'
-                    });
-                    done();
+                CMS.API.Helpers.addEventListener('my-event', fn);
+                CMS.API.Helpers.dispatchEvent('my-event', {
+                    payload: 'djangoCMS'
+                });
+                expect(fn).toHaveBeenCalledWith(jasmine.any(Object), {
+                    payload: 'djangoCMS'
                 });
             });
         });
