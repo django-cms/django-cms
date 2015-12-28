@@ -92,7 +92,6 @@ var CMS = window.CMS || {};
                 toolbarTrigger: container.find('.cms-toolbar-trigger'),
                 navigations: container.find('.cms-toolbar-item-navigation'),
                 buttons: container.find('.cms-toolbar-item-buttons'),
-                switcher: container.find('.cms-toolbar-item-switch'),
                 messages: container.find('.cms-messages'),
                 screenBlock: container.find('.cms-screenblock'),
                 structureBoard: container.find('.cms-structure')
@@ -270,14 +269,6 @@ var CMS = window.CMS || {};
                     that.ui.toolbar.off(that.click, reset);
                     that.ui.structureBoard.off(that.click);
                 }
-            });
-
-            // attach event to the switcher elements
-            this.ui.switcher.each(function () {
-                $(this).on(that.click, function (e) {
-                    e.preventDefault();
-                    that._setSwitcher($(e.currentTarget));
-                });
             });
 
             // attach event for first page publish
