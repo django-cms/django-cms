@@ -355,6 +355,14 @@ describe('CMS.Toolbar', function () {
     describe('.openAjax()', function () {
         it('makes the request');
 
+        it('unlocks the toolbar after request succeeds');
+
+        it('uses custom callback after request succeeds');
+
+        it('uses custom onSuccess url after request succeeds');
+
+        it('opens an error message if request failed');
+
         it('does not make the request if there is a confirmation that is not succeeded');
     });
 });
