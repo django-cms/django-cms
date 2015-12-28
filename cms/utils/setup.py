@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+
+from warnings import warn
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 from cms.utils.compat.dj import is_installed as app_is_installed
-
+from cms.utils.conf import get_cms_setting
 
 def validate_dependencies():
     """
@@ -38,6 +42,10 @@ def validate_settings():
                 'django.template.context_processors.request' not in context_processors):
             raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
                                        "'django.template.backends.django.DjangoTemplates' context processors.")
+    # Warn on empty CMS_INTERNAL_IPS
+    if not get_cms_setting('INTERNAL_IPS'):
+        warn('The setting `CMS_INTERNAL_IPS` was not defined or is empty, this '
+             'may allow any IP address to access the CMS toolbar.')
 
 
 def setup():

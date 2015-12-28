@@ -193,6 +193,38 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, '<div id="cms-top"')
         self.assertContains(response, 'cms.base.css')
 
+    # This test assumes that the test environment will use 127.0.0.1, but this
+    # may not be a valid assumption, in which case, this test can be removed.
+    @override_settings(CMS_INTERNAL_IPS=['127.0.0.1'])
+    def test_toolbar_allowed_internal_ip(self):
+        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<div class="cms-toolbar">')
+
+    # As of version 3.2.1, an empty list means any IP is allowed.
+    @override_settings(CMS_INTERNAL_IPS=[])
+    def test_toolbar_any_ip_allowed(self):
+        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<div class="cms-toolbar">')
+
+    # Here we're just using an illegal IP, which essentially means no IP
+    # is allowed.
+    @override_settings(CMS_INTERNAL_IPS=['255.255.255.255'])
+    def test_toolbar_disallowed_internal_ip(self):
+        create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, '<div class="cms-toolbar">')
+
     def test_markup_generic_module(self):
         create_page("toolbar-page", "col_two.html", "en", published=True)
         superuser = self.get_superuser()

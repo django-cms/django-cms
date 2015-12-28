@@ -2,6 +2,7 @@
 """
 Edit Toolbar middleware
 """
+
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
@@ -12,6 +13,35 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.placeholder import get_toolbar_plugin_struct
 from menus.menu_pool import menu_pool
+
+
+def get_client_ip(request):
+    """
+    Returns the REMOTE_ADDR (IP address of the calling client). Is aware
+    of properly configured proxies and uses the X-FOWARDED-FOR header, if
+    available, in the canonical manner.
+    :param request:
+    :return: Client IP address (String)
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+def is_allowed_ip_address(request):
+    # NOTE: This is `settings.CMS_INTERNAL_IPS`, not the Django variant,
+    # `settings.INTERNAL_IPS`
+    INTERNAL_IPS = get_cms_setting('INTERNAL_IPS')
+
+    # For backwards compatibility, if INTERNAL_IPS is empty, all are allowed.
+    if not INTERNAL_IPS:
+        return True
+
+    client_ip = get_client_ip(request)
+    return client_ip in INTERNAL_IPS
 
 
 def toolbar_plugin_processor(instance, placeholder, rendered_content, original_context):
@@ -81,12 +111,15 @@ class ToolbarMiddleware(object):
         disable = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
         anonymous_on = get_cms_setting('TOOLBAR_ANONYMOUS_ON')
 
-        if disable in request.GET:
-            request.session['cms_toolbar_disabled'] = True
-        if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
-            request.session['cms_toolbar_disabled'] = False
+        allowed_ip = is_allowed_ip_address(request)
 
-        if request.user.is_staff or (anonymous_on and request.user.is_anonymous()):
+        if allowed_ip:
+            if disable in request.GET:
+                request.session['cms_toolbar_disabled'] = True
+            if edit_on in request.GET:  # If we actively enter edit mode, we should show the toolbar in any case
+                request.session['cms_toolbar_disabled'] = False
+
+        if allowed_ip and (request.user.is_staff or (anonymous_on and request.user.is_anonymous())):
             if edit_on in request.GET and not request.session.get('cms_edit', False):
                 if not request.session.get('cms_edit', False):
                     menu_pool.clear()
@@ -104,6 +137,9 @@ class ToolbarMiddleware(object):
         else:
             request.session['cms_build'] = False
             request.session['cms_edit'] = False
+            request.session['cms_toolbar_disabled'] = True
+            # menu_pool.clear()
+
         if request.user.is_staff:
             try:
                 request.cms_latest_entry = LogEntry.objects.filter(
@@ -112,6 +148,7 @@ class ToolbarMiddleware(object):
                 ).only('pk').order_by('-pk')[0].pk
             except IndexError:
                 request.cms_latest_entry = -1
+
         request.toolbar = CMSToolbar(request)
 
     def process_view(self, request, view_func, view_args, view_kwarg):
