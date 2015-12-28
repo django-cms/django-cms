@@ -26,6 +26,10 @@ describe('CMS.Toolbar', function () {
             });
         });
 
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
         it('has ui', function () {
             expect(toolbar.ui).toEqual(jasmine.any(Object));
             expect(Object.keys(toolbar.ui)).toContain('container');
@@ -74,9 +78,38 @@ describe('CMS.Toolbar', function () {
     });
 
     describe('.toggle()', function () {
-        it('delegates to `open()`');
+        var toolbar;
+        beforeEach(function (done) {
+            fixture.load('toolbar.html');
+            $(function () {
+                CMS.settings = {
+                    toolbar: 'collapsed'
+                };
+                toolbar = new CMS.Toolbar();
+                done();
+            });
+        });
 
-        it('delegates to `close()`');
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('delegates to `open()`', function () {
+            spyOn(toolbar, 'open');
+            spyOn(toolbar, 'close');
+            toolbar.toggle();
+            expect(toolbar.open).toHaveBeenCalled();
+            expect(toolbar.close).not.toHaveBeenCalled();
+        });
+
+        it('delegates to `close()`', function () {
+            CMS.settings.toolbar = 'open'
+            spyOn(toolbar, 'open');
+            spyOn(toolbar, 'close');
+            toolbar.toggle();
+            expect(toolbar.open).not.toHaveBeenCalled();
+            expect(toolbar.close).toHaveBeenCalled();
+        });
     });
 
     describe('.open', function () {
