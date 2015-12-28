@@ -5,7 +5,7 @@
 - Added placeholder name to the edit tooltip
 - Fix breadcrumb in page revision list
 - Fix clash with Foundation that caused "Add plugin" button to be unusable
-- Fixed a tree corruption when pasting a nested plugin under another plugin.
+- Adds new setting CMS_INTERNAL_IPS which restricts toolbar rendering to allowed IPs/ranges.
 - Fix message with CMS version not showing up on hover in debug mode
 - Fix messages not being positioned correctly in debug mode
 
