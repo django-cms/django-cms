@@ -177,6 +177,14 @@ gulp.task('tests:integration', function (done) {
         'loginAdmin',
         'toolbar',
         'addFirstPage',
+        'editMode',
+        'sideframe',
+        'createContent',
+        'users',
+        'newPage',
+        'switchLanguage',
+        'editContent',
+        'editContentTools',
         'logout',
         'loginToolbar'
     ];

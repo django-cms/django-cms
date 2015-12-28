@@ -14,8 +14,17 @@ module.exports = {
     editOffUrl: 'http://localhost:8000/en/?edit_off',
     adminUrl: 'http://localhost:8000/en/admin/login/',
     credentials: {
-        // djangocms helper creates such a user by default
         username: 'admin',
         password: 'admin'
+    },
+    content: {
+        page: {
+            title: 'First page',
+            text: 'First page content'
+        }
+    },
+    user: {
+        // TODO add more data for the new user profile
+        firstName: 'test-first-name'
     }
 };

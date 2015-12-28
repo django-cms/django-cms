@@ -1,3 +1,4 @@
+/* globals localStorage */
 'use strict';
 
 // #############################################################################
@@ -21,6 +22,16 @@ var messages = require('./settings/messages').login.admin;
 casper.test.begin('User Login (via Admin Panel)', function (test) {
     casper
         .start(globals.adminUrl, function () {
+            // we explicitly kill the session id cookie to reset the login state
+            // and localstorage data to reset the ui state (sideframe, toolbar, etc)
+            this.page.deleteCookie('sessionid');
+            this.evaluate(function () {
+                localStorage.clear();
+            });
+
+            this.echo('The currently set cookies are: ' + JSON.stringify(this.page.cookies), 'INFO');
+        })
+        .then(function () {
             var titleRegExp = new RegExp(globals.adminTitle, 'g');
 
             test.assertTitleMatch(titleRegExp, messages.cmsTitleOk);
