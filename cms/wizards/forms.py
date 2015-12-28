@@ -2,7 +2,6 @@
 
 from django import forms
 
-from cms import __version__
 from cms.models import Page
 from cms.utils.urlutils import static_with_version
 
