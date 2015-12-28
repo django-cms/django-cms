@@ -318,12 +318,38 @@ describe('CMS.Toolbar', function () {
         });
     });
 
-    describe('.showLoader()', function () {
-        it('shows the loader');
-    });
+    describe('.showLoader() / hideLoader()', function () {
+        var toolbar;
+        beforeEach(function (done) {
+            fixture.load('toolbar.html');
+            CMS.config = {};
+            CMS.settings = {
+                toolbar: 'expanded'
+            };
+            spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
+                return {};
+            });
+            $(function () {
+                toolbar = new CMS.Toolbar();
+                done();
+            });
+        });
 
-    describe('.hideLoader()', function () {
-        it('hides the loader');
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('shows the loader', function () {
+            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-loader');
+            toolbar.showLoader();
+            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-loader');
+        });
+        it('hides the loader', function () {
+            toolbar.showLoader();
+            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-loader');
+            toolbar.hideLoader();
+            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-loader');
+        });
     });
 
     describe('.openAjax()', function () {
