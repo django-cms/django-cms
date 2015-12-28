@@ -253,9 +253,6 @@ def admin_static_url():
     """
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
 
-@register.simple_tag
-def get_cms_version():
-    return __version__
 
 class CMSAdminIconBase(Tag):
     name = 'cms_admin_icon_base'
