@@ -260,6 +260,12 @@ describe('CMS.Toolbar', function () {
             toolbar.close();
             expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
             expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
+
+            toolbar._lock(false);
+            expect(toolbar._hide()).toEqual(undefined);
+            toolbar.close();
+            expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
+            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
         });
 
         it('animates toolbar and body to correct position', function () {
