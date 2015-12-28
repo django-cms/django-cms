@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _, get_language
 
+from cms import __version__
 from cms.api import generate_valid_slug
 from cms.constants import PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
@@ -77,11 +78,11 @@ class PageTypeSelect(forms.widgets.Select):
     """
     class Media:
         js = (
-            'cms/js/modules/jquery.noconflict.pre.js',
-            'cms/js/dist/bundle.admin.base.min.js',
-            'cms/js/modules/cms.base.js',
-            'cms/js/widgets/wizard.pagetypeselect.js',
-            'cms/js/modules/jquery.noconflict.post.js'
+            'cms/js/modules/jquery.noconflict.pre.js?%s' % __version__,
+            'cms/js/dist/bundle.admin.base.min.js?%s' % __version__,
+            'cms/js/modules/cms.base.js?%s' % __version__,
+            'cms/js/widgets/wizard.pagetypeselect.js?%s' % __version__,
+            'cms/js/modules/jquery.noconflict.post.js?%s' % __version__
         )
 
 

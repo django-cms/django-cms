@@ -2,6 +2,7 @@
 
 from django import forms
 
+from cms import __version__
 from cms.models import Page
 
 from .wizard_pool import entry_choices
@@ -46,13 +47,13 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
     class Media:
         css = {
-            'all': ('cms/css/cms.wizard.css', )
+            'all': ('cms/css/cms.wizard.css?%s' % __version__, )
         }
         js = (
-            'cms/js/modules/jquery.noconflict.pre.js',
-            'cms/js/dist/bundle.admin.base.min.js',
-            'cms/js/modules/cms.wizards.js',
-            'cms/js/modules/jquery.noconflict.post.js'
+            'cms/js/modules/jquery.noconflict.pre.js?%s' % __version__,
+            'cms/js/dist/bundle.admin.base.min.js?%s' % __version__,
+            'cms/js/modules/cms.wizards.js?%s' % __version__,
+            'cms/js/modules/jquery.noconflict.post.js?%s' % __version__,
         )
 
     page = forms.ModelChoiceField(

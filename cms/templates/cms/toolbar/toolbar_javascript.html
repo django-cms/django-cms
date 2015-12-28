@@ -1,10 +1,10 @@
 {% load i18n l10n sekizai_tags admin_static cms_tags %}
 
-{% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" />{% endaddtoblock %}
+{% addtoblock "css" %}<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}?{{ cms_version }}" />{% endaddtoblock %}
 
 {% addtoblock "js" %}
-<script src="{% static "cms/js/modules/jquery.noconflict.pre.js" %}" type="text/javascript"></script>
-<script src="{% static "cms/js/dist/bundle.toolbar.min.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/jquery.noconflict.pre.js" %}?{{ cms_version }}" type="text/javascript"></script>
+<script src="{% static "cms/js/dist/bundle.toolbar.min.js" %}?{{ cms_version }}" type="text/javascript"></script>
 {% language request.toolbar.toolbar_language %}
 <script>
 CMS._plugins = [];
@@ -75,5 +75,5 @@ $(document).ready(function () {
 })(CMS.$);
 </script>
 {% endlanguage %}
-<script src="{% static "cms/js/modules/jquery.noconflict.post.js" %}" type="text/javascript"></script>
+<script src="{% static "cms/js/modules/jquery.noconflict.post.js" %}?{{ cms_version }}" type="text/javascript"></script>
 {% endaddtoblock %}
