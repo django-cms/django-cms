@@ -28,8 +28,6 @@ var CMS = window.CMS || {};
         implement: [CMS.API.Helpers],
 
         options: {
-            preventSwitch: false,
-            preventSwitchMessage: 'Switching is disabled.',
             toolbarDuration: 200
         },
 
@@ -627,61 +625,6 @@ var CMS = window.CMS || {};
                 default:
                     window.location.href = el.attr('href');
             }
-        },
-
-        /**
-         * Sets the functionality for the switcher button.
-         *
-         * @method _setSwitcher
-         * @param {jQuery} el button element
-         * @private
-         * @deprecated
-         */
-        _setSwitcher: function _setSwitcher(el) {
-            // save local vars
-            var active = el.hasClass('cms-toolbar-item-switch-active');
-            var anchor = el.find('a');
-            var knob = el.find('.cms-toolbar-item-switch-knob');
-            var duration = 300;
-
-            // prevent if switchopstion is passed
-            if (this.options.preventSwitch) {
-                CMS.API.Messages.open({
-                    message: this.options.preventSwitchMessage,
-                    dir: 'right'
-                });
-                return false;
-            }
-
-            // determin what to trigger
-            if (active) {
-                knob.animate({
-                    'right': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)
-                }, duration);
-                // move anchor behind the knob
-                anchor.css('z-index', 1).animate({
-                    'padding-top': 6,
-                    'padding-right': 14,
-                    'padding-bottom': 4,
-                    'padding-left': 28
-                }, duration);
-            } else {
-                knob.animate({
-                    'left': anchor.outerWidth(true) - (knob.outerWidth(true) + 2)
-                }, duration);
-                // move anchor behind the knob
-                anchor.css('z-index', 1).animate({
-                    'padding-top': 6,
-                    'padding-right': 28,
-                    'padding-bottom': 4,
-                    'padding-left': 14
-                }, duration);
-            }
-
-            // reload
-            setTimeout(function () {
-                window.location.href = anchor.attr('href');
-            }, duration);
         },
 
         /**
