@@ -394,9 +394,90 @@ describe('CMS.Plugin', function () {
     });
 
     describe('.editPlugin()', function () {
-        it('creates and opens a modal to edit a plugin');
-        it('creates and opens a modal to edit freshly created plugin');
-        it('adds events to remove the "add plugin" placeholder');
+        var plugin;
+        var fakeModal;
+
+        beforeEach(function (done) {
+            fakeModal = {
+                on: jasmine.createSpy(),
+                open: jasmine.createSpy()
+            };
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: "/en/admin/cms/page/add-plugin/",
+                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
+                        move_plugin: "/en/admin/cms/page/move-plugin/",
+                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
+                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('creates and opens a modal to edit a plugin', function () {
+            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+                return fakeModal;
+            });
+            plugin.editPlugin('/edit-url', 'Test Plugin', 'breadcrumb');
+            expect(fakeModal.open).toHaveBeenCalledWith({
+                url: '/edit-url',
+                title: 'Test Plugin',
+                breadcrumbs: 'breadcrumb',
+                width: 850
+            });
+        });
+
+        it('creates and opens a modal to edit freshly created plugin', function () {
+            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+                return fakeModal;
+            });
+
+            plugin.newPlugin = true;
+            plugin.editPlugin('/edit-plugin-url', 'Random Plugin', ['breadcrumb']);
+            expect(fakeModal.open).toHaveBeenCalledWith({
+                url: '/edit-plugin-url',
+                title: 'Random Plugin',
+                breadcrumbs: ['breadcrumb'],
+                width: 850
+            });
+        });
+        it('adds events to remove the "add plugin" placeholder', function () {
+            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+                return fakeModal;
+            });
+
+            plugin.editPlugin('/edit-plugin-url', 'Random Plugin', ['breadcrumb']);
+
+            expect(fakeModal.on).toHaveBeenCalledWith('cms.modal.loaded', jasmine.any(Function));
+            expect(fakeModal.on).toHaveBeenCalledWith('cms.modal.closed', jasmine.any(Function));
+
+            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
+            fakeModal.on.calls.argsFor(0)[1]();
+            expect($('.cms-add-plugin-placeholder')).not.toExist();
+
+            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
+            fakeModal.on.calls.argsFor(1)[1]();
+            expect($('.cms-add-plugin-placeholder')).not.toExist();
+        });
     });
 
     describe('.copyPlugin()', function () {
