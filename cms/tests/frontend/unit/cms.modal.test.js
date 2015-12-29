@@ -1,5 +1,3 @@
-/* globals $ */
-
 'use strict';
 
 describe('CMS.Modal', function () {
