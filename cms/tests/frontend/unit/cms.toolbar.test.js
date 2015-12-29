@@ -20,6 +20,11 @@ describe('CMS.Toolbar', function () {
         var toolbar;
         beforeEach(function (done) {
             fixture.load('toolbar.html');
+            CMS.settings = { sideframe: {} };
+            spyOn(CMS.Toolbar.prototype, 'setSettings').and.callFake(function () {
+                return CMS.settings;
+            });
+
             $(function () {
                 spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                     return {};
@@ -95,8 +100,12 @@ describe('CMS.Toolbar', function () {
             fixture.load('toolbar.html');
             $(function () {
                 CMS.settings = {
+                    sideframe: {},
                     toolbar: 'collapsed'
                 };
+                spyOn(CMS.Toolbar.prototype, 'setSettings').and.callFake(function () {
+                    return CMS.settings;
+                });
                 spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                     return {};
                 });
@@ -133,8 +142,12 @@ describe('CMS.Toolbar', function () {
             fixture.load('toolbar.html');
             CMS.config = {};
             CMS.settings = {
+                sideframe: {},
                 toolbar: 'collapsed'
             };
+            spyOn(CMS.Toolbar.prototype, 'setSettings').and.callFake(function () {
+                return CMS.settings;
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
@@ -228,8 +241,12 @@ describe('CMS.Toolbar', function () {
             fixture.load('toolbar.html');
             CMS.config = {};
             CMS.settings = {
+                sideframe: {},
                 toolbar: 'expanded'
             };
+            spyOn(CMS.Toolbar.prototype, 'setSettings').and.callFake(function () {
+                return CMS.settings;
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
@@ -324,8 +341,12 @@ describe('CMS.Toolbar', function () {
             fixture.load('toolbar.html');
             CMS.config = {};
             CMS.settings = {
+                sideframe: {},
                 toolbar: 'expanded'
             };
+            spyOn(CMS.Toolbar.prototype, 'setSettings').and.callFake(function () {
+                return CMS.settings;
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
@@ -358,8 +379,12 @@ describe('CMS.Toolbar', function () {
             fixture.load('toolbar.html');
             CMS.config = {};
             CMS.settings = {
+                sideframe: {},
                 toolbar: 'expanded'
             };
+            spyOn(CMS.Toolbar.prototype, 'setSettings').and.callFake(function () {
+                return CMS.settings;
+            });
             spyOn(CMS.Navigation.prototype, 'initialize').and.callFake(function () {
                 return {};
             });
