@@ -3,7 +3,7 @@
 describe('CMS.Toolbar', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    it('creates a Toolbar class when document is ready', function () {
+    it('creates a Toolbar class', function () {
         expect(CMS.Toolbar).toBeDefined();
     });
 
