@@ -731,7 +731,8 @@ For backwards compatibility, the default value of this setting is an empty list
 and the default behaviour of the CMS when provided an empty list is to allow all
 IP addresses. However, when this setting is not defined or contains an empty
 list (evaluates to ``None``), a warning will be emitted to the console on
-startup.
+startup. (If you wish to suppress this warning for some reason, see the example
+below)
 
 Example::
 
@@ -764,7 +765,20 @@ Example using iptools::
     )
     ...
 
+If you know what you are doing and you do not wish to see the warning about the
+setting being undefined or empty, you can explicitly define all IPv4 addresses::
+
+    # settings.py
+    ...
+    CMS_INTERNAL_IPs = iptools.IpRangeList(
+        '0.0.0.0/0',  # Explicitly allow all IPv4 addresses
+    )
+
+Note that at the time of this writing, there is no way to do this for all
+addresses in the IPv6 space as the pattern '2000::/3' overflows iptools.
+
 .. setting:: CMS_PERMISSION
+
 
 CMS_PERMISSION
 ==============
