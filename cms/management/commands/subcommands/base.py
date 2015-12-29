@@ -1,36 +1,35 @@
 # -*- coding: utf-8 -*-
-import sys
+from __future__ import absolute_import, print_function, unicode_literals
 
-from django.core.management.base import BaseCommand, CommandError
+from collections import OrderedDict
+
+from django.core.management.base import BaseCommand
 
 
 class SubcommandsCommand(BaseCommand):
-    subcommands = {}
+    subcommands = OrderedDict()
+    instances = {}
+    stdout = None
+    stderr = None
+    help_string = ''
     command_name = ''
 
-    def __init__(self):
-        super(SubcommandsCommand, self).__init__()
-        for name, subcommand in self.subcommands.items():
-            subcommand.command_name = '%s %s' % (self.command_name, name)
+    def add_arguments(self, parser):
+        if self.subcommands:
+            subparsers = parser.add_subparsers(dest='cmd')
+            for command, cls in self.subcommands.items():
+                instance = cls(self.stdout, self.stderr)
+                instance.style = self.style
+                parser_sub = subparsers.add_parser(
+                    cmd=self, name=instance.command_name, help=instance.help_string,
+                    description=instance.help_string
+                )
+                instance.add_arguments(parser_sub)
+                self.instances[command] = instance
+            super(SubcommandsCommand, self).add_arguments(parser)
 
     def handle(self, *args, **options):
-        stderr = getattr(self, 'stderr', sys.stderr)
-        stdout = getattr(self, 'stdout', sys.stdout)
-        if len(args) > 0:
-            if args[0] in self.subcommands.keys():
-                handle_command = self.subcommands.get(args[0])()
-                handle_command.stdout = stdout
-                handle_command.stderr = stderr
-                handle_command.handle(*args[1:], **options)
-            else:
-                stderr.write("%r is not a valid subcommand for %r\n" % (args[0], self.command_name))
-                stderr.write("Available subcommands are:\n")
-                for subcommand in sorted(self.subcommands.keys()):
-                    stderr.write("  %r\n" % subcommand)
-                raise CommandError('Invalid subcommand %r for %r' % (args[0], self.command_name))
+        if options['cmd'] in self.instances:
+            self.instances[options['cmd']].handle(*args, **options)
         else:
-            stderr.write("%r must be called with at least one argument, it's subcommand.\n" % self.command_name)
-            stderr.write("Available subcommands are:\n")
-            for subcommand in sorted(self.subcommands.keys()):
-                stderr.write("  %r\n" % subcommand)
-            raise CommandError('No subcommand given for %r' % self.command_name)
+            self.print_help('manage.py', 'cms')
