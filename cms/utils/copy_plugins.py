@@ -29,7 +29,7 @@ def copy_plugins_to(old_plugins, to_placeholder,
         for idx, plugin in enumerate(new_plugins):
             if plugin.parent_id is None:
                 plugin.parent_id = parent_plugin_id
-                plugin.save()
+                plugin.save(update_fields=['parent'])
                 new_plugins[idx] = plugin.move(parent_plugin, pos="last-child")
 
     plugins_ziplist = list(zip(new_plugins, old_plugins))
