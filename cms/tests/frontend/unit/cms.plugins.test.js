@@ -402,6 +402,9 @@ describe('CMS.Plugin', function () {
                 on: jasmine.createSpy(),
                 open: jasmine.createSpy()
             };
+            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
+                return fakeModal;
+            });
             fixture.load('plugins.html');
             CMS.config = {
                 csrf: 'CSRF_TOKEN',
@@ -434,9 +437,6 @@ describe('CMS.Plugin', function () {
         });
 
         it('creates and opens a modal to edit a plugin', function () {
-            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
-                return fakeModal;
-            });
             plugin.editPlugin('/edit-url', 'Test Plugin', 'breadcrumb');
             expect(fakeModal.open).toHaveBeenCalledWith({
                 url: '/edit-url',
@@ -447,10 +447,6 @@ describe('CMS.Plugin', function () {
         });
 
         it('creates and opens a modal to edit freshly created plugin', function () {
-            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
-                return fakeModal;
-            });
-
             plugin.newPlugin = true;
             plugin.editPlugin('/edit-plugin-url', 'Random Plugin', ['breadcrumb']);
             expect(fakeModal.open).toHaveBeenCalledWith({
@@ -461,10 +457,6 @@ describe('CMS.Plugin', function () {
             });
         });
         it('adds events to remove the "add plugin" placeholder', function () {
-            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function () {
-                return fakeModal;
-            });
-
             plugin.editPlugin('/edit-plugin-url', 'Random Plugin', ['breadcrumb']);
 
             expect(fakeModal.on).toHaveBeenCalledWith('cms.modal.loaded', jasmine.any(Function));
