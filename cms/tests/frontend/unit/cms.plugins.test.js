@@ -7,13 +7,234 @@ describe('CMS.Plugin', function () {
         expect(CMS.Plugin).toBeDefined();
     });
 
-    it('has public API');
+    it('has public API', function () {
+        expect(CMS.Plugin.prototype.addPlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.editPlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.copyPlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.cutPlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.pastePlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.movePlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.deletePlugin).toEqual(jasmine.any(Function));
+        expect(CMS.Plugin.prototype.editPluginPostAjax).toEqual(jasmine.any(Function));
+    });
 
     describe('instance', function () {
-        it('has ui');
-        it('has options');
-        it('can be of different types');
-        it('sets its options to the dom node');
+        var plugin1;
+        var plugin2;
+        var placeholder1;
+        var generic;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+
+            $(function () {
+                plugin1 = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: "/en/admin/cms/page/add-plugin/",
+                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
+                        move_plugin: "/en/admin/cms/page/move-plugin/",
+                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
+                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    }
+                });
+                plugin2 = new CMS.Plugin('cms-plugin-2', {
+                    type: 'plugin',
+                    plugin_id: 2,
+                    plugin_type: 'RandomPlugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: "/en/admin/cms/page/add-plugin/",
+                        edit_plugin: "/en/admin/cms/page/edit-plugin/2/",
+                        move_plugin: "/en/admin/cms/page/move-plugin/",
+                        delete_plugin: "/en/admin/cms/page/delete-plugin/2/",
+                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    }
+                });
+                placeholder1 = new CMS.Plugin('cms-placeholder-1', {
+                    type: 'placeholder',
+                    placeholder_id: 1
+                });
+                generic = new CMS.Plugin('cms-plugin-cms-page-changelist-33');
+
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('has ui depending on the type', function () {
+            expect(plugin1.ui).toEqual(jasmine.any(Object));
+            expect(plugin2.ui).toEqual(jasmine.any(Object));
+            expect(placeholder1.ui).toEqual(jasmine.any(Object));
+            expect(generic.ui).toEqual(jasmine.any(Object));
+
+            expect(plugin1.ui.container).toExist();
+            expect(plugin1.ui.publish).toExist();
+            expect(plugin1.ui.save).toExist();
+            expect(plugin1.ui.window).toExist();
+            expect(plugin1.ui.revert).toExist();
+            expect(plugin1.ui.dragbar).toEqual(null);
+            expect(plugin1.ui.draggable).toExist();
+            expect(plugin1.ui.draggables).not.toExist();
+            expect(plugin1.ui.submenu).toExist();
+            expect(plugin1.ui.dropdown).toExist();
+            expect(plugin1.ui.dragitem).toExist();
+
+            expect(plugin2.ui.container).toExist();
+            expect(plugin2.ui.publish).toExist();
+            expect(plugin2.ui.save).toExist();
+            expect(plugin2.ui.window).toExist();
+            expect(plugin2.ui.revert).toExist();
+            expect(plugin2.ui.dragbar).toEqual(null);
+            expect(plugin2.ui.draggable).toExist();
+            expect(plugin2.ui.draggables).toExist();
+            expect(plugin2.ui.submenu).toExist();
+            expect(plugin2.ui.dropdown).toExist();
+            expect(plugin2.ui.dragitem).toExist();
+
+            expect(placeholder1.ui.container).toExist();
+            expect(placeholder1.ui.publish).toExist();
+            expect(placeholder1.ui.save).toExist();
+            expect(placeholder1.ui.window).toExist();
+            expect(placeholder1.ui.revert).toExist();
+            expect(placeholder1.ui.dragbar).toExist();
+            expect(placeholder1.ui.draggable.selector).toEqual('.cms-draggable-null');
+            expect(placeholder1.ui.draggables).toExist();
+            expect(placeholder1.ui.submenu).toExist();
+            expect(placeholder1.ui.dropdown).toExist();
+            expect(placeholder1.ui.dragitem).not.toBeDefined();
+
+            expect(generic.ui.container).toExist();
+            expect(generic.ui.publish).toExist();
+            expect(generic.ui.save).toExist();
+            expect(generic.ui.window).toExist();
+            expect(generic.ui.revert).toExist();
+            expect(generic.ui.dragbar).toEqual(null);
+            expect(generic.ui.draggable).toEqual(null);
+            expect(generic.ui.draggables).toEqual(null);
+            expect(generic.ui.submenu).toEqual(null);
+            expect(generic.ui.dropdown).toEqual(null);
+            expect(generic.ui.dragitem).not.toBeDefined();
+        });
+
+        it('has options', function () {
+            expect(plugin1.options).toEqual({
+                type: 'plugin',
+                placeholder_id: 1,
+                plugin_type: 'TextPlugin',
+                plugin_id: 1,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                plugin_parent_restriction: [],
+                urls: {
+                    add_plugin: "/en/admin/cms/page/add-plugin/",
+                    edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
+                    move_plugin: "/en/admin/cms/page/move-plugin/",
+                    delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
+                    copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                }
+            });
+
+            expect(plugin2.options).toEqual({
+                type: 'plugin',
+                placeholder_id: 1,
+                plugin_type: 'RandomPlugin',
+                plugin_id: 2,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                plugin_parent_restriction: [],
+                urls: {
+                    add_plugin: "/en/admin/cms/page/add-plugin/",
+                    edit_plugin: "/en/admin/cms/page/edit-plugin/2/",
+                    move_plugin: "/en/admin/cms/page/move-plugin/",
+                    delete_plugin: "/en/admin/cms/page/delete-plugin/2/",
+                    copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                }
+            });
+
+            expect(placeholder1.options).toEqual({
+                type: 'placeholder',
+                placeholder_id: 1,
+                plugin_type: '',
+                plugin_id: null,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                plugin_parent_restriction: [],
+                urls: {
+                    add_plugin: '',
+                    edit_plugin: '',
+                    move_plugin: '',
+                    copy_plugin: '',
+                    delete_plugin: ''
+                }
+            });
+
+            expect(generic.options).toEqual({
+                type: '',
+                placeholder_id: null,
+                plugin_type: '',
+                plugin_id: null,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                plugin_parent_restriction: [],
+                urls: {
+                    add_plugin: '',
+                    edit_plugin: '',
+                    move_plugin: '',
+                    copy_plugin: '',
+                    delete_plugin: ''
+                }
+            });
+        });
+
+        it('sets its options to the dom node', function () {
+            expect(plugin1.ui.container.data('settings')).toEqual(plugin1.options);
+            expect(plugin2.ui.container.data('settings')).toEqual(plugin2.options);
+            expect(placeholder1.ui.container.data('settings')).toEqual(placeholder1.options);
+            expect(generic.ui.container.data('settings')).toEqual(generic.options);
+        });
+
+        it('checks if pasting into this plugin is allowed', function () {
+            spyOn(CMS.Plugin.prototype, '_checkIfPasteAllowed');
+
+            plugin1 = new CMS.Plugin('cms-plugin-1', {
+                type: 'plugin',
+                plugin_id: 1,
+            });
+            expect(CMS.Plugin.prototype._checkIfPasteAllowed.calls.count()).toEqual(1);
+            placeholder1 = new CMS.Plugin('cms-placeholder-1', {
+                type: 'placeholder',
+                placeholder_id: 1
+            });
+            expect(CMS.Plugin.prototype._checkIfPasteAllowed.calls.count()).toEqual(2);
+            generic = new CMS.Plugin('cms-plugin-cms-page-changelist-33');
+            expect(CMS.Plugin.prototype._checkIfPasteAllowed.calls.count()).toEqual(2);
+        });
     });
 
     describe('.addPlugin()', function () {
