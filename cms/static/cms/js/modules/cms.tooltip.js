@@ -40,8 +40,8 @@ var CMS = window.CMS || {};
                  */
                 this.domElem = this._pick();
 
-                this._checkTouch();
                 this._forceTouchOnce = CMS.API.Helpers.once(this._forceTouch);
+                this._checkTouch();
             },
 
             /**
