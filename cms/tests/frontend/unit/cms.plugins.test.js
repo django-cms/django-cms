@@ -473,16 +473,188 @@ describe('CMS.Plugin', function () {
     });
 
     describe('.copyPlugin()', function () {
-        it('makes a request to the API');
-        it('does not make a request if CMS.API is locked');
-        it('shows the success message if request succeeds');
-        it('reloads the browser if request succeeds');
-        it('shows the error message if request failed');
-        it('locks the CMS.API before making the request');
-        it('unlocks the CMS.API if request is successful');
-        it('unlocks the CMS.API if request is not successful');
-        it('clears the clipboard first if custom options were passed');
-        it('clears the clipboard first if source language was passed');
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                clipboard: {
+                    id: 'clipboardId'
+                },
+                lang: {
+                    success: 'Voila!',
+                    error: 'Test error occured: '
+                }
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            jasmine.Ajax.install();
+
+            $(function () {
+                CMS.API.Messages = new CMS.Messages();
+                spyOn(CMS.API.Messages, 'open');
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: "/en/admin/cms/page/add-plugin/",
+                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
+                        move_plugin: "/en/admin/cms/page/move-plugin/",
+                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
+                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+            jasmine.Ajax.uninstall();
+        });
+
+        it('makes a request to the API', function () {
+            expect(plugin.copyPlugin(plugin.options)).toEqual(undefined);
+            var request = jasmine.Ajax.requests.mostRecent();
+            expect(request.url).toEqual('/en/admin/cms/page/copy-plugins/');
+            expect(request.method).toEqual('POST');
+            expect(request.data()).toEqual({
+                source_placeholder_id: ['1'],
+                source_plugin_id: ['1'],
+                source_language: [''],
+                target_plugin_id: [''],
+                target_placeholder_id: ['clipboardId'],
+                target_language: [''],
+                csrfmiddlewaretoken: ['CSRF_TOKEN']
+            });
+        });
+
+        it('does not make a request if CMS.API is locked', function () {
+            CMS.API.locked = true;
+            expect(plugin.copyPlugin(plugin.options)).toEqual(false);
+            expect(jasmine.Ajax.requests.count()).toEqual(0);
+            CMS.API.locked = false;
+        });
+
+        it('shows the success message if request succeeds', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success();
+                CMS.API.locked = false;
+            });
+            plugin.copyPlugin(plugin.options);
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: 'Voila!'
+            });
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
+        });
+
+        it('reloads the browser if request succeeds', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success();
+                CMS.API.locked = false;
+            });
+            plugin.copyPlugin(plugin.options);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalled();
+        });
+
+        it('shows the error message if request failed', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.error({
+                    responseText: 'everything is wrong'
+                });
+            });
+            plugin.copyPlugin(plugin.options);
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: 'Test error occured: everything is wrong',
+                error: true
+            });
+        });
+
+        // not supposed to happen
+        it('shows generic error message if request failed', function () {
+            CMS.config.lang.error = '';
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.error({
+                    responseText: '',
+                    status: 418,
+                    statusText: "I'm a teapot"
+                });
+            });
+            plugin.copyPlugin(plugin.options);
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: "418 I'm a teapot",
+                error: true
+            });
+        });
+
+        it('locks but does not unlock the CMS.API if request is successful', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                expect(CMS.API.locked).toEqual(true);
+                ajax.success();
+                expect(CMS.API.locked).toEqual(true);
+            });
+            CMS.API.locked = false;
+            plugin.copyPlugin(plugin.options);
+        });
+
+        it('locks/unlocks the CMS.API if request is not successful', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                expect(CMS.API.locked).toEqual(true);
+                ajax.error({});
+                expect(CMS.API.locked).toEqual(false);
+            });
+            CMS.API.locked = false;
+            plugin.copyPlugin(plugin.options);
+        });
+
+        it('clears the clipboard first if no options were passed', function () {
+            CMS.API.Clipboard = new CMS.Clipboard();
+            spyOn(CMS.API.Clipboard, 'clear').and.callFake(function (callback) {
+                callback();
+            });
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                expect(ajax.data).toEqual({
+                    source_placeholder_id: 1,
+                    source_plugin_id: 1,
+                    source_language: 'es',
+                    target_plugin_id: '',
+                    target_placeholder_id: 'clipboardId',
+                    target_language: 'es',
+                    csrfmiddlewaretoken: 'CSRF_TOKEN'
+                });
+                CMS.API.locked = false;
+            });
+
+            plugin.options.plugin_language = 'es';
+            plugin.copyPlugin();
+        });
+
+        it('clears the clipboard first if source language was passed', function () {
+            CMS.API.Clipboard = new CMS.Clipboard();
+            spyOn(CMS.API.Clipboard, 'clear').and.callFake(function (callback) {
+                callback();
+            });
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                expect(ajax.data).toEqual({
+                    source_placeholder_id: 1,
+                    source_plugin_id: '',
+                    source_language: 'de',
+                    target_plugin_id: '',
+                    target_placeholder_id: 1,
+                    target_language: 'es',
+                    csrfmiddlewaretoken: 'CSRF_TOKEN'
+                });
+                CMS.API.locked = false;
+            });
+
+            plugin.options.page_language = 'es';
+            plugin.copyPlugin(undefined, 'de');
+        });
     });
 
     describe('.cutPlugin()', function () {
