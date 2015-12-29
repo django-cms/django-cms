@@ -29,6 +29,11 @@ def copy_plugins_to(old_plugins, to_placeholder,
         for idx, plugin in enumerate(new_plugins):
             if plugin.parent_id is None:
                 plugin.parent_id = parent_plugin_id
+                # Always use update fields to avoid side-effects.
+                # In this case "plugin" has invalid values for internal fields
+                # like numchild.
+                # The invalid value is only in memory because the instance
+                # was never updated.
                 plugin.save(update_fields=['parent'])
                 new_plugins[idx] = plugin.move(parent_plugin, pos="last-child")
 
