@@ -382,16 +382,216 @@ describe('CMS.Toolbar', function () {
             expect(request.url).toEqual('/url');
         });
 
-        it('shows and hides loader after request succeeds');
+        it('does not make the request if there is a confirmation that is not succeeded', function () {
+            spyOn(CMS.API.Helpers, 'secureConfirm').and.callFake(function (question) {
+                expect(question).toEqual('Are you sure?');
+                return false;
+            });
+            expect(toolbar.openAjax({ url: '/url', text: 'Are you sure?' })).toEqual(false);
+        });
 
-        it('unlocks the toolbar after request succeeds');
+        it('shows the loader before making the request', function () {
+            spyOn(toolbar, 'showLoader');
+            expect(toolbar.openAjax({ url: '/url' })).toEqual(jasmine.any(Object));
+            expect(toolbar.showLoader).toHaveBeenCalled();
+        });
 
-        it('uses custom callback after request succeeds');
+        it('uses custom callback after request succeeds and hides the loader', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('response');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+            spyOn(toolbar, 'hideLoader');
 
-        it('uses custom onSuccess url after request succeeds');
+            var callback = jasmine.createSpy();
 
-        it('opens an error message if request failed');
+            toolbar.openAjax({
+                url: '/url',
+                callback: callback
+            });
 
-        it('does not make the request if there is a confirmation that is not succeeded');
+            expect(callback).toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledWith(toolbar, 'response');
+            expect(toolbar.hideLoader).toHaveBeenCalled();
+        });
+
+        it('does not hide the loader if no callback provided', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('response');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            spyOn(toolbar, 'showLoader');
+            spyOn(toolbar, 'hideLoader');
+
+            toolbar.openAjax({
+                url: '/url',
+                onSuccess: '/another-url'
+            });
+
+            expect(toolbar.showLoader).toHaveBeenCalled();
+            expect(toolbar.hideLoader).not.toHaveBeenCalled();
+        });
+
+        it('uses custom onSuccess url after request succeeds', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('response');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+
+            toolbar.openAjax({
+                url: '/url',
+                onSuccess: '/another-url'
+            });
+
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/another-url', false, true);
+        });
+
+        it('reloads the page if no callback or onSuccess passed', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('response');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+
+            toolbar.openAjax({
+                url: '/url'
+            });
+
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false, false, true);
+        });
+
+        it('handles parameters', function () {
+            spyOn($, 'ajax').and.callFake(function (param) {
+                expect(param.data).toEqual({ param1: true, param2: false, param3: 150, param4: 'alala' });
+                return {
+                    done: function () {
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            toolbar.openAjax({
+                url: '/whatever',
+                post: JSON.stringify({ param1: true, param2: false, param3: 150, param4: 'alala' })
+            });
+        });
+
+        it('opens an error message if request failed', function () {
+            CMS.API.Messages = new CMS.Messages();
+            spyOn(CMS.API.Messages, 'open');
+
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function () {
+                        return {
+                            fail: function (callback) {
+                                callback({
+                                    responseText: 'An error occured',
+                                    status: 418,
+                                    statusText: "I'm a teapot"
+                                });
+                            }
+                        };
+                    }
+                };
+            });
+
+            toolbar.openAjax({
+                url: '/whatever'
+            });
+
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: "An error occured | 418 I'm a teapot",
+                error: true
+            });
+        });
+
+        it('unlocks the toolbar if request succeeds', function () {
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function (callback) {
+                        callback('response');
+                        return { fail: $.noop };
+                    }
+                };
+            });
+
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            CMS.API.locked = true;
+
+            toolbar.openAjax({
+                url: '/url'
+            });
+
+            expect(CMS.API.locked).toEqual(false);
+
+            CMS.API.locked = true;
+
+            toolbar.openAjax({
+                url: '/url',
+                callback: $.noop
+            });
+
+            expect(CMS.API.locked).toEqual(false);
+
+            CMS.API.locked = true;
+
+            toolbar.openAjax({
+                url: '/url',
+                onSuccess: '/another-url'
+            });
+
+            expect(CMS.API.locked).toEqual(false);
+        });
+
+        it('unlocks the toolbar if request fails', function () {
+            CMS.API.Messages = new CMS.Messages();
+            spyOn(CMS.API.Messages, 'open');
+
+            spyOn($, 'ajax').and.callFake(function () {
+                return {
+                    done: function () {
+                        return {
+                            fail: function (callback) {
+                                callback({
+                                    responseText: 'An error occured',
+                                    status: 418,
+                                    statusText: "I'm a teapot"
+                                });
+                            }
+                        };
+                    }
+                };
+            });
+
+            CMS.API.locked = true;
+
+            toolbar.openAjax({
+                url: '/whatever'
+            });
+
+            expect(CMS.API.locked).toEqual(false);
+        });
     });
 });
