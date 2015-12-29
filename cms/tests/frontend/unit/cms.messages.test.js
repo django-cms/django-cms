@@ -81,6 +81,11 @@ describe('CMS.Messages', function () {
             messages.open({ message: 'test message' });
             expect(messages.ui.messages.find('.cms-messages-inner')).toHaveText('test message');
             expect(messages.ui.messages).toBeVisible();
+
+            messages.open({ message: '<strong>html</strong> message' });
+            expect(messages.ui.messages.find('.cms-messages-inner')).toHaveText('html message');
+            expect(messages.ui.messages.find('.cms-messages-inner')).toContainHtml('<strong>html</strong> message');
+            expect(messages.ui.messages).toBeVisible();
         });
 
         it('adds correct styling if it is an error message', function () {
