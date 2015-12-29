@@ -540,7 +540,7 @@ var CMS = window.CMS || {};
                 CMS.API.locked = false;
 
                 CMS.API.Messages.open({
-                    message: jqXHR.response + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
+                    message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
                     error: true
                 });
             });
