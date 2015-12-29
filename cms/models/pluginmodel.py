@@ -238,7 +238,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                                                              placeholder_id=self.placeholder_id).count()
                 self.add_root(instance=self)
             return
-        super(CMSPlugin, self).save()
+        super(CMSPlugin, self).save(*args, **kwargs)
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
