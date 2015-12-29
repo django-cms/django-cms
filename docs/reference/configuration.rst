@@ -747,7 +747,7 @@ Example::
 
 If larger set of IP addresses are to be used, consider installing and using
 `iptools <https://python-iptools.readthedocs.org/en/latest/>`_, which allows
-specifying whole ranges in CIDR notation for IPV4 and IPV6 addresses.
+specifying whole ranges in CIDR notation for IPv4 and IPv6 addresses.
 
 Example using iptools::
 
