@@ -27,7 +27,6 @@ def do_static_with_version(parser, token):
 
 class StaticWithVersionNode(StaticNode):
 
-    @classmethod
-    def handle_simple(cls, path):
-        url = super(StaticWithVersionNode, cls).handle_simple(path)
+    def url(self, context):
+        url = super(StaticWithVersionNode, self).url(context)
         return static_with_version(url)
