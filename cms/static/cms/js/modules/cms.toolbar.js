@@ -380,7 +380,7 @@ var CMS = window.CMS || {};
             }
 
             // open sideframe if it was previously opened
-            if (CMS.settings.sideframe.url) {
+            if (CMS.settings.sideframe && CMS.settings.sideframe.url) {
                 var sideframe = new CMS.Sideframe();
                 sideframe.open({
                     url: CMS.settings.sideframe.url,
