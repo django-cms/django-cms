@@ -180,17 +180,144 @@ describe('CMS.StructureBoard', function () {
     });
 
     describe('.hide()', function () {
-        it('hides the board');
-        it('does not hide the board if we are viewing published page');
-        it('resets size of the toolbar');
-        it('highlights correct trigger');
-        it('hides the clipboard');
-        it('remembers the state');
-        it('hides the placeholders');
-        it('shows the plugins');
-        it('removes resize event for sideframe');
-        it('triggers `strucutreboard_hidden` event on the window');
-        it('resizes the structureboard if type of structureboard is dynamic');
+        var board;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.settings = {
+                mode: 'edit'
+            };
+            CMS.config = {
+                mode: 'edit',
+                simpleStructureBoard: true
+            };
+            $(function () {
+                board = new CMS.StructureBoard();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('hides the board', function () {
+            spyOn(board, '_hideBoard').and.callThrough();
+            board.show();
+            expect(board.ui.container).toBeVisible();
+
+            board.hide();
+            expect(board.ui.container).not.toBeVisible();
+            expect(board._hideBoard).toHaveBeenCalled();
+        });
+
+        it('does not hide the board if we are viewing published page', function () {
+            CMS.config.mode = 'live';
+            spyOn(board, '_hideBoard');
+            expect(board.ui.container).not.toBeVisible();
+            expect(board.hide()).toEqual(false);
+            expect(board.ui.container).not.toBeVisible();
+            expect(board._hideBoard).not.toHaveBeenCalled();
+        });
+
+        it('resets size of the toolbar if there was no scrollbar', function () {
+            board.show();
+            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
+            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
+            board.hide();
+            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
+            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
+        });
+
+        it('resets size of the toolbar if there was a scrollbar', function () {
+            // fake window that has a scrollbar of 100px
+            board.ui.window = {
+                0: {
+                    innerWidth: board.ui.toolbar.width() + 100
+                },
+                off: $.noop,
+                trigger: $.noop
+            };
+            board.show();
+            board.hide();
+            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
+            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
+        });
+
+
+        it('highlights correct trigger', function () {
+            board.show();
+            board.hide();
+            expect(board.ui.toolbarModeLinks.eq(0)).not.toHaveClass('cms-btn-active');
+            expect(board.ui.toolbarModeLinks.eq(1)).toHaveClass('cms-btn-active');
+        });
+
+        it('hides the clipboard', function () {
+            board.show();
+            board.ui.container.append(
+                '<div class="cms-clipboard" style="display: block; width: 10px; height: 10px;">'
+            );
+
+            expect($('.cms-clipboard')).toBeVisible();
+            board.hide();
+            expect($('.cms-clipboard')).not.toBeVisible();
+            expect($('.cms-clipboard').attr('style')).toMatch(/display: none/);
+        });
+
+        it('remembers the state', function () {
+            board.show();
+            expect(CMS.settings.mode).toEqual('structure');
+            spyOn(CMS.StructureBoard.prototype, 'setSettings').and.callFake(function (input) {
+                return input;
+            });
+            board.hide();
+            expect(CMS.settings.mode).toEqual('edit');
+            expect(CMS.StructureBoard.prototype.setSettings).toHaveBeenCalled();
+        });
+
+        it('hides the placeholders', function () {
+            board.show();
+            expect(board.ui.placeholders).toBeVisible();
+            board.hide();
+            expect(board.ui.placeholders).not.toBeVisible();
+        });
+
+        it('shows the plugins', function () {
+            board.show();
+            expect(board.ui.plugins.not(board.ui.render_model)).not.toBeVisible();
+            board.hide();
+            // toBeVisible doesn't work because they are display: inline and have no size
+            board.ui.plugins.each(function () {
+                expect($(this).css('display')).not.toEqual('none');
+            });
+        });
+
+        it('removes resize event for sideframe', function () {
+            board.show();
+            spyOn($.fn, 'off');
+            board.hide();
+            expect($.fn.off).toHaveBeenCalledWith('resize.sideframe');
+        });
+
+        it('triggers `strucutreboard_hidden` event on the window', function () {
+            board.show();
+            spyOn($.fn, 'trigger');
+            board.hide();
+            expect($.fn.trigger).toHaveBeenCalledWith('structureboard_hidden.sideframe');
+        });
+
+        it('resizes the structureboard if type of structureboard is dynamic', function () {
+            board.show();
+            CMS.config.simpleStructureBoard = false;
+            // faking document height
+            board.ui.doc = {
+                outerHeight: function () {
+                    return 329;
+                }
+            };
+            expect(board.ui.container.height()).not.toEqual(329);
+            board.hide();
+            expect(board.ui.container.height()).toEqual(329);
+        });
     });
 
     describe('.getId()', function () {
