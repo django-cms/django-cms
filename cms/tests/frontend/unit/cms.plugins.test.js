@@ -42,11 +42,11 @@ describe('CMS.Plugin', function () {
                     plugin_type: 'TextPlugin',
                     placeholder_id: 1,
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
                 plugin2 = new CMS.Plugin('cms-plugin-2', {
@@ -55,11 +55,11 @@ describe('CMS.Plugin', function () {
                     plugin_type: 'RandomPlugin',
                     placeholder_id: 1,
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/2/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/2/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/2/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
                 placeholder1 = new CMS.Plugin('cms-placeholder-1', {
@@ -144,11 +144,11 @@ describe('CMS.Plugin', function () {
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
-                    add_plugin: "/en/admin/cms/page/add-plugin/",
-                    edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
-                    move_plugin: "/en/admin/cms/page/move-plugin/",
-                    delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
-                    copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    add_plugin: '/en/admin/cms/page/add-plugin/',
+                    edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                    move_plugin: '/en/admin/cms/page/move-plugin/',
+                    delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                    copy_plugin: '/en/admin/cms/page/copy-plugins/'
                 }
             });
 
@@ -164,11 +164,11 @@ describe('CMS.Plugin', function () {
                 plugin_restriction: [],
                 plugin_parent_restriction: [],
                 urls: {
-                    add_plugin: "/en/admin/cms/page/add-plugin/",
-                    edit_plugin: "/en/admin/cms/page/edit-plugin/2/",
-                    move_plugin: "/en/admin/cms/page/move-plugin/",
-                    delete_plugin: "/en/admin/cms/page/delete-plugin/2/",
-                    copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    add_plugin: '/en/admin/cms/page/add-plugin/',
+                    edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
+                    move_plugin: '/en/admin/cms/page/move-plugin/',
+                    delete_plugin: '/en/admin/cms/page/delete-plugin/2/',
+                    copy_plugin: '/en/admin/cms/page/copy-plugins/'
                 }
             });
 
@@ -259,11 +259,11 @@ describe('CMS.Plugin', function () {
                     plugin_type: 'TextPlugin',
                     placeholder_id: 1,
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
                 done();
@@ -422,11 +422,11 @@ describe('CMS.Plugin', function () {
                     plugin_type: 'TextPlugin',
                     placeholder_id: 1,
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
                 done();
@@ -503,11 +503,11 @@ describe('CMS.Plugin', function () {
                     plugin_type: 'TextPlugin',
                     placeholder_id: 1,
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
                 done();
@@ -696,11 +696,11 @@ describe('CMS.Plugin', function () {
                     placeholder_id: 1,
                     page_language: 'en',
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
                 done();
@@ -881,11 +881,11 @@ describe('CMS.Plugin', function () {
                     placeholder_id: 2,
                     page_language: 'en',
                     urls: {
-                        add_plugin: "/en/admin/cms/page/add-plugin/",
-                        edit_plugin: "/en/admin/cms/page/edit-plugin/2/",
-                        move_plugin: "/en/admin/cms/page/move-plugin/",
-                        delete_plugin: "/en/admin/cms/page/delete-plugin/2/",
-                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/2/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/2/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
                     }
                 });
 
