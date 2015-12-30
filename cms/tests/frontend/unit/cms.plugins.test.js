@@ -1331,6 +1331,49 @@ describe('CMS.Plugin', function () {
     });
 
     describe('.editPluginPostAjax()', function () {
-        it('delegates to editPlugin with url coming from response');
+        var plugin;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    plugin_name: 'Test Text Plugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('delegates to editPlugin with url coming from response', function () {
+            spyOn(plugin, 'editPlugin');
+            plugin.editPluginPostAjax({}, { url: 'test-url', breadcrumb: 'whatever' });
+            expect(plugin.editPlugin).toHaveBeenCalledWith(
+                'test-url',
+                'Test Text Plugin',
+                'whatever'
+            );
+        });
     });
 });
