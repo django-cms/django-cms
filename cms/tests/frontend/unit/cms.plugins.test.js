@@ -1264,8 +1264,70 @@ describe('CMS.Plugin', function () {
     });
 
     describe('.deletePlugin()', function () {
-        it('creates and opens a modal for plugin deletion');
-        it('adds events to remove any existing "add plugin" placeholders');
+        var plugin;
+        var fakeModal;
+
+        beforeEach(function (done) {
+            fakeModal = {
+                on: jasmine.createSpy(),
+                open: jasmine.createSpy()
+            };
+            spyOn(CMS.Modal.prototype, 'initialize').and.callFake(function (params) {
+                expect(params).toEqual({
+                    newPlugin: false,
+                    onClose: false,
+                    redirectOnClose: false
+                });
+                return fakeModal;
+            });
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                lang: {}
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            $(function () {
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    placeholder_id: 1,
+                    urls: {
+                        add_plugin: '/en/admin/cms/page/add-plugin/',
+                        edit_plugin: '/en/admin/cms/page/edit-plugin/1/',
+                        move_plugin: '/en/admin/cms/page/move-plugin/',
+                        delete_plugin: '/en/admin/cms/page/delete-plugin/1/',
+                        copy_plugin: '/en/admin/cms/page/copy-plugins/'
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('creates and opens a modal for plugin deletion', function () {
+            plugin.deletePlugin('delete-url', 'Delete name', 'breadcrumb');
+            expect(fakeModal.open).toHaveBeenCalledWith({
+                url: 'delete-url',
+                title: 'Delete name',
+                breadcrumbs: 'breadcrumb'
+            });
+        });
+
+        it('adds events to remove any existing "add plugin" placeholders', function () {
+            plugin.deletePlugin();
+            expect(fakeModal.on).toHaveBeenCalledWith('cms.modal.loaded', jasmine.any(Function));
+
+            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
+            fakeModal.on.calls.argsFor(0)[1]();
+            expect($('.cms-add-plugin-placeholder')).not.toExist();
+        });
     });
 
     describe('.editPluginPostAjax()', function () {
