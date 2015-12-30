@@ -1,3 +1,4 @@
+/* globals window */
 'use strict';
 
 describe('CMS.Plugin', function () {
