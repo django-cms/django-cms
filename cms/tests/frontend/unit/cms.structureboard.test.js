@@ -25,6 +25,7 @@ describe('CMS.StructureBoard', function () {
                 mode: 'edit'
             };
             $(function () {
+                CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
@@ -78,6 +79,7 @@ describe('CMS.StructureBoard', function () {
                 simpleStructureBoard: true
             };
             $(function () {
+                CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
@@ -199,6 +201,7 @@ describe('CMS.StructureBoard', function () {
                 simpleStructureBoard: true
             };
             $(function () {
+                CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
@@ -340,6 +343,7 @@ describe('CMS.StructureBoard', function () {
                 simpleStructureBoard: true
             };
             $(function () {
+                CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
@@ -436,6 +440,7 @@ describe('CMS.StructureBoard', function () {
                 simpleStructureBoard: true
             };
             $(function () {
+                CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
                 done();
             });
