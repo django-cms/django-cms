@@ -5,6 +5,7 @@
 - Added placeholder name to the edit tooltip
 - Fix breadcrumb in page revision list
 - Fix clash with Foundation that caused "Add plugin" button to be unusable
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
 
 
 === 3.2.0 (2015-11-24) ===
