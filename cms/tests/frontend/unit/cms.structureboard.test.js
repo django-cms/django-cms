@@ -56,6 +56,14 @@ describe('CMS.StructureBoard', function () {
         it('has no options', function () {
             expect(board.options).toEqual(undefined);
         });
+
+        it('applies correct classes to empty placeholder dragareas', function () {
+            $('.cms-dragarea').removeClass('cms-dragarea-empty');
+            board = new CMS.StructureBoard();
+            expect('.cms-dragarea-1').not.toHaveClass('cms-dragarea-empty');
+            expect('.cms-dragarea-2').toHaveClass('cms-dragarea-empty');
+            expect('.cms-dragarea-10').toHaveClass('cms-dragarea-empty');
+        });
     });
 
     describe('.show()', function () {
