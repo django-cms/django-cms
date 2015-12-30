@@ -409,6 +409,11 @@ describe('CMS.StructureBoard', function () {
             expect(board.getId($('.non-existent'))).toEqual(false);
             expect(board.getId([])).toEqual(false);
         });
+
+        it('fails if classname string is incorrect', function () {
+            expect(board.getId.bind(board, $('<div class="cms-plugin"></div>'))).toThrow();
+            expect(board.getId($('<div class="cms-plugin fail cms-plugin-10"></div>'))).toEqual('fail');
+        });
     });
 
     describe('.getIds()', function () {
