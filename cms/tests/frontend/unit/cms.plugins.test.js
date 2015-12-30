@@ -834,9 +834,135 @@ describe('CMS.Plugin', function () {
     });
 
     describe('.pastePlugin()', function () {
-        it('moves the clipboard draggable dom node plugins child list');
-        it('moves the clipboard draggable dom node placeholders child list');
-        it('triggers correct events afterwards');
+        var plugin;
+        var clipboardPlugin;
+        var placeholder;
+
+        beforeEach(function (done) {
+            fixture.load('plugins.html', 'clipboard.html', true);
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                clipboard: {
+                    id: 'clipboardId'
+                },
+                lang: {
+                    success: 'Voila!',
+                    error: 'Test error occured: '
+                }
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+
+            $(function () {
+                CMS.Plugin._initializeGlobalHandlers();
+                CMS.API.StructureBoard = {
+                    getId: function () {
+                        return 2;
+                    },
+                    getIds: function () {
+                        return [];
+                    }
+                };
+
+                clipboardPlugin = new CMS.Plugin('cms-plugin-3', {
+                    type: 'plugin',
+                    plugin_id: 3,
+                    plugin_type: 'ClipboardPlugin',
+                    plugin_parent_restriction: ['RandomPlugin']
+                });
+
+                plugin = new CMS.Plugin('cms-plugin-2', {
+                    type: 'plugin',
+                    plugin_id: 2,
+                    plugin_type: 'RandomPlugin',
+                    placeholder_id: 2,
+                    page_language: 'en',
+                    urls: {
+                        add_plugin: "/en/admin/cms/page/add-plugin/",
+                        edit_plugin: "/en/admin/cms/page/edit-plugin/2/",
+                        move_plugin: "/en/admin/cms/page/move-plugin/",
+                        delete_plugin: "/en/admin/cms/page/delete-plugin/2/",
+                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    }
+                });
+
+                placeholder = new CMS.Plugin('cms-placeholder-2', {
+                    type: 'placeholder',
+                    placeholder_id: 2
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it("moves the clipboard draggable dom node to plugin's child list", function () {
+            var clipboard = $('.cms-clipboard');
+            var clipboardDraggable = clipboard.find('.cms-draggable:first');
+            var clipboardPluginDOM = clipboard.find('.cms-plugin:first');
+            expect(clipboard).toExist();
+            expect(clipboardDraggable).toExist();
+            expect(clipboardPluginDOM).toExist();
+            plugin.pastePlugin();
+            expect(plugin.ui.draggables).toContainElement('.cms-draggable-3');
+        });
+
+        it("moves the clipboard draggable dom node placeholder's child list", function () {
+            var clipboard = $('.cms-clipboard');
+            var clipboardDraggable = clipboard.find('.cms-draggable:first');
+            var clipboardPluginDOM = clipboard.find('.cms-plugin:first');
+            expect(clipboard).toExist();
+            expect(clipboardDraggable).toExist();
+            expect(clipboardPluginDOM).toExist();
+            placeholder.pastePlugin();
+            expect(placeholder.ui.draggables).toContainElement('.cms-draggable-3');
+        });
+
+        it('triggers correct events on a freshly pasted clipboard plugin', function (done) {
+            var clipboardPluginDOM = $('.cms-clipboard .cms-plugin:first');
+            clipboardPluginDOM.on('cms.plugin.update', function () {
+                done();
+            });
+            plugin.pastePlugin();
+        });
+
+        it('triggers correct events on a child list where the plugin was just moved', function (done) {
+            plugin.ui.draggables.on('cms.update', function () {
+                done();
+            });
+            plugin.pastePlugin();
+        });
+
+        it('triggers movePlugin on clipboard plugin eventually', function () {
+            spyOn(clipboardPlugin, 'movePlugin');
+            plugin.pastePlugin();
+            expect(clipboardPlugin.movePlugin).toHaveBeenCalledWith({
+                type: 'plugin',
+                placeholder_id: null,
+                plugin_type: 'ClipboardPlugin',
+                plugin_id: 3,
+                plugin_language: '',
+                plugin_parent: null,
+                plugin_order: null,
+                plugin_breadcrumb: [],
+                plugin_restriction: [],
+                plugin_parent_restriction: ['RandomPlugin'],
+                urls: {
+                    add_plugin: '',
+                    edit_plugin: '',
+                    move_plugin: '',
+                    copy_plugin: '',
+                    delete_plugin: ''
+                },
+                target: 2,
+                parent: 2,
+                move_a_copy: true
+            });
+        });
     });
 
     describe('.movePlugin()', function () {
