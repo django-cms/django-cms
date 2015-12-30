@@ -206,7 +206,7 @@ var CMS = window.CMS || {};
             // had the scrollbar nad if it had - we adjust
             // the toolbar positioning
             var width = this.ui.toolbar.width();
-            var scrollBarWidth = window.innerWidth - width;
+            var scrollBarWidth = this.ui.window[0].innerWidth - width;
             if (scrollBarWidth) {
                 this.ui.toolbar.css('right', scrollBarWidth);
                 this.ui.toolbarTrigger.css('right', scrollBarWidth);
