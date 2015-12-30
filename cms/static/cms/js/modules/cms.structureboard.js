@@ -3,6 +3,7 @@
 /**
  * @module CMS
  */
+/* istanbul ignore next */
 var CMS = window.CMS || {};
 
 (function ($) {
