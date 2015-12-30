@@ -131,9 +131,13 @@ describe('CMS.StructureBoard', function () {
         });
 
         it('remembers state', function () {
+            spyOn(CMS.StructureBoard.prototype, 'setSettings').and.callFake(function (input) {
+                return input;
+            });
             expect(CMS.settings.mode).toEqual('edit');
             board.show();
             expect(CMS.settings.mode).toEqual('structure');
+            expect(CMS.StructureBoard.prototype.setSettings).toHaveBeenCalled();
         });
 
         it('shows all placeholders', function () {
