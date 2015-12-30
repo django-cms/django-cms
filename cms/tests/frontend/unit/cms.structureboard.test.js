@@ -104,7 +104,13 @@ describe('CMS.StructureBoard', function () {
 
         it('resizes toolbar correctly based if there is a scrollbar', function () {
             // fake window that has a scrollbar of 20px
-            board.ui.window = [{ innerWidth: board.ui.toolbar.width() + 20 }];
+            board.ui.window = {
+                0: {
+                    innerWidth: board.ui.toolbar.width() + 20
+                },
+                off: $.noop,
+                trigger: $.noop
+            };
             board.show();
             expect(board.ui.toolbar).toHaveCss({ right: '20px' });
             expect(board.ui.toolbarTrigger).toHaveCss({ right: '20px' });
