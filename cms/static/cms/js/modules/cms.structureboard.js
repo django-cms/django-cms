@@ -10,6 +10,8 @@ var CMS = window.CMS || {};
     'use strict';
 
     var placeholders;
+
+    // TODO make these static methods on CMS.StructureBoard
     function actualizeEmptyPlaceholders() {
         placeholders.each(function () {
             var placeholder = $(this);
@@ -35,11 +37,6 @@ var CMS = window.CMS || {};
             }
         });
     }
-
-    // shorthand for jQuery(document).ready();
-    $(function () {
-        placeholders = $('.cms-dragarea:not(.cms-clipboard-containers)');
-    });
 
     /**
      * Handles drag & drop, mode switching and collapsables.
@@ -592,4 +589,20 @@ var CMS = window.CMS || {};
         }
 
     });
+
+    /**
+     * Similar to CMS.Plugin populates globally required
+     * variables, that only need querying once, e.g. placeholders.
+     *
+     * @method _initializeGlobalHandlers
+     * @static
+     * @private
+     */
+    CMS.StructureBoard._initializeGlobalHandlers = function _initializeGlobalHandlers() {
+        placeholders = $('.cms-dragarea:not(.cms-clipboard-containers)');
+    };
+
+    // shorthand for jQuery(document).ready();
+    $(CMS.StructureBoard._initializeGlobalHandlers);
+
 })(CMS.$);
