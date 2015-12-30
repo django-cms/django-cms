@@ -417,6 +417,53 @@ describe('CMS.StructureBoard', function () {
     });
 
     describe('.getIds()', function () {
-        it('returns the array of ids of passed collection');
+        var board;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.settings = {
+                mode: 'edit'
+            };
+            CMS.config = {
+                mode: 'edit',
+                simpleStructureBoard: true
+            };
+            $(function () {
+                board = new CMS.StructureBoard();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('returns the array of ids of passed collection', function () {
+            spyOn(board, 'getId').and.callThrough();
+            [
+                {
+                    from: ['cms-plugin cms-plugin-1'],
+                    result: ['1']
+                },
+                {
+                    from: ['cms-plugin cms-plugin-125', 'cms-plugin cms-plugin-1'],
+                    result: ['125', '1']
+                },
+                {
+                    from: ['cms-plugin cms-plugin-125', 'cms-plugin cms-plugin-1', 'cms-draggable cms-draggable-12'],
+                    result: ['125', '1', '12']
+                },
+                {
+                    from: ['non-existent', 'cms-plugin cms-plugin-1'],
+                    result: [null, '1']
+                }
+            ].forEach(function (obj) {
+                var collection = $();
+                obj.from.forEach(function (className) {
+                    collection = collection.add($('<div class="' + className + '"></div>'));
+                });
+                expect(board.getIds(collection)).toEqual(obj.result);
+            });
+            expect(board.getId).toHaveBeenCalled();
+        });
     });
 });
