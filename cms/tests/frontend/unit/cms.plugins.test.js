@@ -658,15 +658,179 @@ describe('CMS.Plugin', function () {
     });
 
     describe('.cutPlugin()', function () {
-        it('makes a request to the API');
-        it('clears the clipboard before making the request');
-        it('shows the success message if request succeeds');
-        it('reloads the browser if request succeeds');
-        it('shows the error message if request failed');
-        it('does not make a request if CMS.API is locked');
-        it('locks the CMS.API before making the request');
-        it('unlocks the CMS.API if request is successful');
-        it('unlocks the CMS.API if request is not successful');
+        var plugin;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.config = {
+                csrf: 'CSRF_TOKEN',
+                clipboard: {
+                    id: 'clipboardId'
+                },
+                lang: {
+                    success: 'Voila!',
+                    error: 'Test error occured: '
+                }
+            };
+            CMS.settings = {
+                dragbars: [],
+                states: []
+            };
+            spyOn(CMS.API.Helpers, 'reloadBrowser');
+            jasmine.Ajax.install();
+
+            $(function () {
+                CMS.API.Messages = new CMS.Messages();
+                spyOn(CMS.API.Messages, 'open');
+
+                CMS.API.Clipboard = new CMS.Clipboard();
+                spyOn(CMS.API.Clipboard, 'clear').and.callFake(function (callback) {
+                    CMS.API.locked = false; // it happens as part of CMS.API.Toolbar.openAjax
+                    callback();
+                });
+
+                plugin = new CMS.Plugin('cms-plugin-1', {
+                    type: 'plugin',
+                    plugin_id: 1,
+                    plugin_type: 'TextPlugin',
+                    placeholder_id: 1,
+                    page_language: 'en',
+                    urls: {
+                        add_plugin: "/en/admin/cms/page/add-plugin/",
+                        edit_plugin: "/en/admin/cms/page/edit-plugin/1/",
+                        move_plugin: "/en/admin/cms/page/move-plugin/",
+                        delete_plugin: "/en/admin/cms/page/delete-plugin/1/",
+                        copy_plugin: "/en/admin/cms/page/copy-plugins/"
+                    }
+                });
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+            jasmine.Ajax.uninstall();
+        });
+
+        it('makes a request to the API', function () {
+            expect(plugin.cutPlugin()).toEqual(undefined);
+            var request = jasmine.Ajax.requests.mostRecent();
+            expect(request.url).toEqual('/en/admin/cms/page/move-plugin/');
+            expect(request.method).toEqual('POST');
+            expect(request.data()).toEqual({
+                placeholder_id: ['clipboardId'],
+                plugin_id: ['1'],
+                plugin_language: ['en'],
+                plugin_parent: [''],
+                'plugin_order[]': ['1'],
+                csrfmiddlewaretoken: ['CSRF_TOKEN']
+            });
+            CMS.API.locked = false;
+        });
+
+        it('clears the clipboard before making the request', function () {
+            plugin.cutPlugin();
+            expect(CMS.API.Clipboard.clear).toHaveBeenCalled();
+            CMS.API.locked = false;
+        });
+
+        it('shows the success message if request succeeds', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success();
+                CMS.API.locked = false;
+            });
+            plugin.cutPlugin();
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: 'Voila!'
+            });
+        });
+
+        it('reloads the browser if request succeeds', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.success();
+                CMS.API.locked = false;
+            });
+            plugin.cutPlugin();
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalled();
+        });
+
+        it('shows the error message if request failed', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.error({
+                    responseText: 'Cannot cut a plugin'
+                });
+            });
+            plugin.cutPlugin();
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: 'Test error occured: Cannot cut a plugin',
+                error: true
+            });
+        });
+
+        // not supposed to happen
+        it('shows generic error message if request failed', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                ajax.error({
+                    responseText: '',
+                    status: 418,
+                    statusText: "I'm a teapot"
+                });
+            });
+            CMS.config.lang.error = '';
+            plugin.cutPlugin();
+            expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                message: "418 I'm a teapot",
+                error: true
+            });
+        });
+
+        it('does not make a request if CMS.API is locked', function () {
+            CMS.API.locked = true;
+            expect(plugin.cutPlugin()).toEqual(false);
+            expect(CMS.API.Clipboard.clear).not.toHaveBeenCalled();
+            expect(jasmine.Ajax.requests.count()).toEqual(0);
+            CMS.API.locked = false;
+        });
+
+        it('does not make a request if CMS.API is locked after clearing the clipboard', function () {
+            CMS.API.Clipboard.clear.and.callFake(function (callback) {
+                CMS.API.locked = true;
+                expect(callback()).toEqual(false);
+            });
+            spyOn($, 'ajax');
+            expect(plugin.cutPlugin()).toEqual(undefined);
+            expect(CMS.API.Clipboard.clear).toHaveBeenCalled();
+            expect(jasmine.Ajax.requests.count()).toEqual(0);
+            expect($.ajax).not.toHaveBeenCalled();
+            CMS.API.locked = false;
+        });
+
+        it('locks the CMS.API before making the request', function () {
+            CMS.API.locked = false;
+            CMS.API.Clipboard.clear.and.callFake($.noop);
+            plugin.cutPlugin();
+            expect(CMS.API.locked).toEqual(true);
+            CMS.API.locked = false;
+        });
+
+        it('does not unlock the CMS.API if request is successful', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                expect(CMS.API.locked).toEqual(true);
+                ajax.success();
+                expect(CMS.API.locked).toEqual(true);
+            });
+            CMS.API.locked = false;
+            plugin.cutPlugin();
+        });
+
+        it('unlocks the CMS.API if request is not successful', function () {
+            spyOn($, 'ajax').and.callFake(function (ajax) {
+                expect(CMS.API.locked).toEqual(true);
+                ajax.error({});
+                expect(CMS.API.locked).toEqual(false);
+            });
+            CMS.API.locked = false;
+            plugin.cutPlugin();
+        });
     });
 
     describe('.pastePlugin()', function () {
