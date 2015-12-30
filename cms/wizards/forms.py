@@ -3,6 +3,7 @@
 from django import forms
 
 from cms.models import Page
+from cms.utils.urlutils import static_with_version
 
 from .wizard_pool import entry_choices
 
@@ -46,14 +47,18 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
     class Media:
         css = {
-            'all': ('cms/css/cms.wizard.css', )
+            'all': (
+                static_with_version('cms/css/cms.wizard.css'),
+            )
         }
         js = (
             'cms/js/modules/jquery.noconflict.pre.js',
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.wizards.js',
-            'cms/js/modules/jquery.noconflict.post.js'
+            'cms/js/modules/jquery.noconflict.post.js',
         )
+
+        js = tuple(map(static_with_version, js))
 
     page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
