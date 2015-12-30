@@ -51,13 +51,7 @@ var CMS = window.CMS || {};
 
         implement: [CMS.API.Helpers],
 
-        options: {
-            speed: 300
-        },
-
-        initialize: function (options) {
-            this.options = $.extend(true, {}, this.options, options);
-
+        initialize: function () {
             // elements
             this._setupUI();
 
