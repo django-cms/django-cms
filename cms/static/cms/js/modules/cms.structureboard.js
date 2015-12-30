@@ -267,6 +267,7 @@ var CMS = window.CMS || {};
 
         /**
          * Gets the id of the element.
+         * TODO: relies on cms-{item}-{id} to always be second in a string of classes
          *
          * @method getId
          * @param {jQuery} el element to get id from
