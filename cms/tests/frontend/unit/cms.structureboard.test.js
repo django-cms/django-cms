@@ -321,8 +321,94 @@ describe('CMS.StructureBoard', function () {
     });
 
     describe('.getId()', function () {
-        it('returns the id of passed element');
-        it('false if element does not exist');
+        var board;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.settings = {
+                mode: 'edit'
+            };
+            CMS.config = {
+                mode: 'edit',
+                simpleStructureBoard: true
+            };
+            $(function () {
+                board = new CMS.StructureBoard();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('returns the id of passed element', function () {
+            [
+                {
+                    from: 'cms-plugin cms-plugin-1',
+                    result: '1'
+                },
+                {
+                    from: 'cms-plugin cms-plugin-125',
+                    result: '125'
+                },
+                {
+                    from: 'cms-draggable cms-draggable-1',
+                    result: '1'
+                },
+                {
+                    from: 'cms-draggable cms-draggable-125',
+                    result: '125'
+                },
+                {
+                    from: 'cms-placeholder cms-placeholder-1',
+                    result: '1'
+                },
+                {
+                    from: 'cms-placeholder cms-placeholder-125',
+                    result: '125'
+                },
+                {
+                    from: 'cms-dragbar cms-dragbar-1',
+                    result: '1'
+                },
+                {
+                    from: 'cms-dragbar cms-dragbar-125',
+                    result: '125'
+                },
+                {
+                    from: 'cms-dragarea cms-dragarea-1',
+                    result: '1'
+                },
+                {
+                    from: 'cms-dragarea cms-dragarea-125',
+                    result: '125'
+                }
+            ].forEach(function (obj) {
+                expect(board.getId($('<div class="' + obj.from + '"></div>'))).toEqual(obj.result);
+            });
+        });
+
+        it('returns null if element is of non supported "type"', function () {
+            [
+                {
+                    from: 'cannot determine',
+                    result: null
+                },
+                {
+                    from: 'cms-not-supported cms-not-supported-1',
+                    result: null
+                }
+            ].forEach(function (obj) {
+                expect(board.getId($('<div class="' + obj.from + '"></div>'))).toEqual(obj.result);
+            });
+        });
+
+        it('returns false if element does not exist', function () {
+            expect(board.getId()).toEqual(false);
+            expect(board.getId(null)).toEqual(false);
+            expect(board.getId($('.non-existent'))).toEqual(false);
+            expect(board.getId([])).toEqual(false);
+        });
     });
 
     describe('.getIds()', function () {
