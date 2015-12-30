@@ -261,6 +261,9 @@ var CMS = window.CMS || {};
          * Checks if paste is allowed into current plugin/placeholder based
          * on restrictions we have. Also determines which tooltip to show.
          *
+         * WARNING: this relies on clipboard plugins always being instantiated
+         * first, so they have data('settings') by the time this method is called.
+         *
          * @method _checkIfPasteAllowed
          * @private
          * @return {Boolean}
@@ -1381,8 +1384,17 @@ var CMS = window.CMS || {};
         $('.cms-dragbar').css('position', '');
     };
 
-    // shorthand for jQuery(document).ready();
-    $(function () {
+    /**
+     * Initialises handlers that affect all plugins and don't make sense
+     * in context of each own plugin instance, e.g. listening for a click on a document
+     * to hide plugin settings menu should only be applied once, and not every time
+     * CMS.Plugin is instantiated.
+     *
+     * @method _initializeGlobalHandlers
+     * @static
+     * @private
+     */
+    CMS.Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         var timer;
         var clickCounter = 0;
 
@@ -1424,6 +1436,9 @@ var CMS = window.CMS || {};
                 clickCounter = 0;
             }
         });
-    });
+    };
+
+    // shorthand for jQuery(document).ready();
+    $(CMS.Plugin._initializeGlobalHandlers);
 
 })(CMS.$);
