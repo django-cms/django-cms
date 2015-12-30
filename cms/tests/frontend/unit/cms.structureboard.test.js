@@ -59,14 +59,114 @@ describe('CMS.StructureBoard', function () {
     });
 
     describe('.show()', function () {
-        it('shows the board');
-        it('does not show the board if we are viewing published page');
-        it('resizes toolbar correctly based on scrollbar width');
-        it('highlights correct trigger');
-        it('remembers state');
-        it('shows all placeholders');
-        it('applies correct classes based on type of structureboard');
-        it('reorders static placeholders to be last');
+        var board;
+        beforeEach(function (done) {
+            fixture.load('plugins.html');
+            CMS.settings = {
+                mode: 'edit'
+            };
+            CMS.config = {
+                mode: 'edit',
+                simpleStructureBoard: true
+            };
+            $(function () {
+                board = new CMS.StructureBoard();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('shows the board', function () {
+            spyOn(board, '_showBoard').and.callThrough();
+            expect(board.ui.container).not.toBeVisible();
+            board.show();
+            expect(board.ui.container).toBeVisible();
+            expect(board._showBoard).toHaveBeenCalled();
+        });
+
+        it('does not show the board if we are viewing published page', function () {
+            CMS.config.mode = 'live';
+            spyOn(board, '_showBoard').and.callThrough();
+            expect(board.ui.container).not.toBeVisible();
+            expect(board.show()).toEqual(false);
+            expect(board.ui.container).not.toBeVisible();
+            expect(board._showBoard).not.toHaveBeenCalled();
+        });
+
+        it('resizes toolbar correctly if there is no scrollbar', function () {
+            board.show();
+            expect(board.ui.toolbar).toHaveCss({ right: '0px' });
+            expect(board.ui.toolbarTrigger).toHaveCss({ right: '0px' });
+        });
+
+        it('resizes toolbar correctly based if there is a scrollbar', function () {
+            // fake window that has a scrollbar of 20px
+            board.ui.window = [{ innerWidth: board.ui.toolbar.width() + 20 }];
+            board.show();
+            expect(board.ui.toolbar).toHaveCss({ right: '20px' });
+            expect(board.ui.toolbarTrigger).toHaveCss({ right: '20px' });
+        });
+
+        it('highlights correct trigger', function () {
+            expect(board.ui.toolbarModeLinks.eq(0)).not.toHaveClass('cms-btn-active');
+            board.show();
+            expect(board.ui.toolbarModeLinks.eq(0)).toHaveClass('cms-btn-active');
+            expect(board.ui.toolbarModeLinks.eq(1)).not.toHaveClass('cms-btn-active');
+        });
+
+        it('adds correct classes to the root of the document', function () {
+            board.ui.html.removeClass('cms-structure-mode-structure');
+            expect(board.ui.html).not.toHaveClass('cms-structure-mode-structure');
+            board.show();
+            expect(board.ui.html).toHaveClass('cms-structure-mode-structure');
+        });
+
+        it('remembers state', function () {
+            expect(CMS.settings.mode).toEqual('edit');
+            board.show();
+            expect(CMS.settings.mode).toEqual('structure');
+        });
+
+        it('shows all placeholders', function () {
+            expect(board.ui.dragareas).not.toBeVisible();
+            expect(board.ui.dragareas).not.toHaveAttr('style');
+            board.show(true);
+            expect(board.ui.dragareas).toBeVisible();
+            // browsers report different strings
+            expect(board.ui.dragareas.attr('style')).toMatch(/opacity: 1/);
+        });
+
+        it('applies correct classes based on type of structureboard 1', function () {
+            expect(board.ui.content).not.toHaveClass('cms-structure-content-simple');
+            expect(board.ui.dragareas).not.toHaveClass('cms-dragarea-simple');
+            expect(board.ui.container).not.toHaveClass('cms-structure-dynamic');
+            board.show();
+            expect(board.ui.content).toHaveClass('cms-structure-content-simple');
+            expect(board.ui.container).not.toHaveClass('cms-structure-dynamic');
+            expect(board.ui.dragareas).toHaveClass('cms-dragarea-simple');
+        });
+
+        it('applies correct classes based on type of structureboard 2', function () {
+            spyOn(board, '_resizeBoard').and.callFake($.noop);
+            CMS.config.simpleStructureBoard = false;
+            expect(board.ui.content).not.toHaveClass('cms-structure-content-simple');
+            expect(board.ui.dragareas).not.toHaveClass('cms-dragarea-simple');
+            expect(board.ui.container).not.toHaveClass('cms-structure-dynamic');
+            board.show();
+            expect(board.ui.content).not.toHaveClass('cms-structure-content-simple');
+            expect(board.ui.container).toHaveClass('cms-structure-dynamic');
+            expect(board.ui.dragareas).not.toHaveClass('cms-dragarea-simple');
+            CMS.config.simpleStructureBoard = true;
+        });
+
+        it('reorders static placeholders to be last', function () {
+            expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:first'));
+            board.show();
+            expect($('.cms-dragarea-static')).toEqual($('.cms-dragarea:last'));
+        });
     });
 
     describe('.hide()', function () {
