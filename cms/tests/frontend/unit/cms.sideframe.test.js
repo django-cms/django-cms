@@ -80,6 +80,9 @@ describe('CMS.Sideframe', function () {
             };
             $(function () {
                 sideframe = new CMS.Sideframe();
+                spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                    return input;
+                });
                 url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
                 done();
             });
@@ -291,9 +294,6 @@ describe('CMS.Sideframe', function () {
         });
 
         it('saves the url in settings', function (done) {
-            spyOn(sideframe, 'setSettings').and.callFake(function (input) {
-                return input;
-            });
             sideframe.open({ url: url });
 
             expect(CMS.settings.sideframe).toEqual({});
@@ -306,10 +306,6 @@ describe('CMS.Sideframe', function () {
         });
 
         it('shows iframe after it has been loaded', function (done) {
-            spyOn(sideframe, 'setSettings').and.callFake(function (input) {
-                return input;
-            });
-
             sideframe.open({ url: url });
 
             var iframe = sideframe.ui.frame.find('iframe');
@@ -321,10 +317,6 @@ describe('CMS.Sideframe', function () {
         });
 
         it('adds target=_top to "view site" links', function (done) {
-            spyOn(sideframe, 'setSettings').and.callFake(function (input) {
-                return input;
-            });
-
             sideframe.open({ url: url });
 
             sideframe.ui.frame.find('iframe').on('load', function () {
