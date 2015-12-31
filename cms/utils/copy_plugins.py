@@ -19,7 +19,12 @@ def copy_plugins_to(old_plugins, to_placeholder,
     if new_plugins and parent_plugin_id:
         from cms.models import CMSPlugin
         new_plugins[0].parent_id = parent_plugin_id
-        new_plugins[0].save()
+        # Always use update fields to avoid side-effects.
+        # In this case "plugin" has invalid values for internal fields
+        # like numchild.
+        # The invalid value is only in memory because the instance
+        # was never updated.
+        new_plugins[0].save(update_fields=['parent'])
         new_plugins[0] = new_plugins[0].move(CMSPlugin.objects.get(pk=parent_plugin_id), pos='last-child')
     plugins_ziplist = list(zip(new_plugins, old_plugins))
 

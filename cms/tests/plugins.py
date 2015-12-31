@@ -528,45 +528,53 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_deep_copy_plugins(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
-        page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
         ph_en = page_en.placeholders.get(slot="body")
+
+        # Grid wrapper 1
+        mcol1_en = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
+
+        # Grid column 1.1
+        col1_en = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1_en)
+
+        # Grid column 1.2
+        col2_en = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1_en)
+
+        # add a *nested* link plugin
+        link_plugin_en = api.add_plugin(
+            ph_en,
+            "LinkPlugin",
+            "en",
+            target=col2_en,
+            name="A Link",
+            url="https://www.django-cms.org"
+        )
+
+        old_plugins = [mcol1_en, col1_en, col2_en, link_plugin_en]
+
+        page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
         ph_de = page_de.placeholders.get(slot="body")
 
-        # add the text plugin
-        mcol1 = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
-        mcol2 = api.add_plugin(ph_en, "MultiColumnPlugin", "en", position="first-child")
-        mcol1 = self.reload(mcol1)
-        col1 = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
-        mcol1 = self.reload(mcol1)
-        col2 = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol1)
+        # Grid wrapper 1
+        mcol1_de = api.add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
 
-        mcol2 = self.reload(mcol2)
-        col3 = api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
-        mcol2 = self.reload(mcol2)
-        api.add_plugin(ph_en, "ColumnPlugin", "en", position="first-child", target=mcol2)
-        mcol1 = api.add_plugin(ph_de, "MultiColumnPlugin", "de", position="first-child")
-        # add a *nested* link plugin
-        mcol1 = self.reload(mcol1)
-        mcol2 = self.reload(mcol2)
-        col3 = self.reload(col3)
-        col2 = self.reload(col2)
-        col1 = self.reload(col1)
-        link_plugin_en = api.add_plugin(ph_en, "LinkPlugin", "en", target=col2,
-                                    name="A Link", url="https://www.django-cms.org")
-        mcol1 = self.reload(mcol1)
-        mcol2 = self.reload(mcol2)
-        col3 = self.reload(col3)
-        col2 = self.reload(col2)
-        col1 = self.reload(col1)
-        copy_plugins_to([col2, link_plugin_en], ph_de, 'de', mcol1.pk)
-        mcol1 = self.reload(mcol1)
-        mcol2 = self.reload(mcol2)
-        self.reload(col3)
-        self.reload(col2)
-        self.reload(col1)
-        self.reload(link_plugin_en)
-        mcol1 = self.reload(mcol1)
-        self.assertEqual(mcol1.get_descendants().count(), 2)
+        # Grid column 1.1
+        col1_de = api.add_plugin(ph_de, "ColumnPlugin", "de", position="first-child", target=mcol1_de)
+
+        copy_plugins_to(
+            old_plugins=[mcol1_en, col1_en, col2_en, link_plugin_en],
+            to_placeholder=ph_de,
+            to_language='de',
+            parent_plugin_id=col1_de.pk,
+        )
+
+        col1_de = self.reload(col1_de)
+
+        new_plugins = col1_de.get_descendants().order_by('path')
+
+        self.assertEqual(new_plugins.count(), len(old_plugins))
+
+        for old_plugin, new_plugin in zip(old_plugins, new_plugins):
+            self.assertEqual(old_plugin.numchild, new_plugin.numchild)
 
         with self.assertNumQueries(FuzzyInt(0, 207)):
             page_en.publish('en')
