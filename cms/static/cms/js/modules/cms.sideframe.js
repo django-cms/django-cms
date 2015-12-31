@@ -248,6 +248,18 @@ var CMS = window.CMS || {};
 
             // attach load event to iframe
             iframe.hide().on('load', function () {
+                // check if iframe can be accessed
+                try {
+                    iframe.contents();
+                } catch (error) {
+                    CMS.API.Messages.open({
+                        message: '<strong>' + error + '</strong>',
+                        error: true
+                    });
+                    that.close();
+                    return;
+                }
+
                 contents = iframe.contents();
                 body = contents.find('body');
 
