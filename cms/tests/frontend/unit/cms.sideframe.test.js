@@ -365,11 +365,115 @@ describe('CMS.Sideframe', function () {
     });
 
     describe('.close()', function () {
-        it('hides the dimmer');
-        it('sets correct state');
-        it('checks if page requires reloading');
-        it('unlocks the toolbar');
-        it('removes the loader from sideframe');
-        it('restores scrolling of the outer body for mobile devices');
+        var sideframe;
+        var url;
+        beforeEach(function (done) {
+            fixture.load('sideframe.html');
+            CMS.config = {
+                request: {}
+            };
+            CMS.settings = {
+                sideframe: {}
+            };
+            CMS.API.Messages = {
+                open: jasmine.createSpy()
+            };
+            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
+            // fake _content that loads the iframe since
+            // we do not really care, and things fail in IE
+            spyOn(CMS.Sideframe.prototype, '_content');
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy(),
+                _lock: jasmine.createSpy()
+            };
+            $(function () {
+                sideframe = new CMS.Sideframe();
+                spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                    return input;
+                });
+                url = '/base/cms/tests/frontend/unit/html/sideframe_iframe.html';
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('hides the dimmer', function () {
+            sideframe.open({ url: url });
+            expect(sideframe.ui.dimmer).toBeVisible();
+            sideframe.close();
+            expect(sideframe.ui.dimmer).not.toBeVisible();
+        });
+
+        it('sets correct state', function () {
+            sideframe.open({ url: url });
+            sideframe.close();
+            expect(CMS.settings.sideframe).toEqual({
+                url: null,
+                hidden: false,
+                width: 0.8
+            });
+            expect(sideframe.setSettings).toHaveBeenCalled();
+        });
+
+        it('checks if page requires reloading', function () {
+            sideframe.open({ url: url });
+            sideframe.close();
+            expect(CMS.Sideframe.prototype.reloadBrowser).toHaveBeenCalledWith(false, false, true);
+
+            sideframe = new CMS.Sideframe({ onClose: 'REFRESH_PAGE' });
+            sideframe.open({ url: url });
+            sideframe.close();
+            expect(CMS.Sideframe.prototype.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE', false, true);
+        });
+
+        it('unlocks the toolbar', function () {
+            sideframe.open({ url: url });
+            sideframe.close();
+            expect(CMS.API.Toolbar._lock).toHaveBeenCalledWith(false);
+        });
+
+        it('removes the loader from sideframe', function () {
+            sideframe.open({ url: url });
+            expect(sideframe.ui.frame).toHaveClass('cms-loader');
+            sideframe.close();
+            expect(sideframe.ui.frame).not.toHaveClass('cms-loader');
+        });
+
+        it('removes "close by escape" handler', function () {
+            sideframe.open({ url: url });
+            expect(sideframe.ui.body).toHandle('keydown.cms.close');
+            sideframe.close();
+            expect(sideframe.ui.frame).not.toHandle('keydown.cms.close');
+        });
+
+        it('restores scrolling of the outer body for mobile devices', function () {
+            spyOn(sideframe, 'allowTouchScrolling');
+            sideframe.ui.body.removeClass('cms-prevent-scrolling');
+            sideframe.open({ url: url });
+            expect(sideframe.ui.body).toHaveClass('cms-prevent-scrolling');
+            expect(sideframe.allowTouchScrolling).not.toHaveBeenCalled();
+            sideframe.close();
+            expect(sideframe.ui.frame).not.toHaveClass('cms-prevent-scrolling');
+            expect(sideframe.allowTouchScrolling).toHaveBeenCalledWith($(document), 'sideframe');
+        });
+
+        it('animates the sideframe to 0 and then hides it', function () {
+            sideframe.open({ url: url });
+            spyOn($.fn, 'animate');
+            sideframe.close();
+            expect($.fn.animate).toHaveBeenCalledWith(
+                { width: 0 },
+                300,
+                jasmine.any(Function)
+            );
+            expect(sideframe.ui.sideframe).toBeVisible();
+            $.fn.animate.calls.mostRecent().args[2].bind(sideframe.ui.sideframe)();
+            expect(sideframe.ui.sideframe).not.toBeVisible();
+        });
     });
 });
