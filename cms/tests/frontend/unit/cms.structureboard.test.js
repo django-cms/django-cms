@@ -26,12 +26,14 @@ describe('CMS.StructureBoard', function () {
             };
             $(function () {
                 CMS.StructureBoard._initializeGlobalHandlers();
+                jasmine.clock().install();
                 board = new CMS.StructureBoard();
                 done();
             });
         });
 
         afterEach(function () {
+            jasmine.clock().uninstall();
             fixture.cleanup();
         });
 
@@ -65,6 +67,32 @@ describe('CMS.StructureBoard', function () {
             expect('.cms-dragarea-2').toHaveClass('cms-dragarea-empty');
             expect('.cms-dragarea-10').toHaveClass('cms-dragarea-empty');
         });
+
+        it('initially shows or hides board based on settings', function () {
+            spyOn(board, 'show');
+            spyOn(board, 'hide');
+
+            expect(CMS.settings.mode).toEqual('edit');
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+            jasmine.clock().tick();
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).toHaveBeenCalled();
+        });
+
+        it('initially shows or hides board based on settings 2', function () {
+            spyOn(board, 'show');
+            spyOn(board, 'hide');
+
+            CMS.settings.mode = 'structure';
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+            jasmine.clock().tick();
+            expect(board.show).toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+        });
+
+        // it('shows board mode switcher if there are placeholders');
     });
 
     describe('.show()', function () {
