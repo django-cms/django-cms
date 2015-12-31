@@ -272,6 +272,10 @@ describe('CMS.Sideframe', function () {
             });
         });
 
+        it('is chainable', function () {
+            expect(sideframe.open({ url: url })).toEqual(sideframe);
+        });
+
         it('empties frame holder before injecting iframe (to remove events)', function () {
             spyOn($.fn, 'empty').and.callThrough();
             sideframe.ui.frame.append('<div>I should not be here</div>');
@@ -332,10 +336,6 @@ describe('CMS.Sideframe', function () {
                 expect($(this.contentDocument.body).find('.viewsitelink')).toHaveAttr('target', '_top');
                 done();
             });
-        });
-
-        it('is chainable', function () {
-            expect(sideframe.open({ url: url })).toEqual(sideframe);
         });
     });
 
