@@ -7,11 +7,56 @@ describe('CMS.Sideframe', function () {
         expect(CMS.Sideframe).toBeDefined();
     });
 
-    it('has public API');
+    it('has public API', function () {
+        expect(CMS.Sideframe.prototype.open).toEqual(jasmine.any(Function));
+        expect(CMS.Sideframe.prototype.close).toEqual(jasmine.any(Function));
+    });
 
     describe('instance', function () {
-        it('has ui');
-        it('has options');
+        var sideframe;
+        beforeEach(function (done) {
+            $(function () {
+                sideframe = new CMS.Sideframe();
+                done();
+            });
+        });
+
+        it('has ui', function () {
+            expect(sideframe.ui).toEqual(jasmine.any(Object));
+            expect(Object.keys(sideframe.ui)).toContain('sideframe');
+            expect(Object.keys(sideframe.ui)).toContain('body');
+            expect(Object.keys(sideframe.ui)).toContain('window');
+            expect(Object.keys(sideframe.ui)).toContain('dimmer');
+            expect(Object.keys(sideframe.ui)).toContain('close');
+            expect(Object.keys(sideframe.ui)).toContain('resize');
+            expect(Object.keys(sideframe.ui)).toContain('frame');
+            expect(Object.keys(sideframe.ui)).toContain('shim');
+            expect(Object.keys(sideframe.ui)).toContain('historyBack');
+            expect(Object.keys(sideframe.ui)).toContain('historyForward');
+            expect(Object.keys(sideframe.ui).length).toEqual(10);
+        });
+
+        it('has options', function () {
+            expect(sideframe.options).toEqual({
+                onClose: false,
+                sideframeDuration: 300,
+                sideframeWidth: 0.8
+            });
+
+            sideframe = new CMS.Sideframe({
+                onClose: 'something',
+                sideframeDuration: 310,
+                sideframeWidth: 0.9,
+                something: 'else'
+            });
+
+            expect(sideframe.options).toEqual({
+                onClose: 'something',
+                sideframeDuration: 310,
+                sideframeWidth: 0.9,
+                something: 'else'
+            });
+        });
     });
 
     describe('.open()', function () {
