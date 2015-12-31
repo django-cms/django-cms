@@ -326,9 +326,9 @@ var CMS = window.CMS || {};
             } else {
                 this.ui.sideframe.css('width', width);
                 // reset width if larger than available space
-                if (width >= $(window).width()) {
+                if (width >= this.ui.window.width()) {
                     this.ui.sideframe.css({
-                        width: $(window).width() - 30,
+                        width: this.ui.window.width() - 30,
                         overflow: 'visible'
                     });
                 }
@@ -433,8 +433,8 @@ var CMS = window.CMS || {};
                 if (e.originalEvent.clientX <= 320) {
                     e.originalEvent.clientX = 320;
                 }
-                if (e.originalEvent.clientX >= $(window).width() - outerOffset) {
-                    e.originalEvent.clientX = $(window).width() - outerOffset;
+                if (e.originalEvent.clientX >= that.ui.window.width() - outerOffset) {
+                    e.originalEvent.clientX = that.ui.window.width() - outerOffset;
                 }
 
                 that.ui.sideframe.css('width', e.originalEvent.clientX);
