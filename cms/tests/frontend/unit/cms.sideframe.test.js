@@ -72,6 +72,15 @@ describe('CMS.Sideframe', function () {
             CMS.settings = {
                 sideframe: {}
             };
+            // mocking up messages, because
+            // in most of the tests the iframe is thrown away
+            // before it's loaded and in IE that results in an
+            // error when trying to access iframe contents, which
+            // results in failing tests
+            CMS.API.Messages = {
+                open: $.noop
+            };
+            spyOn(CMS.Sideframe.prototype, 'reloadBrowser');
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
