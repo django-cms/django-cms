@@ -92,7 +92,56 @@ describe('CMS.StructureBoard', function () {
             expect(board.hide).not.toHaveBeenCalled();
         });
 
-        // it('shows board mode switcher if there are placeholders');
+        it('does not show or hide structureboard if there are no dragareas', function () {
+            board.ui.dragareas.remove();
+            board = new CMS.StructureBoard();
+
+            spyOn(board, 'show');
+            spyOn(board, 'hide');
+
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+            jasmine.clock().tick(200);
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+        });
+
+        it('does not show or hide structureboard if there is no board mode switcher', function () {
+            board.ui.toolbarModeSwitcher.remove();
+            board = new CMS.StructureBoard();
+
+            spyOn(board, 'show');
+            spyOn(board, 'hide');
+
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+            jasmine.clock().tick(200);
+            expect(board.show).not.toHaveBeenCalled();
+            expect(board.hide).not.toHaveBeenCalled();
+        });
+
+        it('shows board mode switcher if there are placeholders', function () {
+            expect(board.ui.placeholders.length > 0).toEqual(true);
+            board.ui.toolbarModeSwitcher.hide();
+            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
+
+            new CMS.StructureBoard();
+
+            expect(board.ui.toolbarModeSwitcher).toBeVisible();
+        });
+
+        it('does not show board mode switcher if there are no placeholders', function () {
+            expect(board.ui.placeholders.length > 0).toEqual(true);
+            board.ui.placeholders.remove();
+
+            board.ui.toolbarModeSwitcher.hide();
+            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
+
+            board = new CMS.StructureBoard();
+            expect(board.ui.placeholders.length).toEqual(0);
+
+            expect(board.ui.toolbarModeSwitcher).not.toBeVisible();
+        });
     });
 
     describe('.show()', function () {
