@@ -271,11 +271,12 @@ describe('CMS.Plugin', function () {
         });
 
         afterEach(function () {
-            fixture.cleanup();
             jasmine.Ajax.uninstall();
+            fixture.cleanup();
         });
 
         it('makes a request to the API', function () {
+            CMS.API.locked = false;
             expect(plugin.addPlugin('TestPlugin', 'Test Plugin', 1)).toEqual(undefined);
             var request = jasmine.Ajax.requests.mostRecent();
             expect(request.url).toEqual('/en/admin/cms/page/add-plugin/');
@@ -1233,7 +1234,7 @@ describe('CMS.Plugin', function () {
                     expect(plugin.ui.publish).not.toHaveClass('cms-btn-disabled');
                     expect(plugin.ui.publish.parent()).toBeVisible();
                     done();
-                }, 0);
+                }, 10);
             });
 
             CMS.API.locked = false;
