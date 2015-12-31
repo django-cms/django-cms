@@ -127,7 +127,7 @@ var CMS = window.CMS || {};
          * @chainable
          * @param {Object} opts
          * @param {String} opts.url url to render iframe
-         * @param {Boolean} [opts.animate] should modal be animated
+         * @param {Boolean} [opts.animate] should sideframe be animated
          */
         open: function open(opts) {
             if (!(opts && opts.url)) {
