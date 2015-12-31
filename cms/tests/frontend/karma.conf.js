@@ -94,6 +94,9 @@ module.exports = function (config) {
 
         // optionally, configure the reporter
         coverageReporter: {
+            instrumenterOptions: {
+                istanbul: { noCompact: true }
+            },
             reporters: [
                 { type: 'html', dir: 'cms/tests/frontend/coverage/' },
                 { type: 'lcov', dir: 'cms/tests/frontend/coverage/' }
