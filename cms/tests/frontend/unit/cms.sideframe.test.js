@@ -245,6 +245,31 @@ describe('CMS.Sideframe', function () {
             expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalled();
         });
 
+        it('adds "close by escape" handler', function (done) {
+            spyOn(sideframe, 'close');
+            sideframe.options.onClose = 'mock';
+            sideframe.open({ url: url });
+            expect(sideframe.ui.body).toHandle('keydown.cms.close');
+            sideframe.ui.body.on('keydown', function (e) {
+                if (e.keyCode === CMS.KEYS.ESC) {
+                    // second
+                    expect(sideframe.options.onClose).toEqual(null);
+                    expect(sideframe.close).toHaveBeenCalled();
+                    done();
+                } else {
+                    // first
+                    expect(sideframe.options.onClose).toEqual('mock');
+                    expect(sideframe.close).not.toHaveBeenCalled();
+                }
+            });
+
+            var spaceEvent = new $.Event('keydown', { keyCode: CMS.KEYS.SPACE });
+            sideframe.ui.body.trigger(spaceEvent);
+
+            var escEvent = new $.Event('keydown', { keyCode: CMS.KEYS.ESC });
+            sideframe.ui.body.trigger(escEvent);
+        });
+
         it('prevents scrolling of the outer body for mobile devices', function () {
             spyOn(sideframe, 'preventTouchScrolling');
             spyOn(sideframe, 'allowTouchScrolling');
