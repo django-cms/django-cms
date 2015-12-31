@@ -396,8 +396,8 @@ var CMS = window.CMS || {};
          *
          * @method _hide
          * @private
-         * @param {Object} opts
-         * @param {Number} opts.duration animation duration
+         * @param {Object} [opts]
+         * @param {Number} [opts.duration=this.options.sideframeDuration] animation duration
          */
         _hide: function _hide(opts) {
             var duration = this.options.sideframeDuration;
