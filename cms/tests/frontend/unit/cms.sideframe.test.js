@@ -260,6 +260,79 @@ describe('CMS.Sideframe', function () {
             });
         });
 
+        it('empties frame holder before injecting iframe (to remove events)', function () {
+            spyOn($.fn, 'empty').and.callThrough();
+            sideframe.ui.frame.append('<div>I should not be here</div>');
+            expect(sideframe.ui.frame).toHaveText('I should not be here');
+            sideframe.open({ url: url });
+            expect(sideframe.ui.frame).not.toHaveText('I should not be here');
+            expect($.fn.empty).toHaveBeenCalled();
+        });
+
+        it('adds specific classes on the iframe body', function (done) {
+            sideframe.open({ url: url });
+            expect(sideframe.ui.frame).toContainElement('iframe');
+
+            sideframe.ui.frame.find('iframe').on('load', function () {
+                expect($(this.contentDocument.body)).toHaveClass('cms-admin');
+                expect($(this.contentDocument.body)).toHaveClass('cms-admin-sideframe');
+                done();
+            });
+        });
+
+        it('adds specific classes on the iframe body if debug mode is on', function (done) {
+            CMS.config.debug = true;
+            sideframe.open({ url: url });
+
+            sideframe.ui.frame.find('iframe').on('load', function () {
+                expect($(this.contentDocument.body)).toHaveClass('cms-debug');
+                done();
+            });
+        });
+
+        it('saves the url in settings', function (done) {
+            spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                return input;
+            });
+            sideframe.open({ url: url });
+
+            expect(CMS.settings.sideframe).toEqual({});
+            sideframe.ui.frame.find('iframe').on('load', function () {
+                expect(sideframe.setSettings).toHaveBeenCalled();
+                // actual url would be http://localhost:port/${url}
+                expect(CMS.settings.sideframe.url).toMatch(new RegExp(url));
+                done();
+            });
+        });
+
+        it('shows iframe after it has been loaded', function (done) {
+            spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                return input;
+            });
+
+            sideframe.open({ url: url });
+
+            var iframe = sideframe.ui.frame.find('iframe');
+            iframe.on('load', function () {
+                expect(iframe).toBeVisible();
+                done();
+            });
+            expect(iframe).not.toBeVisible();
+        });
+
+        it('adds target=_top to "view site" links', function (done) {
+            spyOn(sideframe, 'setSettings').and.callFake(function (input) {
+                return input;
+            });
+
+            sideframe.open({ url: url });
+
+            sideframe.ui.frame.find('iframe').on('load', function () {
+                expect($(this.contentDocument.body).find('.viewsitelink')).toHaveAttr('target', '_top');
+                done();
+            });
+        });
+
         it('is chainable', function () {
             expect(sideframe.open({ url: url })).toEqual(sideframe);
         });
