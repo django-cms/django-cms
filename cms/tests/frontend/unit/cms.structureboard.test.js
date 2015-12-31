@@ -54,6 +54,7 @@ describe('CMS.StructureBoard', function () {
             expect(Object.keys(board.ui)).toContain('toolbarModeSwitcher');
             expect(Object.keys(board.ui)).toContain('toolbarModeLinks');
             expect(Object.keys(board.ui)).toContain('toolbarTrigger');
+            expect(Object.keys(board.ui).length).toEqual(15);
         });
 
         it('has no options', function () {

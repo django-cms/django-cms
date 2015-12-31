@@ -95,6 +95,9 @@ describe('CMS.Modal', function () {
         });
 
         it('throws an error when no url or html options were passed', function () {
+            expect(modal.open.bind(modal)).toThrowError(
+                Error, 'The arguments passed to "open" were invalid.'
+            );
             expect(modal.open.bind(modal, {})).toThrowError(
                 Error, 'The arguments passed to "open" were invalid.'
             );
