@@ -115,6 +115,43 @@ describe('CMS.Clipboard', function () {
     });
 
     describe('.clear()', function () {
-        it('makes a request to the API');
+        var clipboard;
+        beforeEach(function (done) {
+            fixture.load('clipboard.html');
+            CMS.API.Toolbar = {
+                openAjax: jasmine.createSpy()
+            };
+            CMS.config = {
+                csrf: 'test_csrf',
+                clipboard: {
+                    url: 'clear-clipboard'
+                }
+            };
+            $(function () {
+                clipboard = new CMS.Clipboard();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('makes a request to the API', function () {
+            clipboard.clear();
+            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
+                url: 'clear-clipboard',
+                post: '{ "csrfmiddlewaretoken": "test_csrf" }',
+                callback: undefined
+            });
+
+            clipboard.clear($.noop);
+            expect(CMS.API.Toolbar.openAjax).toHaveBeenCalledWith({
+                url: 'clear-clipboard',
+                post: '{ "csrfmiddlewaretoken": "test_csrf" }',
+                callback: $.noop
+            });
+        });
+
     });
 });
