@@ -14,7 +14,7 @@ from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
-
+from cms.utils.urlutils import static_with_version
 from cms.utils.conf import get_cms_setting
 
 try:
@@ -81,8 +81,10 @@ class PageTypeSelect(forms.widgets.Select):
             'cms/js/dist/bundle.admin.base.min.js',
             'cms/js/modules/cms.base.js',
             'cms/js/widgets/wizard.pagetypeselect.js',
-            'cms/js/modules/jquery.noconflict.post.js'
+            'cms/js/modules/jquery.noconflict.post.js',
         )
+
+        js = tuple(map(static_with_version, js))
 
 
 class BaseCMSPageForm(forms.Form):

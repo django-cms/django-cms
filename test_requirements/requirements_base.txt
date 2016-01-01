@@ -9,9 +9,8 @@ argparse
 dj-database-url
 selenium
 djangocms-admin-style>=1.0
-djangocms-text-ckeditor==2.8
 django-sekizai>=0.9
-django-classy-tags>=0.7
+django-classy-tags>=0.5
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file

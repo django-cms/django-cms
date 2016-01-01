@@ -1,6 +1,7 @@
 -r requirements_base.txt
 django>=1.7,<1.8
 django-reversion==1.10.0
-django-formtools
+djangocms-text-ckeditor>=2.8.1
 django-hvad==1.4
+django-formtools
 django-debug-toolbar<=1.4

@@ -58,7 +58,7 @@
 
 /* Base styles for the tooltip's content area */
 .cms-hover-tooltip:after {
-    content: attr(data-tooltip);
+    content: attr(data-cms-tooltip);
     z-index: 1;
     color: $white !important;
     font-size: $font-size-normal - 2px;

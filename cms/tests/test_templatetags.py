@@ -15,6 +15,7 @@ from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
+import cms
 from cms.api import create_page, create_title, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models.pagemodel import Page, Placeholder
@@ -83,6 +84,17 @@ class TemplatetagTests(TestCase):
         self.assertTrue('"item3": 3' in filtered_dict)
         today = now().today()
         self.assertEqual('"%s"' % today.isoformat()[:-3], json_filter(today))
+
+    def test_static_with_version(self):
+        expected = '<script src="/static/cms/css/cms.base.css?%(version)s" type="text/javascript"></script>'
+        expected = expected % {'version': cms.__version__}
+
+        template = Template(
+            """{% load cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
+            """type="text/javascript"></script>"""
+        )
+
+        self.assertEqual(expected, template.render(Context()))
 
 
 class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
