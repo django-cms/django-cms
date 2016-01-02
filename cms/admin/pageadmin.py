@@ -213,6 +213,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         obj.save()
 
         if 'recover' in request.path_info or 'history' in request.path_info:
+            print("revert plugins")
             revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
@@ -395,6 +396,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             uhd_urls = []
         return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
 
+    @create_revision()
     def add_view(self, request, form_url='', extra_context=None):
         extra_context = extra_context or {}
         language = get_language_from_request(request)
@@ -449,7 +451,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
-        if request.method == "POST" and response.status_code == 200:
+        print("change", request.path_info, response.status_code, request.method)
+        if request.method == "POST" and response.status_code in (200, 302):
             if 'history' in request.path_info:
                 return HttpResponseRedirect("../../")
             elif 'recover' in request.path_info:
@@ -798,9 +801,27 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         obj.version = version
         return obj, version
 
+    # Reversion 1.9+ no longer uses these two methods to save revision, but we still need them
+    # as we do not use signals
+    def log_addition(self, request, object):
+        """Sets the version meta information."""
+        if not hasattr(self, 'get_revision_data'):
+            adapter = self.revision_manager.get_adapter(object.__class__)
+            self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
+            self.revision_context_manager.set_comment(_("Initial version."))
+        super(PageAdmin, self).log_addition(request, object)
+
+    def log_change(self, request, object, message):
+        """Sets the version meta information."""
+        if not hasattr(self, 'get_revision_data'):
+            adapter = self.revision_manager.get_adapter(object.__class__)
+            self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
+            self.revision_context_manager.set_comment(message)
+        super(PageAdmin, self).log_change(request, object, message)
+
     # This is just for Django 1.6 / reversion 1.8 compatibility
     # The handling of recover / revision in 3.3 can be simplified
-    # by using the new reversin semantic and django changeform_view
+    # by using the new reversion semantic and django changeform_view
     def revisionform_view(self, request, version, template_name, extra_context=None):
         try:
             with transaction.atomic():

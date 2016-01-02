@@ -44,7 +44,7 @@ def make_revision_with_plugins(obj, user=None, message=None):
     Only add to revision if it is a draft.
     """
     from cms.utils.reversion_hacks import revision_context,  revision_manager
-
+    print("make revision")
     cls = obj.__class__
     if hasattr(revision_manager, '_registration_key_for_model'):
         model_key = revision_manager._registration_key_for_model(cls)
