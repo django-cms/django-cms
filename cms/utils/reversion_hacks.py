@@ -2,19 +2,19 @@
 
 try:
     from reversion import revisions as reversion
-    from reversion.admin import VersionAdmin as ModelAdmin, RollBackRevisionView  # NOQA
-    from reversion.models import Revision, Version  # NOQA
-    from reversion.revisions import create_revision, RegistrationError, VersionAdapter  # NOQA
-    from reversion.signals import post_revision_commit  # NOQA
+    from reversion.admin import VersionAdmin as ModelAdmin, RollBackRevisionView  # NOQA  # nopyflakes
+    from reversion.models import Revision, Version  # NOQA  # nopyflakes
+    from reversion.revisions import create_revision, RegistrationError, VersionAdapter  # NOQA  # nopyflakes
+    from reversion.signals import post_revision_commit  # NOQA  # nopyflakes
 
     revision_manager = reversion.default_revision_manager
     revision_context = reversion.revision_context_manager
 except ImportError:
     import reversion
-    from reversion import create_revision  # NOQA
-    from reversion.admin import VersionAdmin as ModelAdmin  # NOQA
-    from reversion.models import Revision, Version, post_revision_commit  # NOQA
-    from reversion.revisions import RegistrationError, VersionAdapter  # NOQA
+    from reversion import create_revision  # NOQA  # nopyflakes
+    from reversion.admin import VersionAdmin as ModelAdmin  # NOQA  # nopyflakes
+    from reversion.models import Revision, Version, post_revision_commit  # NOQA  # nopyflakes
+    from reversion.revisions import RegistrationError, VersionAdapter  # NOQA  # nopyflakes
 
     revision_manager = reversion.revision
     revision_context = reversion.revision_context_manager
