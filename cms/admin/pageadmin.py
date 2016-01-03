@@ -213,7 +213,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         obj.save()
 
         if 'recover' in request.path_info or 'history' in request.path_info:
-            print("revert plugins")
             revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
@@ -451,7 +450,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
             location = response._headers['location']
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
-        print("change", request.path_info, response.status_code, request.method)
         if request.method == "POST" and response.status_code in (200, 302):
             if 'history' in request.path_info:
                 return HttpResponseRedirect("../../")
@@ -805,7 +803,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     # as we do not use signals
     def log_addition(self, request, object):
         """Sets the version meta information."""
-        if not hasattr(self, 'get_revision_data'):
+        if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
             self.revision_context_manager.set_comment(_("Initial version."))
@@ -813,10 +811,15 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def log_change(self, request, object, message):
         """Sets the version meta information."""
-        if not hasattr(self, 'get_revision_data'):
+        if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
             self.revision_context_manager.set_comment(message)
+            if isinstance(object, Title):
+                page = object.page
+            if isinstance(object, Page):
+                page = object
+            helpers.make_revision_with_plugins(page, request.user, message)
         super(PageAdmin, self).log_change(request, object, message)
 
     # This is just for Django 1.6 / reversion 1.8 compatibility

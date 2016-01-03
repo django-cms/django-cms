@@ -51,7 +51,6 @@ class ReversionTestCase(TransactionCMSTestCase):
                 'placeholder_id': placeholderpk,
                 'plugin_parent': '',
             }
-            print("add plugin")
             response = self.client.post(URL_CMS_PLUGIN_ADD, plugin_data)
             self.assertEqual(response.status_code, 200)
             # now edit the plugin
@@ -59,20 +58,17 @@ class ReversionTestCase(TransactionCMSTestCase):
                 0] + "/"
             response = self.client.get(edit_url)
             self.assertEqual(response.status_code, 200)
-            print("change plugin")
             response = self.client.post(edit_url, {"body": "Hello World"})
             self.assertEqual(response.status_code, 200)
             txt = Text.objects.all()[0]
             self.assertEqual("Hello World", txt.body)
             self.txt = txt
             # change the content
-            print("change plugin")
             response = self.client.post(edit_url, {"body": "Bye Bye World"})
             self.assertEqual(response.status_code, 200)
             txt = Text.objects.all()[0]
             self.assertEqual("Bye Bye World", txt.body)
             p_data = self.page_data.copy()
-            print("chage data")
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             page.publish('en')
@@ -206,7 +202,6 @@ class ReversionTestCase(TransactionCMSTestCase):
         with self.login_user_context(self.user):
             self.assertEqual(Revision.objects.all().count(), 5)
             ctype = ContentType.objects.get_for_model(Page)
-            print(Revision.objects.all())
             revision = Revision.objects.all()[4]
             version = Version.objects.filter(content_type=ctype, revision=revision)[0]
 
@@ -236,7 +231,6 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             # test that CMSPlugin subclasses are recovered
             self.assertEqual(Text.objects.all().count(), 1)
-            print(Text.objects.all())
 
     def test_recover_path_collision(self):
         with self.login_user_context(self.user):
