@@ -496,8 +496,6 @@ var CMS = window.CMS || {};
                 obj.position = 'last-child';
             }
 
-            console.log(el.data);
-
             if (element.data) {
                 obj.id = element.data.id;
             }
