@@ -807,13 +807,13 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     # Reversion 1.9+ no longer uses these two methods to save revision, but we still need them
     # as we do not use signals
-    def log_addition(self, request, object):
+    def log_addition(self, request, object, message=None):
         """Sets the version meta information."""
         if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
             self.revision_context_manager.set_comment(_("Initial version."))
-        super(PageAdmin, self).log_addition(request, object)
+        super(PageAdmin, self).log_addition(request, object, message)
 
     def log_change(self, request, object, message):
         """Sets the version meta information."""
