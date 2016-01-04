@@ -112,6 +112,49 @@ describe('CMS.Clipboard', function () {
             expect(clipboard.modal.close).not.toHaveBeenCalled();
             expect(click).not.toHaveBeenTriggered();
         });
+
+        it('sets up events to clear "add plugin" placeholder', function () {
+            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
+            clipboard.modal.trigger('cms.modal.loaded');
+            expect($('.cms-add-plugin-placeholder')).not.toExist();
+
+            $('<div class="cms-add-plugin-placeholder"></div>').prependTo('body');
+            clipboard.modal.trigger('cms.modal.closed');
+            expect($('.cms-add-plugin-placeholder')).not.toExist();
+        });
+
+        it('sets up events to move pluginList back to the modal', function () {
+            $('<div class="cms-modal"></div>').prependTo(fixture.el);
+            clipboard = new CMS.Clipboard();
+
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+
+            clipboard.ui.triggers.trigger('click');
+            expect(clipboard.ui.clipboard).not.toContainElement(clipboard.ui.pluginList);
+
+            // modal is closed
+            clipboard.modal.trigger('cms.modal.closed');
+            expect(clipboard.ui.clipboard).toContainElement(clipboard.ui.pluginsList);
+
+            clipboard.ui.triggers.trigger('click');
+            expect(clipboard.ui.clipboard).not.toContainElement(clipboard.ui.pluginList);
+
+            // this modal instance is being opened again
+            clipboard.modal.trigger('cms.modal.load');
+            expect(clipboard.ui.clipboard).toContainElement(clipboard.ui.pluginsList);
+
+            clipboard.ui.triggers.trigger('click');
+            expect(clipboard.ui.clipboard).not.toContainElement(clipboard.ui.pluginList);
+
+            // new modal instance overtook and is opening
+            clipboard.modal.ui.modal.trigger('cms.modal.load');
+            expect(clipboard.ui.clipboard).toContainElement(clipboard.ui.pluginsList);
+
+            // manually cleaning up, otherwise PhantomJS fails
+            $('.cms-modal').remove();
+        });
     });
 
     describe('.clear()', function () {
