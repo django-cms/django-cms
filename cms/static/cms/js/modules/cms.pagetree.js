@@ -122,6 +122,11 @@ var CMS = window.CMS || {};
             this.cache = undefined;
             this.cacheType = '';
 
+            // cms states
+            CMS.config = {
+                settings: CMS.API.Helpers.getSettings()
+            };
+
             // elements
             this._setupUI();
             this._events();
@@ -313,10 +318,7 @@ var CMS = window.CMS || {};
          * @return {Array} list of ids
          */
         _getNodes: function _getNodes() {
-            // TODO needs proper implementation, for testing only atm
-            var storage = localStorage.getItem('cms_test_storage');
-
-            return (storage) ? storage.split(',') : [];
+            return CMS.settings.pagetree || [];
         },
 
         /**
@@ -328,15 +330,16 @@ var CMS = window.CMS || {};
          * @return {String} id that has been stored
          */
         _setNode: function _setNode(id) {
-            // TODO needs proper implementation, for testing only atm
-            var number = id.toString();
+            var number = id;
             var storage = this._getNodes();
+
             // store value only if it isn't there yet
             if (storage.indexOf(number) === -1) {
                 storage.push(number);
             }
 
-            localStorage.setItem('cms_test_storage', storage);
+            CMS.settings.pagetree = storage;
+            CMS.API.Helpers.setSettings(CMS.settings);
 
             return number;
         },
@@ -350,7 +353,7 @@ var CMS = window.CMS || {};
          * @return {String} id that has been removed
          */
         _removeNode: function _removeNode(id) {
-            var number = id.toString();
+            var number = id;
             var storage = this._getNodes();
             var index = storage.indexOf(number);
 
@@ -359,7 +362,8 @@ var CMS = window.CMS || {};
                 storage.splice(index, 1);
             }
 
-            localStorage.setItem('cms_test_storage', storage);
+            CMS.settings.pagetree = storage;
+            CMS.API.Helpers.setSettings(CMS.settings);
 
             return number;
         },
