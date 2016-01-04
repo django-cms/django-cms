@@ -100,8 +100,6 @@ var CMS = window.CMS || {};
         }
     };
 
-    // TODO implement success feedback when moving a tree item (that.options.lang.success)
-
     /**
      * The pagetree is loaded via `/admin/cms/page` and has a custom admin
      * templates stored within `templates/admin/cms/page/tree`.
@@ -271,7 +269,8 @@ var CMS = window.CMS || {};
 
             // drag and dropping items and saving their states
             $(document).on('dnd_stop.vakata', function (e, el) {
-                that._moveNode(that._getNodeData(el.element));
+                var node = that._getNodeData(el.element);
+                that._moveNode(node);
             });
 
             // set event for cut and paste
@@ -498,9 +497,8 @@ var CMS = window.CMS || {};
                 obj.position = 'last-child';
             }
 
-            if (element.data) {
-                obj.id = element.data.id;
-            }
+            // set the id
+            obj.id = element.data.id;
 
             return obj;
         },
