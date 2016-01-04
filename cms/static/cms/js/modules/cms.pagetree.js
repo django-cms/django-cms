@@ -121,11 +121,6 @@ var CMS = window.CMS || {};
             this.cacheType = '';
             this.successTimer = 600;
 
-            // cms states
-            CMS.config = {
-                settings: CMS.API.Helpers.getSettings()
-            };
-
             // elements
             this._setupUI();
             this._events();
@@ -638,6 +633,9 @@ var CMS = window.CMS || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
+        // load cms settings beforehand
+        CMS.config = {};
+        CMS.settings = CMS.API.Helpers.getSettings();
         // autoload the pagetree
         new CMS.PageTree();
     });
