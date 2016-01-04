@@ -196,5 +196,57 @@ describe('CMS.Clipboard', function () {
             });
         });
 
+        it('resets plugins "paste" menu item to show correct tooltip', function () {
+            var statesBefore = [
+                {
+                    empty: 'none',
+                    restricted: 'block',
+                    disabled: 'none'
+                },
+                {
+                    empty: 'none',
+                    restricted: 'none',
+                    disabled: 'block'
+                },
+                {
+                    empty: 'block',
+                    restricted: 'none',
+                    disabled: 'none'
+                },
+                {
+                    empty: 'none',
+                    restricted: 'none',
+                    disabled: 'none'
+                }
+            ];
+
+            var stateAfter = {
+                empty: 'block',
+                restricted: 'none',
+                disabled: 'none'
+            };
+
+            statesBefore.forEach(function (obj, index) {
+                var el = $('#submenu-item-' + (index + 1));
+                Object.keys(obj).forEach(function (key) {
+                    var value = obj[key];
+                    expect(el.find('.cms-submenu-item-paste-tooltip-' + key)).toHaveCss({
+                        display: value
+                    });
+                });
+            });
+
+            clipboard.clear();
+
+            statesBefore.forEach(function (obj, index) {
+                var el = $('#submenu-item-' + (index + 1));
+                Object.keys(stateAfter).forEach(function (key) {
+                    var value = stateAfter[key];
+                    expect(el.find('.cms-submenu-item-paste-tooltip-' + key)).toHaveCss({
+                        display: value
+                    });
+                });
+            });
+        });
     });
 });
