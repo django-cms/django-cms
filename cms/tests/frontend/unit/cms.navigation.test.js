@@ -19,6 +19,7 @@ describe('CMS.Navigation', function () {
 
     describe('instance', function () {
         var nav;
+
         beforeEach(function (done) {
             fixture.load('toolbar.html');
             $(function () {
@@ -28,6 +29,7 @@ describe('CMS.Navigation', function () {
                 done();
             });
         });
+
         afterEach(function () {
             nav.ui.window.off('.cms.navigation');
             fixture.cleanup();
