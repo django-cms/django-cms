@@ -3,7 +3,7 @@
 describe('CMS.Modal', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    it('creates a Modal class when document is ready', function () {
+    it('creates a Modal class', function () {
         expect(CMS.Modal).toBeDefined();
     });
 
