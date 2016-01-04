@@ -2,6 +2,7 @@
 from __future__ import with_statement
 import shutil
 from os.path import join
+
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -93,11 +94,11 @@ class ReversionTestCase(TransactionCMSTestCase):
             version = Version.objects.get(content_type=ctype, revision=revision)
             page = Page.objects.all()[0]
 
-            history_url = URL_CMS_PAGE_CHANGE % (page.pk) + "history/"
+            history_url = '%s%s/%s/' % (URL_CMS_PAGE, str(page.pk), "history")
             response = self.client.get(history_url)
             self.assertEqual(response.status_code, 200)
 
-            revert_url = history_url + "%s/" % version.pk
+            revert_url = '%s%s/' % (history_url, version.pk)
             response = self.client.get(revert_url)
             self.assertEqual(response.status_code, 200)
             response = self.client.post("%s?language=en&" % revert_url, self.page_data)
@@ -223,17 +224,16 @@ class ReversionTestCase(TransactionCMSTestCase):
             recover_url = URL_CMS_PAGE + "recover/"
             response = self.client.get(recover_url)
             self.assertEqual(response.status_code, 200)
-
             recover_url += "%s/" % version.pk
             response = self.client.get(recover_url)
             self.assertEqual(response.status_code, 200)
             response = self.client.post(recover_url, self.page_data)
-            self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
             self.assertEqual(Page.objects.all().count(), 1)
             self.assertEqual(CMSPlugin.objects.all().count(), 1)
 
             # test that CMSPlugin subclasses are recovered
             self.assertEqual(Text.objects.all().count(), 1)
+            self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
 
     def test_recover_path_collision(self):
         with self.login_user_context(self.user):
@@ -270,7 +270,6 @@ class ReversionTestCase(TransactionCMSTestCase):
             recover_url += "%s/" % version.pk
             response = self.client.get(recover_url)
             self.assertEqual(response.status_code, 200)
-            print(recover_url)
             response = self.client.post(recover_url, page_data2)
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page2_pk)
             self.assertEqual(Page.objects.all().count(), 5)

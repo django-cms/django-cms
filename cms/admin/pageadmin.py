@@ -452,9 +452,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         if request.method == "POST" and response.status_code in (200, 302):
             if 'history' in request.path_info:
-                return HttpResponseRedirect("../../")
+                return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
             elif 'recover' in request.path_info:
-                return HttpResponseRedirect("../../%s/" % quote(object_id))
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id))))
         return response
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
@@ -496,7 +496,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         """
         # save the object again, so all the related changes to page model
         # can be published if required
-        print("hange", request.method)
         obj.save()
         return super(PageAdmin, self).response_change(request, obj)
 
@@ -812,8 +811,11 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
-            self.revision_context_manager.set_comment(_("Initial version."))
-        super(PageAdmin, self).log_addition(request, object, message)
+        # Same code as reversion 1.9
+        try:
+            super(PageAdmin, self).log_addition(request, object, INITIAL_COMMENT)
+        except TypeError:  # Django < 1.9 pragma: no cover
+            super(PageAdmin, self).log_addition(request, object)
 
     def log_change(self, request, object, message):
         """Sets the version meta information."""
@@ -921,7 +923,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
         if target is None or position is None:
-            return HttpResponseRedirect('../../')
+            return HttpResponseRedirect(admin_reverse('cms_page_change', args=(page_id)))
 
         try:
             page = self.model.objects.get(pk=page_id)
@@ -1032,7 +1034,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     exc = sys.exc_info()[1]
                     return jsonify_request(HttpResponseBadRequest(exc.messages))
         context.update(extra_context or {})
-        return HttpResponseRedirect('../../')
+        return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
 
     @require_POST
     @transaction.atomic
@@ -1124,7 +1126,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     revision = version.revision
                     revision.delete()
                     deleted.append(revision.pk)
-                    # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
+            # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
             publish_limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
             if publish_limit and publish:
                 deleted = []

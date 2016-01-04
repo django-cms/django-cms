@@ -246,6 +246,7 @@ class BasicToolbar(CMSToolbar):
         context.pop()
         return [clipboard]
 
+
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
     watch_models = [Page]
