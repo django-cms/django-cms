@@ -218,7 +218,9 @@ var CMS = window.CMS || {};
                     // disable open/close animations
                     animation: 0,
                     // core setting to allow actions
-                    check_callback: true,
+                    check_callback: function () {
+                        return (that.options.filtered === 'false') ? true : false;
+                    },
                     // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                     data: data,
                     // strings used within jstree that are called using `get_string`
