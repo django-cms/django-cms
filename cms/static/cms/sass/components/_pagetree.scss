@@ -268,7 +268,12 @@ $pagetree-tooltip-min-width: 130px;
 // HELPERS
 // helpers for copy and pasting
 .cms-tree-item-helpers {}
-
+.cms-tree-node {
+    transition: background $speed-base;
+}
+.cms-tree-node-success {
+    background: $color-success !important;
+}
 
 //###########################################################
 // TREE HACKS (temporary)
