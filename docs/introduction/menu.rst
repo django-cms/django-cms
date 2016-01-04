@@ -9,9 +9,6 @@ is still only determined by django CMS Pages.
 We can hook into the django CMS menu system to add our own nodes to that
 navigation menu.
 
-Create a new ``cms_menus.py`` file in your Polls application (note: *not* in
-the Polls Plugin application):
-
 For this we need a file called ``cms_menus.py`` in our application. Add
 ``polls_plugin/cms_menus.py``:
 
@@ -59,7 +56,7 @@ What's happening here:
 This menu class is not active until attached to the apphook we created earlier.
 So open your ``cms_apps.py`` and add::
 
-    from polls_plugin.menu import PollsMenu
+    from polls_plugin.cms_menus import PollsMenu
 
 for importing ``PollsMenu`` and::
 

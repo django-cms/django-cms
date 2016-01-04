@@ -431,11 +431,46 @@ Example::
 
 See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
 
+
+get_add_url
+-----------
+
+Returns the URL to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_edit_url
+------------
+
+Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_move_url
+------------
+
+Returns the URL to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_delete_url
+--------------
+
+Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_copy_url
+------------
+
+Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+
 add_url
 -------
 
 Returns the URL to call to add a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_add_url`` method instead.
 
 Default: None (``cms_page_add_plugin`` view is used)
 
@@ -443,7 +478,10 @@ edit_url
 --------
 
 Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_edit_url`` method instead.
 
 Default: None (``cms_page_edit_plugin`` view is used)
 
@@ -451,7 +489,10 @@ move_url
 --------
 
 Returns the URL to call to move a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_move_url`` method instead.
 
 Default: None (``cms_page_move_plugin`` view is used)
 
@@ -459,7 +500,10 @@ delete_url
 ----------
 
 Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_delete_url`` method instead.
 
 Default: None (``cms_page_delete_plugin`` view is used)
 
@@ -467,6 +511,9 @@ copy_url
 --------
 
 Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
-logic in a custom view
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_copy_url`` method instead.
 
 Default: None (``cms_page_copy_plugins`` view is used)
