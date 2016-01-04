@@ -382,8 +382,6 @@ var CMS = window.CMS || {};
             var that = this;
             obj.site = that.options.site;
 
-            console.log(obj);
-
             $.ajax({
                 method: 'post',
                 url: that.options.urls.move.replace('{id}', obj.id),
@@ -395,6 +393,7 @@ var CMS = window.CMS || {};
                         that.ui.tree.find('li[data-id="' + obj.target + '"]'));
                 }
                 that.cache = undefined;
+                that._showSuccess(obj);
             }).fail(function (error) {
                 that.showError(error.statusText);
             });
@@ -604,6 +603,20 @@ var CMS = window.CMS || {};
          */
         _toggleHelpers: function _toggleHelpers() {
             $('.cms-tree-item-helpers').toggleClass('cms-hidden');
+        },
+
+        /**
+         * Shows success message on node after successful action.
+         *
+         * @method _showSuccess
+         * @param {Object} [opts]
+         * @param {Number} [opts.id] current element id for url matching
+         * @param {Number} [opts.target] target sibling or parent
+         * @param {Number} [opts.position] either `left`, `right` or `last-child`
+         * @private
+         */
+        _showSuccess: function _showSuccess(obj) {
+            console.log('success ', obj.id);
         },
 
         /**
