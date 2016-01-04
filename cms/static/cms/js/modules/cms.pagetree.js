@@ -121,6 +121,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.pagetree';
             this.cache = undefined;
             this.cacheType = '';
+            this.successTimer = 600;
 
             // cms states
             CMS.config = {
@@ -393,7 +394,7 @@ var CMS = window.CMS || {};
                         that.ui.tree.find('li[data-id="' + obj.target + '"]'));
                 }
                 that.cache = undefined;
-                that._showSuccess(obj);
+                that._showSuccess(obj.id);
             }).fail(function (error) {
                 that.showError(error.statusText);
             });
@@ -609,14 +610,15 @@ var CMS = window.CMS || {};
          * Shows success message on node after successful action.
          *
          * @method _showSuccess
-         * @param {Object} [opts]
-         * @param {Number} [opts.id] current element id for url matching
-         * @param {Number} [opts.target] target sibling or parent
-         * @param {Number} [opts.position] either `left`, `right` or `last-child`
+         * @param {Number} id id of the element to add the success class
          * @private
          */
-        _showSuccess: function _showSuccess(obj) {
-            console.log('success ', obj.id);
+        _showSuccess: function _showSuccess(id) {
+            var element = this.ui.tree.find('li[data-id="' + id + '"]');
+            element.addClass('cms-tree-node-success');
+            setTimeout(function () {
+                element.removeClass('cms-tree-node-success');
+            }, this.successTimer);
         },
 
         /**
