@@ -112,8 +112,6 @@ var CMS = window.CMS || {};
      */
     CMS.PageTree = new CMS.Class({
 
-        implement: [CMS.API.Helpers],
-
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
             this.options = $('.js-cms-pagetree').data('json');
@@ -441,7 +439,7 @@ var CMS = window.CMS || {};
                     url: that.options.urls.copy.replace('{id}', obj.id),
                     data: obj
                 }).done(function () {
-                    that.reloadBrowser();
+                    CMS.API.Helpers.reloadBrowser();
                 }).fail(function (error) {
                     that.showError(error.statusText);
                 });
@@ -587,7 +585,7 @@ var CMS = window.CMS || {};
                     method: 'post',
                     url: $(this).attr('href')
                 }).done(function () {
-                    window.location.reload();
+                    CMS.API.Helpers.reloadBrowser();
                 }).fail(function (error) {
                     that.showError(error.statusText);
                 });
