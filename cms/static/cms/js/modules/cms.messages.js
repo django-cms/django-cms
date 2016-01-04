@@ -104,11 +104,6 @@ var CMS = window.CMS || {};
                     top = 0;
                 }
 
-                // do we need to add debug styles?
-                if (CMS.config.debug) {
-                    top = top + 5;
-                }
-
                 // set correct position and show
                 this.ui.messages.css('top', -height).show();
 
