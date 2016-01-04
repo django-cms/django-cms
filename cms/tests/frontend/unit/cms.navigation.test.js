@@ -75,7 +75,7 @@ describe('CMS.Navigation', function () {
                     { element: jasmine.any(Object), width: jasmine.any(Number) }
                 ],
                 rightTotalWidth: jasmine.any(Number),
-                moreButtonWidth: 65
+                moreButtonWidth: jasmine.any(Number)
             });
         });
     });
