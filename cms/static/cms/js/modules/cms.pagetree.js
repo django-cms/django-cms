@@ -236,6 +236,10 @@ var CMS = window.CMS || {};
                 },
                 // activate drag and drop plugin
                 plugins : ['dnd', 'search', 'grid', 'gridResize'],
+                // https://www.jstree.com/api/#/?f=$.jstree.defaults.dnd
+                dnd: {
+                    inside_pos: 'last'
+                },
                 // https://github.com/deitch/jstree-grid
                 grid: {
                     // columns are provided from base.html options
