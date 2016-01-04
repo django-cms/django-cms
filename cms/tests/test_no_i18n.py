@@ -100,7 +100,7 @@ class TestNoI18N(CMSTestCase):
         ):
             create_page("home", template="col_two.html", language="en-us", published=True, redirect='/foobar/')
             response = self.client.get('/', follow=False)
-            self.assertEqual(response['Location'], 'http://testserver/foobar/')
+            self.assertTrue(response['Location'].endswith("/foobar/"))
 
     def test_plugin_add_edit(self):
         page_data = {
