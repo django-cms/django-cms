@@ -264,7 +264,7 @@ var CMS = window.CMS || {};
 
             // drag and dropping items and saving their states
             $(document).on('dnd_stop.vakata', function (e, el) {
-                var node = that._getNodeData(el.element);
+                var node = that._getNodeData(el.data.obj.selector);
                 that._moveNode(node);
             });
 
@@ -282,7 +282,7 @@ var CMS = window.CMS || {};
                 var target = that._getNodeData(that._getNodeId($(this)));
                 var obj = {
                     target: target.id,
-                    position: 'last-child',
+                    position: 'first-child',
                     id: that.cache.id
                 };
 
@@ -465,12 +465,12 @@ var CMS = window.CMS || {};
          *
          * @method _getNodeData
          * @private
-         * @param {jQuery} el node to be evaluated
+         * @param {String} id to look for in `get_node`
          * @return {Object} evaluated object with params
          */
-        _getNodeData: function _getNodeData(el) {
+        _getNodeData: function _getNodeData(id) {
             var obj = {};
-            var element = this.ui.tree.jstree('get_node', el);
+            var element = this.ui.tree.jstree('get_node', id);
             var parent = this.ui.tree.jstree('get_parent', element);
             var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
             var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
