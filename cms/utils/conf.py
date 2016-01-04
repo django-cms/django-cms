@@ -62,7 +62,6 @@ DEFAULTS = {
     'TOOLBAR_URL__BUILD': 'build',
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
-    'APP_NAME': None,
     'TOOLBAR_HIDE': False,
     'WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'WIZARD_CONTENT_PLUGIN': 'TextPlugin',
