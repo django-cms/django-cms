@@ -188,13 +188,14 @@ gulp.task('tests:integration', function (done) {
         'logout',
         'loginToolbar'
     ];
+    var pre = ['setup'];
 
     if (argv && argv.tests) {
         files = argv.tests.split(',');
         gutil.log('Running tests for ' + files.join(', '));
     }
 
-    var tests = files.map(function (file) {
+    var tests = pre.concat(files).map(function (file) {
         return PROJECT_PATH.tests + '/integration/' + file + '.js';
     });
 
