@@ -399,7 +399,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Cast to int cache version
 - Fix extensions copy when using duplicate page/create page type
 
-=== 3.0.16 (Unreleased) ===
+=== 3.0.16 (2015-11-24) ===
 
 - Fix JS error when using PageSelectWidget
 - Fix whitespace markup issues in draft mode
