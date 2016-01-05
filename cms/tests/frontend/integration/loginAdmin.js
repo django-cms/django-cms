@@ -6,6 +6,7 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').login.admin;
+var cms = require('./helpers/cms');
 
 casper.test.begin('User Login (via Admin Panel)', function (test) {
     casper
@@ -41,4 +42,8 @@ casper.test.begin('User Login (via Admin Panel)', function (test) {
         .run(function () {
             test.done();
         });
+});
+
+casper.test.tearDown(function (done) {
+    casper.start().then(cms.logout).run(done);
 });
