@@ -4,7 +4,7 @@ import json
 from classytags.core import Tag, Options
 from cms.utils.encoder import SafeJSONEncoder
 from django import template
-from django.utils.text import javascript_quote
+from django.utils.html import escapejs
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -36,5 +36,5 @@ class JavascriptString(Tag):
 
     def render_tag(self, context, **kwargs):
         rendered = self.nodelist.render(context)
-        return u"'%s'" % javascript_quote(rendered.strip())
+        return u"'%s'" % escapejs(rendered.strip())
 register.tag(JavascriptString)
