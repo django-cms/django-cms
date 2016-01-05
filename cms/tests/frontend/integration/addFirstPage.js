@@ -32,7 +32,7 @@ casper.test.begin('Add First Page', function (test) {
             }, true);
         })
         .waitForSelector('.cms-ready', function () {
-            test.assertSelectorHasText('.cms-plugin-1', content.text, messages.created);
+            test.assertSelectorHasText('.cms-plugin', content.text, messages.created);
 
             // handles confirm popup
             this.setFilter('page.confirm', function () {
