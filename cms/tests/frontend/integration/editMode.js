@@ -5,6 +5,17 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.editMode;
+var content = require('./settings/globals').content.page;
+
+var cms = require('./helpers/cms');
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login)
+        .then(cms.addPage({ name: content.title }))
+        .run(done);
+});
+
 
 casper.test.begin('Opening Page in Edit Mode', function (test) {
     casper
