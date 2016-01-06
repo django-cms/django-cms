@@ -2,7 +2,7 @@
 'use strict';
 
 // #############################################################################
-// Users managed via the admin panel
+// Publishing a page with a publish date
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.publish;
