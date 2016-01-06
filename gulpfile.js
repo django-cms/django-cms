@@ -41,7 +41,8 @@ var PROJECT_PATTERNS = {
         '!' + PROJECT_PATH.js + '/dist/*.js'
     ],
     sass: [
-        PROJECT_PATH.sass + '/**/*.{scss,sass}'
+        PROJECT_PATH.sass + '/**/*.{scss,sass}',
+        PROJECT_PATH.js + '/libs/jstree/themes/**/*.{scss,sass}',
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'

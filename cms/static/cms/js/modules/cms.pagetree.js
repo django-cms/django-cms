@@ -238,7 +238,11 @@ var CMS = window.CMS || {};
                         that.showError(error.reason);
                     },
                     themes: {
-                        name: 'default'
+                        name: 'django-cms',
+                        url: true,
+                        // custom values specific for django-cms theme
+                        dir: this.options.urls.theme,
+                        icons: false
                     }
                 },
                 // activate drag and drop plugin
