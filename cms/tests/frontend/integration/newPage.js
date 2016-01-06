@@ -6,8 +6,24 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.creation.toolbar;
 var randomString = require('./helpers/randomString').randomString;
+var cms = require('./helpers/cms')();
 
-var newPageTitle = randomString(10);
+var newPageTitle = randomString({ length: 50, withWhitespaces: false });
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'First page' }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage({ title: newPageTitle }))
+        .then(cms.removePage({ title: 'First page' })) // removing both pages
+        .then(cms.logout())
+        .run(done);
+});
 
 casper.test.begin('New Page Creation', function (test) {
     casper
@@ -38,7 +54,7 @@ casper.test.begin('New Page Creation', function (test) {
                 });
         })
         .waitForSelector('.cms-ready', function () {
-            test.assertTitle(newPageTitle, messages.addOk);
+            test.assertTitleMatch(new RegExp(newPageTitle), messages.addOk);
         })
         .run(function () {
             test.done();

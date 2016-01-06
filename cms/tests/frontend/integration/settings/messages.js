@@ -70,6 +70,12 @@ module.exports = {
             modalAppearsAfterEditButton: 'Modal window appears after Edit button click in the Structure mode',
             contentUpdatedDoubleClickStructure: 'Content has been updated by double click within the Structure mode'
         },
+        editUtils: {
+            copySuccessful: 'Copy plugin successful',
+            deleteSuccessful: 'Delete plugin successful',
+            cutSuccessful: 'Cut plugin successful',
+            pasteAfterCutSuccessful: 'Paste after cutting plugin successful'
+        },
         publish: {
 
         }

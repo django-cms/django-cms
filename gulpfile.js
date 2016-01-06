@@ -184,21 +184,23 @@ gulp.task('tests:integration', function (done) {
         'newPage',
         'switchLanguage',
         'editContent',
+        'editContentTools',
         'publish',
         'logout',
         'loginToolbar'
     ];
+    var pre = ['setup'];
 
     if (argv && argv.tests) {
         files = argv.tests.split(',');
         gutil.log('Running tests for ' + files.join(', '));
     }
 
-    var tests = files.map(function (file) {
+    var tests = pre.concat(files).map(function (file) {
         return PROJECT_PATH.tests + '/integration/' + file + '.js';
     });
 
-    var casperChild = spawn('./node_modules/.bin/casperjs', ['test'].concat(tests));
+    var casperChild = spawn('./node_modules/.bin/casperjs', ['test', '--web-security=no'].concat(tests));
 
     casperChild.stdout.on('data', function (data) {
         gutil.log('CasperJS:', data.toString().slice(0, -1));

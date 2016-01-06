@@ -1,11 +1,9 @@
-/* globals $ */
-
 'use strict';
 
 describe('CMS.Modal', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
 
-    it('creates a Modal class when document is ready', function () {
+    it('creates a Modal class', function () {
         expect(CMS.Modal).toBeDefined();
     });
 
@@ -97,6 +95,9 @@ describe('CMS.Modal', function () {
         });
 
         it('throws an error when no url or html options were passed', function () {
+            expect(modal.open.bind(modal)).toThrowError(
+                Error, 'The arguments passed to "open" were invalid.'
+            );
             expect(modal.open.bind(modal, {})).toThrowError(
                 Error, 'The arguments passed to "open" were invalid.'
             );

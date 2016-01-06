@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+
+{% block title %}{% page_attribute 'title' %}{% endblock title %}
+
+{% block content %}
+    {% placeholder "placeholder_content_1" %}
+{% endblock content %}
+
+{% block additional_content %}
+    {% placeholder "placeholder_content_2" %}
+{% endblock additional_content %}

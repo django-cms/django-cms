@@ -10,9 +10,11 @@
 window.django = window.django || undefined;
 
 // ensuring jQuery namespace is set correctly
+// istanbul ignore next
 window.jQuery = (window.django && window.django.jQuery) ? window.django.jQuery : window.jQuery || undefined;
 
 // ensuring Class namespace is set correctly
+// istanbul ignore next
 window.Class = window.Class || undefined;
 
 // ensuring CMS namespace is set correctly
@@ -20,8 +22,8 @@ window.Class = window.Class || undefined;
  * @module CMS
  */
 var CMS = {
-    $: (typeof window.jQuery === 'function') ? window.jQuery : undefined,
-    Class: (typeof window.Class === 'function') ? window.Class : undefined,
+    $: (typeof window.jQuery === 'function') ? window.jQuery :/* istanbul ignore next */ undefined,
+    Class: (typeof window.Class === 'function') ? window.Class :/* istanbul ignore next */ undefined,
     /**
      * @module CMS
      * @submodule CMS.API
@@ -437,6 +439,7 @@ var CMS = {
                 context = this;
                 args = arguments;
                 if (remaining <= 0 || remaining > wait) {
+                    // istanbul ignore if
                     if (timeout) {
                         clearTimeout(timeout);
                         timeout = null;

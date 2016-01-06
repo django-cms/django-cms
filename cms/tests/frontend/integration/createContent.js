@@ -6,9 +6,25 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.addContent;
 var randomString = require('./helpers/randomString').randomString;
+var cms = require('./helpers/cms')();
+var xPath = require('casper').selectXPath;
 
 // random text string for filtering and content purposes
-var randomText = randomString(10);
+var randomText = randomString({ length: 50, withWhitespaces: false });
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'First page' }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
+});
 
 casper.test.begin('User Add Content', function (test) {
     casper
@@ -24,6 +40,7 @@ casper.test.begin('User Add Content', function (test) {
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
+        .waitWhileVisible('.cms-modal-morphing')
         .waitUntilVisible('.cms-modal-open', function () {
             this.setFilter('page.confirm', function () {
                 return true;
@@ -51,18 +68,24 @@ casper.test.begin('User Add Content', function (test) {
                 this.sendKeys('.cms-quicksearch input', 'text', { reset: true });
             });
             this.waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
-                test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
-                    messages.filteredPluginAvailable);
+                this.waitFor(function () {
+                    return this.evaluate(function () {
+                        return $('.cms-submenu-item [data-rel="add"]:visible').length === 1;
+                    });
+                }).then(function () {
+                    test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
+                        messages.filteredPluginAvailable);
+                });
             });
             this.then(function () {
-                this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
+                this.click(xPath('//a[@data-rel="add"]/text()[normalize-space(.)="Text"]'));
             });
             // ensure previous content has been changed
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
         .withFrame(0, function () {
             casper
-                .waitUntilVisible('#text_form', function () {
+                .waitUntilVisible('.cke_inner', function () {
                     // explicitly put text to ckeditor
                     this.evaluate(function (contentData) {
                         CMS.CKEditor.editor.setData(contentData);

@@ -2,22 +2,17 @@
 'use strict';
 
 // #############################################################################
-// Init all settings and event handlers on suite start
-
-require('./../casperjs.conf').init();
-
-require('./handlers/pageErrors').bind();
-require('./handlers/loadFailures').bind();
-require('./handlers/missingPages').bind();
-require('./handlers/externalMissing').bind();
-require('./handlers/suiteFailures').bind();
-
-
-// #############################################################################
 // User login via the admin panel
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').login.admin;
+var cms = require('./helpers/cms')();
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.logout())
+        .run(done);
+});
 
 casper.test.begin('User Login (via Admin Panel)', function (test) {
     casper

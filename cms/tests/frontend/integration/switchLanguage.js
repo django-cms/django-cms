@@ -6,11 +6,25 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.switchLanguage;
 var randomString = require('./helpers/randomString').randomString;
+var cms = require('./helpers/cms')();
 // random text string for filtering and content purposes
-var randomText = randomString(10);
+var randomText = randomString({ length: 50, withWhitespaces: false });
 // No Preview Template text
 var noPreviewText = 'This page has no preview';
 
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'First page' }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
+});
 
 casper.test.begin('Switch language', function (test) {
     casper

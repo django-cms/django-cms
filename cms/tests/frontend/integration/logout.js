@@ -5,6 +5,17 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').logout;
+var cms = require('./helpers/cms')();
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'First page' }))
+        .run(done);
+});
+
+casper.test.tearDown(function () {
+});
 
 casper.test.begin('User Logout', function (test) {
     casper
