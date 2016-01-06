@@ -52,16 +52,15 @@ casper.test.begin('Edit content', function (test) {
         .waitUntilVisible('.cms-modal-open')
         // change content inside appeared modal window
         .withFrame(0, function () {
-            casper
-                .waitUntilVisible('#text_form', function () {
-                    // explicitly put text to ckeditor
-                    previousContentText = this.evaluate(function (contentData) {
-                        var previousContent = CMS.CKEditor.editor.document.getBody().getText();
+            casper.waitUntilVisible('#text_form', function () {
+                // explicitly put text to ckeditor
+                previousContentText = this.evaluate(function (contentData) {
+                    var previousContent = CMS.CKEditor.editor.document.getBody().getText();
 
-                        CMS.CKEditor.editor.setData(contentData);
-                        return previousContent;
-                    }, randomText);
-                });
+                    CMS.CKEditor.editor.setData(contentData);
+                    return previousContent;
+                }, randomText);
+            });
         })
         // submit changes in modal
         .then(function () {
@@ -104,13 +103,12 @@ casper.test.begin('Edit content', function (test) {
         // edit content inside opened editor modal
         .waitUntilVisible('.cms-modal-open')
         .withFrame(0, function () {
-            casper
-                .waitUntilVisible('#text_form', function () {
-                    // explicitly put text to ckeditor
-                    this.evaluate(function (contentData) {
-                        CMS.CKEditor.editor.setData(contentData);
-                    }, previousContentText);
-                });
+            casper.waitUntilVisible('#text_form', function () {
+                // explicitly put text to ckeditor
+                this.evaluate(function (contentData) {
+                    CMS.CKEditor.editor.setData(contentData);
+                }, previousContentText);
+            });
         })
         // submit changes
         .then(function () {
