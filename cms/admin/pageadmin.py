@@ -452,9 +452,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         if request.method == "POST" and response.status_code in (200, 302):
             if 'history' in request.path_info:
-                return HttpResponseRedirect("../../")
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
             elif 'recover' in request.path_info:
-                return HttpResponseRedirect("../../%s/" % quote(object_id))
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
@@ -469,7 +469,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return super(PageAdmin, self).render_change_form(request, context, add, change, form_url, obj)
 
     def _get_site_languages(self, obj=None):
-        site_id = None
         if obj:
             site_id = obj.site_id
         else:
@@ -915,7 +914,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
         if target is None or position is None:
-            return HttpResponseRedirect('../../')
+            return HttpResponseRedirect(admin_reverse('cms_page_change', args=(page_id,)))
 
         try:
             page = self.model.objects.get(pk=page_id)
@@ -1026,7 +1025,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     exc = sys.exc_info()[1]
                     return jsonify_request(HttpResponseBadRequest(exc.messages))
         context.update(extra_context or {})
-        return HttpResponseRedirect('../../')
+        return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
 
     @require_POST
     @transaction.atomic
@@ -1278,8 +1277,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 helpers.make_revision_with_plugins(obj, request.user, message)
 
             if not self.has_change_permission(request, None):
-                return HttpResponseRedirect("../../../../")
-            return HttpResponseRedirect("../../")
+                return HttpResponseRedirect(admin_reverse('index'))
+            return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
 
         context = {
             "title": _("Are you sure?"),
