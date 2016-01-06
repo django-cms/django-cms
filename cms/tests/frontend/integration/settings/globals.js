@@ -13,6 +13,8 @@ module.exports = {
     editUrl: 'http://localhost:8000/en/?edit',
     editOffUrl: 'http://localhost:8000/en/?edit_off',
     adminUrl: 'http://localhost:8000/en/admin/login/',
+    adminLogoutUrl: 'http://localhost:8000/en/admin/logout/',
+    adminPagesUrl: 'http://localhost:8000/en/admin/cms/page/',
     credentials: {
         username: 'admin',
         password: 'admin'

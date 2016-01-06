@@ -6,6 +6,20 @@
 var globals = require('./settings/globals');
 var content = require('./settings/globals').content.page;
 var messages = require('./settings/messages').page.creation;
+var cms = require('./helpers/cms')();
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
+});
 
 casper.test.begin('Add First Page', function (test) {
     casper
@@ -32,7 +46,7 @@ casper.test.begin('Add First Page', function (test) {
             }, true);
         })
         .waitForSelector('.cms-ready', function () {
-            test.assertSelectorHasText('.cms-plugin-1', content.text, messages.created);
+            test.assertSelectorHasText('.cms-plugin', content.text, messages.created);
 
             // handles confirm popup
             this.setFilter('page.confirm', function () {
