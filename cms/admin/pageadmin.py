@@ -454,7 +454,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             if 'history' in request.path_info:
                 return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
             elif 'recover' in request.path_info:
-                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id))))
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
 
     def render_change_form(self, request, context, add=False, change=False, form_url='', obj=None):
@@ -923,7 +923,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
         if target is None or position is None:
-            return HttpResponseRedirect(admin_reverse('cms_page_change', args=(page_id)))
+            return HttpResponseRedirect(admin_reverse('cms_page_change', args=(page_id,)))
 
         try:
             page = self.model.objects.get(pk=page_id)
