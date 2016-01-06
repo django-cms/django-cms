@@ -38,7 +38,7 @@ casper.test.begin('New Page Creation', function (test) {
                 });
         })
         .waitForSelector('.cms-ready', function () {
-            test.assertTitle(newPageTitle, messages.addOk);
+            test.assertTitleMatch(new RegExp(newPageTitle), messages.addOk);
         })
         .run(function () {
             test.done();
