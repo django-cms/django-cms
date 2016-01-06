@@ -15,7 +15,7 @@ var randomText = randomString({ length: 50, withWhitespaces: false });
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login)
-        .then(cms.addPage({ name: 'First page' }))
+        .then(cms.addPage({ title: 'First page' }))
         .run(done);
 });
 

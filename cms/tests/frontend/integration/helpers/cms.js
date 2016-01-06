@@ -56,14 +56,14 @@ module.exports = function (casperjs) {
         *
         * @public
         * @param {Object} opts
-        * @param {String} opts.name name of the page
+        * @param {String} opts.title name of the page
         */
         addPage: function (opts) {
             return function () {
                 return this.thenOpen(globals.adminPagesUrl + 'add/')
                     .waitUntilVisible('#id_title')
                     .then(function () {
-                        this.sendKeys('#id_title', opts.name);
+                        this.sendKeys('#id_title', opts.title);
                         this.click('input[name="_save"]');
                     });
             };
