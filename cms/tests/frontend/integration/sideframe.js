@@ -5,6 +5,19 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').sideframe;
+var cms = require('./helpers/cms')();
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login)
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.logout)
+        .run(done);
+});
 
 casper.test.begin('Sideframe', function (test) {
     casper

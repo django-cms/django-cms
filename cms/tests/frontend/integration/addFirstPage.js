@@ -6,10 +6,17 @@
 var globals = require('./settings/globals');
 var content = require('./settings/globals').content.page;
 var messages = require('./settings/messages').page.creation;
-var cms = require('./helpers/cms');
+var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
     casper.start().then(cms.login).run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removeFirstPage)
+        .then(cms.logout)
+        .run(done);
 });
 
 casper.test.begin('Add First Page', function (test) {
@@ -53,11 +60,4 @@ casper.test.begin('Add First Page', function (test) {
             this.removeAllFilters('page.confirm');
             test.done();
         });
-});
-
-casper.test.tearDown(function (done) {
-    casper.start()
-        .then(cms.removeFirstPage)
-        .then(cms.logout)
-        .run(done);
 });

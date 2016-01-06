@@ -5,7 +5,7 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').toolbar;
-var cms = require('./helpers/cms');
+var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
     casper.start().then(cms.login).run(done);

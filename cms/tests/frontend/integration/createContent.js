@@ -6,9 +6,25 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.addContent;
 var randomString = require('./helpers/randomString').randomString;
+var cms = require('./helpers/cms')();
+var xPath = require('casper').selectXPath;
 
 // random text string for filtering and content purposes
 var randomText = randomString({ length: 50, withWhitespaces: false });
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login)
+        .then(cms.addPage({ name: 'First page' }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removeFirstPage)
+        .then(cms.logout)
+        .run(done);
+});
 
 casper.test.begin('User Add Content', function (test) {
     casper
@@ -24,6 +40,7 @@ casper.test.begin('User Add Content', function (test) {
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
+        .waitWhileVisible('.cms-modal-morphing')
         .waitUntilVisible('.cms-modal-open', function () {
             this.setFilter('page.confirm', function () {
                 return true;

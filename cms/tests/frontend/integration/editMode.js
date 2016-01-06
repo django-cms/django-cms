@@ -7,7 +7,7 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.editMode;
 var content = require('./settings/globals').content.page;
 
-var cms = require('./helpers/cms');
+var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -16,6 +16,12 @@ casper.test.setUp(function (done) {
         .run(done);
 });
 
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removeFirstPage)
+        .then(cms.logout)
+        .run(done);
+});
 
 casper.test.begin('Opening Page in Edit Mode', function (test) {
     casper
