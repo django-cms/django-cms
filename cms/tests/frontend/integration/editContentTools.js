@@ -5,7 +5,34 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.editUtils;
+var casperjs = require('casper');
+var cms = require('./helpers/cms')(casperjs);
 
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'First page' }))
+        .then(cms.addPlugin({
+            type: 'TextPlugin',
+            content: {
+                id_body: 'Test text'
+            }
+        }))
+        .then(cms.addPlugin({
+            type: 'TextPlugin',
+            content: {
+                id_body: 'Another Test text'
+            }
+        }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
+});
 
 casper.test.begin('Edit utils page content', function (test) {
     var contentNumber;
