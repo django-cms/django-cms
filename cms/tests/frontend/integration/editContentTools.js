@@ -53,7 +53,7 @@ casper.test.begin('Edit utils page content', function (test) {
                 return document.querySelectorAll('.cms-structure-content .cms-draggable').length;
             });
             // click settings for last content plugin
-            this.click('.cms-draggable:last-child .cms-submenu-settings');
+            this.click('.cms-structure .cms-draggable:last-child .cms-submenu-settings');
         })
         // select copy button from dropdown list
         .waitUntilVisible(
@@ -70,9 +70,24 @@ casper.test.begin('Edit utils page content', function (test) {
         .waitUntilVisible('.cms-submenu-dropdown', function () {
             this.click('.cms-dragbar .cms-submenu-dropdown .cms-submenu-item a[data-rel="paste"]');
         })
-        // check if number of content plugins has been incereased (contentNumber variable)
+        // check if number of content plugins has been increased (contentNumber variable)
         .then(function () {
-            test.assertElementCount('.cms-draggables .cms-draggable', contentNumber + 1, messages.copySuccessful);
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggable',
+                contentNumber + 1,
+                messages.copySuccessful
+            );
+        })
+        // wait till the paste actually succeeds
+        .waitForResource(/move\-plugin/)
+        .reload()
+        // check that number of content plugins has been indeed increased
+        .then(function () {
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggable',
+                contentNumber + 1,
+                messages.copySuccessful
+            );
         })
 
         .wait(1000)
@@ -95,8 +110,13 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertVisible('.cms-modal-open');
             this.click('.cms-modal-buttons .deletelink');
         })
+        // the modal is visible until page is reloaded
         .waitWhileVisible('.cms-modal-open', function () {
-            test.assertElementCount('.cms-draggables .cms-draggable', contentNumber, messages.deleteSuccessful);
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggable',
+                contentNumber - 1,
+                messages.deleteSuccessful
+            );
         })
 
         // CHECK CUT UTIL
@@ -104,7 +124,7 @@ casper.test.begin('Edit utils page content', function (test) {
         .then(function () {
             // save initial number of content plugins
             contentNumber = this.evaluate(function () {
-                return document.querySelectorAll('.cms-structure-content .cms-draggable').length;
+                return document.querySelectorAll('.cms-structure .cms-draggable').length;
             });
             // click settings for last content plugin
             this.click('.cms-structure .cms-draggable:last-child .cms-submenu-settings');
@@ -134,7 +154,26 @@ casper.test.begin('Edit utils page content', function (test) {
         })
         // check if number of content plugins has been incereased (paste previously cutted value)
         .then(function () {
-            test.assertElementCount('.cms-draggables .cms-draggable', contentNumber, messages.pasteAfterCutSuccessful);
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggable',
+                contentNumber,
+                messages.pasteAfterCutSuccessful
+            );
+        })
+
+        // wait till the paste actually succeeds
+        .waitForResource(/move\-plugin/)
+        .wait(1000)
+        .reload()
+        .waitUntilVisible('.cms-structure')
+
+        // check that number of content plugins has been indeed increased
+        .then(function () {
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggable',
+                contentNumber,
+                messages.pasteAfterCutSuccessful
+            );
         })
         .run(function () {
             test.done();
