@@ -4,13 +4,17 @@ var globals = require('../settings/globals');
 module.exports = function (casperjs) {
     return {
         login: function () {
-            return this.thenOpen(globals.adminUrl).then(function () {
-                this.fill('#login-form', globals.credentials, true);
-            });
+            return function () {
+                return this.thenOpen(globals.adminUrl).then(function () {
+                    this.fill('#login-form', globals.credentials, true);
+                });
+            };
         },
 
         logout: function () {
-            return this.thenOpen(globals.adminLogoutUrl);
+            return function () {
+                return this.thenOpen(globals.adminLogoutUrl);
+            };
         },
 
         /**

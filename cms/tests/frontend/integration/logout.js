@@ -9,7 +9,7 @@ var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
     casper.start()
-        .then(cms.login)
+        .then(cms.login())
         .then(cms.addPage({ title: 'First page' }))
         .run(done);
 });
