@@ -19,8 +19,8 @@ casper.test.setUp(function (done) {
 
 casper.test.tearDown(function (done) {
     casper.start()
-        .then(cms.removeFirstPage)
-        .then(cms.removeFirstPage) // removing both pages
+        .then(cms.removePage({ title: newPageTitle }))
+        .then(cms.removePage({ title: 'First page' })) // removing both pages
         .then(cms.logout)
         .run(done);
 });
