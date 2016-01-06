@@ -9,7 +9,9 @@ var messages = require('./settings/messages').login.admin;
 var cms = require('./helpers/cms')();
 
 casper.test.tearDown(function (done) {
-    casper.start().then(cms.logout).run(done);
+    casper.start()
+        .then(cms.logout())
+        .run(done);
 });
 
 casper.test.begin('User Login (via Admin Panel)', function (test) {
