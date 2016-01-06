@@ -129,6 +129,16 @@ module.exports = function (casperjs) {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
                     });
             };
+        },
+
+        clearClipboard: function () {
+            return function () {
+                return this.thenOpen(globals.editUrl)
+                    .then(function () {
+                        this.click('.cms-clipboard-empty a');
+                    })
+                    .waitForResource(/clear/);
+            };
         }
     };
 };
