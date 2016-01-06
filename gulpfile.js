@@ -185,6 +185,7 @@ gulp.task('tests:integration', function (done) {
         'switchLanguage',
         'editContent',
         'editContentTools',
+        'publish',
         'logout',
         'loginToolbar'
     ];

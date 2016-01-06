@@ -75,6 +75,12 @@ module.exports = {
             deleteSuccessful: 'Delete plugin successful',
             cutSuccessful: 'Cut plugin successful',
             pasteAfterCutSuccessful: 'Paste after cutting plugin successful'
+        },
+        publish: {
+            pageIsUnpublished: 'Page is unpublished',
+            logoutSuccessful: 'Successfully logged out',
+            pageNotYetAvailable: 'The page is not yet available',
+            pageIsAvailable: 'The page is published and available'
         }
     },
     users: {
