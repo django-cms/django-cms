@@ -1,3 +1,4 @@
+/* global DateTimeShortcuts */
 'use strict';
 
 // #############################################################################
@@ -98,12 +99,12 @@ casper.test.begin('Publishing pages', function (test) {
 
         })
         // going to the newly created page url and checking that it hasn't been published yet
-        .thenOpen(pageUrl, function() {
+        .thenOpen(pageUrl, function () {
             test.assertTitle('Page not found', 'The page is not yet available');
         })
         // trying the same in a minute
         .wait(60000)
-        .thenOpen(pageUrl, function() {
+        .thenOpen(pageUrl, function () {
             test.assertTitle(pageTitle, 'The page is published and available');
         })
         .run(function () {
