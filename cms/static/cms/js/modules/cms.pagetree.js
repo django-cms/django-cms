@@ -117,7 +117,7 @@ var CMS = window.CMS || {};
 
             // states and events
             this.click = 'click.cms.pagetree';
-            this.cache = undefined;
+            this.cache = null;
             this.cacheType = '';
             this.successTimer = 600;
 
@@ -392,12 +392,15 @@ var CMS = window.CMS || {};
                 url: that.options.urls.move.replace('{id}', obj.id),
                 data: obj
             }).done(function () {
+                // we only need to move the node when not using drag & drop
+                // for example when we use copy & paste
+                // jstrees drag & drop will move the node for us
                 if (that.cache) {
                     that.ui.tree.jstree('move_node',
                         that.ui.tree.find('li[data-id="' + obj.id + '"]'),
                         that.ui.tree.find('li[data-id="' + obj.target + '"]'));
                 }
-                that.cache = undefined;
+                that.cache = null;
                 that._showSuccess(obj.id);
             }).fail(function (error) {
                 that.showError(error.statusText);
