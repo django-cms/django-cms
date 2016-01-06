@@ -206,7 +206,7 @@ var CMS = window.CMS || {};
                         // we need to store the opened items inside the localstorage
                         // as we have to load the pagetree with the previous opened
                         // state
-                        obj.openNodes = that._getSotredNodeIds();
+                        obj.openNodes = that._getStoredNodeIds();
 
                         // we need to set the site id to get the correct tree
                         obj.site = that.options.site;
@@ -327,11 +327,11 @@ var CMS = window.CMS || {};
         /**
          * Retreives a list of nodes from local storage.
          *
-         * @method _getSotredNodeIds
+         * @method _getStoredNodeIds
          * @private
          * @return {Array} list of ids
          */
-        _getSotredNodeIds: function _getSotredNodeIds() {
+        _getStoredNodeIds: function _getStoredNodeIds() {
             return CMS.settings.pagetree || [];
         },
 
@@ -345,7 +345,7 @@ var CMS = window.CMS || {};
          */
         _storeNodeId: function _storeNodeId(id) {
             var number = id;
-            var storage = this._getSotredNodeIds();
+            var storage = this._getStoredNodeIds();
 
             // store value only if it isn't there yet
             if (storage.indexOf(number) === -1) {
@@ -368,7 +368,7 @@ var CMS = window.CMS || {};
          */
         _removeNodeId: function _removeNodeId(id) {
             var number = id;
-            var storage = this._getSotredNodeIds();
+            var storage = this._getStoredNodeIds();
             var index = storage.indexOf(number);
 
             // remove given id from storage
