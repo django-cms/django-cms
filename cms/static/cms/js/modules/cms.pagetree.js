@@ -196,7 +196,7 @@ var CMS = window.CMS || {};
                         // care about `obj.openNodes`, in the following case
                         // we are requesting a specific node
                         if (node.id !== '#') {
-                            obj.pageId = that._setNode(node.data.id);
+                            obj.pageId = that._storeNodeId(node.data.id);
                         }
 
                         // we need to store the opened items inside the localstorage
@@ -263,10 +263,10 @@ var CMS = window.CMS || {};
 
             // set events for the nodeId updates
             this.ui.tree.on('after_close.jstree', function (e, el) {
-                that._removeNode(el.node.data.id);
+                that._removeNodeId(el.node.data.id);
             });
             this.ui.tree.on('after_open.jstree', function (e, el) {
-                that._setNode(el.node.data.id);
+                that._storeNodeId(el.node.data.id);
             });
 
             // drag and dropping items and saving their states
@@ -278,6 +278,8 @@ var CMS = window.CMS || {};
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
                 e.preventDefault();
+                // we need to cache the node and type so `_toggleHelpers`
+                // wil trigger the correct behaviour
                 that.cache = that._getNodeData(that._getNodeId($(this)));
                 that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
                 that._toggleHelpers();
@@ -295,6 +297,7 @@ var CMS = window.CMS || {};
 
                 that._toggleHelpers();
 
+                // here we determine the cached type from the cut or copy events
                 if (that.cacheType === 'cut') {
                     that._moveNode(obj);
                 }
@@ -326,12 +329,12 @@ var CMS = window.CMS || {};
         /**
          * Stores a node in local storage.
          *
-         * @method _setNode
+         * @method _storeNodeId
          * @private
          * @param {String} id to be stored
          * @return {String} id that has been stored
          */
-        _setNode: function _setNode(id) {
+        _storeNodeId: function _storeNodeId(id) {
             var number = id;
             var storage = this._getNodes();
 
@@ -349,12 +352,12 @@ var CMS = window.CMS || {};
         /**
          * Removes a node in local storage.
          *
-         * @method _setNode
+         * @method _removeNodeId
          * @private
          * @param {String} id to be stored
          * @return {String} id that has been removed
          */
-        _removeNode: function _removeNode(id) {
+        _removeNodeId: function _removeNodeId(id) {
             var number = id;
             var storage = this._getNodes();
             var index = storage.indexOf(number);
