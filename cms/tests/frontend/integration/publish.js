@@ -25,6 +25,9 @@ casper.test.tearDown(function (done) {
         .run(done);
 });
 
+
+casper.test.begin('Publishing dates', function (test) {
+    var pageUrl = (globals.baseUrl + 'Second').toLowerCase() + '/';
     var pageTitle;
     var publishDate;
     var publishTime;
@@ -32,13 +35,13 @@ casper.test.tearDown(function (done) {
     casper
         .start(globals.editUrl)
         // opening an unpublished new page
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.nav li:nth-child(2) a');
+        .waitUntilVisible('.cms-toolbar-expanded')
+        .then(function () {
+            this.thenOpen(pageUrl);
         })
-        // checking that it isn't published, storing its' url and opening Page menu
+        // checking that it isn't published
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             pageTitle = this.getTitle();
-            pageUrl = (globals.baseUrl + pageTitle).toLowerCase() + '/';
 
             test.assertSelectorHasText(
                 '.cms-publish-page',
@@ -78,8 +81,14 @@ casper.test.tearDown(function (done) {
                     // adding one minute to the publish time
                     var timestamp = new Date(year, month, day, hours, minutes, seconds);
                     timestamp.setMinutes(timestamp.getMinutes() + 1);
+                    minutes = timestamp.getMinutes();
+                    if (minutes < 10) {
+                        minutes = '0' + minutes;
+                    }
 
-                    publishTime = timestamp.getHours() + ':' + timestamp.getMinutes() + ':' + timestamp.getSeconds();
+                    publishTime = timestamp.getHours() + ':' + minutes + ':' + timestamp.getSeconds();
+
+                    casper.echo('Publish time (Server) is: ' + publishTime);
 
                     this.fill('#page_form', {
                         publication_date_1: publishTime
@@ -99,7 +108,7 @@ casper.test.tearDown(function (done) {
 
             this.click('.cms-btn-publish');
         })
-        // logging out
+        // logging out through toolbar
         .thenOpen(globals.editUrl)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
@@ -109,19 +118,15 @@ casper.test.tearDown(function (done) {
         })
         .waitForSelector('body', function () {
             test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
-
-            casper.echo(globals.baseUrl);
-            casper.echo(pageUrl);
-
         })
         // going to the newly created page url and checking that it hasn't been published yet
         .thenOpen(pageUrl, function () {
-            test.assertTitle('Page not found', 'The page is not yet available');
+            test.assertTitleMatch(/Page not found/, 'The page is not yet available');
         })
-        // trying the same in a minute
-        .wait(60000)
+        // trying the same in a minute and a half (to be completely sure)
+        .wait(90000)
         .thenOpen(pageUrl, function () {
-            test.assertTitle(pageTitle, 'The page is published and available');
+            test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
         })
         .run(function () {
             this.removeAllFilters('page.confirm');
