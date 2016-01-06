@@ -114,8 +114,8 @@
                 "csrf": "{{ csrf_token }}",
                 "static": "{{ STATIC_URL }}",
                 "permission": "{{ CMS_PERMISSION|bool }}",
-                "debug": "{{ DEBUG|bool }}",
-                "filtered": "{% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %}",
+                "debug": {{ DEBUG|bool }},
+                "filtered": {% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %},
                 "site": "{{ cl.current_site.pk }}",
                 "lang": {
                     "code": "{{ LANGUAGE_CODE|lower }}",

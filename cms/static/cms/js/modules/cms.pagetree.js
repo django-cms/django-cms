@@ -160,7 +160,7 @@ var CMS = window.CMS || {};
                 language: this.options.lang.code,
                 openNodes: []
             };
-            var data = (this.options.filtered === 'true') ? false : true;
+            var data = false;
 
             // make sure that ajax request send the csrf token
             CMS.API.Helpers.csrf(this.options.csrf);
@@ -188,7 +188,7 @@ var CMS = window.CMS || {};
             });
 
             // prepare data
-            if (data) {
+            if (!this.options.filtered) {
                 data = {
                     url: this.options.urls.tree,
                     data: function (node) {
@@ -219,7 +219,8 @@ var CMS = window.CMS || {};
                     animation: 0,
                     // core setting to allow actions
                     check_callback: function () {
-                        return (that.options.filtered === 'false') ? true : false;
+                        // cancel dragging when filtering is active by setting `false`
+                        return (that.options.filtered) ? false : true;
                     },
                     // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                     data: data,
