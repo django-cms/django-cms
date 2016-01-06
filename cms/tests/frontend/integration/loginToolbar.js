@@ -5,6 +5,22 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').login.toolbar;
+var cms = require('./helpers/cms')();
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login)
+        .then(cms.addPage({ name: 'First page' }))
+        .then(cms.logout)
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removeFirstPage)
+        .then(cms.logout)
+        .run(done);
+});
 
 casper.test.begin('User Login (via Toolbar)', function (test) {
     casper

@@ -6,8 +6,24 @@
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.creation.toolbar;
 var randomString = require('./helpers/randomString').randomString;
+var cms = require('./helpers/cms')();
 
 var newPageTitle = randomString({ length: 50, withWhitespaces: false });
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login)
+        .then(cms.addPage({ name: 'First page' }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removeFirstPage)
+        .then(cms.removeFirstPage) // removing both pages
+        .then(cms.logout)
+        .run(done);
+});
 
 casper.test.begin('New Page Creation', function (test) {
     casper
