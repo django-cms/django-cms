@@ -399,8 +399,8 @@ var CMS = window.CMS || {};
                     that.ui.tree.jstree('move_node',
                         that.ui.tree.find('li[data-id="' + obj.id + '"]'),
                         that.ui.tree.find('li[data-id="' + obj.target + '"]'));
+                    that.cache = null;
                 }
-                that.cache = null;
                 that._showSuccess(obj.id);
             }).fail(function (error) {
                 that.showError(error.statusText);
