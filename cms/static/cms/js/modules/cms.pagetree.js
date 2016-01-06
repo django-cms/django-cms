@@ -468,9 +468,7 @@ var CMS = window.CMS || {};
         _getNodeId: function _getElement(el) {
             return el.closest('.jstree-grid-cell')
                 .attr('class')
-                .split(' ')[0]
-                .replace('jsgrid_', '')
-                .replace('_col', '');
+                .replace(/.*jsgrid_(\d+)_col.*/, '$1');
         },
 
         /**
@@ -487,7 +485,8 @@ var CMS = window.CMS || {};
             var parent = this.ui.tree.jstree('get_parent', element);
             var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
             var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
-            var parentDom = this.ui.tree.jstree('get_node', parent);
+            // this refers to the parent jstree node which is the tree itself
+            var parent = this.ui.tree.jstree('get_node', parent);
 
             // last-child if there is only one element (nested)
             // left if it can be placed before the get_next_dom (current sibling level)
@@ -498,9 +497,9 @@ var CMS = window.CMS || {};
             } else if (prevDom) {
                 obj.position = 'right';
                 obj.target = prevDom.data().id;
-            } else if (parentDom) {
+            } else if (parent) {
                 obj.position = 'last-child';
-                obj.target = parentDom.data.id;
+                obj.target = parent.data.id;
             } else {
                 obj.position = 'last-child';
             }
@@ -609,6 +608,8 @@ var CMS = window.CMS || {};
          * @private
          */
         _toggleHelpers: function _toggleHelpers() {
+            // helpers are generated on the fly, so we need to reference
+            // them every single time
             $('.cms-tree-item-helpers').toggleClass('cms-hidden');
         },
 
