@@ -13,16 +13,42 @@ module.exports = function (casperjs) {
             return this.thenOpen(globals.adminLogoutUrl);
         },
 
-        removeFirstPage: function () {
-            return this.thenOpen(globals.adminPagesUrl)
-                .waitUntilVisible('.tree .deletelink')
-                .then(function () {
-                    this.click('.tree .deletelink');
-                })
-                .waitUntilVisible('input[type=submit]')
-                .then(function () {
-                    this.click('input[type=submit]');
-                });
+        /**
+         * removes a page by name, or the first encountered one
+         *
+         * @public
+         * @param {Object} opts
+         * @param {String} [title] Name of the page to delete
+         */
+        removePage: function (opts) {
+            return function () {
+                return this.thenOpen(globals.adminPagesUrl)
+                    .waitUntilVisible('.tree .deletelink')
+                    .then(function () {
+                        var pageId;
+                        if (opts && opts.title) {
+                            // important to pass single param, because casper acts
+                            // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
+                            pageId = this.evaluate(function (title) {
+                                return CMS.$('.col1 a > span').map(function () {
+                                    var span = $(this);
+                                    if (span.text().trim() === title) {
+                                        return span.closest('li').attr('id').split('_')[1];
+                                    }
+                                }).get()[0];
+                            }, opts.title);
+                        }
+                        if (pageId) {
+                            this.click('.tree .deletelink[href*="' + pageId + '"]');
+                        } else {
+                            this.click('.tree .deletelink');
+                        }
+                    })
+                    .waitUntilVisible('input[type=submit]')
+                    .then(function () {
+                        this.click('input[type=submit]');
+                    });
+            };
         },
 
         /**
