@@ -199,7 +199,7 @@ gulp.task('tests:integration', function (done) {
         return PROJECT_PATH.tests + '/integration/' + file + '.js';
     });
 
-    var casperChild = spawn('./node_modules/.bin/casperjs', ['test'].concat(tests));
+    var casperChild = spawn('./node_modules/.bin/casperjs', ['test', '--web-security=no'].concat(tests));
 
     casperChild.stdout.on('data', function (data) {
         gutil.log('CasperJS:', data.toString().slice(0, -1));
