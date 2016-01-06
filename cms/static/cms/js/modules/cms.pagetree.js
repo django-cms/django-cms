@@ -495,14 +495,14 @@ var CMS = window.CMS || {};
 
             data.position = obj.position;
 
-            // jstree indicates no parent with `#`, in this case we need the
-            // root id of the jstree
-            if (obj.parent === '#') {
-                data.target = -1;
-            } else {
+            // jstree indicates no parent with `#`, in this case we do not
+            // need to set the target attribute at all
+            if (obj.parent !== '#') {
                 data.target = node.data.id;
             }
 
+            // some functions like copy create a new element with a new id,
+            // in this case we need to set `data.id` manually
             if (obj.node && obj.node.data) {
                 data.id = obj.node.data.id;
             }
