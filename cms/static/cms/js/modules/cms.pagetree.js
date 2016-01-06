@@ -117,7 +117,7 @@ var CMS = window.CMS || {};
 
             // states and events
             this.click = 'click.cms.pagetree';
-            this.cache = undefined;
+            this.cache = null;
             this.cacheType = '';
             this.successTimer = 600;
 
@@ -160,7 +160,7 @@ var CMS = window.CMS || {};
                 language: this.options.lang.code,
                 openNodes: []
             };
-            var data = (this.options.filtered === 'true') ? false : true;
+            var data = false;
 
             // make sure that ajax request send the csrf token
             CMS.API.Helpers.csrf(this.options.csrf);
@@ -188,7 +188,7 @@ var CMS = window.CMS || {};
             });
 
             // prepare data
-            if (data) {
+            if (!this.options.filtered) {
                 data = {
                     url: this.options.urls.tree,
                     data: function (node) {
@@ -196,7 +196,7 @@ var CMS = window.CMS || {};
                         // care about `obj.openNodes`, in the following case
                         // we are requesting a specific node
                         if (node.id !== '#') {
-                            obj.pageId = that._setNode(node.data.id);
+                            obj.pageId = that._storeNodeId(node.data.id);
                         }
 
                         // we need to store the opened items inside the localstorage
@@ -219,7 +219,8 @@ var CMS = window.CMS || {};
                     animation: 0,
                     // core setting to allow actions
                     check_callback: function () {
-                        return (that.options.filtered === 'false') ? true : false;
+                        // cancel dragging when filtering is active by setting `false`
+                        return (that.options.filtered) ? false : true;
                     },
                     // https://www.jstree.com/api/#/?f=$.jstree.defaults.core.data
                     data: data,
@@ -262,10 +263,10 @@ var CMS = window.CMS || {};
 
             // set events for the nodeId updates
             this.ui.tree.on('after_close.jstree', function (e, el) {
-                that._removeNode(el.node.data.id);
+                that._removeNodeId(el.node.data.id);
             });
             this.ui.tree.on('after_open.jstree', function (e, el) {
-                that._setNode(el.node.data.id);
+                that._storeNodeId(el.node.data.id);
             });
 
             // drag and dropping items and saving their states
@@ -277,6 +278,8 @@ var CMS = window.CMS || {};
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
                 e.preventDefault();
+                // we need to cache the node and type so `_toggleHelpers`
+                // will trigger the correct behaviour
                 that.cache = that._getNodeData(that._getNodeId($(this)));
                 that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
                 that._toggleHelpers();
@@ -294,6 +297,7 @@ var CMS = window.CMS || {};
 
                 that._toggleHelpers();
 
+                // here we determine the cached type from the cut or copy events
                 if (that.cacheType === 'cut') {
                     that._moveNode(obj);
                 }
@@ -325,12 +329,12 @@ var CMS = window.CMS || {};
         /**
          * Stores a node in local storage.
          *
-         * @method _setNode
+         * @method _storeNodeId
          * @private
          * @param {String} id to be stored
          * @return {String} id that has been stored
          */
-        _setNode: function _setNode(id) {
+        _storeNodeId: function _storeNodeId(id) {
             var number = id;
             var storage = this._getNodes();
 
@@ -348,12 +352,12 @@ var CMS = window.CMS || {};
         /**
          * Removes a node in local storage.
          *
-         * @method _setNode
+         * @method _removeNodeId
          * @private
          * @param {String} id to be stored
          * @return {String} id that has been removed
          */
-        _removeNode: function _removeNode(id) {
+        _removeNodeId: function _removeNodeId(id) {
             var number = id;
             var storage = this._getNodes();
             var index = storage.indexOf(number);
@@ -388,12 +392,15 @@ var CMS = window.CMS || {};
                 url: that.options.urls.move.replace('{id}', obj.id),
                 data: obj
             }).done(function () {
+                // we only need to move the node when not using drag & drop
+                // for example when we use copy & paste
+                // jstrees drag & drop will move the node for us
                 if (that.cache) {
                     that.ui.tree.jstree('move_node',
                         that.ui.tree.find('li[data-id="' + obj.id + '"]'),
                         that.ui.tree.find('li[data-id="' + obj.target + '"]'));
+                    that.cache = null;
                 }
-                that.cache = undefined;
                 that._showSuccess(obj.id);
             }).fail(function (error) {
                 that.showError(error.statusText);
@@ -461,9 +468,7 @@ var CMS = window.CMS || {};
         _getNodeId: function _getElement(el) {
             return el.closest('.jstree-grid-cell')
                 .attr('class')
-                .split(' ')[0]
-                .replace('jsgrid_', '')
-                .replace('_col', '');
+                .replace(/.*jsgrid_(\d+)_col.*/, '$1');
         },
 
         /**
@@ -480,7 +485,8 @@ var CMS = window.CMS || {};
             var parent = this.ui.tree.jstree('get_parent', element);
             var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
             var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
-            var parentDom = this.ui.tree.jstree('get_node', parent);
+            // this refers to the jstree object which is the root tree itself
+            var root = this.ui.tree.jstree('get_node', parent);
 
             // last-child if there is only one element (nested)
             // left if it can be placed before the get_next_dom (current sibling level)
@@ -491,9 +497,9 @@ var CMS = window.CMS || {};
             } else if (prevDom) {
                 obj.position = 'right';
                 obj.target = prevDom.data().id;
-            } else if (parentDom) {
+            } else if (root) {
                 obj.position = 'last-child';
-                obj.target = parentDom.data.id;
+                obj.target = root.data.id;
             } else {
                 obj.position = 'last-child';
             }
@@ -602,6 +608,8 @@ var CMS = window.CMS || {};
          * @private
          */
         _toggleHelpers: function _toggleHelpers() {
+            // helpers are generated on the fly, so we need to reference
+            // them every single time
             $('.cms-tree-item-helpers').toggleClass('cms-hidden');
         },
 
