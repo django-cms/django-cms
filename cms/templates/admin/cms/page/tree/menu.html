@@ -9,6 +9,7 @@
     {% if not CMS_PERMISSION or has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     "
     data-id="{{ page.pk }}"
+    data-slug="{{ page.get_slug }}"
     data-colview='
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
@@ -132,7 +133,7 @@
                     <h3>{% trans "Information:" %}</h3>
                     <div class="cms-tree-tooltip-wrapper">
                         {% if page.publication_date %}
-                        <p><strong>{% trans "publication date" %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
+                            <p><strong>{% trans "publication date" %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
                         {% endif %}
                         {% if page.publication_end_date %}
                             <p><strong>{% trans "publication end date" %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
