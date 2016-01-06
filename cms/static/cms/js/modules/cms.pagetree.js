@@ -279,7 +279,7 @@ var CMS = window.CMS || {};
             this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
                 e.preventDefault();
                 // we need to cache the node and type so `_toggleHelpers`
-                // wil trigger the correct behaviour
+                // will trigger the correct behaviour
                 that.cache = that._getNodeData(that._getNodeId($(this)));
                 that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
                 that._toggleHelpers();
@@ -485,8 +485,8 @@ var CMS = window.CMS || {};
             var parent = this.ui.tree.jstree('get_parent', element);
             var nextDom = this.ui.tree.jstree('get_next_dom', element, true);
             var prevDom = this.ui.tree.jstree('get_prev_dom', element, true);
-            // this refers to the parent jstree node which is the tree itself
-            var parent = this.ui.tree.jstree('get_node', parent);
+            // this refers to the jstree object which is the root tree itself
+            var root = this.ui.tree.jstree('get_node', parent);
 
             // last-child if there is only one element (nested)
             // left if it can be placed before the get_next_dom (current sibling level)
@@ -497,9 +497,9 @@ var CMS = window.CMS || {};
             } else if (prevDom) {
                 obj.position = 'right';
                 obj.target = prevDom.data().id;
-            } else if (parent) {
+            } else if (root) {
                 obj.position = 'last-child';
-                obj.target = parent.data.id;
+                obj.target = root.data.id;
             } else {
                 obj.position = 'last-child';
             }
