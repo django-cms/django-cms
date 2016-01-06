@@ -6,7 +6,11 @@ from django import forms
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import (
+    ugettext,
+    ugettext_lazy as _,
+    get_language,
+)
 
 from cms.api import generate_valid_slug
 from cms.constants import PAGE_TYPES_ID
@@ -14,6 +18,7 @@ from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
+from cms.utils.compat.dj import is_installed
 from cms.utils.urlutils import static_with_version
 from cms.utils.conf import get_cms_setting
 
@@ -270,6 +275,16 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
                     })
 
+        if is_installed('reversion'):
+            import reversion
+            from cms.utils.helpers import make_revision_with_plugins
+
+            with reversion.create_revision():
+                make_revision_with_plugins(
+                    obj=page,
+                    user=self.user,
+                    message=ugettext('Initial version.'),
+                )
         return page
 
 
