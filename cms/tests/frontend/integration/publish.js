@@ -6,9 +6,25 @@
 
 var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.publish;
+var cms = require('./helpers/cms')();
 
-casper.test.begin('Publishing pages', function (test) {
-    var pageUrl;
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'First page' }))
+        .then(cms.addPage({ title: 'Second' })) // we rely on slug being "/second"
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.removePage())
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
+});
+
     var pageTitle;
     var publishDate;
     var publishTime;
