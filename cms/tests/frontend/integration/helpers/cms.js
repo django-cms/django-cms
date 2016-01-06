@@ -97,7 +97,7 @@ module.exports = function (casperjs) {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
                     .waitUntilVisible('.cms-structure', function () {
-                        this.click('.cms-submenu-add [data-tooltip="Add plugin"]');
+                        this.click('.cms-structure .cms-submenu-add [data-tooltip="Add plugin"]');
                     })
                     .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                         this.then(function () {
@@ -128,6 +128,16 @@ module.exports = function (casperjs) {
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
                     });
+            };
+        },
+
+        clearClipboard: function () {
+            return function () {
+                return this.thenOpen(globals.editUrl)
+                    .then(function () {
+                        this.click('.cms-clipboard-empty a');
+                    })
+                    .waitForResource(/clear/);
             };
         }
     };

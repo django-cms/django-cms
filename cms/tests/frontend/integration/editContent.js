@@ -32,7 +32,6 @@ casper.test.tearDown(function (done) {
         .run(done);
 });
 
-
 casper.test.begin('Edit content', function (test) {
     var previousContentText;
 
