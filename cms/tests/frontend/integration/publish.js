@@ -46,7 +46,7 @@ casper.test.begin('Publishing dates', function (test) {
             test.assertSelectorHasText(
                 '.cms-publish-page',
                 'Publish page now',
-                'Unpublished page has been opened'
+                messages.pageIsUnpublished
             );
 
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -117,16 +117,16 @@ casper.test.begin('Publishing dates', function (test) {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
         .waitForSelector('body', function () {
-            test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
+            test.assertDoesntExist('.cms-toolbar', messages.logoutSuccessful);
         })
         // going to the newly created page url and checking that it hasn't been published yet
         .thenOpen(pageUrl, function () {
-            test.assertTitleMatch(/Page not found/, 'The page is not yet available');
+            test.assertTitleMatch(/Page not found/, messages.pageNotYetAvailable);
         })
         // trying the same in a minute and a half (to be completely sure)
         .wait(90000)
         .thenOpen(pageUrl, function () {
-            test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
+            test.assertTitleMatch(new RegExp(pageTitle), messages.pageIsAvailable);
         })
         .run(function () {
             this.removeAllFilters('page.confirm');
