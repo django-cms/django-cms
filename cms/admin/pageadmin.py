@@ -842,31 +842,93 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @transaction.atomic
     def move_page(self, request, page_id, extra_context=None):
         """
-        Move the page to the requested target, at the given position
+        Move the page to the requested target, at the given position.
+
+        NOTE: We have to change from one "coordinate system" to another to
+        adapt JSTree to Django Treebeard.
+
+        If the Tree looks like this:
+
+            <root>
+               ⊢ …
+               ⊢ …
+               ⊢ Page 4
+                   ⊢ Page 5 (position 0)
+                   ⊢ …
+
+        For example,
+            target=4, position=1 => target=5, position="right"
+            target=4, position=0 => target=4, position="first-child"
+
         """
         target = request.POST.get('target', None)
-        position = request.POST.get('position', None)
-        if target is None or position is None:
-            return HttpResponseRedirect('../../')
+        position = request.POST.get('position', 0)
+        site_id = request.POST.get('site', None)
+
+        try:
+            position = int(position)
+        except (TypeError, ValueError):
+            position = 0
 
         try:
             page = self.model.objects.get(pk=page_id)
-            target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
             return jsonify_request(HttpResponseBadRequest("error"))
 
-        # does he haves permissions to do this...?
-        if not page.has_move_page_permission(request) or \
-                not target.has_add_permission(request):
+        try:
+            site = Site.objects.get(id=int(site_id))
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if target is None:
+            # Special case: If «target» is not provided, it means to let the
+            # page become a new root node.
+            try:
+                tb_target = Page.get_root_nodes().filter(
+                    publisher_is_draft=True, site=site)[position]
+                if page.is_sibling_of(tb_target) and page.path < tb_target.path:
+                    tb_position = "right"
+                else:
+                    tb_position = "left"
+            except IndexError:
+                # Move page to become the last root node.
+                tb_target = Page.get_last_root_node()
+                tb_position = "right"
+        else:
+            try:
+                target = tb_target = self.model.objects.get(pk=int(target), site=site)
+            except (TypeError, ValueError, self.model.DoesNotExist):
+                return jsonify_request(HttpResponseBadRequest("error"))
+            if position == 0:
+                tb_position = "first-child"
+            else:
+                try:
+                    tb_target = target.get_children().filter(
+                        publisher_is_draft=True, site=site)[position]
+                    if page.is_sibling_of(tb_target) and page.path < tb_target.path:
+                        tb_position = "right"
+                    else:
+                        tb_position = "left"
+                except IndexError:
+                    tb_position = "last-child"
+
+        # Does the user have permissions to do this...?
+        if not page.has_move_page_permission(request) or (
+                    target and not target.has_add_permission(request)):
             return jsonify_request(
-                HttpResponseForbidden(force_text(_("Error! You don't have permissions to move this page. Please reload the page"))))
-            # move page
-        page.move_page(target, position)
+                HttpResponseForbidden(
+                    force_text(_("Error! You don't have permissions to move "
+                                 "this page. Please reload the page"))))
+
+        page.move_page(tb_target, tb_position)
         if is_installed('reversion'):
             self.cleanup_history(page)
-            helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
+            helpers.make_revision_with_plugins(
+                page, request.user, _("Page moved"))
 
-        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page)))
+        return jsonify_request(
+            HttpResponse(admin_utils.render_admin_menu_item(request, page)))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(self.model, id=page_id)
@@ -928,37 +990,75 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @transaction.atomic
     def copy_page(self, request, page_id, extra_context=None):
         """
-        Copy the page and all its plugins and descendants to the requested target, at the given position
-        """
-        context = {}
-        page = Page.objects.get(pk=page_id)
+        Copy the page and all its plugins and descendants to the requested
+        target, at the given position
 
+        NOTE: We have to change from one "coordinate system" to another to
+        adapt JSTree to Django Treebeard. See comments in move_page().
+
+        NOTE: This code handles more cases then are *currently* supported in
+        the UI, specifically, the target should never be None and the position
+        should never be non-zero. These are implemented, however, because we
+        intend to support these cases later.
+        """
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
-        site = request.POST.get('site', None)
-        if target is not None and position is not None and site is not None:
+        site_id = request.POST.get('site', None)
+        copy_permissions = request.POST.get('copy_permissions', False)
+
+        try:
+            page = self.model.objects.get(pk=page_id)
+        except self.model.DoesNotExist:
+            return jsonify_request(HttpResponseBadRequest("Error"))
+
+        try:
+            position = int(position)
+        except (TypeError, ValueError):
+            position = 0
+        try:
+            site = Site.objects.get(id=int(site_id))
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if target is None:
+            # Special case: If «target» is not provided, it means to create the
+            # new page as a root node.
             try:
-                target = self.model.objects.get(pk=target)
-                # does he have permissions to copy this page under target?
-                assert target.has_add_permission(request)
-                site = Site.objects.get(pk=site)
-            except (ObjectDoesNotExist, AssertionError):
-                return HttpResponse("error")
+                tb_target = Page.get_root_nodes().filter(
+                    publisher_is_draft=True, site=site)[position]
+                tb_position = "left"
+            except IndexError:
+                # New page to become the last root node.
+                tb_target = Page.get_last_root_node()
+                tb_position = "right"
+        else:
+            try:
+                tb_target = self.model.objects.get(pk=int(target), site=site)
+                assert tb_target.has_add_permission(request)
+            except (TypeError, ValueError, self.model.DoesNotExist,
+                    AssertionError):
+                return jsonify_request(HttpResponseBadRequest("Error"))
+            if position == 0:
+                # This is really the only possible value for position.
+                tb_position = "first-child"
             else:
+                # But, just in case...
                 try:
-                    permissions = request.GET.get('copy_permissions', False)
-                    if not permissions:
-                        permissions = request.POST.get('copy_permissions', False)
-                    kwargs = {
-                        'copy_permissions': permissions,
-                    }
-                    page.copy_page(target, site, position, **kwargs)
-                    return jsonify_request(HttpResponse("ok"))
-                except ValidationError:
-                    exc = sys.exc_info()[1]
-                    return jsonify_request(HttpResponseBadRequest(exc.messages))
-        context.update(extra_context or {})
-        return HttpResponseRedirect('../../')
+                    tb_target = target.get_children().filter(
+                        publisher_is_draft=True, site=site)[position]
+                    tb_position = "left"
+                except IndexError:
+                    tb_position = "last-child"
+        try:
+            new_page = page.copy_page(tb_target, site, tb_position,
+                                      copy_permissions=copy_permissions)
+            results = {"id": new_page.pk}
+            return HttpResponse(
+                json.dumps(results), content_type='application/json')
+        except ValidationError:
+            exc = sys.exc_info()[1]
+            return jsonify_request(HttpResponseBadRequest(exc.messages))
 
     @require_POST
     @transaction.atomic
