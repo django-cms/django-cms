@@ -8,6 +8,9 @@
 @import "../../../../../sass/settings/all";
 @import "../../../../../sass/mixins/all";
 
+$pagetree-cell-height: 40px;
+$pagetree-nesting-padding: 20px;
+
 //##############################################################################
 // RESET
 
@@ -15,6 +18,9 @@
 // are not interfering (increasing specificity). This section only defines
 // resets added through inline styles
 .jstree-django-cms {
+    * {
+        box-sizing: border-box;
+    }
     // parent and children ul
     .jstree-container-ul,
     .jstree-children,
@@ -57,7 +63,9 @@
     border: 1px solid $gray-lighter;
 }
 .jstree-grid-wrapper {
-    border: 1px solid $white;
+    padding-bottom: 5px !important;
+    border-left: 1px solid $white;
+    border-bottom: 1px solid $white;
     background: $gray-lightest;
 }
 
@@ -75,5 +83,47 @@
     // ensure first line is not centered
     .jstree-grid-column-0 .jstree-grid-header {
         text-align: left !important;
+    }
+
+    // SECTION: nesting
+    .jstree-container-ul {
+        margin-left: $pagetree-nesting-padding;
+    }
+    .jstree-children {
+        margin-left: $pagetree-nesting-padding;
+    }
+
+    // SECTION: background color and paddings
+    .jstree-anchor {
+        display: block;
+        cursor: move;
+        outline: none;
+        color: $gray;
+        height: $pagetree-cell-height;
+        padding: 9px 25px;
+        border-bottom: 1px solid $gray-lighter;
+        border-left: 1px solid $gray-lighter;
+        background: $white url('../../../img/pagetree/tree-li-drag.gif') no-repeat left center;
+
+        &:hover {
+            color: $gray !important;
+        }
+    }
+
+    // style cells afterwards
+    .jstree-grid-cell {
+        height: $pagetree-cell-height;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
+        // don't apply these styles for the first column
+        &.jstree-django-cms {
+            height: auto;
+            border: none;
+            background: none;
+        }
+    }
+
+    .jstree-hovered {
+        background-color: $gray-lightest;
     }
 }
