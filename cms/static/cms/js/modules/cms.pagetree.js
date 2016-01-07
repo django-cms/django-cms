@@ -302,9 +302,6 @@ var CMS = window.CMS || {};
                 var copyFromId = that._getNodeId(that.cacheTarget);
                 var copyToId = that._getNodeId($(e.currentTarget));
 
-                console.log('copy from: ', copyFromId, that.cacheTarget.data().id);
-                console.log('copy to: ', copyToId, $(e.currentTarget).data().id);
-
                 // TODO it is currently not possible to copy/cut a node to the root
                 if (that.cacheType === 'cut') {
                     that.ui.tree.jstree('cut', copyFromId);
@@ -506,8 +503,6 @@ var CMS = window.CMS || {};
             if (obj.node && obj.node.data) {
                 data.id = obj.node.data.id;
             }
-
-            console.log('data: ', data);
 
             return data;
         },
