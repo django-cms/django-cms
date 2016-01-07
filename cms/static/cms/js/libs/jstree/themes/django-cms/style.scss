@@ -15,7 +15,6 @@
 
 $pagetree-cell-height: 40px;
 $pagetree-nesting-padding: 20px;
-$pagetree-arrow-size: 6px;
 
 //##############################################################################
 // RESET
@@ -85,7 +84,7 @@ $pagetree-arrow-size: 6px;
         font-size: $font-size-small;
         font-color: $gray;
         text-align: center;
-        padding: 3px 5px;
+        padding: 3px 6px;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
     }
@@ -163,6 +162,11 @@ $pagetree-arrow-size: 6px;
             background: none;
         }
     }
+    .jstree-grid-cell-regular {
+        text-align: center;
+        padding: 7px 10px;
+        border-left: 1px solid $gray-lighter;
+    }
     // hover states
     .jstree-hovered,
     .jstree-clicked {
@@ -175,7 +179,7 @@ $pagetree-arrow-size: 6px;
 #jstree-dnd {
     box-sizing: border-box;
     display: block;
-    min-width: 40%;
+    min-width: 300px;
     height: $pagetree-cell-height;
     padding: 9px 15px !important;
     border: 1px solid $gray-lighter;
@@ -208,10 +212,10 @@ $pagetree-arrow-size: 6px;
 
 #jstree-marker {
     position: absolute;
-    margin: -$pagetree-arrow-size 0 0 0;
+    margin: -6px 0 0 0;
     border-right: 0;
-    border-top: $pagetree-arrow-size solid transparent;
-    border-bottom: $pagetree-arrow-size solid transparent;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
     border-left: 6px solid $black;
     width: 0;
     height: 0;

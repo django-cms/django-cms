@@ -2,8 +2,8 @@
 // PAGETREE
 
 $pagetree-icon-size: 18px;
-$pagetree-icon-offset: 4px;
-$pagetree-lang-size: 14px;
+$pagetree-icon-offset: 5px;
+$pagetree-lang-size: 15px;
 $pagetree-tooltip-min-width: 130px;
 
 // INFO: please not that all related styles to the pagetree itselfs are
@@ -33,9 +33,10 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-tooltip-container {
     display: none;
     position: absolute;
-    right: 20px;
-    top: -5px;
+    right: 25px;
+    top: -6px;
     z-index: 100;
+    text-align: left;
     border-radius: $border-radius-base;
     background: $white;
     border: 1px solid $gray-lighter;
@@ -104,6 +105,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item-icons {
     position: relative;
     top: $pagetree-icon-offset;
+    padding: 0 3px;
 
     span:before {
         color: $gray-light;
@@ -120,6 +122,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item-preview {
     position: relative;
     top: 1px;
+    left: 3px;
 
     a {
         @extend %icon;
@@ -198,7 +201,7 @@ $pagetree-tooltip-min-width: 130px;
 // shows language bubbles
 .cms-tree-item-menu {
     position: relative;
-    top: $pagetree-icon-offset;
+    top: $pagetree-icon-offset - 1;
 
     .cms-icon:before {
         font-size: $pagetree-icon-size - 3;
@@ -215,6 +218,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item-info {
     position: relative;
     top: $pagetree-icon-offset;
+    left: 1px;
 
     .cms-icon:before {
         font-size: $pagetree-icon-size;
