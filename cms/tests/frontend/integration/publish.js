@@ -8,11 +8,13 @@ var globals = require('./settings/globals');
 var messages = require('./settings/messages').page.publish;
 var cms = require('./helpers/cms')();
 
+var SECOND_PAGE_TITLE = 'Second'; // we rely on slug being "/second"
+
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login())
         .then(cms.addPage({ title: 'First page' }))
-        .then(cms.addPage({ title: 'Second' })) // we rely on slug being "/second"
+        .then(cms.addPage({ title: SECOND_PAGE_TITLE }))
         .run(done);
 });
 
@@ -25,9 +27,54 @@ casper.test.tearDown(function (done) {
         .run(done);
 });
 
+casper.test.begin('Publishing a page with publish button', function (test) {
+    var pageUrl = (globals.baseUrl + SECOND_PAGE_TITLE).toLowerCase() + '/';
+    var pageTitle;
+
+    // open an unpublished new page
+    casper.start(pageUrl + '?edit')
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            pageTitle = this.getTitle();
+
+            test.assertSelectorHasText(
+                '.cms-publish-page',
+                'Publish page now',
+                messages.pageIsUnpublished
+            );
+        })
+        .then(cms.logout())
+        // check that the page is 404
+        .thenOpen(pageUrl, function () {
+            test.assertTitleMatch(/Page not found/, messages.pageNotYetAvailable);
+        })
+        .then(cms.login())
+        .thenOpen(pageUrl + '?edit')
+        // clicking on 'Publish page now' button
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            // handles confirm popup
+            this.setFilter('page.confirm', function () {
+                return true;
+            });
+
+            this.click('.cms-btn-publish');
+        })
+        // wait until it successfully publishes
+        .waitForResource(/publish/)
+        .then(cms.logout())
+        // open a page and check if it's published for non-logged in user
+        .thenOpen(pageUrl, function () {
+            test.assertTitleMatch(new RegExp(pageTitle), messages.pageIsAvailable);
+        })
+        .then(function () {
+            this.removeAllFilters();
+        })
+        .run(function () {
+            test.done();
+        });
+});
 
 casper.test.begin('Publishing dates', function (test) {
-    var pageUrl = (globals.baseUrl + 'Second').toLowerCase() + '/';
+    var pageUrl = (globals.baseUrl + SECOND_PAGE_TITLE).toLowerCase() + '/';
     var pageTitle;
     var publishDate;
     var publishTime;
