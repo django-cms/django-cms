@@ -117,7 +117,7 @@ var CMS = window.CMS || {};
 
             // states and events
             this.click = 'click.cms.pagetree';
-            this.cache = null;
+            this.cacheTarget = null;
             this.cacheType = '';
             this.successTimer = 600;
 
@@ -276,7 +276,7 @@ var CMS = window.CMS || {};
             // store moved position node
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
                 if (!that.cacheType || that.cacheType === 'cut') {
-                    that._moveNode(that._getPosition(obj));
+                    that._moveNode(that._getNodePosition(obj));
                 } else {
                     that._copyNode(obj);
                 }
@@ -287,7 +287,7 @@ var CMS = window.CMS || {};
                 e.preventDefault();
                 // we need to cache the node and type so `_showHelpers`
                 // will trigger the correct behaviour
-                that.cache = e;
+                that.cacheTarget = $(e.currentTarget);
                 that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
                 that._showHelpers();
             });
@@ -299,10 +299,10 @@ var CMS = window.CMS || {};
                 // hide helpers after we picked one
                 that._hideHelpers();
 
-                var copyFromId = that._getNodeId($(that.cache.currentTarget));
+                var copyFromId = that._getNodeId(that.cacheTarget);
                 var copyToId = that._getNodeId($(e.currentTarget));
 
-                console.log('copy from: ', copyFromId, $(that.cache.currentTarget).data().id);
+                console.log('copy from: ', copyFromId, that.cacheTarget.data().id);
                 console.log('copy to: ', copyToId, $(e.currentTarget).data().id);
 
                 // TODO it is currently not possible to copy/cut a node to the root
@@ -417,7 +417,7 @@ var CMS = window.CMS || {};
          */
         _copyNode: function _copyNode(obj) {
             var that = this;
-            var node = that._getPosition(obj);
+            var node = that._getNodePosition(obj);
             var data = {
                 site: this.options.site,
                 // we need to refer to the original item here, as the copied
@@ -484,12 +484,12 @@ var CMS = window.CMS || {};
         /**
          * Gets the new position after moving.
          *
-         * @method _getPosition
+         * @method _getNodePosition
          * @private
          * @param {Object} obj jstree move object
          * @return {Object} evaluated object with params
          */
-        _getPosition: function _getPosition(obj) {
+        _getNodePosition: function _getNodePosition(obj) {
             var data = {};
             var node = this.ui.tree.jstree('get_node', obj.node.parent);
 
