@@ -44,6 +44,7 @@
     &.jstree-grid-wrapper,
     .jstree-grid-column,
     .jstree-grid-cell {
+        box-sizing: border-box;
         overflow: visible;
     }
 }
@@ -51,10 +52,28 @@
 //###########################################################
 // DJANGO-CMS THEME
 
-.jstree-grid-header {
-    font-size: $font-size-small;
-    text-align: center;
-    .jstree-grid-column-0 & {
-        text-align: left;
+// general wrapper
+.cms-pagetree-container {
+    border: 1px solid $gray-lighter;
+}
+.jstree-grid-wrapper {
+    border: 1px solid $white;
+    background: $gray-lightest;
+}
+
+// specificity required for admin styles and jstree resets
+.jstree-django-cms {
+    // header column
+    .jstree-grid-header {
+        font-size: $font-size-small;
+        font-color: $gray;
+        text-align: center;
+        padding: 3px 5px;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
+    }
+    // ensure first line is not centered
+    .jstree-grid-column-0 .jstree-grid-header {
+        text-align: left !important;
     }
 }
