@@ -482,7 +482,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Gets the new position after moving.
+         * Gets the new node position after moving.
          *
          * @method _getNodePosition
          * @private
