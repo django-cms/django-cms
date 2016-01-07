@@ -504,3 +504,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix whitespace markup issues in draft mode
 - Detect plugin migrations layout in tests
 - Fix some treebeard corruption issues
+
+=== 3.1.5 (Unreleased) ===
+
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
