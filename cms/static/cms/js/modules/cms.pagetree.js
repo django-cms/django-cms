@@ -109,7 +109,9 @@ var CMS = window.CMS || {};
      * @uses CMS.API.Helpers
      */
     CMS.PageTree = new CMS.Class({
-
+        // TODO add paste button for root elements
+        // TODO hide paste on origin element for copy & paste
+        // TODO add mechanics to set the home page
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
             this.options = $('.js-cms-pagetree').data('json');
@@ -241,8 +243,8 @@ var CMS = window.CMS || {};
                         name: 'django-cms',
                         url: true,
                         // custom values specific for django-cms theme
-                        dir: this.options.urls.theme,
-                        icons: false
+                        dir: this.options.urls.theme/*,
+                        //icons: false*/
                     }
                 },
                 // activate drag and drop plugin
