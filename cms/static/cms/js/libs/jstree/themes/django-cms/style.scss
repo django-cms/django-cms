@@ -76,6 +76,9 @@ $pagetree-nesting-padding: 20px;
 
 // specificity required for admin styles and jstree resets
 .jstree-django-cms {
+    .jstree {
+        padding-left: $pagetree-nesting-padding / 2;
+    }
     // header column
     .jstree-grid-header {
         font-size: $font-size-small;
@@ -103,11 +106,21 @@ $pagetree-nesting-padding: 20px;
         cursor: pointer;
         float: left;
         position: relative;
-        left: -16px;
+        left: -$pagetree-nesting-padding;
         font-size: 12px;
         color: $gray-light;
         padding: 14px 0;
         @extend %icon;
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            right: -8px;
+            top: 19px;
+            width: 8px;
+            height: 2px;
+            background: $gray-lighter;
+        }
     }
     .jstree-open > .jstree-ocl {
         @include icon(minus-square-o);
