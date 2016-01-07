@@ -7,6 +7,11 @@
 // IMPORT SETTINGS
 @import "../../../../../sass/settings/all";
 @import "../../../../../sass/mixins/all";
+@import "../../../../../sass/mixins/all";
+
+//##############################################################################
+// IMPORT COMPONENTS
+@import "../../../../../sass/components/iconography";
 
 $pagetree-cell-height: 40px;
 $pagetree-nesting-padding: 20px;
@@ -85,31 +90,54 @@ $pagetree-nesting-padding: 20px;
         text-align: left !important;
     }
 
-    // SECTION: nesting
+    //###########################################################
+    // styles for nesting elements
     .jstree-container-ul {
         margin-left: $pagetree-nesting-padding;
     }
     .jstree-children {
         margin-left: $pagetree-nesting-padding;
     }
+    .jstree-open > .jstree-ocl,
+    .jstree-closed > .jstree-ocl {
+        cursor: pointer;
+        float: left;
+        position: relative;
+        left: -16px;
+        font-size: 12px;
+        color: $gray-light;
+        padding: 14px 0;
+        @extend %icon;
+    }
+    .jstree-open > .jstree-ocl {
+        @include icon(minus-square-o);
+        color: $gray;
+    }
+    .jstree-closed > .jstree-ocl {
+        @include icon(plus-square-o);
+    }
 
-    // SECTION: background color and paddings
+    //###########################################################
+    // background color and paddings for nodes
+    // first row styling
     .jstree-anchor {
         display: block;
         cursor: move;
         outline: none;
         color: $gray;
-        height: $pagetree-cell-height;
+        // we need to add one pixel in to negate the negative margin
+        // value to get the borders to work visually
+        height: $pagetree-cell-height + 1;
         padding: 9px 25px;
-        border-bottom: 1px solid $gray-lighter;
-        border-left: 1px solid $gray-lighter;
+        margin-top: -1px;
+        border: 1px solid $gray-lighter;
+        border-right: none;
         background: $white url('../../../img/pagetree/tree-li-drag.gif') no-repeat left center;
 
         &:hover {
             color: $gray !important;
         }
     }
-
     // style cells afterwards
     .jstree-grid-cell {
         height: $pagetree-cell-height;
@@ -122,8 +150,9 @@ $pagetree-nesting-padding: 20px;
             background: none;
         }
     }
-
-    .jstree-hovered {
+    // hover states
+    .jstree-hovered,
+    .jstree-clicked {
         background-color: $gray-lightest;
     }
 }
