@@ -15,6 +15,7 @@
 
 $pagetree-cell-height: 40px;
 $pagetree-nesting-padding: 20px;
+$pagetree-arrow-size: 6px;
 
 //##############################################################################
 // RESET
@@ -109,14 +110,14 @@ $pagetree-nesting-padding: 20px;
         left: -$pagetree-nesting-padding;
         font-size: 12px;
         color: $gray-light;
-        padding: 14px 0;
+        padding: 15px 0;
         @extend %icon;
         &:after {
             content: "";
             display: block;
             position: absolute;
             right: -8px;
-            top: 19px;
+            top: 20px;
             width: 8px;
             height: 2px;
             background: $gray-lighter;
@@ -124,7 +125,6 @@ $pagetree-nesting-padding: 20px;
     }
     .jstree-open > .jstree-ocl {
         @include icon(minus-square-o);
-        color: $gray;
     }
     .jstree-closed > .jstree-ocl {
         @include icon(plus-square-o);
@@ -169,3 +169,52 @@ $pagetree-nesting-padding: 20px;
         background-color: $gray-lightest;
     }
 }
+
+//###########################################################
+// drag & drop item
+#jstree-dnd {
+    box-sizing: border-box;
+    display: block;
+    min-width: 40%;
+    height: $pagetree-cell-height;
+    padding: 9px 15px !important;
+    border: 1px solid $gray-lighter;
+    background: $white;
+    // copy icon triggered when pressing `CMD`
+    .jstree-copy {
+        color: $white;
+        padding: 0 5px 2px;
+        margin-left: 5px;
+        border-radius: $border-radius-base;
+        background: $gray-light;
+    }
+    // error color displayed if we can/cannot move it
+    .jstree-ok,
+    .jstree-er {
+        position: absolute;
+        top: 0;
+        left: -5px;
+        width: 5px;
+        height: 100%;
+        background: $gray-lighter;
+    }
+    .jstree-ok {
+        background-color: $color-success;
+    }
+    .jstree-er {
+        background-color: $color-danger;
+    }
+}
+
+#jstree-marker {
+    position: absolute;
+    margin: -$pagetree-arrow-size 0 0 0;
+    border-right: 0;
+    border-top: $pagetree-arrow-size solid transparent;
+    border-bottom: $pagetree-arrow-size solid transparent;
+    border-left: 6px solid $black;
+    width: 0;
+    height: 0;
+}
+
+
