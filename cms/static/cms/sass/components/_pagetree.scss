@@ -6,6 +6,11 @@ $pagetree-icon-offset: 4px;
 $pagetree-lang-size: 14px;
 $pagetree-tooltip-min-width: 130px;
 
+// INFO: please not that all related styles to the pagetree itselfs are
+// handled through theming via `static/js/libs/jstree/themes/django-cms`.
+// This part only handles elements such as icons, tooltips, language display,
+// search and filtering
+
 .cms-pagetree-container,
 .cms-pagetree {
     // helper classes
@@ -21,7 +26,6 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item {
     display: inline-block;
 }
-
 
 //###########################################################
 // TOOLTIP
@@ -273,30 +277,4 @@ $pagetree-tooltip-min-width: 130px;
 }
 .cms-tree-node-success {
     background: $color-success !important;
-}
-
-//###########################################################
-// TREE HACKS (temporary)
-.jstree-grid-column,
-.jstree-grid-cell {
-    overflow: visible !important;
-}
-.jstree-grid-header {
-    font-size: $font-size-small;
-    text-align: center;
-    .jstree-grid-column-0 & {
-        text-align: left;
-    }
-}
-.jstree-grid-cell {
-    padding: 0 10px !important;
-}
-.jstree-grid-wrapper {
-    overflow: visible !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-.jstree-container-ul {
-    padding: 0 !important;
-    margin: 0 !important;
 }
