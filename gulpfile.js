@@ -63,11 +63,10 @@ var JS_BUNDLES = {
     'bundle.admin.changeform.min.js': [
         PROJECT_PATH.js + '/modules/cms.changeform.js'
     ],
-    'bundle.admin.changelist.min.js': [
-        PROJECT_PATH.js + '/modules/jquery.ui.custom.js',
-        PROJECT_PATH.js + '/modules/cms.changelist.js',
-        PROJECT_PATH.js + '/jstree/_lib/_all.js',
-        PROJECT_PATH.js + '/jstree/tree_component.js'
+    'bundle.admin.pagetree.min.js': [
+        PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
+        PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.js',
     ],
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/libs/jquery.min.js',

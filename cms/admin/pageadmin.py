@@ -1362,7 +1362,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Get html for the descendants (only) of given page or if no page_id is
         provided, all the root nodes.
 
-        Used for lazy loading pages in cms.changelist.js
+        Used for lazy loading pages in cms.pagetree.js
 
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
