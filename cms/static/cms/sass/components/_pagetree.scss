@@ -18,6 +18,9 @@ $pagetree-tooltip-min-width: 130px;
         display: none !important;
     }
 }
+.hidden {
+    display: none !important;
+}
 
 .cms-tree-col {
     height: 24px;
@@ -266,6 +269,7 @@ $pagetree-tooltip-min-width: 130px;
         position: absolute;
         top: 0;
         right: 0;
+        padding-right: 20px;
         line-height: 30px;
         width: 175px;
         border-bottom: 1px solid $gray-lighter;
@@ -273,4 +277,10 @@ $pagetree-tooltip-min-width: 130px;
     h2 {
         display: none;
     }
+}
+
+//###########################################################
+// django default admin theme adaptions
+.cms-tree-col {
+    line-height: 16px;
 }
