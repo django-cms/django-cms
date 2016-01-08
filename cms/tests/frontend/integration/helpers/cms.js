@@ -22,7 +22,7 @@ module.exports = function (casperjs) {
          *
          * @public
          * @param {Object} opts
-         * @param {String} [title] Name of the page to delete
+         * @param {String} [opts.title] Name of the page to delete
          */
         removePage: function (opts) {
             return function () {

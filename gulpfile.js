@@ -187,7 +187,8 @@ gulp.task('tests:integration', function (done) {
         'editContentTools',
         'publish',
         'logout',
-        'loginToolbar'
+        'loginToolbar',
+        'disableToolbar'
     ];
     var pre = ['setup'];
 
