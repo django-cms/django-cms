@@ -21,8 +21,7 @@ casper.test.tearDown(function (done) {
 });
 
 casper.test.begin('Disable Toolbar', function (test) {
-  casper
-
+    casper
         .start(globals.editUrl)
         // click on example.com
         .waitUntilVisible('.cms-toolbar-expanded', function () {
