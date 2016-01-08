@@ -121,7 +121,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.pagetree';
             this.cacheTarget = null;
             this.cacheType = '';
-            this.successTimer = 600;
+            this.successTimer = 1000;
 
             // elements
             this._setupUI();

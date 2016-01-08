@@ -274,14 +274,3 @@ $pagetree-tooltip-min-width: 130px;
         display: none;
     }
 }
-
-//###########################################################
-// HELPERS
-// helpers for copy and pasting
-.cms-tree-item-helpers {}
-.cms-tree-node {
-    transition: background $speed-base;
-}
-.cms-tree-node-success {
-    background: $color-success !important;
-}

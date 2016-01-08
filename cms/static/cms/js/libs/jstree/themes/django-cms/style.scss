@@ -200,6 +200,23 @@ $pagetree-cell-padding: 7px 8px;
         border: none;
         background: none;
     }
+
+    .jstree-loading > .jstree-ocl {
+        display: none;
+    }
+}
+
+//###########################################################
+// success animation
+.cms-tree-node-success {
+    > .jstree-anchor .jstree-themeicon {
+        content: "";
+        position: relative;
+        top: 4px;
+        color: $color-success;
+        @extend %icon;
+        @include icon(check);
+    }
 }
 
 //###########################################################
