@@ -4,7 +4,6 @@
 // Users managed via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.editMode;
 var content = require('./settings/globals').content.page;
 
 var cms = require('./helpers/cms')();
@@ -28,17 +27,18 @@ casper.test.begin('Opening Page in Edit Mode', function (test) {
         // opening the page in edit off mode
         .start(globals.editOffUrl)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertExists('.cms-btn-switch-edit', messages.editOff);
+            test.assertExists('.cms-btn-switch-edit', 'The page is on edit off mode');
             this.click('.cms-btn-switch-edit');
         })
         // checking the mode after clicking on toolbar "Edit" button
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertExists('.cms-toolbar-item-switch-save-edit', messages.editOnByEditButton);
+            test.assertExists('.cms-toolbar-item-switch-save-edit',
+                'The page is in edit mode after clicking on edit button');
         })
         // going back to edit off mode and opening the "Page" menu item
         .thenOpen(globals.editOffUrl)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertExists('.cms-btn-switch-edit', messages.editOff);
+            test.assertExists('.cms-btn-switch-edit', 'The page is on edit off mode');
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         // opening "Edit this Page" menu item
@@ -47,7 +47,8 @@ casper.test.begin('Opening Page in Edit Mode', function (test) {
         })
         // checking the mode after clicking on "Page -> Edit this Page"
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            test.assertExists('.cms-toolbar-item-switch-save-edit', messages.editOnByNav);
+            test.assertExists('.cms-toolbar-item-switch-save-edit',
+                'The page is in edit mode after clicking Page -> Edit this Page');
         })
         .run(function () {
             test.done();

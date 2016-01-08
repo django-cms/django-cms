@@ -4,7 +4,6 @@
 // Switch language via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.switchLanguage;
 var randomString = require('./helpers/randomString').randomString;
 var cms = require('./helpers/cms')();
 // random text string for filtering and content purposes
@@ -42,7 +41,7 @@ casper.test.begin('Switch language', function (test) {
             test.assertSelectorHasText(
                 '.cms-screenblock-inner h1',
                 noPreviewText,
-                messages.noContentPreview
+                'This page isn\'t available'
             );
             this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
         })
@@ -64,7 +63,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // check if german version appears
         .waitWhileVisible('.cms-modal-open', function () {
-            test.assertSelectorHasText('ul.nav > .child > a[href="/de/"]', randomText, messages.newContentAvailable);
+            test.assertSelectorHasText('ul.nav > .child > a[href="/de/"]', randomText, 'New translation page appears');
         })
         // click on language bar
         .waitUntilVisible('.cms-toolbar-expanded', function () {
@@ -83,7 +82,7 @@ casper.test.begin('Switch language', function (test) {
             test.assertSelectorHasText(
                 '.cms-screenblock-inner h1',
                 noPreviewText,
-                messages.noContentPreview
+                'This page isn\'t available'
             );
         })
         .run(function () {

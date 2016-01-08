@@ -4,7 +4,6 @@
 // Users managed via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.creation.toolbar;
 var randomString = require('./helpers/randomString').randomString;
 var cms = require('./helpers/cms')();
 
@@ -38,14 +37,14 @@ casper.test.begin('New Page Creation', function (test) {
             this.click('.cms-toolbar-item-navigation-hover .cms-toolbar-item-navigation-hover li:first-child a');
         })
         .waitUntilVisible('.cms-modal', function () {
-            test.assertVisible('.cms-modal', messages.modalOpened);
+            test.assertVisible('.cms-modal', 'The modal to add page is available');
 
             this.click('.cms-modal .cms-btn-action');
         })
         .withFrame(0, function () {
             casper
                 .waitForSelector('#page_form', function () {
-                    test.assertExists('.errornote', messages.addFail);
+                    test.assertExists('.errornote', 'Error message shows up if no data has been entered');
 
                     this.fill('#page_form', {
                         'title': newPageTitle,
@@ -54,7 +53,7 @@ casper.test.begin('New Page Creation', function (test) {
                 });
         })
         .waitForSelector('.cms-ready', function () {
-            test.assertTitleMatch(new RegExp(newPageTitle), messages.addOk);
+            test.assertTitleMatch(new RegExp(newPageTitle), 'The new page has been created');
         })
         .run(function () {
             test.done();

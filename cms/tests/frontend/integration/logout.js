@@ -4,7 +4,6 @@
 // User logout
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').logout;
 var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
@@ -27,7 +26,7 @@ casper.test.begin('User Logout', function (test) {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
         .waitForSelector('.nav', function () {
-            test.assertDoesntExist('.cms-toolbar', messages.logoutOk);
+            test.assertDoesntExist('.cms-toolbar', 'Logout via the toolbar done');
         })
         .run(function () {
             test.done();

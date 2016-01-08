@@ -4,7 +4,6 @@
 // User login via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.addContent;
 var randomString = require('./helpers/randomString').randomString;
 var cms = require('./helpers/cms')();
 var xPath = require('casper').selectXPath;
@@ -52,7 +51,7 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })
         .waitWhileVisible('.cms-structure', function () {
-            test.assertSelectorDoesntHaveText('.cms-plugin p', randomText, messages.noEmptyPlugin);
+            test.assertSelectorDoesntHaveText('.cms-plugin p', randomText, 'Empty plugin hasn\'t been created');
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
 
@@ -64,7 +63,7 @@ casper.test.begin('User Add Content', function (test) {
             this.sendKeys('.cms-quicksearch input', randomText);
             this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                 test.assertNotVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
-                    messages.noFilteredResults);
+                    'No filtered results for random string');
                 this.sendKeys('.cms-quicksearch input', 'text', { reset: true });
             });
             this.waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
@@ -74,7 +73,7 @@ casper.test.begin('User Add Content', function (test) {
                     });
                 }).then(function () {
                     test.assertVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]',
-                        messages.filteredPluginAvailable);
+                        'There is text plugin available by the filter: text');
                 });
             });
             this.then(function () {
@@ -99,7 +98,7 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })
         .waitUntilVisible('.cms-plugin', function () {
-            test.assertSelectorHasText('.cms-plugin p', randomText, messages.newPluginVisible);
+            test.assertSelectorHasText('.cms-plugin p', randomText, 'Newly created text plugin can be seen on page');
         })
         .run(function () {
             test.done();

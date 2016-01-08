@@ -4,7 +4,6 @@
 // Users managed via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').users;
 var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
@@ -34,12 +33,12 @@ casper.test.begin('Users Management', function (test) {
         .withFrame(0, function () {
             casper
                 .waitForSelector('#changelist-form', function () {
-                    test.assertExists('.column-first_name', messages.usersListOpened);
+                    test.assertExists('.column-first_name', 'Admin panel with the list of users opened in sideframe');
 
                     this.click('.field-username a[href$="/user/1/"]');
                 })
                 .waitForSelector('#user_form', function () {
-                    test.assertExists('#user_form', messages.editPageOpened);
+                    test.assertExists('#user_form', 'The admin profile edit page has been opened');
 
                     this.fill('#user_form', { first_name: globals.user.firstName }, true);
                 })
@@ -47,7 +46,7 @@ casper.test.begin('Users Management', function (test) {
                     test.assertSelectorHasText(
                         '#changelist-form .field-first_name',
                         globals.user.firstName,
-                        messages.firstNameChanged
+                        'The admin first name has been updated'
                     );
                 });
         })

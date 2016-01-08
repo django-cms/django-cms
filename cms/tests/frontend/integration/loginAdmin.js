@@ -5,7 +5,6 @@
 // User login via the admin panel
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').login.admin;
 var cms = require('./helpers/cms')();
 
 casper.test.tearDown(function (done) {
@@ -29,8 +28,8 @@ casper.test.begin('User Login (via Admin Panel)', function (test) {
         .then(function () {
             var titleRegExp = new RegExp(globals.adminTitle, 'g');
 
-            test.assertTitleMatch(titleRegExp, messages.cmsTitleOk);
-            test.assertExists('#login-form', messages.adminAvailable);
+            test.assertTitleMatch(titleRegExp, 'The CMS is available and admin panel title is correct');
+            test.assertExists('#login-form', 'Admin login form is available');
 
             this.fill('#login-form', {
                 username: 'fake',
@@ -38,12 +37,12 @@ casper.test.begin('User Login (via Admin Panel)', function (test) {
             }, true);
         })
         .waitForSelector('.errornote', function () {
-            test.assertExists('.errornote', messages.loginFail);
+            test.assertExists('.errornote', 'login with wrong credentials failed');
 
             this.fill('#login-form', globals.credentials, true);
         })
         .thenOpen(globals.baseUrl, function () {
-            test.assertExists('.cms-toolbar', messages.loginOk);
+            test.assertExists('.cms-toolbar', 'Login via the admin form done');
         })
         .run(function () {
             test.done();
