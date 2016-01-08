@@ -23,6 +23,7 @@ $pagetree-nesting-padding: 20px;
 // are not interfering (increasing specificity). This section only defines
 // resets added through inline styles
 .jstree-django-cms {
+    box-sizing: border-box;
     * {
         box-sizing: border-box;
     }
@@ -52,12 +53,15 @@ $pagetree-nesting-padding: 20px;
     }
 
     // tooltips are hidden if overflow is prevented
-    &.jstree-grid-wrapper,
     .jstree-grid-column,
     .jstree-grid-cell {
         box-sizing: border-box;
         overflow: visible;
     }
+}
+// wrapper added by jstree
+.jstree-grid-wrapper {
+    box-sizing: border-box;
 }
 
 //###########################################################
@@ -167,10 +171,27 @@ $pagetree-nesting-padding: 20px;
         padding: 7px 10px;
         border-left: 1px solid $gray-lighter;
     }
+    .jstree-grid-cell-regular-noborder {
+        border-left: none;
+    }
     // hover states
     .jstree-hovered,
     .jstree-clicked {
         background-color: $gray-lightest;
+    }
+}
+
+//###########################################################
+// initial loading display of the tree
+.jstree-loading {
+    .jstree-container-ul {
+        margin: 0;
+    }
+    .jstree-anchor {
+        padding-top: 13px;
+        padding-left: 15px;
+        border: none;
+        background: none;
     }
 }
 

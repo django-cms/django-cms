@@ -174,7 +174,8 @@ var CMS = window.CMS || {};
                     // just leave the "key" param empty
                     columns.push({
                         header: obj.title,
-                        width: obj.width || '1%'
+                        width: obj.width || '1%',
+                        wideCellClass: obj.cls
                     });
                 } else {
                     columns.push({
@@ -188,7 +189,8 @@ var CMS = window.CMS || {};
                                 return '';
                             }
                         },
-                        width: obj.width || '1%'
+                        width: obj.width || '1%',
+                        wideCellClass: obj.cls
                     });
                 }
             });
