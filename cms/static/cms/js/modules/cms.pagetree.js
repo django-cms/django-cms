@@ -288,6 +288,9 @@ var CMS = window.CMS || {};
                 } else {
                     that._copyNode(obj);
                 }
+                // we need to open the parent node if we trigger an element
+                // if not already opened
+                that.ui.tree.jstree('open_node', obj.parent);
             });
 
             // set event for cut and paste
