@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags %}
+{% load i18n admin_list admin_static admin_urls cms_admin %}
 
 {# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
@@ -11,12 +11,12 @@
 {% block extrahead %}
     {{ block.super }}
     {# INFO: we need to add styles here instead of "extrastyle" to avoid conflicts with adminstyle #}
-    <link rel="stylesheet" href="{% static 'cms/css/cms.base.css' %}">
-    <link rel="stylesheet" href="{% static 'cms/css/cms.pagetree.css' %}">
-    <script src="{% static 'cms/js/modules/jquery.noconflict.pre.js' %}"></script>
-    <script src="{% static 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
-    <script src="{% static 'cms/js/dist/bundle.admin.pagetree.min.js' %}"></script>
-    <script src="{% static 'cms/js/modules/jquery.noconflict.post.js' %}"></script>
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}">
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.pagetree.css' %}">
+    <script src="{% static_with_version 'cms/js/modules/jquery.noconflict.pre.js' %}"></script>
+    <script src="{% static_with_version 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
+    <script src="{% static_with_version 'cms/js/dist/bundle.admin.pagetree.min.js' %}"></script>
+    <script src="{% static_with_version 'cms/js/modules/jquery.noconflict.post.js' %}"></script>
 {% endblock extrahead %}
 
 {% if not is_popup %}

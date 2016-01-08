@@ -4,6 +4,10 @@
 - Fixed an issue with sideframe urls not being remembered after reload
 - Added placeholder name to the edit tooltip
 - Fix breadcrumb in page revision list
+- Fix clash with Foundation that caused "Add plugin" button to be unusable
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+- Fix message with CMS version not showing up on hover in debug mode
+- Fix messages not being positioned correctly in debug mode
 
 
 === 3.2.0 (2015-11-24) ===
