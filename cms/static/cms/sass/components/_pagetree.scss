@@ -162,6 +162,7 @@ $pagetree-tooltip-min-width: 130px;
     }
 }
 .cms-tree-lang-container span {
+    box-sizing: border-box;
     display: inline-block;
     width: $pagetree-lang-size;
     height: $pagetree-lang-size;
