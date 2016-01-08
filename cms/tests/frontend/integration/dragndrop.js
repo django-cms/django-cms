@@ -113,3 +113,84 @@ casper.test.begin('Drag plugin to another placeholder', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Move plugins inside a plugin', function (test) {
+    var drop;
+
+    casper.start(globals.editUrl)
+        .then(function () {
+            test.assertElementCount('.cms-structure .cms-draggable', 4);
+        })
+        // make sure we are in structure mode
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
+        })
+        .waitUntilVisible('.cms-structure')
+        // expand the multi columns plugin
+        .then(function () {
+            this.mouse.click(
+                '.cms-dragarea:first-child > .cms-draggables > .cms-draggable > .cms-dragitem-collapsable'
+            );
+        })
+        .then(function () {
+            // have to wait a bit because the collapse is debounced
+            this.wait(10);
+            test.assertVisible('.cms-dragitem-text[title*="GridColumnPlugin"]');
+        })
+        // move plugin
+        .then(function () {
+            // first grid column
+            drop = this.getElementBounds(
+                '.cms-dragarea:first-child > .cms-draggables > .cms-draggable .cms-draggable:first-child');
+
+            this.evaluate(function () {
+                // changing delay here because casper doesn't understand
+                // that we want to wait 100 ms after "picking up" the plugin
+                // for sortable to work
+                CMS.API.StructureBoard.ui.sortables.nestedSortable('option', 'delay', 0);
+            });
+
+            this.mouse.down('.cms-dragarea:first-child > .cms-draggables > .cms-draggable:last-child');
+            this.mouse.move(drop.left + drop.width / 2, drop.top + drop.height);
+            this.mouse.move(drop.left + drop.width / 2 + 30, drop.top + drop.height);
+        }).then(function () {
+            this.mouse.up(drop.left + drop.width / 2 + 30, drop.top + drop.height);
+        })
+        .waitForResource(/move-plugin/)
+        .then(function () {
+            this.reload();
+        })
+        // check after reload
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
+        })
+        .then(function () {
+            test.assertElementCount(
+                '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
+                1,
+                'There is only one root plugin'
+            );
+
+            test.assertEvalEquals(function () {
+                return $('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                    .closest('.cms-dragitem')
+                    .hasClass('cms-dragitem-collapsable');
+            }, true, 'First grid column has a child');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-dragitem-text[title*=GridColumnPlugin]:first')
+                    .closest('.cms-draggable')
+                    .find('.cms-draggables')
+                    .find('.cms-dragitem-text strong').text() === 'Text';
+            }, true, 'First grid column has TextPlugin as a child');
+        })
+        // collapse the multi columns plugin
+        .then(function () {
+            this.mouse.click(
+                '.cms-dragarea:first-child > .cms-draggables > .cms-draggable > .cms-dragitem-collapsable'
+            );
+        })
+        .run(function () {
+            test.done();
+        });
+});
