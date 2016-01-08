@@ -8,7 +8,7 @@ module.exports = function (casperjs) {
             return function () {
                 return this.thenOpen(globals.adminUrl).then(function () {
                     this.fill('#login-form', globals.credentials, true);
-                });
+                }).waitForSelector('#content');
             };
         },
 
