@@ -137,6 +137,7 @@
 					isThemeroller : !!this._data.themeroller,
 					treeWidthDiff : 0,
 					resizable : s.resizable,
+					stateful: s.stateful,
 					indent: 0
 				}, cols = gs.columns, treecol = 0;
 				// find which column our tree shuld go in
@@ -152,7 +153,7 @@
 				this.uniq = Math.ceil(Math.random()*1000);
 				this.treecol = treecol;
 				this.rootid = container.attr("id");
-			
+
 				var msie = /msie/.test(navigator.userAgent.toLowerCase());
 				if (msie) {
 					var version = parseFloat(navigator.appVersion.split("MSIE")[1]);
@@ -161,7 +162,7 @@
 						gs.defaultConf.zoom = "1";
 					}
 				}
-			
+
 				// set up the classes we need
 				if (!styled) {
 					styled = true;
@@ -197,11 +198,11 @@
 				}
 				this.midWrapper.children("div:eq("+treecol+")").append(container);
 				container.addClass("jstree-grid-cell");
-				
+
 				this._initialized = true;
 			}
 		};
-		this.init = function (el,options) { 
+		this.init = function (el,options) {
 			parent.init.call(this,el,options);
 			this._initialize();
 		};
@@ -209,8 +210,10 @@
 			parent.bind.call(this);
 			this._initialize();
 			this.element
-			.on("move_node.jstree create_node.jstree clean_node.jstree change_node.jstree", $.proxy(function (e, data) { 
+			.on("move_node.jstree create_node.jstree clean_node.jstree change_node.jstree", $.proxy(function (e, data) {
 				var target = this.get_node(data || "#",true);
+				console.log('prepare');
+				return false;
 				this._prepare_grid(target);
 			}, this))
 			.on("delete_node.jstree",$.proxy(function (e,data) {
@@ -243,7 +246,7 @@
 
 				// add container classes to the wrapper
 				this.gridWrapper.addClass(this.element.attr("class"));
-								
+
 			},this))
 			.on("move_node.jstree",$.proxy(function(e,data){
 				var node = data.new_instance.element;
@@ -252,7 +255,7 @@
 				node.find("li > a").each($.proxy(function(i,elm){
 					//renderAWidth($(elm),this);
 				},this));
-				
+
 			},this))
 			.on("hover_node.jstree",$.proxy(function(node,selected,event){
 				var id = selected.node.id;
@@ -322,6 +325,13 @@
 						data.rslt.obj.children("a").nextAll("div").removeClass("ui-state-hover");
 					},this));
 			}
+
+			if (this._gridSettings.stateful) {
+				this.element
+					.on("resize_column.jstree-grid",$.proxy(function(e,col,width){
+						localStorage['jstree-root-'+this.rootid+'-column-'+col] = width;
+					},this));
+			}
 		};
 		// tear down the tree entirely
 		this.teardown = function() {
@@ -345,13 +355,13 @@
 		this._prepare_headers = function() {
 			var header, i, col, gs = this._gridSettings,cols = gs.columns || [], width, defaultWidth = gs.columnWidth, resizable = gs.resizable || false,
 			cl, ccl, val, margin, last, tr = gs.isThemeroller, classAdd = (tr?"themeroller":"regular"), puller,
-			hasHeaders = false, gridparent = this.gridparent,
+			hasHeaders = false, gridparent = this.gridparent, rootid = this.rootid,
 			conf = gs.defaultConf,
 			borPadWidth = 0, totalWidth = 0;
 			// save the original parent so we can reparent on destroy
 			this.parent = gridparent;
-			
-			
+
+
 			// create the headers
 			for (i=0;i<cols.length;i++) {
 				//col = $("<col/>");
@@ -360,7 +370,10 @@
 				ccl = cols[i].columnClass || "";
 				val = cols[i].header || "";
 				if (val) {hasHeaders = true;}
-				width = cols[i].width || defaultWidth;
+				if(gs.stateful && localStorage['jstree-root-'+rootid+'-column-'+i])
+					width = localStorage['jstree-root-'+rootid+'-column-'+i];
+				else
+					width = cols[i].width || defaultWidth;
 
 				// we only deal with borders if width is not auto and not percentages
 				borPadWidth = tr ? 1+6 : 2+8; // account for the borders and padding
@@ -408,28 +421,28 @@
 						width = ref._gridSettings.columns[colNum].width = parseFloat(toResize.css("width"));
 						isClickedSep = false;
 						toResize = null;
-						
+
 						currentTree.trigger("resize_column.jstree-grid", [colNum,width]);
 					}
 				}).mousemove(function (e) {
 						if (isClickedSep) {
 							newMouseX = e.pageX;
 							var diff = newMouseX - oldMouseX,
-							oldPrevHeaderInner, 
+							oldPrevHeaderInner,
 							oldPrevColWidth, newPrevColWidth;
 
 							if (diff !== 0){
 								oldPrevHeaderInner = toResize.width();
 								oldPrevColWidth = parseFloat(toResize.css("width"));
-								
+
 								// handle a Chrome issue with columns set to auto
 								// thanks to Brabus https://github.com/side-by-side
 								if (!oldPrevColWidth) {oldPrevColWidth = toResize.innerWidth();}
-								
+
 								// make sure that diff cannot be beyond the left/right limits
 								diff = diff < 0 ? Math.max(diff,-oldPrevHeaderInner) : diff;
 								newPrevColWidth = oldPrevColWidth+diff;
-								
+
 								// only do this if we are not shrinking past 0 on left - and limit it to that amount
 								if ((diff > 0 || oldPrevHeaderInner > 0) && newPrevColWidth > MINCOLWIDTH) {
 									toResize.width(newPrevColWidth+"px");
@@ -440,8 +453,8 @@
 							}
 						}
 					});
-				this.gridWrapper.on("selectstart", ".jstree-grid-resizable-separator", function () { 
-					return false; 
+				this.gridWrapper.on("selectstart", ".jstree-grid-resizable-separator", function () {
+					return false;
 				}).on("mousedown", ".jstree-grid-resizable-separator", function (e) {
 					isClickedSep = true;
 					oldMouseX = e.pageX;
@@ -454,8 +467,8 @@
 					oldPrevColWidth = parseFloat(col.css("width")), newWidth = 0, diff,
 					colNum = col.prevAll(".jstree-grid-column").length,
 					oldPrevHeaderInner = col.width(), newPrevColWidth;
-					
-			
+
+
 					//find largest width
 					col.find(".jstree-grid-cell").each(function() {
 						var item = $(this), width;
@@ -463,18 +476,18 @@
 						item.css("width", "auto");
 						width = item.outerWidth();
 						item.css("position", "relative");
-					
+
 						if (width>newWidth) {
 							newWidth = width;
 						}
 					});
-				
+
 					diff = newWidth-oldPrevColWidth;
-				
+
 					// make sure that diff cannot be beyond the left limits
 					diff = diff < 0 ? Math.max(diff,-oldPrevHeaderInner) : diff;
 					newPrevColWidth = (oldPrevColWidth+diff)+"px";
-				
+
 					col.width(newPrevColWidth);
 					col.css("min-width",newPrevColWidth);
 					col.css("max-width",newPrevColWidth);
@@ -584,8 +597,8 @@
 						"blur" : $.proxy(function () {
 							var v = h2.val();
 							// save the value if changed
-							if(v === "" || v === t) { 
-								v = t; 
+							if(v === "" || v === t) {
+								v = t;
 							} else {
 								obj.data[col.value] = v;
 								this.element.trigger('update_cell.jstree-grid',{node:obj, col:col.value, value:v, old:t});
@@ -631,7 +644,7 @@
 			h2.css(fn).width(Math.min(h1.text("pW" + h2[0].value).width(),w))[0].select();
 		};
 		this._prepare_grid = function (obj) {
-			var gs = this._gridSettings, c = gs.treeClass, _this = this, t, cols = gs.columns || [], width, tr = gs.isThemeroller, 
+			var gs = this._gridSettings, c = gs.treeClass, _this = this, t, cols = gs.columns || [], width, tr = gs.isThemeroller,
 			tree = this.element, rootid = this.rootid,
 			classAdd = (tr?"themeroller":"regular"), img, objData = this.get_node(obj),
 			defaultWidth = gs.columnWidth, conf = gs.defaultConf, cellClickHandler = function (tree,node,val,col,t) {
@@ -660,7 +673,7 @@
 				return function() { jsTreeInstance.dehover_node(node); };
 			},
 			i, val, cl, wcl, ccl, a, last, valClass, wideValClass, span, paddingleft, title, gridCellName, gridCellParentId, gridCellParent,
-			gridCellPrev, gridCellPrevId, gridCellNext, gridCellNextId, gridCellChild, gridCellChildId, 
+			gridCellPrev, gridCellPrevId, gridCellNext, gridCellNextId, gridCellChild, gridCellChildId,
 			col, content, tmpWidth, mw = this.midWrapper, dataCell, lid = objData.id,
 			peers = this.get_node(objData.parent).children,
 			// find my position in the list of peers. "peers" is the list of everyone at my level under my parent, in order
@@ -668,10 +681,10 @@
 			hc = this.holdingCells, rendered = false, closed;
 			// get our column definition
 			t = $(obj);
-			
+
 			// find the a children
 			a = t.children("a");
-			
+
 			if (a.length === 1) {
 				closed = !objData.state.opened;
 				gridCellName = GRIDCELLID_PREFIX+escapeId(lid)+GRIDCELLID_POSTFIX;
@@ -707,7 +720,7 @@
 					} else {
 						val = "";
 					}
-					
+
 					if (typeof(col.format) === "function") {
 						val = col.format(val);
 					}
@@ -717,7 +730,7 @@
 					img = col.images[val] || col.images["default"];
 					if (img) {content = img[0] === "*" ? '<span class="'+img.substr(1)+'"></span>' : '<img src="'+img+'">';}
 					} else { content = val; }
-					
+
 					// content cannot be blank, or it messes up heights
 					if (content === undefined || content === null || BLANKRE.test(content)) {
 						content = "&nbsp;";
@@ -737,14 +750,14 @@
 					title = col.title && objData.data !== null && objData.data !== undefined ? objData.data[col.title] || "" : "";
 					// strip out HTML
 					title = title.replace(htmlstripre, '');
-					
+
 					// get the width
 					paddingleft = 7;
 					width = col.width || defaultWidth;
 					if (width !== 'auto') {
 						width = tmpWidth || (width - paddingleft);
 					}
-					
+
 					last = findDataCell(dataCell, lid);
 					if (!last || last.length < 1) {
 						last = $("<div></div>");
@@ -767,9 +780,9 @@
 					// here is the logic for jstree drawing:
 					//   it draws peers from first to last or from last to first
 					//   it draws children before a parent
-					// 
+					//
 					// so I can rely on my *parent* not being drawn, but I cannot rely on my previous peer or my next peer being drawn
-					
+
 					// so we do the following:
 					//   1- We are the first child: install after the parent
 					//   2- Our previous peer is already drawn: install after the previous peer
@@ -829,19 +842,19 @@
 					last.click(cellClickHandler(tree,t,val,col,this));
 					last.on("contextmenu",cellRightClickHandler(tree,t,val,col,this));
 					last.hover(hoverInHandler(t, this), hoverOutHandler(t, this));
-					
+
 					if (title) {
 						span.attr("title",title);
 					}
 
-				}		
+				}
 				last.addClass("jstree-grid-cell-last"+(tr?" ui-state-default":""));
 				// if there is no width given for the last column, do it via automatic
 				if (cols[cols.length-1].width === undefined) {
 					last.addClass("jstree-grid-width-auto").next(".jstree-grid-separator").remove();
 				}
 			}
-			this.element.css({'overflow-y':'auto !important'});			
+			this.element.css({'overflow-y':'auto !important'});
 		};
 		// clean up holding cells
 		this.holdingCells = {};

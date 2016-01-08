@@ -1,10 +1,10 @@
 //##############################################################################
 // PAGETREE
 
-$pagetree-icon-size: 18px;
-$pagetree-icon-offset: 4px;
-$pagetree-lang-size: 14px;
-$pagetree-tooltip-min-width: 130px;
+// INFO: please not that all related styles to the pagetree itselfs are
+// handled through theming via `static/js/libs/jstree/themes/django-cms`.
+// This part only handles elements such as icons, tooltips, language display,
+// search and filtering
 
 .cms-pagetree-container,
 .cms-pagetree {
@@ -13,15 +13,17 @@ $pagetree-tooltip-min-width: 130px;
         display: none !important;
     }
 }
+.hidden {
+    display: none !important;
+}
 
 .cms-tree-col {
-    height: 24px;
+    height: $pagetree-header-height;
 }
 
 .cms-tree-item {
     display: inline-block;
 }
-
 
 //###########################################################
 // TOOLTIP
@@ -29,9 +31,10 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-tooltip-container {
     display: none;
     position: absolute;
-    right: 20px;
-    top: -5px;
+    right: $pagetree-tooltip-offset;
+    top: -$pagetree-icon-offset + 1;
     z-index: 100;
+    text-align: left;
     border-radius: $border-radius-base;
     background: $white;
     border: 1px solid $gray-lighter;
@@ -41,7 +44,7 @@ $pagetree-tooltip-min-width: 130px;
         content: "";
         position: absolute;
         left: 100%;
-        top: 7px;
+        top: $pagetree-icon-offset + 2;
         z-index: 1;
         width: $dropdown-arrow-side;
         height: $dropdown-arrow-side;
@@ -58,7 +61,7 @@ $pagetree-tooltip-min-width: 130px;
         font-size: $font-size-small;
         font-weight: normal;
         text-transform: uppercase;
-        padding: 2px 10px;
+        padding: $pagetree-tooltip-header-padding;
         margin: 0 !important;
         border-bottom: 1px solid $gray-lighter;
         background: $white;
@@ -66,7 +69,7 @@ $pagetree-tooltip-min-width: 130px;
 
     a {
         display: block;
-        padding: 10px;
+        padding: $pagetree-tooltip-anchor-padding;
         min-width: $pagetree-tooltip-min-width;
         text-transform: none;
         border-bottom: 1px solid $gray-lighter;
@@ -100,6 +103,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item-icons {
     position: relative;
     top: $pagetree-icon-offset;
+    padding: $pagetree-icon-padding;
 
     span:before {
         color: $gray-light;
@@ -115,7 +119,9 @@ $pagetree-tooltip-min-width: 130px;
 // shows preview eye icon
 .cms-tree-item-preview {
     position: relative;
+    // need custom positioning here
     top: 1px;
+    left: 3px;
 
     a {
         @extend %icon;
@@ -147,8 +153,12 @@ $pagetree-tooltip-min-width: 130px;
     // required for tooltip
     position: relative;
     top: $pagetree-icon-offset;
+    .cms-tree-tooltip-container {
+        right: $pagetree-tooltip-offset - 3;
+    }
 }
 .cms-tree-lang-container span {
+    box-sizing: border-box;
     display: inline-block;
     width: $pagetree-lang-size;
     height: $pagetree-lang-size;
@@ -194,14 +204,14 @@ $pagetree-tooltip-min-width: 130px;
 // shows language bubbles
 .cms-tree-item-menu {
     position: relative;
-    top: $pagetree-icon-offset;
+    top: $pagetree-icon-offset - 1;
 
     .cms-icon:before {
-        font-size: $pagetree-icon-size;
-        color: $gray-light;
-    }
-    .cms-icon-check:before {
+        font-size: $pagetree-icon-size - 4;
         color: $gray-darker;
+    }
+    .cms-icon-check-square:before {
+        color: $color-success;
     }
 }
 
@@ -211,6 +221,7 @@ $pagetree-tooltip-min-width: 130px;
 .cms-tree-item-info {
     position: relative;
     top: $pagetree-icon-offset;
+    left: 1px;
 
     .cms-icon:before {
         font-size: $pagetree-icon-size;
@@ -239,14 +250,14 @@ $pagetree-tooltip-min-width: 130px;
     select {
         position: relative;
         top: 2px;
-        width: 175px !important;
+        width: $pagetree-search-width !important;
     }
     // need to overwrite djangocms-admin-theme
     #toolbar form#changelist-search input[type="submit"] {
         margin-left: 0 !important;
     }
     #toolbar form#changelist-search #searchbar {
-        width: 175px !important;
+        width: $pagetree-search-width !important;
     }
 }
 .cms-tree-filters {
@@ -255,6 +266,7 @@ $pagetree-tooltip-min-width: 130px;
         position: absolute;
         top: 0;
         right: 0;
+        padding-right: 20px;
         line-height: 30px;
         width: 175px;
         border-bottom: 1px solid $gray-lighter;
@@ -265,38 +277,7 @@ $pagetree-tooltip-min-width: 130px;
 }
 
 //###########################################################
-// HELPERS
-// helpers for copy and pasting
-.cms-tree-item-helpers {}
-.cms-tree-node {
-    transition: background $speed-base;
-}
-.cms-tree-node-success {
-    background: $color-success !important;
-}
-
-//###########################################################
-// TREE HACKS (temporary)
-.jstree-grid-column,
-.jstree-grid-cell {
-    overflow: visible !important;
-}
-.jstree-grid-header {
-    font-size: $font-size-small;
-    text-align: center;
-    .jstree-grid-column-0 & {
-        text-align: left;
-    }
-}
-.jstree-grid-cell {
-    padding: 0 10px !important;
-}
-.jstree-grid-wrapper {
-    overflow: visible !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-.jstree-container-ul {
-    padding: 0 !important;
-    margin: 0 !important;
+// django default admin theme adaptions
+.cms-tree-col {
+    line-height: 16px;
 }

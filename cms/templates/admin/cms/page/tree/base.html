@@ -13,8 +13,6 @@
     {# INFO: we need to add styles here instead of "extrastyle" to avoid conflicts with adminstyle #}
     <link rel="stylesheet" href="{% static 'cms/css/cms.base.css' %}">
     <link rel="stylesheet" href="{% static 'cms/css/cms.pagetree.css' %}">
-    <link rel="stylesheet" href="{% static 'cms/js/jstree/tree_component.css' %}">
-    <link rel="stylesheet" href="{% static 'cms/js/libs/jstree/themes/default/style.min.css' %}">
     <script src="{% static 'cms/js/modules/jquery.noconflict.pre.js' %}"></script>
     <script src="{% static 'cms/js/dist/bundle.admin.base.min.js' %}"></script>
     <script src="{% static 'cms/js/libs/jstree/jstree.js' %}"></script>
@@ -99,7 +97,6 @@
 
 {% block result_list %}
     <div class="clear"></div>
-    <h2>{% trans "Pages" %}</h2>
 
     {# INFO: javascript is loaded from cms.pagetree.js #}
     {% if cl.get_items or cl.get_items and cl.is_filtered %}
@@ -109,7 +106,8 @@
                     "tree": "{% url 'admin:get_tree' %}",
                     "move": "./{id}/move-page/",
                     "copy": "./{id}/copy-page/",
-                    "copyPermission": "./{id}/dialog/copy/"
+                    "copyPermission": "./{id}/dialog/copy/",
+                    "theme": "{% static 'cms/css/' %}"
                 },
                 "csrf": "{{ csrf_token }}",
                 "static": "{{ STATIC_URL }}",
@@ -133,7 +131,8 @@
                     "width": "100%"
                 }, {
                     "title": "&nbsp;",
-                    "key": "view"
+                    "key": "view",
+                    "cls": "jstree-grid-cell-regular-options"
                 }, {
                     "title": "{% trans 'View' %}",
                     "key": "preview"

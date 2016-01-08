@@ -109,7 +109,9 @@ var CMS = window.CMS || {};
      * @uses CMS.API.Helpers
      */
     CMS.PageTree = new CMS.Class({
-
+        // TODO add paste button for root elements
+        // TODO hide paste on origin element for copy & paste
+        // TODO add mechanics to set the home page
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
             this.options = $('.js-cms-pagetree').data('json');
@@ -119,7 +121,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.pagetree';
             this.cacheTarget = null;
             this.cacheType = '';
-            this.successTimer = 600;
+            this.successTimer = 1000;
 
             // elements
             this._setupUI();
@@ -172,7 +174,8 @@ var CMS = window.CMS || {};
                     // just leave the "key" param empty
                     columns.push({
                         header: obj.title,
-                        width: obj.width || '1%'
+                        width: obj.width || '1%',
+                        wideCellClass: obj.cls
                     });
                 } else {
                     columns.push({
@@ -186,7 +189,8 @@ var CMS = window.CMS || {};
                                 return '';
                             }
                         },
-                        width: obj.width || '1%'
+                        width: obj.width || '1%',
+                        wideCellClass: obj.cls
                     });
                 }
             });
@@ -238,7 +242,11 @@ var CMS = window.CMS || {};
                         that.showError(error.reason);
                     },
                     themes: {
-                        name: 'default'
+                        name: 'django-cms',
+                        url: true,
+                        // custom values specific for django-cms theme
+                        dir: this.options.urls.theme/*,
+                        //icons: false*/
                     }
                 },
                 // activate drag and drop plugin
@@ -280,6 +288,9 @@ var CMS = window.CMS || {};
                 } else {
                     that._copyNode(obj);
                 }
+                // we need to open the parent node if we trigger an element
+                // if not already opened
+                that.ui.tree.jstree('open_node', obj.parent);
             });
 
             // set event for cut and paste

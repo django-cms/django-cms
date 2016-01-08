@@ -44,77 +44,89 @@
     @if $filename == check-o {
         $char: "E006";
     }
-    @if $filename == check {
+    @if $filename == check-square {
         $char: "E007";
     }
-    @if $filename == close {
+    @if $filename == check {
         $char: "E008";
     }
-    @if $filename == cogs {
+    @if $filename == close {
         $char: "E009";
     }
-    @if $filename == copy {
+    @if $filename == cogs {
         $char: "E00A";
     }
-    @if $filename == eye {
+    @if $filename == copy {
         $char: "E00B";
     }
-    @if $filename == forbidden {
+    @if $filename == eye {
         $char: "E00C";
     }
-    @if $filename == handler {
+    @if $filename == forbidden {
         $char: "E00D";
     }
-    @if $filename == home {
+    @if $filename == handler {
         $char: "E00E";
     }
-    @if $filename == info {
+    @if $filename == home {
         $char: "E00F";
     }
-    @if $filename == loader {
+    @if $filename == info {
         $char: "E010";
     }
-    @if $filename == lock {
+    @if $filename == loader {
         $char: "E011";
     }
-    @if $filename == logo {
+    @if $filename == lock {
         $char: "E012";
     }
-    @if $filename == menu {
+    @if $filename == logo {
         $char: "E013";
     }
-    @if $filename == minimize {
+    @if $filename == menu {
         $char: "E014";
     }
-    @if $filename == minus {
+    @if $filename == minimize {
         $char: "E015";
     }
-    @if $filename == paste {
+    @if $filename == minus-square-o {
         $char: "E016";
     }
-    @if $filename == pencil {
+    @if $filename == minus-square {
         $char: "E017";
     }
-    @if $filename == pin {
+    @if $filename == minus {
         $char: "E018";
     }
-    @if $filename == plus {
+    @if $filename == paste {
         $char: "E019";
     }
-    @if $filename == puzzle {
+    @if $filename == pencil {
         $char: "E01A";
     }
-    @if $filename == scissors {
+    @if $filename == pin {
         $char: "E01B";
     }
-    @if $filename == search {
+    @if $filename == plus-square-o {
         $char: "E01C";
     }
-    @if $filename == sitemap {
+    @if $filename == plus {
         $char: "E01D";
     }
-    @if $filename == window {
+    @if $filename == puzzle {
         $char: "E01E";
+    }
+    @if $filename == scissors {
+        $char: "E01F";
+    }
+    @if $filename == search {
+        $char: "E020";
+    }
+    @if $filename == sitemap {
+        $char: "E021";
+    }
+    @if $filename == window {
+        $char: "E022";
     }
 
     @return $char;
@@ -158,6 +170,10 @@
 
 .cms-icon-check-o {
     @include icon(check-o);
+}
+
+.cms-icon-check-square {
+    @include icon(check-square);
 }
 
 .cms-icon-check {
@@ -216,6 +232,14 @@
     @include icon(minimize);
 }
 
+.cms-icon-minus-square-o {
+    @include icon(minus-square-o);
+}
+
+.cms-icon-minus-square {
+    @include icon(minus-square);
+}
+
 .cms-icon-minus {
     @include icon(minus);
 }
@@ -230,6 +254,10 @@
 
 .cms-icon-pin {
     @include icon(pin);
+}
+
+.cms-icon-plus-square-o {
+    @include icon(plus-square-o);
 }
 
 .cms-icon-plus {
