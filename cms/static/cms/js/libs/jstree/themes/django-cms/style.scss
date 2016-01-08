@@ -176,9 +176,11 @@
         text-align: right;
     }
     // hover states
-    .jstree-hovered,
+    .jstree-hovered {
+        background-color: $gray-lightest !important;
+    }
     .jstree-clicked {
-        background-color: $gray-lightest;
+        background-color: lighten($gray-lightest, 3%);
     }
 }
 
