@@ -1,5 +1,6 @@
 === 3.2.1 (Unreleased) ===
 
+- Add support for django-reversion 1.10+
 - Fixed an issue with refreshing the UI when switching CMS language
 - Fixed an issue with sideframe urls not being remembered after reload
 - Added placeholder name to the edit tooltip
