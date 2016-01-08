@@ -1,0 +1,283 @@
+//##############################################################################
+// PAGETREE
+
+// INFO: please not that all related styles to the pagetree itselfs are
+// handled through theming via `static/js/libs/jstree/themes/django-cms`.
+// This part only handles elements such as icons, tooltips, language display,
+// search and filtering
+
+.cms-pagetree-container,
+.cms-pagetree {
+    // helper classes
+    .cms-hidden {
+        display: none !important;
+    }
+}
+.hidden {
+    display: none !important;
+}
+
+.cms-tree-col {
+    height: $pagetree-header-height;
+}
+
+.cms-tree-item {
+    display: inline-block;
+}
+
+//###########################################################
+// TOOLTIP
+// handles tooltip styling
+.cms-tree-tooltip-container {
+    display: none;
+    position: absolute;
+    right: $pagetree-tooltip-offset;
+    top: -$pagetree-icon-offset + 1;
+    z-index: 100;
+    text-align: left;
+    border-radius: $border-radius-base;
+    background: $white;
+    border: 1px solid $gray-lighter;
+
+    // icon on the right
+    &:before {
+        content: "";
+        position: absolute;
+        left: 100%;
+        top: $pagetree-icon-offset + 2;
+        z-index: 1;
+        width: $dropdown-arrow-side;
+        height: $dropdown-arrow-side;
+        margin-left: -($dropdown-arrow-side / 2);
+        transform: rotate(45deg);
+        box-shadow: $dropdown-shadow;
+        background-color: $submenu-dropdown-bgcolor;
+    }
+
+    h3 {
+        position: relative;
+        z-index: 10;
+        color: $gray-light;
+        font-size: $font-size-small;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: $pagetree-tooltip-header-padding;
+        margin: 0 !important;
+        border-bottom: 1px solid $gray-lighter;
+        background: $white;
+    }
+
+    a {
+        display: block;
+        padding: $pagetree-tooltip-anchor-padding;
+        min-width: $pagetree-tooltip-min-width;
+        text-transform: none;
+        border-bottom: 1px solid $gray-lighter;
+
+        &:hover,
+        &:link:hover {
+            color: darken($color-primary, 10%) !important;
+        }
+        &:last-child {
+            border: none;
+        }
+    }
+
+    .cms-icon {
+        position: relative;
+        top: 3px;
+        left: -1px;
+    }
+    // open state
+    &-open {
+        display: block;
+    }
+}
+.cms-tree-tooltip-wrapper {
+    padding: 10px;
+}
+
+//###########################################################
+// ICONS
+// used for the sitemap and apphook icons
+.cms-tree-item-icons {
+    position: relative;
+    top: $pagetree-icon-offset;
+    padding: $pagetree-icon-padding;
+
+    span:before {
+        color: $gray-light;
+    }
+
+    &-dark span:before {
+        color: $gray-darker;
+    }
+}
+
+//###########################################################
+// PREVIEW
+// shows preview eye icon
+.cms-tree-item-preview {
+    position: relative;
+    // need custom positioning here
+    top: 1px;
+    left: 3px;
+
+    a {
+        @extend %icon;
+        @include icon(eye);
+        font-size: $pagetree-icon-size;
+
+        &:before {
+            color: $gray-darker;
+        }
+        &:hover:before {
+            color: $black;
+        }
+    }
+    span {
+        display: inline-block;
+        @include hide-content();
+    }
+
+    // active state for current selected page
+    &-active a:before {
+        color: $black;
+    }
+}
+
+//###########################################################
+// LANGUAGE
+// shows language bubbles
+.cms-tree-item-lang {
+    // required for tooltip
+    position: relative;
+    top: $pagetree-icon-offset;
+    .cms-tree-tooltip-container {
+        right: $pagetree-tooltip-offset - 3;
+    }
+}
+.cms-tree-lang-container span {
+    box-sizing: border-box;
+    display: inline-block;
+    width: $pagetree-lang-size;
+    height: $pagetree-lang-size;
+    border-radius: 100%;
+    // will change according to states
+    border: 1px solid $white;
+    background: $white;
+    &.empty {
+        border-color: $gray-light;
+        background-color: $white;
+    }
+    &.unpublished,
+    &.unpublishedparent {
+        border-color: $gray-light;
+        background-color: $gray-light;
+    }
+    &.published {
+        border-color: $color-success;
+        background-color: $color-success;
+    }
+    &.dirty {
+        animation: pulsate 2.5s ease-out infinite;
+        border-color: $color-primary;
+        background-color: $color-primary;
+    }
+}
+
+// animation for publishing
+@keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}
+
+//###########################################################
+// LANGUAGE
+// shows language bubbles
+.cms-tree-item-menu {
+    position: relative;
+    top: $pagetree-icon-offset - 1;
+
+    .cms-icon:before {
+        font-size: $pagetree-icon-size - 4;
+        color: $gray-darker;
+    }
+    .cms-icon-check-square:before {
+        color: $color-success;
+    }
+}
+
+//###########################################################
+// INFO
+// icon used at the end to display additional help
+.cms-tree-item-info {
+    position: relative;
+    top: $pagetree-icon-offset;
+    left: 1px;
+
+    .cms-icon:before {
+        font-size: $pagetree-icon-size;
+    }
+
+    p {
+        color: $gray-darkest;
+        padding: 0;
+        margin: 0;
+    }
+    strong {
+        color: $gray-light;
+        font-weight: normal;
+    }
+}
+
+//###########################################################
+// SEARCH & FILTERING
+// searchform or filtering
+.cms-tree-search {
+    float: left;
+    margin-right: 5px;
+    label {
+        display: none !important;
+    }
+    select {
+        position: relative;
+        top: 2px;
+        width: $pagetree-search-width !important;
+    }
+    // need to overwrite djangocms-admin-theme
+    #toolbar form#changelist-search input[type="submit"] {
+        margin-left: 0 !important;
+    }
+    #toolbar form#changelist-search #searchbar {
+        width: $pagetree-search-width !important;
+    }
+}
+.cms-tree-filters {
+    float: right;
+    .js-cms-tree-filter-trigger {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding-right: 20px;
+        line-height: 30px;
+        width: 175px;
+        border-bottom: 1px solid $gray-lighter;
+    }
+    h2 {
+        display: none;
+    }
+}
+
+//###########################################################
+// django default admin theme adaptions
+.cms-tree-col {
+    line-height: 16px;
+}
