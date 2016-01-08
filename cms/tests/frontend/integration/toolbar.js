@@ -4,7 +4,6 @@
 // Toolbar behaviour
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').toolbar;
 var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
@@ -29,7 +28,8 @@ casper.test.begin('Toolbar Visibility', function (test) {
         .start(globals.baseUrl)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertEquals(
-                this.getElementAttribute('.cms-toolbar-item-logo a', 'href'), '/', messages.logoUrlCorrect
+                this.getElementAttribute('.cms-toolbar-item-logo a', 'href'), '/',
+                'The django CMS logo redirects to homepage'
             );
 
             this.click('.cms-toolbar-trigger');
@@ -39,7 +39,7 @@ casper.test.begin('Toolbar Visibility', function (test) {
                 return parseInt($('.cms-toolbar').css('marginTop'), 10);
             });
 
-            test.assertTruthy(toolbarOffset < 0, messages.toolbarClosed);
+            test.assertTruthy(toolbarOffset < 0, 'Toolbar can be closed on trigger click');
 
             this.click('.cms-toolbar-trigger');
         })
@@ -48,7 +48,7 @@ casper.test.begin('Toolbar Visibility', function (test) {
                 return parseInt($('.cms-toolbar').css('marginTop'), 10);
             });
 
-            test.assertTruthy(toolbarOffset === 0, messages.toolbarOpened);
+            test.assertTruthy(toolbarOffset === 0, 'Toolbar can be opened on trigger click');
         })
         .run(function () {
             test.done();

@@ -5,7 +5,6 @@
 // Publishing a page with a publish date
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.publish;
 var cms = require('./helpers/cms')();
 
 var SECOND_PAGE_TITLE = 'Second'; // we rely on slug being "/second"
@@ -39,13 +38,13 @@ casper.test.begin('Publishing a page with publish button', function (test) {
             test.assertSelectorHasText(
                 '.cms-publish-page',
                 'Publish page now',
-                messages.pageIsUnpublished
+                'Page is unpublished'
             );
         })
         .then(cms.logout())
         // check that the page is 404
         .thenOpen(pageUrl, function () {
-            test.assertTitleMatch(/Page not found/, messages.pageNotYetAvailable);
+            test.assertTitleMatch(/Page not found/, 'The page is not yet available');
         })
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
@@ -63,7 +62,7 @@ casper.test.begin('Publishing a page with publish button', function (test) {
         .then(cms.logout())
         // open a page and check if it's published for non-logged in user
         .thenOpen(pageUrl, function () {
-            test.assertTitleMatch(new RegExp(pageTitle), messages.pageIsAvailable);
+            test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
         })
         .then(function () {
             this.removeAllFilters();
@@ -93,7 +92,7 @@ casper.test.begin('Publishing dates', function (test) {
             test.assertSelectorHasText(
                 '.cms-publish-page',
                 'Publish page now',
-                messages.pageIsUnpublished
+                'Page is unpublished'
             );
 
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -164,16 +163,16 @@ casper.test.begin('Publishing dates', function (test) {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
         .waitForSelector('body', function () {
-            test.assertDoesntExist('.cms-toolbar', messages.logoutSuccessful);
+            test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
         })
         // going to the newly created page url and checking that it hasn't been published yet
         .thenOpen(pageUrl, function () {
-            test.assertTitleMatch(/Page not found/, messages.pageNotYetAvailable);
+            test.assertTitleMatch(/Page not found/, 'The page is not yet available');
         })
         // trying the same in a minute and a half (to be completely sure)
         .wait(90000)
         .thenOpen(pageUrl, function () {
-            test.assertTitleMatch(new RegExp(pageTitle), messages.pageIsAvailable);
+            test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
         })
         .run(function () {
             this.removeAllFilters('page.confirm');

@@ -5,7 +5,6 @@
 
 var globals = require('./settings/globals');
 var content = require('./settings/globals').content.page;
-var messages = require('./settings/messages').page.creation;
 var cms = require('./helpers/cms')();
 
 casper.test.setUp(function (done) {
@@ -28,17 +27,17 @@ casper.test.begin('Add First Page', function (test) {
             this.click('.cms-modal .cms-modal-close');
         })
         .waitWhileVisible('.cms-modal', function () {
-            test.assertNotVisible('.cms-modal', messages.wizard.closed);
+            test.assertNotVisible('.cms-modal', 'The wizard pop up is closed');
 
             this.click('.js-welcome-add');
         })
         .waitUntilVisible('.cms-modal', function () {
-            test.assertVisible('.cms-modal', messages.wizard.opened);
+            test.assertVisible('.cms-modal', 'The wizard pop up is opened');
 
             this.click('.cms-modal-buttons .cms-btn-action');
         })
         .withFrame(0, function () {
-            test.assertExists('#id_1-title', messages.wizard.formAvailable);
+            test.assertExists('#id_1-title', 'The page creation wizard form is available');
 
             this.fill('.cms-content-wizard form', {
                 '1-title': content.title,
@@ -46,7 +45,8 @@ casper.test.begin('Add First Page', function (test) {
             }, true);
         })
         .waitForSelector('.cms-ready', function () {
-            test.assertSelectorHasText('.cms-plugin', content.text, messages.created);
+            test.assertSelectorHasText('.cms-plugin', content.text,
+                'The new page has been created and its content is correct');
 
             // handles confirm popup
             this.setFilter('page.confirm', function () {
@@ -56,7 +56,7 @@ casper.test.begin('Add First Page', function (test) {
             this.click('.cms-btn-publish');
         })
         .waitForSelector('.cms-btn-switch-edit', function () {
-            test.assertExists('.cms-btn-switch-edit', messages.published);
+            test.assertExists('.cms-btn-switch-edit', 'The new page has been published');
         })
         .run(function () {
             this.removeAllFilters('page.confirm');

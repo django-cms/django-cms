@@ -5,7 +5,6 @@
 // Edit utils page content
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.editUtils;
 var casperjs = require('casper');
 var cms = require('./helpers/cms')(casperjs);
 
@@ -77,7 +76,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber + 1,
-                messages.copySuccessful
+                'Copy plugin successful'
             );
         })
         // wait till the paste actually succeeds
@@ -88,7 +87,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber + 1,
-                messages.copySuccessful
+                'Copy plugin successful'
             );
         })
 
@@ -117,7 +116,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber - 1,
-                messages.deleteSuccessful
+                'Delete plugin successful'
             );
         })
 
@@ -143,7 +142,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber - 1,
-                messages.cutSuccessful
+                'Cut plugin successful'
             );
         })
         // click on settings bar for current structure content block
@@ -159,7 +158,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber,
-                messages.pasteAfterCutSuccessful
+                'Paste after cutting plugin successful'
             );
         })
 
@@ -174,7 +173,7 @@ casper.test.begin('Edit utils page content', function (test) {
             test.assertElementCount(
                 '.cms-structure .cms-draggables .cms-draggable',
                 contentNumber,
-                messages.pasteAfterCutSuccessful
+                'Paste after cutting plugin successful'
             );
         })
         .run(function () {

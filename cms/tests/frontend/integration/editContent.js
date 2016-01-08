@@ -4,7 +4,6 @@
 // Edit page content
 
 var globals = require('./settings/globals');
-var messages = require('./settings/messages').page.editContent;
 var randomString = require('./helpers/randomString').randomString;
 // random text string for filtering and content purposes
 var randomText = randomString({ length: 50, withWhitespaces: false });
@@ -72,7 +71,7 @@ casper.test.begin('Edit content', function (test) {
             test.assertSelectorHasText(
                 '.cms-plugin:last-child',
                 randomText,
-                messages.contentUpdatedDoubleClick
+                'Content has been updated by double click within the Content mode'
             );
         })
         // go to the Structure mode
@@ -87,7 +86,7 @@ casper.test.begin('Edit content', function (test) {
         })
         // check if edit modal window appeared
         .waitUntilVisible('.cms-modal-open', function () {
-            test.assertVisible('.cms-modal-open', messages.modalAppearsAfterEditButton);
+            test.assertVisible('.cms-modal-open', 'Modal window appears after Edit button click in the Structure mode');
         })
         // close edit modal
         .then(function () {
@@ -124,7 +123,7 @@ casper.test.begin('Edit content', function (test) {
             test.assertSelectorHasText(
                 '.cms-plugin:last-child',
                 previousContentText,
-                messages.contentUpdatedDoubleClickStructure
+                'Content has been updated by double click within the Content mode'
             );
         })
         .run(function () {
