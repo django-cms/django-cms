@@ -322,7 +322,8 @@
 // wrapper added by jstree
 .jstree-grid-wrapper {
     box-sizing: border-box;
-    overflow: visible;
+    overflow: visible !important;
+    width: 100% !important;
 }
 
 //###########################################################
