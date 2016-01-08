@@ -15,6 +15,7 @@
 
 $pagetree-cell-height: 40px;
 $pagetree-nesting-padding: 20px;
+$pagetree-cell-padding: 7px 8px;
 
 //##############################################################################
 // RESET
@@ -132,6 +133,12 @@ $pagetree-nesting-padding: 20px;
     .jstree-closed > .jstree-ocl {
         @include icon(plus-square-o);
     }
+    .jstree-loading > .jstree-ocl {
+        @include icon(loader);
+        &:before {
+            animation: cms-spin 2s infinite linear;
+        }
+    }
 
     //###########################################################
     // background color and paddings for nodes
@@ -168,7 +175,7 @@ $pagetree-nesting-padding: 20px;
     }
     .jstree-grid-cell-regular {
         text-align: center;
-        padding: 7px 10px;
+        padding: $pagetree-cell-padding;
         border-left: 1px solid $gray-lighter;
     }
     .jstree-grid-cell-regular-noborder {
@@ -241,5 +248,3 @@ $pagetree-nesting-padding: 20px;
     width: 0;
     height: 0;
 }
-
-

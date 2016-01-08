@@ -154,6 +154,9 @@ $pagetree-tooltip-min-width: 130px;
     // required for tooltip
     position: relative;
     top: $pagetree-icon-offset;
+    .cms-tree-tooltip-container {
+        right: 22px;
+    }
 }
 .cms-tree-lang-container span {
     display: inline-block;
