@@ -186,7 +186,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Called from admin interface when page is moved. Should be used on
         all the places which are changing page position. Used like an interface
-        to mptt, but after move is done page_moved signal is fired.
+        to django-treebeard, but after move is done page_moved signal is fired.
 
         Note for issue #1166: url conflicts are handled by updated
         check_title_slugs, overwrite_url on the moved page don't need any check

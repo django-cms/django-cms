@@ -63,8 +63,7 @@ class TreePublishRow(Tag):
                 cls = "published"
                 text = _("published")
         else:
-
-            if language in page.languages:
+            if language in list(page.languages):
                 public_pending = page.publisher_public_id and page.publisher_public.get_publisher_state(
                         language) == PUBLISHER_STATE_PENDING
                 if public_pending or page.get_publisher_state(
@@ -160,20 +159,13 @@ def boolean_icon(value):
 def is_restricted(page, request):
     if get_cms_setting('PERMISSION'):
         if hasattr(page, 'permission_restricted'):
-            icon = boolean_icon(bool(page.permission_restricted))
+            text = bool(page.permission_restricted)
         else:
             all_perms = list(get_any_page_view_permissions(request, page))
-            icon = boolean_icon(bool(all_perms))
-        return mark_safe(
-            ugettext('<span>%(icon)s</span>') % {
-                'icon': icon,
-            })
+            text = bool(all_perms)
+        return text
     else:
-        icon = boolean_icon(None)
-        return mark_safe(
-            ugettext('<span>%(icon)s</span>') % {
-                'icon': icon,
-            })
+        return boolean_icon(None)
 
 
 @register.filter
