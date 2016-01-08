@@ -183,7 +183,7 @@
 
 //###########################################################
 // initial loading display of the tree
-.jstree-loading {
+.jstree.jstree-loading {
     .jstree-container-ul {
         margin: 0;
     }
@@ -201,6 +201,7 @@
 
 //###########################################################
 // success animation and paste functionality
+// this should only be attached to the root
 .cms-tree-node-success {
     > .jstree-anchor .jstree-themeicon {
         content: "";
