@@ -232,7 +232,7 @@
     min-width: 300px;
     height: $pagetree-cell-height;
     padding: $pagetree-anchor-padding !important;
-    margin-left: -10px;
+    margin-left: -$pagetree-marker-size + 1;
     border: 1px solid $gray-lighter;
     background: $white;
     // copy icon triggered when pressing `CMD`
