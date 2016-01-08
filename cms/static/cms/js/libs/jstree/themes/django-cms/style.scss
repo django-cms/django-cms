@@ -176,8 +176,9 @@ $pagetree-cell-padding: 7px 8px;
         padding: $pagetree-cell-padding;
         border-left: 1px solid $gray-lighter;
     }
-    .jstree-grid-cell-regular-noborder {
+    .jstree-grid-cell-regular-options {
         border-left: none;
+        text-align: right;
     }
     // hover states
     .jstree-hovered,
@@ -205,7 +206,7 @@ $pagetree-cell-padding: 7px 8px;
 }
 
 //###########################################################
-// success animation
+// success animation and paste functionality
 .cms-tree-node-success {
     > .jstree-anchor .jstree-themeicon {
         content: "";
@@ -214,6 +215,17 @@ $pagetree-cell-padding: 7px 8px;
         color: $color-success;
         @extend %icon;
         @include icon(check);
+    }
+}
+
+.cms-tree-item-helpers a {
+    position: relative;
+    top: 2px;
+    font-size: $font-size-normal;
+    .cms-icon {
+        position: relative;
+        top: 1px;
+        font-size: $font-size-small;
     }
 }
 

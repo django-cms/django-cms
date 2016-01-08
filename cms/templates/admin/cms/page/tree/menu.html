@@ -12,9 +12,6 @@
     data-slug="{{ page.get_slug }}"
     data-colview='
         <div class="cms-tree-col">
-            <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
-                <a href="#" data-id="{{ page.pk }}"><span class="cms-icon cms-icon-alias"></span> {% trans "Paste" %}</a>
-            </div>
             <div class="cms-tree-item cms-tree-item-icons">
                 {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
                 {% if page.soft_root %}
@@ -27,6 +24,9 @@
                         <span class="cms-icon cms-icon-puzzle" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}">
                     </a>
                 {% endif %}
+            </div>
+            <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
+                <a href="#" data-id="{{ page.pk }}"><span class="cms-icon cms-icon-alias"></span> {% trans "Paste" %}</a>
             </div>
         </div>
     '
