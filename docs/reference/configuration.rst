@@ -717,7 +717,54 @@ user under which Django will be running.
 Advanced Settings
 *****************
 
+.. setting:: CMS_INTERNAL_IPS
+
+CMS_INTERNAL_IPS
+================
+
+.. note:: New as of version 3.2.1
+
+This setting is used to determine if the current HTTP client is allowed to see
+the CMS Toolbar, provided that other checks are satisfied.
+
+For backwards compatibility, the default value of this setting is an empty list
+and the default behaviour of the CMS when provided an empty list is to allow all
+IP addresses.
+
+Example::
+
+    # settings.py
+    ...
+    CMS_INTERNAL_IPS = [
+        '10.0.0.1',
+        '10.0.0.2',
+        '10.0.0.3',
+    ]
+    ...
+
+If larger set of IP addresses are to be used, consider installing and using
+`iptools <https://python-iptools.readthedocs.org/en/latest/>`_, which allows
+specifying whole ranges in CIDR notation for IPv4 and IPv6 addresses.
+
+Example using iptools::
+
+    # settings.py
+    ...
+    # This example from the iptools docs at:
+    # https://python-iptools.readthedocs.org/en/latest/#installation
+    CMS_INTERNAL_IPS = iptools.IpRangeList(
+        '127.0.0.1',                # single ip
+        '192.168/16',               # CIDR network block
+        ('10.0.0.1', '10.0.0.19'),  # arbitrary inclusive range
+        '::1',                      # single IPv6 address
+        'fe80::/10',                # IPv6 CIDR block
+        '::ffff:172.16.0.2'         # IPv4-mapped IPv6 address
+    )
+    ...
+
+
 .. setting:: CMS_PERMISSION
+
 
 CMS_PERMISSION
 ==============
