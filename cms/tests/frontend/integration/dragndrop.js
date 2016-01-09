@@ -127,6 +127,10 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
         })
         .waitUntilVisible('.cms-structure')
         // expand the multi columns plugin
+        .thenBypassIf(function () {
+            // if its already expanded, skip
+            return this.visible('.cms-dragitem-text[title*="GridColumnPlugin"]');
+        }, 2)
         .then(function () {
             this.mouse.click(
                 '.cms-dragarea:first-child > .cms-draggables > .cms-draggable > .cms-dragitem-collapsable'
