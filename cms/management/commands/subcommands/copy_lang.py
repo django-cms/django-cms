@@ -64,7 +64,7 @@ class CopyLangCommand(SubcommandsCommand):
                 copy_plugins_to_language(page, from_lang, to_lang, only_empty)
             else:
                 if verbose:
-                    self.stdout.write('Skipping page %s, language %s not defined\n' % (page, from_lang))
+                    self.stdout.write('Skipping page %s, language %s not defined\n' % (page.get_page_title(page.get_languages()[0]), from_lang))
 
         for static_placeholder in StaticPlaceholder.objects.all():
             plugin_list = []

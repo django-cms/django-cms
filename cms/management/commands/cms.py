@@ -29,3 +29,5 @@ class Command(SubcommandsCommand):
         ('uninstall', UninstallCommand),
     ))
     missing_args_message = 'one of the available sub commands must be provided'
+
+    subcommand_dest = 'cmd'
