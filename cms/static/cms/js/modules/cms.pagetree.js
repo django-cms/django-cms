@@ -298,6 +298,7 @@ var CMS = window.CMS || {};
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
                 e.preventDefault();
+                var jsTreeId = that._getNodeId($(this).closest('.jstree-grid-cell'));
                 // resets if we click again
                 if (that.cacheType === 'cut') {
                     that.cacheType = null;
@@ -308,6 +309,8 @@ var CMS = window.CMS || {};
                     that.cacheTarget = $(e.currentTarget);
                     that.cacheType = 'cut';
                     that._showHelpers();
+                    // hide paste for current cut element
+                    $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
                 }
             });
 
