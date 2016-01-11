@@ -504,6 +504,7 @@ var CMS = window.CMS || {};
                 // remove just copied node
                 that.ui.tree.jstree('delete_node', obj.node.id);
                 $('.js-cms-dialog').remove();
+                $('.js-cms-dialog-dimmer').remove();
             }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
                 e.preventDefault();
                 var formData = $(this).closest('form').serialize().split('&');
@@ -533,9 +534,9 @@ var CMS = window.CMS || {};
          * @return {String} jsTree node element id
          */
         _getNodeId: function _getElement(el) {
-            return el.closest('.jstree-grid-cell')
-                .attr('class')
-                .replace(/.*jsgrid_(.+?)_col.*/, '$1');
+            var cls = el.closest('.jstree-grid-cell').attr('class');
+
+            return (cls) ? cls.replace(/.*jsgrid_(.+?)_col.*/, '$1') : false;
         },
 
         /**
@@ -716,6 +717,8 @@ var CMS = window.CMS || {};
             setTimeout(function () {
                 element.removeClass('cms-tree-node-success');
             }, this.successTimer);
+            // hide elements
+            this._hideHelpers();
         },
 
         /**

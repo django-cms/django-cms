@@ -30,7 +30,7 @@
     display: none;
     position: absolute;
     right: $pagetree-tooltip-offset;
-    top: -$pagetree-icon-offset + 1;
+    top: -$pagetree-icon-offset;
     z-index: 100;
     text-align: left;
     border-radius: $border-radius-base;
@@ -445,9 +445,7 @@
         text-align: right;
     }
     // hover states
-    .jstree-hovered {
-        background-color: $gray-lightest !important;
-    }
+    .jstree-hovered,
     .jstree-clicked {
         background-color: lighten($gray-lightest, 3%);
     }
