@@ -15,6 +15,7 @@ module.exports = {
     adminUrl: 'http://localhost:8000/en/admin/login/',
     adminLogoutUrl: 'http://localhost:8000/en/admin/logout/',
     adminPagesUrl: 'http://localhost:8000/en/admin/cms/page/',
+    adminPageUsers: 'http://localhost:8000/en/admin/auth/user/',
     credentials: {
         username: 'admin',
         password: 'admin'
@@ -27,6 +28,10 @@ module.exports = {
     },
     user: {
         // TODO add more data for the new user profile
-        firstName: 'test-first-name'
+        firstName: 'test-first-name',
+        lastName: 'test-last-name',
+        userEmail: 'test@email.com',
+        addUsername: 'test-add-user',
+        addPassword1: 'test',
     }
 };

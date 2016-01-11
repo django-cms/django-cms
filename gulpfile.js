@@ -181,14 +181,14 @@ gulp.task('tests:integration', function (done) {
         'sideframe',
         'createContent',
         'users',
+        'addNewUser',
         'newPage',
         'switchLanguage',
         'editContent',
         'editContentTools',
         'publish',
         'logout',
-        'loginToolbar',
-        'disableToolbar'
+        'loginToolbar'
     ];
     var pre = ['setup'];
 
