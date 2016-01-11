@@ -112,7 +112,7 @@
                 "permission": "{{ CMS_PERMISSION|bool }}",
                 "debug": {{ DEBUG|bool }},
                 "filtered": {% if cl.is_filtered or request.GET.q %}true{% else %}false{% endif %},
-                "site": "{{ cl.current_site.pk }}",
+                "site": {{ cl.current_site.pk }},
                 "lang": {
                     "code": "{{ LANGUAGE_CODE|lower }}",
                     "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
@@ -128,7 +128,7 @@
                     "key": "",
                     "width": "100%"
                 }, {
-                    "title": "&nbsp;",
+                    "title": "<span class=\"cms-tree-item-helpers cms-hidden\"><a href=\"#root\" class=\"cms-tree-right\"><span class=\"cms-icon cms-icon-alias\"></span>{% trans "Paste" %}</a></span>&nbsp;",
                     "key": "view",
                     "cls": "jstree-grid-cell-regular-options"
                 }, {

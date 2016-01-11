@@ -30,7 +30,7 @@
     display: none;
     position: absolute;
     right: $pagetree-tooltip-offset;
-    top: -$pagetree-icon-offset + 1;
+    top: -$pagetree-icon-offset;
     z-index: 100;
     text-align: left;
     border-radius: $border-radius-base;
@@ -417,7 +417,7 @@
         margin-top: -1px;
         border: 1px solid $gray-lighter;
         border-right: none;
-        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat left center;
+        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
 
         &:hover {
             color: $gray !important;
@@ -445,11 +445,27 @@
         text-align: right;
     }
     // hover states
-    .jstree-hovered {
-        background-color: $gray-lightest !important;
-    }
+    .jstree-hovered,
     .jstree-clicked {
         background-color: lighten($gray-lightest, 3%);
+    }
+
+    // special case for paste header
+    .jstree-grid-column-1 .jstree-grid-header {
+        text-align: right;
+        a {
+            font-size: $font-size-small;
+            top: 0;
+        }
+        span {
+            line-height: 1;
+        }
+        // special icon for pasting
+        .cms-icon {
+            font-size: $font-size-small;
+            padding-right: $pagetree-icon-offset;
+            margin-left: $pagetree-icon-offset;
+        }
     }
 }
 

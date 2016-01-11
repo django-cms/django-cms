@@ -109,8 +109,6 @@ var CMS = window.CMS || {};
      * @uses CMS.API.Helpers
      */
     CMS.PageTree = new CMS.Class({
-        // TODO add paste button for root elements
-        // TODO hide paste on origin element for copy & paste
         // TODO add mechanics to set the home page
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
@@ -121,6 +119,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.pagetree';
             this.cacheTarget = null;
             this.cacheType = '';
+            this.cacheId = null;
             this.successTimer = 1000;
 
             // elements
@@ -243,13 +242,19 @@ var CMS = window.CMS || {};
                     },
                     themes: {
                         name: 'django-cms'
-                    }
+                    },
+                    // disable the multi selection of nodes for now
+                    multiple: false
                 },
                 // activate drag and drop plugin
                 plugins : ['dnd', 'search', 'grid', 'gridResize'],
                 // https://www.jstree.com/api/#/?f=$.jstree.defaults.dnd
                 dnd: {
-                    inside_pos: 'last'
+                    inside_pos: 'last',
+                    // disable the multi selection of nodes for now
+                    drag_selection: false,
+                    // disable CMD/CTRL copy
+                    copy: false
                 },
                 // https://github.com/deitch/jstree-grid
                 grid: {
@@ -275,6 +280,7 @@ var CMS = window.CMS || {};
             });
             this.ui.tree.on('after_open.jstree', function (e, el) {
                 that._storeNodeId(el.node.data.id);
+                that._checkHelpers();
             });
 
             // store moved position node
@@ -290,33 +296,21 @@ var CMS = window.CMS || {};
             });
 
             // set event for cut and paste
-            this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
+            this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
                 e.preventDefault();
-                // we need to cache the node and type so `_showHelpers`
-                // will trigger the correct behaviour
-                that.cacheTarget = $(e.currentTarget);
-                that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
-                that._showHelpers();
+                that._cutOrCopy({ type: 'cut', element: $(this) });
+            });
+
+            // set event for cut and paste
+            this.ui.container.on(this.click, '.js-cms-tree-item-copy', function (e) {
+                e.preventDefault();
+                that._cutOrCopy({ type: 'copy', element: $(this) });
             });
 
             // attach events to paste
             this.ui.container.on(this.click, '.cms-tree-item-helpers a', function (e) {
                 e.preventDefault();
-
-                // hide helpers after we picked one
-                that._hideHelpers();
-
-                var copyFromId = that._getNodeId(that.cacheTarget);
-                var copyToId = that._getNodeId($(e.currentTarget));
-
-                // TODO it is currently not possible to copy/cut a node to the root
-                if (that.cacheType === 'cut') {
-                    that.ui.tree.jstree('cut', copyFromId);
-                } else {
-                    that.ui.tree.jstree('copy', copyFromId);
-                }
-
-                that.ui.tree.jstree('paste', copyToId, 'last');
+                that._paste(e);
             });
 
             // additional event handlers
@@ -326,6 +320,61 @@ var CMS = window.CMS || {};
             // make sure ajax post requests are working
             this._setAjaxPost('.js-cms-tree-item-menu a');
             this._setAjaxPost('.js-cms-tree-lang-trigger');
+        },
+
+        /**
+         * Helper to process the cut and copy events.
+         *
+         * @method _cutOrCopy
+         * @param {Object} [opts]
+         * @param {Number} [opts.type] either 'cut' or 'copy'
+         * @param {Number} [opts.element] originated trigger element
+         * @private
+         */
+        _cutOrCopy: function _cutOrCopy(obj) {
+            var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
+            // resets if we click again
+            if (this.cacheType === obj.type && jsTreeId === this.cacheId) {
+                this.cacheType = null;
+                this._hideHelpers();
+            } else {
+                // we need to cache the node and type so `_showHelpers`
+                // will trigger the correct behaviour
+                this.cacheTarget = obj.element;
+                this.cacheType = obj.type;
+                this.cacheId = jsTreeId;
+                this._showHelpers();
+                this._checkHelpers();
+            }
+        },
+
+        /**
+         * RHelper to process the paste event.
+         *
+         * @method _paste
+         * @private
+         * @return {Object} event originated event handler
+         */
+        _paste: function _paste(event) {
+            // hide helpers after we picked one
+            this._hideHelpers();
+
+            var copyFromId = this._getNodeId(this.cacheTarget);
+            var copyToId = this._getNodeId($(event.currentTarget));
+
+            // copyToId contains `jstree-1`, assign to root
+            if (copyToId.indexOf('jstree-1') > -1) {
+                copyToId = '#';
+            }
+
+            // TODO it is currently not possible to copy/cut a node to the root
+            if (this.cacheType === 'cut') {
+                this.ui.tree.jstree('cut', copyFromId);
+            } else {
+                this.ui.tree.jstree('copy', copyFromId);
+            }
+
+            this.ui.tree.jstree('paste', copyToId, 'last');
         },
 
         /**
@@ -427,9 +476,13 @@ var CMS = window.CMS || {};
                 // we need to refer to the original item here, as the copied
                 // node will have no data attributes stored at it (not a clone)
                 id: obj.original.data.id,
-                position: node.position,
-                target: node.target
+                position: node.position
             };
+
+            // if there is no target provided, the node lands in root
+            if (node.target) {
+                data.target = node.target;
+            }
 
             // we need to load a dialog first, to check if permissions should
             // be copied or not
@@ -451,6 +504,7 @@ var CMS = window.CMS || {};
                 // remove just copied node
                 that.ui.tree.jstree('delete_node', obj.node.id);
                 $('.js-cms-dialog').remove();
+                $('.js-cms-dialog-dimmer').remove();
             }).off(this.click, '.submit').on(this.click, '.submit', function (e) {
                 e.preventDefault();
                 var formData = $(this).closest('form').serialize().split('&');
@@ -477,12 +531,12 @@ var CMS = window.CMS || {};
          * @method _getElement
          * @private
          * @param {jQuery} el jQuery node form where to search
-         * @return {String} jsTree node element id
+         * @return {String|Boolean} jsTree node element id
          */
         _getNodeId: function _getElement(el) {
-            return el.closest('.jstree-grid-cell')
-                .attr('class')
-                .replace(/.*jsgrid_(.+?)_col.*/, '$1');
+            var cls = el.closest('.jstree-grid-cell').attr('class');
+
+            return (cls) ? cls.replace(/.*jsgrid_(.+?)_col.*/, '$1') : false;
         },
 
         /**
@@ -627,6 +681,27 @@ var CMS = window.CMS || {};
             // helpers are generated on the fly, so we need to reference
             // them every single time
             $('.cms-tree-item-helpers').addClass('cms-hidden');
+            this.cacheId = null;
+        },
+
+        /**
+         * Checks the current state of the helpers after `after_open.jstree`
+         * or `_cutOrCopy` is triggered.
+         *
+         * @method _checkHelpers
+         * @private
+         */
+        _checkHelpers: function _checkHelpers() {
+            if (this.cacheType) {
+                this._showHelpers(this.cacheType);
+            }
+
+            // hide cut element if it is visible
+            if (this.cacheType === 'cut' && this.cacheTarget) {
+                $('.jsgrid_' +
+                    this._getNodeId(this.cacheTarget.closest('.jstree-grid-cell')) +
+                    '_col .cms-tree-item-helpers').addClass('cms-hidden');
+            }
         },
 
         /**
@@ -642,6 +717,8 @@ var CMS = window.CMS || {};
             setTimeout(function () {
                 element.removeClass('cms-tree-node-success');
             }, this.successTimer);
+            // hide elements
+            this._hideHelpers();
         },
 
         /**
