@@ -84,9 +84,9 @@
                     <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                 {% endif %}
                     {% if page.in_navigation %}
-                        <span class="cms-icon cms-icon-minus-square" title="{% trans "not in menu" %}"></span>
+                        <span class="cms-icon cms-icon-check-square" title="{% trans "not in menu" %}"></span>
                     {% else %}
-                        <span class="cms-icon cms-icon-check-square" title="{% trans "in menu" %}"></span>
+                        <span class="cms-icon cms-icon-minus-square" title="{% trans "in menu" %}"></span>
                     {% endif %}
                 {% if has_change_permission %}
                     </a>
