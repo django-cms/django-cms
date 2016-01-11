@@ -479,9 +479,13 @@ var CMS = window.CMS || {};
                 // we need to refer to the original item here, as the copied
                 // node will have no data attributes stored at it (not a clone)
                 id: obj.original.data.id,
-                position: node.position,
-                target: node.target
+                position: node.position
             };
+
+            // if there is no target provided, the node lands in root
+            if (node.target) {
+                data.target = node.target;
+            }
 
             // we need to load a dialog first, to check if permissions should
             // be copied or not
