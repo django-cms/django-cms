@@ -417,7 +417,7 @@
         margin-top: -1px;
         border: 1px solid $gray-lighter;
         border-right: none;
-        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat left center;
+        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
 
         &:hover {
             color: $gray !important;
