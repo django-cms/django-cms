@@ -119,7 +119,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.pagetree';
             this.cacheTarget = null;
             this.cacheType = '';
-            this.cacheId = '';
+            this.cacheId = null;
             this.successTimer = 1000;
 
             // elements
@@ -298,13 +298,13 @@ var CMS = window.CMS || {};
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
                 e.preventDefault();
-                that._cutAndCopy({ type: 'cut', element: $(this) });
+                that._cutOrCopy({ type: 'cut', element: $(this) });
             });
 
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-copy', function (e) {
                 e.preventDefault();
-                that._cutAndCopy({ type: 'copy', element: $(this) });
+                that._cutOrCopy({ type: 'copy', element: $(this) });
             });
 
             // attach events to paste
@@ -325,13 +325,13 @@ var CMS = window.CMS || {};
         /**
          * Helper to process the cut and copy events.
          *
-         * @method _cutAndCopy
+         * @method _cutOrCopy
          * @param {Object} [opts]
          * @param {Number} [opts.type] either 'cut' or 'copy'
          * @param {Number} [opts.element] originated trigger element
          * @private
          */
-        _cutAndCopy: function _cutAndCopy(obj) {
+        _cutOrCopy: function _cutOrCopy(obj) {
             var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
             // resets if we click again
             if (this.cacheType === obj.type && jsTreeId === this.cacheId) {
@@ -362,7 +362,7 @@ var CMS = window.CMS || {};
             var copyFromId = this._getNodeId(this.cacheTarget);
             var copyToId = this._getNodeId($(event.currentTarget));
 
-            // copyToId contains `jstre-1`, assign to root
+            // copyToId contains `jstree-1`, assign to root
             if (copyToId.indexOf('jstree-1') > -1) {
                 copyToId = '#';
             }
@@ -531,7 +531,7 @@ var CMS = window.CMS || {};
          * @method _getElement
          * @private
          * @param {jQuery} el jQuery node form where to search
-         * @return {String} jsTree node element id
+         * @return {String|Boolean} jsTree node element id
          */
         _getNodeId: function _getElement(el) {
             var cls = el.closest('.jstree-grid-cell').attr('class');
@@ -686,7 +686,7 @@ var CMS = window.CMS || {};
 
         /**
          * Checks the current state of the helpers after `after_open.jstree`
-         * or `_cutAndCopy` is triggered.
+         * or `_cutOrCopy` is triggered.
          *
          * @method _checkHelpers
          * @private
