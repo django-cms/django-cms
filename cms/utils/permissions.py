@@ -132,7 +132,7 @@ def has_page_change_permission(request):
     user = request.user
     site = current_site(request)
     global_change_perm = GlobalPagePermission.objects.user_has_change_permission(
-        request.user, site).exists()
+        user, site).exists()
     return user.is_superuser or (
         has_auth_page_permission(user, action='change')
         and global_change_perm or has_any_page_change_permissions(request))
