@@ -110,7 +110,6 @@ var CMS = window.CMS || {};
      */
     CMS.PageTree = new CMS.Class({
         // TODO add paste button for root elements
-        // TODO hide paste on origin element for copy & paste
         // TODO add mechanics to set the home page
         initialize: function initialize(options) {
             // options are loaded from the pagetree html node
