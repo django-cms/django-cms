@@ -1,4 +1,4 @@
-/* global document */
+/* global document, localStorage */
 'use strict';
 var globals = require('../settings/globals');
 
@@ -14,7 +14,9 @@ module.exports = function (casperjs) {
 
         logout: function () {
             return function () {
-                return this.thenOpen(globals.adminLogoutUrl);
+                return this.thenEvaluate(function () {
+                    localStorage.clear();
+                }).thenOpen(globals.adminLogoutUrl);
             };
         },
 
