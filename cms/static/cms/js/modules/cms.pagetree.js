@@ -243,13 +243,17 @@ var CMS = window.CMS || {};
                     },
                     themes: {
                         name: 'django-cms'
-                    }
+                    },
+                    // disable the multi selection of nodes for now
+                    multiple: false
                 },
                 // activate drag and drop plugin
                 plugins : ['dnd', 'search', 'grid', 'gridResize'],
                 // https://www.jstree.com/api/#/?f=$.jstree.defaults.dnd
                 dnd: {
-                    inside_pos: 'last'
+                    inside_pos: 'last',
+                    // disable the multi selection of nodes for now
+                    drag_selection: false
                 },
                 // https://github.com/deitch/jstree-grid
                 grid: {
