@@ -296,13 +296,35 @@ var CMS = window.CMS || {};
             });
 
             // set event for cut and paste
-            this.ui.container.on(this.click, '.js-cms-tree-item-cut, .js-cms-tree-item-copy', function (e) {
+            this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
                 e.preventDefault();
-                // we need to cache the node and type so `_showHelpers`
-                // will trigger the correct behaviour
-                that.cacheTarget = $(e.currentTarget);
-                that.cacheType = $(this).hasClass('js-cms-tree-item-cut') ? 'cut' : 'copy';
-                that._showHelpers();
+                // resets if we click again
+                if (that.cacheType === 'cut') {
+                    that.cacheType = null;
+                    that._hideHelpers();
+                } else {
+                    // we need to cache the node and type so `_showHelpers`
+                    // will trigger the correct behaviour
+                    that.cacheTarget = $(e.currentTarget);
+                    that.cacheType = 'cut';
+                    that._showHelpers();
+                }
+            });
+
+            // set event for cut and paste
+            this.ui.container.on(this.click, '.js-cms-tree-item-copy', function (e) {
+                e.preventDefault();
+                // resets if we click again
+                if (that.cacheType === 'copy') {
+                    that.cacheType = null;
+                    that._hideHelpers();
+                } else {
+                    // we need to cache the node and type so `_showHelpers`
+                    // will trigger the correct behaviour
+                    that.cacheTarget = $(e.currentTarget);
+                    that.cacheType = 'copy';
+                    that._showHelpers();
+                }
             });
 
             // attach events to paste
