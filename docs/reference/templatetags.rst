@@ -123,8 +123,6 @@ The :ttag:`render_placeholder` tag takes the following parameters:
 * ``width`` parameter for context sensitive plugins (optional)
 * ``language`` keyword plus ``language-code`` string to render content in the
   specified language (optional)
-* ``language`` keyword plus ``language-code`` string to render content in the
-  specified language (optional)
 * ``as`` keyword followed by ``varname`` (optional): the template tag output can
   be saved as a context variable for later use.
 
