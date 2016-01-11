@@ -298,13 +298,13 @@ var CMS = window.CMS || {};
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
                 e.preventDefault();
-                cutCopyHelper('cut', $(this), e);
+                that._cutAndCopy({ type: 'cut', element: $(this) });
             });
 
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-copy', function (e) {
                 e.preventDefault();
-                cutCopyHelper('copy', $(this), e);
+                that._cutAndCopy({ type: 'copy', element: $(this) });
             });
 
             // attach events to paste
@@ -327,27 +327,6 @@ var CMS = window.CMS || {};
                 that.ui.tree.jstree('paste', copyToId, 'last');
             });
 
-            // helper for cut & paste
-            function cutCopyHelper(type, element, event) {
-                var jsTreeId = that._getNodeId(element.closest('.jstree-grid-cell'));
-                // resets if we click again
-                if (that.cacheType === type && jsTreeId === that.cacheId) {
-                    that.cacheType = null;
-                    that._hideHelpers();
-                } else {
-                    // we need to cache the node and type so `_showHelpers`
-                    // will trigger the correct behaviour
-                    that.cacheTarget = $(event.currentTarget);
-                    that.cacheType = type;
-                    that.cacheId = jsTreeId;
-                    that._showHelpers();
-                    // special case for cut, hide the originated cut element
-                    if (that.cacheType === 'cut') {
-                        $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
-                    }
-                }
-            }
-
             // additional event handlers
             this._setFilter();
             this._setTooltips();
@@ -355,6 +334,35 @@ var CMS = window.CMS || {};
             // make sure ajax post requests are working
             this._setAjaxPost('.js-cms-tree-item-menu a');
             this._setAjaxPost('.js-cms-tree-lang-trigger');
+        },
+
+        /**
+         * Helper to process the cut and copy events.
+         *
+         * @method _cutAndCopy
+         * @param {Object} [opts]
+         * @param {Number} [opts.type] either 'cut' or 'copy'
+         * @param {Number} [opts.element] originated trigger element
+         * @private
+         */
+        _cutAndCopy: function _cutAndCopy(obj) {
+            var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
+            // resets if we click again
+            if (this.cacheType === obj.type && jsTreeId === this.cacheId) {
+                this.cacheType = null;
+                this._hideHelpers();
+            } else {
+                // we need to cache the node and type so `_showHelpers`
+                // will trigger the correct behaviour
+                this.cacheTarget = obj.element;
+                this.cacheType = obj.type;
+                this.cacheId = jsTreeId;
+                this._showHelpers();
+                // special case for cut, hide the originated cut element
+                if (this.cacheType === 'cut') {
+                    $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
+                }
+            }
         },
 
         /**
