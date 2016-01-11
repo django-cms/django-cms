@@ -19,7 +19,10 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
-from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import (
+    get_user_sites_queryset,
+    has_auth_page_permission,
+)
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
 
@@ -284,8 +287,16 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            self.page_change_permission = can_change_page(self.request)
-
+            if not self.page and not get_cms_setting('PERMISSION'):
+                # We can't check permissions for an individual page
+                # and can't check global cms permissions because
+                # user opted out of them.
+                # So just check django auth permissions.
+                user = self.request.user
+                can_change = has_auth_page_permission(user, action='change')
+            else:
+                can_change = can_change_page(self.request)
+            self.page_change_permission = can_change
         return self.page_change_permission
 
     def page_is_pending(self, page, language):
