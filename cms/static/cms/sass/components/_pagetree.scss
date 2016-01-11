@@ -451,6 +451,24 @@
     .jstree-clicked {
         background-color: lighten($gray-lightest, 3%);
     }
+
+    // special case for paste header
+    .jstree-grid-column-1 .jstree-grid-header {
+        text-align: right;
+        a {
+            font-size: $font-size-small;
+            top: 0;
+        }
+        span {
+            line-height: 1;
+        }
+        // special icon for pasting
+        .cms-icon {
+            font-size: $font-size-small;
+            padding-right: $pagetree-icon-offset;
+            margin-left: $pagetree-icon-offset;
+        }
+    }
 }
 
 //###########################################################

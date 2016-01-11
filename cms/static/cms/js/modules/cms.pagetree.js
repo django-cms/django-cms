@@ -310,21 +310,7 @@ var CMS = window.CMS || {};
             // attach events to paste
             this.ui.container.on(this.click, '.cms-tree-item-helpers a', function (e) {
                 e.preventDefault();
-
-                // hide helpers after we picked one
-                that._hideHelpers();
-
-                var copyFromId = that._getNodeId(that.cacheTarget);
-                var copyToId = that._getNodeId($(e.currentTarget));
-
-                // TODO it is currently not possible to copy/cut a node to the root
-                if (that.cacheType === 'cut') {
-                    that.ui.tree.jstree('cut', copyFromId);
-                } else {
-                    that.ui.tree.jstree('copy', copyFromId);
-                }
-
-                that.ui.tree.jstree('paste', copyToId, 'last');
+                that._paste(e);
             });
 
             // additional event handlers
@@ -363,6 +349,35 @@ var CMS = window.CMS || {};
                     $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
                 }
             }
+        },
+
+        /**
+         * RHelper to process the paste event.
+         *
+         * @method _paste
+         * @private
+         * @return {Object} event originated event handler
+         */
+        _paste: function _paste(event) {
+            // hide helpers after we picked one
+            this._hideHelpers();
+
+            var copyFromId = this._getNodeId(this.cacheTarget);
+            var copyToId = this._getNodeId($(event.currentTarget));
+
+            // copyToId contains `jstre-1`, assign to root
+            if (copyToId.indexOf('jstree-1') > -1) {
+                copyToId = '#';
+            }
+
+            // TODO it is currently not possible to copy/cut a node to the root
+            if (this.cacheType === 'cut') {
+                this.ui.tree.jstree('cut', copyFromId);
+            } else {
+                this.ui.tree.jstree('copy', copyFromId);
+            }
+
+            this.ui.tree.jstree('paste', copyToId, 'last');
         },
 
         /**
@@ -664,6 +679,7 @@ var CMS = window.CMS || {};
             // helpers are generated on the fly, so we need to reference
             // them every single time
             $('.cms-tree-item-helpers').addClass('cms-hidden');
+            this.cacheId = null;
         },
 
         /**
