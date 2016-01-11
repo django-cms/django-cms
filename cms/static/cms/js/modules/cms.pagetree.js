@@ -253,7 +253,9 @@ var CMS = window.CMS || {};
                 dnd: {
                     inside_pos: 'last',
                     // disable the multi selection of nodes for now
-                    drag_selection: false
+                    drag_selection: false,
+                    // disable CMD/CTRL copy
+                    copy: false
                 },
                 // https://github.com/deitch/jstree-grid
                 grid: {
