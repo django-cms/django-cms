@@ -6,7 +6,7 @@
     @if($important == true) {
         @return !important;
     } @else {
-        @return;
+        @return unquote('');
     }
 }
 @mixin button-variant($color, $background, $border, $important: false) {
