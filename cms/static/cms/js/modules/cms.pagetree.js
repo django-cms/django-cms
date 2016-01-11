@@ -280,6 +280,7 @@ var CMS = window.CMS || {};
             });
             this.ui.tree.on('after_open.jstree', function (e, el) {
                 that._storeNodeId(el.node.data.id);
+                that._checkHelpers();
             });
 
             // store moved position node
@@ -343,10 +344,7 @@ var CMS = window.CMS || {};
                 this.cacheType = obj.type;
                 this.cacheId = jsTreeId;
                 this._showHelpers();
-                // special case for cut, hide the originated cut element
-                if (this.cacheType === 'cut') {
-                    $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
-                }
+                this._checkHelpers();
             }
         },
 
@@ -683,6 +681,26 @@ var CMS = window.CMS || {};
             // them every single time
             $('.cms-tree-item-helpers').addClass('cms-hidden');
             this.cacheId = null;
+        },
+
+        /**
+         * Checks the current state of the helpers after `after_open.jstree`
+         * or `_cutAndCopy` is triggered.
+         *
+         * @method _checkHelpers
+         * @private
+         */
+        _checkHelpers: function _checkHelpers() {
+            if (this.cacheType) {
+                this._showHelpers(this.cacheType);
+            }
+
+            // hide cut element if it is visible
+            if (this.cacheType === 'cut' && this.cacheTarget) {
+                $('.jsgrid_' +
+                    this._getNodeId(this.cacheTarget.closest('.jstree-grid-cell')) +
+                    '_col .cms-tree-item-helpers').addClass('cms-hidden');
+            }
         },
 
         /**
