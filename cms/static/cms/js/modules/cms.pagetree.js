@@ -121,6 +121,7 @@ var CMS = window.CMS || {};
             this.click = 'click.cms.pagetree';
             this.cacheTarget = null;
             this.cacheType = '';
+            this.cacheId = '';
             this.successTimer = 1000;
 
             // elements
@@ -298,36 +299,13 @@ var CMS = window.CMS || {};
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
                 e.preventDefault();
-                var jsTreeId = that._getNodeId($(this).closest('.jstree-grid-cell'));
-                // resets if we click again
-                if (that.cacheType === 'cut') {
-                    that.cacheType = null;
-                    that._hideHelpers();
-                } else {
-                    // we need to cache the node and type so `_showHelpers`
-                    // will trigger the correct behaviour
-                    that.cacheTarget = $(e.currentTarget);
-                    that.cacheType = 'cut';
-                    that._showHelpers();
-                    // hide paste for current cut element
-                    $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
-                }
+                cutCopyHelper('cut', $(this), e);
             });
 
             // set event for cut and paste
             this.ui.container.on(this.click, '.js-cms-tree-item-copy', function (e) {
                 e.preventDefault();
-                // resets if we click again
-                if (that.cacheType === 'copy') {
-                    that.cacheType = null;
-                    that._hideHelpers();
-                } else {
-                    // we need to cache the node and type so `_showHelpers`
-                    // will trigger the correct behaviour
-                    that.cacheTarget = $(e.currentTarget);
-                    that.cacheType = 'copy';
-                    that._showHelpers();
-                }
+                cutCopyHelper('copy', $(this), e);
             });
 
             // attach events to paste
@@ -349,6 +327,27 @@ var CMS = window.CMS || {};
 
                 that.ui.tree.jstree('paste', copyToId, 'last');
             });
+
+            // helper for cut & paste
+            function cutCopyHelper(type, element, event) {
+                var jsTreeId = that._getNodeId(element.closest('.jstree-grid-cell'));
+                // resets if we click again
+                if (that.cacheType === type && jsTreeId === that.cacheId) {
+                    that.cacheType = null;
+                    that._hideHelpers();
+                } else {
+                    // we need to cache the node and type so `_showHelpers`
+                    // will trigger the correct behaviour
+                    that.cacheTarget = $(event.currentTarget);
+                    that.cacheType = type;
+                    that.cacheId = jsTreeId;
+                    that._showHelpers();
+                    // special case for cut, hide the originated cut element
+                    if (that.cacheType === 'cut') {
+                        $('.jsgrid_' + jsTreeId + '_col .cms-tree-item-helpers').addClass('cms-hidden');
+                    }
+                }
+            }
 
             // additional event handlers
             this._setFilter();
