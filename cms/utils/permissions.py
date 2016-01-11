@@ -104,6 +104,22 @@ def has_any_page_change_permissions(request):
     ).exists()
 
 
+def get_model_permission_codename(model, action):
+    opts = model._meta
+    return opts.app_label + '.' + get_permission_codename(action, opts)
+
+
+def has_auth_page_permission(user, action):
+    """
+    Returns True if the user is a superuser or has
+    the cms.page {action} permission set via django's permission model.
+    """
+    if not user.is_superuser:
+        permission = get_model_permission_codename(Page, action=action)
+        return user.has_perm(permission)
+    return True
+
+
 def has_page_change_permission(request):
     """
     Return true if the current user has permission to change this page.
@@ -113,12 +129,12 @@ def has_page_change_permission(request):
     """
     from cms.utils.helpers import current_site
 
-    opts = Page._meta
+    user = request.user
     site = current_site(request)
     global_change_perm = GlobalPagePermission.objects.user_has_change_permission(
         request.user, site).exists()
-    return request.user.is_superuser or (
-        request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
+    return user.is_superuser or (
+        has_auth_page_permission(user, action='change')
         and global_change_perm or has_any_page_change_permissions(request))
 
 
