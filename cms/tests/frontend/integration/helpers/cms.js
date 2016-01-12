@@ -1,3 +1,4 @@
+/* global document, localStorage */
 'use strict';
 var globals = require('../settings/globals');
 
@@ -7,13 +8,15 @@ module.exports = function (casperjs) {
             return function () {
                 return this.thenOpen(globals.adminUrl).then(function () {
                     this.fill('#login-form', globals.credentials, true);
-                });
+                }).waitForSelector('#content');
             };
         },
 
         logout: function () {
             return function () {
-                return this.thenOpen(globals.adminLogoutUrl);
+                return this.thenEvaluate(function () {
+                    localStorage.clear();
+                }).thenOpen(globals.adminLogoutUrl);
             };
         },
 
@@ -104,17 +107,27 @@ module.exports = function (casperjs) {
                             this.click(xPath('//a[@href="' + opts.type + '"]'));
                         });
                         // ensure previous content has been changed
-                        this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
+                        return this.waitWhileVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
                     })
-                    .thenEvaluate(function (opts) {
-                        if (!opts.content) {
-                            return;
-                        }
-                        Object.keys(opts.content).forEach(function (key) {
-                            $('#' + key).val(opts.content[key]);
+                    .withFrame(0, function () {
+                        // we cannot pass the options as object because casper js
+                        // treats objects/arrays in a funny way, so we stringify it
+                        this.waitUntilVisible('#content', function () {
+                            this.evaluate(function (content) {
+                                if (!content.length) {
+                                    return;
+                                }
+
+                                content = JSON.parse(content);
+
+                                Object.keys(content).forEach(function (key) {
+                                    document.querySelector('#' + key).value = content[key];
+                                });
+                            }, JSON.stringify(opts.content));
                         });
-                    }, opts)
+                    })
                     .then(function () {
+                        // djangocms-text-ckeditor is special
                         if (opts.type === 'TextPlugin') {
                             this.withFrame(0, function () {
                                 casper.waitUntilVisible('.cke_inner', function () {
