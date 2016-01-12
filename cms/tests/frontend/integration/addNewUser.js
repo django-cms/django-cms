@@ -119,7 +119,6 @@ casper.test.begin('Add New User', function (test) {
                     );
                 })
 
-                .waitForUrl(/admin\/auth\/user\/\d+/)
                 // delete button gets clicked
                 .waitForSelector('#user_form', function () {
                     test.assertExists('#user_form', 'User Form has been loaded');
