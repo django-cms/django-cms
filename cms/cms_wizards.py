@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 
-from cms.models import Page, GlobalPagePermission
+from cms.models import Page
 from cms.utils import permissions
 
 from .wizards.wizard_pool import wizard_pool
