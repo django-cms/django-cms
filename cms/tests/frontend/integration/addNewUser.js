@@ -15,7 +15,11 @@ casper.test.setUp(function (done) {
         .run(done);
 });
 
-casper.test.tearDown(function () {
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
 });
 
 casper.test.begin('Add New User', function (test) {
