@@ -52,15 +52,19 @@ def user_has_page_add_perm(user, site=None):
     :param site: optional Site object (not just PK)
     :return: Boolean
     """
-    opts = Page._meta
     if not site:
         site = Site.objects.get_current()
-    global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-        user, site.pk).exists()
-    perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-    if user.has_perm(perm_str) and global_add_perm:
-        return True
-    return False
+
+    if get_cms_setting('PERMISSION'):
+        global_add_perm = (
+            GlobalPagePermission
+            .objects
+            .user_has_add_permission(user, site.pk)
+            .exists()
+        )
+    else:
+        global_add_perm = True
+    return has_auth_page_permission(user, action='add') and global_add_perm
 
 
 def has_page_add_permission(user, target=None, position=None, site=None):
@@ -80,22 +84,31 @@ def has_page_add_permission(user, target=None, position=None, site=None):
     if site is None:
         if target:
             site = target.site
-        if site is None:
+        else:
             site = Site.objects.get_current()
 
-    has_page_add_permission = user_has_page_add_perm(user, site=site)
+    has_add_permission = user_has_page_add_perm(user, site=site)
 
-    if target:
-        if has_page_add_permission:
-            return True
-        if position in ("first-child", "last-child"):
-            return target.has_add_permission('')
-        elif position in ("left", "right"):
-            if target.parent_id:
-                return has_generic_permission(
-                    target.parent_id, user, "add", site)
-    else:
-        return has_page_add_permission
+    if not get_cms_setting('PERMISSION') or not target:
+        # If CMS permissions are disabled
+        # we can't really check anything but Django permissions.
+        # If there's no target then we let the global CMS permission
+        # handle user access.
+        return has_add_permission
+
+    if has_add_permission:
+        # There's a target page
+        # and CMS permissions are enabled.
+        # User has global add permissions so no need to check
+        # the target page.
+        return True
+
+    if position in ("first-child", "last-child"):
+        return target.has_add_permission(request=None, user=user)
+    elif position in ("left", "right"):
+        if target.parent_id:
+            return has_generic_permission(
+                target.parent_id, user, "add", site)
     return False
 
 
@@ -117,7 +130,7 @@ def has_page_add_permission_from_request(request):
         user=request.user,
         target=target,
         position=position,
-        site=current_site(request)
+        site=current_site(request),
     )
     return has_add_permission
 
