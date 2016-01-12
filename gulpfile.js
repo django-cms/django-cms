@@ -190,7 +190,9 @@ gulp.task('tests:integration', function (done) {
         'logout',
         'loginToolbar',
         'dragndrop',
-        'changeSettings.js'
+        'changeSettings.js',
+        'disableToolbar',
+        'dragndrop'
     ];
     var pre = ['setup'];
 
