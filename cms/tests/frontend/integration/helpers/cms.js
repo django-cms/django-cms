@@ -9,8 +9,8 @@ module.exports = function (casperjs) {
          *
          * @public
          * @param {Object} [credentials=globals.credentials]
-         * @param {String} opts.username
-         * @param {String} opts.password
+         * @param {String} credentials.username
+         * @param {String} credentials.password
          */
         login: function (credentials) {
             return function () {
