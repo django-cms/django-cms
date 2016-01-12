@@ -251,6 +251,7 @@ class BasicToolbar(CMSToolbar):
 
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
+    _changed_admin_menu = None
     watch_models = [Page]
 
     # Helpers
@@ -443,7 +444,7 @@ class PageToolbar(CMSToolbar):
                                                 question=question % name, on_success=self.toolbar.REFRESH_PAGE)
 
     def change_admin_menu(self):
-        if self.has_page_change_permission():
+        if not self._changed_admin_menu and self.has_page_change_permission():
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             url = admin_reverse('cms_page_changelist')  # cms page admin
             params = {'language': self.toolbar.language}
@@ -451,6 +452,8 @@ class PageToolbar(CMSToolbar):
                 params['page_id'] = self.page.pk
             url = add_url_parameters(url, params)
             admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
+            # Used to prevent duplicates
+            self._changed_admin_menu = True
 
     def add_page_menu(self):
         if self.page and self.has_page_change_permission():

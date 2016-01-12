@@ -3,7 +3,6 @@ from logging import getLogger
 from os.path import join
 
 from django.conf import settings
-from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
