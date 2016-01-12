@@ -141,7 +141,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + admin-menu + logout
         self.assertEqual(len(items), 2, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 9, admin_items)
+        self.assertEqual(len(admin_items), 10, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
@@ -152,7 +152,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 2)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 10, admin_items)
+        self.assertEqual(len(admin_items), 11, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -461,7 +461,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         admin = toolbar.get_left_items()[0]
         lang = toolbar.get_left_items()[1]
-        self.assertEqual(len(admin.get_items()), 9)
+        self.assertEqual(len(admin.get_items()), 13)
         self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
