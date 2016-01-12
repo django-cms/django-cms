@@ -498,7 +498,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Return true if the current user has permission to add a new page.
         """
         if get_cms_setting('PERMISSION'):
-            return permissions.has_page_add_permission(request)
+            return permissions.has_page_add_permission_from_request(request)
         return super(PageAdmin, self).has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
