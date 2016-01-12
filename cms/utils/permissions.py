@@ -121,10 +121,13 @@ def has_page_add_permission_from_request(request):
     position = request.GET.get('position', None)
     target_page_id = request.GET.get('target', None)
 
-    try:
-        target = Page.objects.get(pk=target_page_id)
-    except Page.DoesNotExist:
-        return False
+    if target_page_id:
+        try:
+            target = Page.objects.get(pk=target_page_id)
+        except Page.DoesNotExist:
+            return False
+    else:
+        target = None
 
     has_add_permission = has_page_add_permission(
         user=request.user,
