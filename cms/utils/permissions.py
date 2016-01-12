@@ -63,51 +63,63 @@ def user_has_page_add_perm(user, site=None):
     return False
 
 
-def has_page_add_permission(request):
+def has_page_add_permission(user, target=None, position=None, site=None):
     """
-    Return true if the current user has permission to add a new page. This is
-    just used for general add buttons - only superuser, or user with can_add in
-    globalpagepermission can add page.
+    Return true if the current user has permission to add a new page.
+    If we have target and position, check if user can
+    add page under target page.
+    :param user:
+    :param target: a Page object
+    :param position: a String "first-child", "last-child", "left", or "right"
+    :param site: optional Site object (not just PK)
+    :return: Boolean
+    """
+    if user.is_superuser:
+        return True
 
-    Special case occur when page is going to be added from add page button in
-    change list - then we have target and position there, so check if user can
-    add page under target page will occur.
-    """
-    opts = Page._meta
+    if site is None:
+        if target:
+            site = target.site
+        if site is None:
+            site = Site.objects.get_current()
+
+    has_page_add_permission = user_has_page_add_perm(user, site=site)
+
+    if target:
+        if has_page_add_permission:
+            return True
+        if position in ("first-child", "last-child"):
+            return target.has_add_permission('')
+        elif position in ("left", "right"):
+            if target.parent_id:
+                return has_generic_permission(
+                    target.parent_id, user, "add", site)
+    else:
+        return has_page_add_permission
+    return False
+
+
+def has_page_add_permission_from_request(request):
+    from cms.utils.helpers import current_site
+
     if request.user.is_superuser:
         return True
 
-    # if add under page
-    target = request.GET.get('target', None)
     position = request.GET.get('position', None)
+    target_page_id = request.GET.get('target', None)
 
-    from cms.utils.helpers import current_site
+    try:
+        target = Page.objects.get(pk=target_page_id)
+    except Page.DoesNotExist:
+        return False
 
-    site = current_site(request)
-
-    if target:
-        try:
-            page = Page.objects.get(pk=target)
-        except Page.DoesNotExist:
-            return False
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            request.user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-        if request.user.has_perm(perm_str) and global_add_perm:
-            return True
-        if position in ("first-child", "last-child"):
-            return page.has_add_permission(request)
-        elif position in ("left", "right"):
-            if page.parent_id:
-                return has_generic_permission(
-                    page.parent_id, request.user, "add", page.site)
-    else:
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            request.user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-        if request.user.has_perm(perm_str) and global_add_perm:
-            return True
-    return False
+    has_add_permission = has_page_add_permission(
+        user=request.user,
+        target=target,
+        position=position,
+        site=current_site(request)
+    )
+    return has_add_permission
 
 
 def has_any_page_change_permissions(request):
