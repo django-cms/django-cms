@@ -39,7 +39,6 @@ def get_context():
         context = Context()
         context.template = Template('')
         return context
-#        return namedtuple('Context', 'template')(namedtuple('Template', 'engine')(engines.all()[0]))
     else:
         return {}
 
