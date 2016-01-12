@@ -115,7 +115,7 @@ casper.test.begin('Add New User', function (test) {
                 .waitForSelector('.field-username', function () {
                     this.mouse.click(
                         // xPath searches the th tag with an a tag which contains the name of the user "test-add-user"
-                        xPath('//th[@class="field-username"][./a[text()[contains(.,"test-add-user")]]]')
+                        xPath('//th[@class="field-username"][./a[text()[contains(.,"test-add-user")]]]/a')
                     );
                 })
 
