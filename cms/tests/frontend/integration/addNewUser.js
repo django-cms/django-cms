@@ -128,7 +128,7 @@ casper.test.begin('Add New User', function (test) {
                 // confirming that the user gets deleted
                 .waitForSelector('.delete-confirmation', function () {
                     test.assertExists('.delete-confirmation', 'Delete button clicked confirmed');
-                    this.click('input[type="submit"]')
+                    this.click('input[type="submit"]');
                 })
 
                 // checks if user is removed from the list
