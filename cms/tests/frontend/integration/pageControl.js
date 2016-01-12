@@ -243,11 +243,14 @@ casper.test.begin('Page can be deleted', function (test) {
             test.assertVisible('.cms-modal-open');
             this.click('.cms-modal-buttons .deletelink');
         })
+
+        // check that we were redirected to the root
         .then(function () {
             test.assertUrlMatch(/en\//, 'Page was removed and user was redirected');
             test.assertTitleMatch(/First page/, 'Title is still the same');
         })
 
+        // try to open the page that we deleted
         .thenOpen(pageUrl)
         .then(function () {
             test.assertTitleMatch(/Page not found/, 'The page is not available');
