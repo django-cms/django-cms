@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import six
-
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms.fields import EMPTY_VALUES
@@ -86,5 +84,5 @@ class PageSmartLinkField(forms.CharField):
 
     def widget_attrs(self, widget):
         attrs = super(PageSmartLinkField, self).widget_attrs(widget)
-        attrs.update({'placeholder_text': six.text_type(self.placeholder_text)})
+        attrs.update({'placeholder_text': self.placeholder_text})
         return attrs

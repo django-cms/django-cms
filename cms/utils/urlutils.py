@@ -7,6 +7,8 @@ from django.utils.encoding import force_text
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import urlparse
 
+import cms
+
 from cms.utils.conf import get_cms_setting
 
 # checks validity of absolute / relative url
@@ -56,6 +58,10 @@ def is_media_request(request):
         else:
             return True
     return False
+
+
+def static_with_version(path):
+    return '%s?%s' % (path, cms.__version__)
 
 
 def add_url_parameters(url, *args, **params):
