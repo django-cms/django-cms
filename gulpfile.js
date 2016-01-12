@@ -189,7 +189,8 @@ gulp.task('tests:integration', function (done) {
         'publish',
         'logout',
         'loginToolbar',
-        'dragndrop'
+        'dragndrop',
+        'changeSettings.js'
     ];
     var pre = ['setup'];
 

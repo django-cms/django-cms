@@ -1,0 +1,94 @@
+'use strict';
+
+// #############################################################################
+// Change Settings behaviour
+
+var globals = require('./settings/globals');
+var cms = require('./helpers/cms')();
+var casperjs = require('casper');
+var xPath = casperjs.selectXPath;
+
+casper.test.setUp(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.addPage({ title: 'home' }))
+        .run(done);
+});
+
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
+});
+
+casper.test.begin('Change Settings', function (test) {
+    casper
+        .start(globals.editUrl)
+        // click on example.com
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            this.click('.cms-toolbar-item-navigation li:first-child a');
+        })
+        // click on User Settings
+        .waitUntilVisible('.cms-toolbar-item-navigation-hover a', function () {
+            this.click('.cms-toolbar-item-navigation-hover a[href="/en/admin/cms/usersettings/"]');
+        })
+        // waits till Sideframe is open
+        .waitUntilVisible('.cms-sideframe-frame')
+        .withFrame(0, function () {
+            casper
+                .waitForSelector('#content-main', function () {
+
+                    test.assertExists('#id_language', 'language button exists');
+
+                    this.click('#id_language');
+
+                    //selects German language
+                    this.fill ('#usersettings_form', {
+                        'language': 'de'
+                    }, true);
+                })
+        })
+
+        .waitForResource (/admin/)
+
+        // have to wait for the sideframe again, cause the page reloads itself after saving the the language
+        .waitUntilVisible('.cms-sideframe-frame')
+        .withFrame(0, function () {
+            casper
+                //checks h1 tag if the language changed
+                .waitForSelector('#content-main', function () {
+                    test.assertExists('#content h1', 'h1 tag with german title exists');
+                    this.echo(this.fetchText('#content h1'));
+                })
+
+                .waitForSelector('#content-main', function () {
+
+                    test.assertExists('#id_language', 'Menu correct reloaded');
+
+                    this.click('#id_language');
+
+                    //changes back to english
+                    this.fill ('#usersettings_form', {
+                        'language': 'en'
+                    }, true);
+                })
+        })
+
+        .waitForResource (/admin/)
+
+        // have to wait for the sideframe again, cause the page reloads itself after saving the the language
+        .waitUntilVisible('.cms-sideframe-frame')
+        .withFrame(0, function () {
+            casper
+                 //checks h1 tag if the language changed
+                .waitForSelector('#content-main', function () {
+                    test.assertExists('#content h1', 'h1 tag with english title exists');
+                    this.echo(this.fetchText('#content h1'));
+                })
+        })
+
+        .run(function () {
+            test.done();
+        });
+});
