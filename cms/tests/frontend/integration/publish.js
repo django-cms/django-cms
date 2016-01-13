@@ -162,6 +162,7 @@ casper.test.begin('Publishing dates', function (test) {
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
+        .waitForResource(/admin/)
         .waitForSelector('body', function () {
             test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
         })
