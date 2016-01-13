@@ -54,7 +54,6 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
                 xPath('//a[.//span[text()[contains(.,"Page settings")]]]')
             );
         })
-
         // switch to Page settings modal
         .withFrame(0, function () {
             // wait until form is loaded
@@ -104,7 +103,6 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
                 'Current page has correct title'
             );
         })
-
         .run(function () {
             test.done();
         });
@@ -129,7 +127,6 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
                 xPath('//a[.//span[text()[contains(.,"Page settings")]]]')
             );
         })
-
         // switch to Page settings modal
         .withFrame(0, function () {
             // wait until form is loaded
@@ -141,14 +138,12 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
                 );
             });
         })
-
         // switch to "Advanced settings"
         .then(function () {
             this.click(
                 xPath('//a[contains(@class, "cms-btn")][text()[contains(.,"Advanced Settings")]]')
             );
         })
-
         // then with modal
         .withFrame(0, function () {
             casper.waitUntilVisible('#page_form', function () {
@@ -164,18 +159,15 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
                 }, false);
             });
         })
-
         // submit the advanced settings form
         .then(function () {
             this.click('.cms-modal-item-buttons .cms-btn-action');
         })
-
         // wait until we are redirected to updated page
         .waitForUrl(/overwritten-url/, function () {
             test.assertUrlMatch(/overwritten-url/, 'Url have been overwritten');
             test.assertTitleMatch(new RegExp(SECOND_PAGE_TITLE), 'Title is still the same');
         })
-
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -186,7 +178,6 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
                 xPath('//a[.//span[text()[contains(.,"Advanced settings")]]]')
             );
         })
-
         // then with modal
         .withFrame(0, function () {
             casper.waitUntilVisible('#page_form', function () {
@@ -205,16 +196,13 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
         .then(function () {
             this.click('.cms-modal-item-buttons .cms-btn-action');
         })
-
         // wait until we are redirected to updated page
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
-
         // check that the page was edited correctly
         .then(function () {
             test.assertUrlMatch(new RegExp(SECOND_PAGE_TITLE.toLowerCase()), 'Url have been overwritten');
             test.assertTitleMatch(new RegExp(SECOND_PAGE_TITLE), 'Title is still the same');
         })
-
         .run(function () {
             test.done();
         });
@@ -243,19 +231,16 @@ casper.test.begin('Page can be deleted', function (test) {
             test.assertVisible('.cms-modal-open');
             this.click('.cms-modal-buttons .deletelink');
         })
-
         // check that we were redirected to the root
         .then(function () {
             test.assertUrlMatch(/en\//, 'Page was removed and user was redirected');
             test.assertTitleMatch(/First page/, 'Title is still the same');
         })
-
         // try to open the page that we deleted
         .thenOpen(pageUrl)
         .then(function () {
             test.assertTitleMatch(/Page not found/, 'The page is not available');
         })
-
         // have to add the page back so tearDown runs correctly
         .then(cms.addPage({ title: SECOND_PAGE_TITLE }))
         .run(function () {
@@ -375,7 +360,6 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         .thenOpen(pageUrl, function () {
             test.assertTitleMatch(new RegExp(SECOND_PAGE_TITLE), 'The page is published and available');
         })
-
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
         .then(function () {
@@ -397,7 +381,6 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         })
         // then login again so teardown finishes correctly
         .then(cms.login())
-
         .run(function () {
             test.done();
         });
