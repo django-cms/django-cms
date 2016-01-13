@@ -183,7 +183,7 @@ if __name__ == '__main__':
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             }
         },
-        SESSION_ENGINE="django.contrib.sessions.backends.cache",
+        SESSION_ENGINE="django.contrib.sessions.backends.db",
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
