@@ -102,7 +102,7 @@
                 </div>
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy"
                     data-id="{{ page.pk }}"
-                    data-apphook="{% if page.application_urls %}{{ page.application_urls }}{% endif %}">
+                    data-apphook="{{ page.application_urls|default_if_none:'' }}">
                     <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
                 </div>
             {% endif %}
