@@ -12,25 +12,25 @@ var xPath = casperjs.selectXPath;
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login())
-        // .then(cms.addPage({ title: 'First page' }))
-        // .then(cms.addPlugin({
-        //     type: 'TextPlugin',
-        //     content: {
-        //         id_body: 'Test text'
-        //     }
-        // }))
-        // .then(cms.addPlugin({
-        //     type: 'TextPlugin',
-        //     content: {
-        //         id_body: 'Another Test text'
-        //     }
-        // }))
+        .then(cms.addPage({ title: 'First page' }))
+        .then(cms.addPlugin({
+            type: 'TextPlugin',
+            content: {
+                id_body: 'Test text'
+            }
+        }))
+        .then(cms.addPlugin({
+            type: 'TextPlugin',
+            content: {
+                id_body: 'Another Test text'
+            }
+        }))
         .run(done);
 });
 
 casper.test.tearDown(function (done) {
     casper.start()
-        // .then(cms.removePage())
+        .then(cms.removePage())
         .then(cms.logout())
         .run(done);
 });
