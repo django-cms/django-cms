@@ -141,8 +141,13 @@ gulp.task('lint:javascript', function () {
     return gulp.src(PROJECT_PATTERNS.js)
         .pipe(jshint())
         .pipe(jscs())
+        // required for jscs
         .on('error', function (error) {
             gutil.log('\n' + error.message);
+            if (process.env.CI) {
+                // Force the process to exit with error code
+                process.exit(1);
+            }
         })
         .pipe(jshint.reporter('jshint-stylish'))
         .pipe(jshint.reporter('fail'));
