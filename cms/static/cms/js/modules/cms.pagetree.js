@@ -332,6 +332,12 @@ var CMS = window.CMS || {};
          * @private
          */
         _cutOrCopy: function _cutOrCopy(obj) {
+            // prevent actions if you try to copy a page with an apphook
+            if (obj.type === 'copy' && obj.element.data().apphook) {
+                this.showError(this.options.lang.apphook);
+                return false;
+            }
+
             var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
             // resets if we click again
             if (this.cacheType === obj.type && jsTreeId === this.cacheId) {
@@ -740,7 +746,7 @@ var CMS = window.CMS || {};
             var messages = $('.messagelist');
             var breadcrumb = $('.breadcrumbs');
             var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
-            var msg = tpl.replace('{msg}', this.options.lang.error + ' – ' + message);
+            var msg = tpl.replace('{msg}', '<strong>' + this.options.lang.error + '</strong> ' + message);
 
             messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
         }
