@@ -100,7 +100,9 @@
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
                     <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
                 </div>
-                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy" data-id="{{ page.pk }}" data-apphook="{{ page.application_urls }}">
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy"
+                    data-id="{{ page.pk }}"
+                    data-apphook="{% if page.application_urls %}{{ page.application_urls }}{% endif %}">
                     <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
                 </div>
             {% endif %}
