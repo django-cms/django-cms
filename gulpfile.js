@@ -143,12 +143,9 @@ gulp.task('lint:javascript', function () {
         .pipe(jscs())
         .on('error', function (error) {
             gutil.log('\n' + error.message);
-            if (process.env.CI) {
-                // Force the process to exit with error code
-                process.exit(1);
-            }
         })
-        .pipe(jshint.reporter('jshint-stylish'));
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('tests', ['tests:unit', 'tests:integration']);
