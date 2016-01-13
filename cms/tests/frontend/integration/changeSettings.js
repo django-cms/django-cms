@@ -42,7 +42,7 @@ casper.test.begin('Change Settings', function (test) {
                     this.fill ('#usersettings_form', {
                         'language': 'de'
                     }, true);
-                })
+                });
         })
 
         .waitForResource(/admin/)
@@ -65,7 +65,7 @@ casper.test.begin('Change Settings', function (test) {
                     this.fill ('#usersettings_form', {
                         'language': 'en'
                     }, true);
-                })
+                });
         })
 
         .waitForResource(/admin/)
@@ -78,7 +78,7 @@ casper.test.begin('Change Settings', function (test) {
                 .waitForSelector('#content-main', function () {
                     test.assertEquals(this.fetchText('#content h1'),
                     'Change user setting', 'English language applied');
-                })
+                });
         })
 
         .then (function () {
