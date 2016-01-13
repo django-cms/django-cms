@@ -117,9 +117,11 @@ var CMS = window.CMS || {};
 
             // states and events
             this.click = 'click.cms.pagetree';
-            this.cacheTarget = null;
-            this.cacheType = '';
-            this.cacheId = null;
+            this.cache = {
+                id: null,
+                target: null,
+                type: ''
+            };
             this.successTimer = 1000;
 
             // elements
@@ -285,7 +287,7 @@ var CMS = window.CMS || {};
 
             // store moved position node
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
-                if (!that.cacheType || that.cacheType === 'cut') {
+                if (!that.cache.type || that.cache.type === 'cut') {
                     that._moveNode(that._getNodePosition(obj));
                 } else {
                     that._copyNode(obj);
@@ -340,15 +342,15 @@ var CMS = window.CMS || {};
 
             var jsTreeId = this._getNodeId(obj.element.closest('.jstree-grid-cell'));
             // resets if we click again
-            if (this.cacheType === obj.type && jsTreeId === this.cacheId) {
-                this.cacheType = null;
+            if (this.cache.type === obj.type && jsTreeId === this.cache.id) {
+                this.cache.type = null;
                 this._hideHelpers();
             } else {
                 // we need to cache the node and type so `_showHelpers`
                 // will trigger the correct behaviour
-                this.cacheTarget = obj.element;
-                this.cacheType = obj.type;
-                this.cacheId = jsTreeId;
+                this.cache.target = obj.element;
+                this.cache.type = obj.type;
+                this.cache.id = jsTreeId;
                 this._showHelpers();
                 this._checkHelpers();
             }
@@ -365,7 +367,7 @@ var CMS = window.CMS || {};
             // hide helpers after we picked one
             this._hideHelpers();
 
-            var copyFromId = this._getNodeId(this.cacheTarget);
+            var copyFromId = this._getNodeId(this.cache.target);
             var copyToId = this._getNodeId($(event.currentTarget));
 
             // copyToId contains `jstree-1`, assign to root
@@ -374,7 +376,7 @@ var CMS = window.CMS || {};
             }
 
             // TODO it is currently not possible to copy/cut a node to the root
-            if (this.cacheType === 'cut') {
+            if (this.cache.type === 'cut') {
                 this.ui.tree.jstree('cut', copyFromId);
             } else {
                 this.ui.tree.jstree('copy', copyFromId);
@@ -696,7 +698,7 @@ var CMS = window.CMS || {};
             // helpers are generated on the fly, so we need to reference
             // them every single time
             $('.cms-tree-item-helpers').addClass('cms-hidden');
-            this.cacheId = null;
+            this.cache.id = null;
         },
 
         /**
@@ -707,15 +709,14 @@ var CMS = window.CMS || {};
          * @private
          */
         _checkHelpers: function _checkHelpers() {
-            if (this.cacheType) {
-                this._showHelpers(this.cacheType);
+            if (this.cache.type) {
+                this._showHelpers(this.cache.type);
             }
 
             // hide cut element if it is visible
-            if (this.cacheType === 'cut' && this.cacheTarget) {
-                $('.jsgrid_' +
-                    this._getNodeId(this.cacheTarget.closest('.jstree-grid-cell')) +
-                    '_col .cms-tree-item-helpers').addClass('cms-hidden');
+            if (this.cache.type === 'cut' && this.cache.target) {
+                $('.jsgrid_' + this.cache.id + '_col .cms-tree-item-helpers')
+                    .addClass('cms-hidden');
             }
         },
 
