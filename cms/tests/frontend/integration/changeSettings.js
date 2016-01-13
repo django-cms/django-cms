@@ -31,7 +31,7 @@ casper.test.begin('Change Settings', function (test) {
         })
         // click on User Settings
         .waitUntilVisible('.cms-toolbar-item-navigation-hover a', function () {
-            this.click('.cms-toolbar-item-navigation-hover a[href="/en/admin/cms/usersettings/"]');
+            this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/cms/usersettings/"]');
         })
         // waits till Sideframe is open
         .waitUntilVisible('.cms-sideframe-frame')
@@ -50,7 +50,7 @@ casper.test.begin('Change Settings', function (test) {
                 })
         })
 
-        .waitForResource (/admin/)
+        .waitForResource(/admin/)
 
         // have to wait for the sideframe again, cause the page reloads itself after saving the the language
         .waitUntilVisible('.cms-sideframe-frame')
@@ -58,8 +58,7 @@ casper.test.begin('Change Settings', function (test) {
             casper
                 //checks h1 tag if the language changed
                 .waitForSelector('#content-main', function () {
-                    test.assertExists('#content h1', 'h1 tag with german title exists');
-                    this.echo(this.fetchText('#content h1'));
+                    test.assertEquals(this.fetchText('#content h1'), 'Benutzer-Einstellung ändern', 'German language applied');
                 })
 
                 .waitForSelector('#content-main', function () {
@@ -75,7 +74,7 @@ casper.test.begin('Change Settings', function (test) {
                 })
         })
 
-        .waitForResource (/admin/)
+        .waitForResource(/admin/)
 
         // have to wait for the sideframe again, cause the page reloads itself after saving the the language
         .waitUntilVisible('.cms-sideframe-frame')
@@ -83,9 +82,12 @@ casper.test.begin('Change Settings', function (test) {
             casper
                  //checks h1 tag if the language changed
                 .waitForSelector('#content-main', function () {
-                    test.assertExists('#content h1', 'h1 tag with english title exists');
-                    this.echo(this.fetchText('#content h1'));
+                    test.assertEquals(this.fetchText('#content h1'), 'Change user setting', 'English language applied');
                 })
+        })
+
+        .then (function () {
+            this.click('.cms-sideframe .cms-icon-close');
         })
 
         .run(function () {
