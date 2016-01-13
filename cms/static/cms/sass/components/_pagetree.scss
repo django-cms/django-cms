@@ -26,6 +26,13 @@
     display: inline-block;
 }
 
+// we need to add this to get drag & drop to work on internet explorer,
+// more specifically on a microsoft surface
+.jstree li {
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
 //###########################################################
 // TOOLTIP
 // handles tooltip styling
