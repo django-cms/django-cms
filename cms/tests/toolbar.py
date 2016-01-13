@@ -461,7 +461,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         admin = toolbar.get_left_items()[0]
         lang = toolbar.get_left_items()[1]
-        self.assertEqual(len(admin.get_items()), 13)
+        self.assertEqual(len(admin.get_items()), 10)
         self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
