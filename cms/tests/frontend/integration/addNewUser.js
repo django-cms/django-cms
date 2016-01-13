@@ -115,7 +115,7 @@ casper.test.begin('Add New User', function (test) {
                 .waitForSelector('.field-username', function () {
                     this.mouse.click(
                         // xPath searches the th tag with an a tag which contains the name of the user "test-add-user"
-                        xPath('//th[@class="field-username"][./a[text()[contains(.,"test-add-user")]]]')
+                        xPath('//th[@class="field-username"][./a[text()[contains(.,"test-add-user")]]]/a')
                     );
                 })
 
@@ -128,7 +128,7 @@ casper.test.begin('Add New User', function (test) {
                 // confirming that the user gets deleted
                 .waitForSelector('.delete-confirmation', function () {
                     test.assertExists('.delete-confirmation', 'Delete button clicked confirmed');
-                    this.click('input[type="submit"]')
+                    this.click('input[type="submit"]');
                 })
 
                 // checks if user is removed from the list
