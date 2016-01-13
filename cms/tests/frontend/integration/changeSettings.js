@@ -74,7 +74,7 @@ casper.test.begin('Change Settings', function (test) {
         .waitUntilVisible('.cms-sideframe-frame')
         .withFrame(0, function () {
             casper
-                 //checks h1 tag if the language changed
+                 // checks h1 tag if the language changed
                 .waitForSelector('#content-main', function () {
                     test.assertEquals(this.fetchText('#content h1'),
                     'Change user setting', 'English language applied');
