@@ -262,3 +262,75 @@ casper.test.begin('Page can be deleted', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Page can be hidden in navigation', function (test) {
+    casper
+        .start(globals.editUrl)
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
+        .then(function () {
+            this.thenOpen(pageUrl);
+        })
+        .then(function () {
+            test.assertExists(
+                xPath('//ul[@class="nav"]/li/a[contains(@href,"' + SECOND_PAGE_TITLE.toLowerCase() + '")]' +
+                '[contains(text(),"' + SECOND_PAGE_TITLE + '")]'),
+                'Page is in navigation'
+            );
+        })
+        .then(function () {
+            // click on "Page" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
+        })
+        // in the dropdown click on "hide in navigation"
+        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+            this.click(
+                xPath('//a[.//span[text()[contains(.,"Hide in navigation")]]]')
+            );
+        })
+        // wait for reload
+        .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
+        // wait until we have the navigation displayed again
+        .waitForSelector('.nav', function () {
+            test.assertDoesntExist(
+                xPath('//ul[@class="nav"]/li/a[contains(@href,"' + SECOND_PAGE_TITLE.toLowerCase() + '")]' +
+                '[contains(text(),"' + SECOND_PAGE_TITLE + '")]'),
+                'Page is not in navigation anymore'
+            );
+            test.assertExists(
+                // here we don't check for url because it's root
+                xPath('//ul[@class="nav"]/li/a' +
+                '[contains(text(),"First page")]'),
+                'While the first one still is'
+            );
+        })
+        .then(function () {
+            // click on "Page" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
+        })
+        // in the dropdown click on "display in navigation"
+        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+            this.click(
+                xPath('//a[.//span[text()[contains(.,"Display in navigation")]]]')
+            );
+        })
+        // wait for reload
+        .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
+        // wait until we have the navigation displayed again
+        .waitForSelector('.nav', function () {
+            test.assertExists(
+                xPath('//ul[@class="nav"]/li/a[contains(@href,"' + SECOND_PAGE_TITLE.toLowerCase() + '")]' +
+                '[contains(text(),"' + SECOND_PAGE_TITLE + '")]'),
+                'Page is again in the navigation'
+            );
+            test.assertExists(
+                // here we don't check for url because it's root
+                xPath('//ul[@class="nav"]/li/a' +
+                '[contains(text(),"First page")]'),
+                'And the first one still is'
+            );
+        })
+        .run(function () {
+            test.done();
+        });
+});
