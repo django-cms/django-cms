@@ -1,6 +1,6 @@
 -r requirements_base.txt
 https://github.com/django/django/tarball/stable/1.9.x/django.tar.gz#egg=django
-django-reversion==1.10.0
+django-reversion==1.10,<1.11
 django-formtools
 django-hvad==1.5
 django-debug-toolbar
