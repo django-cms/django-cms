@@ -231,6 +231,7 @@ casper.test.begin('Page can be deleted', function (test) {
             test.assertVisible('.cms-modal-open');
             this.click('.cms-modal-buttons .deletelink');
         })
+        .waitForUrl(/en\//)
         // check that we were redirected to the root
         .then(function () {
             test.assertUrlMatch(/en\//, 'Page was removed and user was redirected');

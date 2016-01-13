@@ -14,7 +14,7 @@ casper.test.setUp(function (done) {
         .then(cms.login())
         .then(cms.addPage({ title: 'First page' }))
         .then(cms.addPage({ title: SECOND_PAGE_TITLE }))
-        .run(done)
+        .run(done);
 });
 
 casper.test.tearDown(function (done) {
