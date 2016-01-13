@@ -192,6 +192,7 @@ gulp.task('tests:integration', function (done) {
         'publish',
         'logout',
         'loginToolbar',
+        'changeSettings',
         'disableToolbar',
         'dragndrop',
         'clipboard'
