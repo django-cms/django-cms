@@ -30,7 +30,7 @@ casper.test.tearDown(function (done) {
         .run(done);
 });
 
-0 && casper.test.begin('Page settings are accessible and can be edited from modal', function (test) {
+casper.test.begin('Page settings are accessible and can be edited from modal', function (test) {
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
@@ -110,7 +110,7 @@ casper.test.tearDown(function (done) {
         });
 });
 
-0 && casper.test.begin('Page advanced settings are accessible from modal and can be edited', function (test) {
+casper.test.begin('Page advanced settings are accessible from modal and can be edited', function (test) {
     var random = randomString();
     casper
         .start(globals.editUrl)
@@ -263,7 +263,7 @@ casper.test.begin('Page can be deleted', function (test) {
         });
 });
 
-casper.test.begin('Page can be hidden in navigation', function (test) {
+casper.test.begin('Page can be hidden / shown in navigation', function (test) {
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
