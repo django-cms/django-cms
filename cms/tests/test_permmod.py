@@ -1123,11 +1123,13 @@ class GlobalPermissionTests(CMSTestCase):
                                       is_superuser=True)
         superuser.set_password("super")
         superuser.save()
+
+        site_1 = Site.objects.get(pk=1)
+        site_2 = Site.objects.create(domain='example2.com', name='example2.com')
+
+        SITES = [site_1, site_2]
+
         # create 2 staff users
-        SITES = [
-            Site.objects.get(pk=1),
-            Site.objects.create(domain='example2.com', name='example2.com'),
-        ]
         USERS = [
             self._create_user("staff", is_staff=True, is_active=True),
             self._create_user("staff_2", is_staff=True, is_active=True),
@@ -1161,7 +1163,7 @@ class GlobalPermissionTests(CMSTestCase):
 
         with self.settings(CMS_PERMISSION=True):
             # for all users, they should have access to site 1
-            request = RequestFactory().get(path='/', data={'site__exact': 1})
+            request = RequestFactory().get(path='/', data={'site__exact': site_1.pk})
             # we need a session attribute for current_site(request), which is
             # used by has_page_add_permission_from_request and has_page_change_permission
             request.session = {}
@@ -1183,7 +1185,7 @@ class GlobalPermissionTests(CMSTestCase):
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
             # to site 1
-            request = RequestFactory().get('/', data={'site__exact': 2})
+            request = RequestFactory().get('/', data={'site__exact': site_2.pk})
             request.session = {}
             # As before, the query count is inflated by doing additional lookups
             # because there's a site param in the request
@@ -1195,7 +1197,7 @@ class GlobalPermissionTests(CMSTestCase):
                 self.assertEqual({'add': False, 'change': False, 'delete': False},
                                  site._registry[Page].get_model_perms(request))
                 # but, going back to the first user, they should.
-                request = RequestFactory().get('/', data={'site__exact': 2})
+                request = RequestFactory().get('/', data={'site__exact': site_2.pk})
                 request.user = USERS[0]
                 self.assertTrue(has_page_add_permission_from_request(request))
                 self.assertTrue(has_page_change_permission(request))
