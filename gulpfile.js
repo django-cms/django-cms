@@ -141,6 +141,7 @@ gulp.task('lint:javascript', function () {
     return gulp.src(PROJECT_PATTERNS.js)
         .pipe(jshint())
         .pipe(jscs())
+        // required for jscs
         .on('error', function (error) {
             gutil.log('\n' + error.message);
             if (process.env.CI) {
@@ -148,7 +149,8 @@ gulp.task('lint:javascript', function () {
                 process.exit(1);
             }
         })
-        .pipe(jshint.reporter('jshint-stylish'));
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'));
 });
 
 gulp.task('tests', ['tests:unit', 'tests:integration']);
