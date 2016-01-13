@@ -5,8 +5,6 @@
 
 var globals = require('./settings/globals');
 var cms = require('./helpers/cms')();
-var casperjs = require('casper');
-var xPath = casperjs.selectXPath;
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -38,12 +36,9 @@ casper.test.begin('Change Settings', function (test) {
         .withFrame(0, function () {
             casper
                 .waitForSelector('#content-main', function () {
-
                     test.assertExists('#id_language', 'language button exists');
 
-                    this.click('#id_language');
-
-                    //selects German language
+                    // selects German language
                     this.fill ('#usersettings_form', {
                         'language': 'de'
                     }, true);
@@ -56,18 +51,17 @@ casper.test.begin('Change Settings', function (test) {
         .waitUntilVisible('.cms-sideframe-frame')
         .withFrame(0, function () {
             casper
-                //checks h1 tag if the language changed
+                // checks h1 tag if the language changed
                 .waitForSelector('#content-main', function () {
-                    test.assertEquals(this.fetchText('#content h1'), 'Benutzer-Einstellung ändern', 'German language applied');
+                    test.assertEquals(this.fetchText('#content h1'),
+                    'Benutzer-Einstellung ändern', 'German language applied');
                 })
 
                 .waitForSelector('#content-main', function () {
 
                     test.assertExists('#id_language', 'Menu correct reloaded');
 
-                    this.click('#id_language');
-
-                    //changes back to english
+                    // changes back to english
                     this.fill ('#usersettings_form', {
                         'language': 'en'
                     }, true);
@@ -82,7 +76,8 @@ casper.test.begin('Change Settings', function (test) {
             casper
                  //checks h1 tag if the language changed
                 .waitForSelector('#content-main', function () {
-                    test.assertEquals(this.fetchText('#content h1'), 'Change user setting', 'English language applied');
+                    test.assertEquals(this.fetchText('#content h1'),
+                    'Change user setting', 'English language applied');
                 })
         })
 
