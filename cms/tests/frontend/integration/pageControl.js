@@ -334,3 +334,71 @@ casper.test.begin('Page can be hidden in navigation', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Page can be published / unpublished', function (test) {
+    casper
+        .start(globals.editUrl)
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
+        .then(function () {
+            this.thenOpen(pageUrl);
+        })
+        // check if publish button is available
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertSelectorHasText(
+                '.cms-publish-page',
+                'Publish page now',
+                'Page is unpublished'
+            );
+        })
+        .then(cms.logout())
+        // check that the page is 404
+        .thenOpen(pageUrl, function () {
+            test.assertTitleMatch(/Page not found/, 'The page is not yet available');
+        })
+        .then(cms.login())
+        .thenOpen(pageUrl + '?edit')
+        .then(function () {
+            // click on "Page" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
+        })
+        // in the dropdown click on "Publish page"
+        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+            this.click(
+                xPath('//a[.//span[text()[contains(.,"Publish page")]]]')
+            );
+        })
+        // wait until it successfully publishes
+        .waitForResource(/publish/)
+        .then(cms.logout())
+        // open a page and check if it's published for non-logged in user
+        .thenOpen(pageUrl, function () {
+            test.assertTitleMatch(new RegExp(SECOND_PAGE_TITLE), 'The page is published and available');
+        })
+
+        .then(cms.login())
+        .thenOpen(pageUrl + '?edit')
+        .then(function () {
+            // click on "Page" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
+        })
+        // in the dropdown click on "Unpublish page"
+        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+            this.click(
+                xPath('//a[.//span[text()[contains(.,"Unpublish page")]]]')
+            );
+        })
+        // wait until it successfully unpublishes
+        .waitForResource(/publish/)
+        .then(cms.logout())
+        // check that the page is 404 again
+        .thenOpen(pageUrl, function () {
+            test.assertTitleMatch(/Page not found/, 'The page is not longer available');
+        })
+        // then login again so teardown finishes correctly
+        .then(cms.login())
+
+        .run(function () {
+            test.done();
+        });
+});
