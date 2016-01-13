@@ -756,12 +756,30 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return super(PageAdmin, self).recover_view(request, version_id, extra_context)
 
     def revision_view(self, request, object_id, version_id, extra_context=None):
+        if not is_installed('reversion'):
+            return HttpResponseBadRequest('django reversion not installed')
+
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
-        extra_context = self.update_language_tab_context(request, None, extra_context)
-        request.original_version_id = version_id
-        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
-        return response
+
+        page = get_object_or_404(self.model, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
+        try:
+            version = Version.objects.get(pk=version_id)
+            clean = page._apply_revision(version.revision, set_dirty=True)
+            if not clean:
+                messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
+            with create_revision():
+                adapter = self.revision_manager.get_adapter(page.__class__)
+                self.revision_context_manager.add_to_context(self.revision_manager, page, adapter.get_version_data(page))
+                self.revision_context_manager.set_comment(_("Reverted to previous version, saved on %(datetime)s") % {"datetime": localize(version.revision.date_created)})
+        except IndexError as e:
+            return HttpResponseBadRequest(e.message)
+
+        return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
 
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):

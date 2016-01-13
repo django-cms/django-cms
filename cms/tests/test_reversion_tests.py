@@ -17,6 +17,7 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CM
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
 from cms.utils.reversion_hacks import Revision, reversion, Version
 
+
 class BasicReversionTestCase(CMSTestCase):
     def setUp(self):
         self.user = self._create_user("test", True, True)
@@ -95,9 +96,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 200)
 
             revert_url = history_url + "%s/" % version.pk
-            response = self.client.get(revert_url)
-            self.assertEqual(response.status_code, 200)
-            response = self.client.post("%s?language=en&" % revert_url, self.page_data)
+            response = self.client.post("%s?language=en&" % revert_url)
             self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page.pk)
             # test for publisher_is_draft, published is set for both draft and
             # published page

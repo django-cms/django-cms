@@ -445,7 +445,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         menu_pool.clear(site_id=site.pk)
         return first_page
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         pages = [self.pk]
         if self.publisher_public_id:
             pages.append(self.publisher_public_id)
@@ -1340,7 +1340,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         clean = self._apply_revision(next_revision)
         return Page.objects.get(pk=self.pk), clean
 
-    def _apply_revision(self, target_revision):
+    def _apply_revision(self, target_revision, set_dirty=False):
         """
         Revert to a specific revision
         """
@@ -1357,7 +1357,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.placeholders.all().delete()
 
         # populate the page status data from the target version
-        target_revision.revert(True)
+        target_revision.revert(delete=True)
         rev_page = get_object_or_404(Page, pk=self.pk)
         rev_page.revision_id = target_revision.pk
         rev_page.publisher_public_id = self.publisher_public_id
@@ -1387,6 +1387,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         title.slug = old_title.slug
                         title.save()
                         clean = False
+            if set_dirty:
+                self.set_publisher_state(title.language, PUBLISHER_STATE_DIRTY)
         return clean
 
 
