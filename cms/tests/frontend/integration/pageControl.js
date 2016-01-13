@@ -274,6 +274,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
                 xPath('//a[.//span[text()[contains(.,"Hide in navigation")]]]')
             );
         })
+        .waitForResource(/change-navigation/)
         // wait for reload
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
         // wait until we have the navigation displayed again
@@ -290,7 +291,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
                 'While the first one still is'
             );
         })
-        .then(function () {
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
@@ -300,6 +301,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
                 xPath('//a[.//span[text()[contains(.,"Display in navigation")]]]')
             );
         })
+        .waitForResource(/change-navigation/)
         // wait for reload
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
         // wait until we have the navigation displayed again
