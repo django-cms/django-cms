@@ -183,6 +183,7 @@ gulp.task('tests:integration', function (done) {
         'users',
         'addNewUser',
         'newPage',
+        'pageControl',
         'switchLanguage',
         'editContent',
         'editContentTools',
