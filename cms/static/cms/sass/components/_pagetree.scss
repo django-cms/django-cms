@@ -4,6 +4,9 @@
 // INFO: please not that all related styles to the pagetree itselfs are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
+.cms-pagetree-container {
+    margin-bottom: $pagetree-bottom-offset;
+}
 .cms-pagetree-container,
 .cms-pagetree {
     // helper classes
@@ -118,7 +121,7 @@
 .cms-tree-item-preview {
     position: relative;
     // need custom positioning here
-    top: 1px;
+    top: 2px;
     left: 3px;
 
     a {

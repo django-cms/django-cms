@@ -652,7 +652,16 @@ var CMS = window.CMS || {};
                     method: 'post',
                     url: $(this).attr('href')
                 }).done(function () {
-                    CMS.API.Helpers.reloadBrowser();
+                    if (window.self !== window.top) {
+                        // if we're in the sideframe we have to actually
+                        // check if we are publishing a page we're currently in
+                        // because if the slug did change we would need to
+                        // redirect to that new slug
+                        CMS.API.Helpers.reloadBrowser(false, false, true);
+                    } else {
+                        // otherwise simply reload the page
+                        CMS.API.Helpers.reloadBrowser();
+                    }
                 }).fail(function (error) {
                     that.showError(error.statusText);
                 });
