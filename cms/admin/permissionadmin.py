@@ -22,6 +22,7 @@ for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
 
+
 class TabularInline(admin.TabularInline):
     pass
 

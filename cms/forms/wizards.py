@@ -276,14 +276,15 @@ class CreateCMSPageForm(BaseCMSPageForm):
                     })
 
         if is_installed('reversion'):
-            import reversion
             from cms.utils.helpers import make_revision_with_plugins
+            from cms.admin.pageadmin import INITIAL_COMMENT
+            from cms.utils.reversion_hacks import create_revision
 
-            with reversion.create_revision():
+            with create_revision():
                 make_revision_with_plugins(
                     obj=page,
                     user=self.user,
-                    message=ugettext('Initial version.'),
+                    message=ugettext(INITIAL_COMMENT),
                 )
         return page
 

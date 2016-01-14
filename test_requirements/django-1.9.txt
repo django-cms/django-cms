@@ -1,10 +1,6 @@
 -r requirements_base.txt
 https://github.com/django/django/tarball/stable/1.9.x/django.tar.gz#egg=django
-django-reversion>=1.8,<1.9
-django-classy-tags>=0.6.1
-djangocms-text-ckeditor>=2.8.1
-django-hvad==1.5
+django-reversion==1.10,<1.11
 django-formtools
-django-classy-tags>=0.6.1
-django-sekizai>=0.8.2
+django-hvad==1.5
 django-debug-toolbar
