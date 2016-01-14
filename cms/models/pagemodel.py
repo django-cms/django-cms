@@ -1293,7 +1293,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the previous revision
         """
-        import reversion
+        from reversion import revisions as reversion
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
@@ -1320,7 +1320,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the next revision
         """
-        import reversion
+        from reversion import revisions as reversion
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
