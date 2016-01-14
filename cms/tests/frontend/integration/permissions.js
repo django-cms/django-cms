@@ -23,7 +23,7 @@ casper.test.setUp(function (done) {
 
 casper.test.tearDown(function (done) {
     casper.start()
-        // .then(cms.removePage())
+        .then(cms.removePage())
         .then(cms.logout())
         .run(done);
 });
