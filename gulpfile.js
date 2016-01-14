@@ -179,6 +179,7 @@ gulp.task('tests:integration', function (done) {
         'loginAdmin',
         'toolbar',
         'addFirstPage',
+        'wizard',
         'editMode',
         'sideframe',
         'createContent',
