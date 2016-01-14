@@ -56,7 +56,7 @@ module.exports = function (casperjs) {
                         if (pageId) {
                             this.click('.tree .deletelink[href*="' + pageId + '"]');
                         } else {
-                            this.click('.tree .deletelink');
+                            this.click('.tree .deletelink'); // first one
                         }
                     })
                     .waitUntilVisible('input[type=submit]')
