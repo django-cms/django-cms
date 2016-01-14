@@ -196,7 +196,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
-        from cms.cms_wizards import user_has_page_add_permission
+        from cms.utils.permissions import has_page_add_permission
 
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
@@ -220,9 +220,9 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
         # Before we do this, verify this user has perms to do so.
         if not (self.user.is_superuser or
-                user_has_page_add_permission(self.user, self.page,
+                has_page_add_permission(self.user, self.page,
                                              position=position,
-                                             site=self.page.site_id)):
+                                             site=self.page.site)):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
 
