@@ -131,6 +131,7 @@ casper.test.begin('Can set / unset "login required" for the page', function (tes
                 'The page no longer requires to be logged in'
             );
         })
+        .then(cms.login())
         .run(function () {
             test.done();
         });

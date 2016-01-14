@@ -303,6 +303,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
         })
         .waitForResource(/change-navigation/)
         // wait for reload
+        .wait(100)
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
         // wait until we have the navigation displayed again
         .waitUntilVisible('.nav', function () {
