@@ -136,10 +136,10 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
                 '.cms-dragarea:first-child > .cms-draggables > .cms-draggable > .cms-dragitem-collapsable'
             );
         })
+        // have to wait a bit because the collapse is debounced
+        .wait(100)
         .then(function () {
-            // have to wait a bit because the collapse is debounced
-            this.wait(10);
-            test.assertVisible('.cms-dragitem-text[title*="GridColumnPlugin"]');
+            test.assertVisible('.cms-dragitem-text[title*="GridColumnPlugin"]', 'Plugin expanded');
         })
         // move plugin
         .then(function () {
