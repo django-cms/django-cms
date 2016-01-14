@@ -46,6 +46,7 @@ from cms.admin.permissionadmin import (
     PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
 )
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.admin.views import revert_plugins
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
@@ -213,6 +214,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not obj.pk:
             new = True
         obj.save()
+
+        if 'recover' in request.path_info or 'history' in request.path_info:
+            revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
             try:
