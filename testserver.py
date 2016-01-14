@@ -11,6 +11,7 @@ gettext = noop_gettext
 
 
 HELPER_SETTINGS = dict(
+    CMS_PERMISSION=True,
     LANGUAGES=(
         ('en', u'English'),
         ('de', u'Deutsch'),
@@ -27,6 +28,8 @@ HELPER_SETTINGS = dict(
         },
     },
     PARLER_ENABLE_CACHING=False,
+    # required for integration tests
+    LOGIN_URL='/admin/login/?user-login=test',
     CMS_LANGUAGES={
         1: [
             {

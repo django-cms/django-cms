@@ -16,15 +16,16 @@ module.exports = function (casperjs) {
             return function () {
                 return this.thenOpen(globals.adminUrl).then(function () {
                     this.fill('#login-form', credentials ||  globals.credentials, true);
-                }).waitForSelector('#content');
+                }).waitForResource(/login/).thenEvaluate(function () {
+                    localStorage.clear();
+                });
             };
         },
 
         logout: function () {
             return function () {
-                return this.thenEvaluate(function () {
-                    localStorage.clear();
-                }).thenOpen(globals.adminLogoutUrl).waitForSelector('#content');
+                return this.thenOpen(globals.adminLogoutUrl)
+                    .waitForSelector('#content');
             };
         },
 

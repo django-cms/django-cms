@@ -1,7 +1,7 @@
 'use strict';
 
 // #############################################################################
-// Create the first page
+// Wizard
 
 var globals = require('./settings/globals');
 var content = require('./settings/globals').content.page;
