@@ -149,6 +149,14 @@ class FrontendEditableAdminMixin(object):
 
 
 class PlaceholderAdminMixin(object):
+
+    def _get_attached_admin(self, placeholder):
+        model = placeholder._get_attached_model()
+
+        if model and self.admin_site.is_registered(model):
+            return self.admin_site._registry[model]
+        return None
+
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
@@ -368,7 +376,25 @@ class PlaceholderAdminMixin(object):
                     'language': plugin.language, 'placeholder_id': plugin.placeholder_id
                 }
             )
+
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
+
+        # When this is executed we are in the admin class of the source placeholder
+        # It can be a page or a model with a placeholder field.
+        # Because of this we need to get the admin class instance of the
+        # target placeholder and call post_copy_plugins() on it.
+        # By doing this we make sure that both the source and target are
+        # informed of the operation.
+        target_placeholder_admin = self._get_attached_admin(target_placeholder)
+
+        if target_placeholder_admin:
+            target_placeholder_admin.post_copy_plugins(
+                request,
+                source_placeholder=source_placeholder,
+                target_placeholder=target_placeholder,
+                plugins=plugins,
+            )
+
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
@@ -570,6 +596,22 @@ class PlaceholderAdminMixin(object):
         reorder_plugins(placeholder, parent_id, language, order)
 
         self.post_move_plugin(request, source_placeholder, placeholder, plugin)
+
+        # When this is executed we are in the admin class of the source placeholder
+        # It can be a page or a model with a placeholder field.
+        # Because of this we need to get the admin class instance of the
+        # target placeholder and call post_move_plugin() on it.
+        # By doing this we make sure that both the source and target are
+        # informed of the operation.
+        target_placeholder_admin = self._get_attached_admin(placeholder)
+
+        if target_placeholder_admin:
+            target_placeholder_admin.post_move_plugin(
+                request,
+                source_placeholder=source_placeholder,
+                target_placeholder=placeholder,
+                plugins=plugin,
+            )
 
         try:
             language = request.toolbar.toolbar_language
