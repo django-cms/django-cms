@@ -13,6 +13,7 @@ django-classy-tags>=0.7
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
+-e git+git://github.com/divio/djangocms-flash.git#egg=djangocms-flash
 -e git+git://github.com/divio/djangocms-googlemap.git#egg=djangocms-googlemap
 -e git+git://github.com/divio/djangocms-inherit.git#egg=djangocms-inherit
 -e git+git://github.com/divio/djangocms-picture.git#egg=djangocms-picture
