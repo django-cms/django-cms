@@ -24,7 +24,7 @@ module.exports = function (casperjs) {
             return function () {
                 return this.thenEvaluate(function () {
                     localStorage.clear();
-                }).thenOpen(globals.adminLogoutUrl);
+                }).thenOpen(globals.adminLogoutUrl).waitForSelector('#content');
             };
         },
 
