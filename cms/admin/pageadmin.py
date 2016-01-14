@@ -5,7 +5,6 @@ import json
 import sys
 
 from django.utils.formats import localize
-from django.core.urlresolvers import reverse
 
 from cms.utils.compat import DJANGO_1_7
 
@@ -47,7 +46,6 @@ from cms.admin.permissionadmin import (
     PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
 )
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-from cms.admin.views import revert_plugins
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
