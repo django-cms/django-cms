@@ -166,6 +166,10 @@ if __name__ == '__main__':
                     return 'notmigrations'
 
             dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
+    if 'test' in sys.argv:
+        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    else:
+        SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
     app_manage.main(
         ['cms', 'menus'],
@@ -183,7 +187,7 @@ if __name__ == '__main__':
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             }
         },
-        SESSION_ENGINE="django.contrib.sessions.backends.db",
+        SESSION_ENGINE=SESSION_ENGINE,
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,

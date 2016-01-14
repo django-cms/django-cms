@@ -64,12 +64,12 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
-        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, SESSION_ENGINE="django.contrib.sessions.backends.cache",):
+        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
             with self.assertNumQueries(FuzzyInt(13, 17)):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
-        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False, SESSION_ENGINE="django.contrib.sessions.backends.cache",):
+        with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware, CMS_PLACEHOLDER_CACHE=False):
             with self.assertNumQueries(FuzzyInt(7, 11)):
                 self.client.get('/en/')
 
@@ -135,7 +135,7 @@ class CacheTestCase(CMSTestCase):
         ]
         mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes, SESSION_ENGINE="django.contrib.sessions.backends.cache",):
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
@@ -212,7 +212,7 @@ class CacheTestCase(CMSTestCase):
         ]
         mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        with self.settings(MIDDLEWARE_CLASSES=mw_classes, SESSION_ENGINE="django.contrib.sessions.backends.cache",):
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
 
             # Silly to do these tests if this setting isn't True
             page_cache_setting = get_cms_setting('PAGE_CACHE')
