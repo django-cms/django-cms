@@ -305,7 +305,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
         // wait for reload
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
         // wait until we have the navigation displayed again
-        .waitForSelector('.nav', function () {
+        .waitUntilVisible('.nav', function () {
             test.assertExists(
                 xPath('//ul[@class="nav"]/li/a[contains(@href,"' + SECOND_PAGE_TITLE.toLowerCase() + '")]' +
                 '[contains(text(),"' + SECOND_PAGE_TITLE + '")]'),
