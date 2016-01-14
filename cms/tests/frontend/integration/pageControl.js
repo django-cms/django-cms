@@ -1,7 +1,7 @@
 'use strict';
 
 // #############################################################################
-// Users managed via the admin panel
+// Page control
 
 var globals = require('./settings/globals');
 var randomString = require('./helpers/randomString').randomString;
