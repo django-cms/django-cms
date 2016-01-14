@@ -52,62 +52,90 @@ def user_has_page_add_perm(user, site=None):
     :param site: optional Site object (not just PK)
     :return: Boolean
     """
-    opts = Page._meta
     if not site:
         site = Site.objects.get_current()
-    global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-        user, site.pk).exists()
-    perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-    if user.has_perm(perm_str) and global_add_perm:
+
+    if get_cms_setting('PERMISSION'):
+        global_add_perm = (
+            GlobalPagePermission
+            .objects
+            .user_has_add_permission(user, site.pk)
+            .exists()
+        )
+    else:
+        global_add_perm = True
+    return has_auth_page_permission(user, action='add') and global_add_perm
+
+
+def has_page_add_permission(user, target=None, position=None, site=None):
+    """
+    Return true if the current user has permission to add a new page.
+    If we have target and position, check if user can
+    add page under target page.
+    :param user:
+    :param target: a Page object
+    :param position: a String "first-child", "last-child", "left", or "right"
+    :param site: optional Site object (not just PK)
+    :return: Boolean
+    """
+    if user.is_superuser:
         return True
+
+    if site is None:
+        if target:
+            site = target.site
+        else:
+            site = Site.objects.get_current()
+
+    has_add_permission = user_has_page_add_perm(user, site=site)
+
+    if not get_cms_setting('PERMISSION') or not target:
+        # If CMS permissions are disabled
+        # we can't really check anything but Django permissions.
+        # If there's no target then we let the global CMS permission
+        # handle user access.
+        return has_add_permission
+
+    if has_add_permission:
+        # There's a target page
+        # and CMS permissions are enabled.
+        # User has global add permissions so no need to check
+        # the target page.
+        return True
+
+    if position in ("first-child", "last-child"):
+        return target.has_add_permission(request=None, user=user)
+    elif position in ("left", "right"):
+        if target.parent_id:
+            return has_generic_permission(
+                target.parent_id, user, "add", site)
     return False
 
 
-def has_page_add_permission(request):
-    """
-    Return true if the current user has permission to add a new page. This is
-    just used for general add buttons - only superuser, or user with can_add in
-    globalpagepermission can add page.
+def has_page_add_permission_from_request(request):
+    from cms.utils.helpers import current_site
 
-    Special case occur when page is going to be added from add page button in
-    change list - then we have target and position there, so check if user can
-    add page under target page will occur.
-    """
-    opts = Page._meta
     if request.user.is_superuser:
         return True
 
-    # if add under page
-    target = request.GET.get('target', None)
     position = request.GET.get('position', None)
+    target_page_id = request.GET.get('target', None)
 
-    from cms.utils.helpers import current_site
-
-    site = current_site(request)
-
-    if target:
+    if target_page_id:
         try:
-            page = Page.objects.get(pk=target)
+            target = Page.objects.get(pk=target_page_id)
         except Page.DoesNotExist:
             return False
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            request.user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-        if request.user.has_perm(perm_str) and global_add_perm:
-            return True
-        if position in ("first-child", "last-child"):
-            return page.has_add_permission(request)
-        elif position in ("left", "right"):
-            if page.parent_id:
-                return has_generic_permission(
-                    page.parent_id, request.user, "add", page.site)
     else:
-        global_add_perm = GlobalPagePermission.objects.user_has_add_permission(
-            request.user, site).exists()
-        perm_str = opts.app_label + '.' + get_permission_codename('add', opts)
-        if request.user.has_perm(perm_str) and global_add_perm:
-            return True
-    return False
+        target = None
+
+    has_add_permission = has_page_add_permission(
+        user=request.user,
+        target=target,
+        position=position,
+        site=current_site(request),
+    )
+    return has_add_permission
 
 
 def has_any_page_change_permissions(request):
