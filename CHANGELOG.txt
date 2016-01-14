@@ -9,6 +9,7 @@
 - Fixed a tree corruption when pasting a nested plugin under another plugin.
 - Fix message with CMS version not showing up on hover in debug mode
 - Fix messages not being positioned correctly in debug mode
+- Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
 
 
 === 3.2.0 (2015-11-24) ===

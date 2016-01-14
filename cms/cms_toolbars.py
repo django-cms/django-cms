@@ -12,7 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
-from cms.models import Title, Page
+from cms.models import CMSPlugin, Title, Page
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -168,12 +168,15 @@ class BasicToolbar(CMSToolbar):
 
             # clipboard
             if self.toolbar.edit_mode or self.toolbar.build_mode:
+                # True if the clipboard exists and there's plugins in it.
+                clipboard_is_bound = self.get_clipboard_plugins().exists()
+
                 self._admin_menu.add_link_item(_('Clipboard...'), url='#',
                         extra_classes=['cms-clipboard-trigger'],
-                        disabled=not self.get_clipboard_plugins())
+                        disabled=not clipboard_is_bound)
                 self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
                         extra_classes=['cms-clipboard-empty'],
-                        disabled=not self.get_clipboard_plugins())
+                        disabled=not clipboard_is_bound)
                 self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
@@ -238,8 +241,9 @@ class BasicToolbar(CMSToolbar):
 
     def get_clipboard_plugins(self):
         self.populate()
+
         if not hasattr(self, "clipboard"):
-            return []
+            return CMSPlugin.objects.none()
         return self.clipboard.get_plugins()
 
     def render_addons(self, context):
