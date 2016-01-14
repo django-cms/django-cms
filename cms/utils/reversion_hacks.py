@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+# This large try / except is to account for reversion 1.10 (top) / 1.8 (bottom) support
+# This will go away in CMS 3.3 when only reversion 1.10 will be supported
 try:
     from reversion import revisions as reversion
     from reversion.admin import VersionAdmin as ModelAdmin, RollBackRevisionView  # NOQA  # nopyflakes

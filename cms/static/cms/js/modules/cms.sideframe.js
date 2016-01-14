@@ -377,7 +377,9 @@ var CMS = window.CMS || {};
                 this.reloadBrowser(this.options.onClose, false, true);
 
                 // trigger hide animation
-                this._hide({ duration: 0 });
+                this._hide({
+                    duration: this.options.sideframeDuration / 2
+                });
             },
 
             /**
@@ -390,7 +392,7 @@ var CMS = window.CMS || {};
              */
             _hide: function _hide(opts) {
                 var duration = this.options.sideframeDuration;
-                if (opts && opts.duration) {
+                if (opts && typeof opts.duration === 'number') {
                     duration = opts.duration;
                 }
 

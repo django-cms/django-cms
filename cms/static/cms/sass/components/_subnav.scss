@@ -112,7 +112,7 @@
                 background: $color-primary;
             }
             &[data-rel],
-            &[data-icon] {
+            &[data-cms-icon] {
                 &:before {
                     @extend %icon;
                     position: absolute;
@@ -122,16 +122,16 @@
                     line-height: $dropdown-item-height
                 }
             }
-            &[data-icon=copy] {
+            &[data-cms-icon=copy] {
                 @include icon(copy);
             }
-            &[data-icon=paste] {
+            &[data-cms-icon=paste] {
                 @include icon(paste);
             }
-            &[data-icon=scissors] {
+            &[data-cms-icon=scissors] {
                 @include icon(scissors);
             }
-            &[data-icon=bin] {
+            &[data-cms-icon=bin] {
                 @include icon(bin);
             }
             &[href*=alias_plugin] {

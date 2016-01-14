@@ -3,7 +3,6 @@ from logging import getLogger
 from os.path import join
 
 from django.conf import settings
-from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
@@ -445,7 +444,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         menu_pool.clear(site_id=site.pk)
         return first_page
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         pages = [self.pk]
         if self.publisher_public_id:
             pages.append(self.publisher_public_id)
@@ -1048,21 +1047,25 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         return request.user.has_perm(codename)
 
     def has_change_permission(self, request, user=None):
-        opts = self._meta
+        from cms.utils.permissions import has_auth_page_permission
+
         if not user:
             user = request.user
+
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts))
+        return (has_auth_page_permission(user, action='change')
                 and self.has_generic_permission(request, "change"))
 
     def has_delete_permission(self, request, user=None):
-        opts = self._meta
+        from cms.utils.permissions import has_auth_page_permission
+
         if not user:
             user = request.user
+
         if user.is_superuser:
             return True
-        return (user.has_perm(opts.app_label + '.' + get_permission_codename('delete', opts))
+        return (has_auth_page_permission(user, action='delete')
                 and self.has_generic_permission(request, "delete"))
 
     def has_publish_permission(self, request, user=None):
@@ -1341,7 +1344,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         clean = self._apply_revision(next_revision)
         return Page.objects.get(pk=self.pk), clean
 
-    def _apply_revision(self, target_revision):
+    def _apply_revision(self, target_revision, set_dirty=False):
         """
         Revert to a specific revision
         """
@@ -1360,7 +1363,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.placeholders.all().delete()
 
         # populate the page status data from the target version
-        target_revision.revert(True)
+        target_revision.revert(delete=True)
         rev_page = get_object_or_404(Page, pk=self.pk)
         rev_page.revision_id = target_revision.pk
         rev_page.publisher_public_id = self.publisher_public_id
@@ -1390,6 +1393,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         title.slug = old_title.slug
                         title.save()
                         clean = False
+            if set_dirty:
+                self.set_publisher_state(title.language, PUBLISHER_STATE_DIRTY)
         return clean
 
 

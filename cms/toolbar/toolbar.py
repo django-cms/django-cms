@@ -136,11 +136,12 @@ class CMSToolbar(ToolbarAPIMixin):
             try:
                 user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
             except UserSettings.DoesNotExist:
-                user_settings = UserSettings(language=self.language, user=self.request.user)
-                placeholder = Placeholder(slot="clipboard")
-                placeholder.save()
-                user_settings.clipboard = placeholder
-                user_settings.save()
+                placeholder = Placeholder.objects.create(slot="clipboard")
+                user_settings = UserSettings.objects.create(
+                    clipboard=placeholder,
+                    language=self.language,
+                    user=self.request.user,
+                )
         return user_settings
 
     def render_addons(self, context):
