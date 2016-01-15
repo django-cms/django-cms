@@ -123,7 +123,7 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
                     // have to use parents, because closest li is selectedChild itself
                     selectedChild.parents('li').eq(0).hasClass('ancestor') &&
                     selectedChild.parents('li').eq(0).find('> a').text() === 'Homepage';
-            }, true, 'Subpage appears in the menu correctly');
+            }, 'Subpage appears in the menu correctly');
         })
 
         .run(function () {

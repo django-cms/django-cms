@@ -39,10 +39,10 @@ casper.test.begin('User Add Content', function (test) {
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
-        .waitWhileVisible('.cms-modal-morphing')
+        .waitUntilVisible('.cms-modal-morphing')
         .withFrame(0, function () {
             // wait until modal fully loads
-            this.waitUntilVisible('#content');
+            return this.waitUntilVisible('#content');
         })
         .then(function () {
             this.setFilter('page.confirm', function () {

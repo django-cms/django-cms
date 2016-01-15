@@ -198,6 +198,7 @@ gulp.task('tests:integration', function (done) {
         'changeSettings',
         'disableToolbar',
         'dragndrop',
+        'narrowScreen',
         'clipboard'
     ];
     var pre = ['setup'];
