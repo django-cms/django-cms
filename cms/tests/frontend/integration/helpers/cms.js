@@ -81,7 +81,8 @@ module.exports = function (casperjs) {
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
                         this.click('input[name="_save"]');
-                    });
+                    })
+                    .waitUntilVisible('.success');
             };
         },
 
