@@ -51,11 +51,10 @@ class ToolbarMiddleware(object):
     Middleware to set up CMS Toolbar.
     """
 
-    def is_cms_request(self,request):
-        cms_app_name = get_cms_setting('APP_NAME')
+    def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
 
-        if not toolbar_hide or not cms_app_name:
+        if not toolbar_hide:
             return True
 
         try:
@@ -63,8 +62,7 @@ class ToolbarMiddleware(object):
         except:
             return False
 
-        return match.app_name == cms_app_name
-
+        return match.app_name in ('pages-root', 'pages-details-by-slug')
 
     def process_request(self, request):
         """
