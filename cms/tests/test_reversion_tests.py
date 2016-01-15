@@ -252,8 +252,8 @@ class ReversionTestCase(TransactionCMSTestCase):
                 page = create_page(**page_data)
 
                 # Assert page has apphooks
-                self.assertEqual(page.apphook, 'SampleApp')
-                self.assertEqual(page.apphook_namespace, 'SampleApp')
+                self.assertEqual(page.application_urls, 'SampleApp')
+                self.assertEqual(page.application_namespace, 'SampleApp')
 
                 # Create revision
                 make_revision_with_plugins(page, user=None, message="Initial version")
@@ -265,13 +265,16 @@ class ReversionTestCase(TransactionCMSTestCase):
             response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
+            # Assert page was truly deleted
+            self.assertEqual(Page.objects.filter(pk=page_pk).count(), 0)
+
             versions_qs = revision_manager.get_deleted(Page).order_by("-pk")
             version = versions_qs[0]
 
-            self.assertEqual(Page.objects.filter(pk=page_pk).count(), 0)
+            recover_url = URL_CMS_PAGE + "recover/%s/" % version.pk
 
+            # Recover deleted page
             page_form_data = self.get_pagedata_from_dbfields(page_data)
-            recover_url = URL_CMS_PAGE + "recover/%s" % version.pk
             self.client.post(recover_url, page_form_data)
 
             # Verify page was recovered correctly
@@ -281,8 +284,8 @@ class ReversionTestCase(TransactionCMSTestCase):
             page = Page.objects.get(pk=page_pk)
 
             # Verify apphook and apphook namespace are set on page.
-            self.assertEqual(page.apphook, 'SampleApp')
-            self.assertEqual(page.apphook_namespace, 'SampleApp')
+            self.assertEqual(page.application_urls, 'SampleApp')
+            self.assertEqual(page.application_namespace, 'SampleApp')
 
     def test_recover_path_collision(self):
         with self.login_user_context(self.user):
