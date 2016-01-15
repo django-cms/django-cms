@@ -40,10 +40,15 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
         .waitWhileVisible('.cms-modal-morphing')
-        .waitUntilVisible('.cms-modal-open', function () {
+        .withFrame(0, function () {
+            // wait until modal fully loads
+            this.waitUntilVisible('#content');
+        })
+        .then(function () {
             this.setFilter('page.confirm', function () {
                 return true;
             });
+            // click on the "Cancel" button
             this.click('.cms-modal-item-buttons:last-child a');
         })
         .waitWhileVisible('.cms-modal-open', function () {
