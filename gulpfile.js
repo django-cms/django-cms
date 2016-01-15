@@ -188,6 +188,7 @@ gulp.task('tests:integration', function (done) {
         'newPage',
         'pageControl',
         'permissions',
+        'pageTypes',
         'switchLanguage',
         'editContent',
         'editContentTools',
