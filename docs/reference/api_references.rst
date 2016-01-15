@@ -645,6 +645,20 @@ menus.base
                          visible or not.
 
 
+    .. attribute:: attr
+
+        A dictionary of various additional information describing the node.
+        Nodes that represent CMS pages have the following keys in attr:
+
+        * **auth_required** (*bool*) – is authentication required to access this page
+        * **is_page** (*bool*) – Always True
+        * **navigation_extenders** (*list*) – navigation extenders connected to this node (including Apphooks)
+        * **redirect_url** (*str*) – redirect URL of page (if any)
+        * **reverse_id** (*str*) – unique identifier for the page
+        * **soft_root** (*bool*) – whether page is a soft root
+        * **visible_for_authenticated** (*bool*) – visible for authenticated users
+        * **visible_for_anonymous** (*bool*) – visible for anonymous users
+
     .. method:: get_descendants
 
         Returns a list of all children beneath the current menu item.
