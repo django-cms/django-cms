@@ -367,6 +367,17 @@ var CMS = window.CMS || {};
                 this.ui.window.off('resize.sideframe');
 
                 this.ui.window.trigger('structureboard_hidden.sideframe');
+
+                // this is sometimes required for user-side scripts to
+                // render dynamic elements on the page correctly.
+                // e.g. you have a parallax script that calculates position
+                // of elements based on document height. but if the page is
+                // loaded with structureboard active - the document height
+                // would be same as screen height, which is likely incorrect,
+                // so triggering resize on window would force user scripts
+                // to recalculate whatever is required there
+                this.ui.window.trigger('resize');
+
                 if (!CMS.config.simpleStructureBoard) {
                     this.ui.container.height(this.ui.doc.outerHeight());
                 }

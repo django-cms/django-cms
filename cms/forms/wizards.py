@@ -6,7 +6,11 @@ from django import forms
 from django.contrib.sites.models import Site
 from django.core.exceptions import PermissionDenied
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import (
+    ugettext,
+    ugettext_lazy as _,
+    get_language,
+)
 
 from cms.api import generate_valid_slug
 from cms.constants import PAGE_TYPES_ID
@@ -14,6 +18,7 @@ from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
 from cms.utils import permissions
+from cms.utils.compat.dj import is_installed
 from cms.utils.urlutils import static_with_version
 from cms.utils.conf import get_cms_setting
 
@@ -191,7 +196,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
-        from cms.cms_wizards import user_has_page_add_permission
+        from cms.utils.permissions import has_page_add_permission
 
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
@@ -215,9 +220,9 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
         # Before we do this, verify this user has perms to do so.
         if not (self.user.is_superuser or
-                user_has_page_add_permission(self.user, self.page,
+                has_page_add_permission(self.user, self.page,
                                              position=position,
-                                             site=self.page.site_id)):
+                                             site=self.page.site)):
             raise NoPermissionsException(
                 _(u"User does not have permission to add page."))
 
@@ -270,6 +275,17 @@ class CreateCMSPageForm(BaseCMSPageForm):
 
                     })
 
+        if is_installed('reversion'):
+            from cms.utils.helpers import make_revision_with_plugins
+            from cms.admin.pageadmin import INITIAL_COMMENT
+            from cms.utils.reversion_hacks import create_revision
+
+            with create_revision():
+                make_revision_with_plugins(
+                    obj=page,
+                    user=self.user,
+                    message=ugettext(INITIAL_COMMENT),
+                )
         return page
 
 

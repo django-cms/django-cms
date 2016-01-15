@@ -9,9 +9,9 @@ try:
 except ImportError:
     from urlparse import urlparse
 try:
-    import unittest
-except ImportError:
     from django.utils import unittest
+except ImportError:
+    import unittest
 
 import django
 from django.conf import settings

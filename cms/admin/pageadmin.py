@@ -5,7 +5,6 @@ import json
 import sys
 
 from django.utils.formats import localize
-from django.core.urlresolvers import reverse
 
 from cms.utils.compat import DJANGO_1_7
 
@@ -19,7 +18,7 @@ from django.contrib.admin.options import IncorrectLookupParameters
 try:
     from django.contrib.admin.utils import get_deleted_objects, quote
 except ImportError:
-    from django.contrib.admin.util import get_deleted_objects
+    from django.contrib.admin.util import get_deleted_objects, quote
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 try:
@@ -215,6 +214,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if not obj.pk:
             new = True
         obj.save()
+
+        if 'recover' in request.path_info or 'history' in request.path_info:
+            revert_plugins(request, obj.version.pk, obj)
 
         if target is not None and position is not None:
             try:
@@ -452,7 +454,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         if request.method == "POST" and response.status_code in (200, 302):
             if 'history' in request.path_info:
-                return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
+                return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
             elif 'recover' in request.path_info:
                 return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
         return response
@@ -504,7 +506,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         Return true if the current user has permission to add a new page.
         """
         if get_cms_setting('PERMISSION'):
-            return permissions.has_page_add_permission(request)
+            return permissions.has_page_add_permission_from_request(request)
         return super(PageAdmin, self).has_add_permission(request)
 
     def has_change_permission(self, request, obj=None):
@@ -756,18 +758,30 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         return super(PageAdmin, self).recover_view(request, version_id, extra_context)
 
     def revision_view(self, request, object_id, version_id, extra_context=None):
+        if not is_installed('reversion'):
+            return HttpResponseBadRequest('django reversion not installed')
+
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
             raise PermissionDenied
-        extra_context = self.update_language_tab_context(request, None, extra_context)
-        request.original_version_id = version_id
-        response = super(PageAdmin, self).revision_view(request, object_id, version_id, extra_context)
-        if request.method == 'POST':
-            if 'recover' in request.path_info or 'history' in request.path_info:
-                version = get_object_or_404(Version, pk=version_id)
-                obj = get_object_or_404(Page, pk=version.object_id)
-                revert_plugins(request, version_id, obj)
-                return HttpResponseRedirect(reverse('admin:cms_page_change', args=(object_id,)))
-        return response
+
+        page = get_object_or_404(self.model, pk=object_id)
+        if not page.publisher_is_draft:
+            page = page.publisher_draft
+        if not page.has_change_permission(request):
+            return HttpResponseForbidden(force_text(_("You do not have permission to change this page")))
+        try:
+            version = Version.objects.get(pk=version_id)
+            clean = page._apply_revision(version.revision, set_dirty=True)
+            if not clean:
+                messages.error(request, _("Page reverted but slug stays the same because of url collisions."))
+            with create_revision():
+                adapter = self.revision_manager.get_adapter(page.__class__)
+                self.revision_context_manager.add_to_context(self.revision_manager, page, adapter.get_version_data(page))
+                self.revision_context_manager.set_comment(_("Reverted to previous version, saved on %(datetime)s") % {"datetime": localize(version.revision.date_created)})
+        except IndexError as e:
+            return HttpResponseBadRequest(e.message)
+
+        return HttpResponseRedirect(admin_reverse('cms_page_change', args=(quote(object_id),)))
 
     def history_view(self, request, object_id, extra_context=None):
         if not self.has_change_permission(request, Page.objects.get(pk=object_id)):
@@ -811,6 +825,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
+            self.revision_context_manager.set_comment(INITIAL_COMMENT)
         # Same code as reversion 1.9
         try:
             super(PageAdmin, self).log_addition(request, object, INITIAL_COMMENT)
@@ -1286,8 +1301,8 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 helpers.make_revision_with_plugins(obj, request.user, message)
 
             if not self.has_change_permission(request, None):
-                return HttpResponseRedirect(reverse('admin:index'))
-            return HttpResponseRedirect(reverse('admin:cms_page_changelist'))
+                return HttpResponseRedirect(admin_reverse('index'))
+            return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
 
         context = {
             "title": _("Are you sure?"),
