@@ -319,7 +319,6 @@ def configure(db_url, **extra):
 
     DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
 
-    print(defaults)
     if DJANGO_1_6:
         defaults['INSTALLED_APPS'].append('south')
         defaults['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
