@@ -20,7 +20,7 @@ casper.test.tearDown(function (done) {
         .run(done);
 });
 
-casper.test.begin('Add First Page', function (test) {
+casper.test.begin('Add First Page with wizard', function (test) {
     casper
         .start(globals.editUrl)
         .waitUntilVisible('.cms-modal', function () {

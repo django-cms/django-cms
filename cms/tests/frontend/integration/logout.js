@@ -13,7 +13,12 @@ casper.test.setUp(function (done) {
         .run(done);
 });
 
-casper.test.tearDown(function () {
+casper.test.tearDown(function (done) {
+    casper.start()
+        .then(cms.login())
+        .then(cms.removePage())
+        .then(cms.logout())
+        .run(done);
 });
 
 casper.test.begin('User Logout', function (test) {
@@ -25,6 +30,7 @@ casper.test.begin('User Logout', function (test) {
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
+        .waitForResource(/logout/)
         .waitForSelector('.nav', function () {
             test.assertDoesntExist('.cms-toolbar', 'Logout via the toolbar done');
         })
