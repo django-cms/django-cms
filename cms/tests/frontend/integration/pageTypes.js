@@ -14,21 +14,21 @@ var SECOND_PAGE_TITLE = 'Second';
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login())
-        // .then(cms.addPage({ title: 'First page' }))
+        .then(cms.addPage({ title: 'First page' }))
         // adding second one because first is published by default
-        // .then(cms.addPage({ title: SECOND_PAGE_TITLE }))
+        .then(cms.addPage({ title: SECOND_PAGE_TITLE }))
         .run(done);
 });
 
 casper.test.tearDown(function (done) {
     casper.start()
-        // .then(cms.removePage({ title: SECOND_PAGE_TITLE }))
-        // .then(cms.removePage({ title: 'First page' })) // removing both pages
+        .then(cms.removePage({ title: SECOND_PAGE_TITLE }))
+        .then(cms.removePage({ title: 'First page' })) // removing both pages
         .then(cms.logout())
         .run(done);
 });
 
-0 && casper.test.begin('Different page template can be applied', function (test) {
+casper.test.begin('Different page template can be applied', function (test) {
     casper.start(globals.editUrl)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertDoesntExist('h1', 'Page is "fullwidth.html"');
@@ -73,7 +73,7 @@ casper.test.tearDown(function (done) {
 });
 
 casper.test.begin('PageType can be created and used', function (test) {
-    casper.start(globals.editUrl)
+    casper.start()
         // actually creates 3 plugins - row > col + col
         .then(cms.addPlugin({
             type: 'GridPlugin',
@@ -96,6 +96,101 @@ casper.test.begin('PageType can be created and used', function (test) {
             },
             parent: '.cms-dragarea:first-child .cms-draggable .cms-draggable:last-child'
         }))
+        .thenOpen(globals.editUrl)
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            // click on "Page" menu item
+            this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
+        })
+        // opening "Save as Page Type" menu item
+        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+            this.click(
+                xPath('//a[.//span[text()[contains(.,"Save as Page Type")]]]')
+            );
+        })
+        // switch to "Add Page Type" modal
+        .withFrame(0, function () {
+            // wait until form is loaded
+            casper.waitUntilVisible('#page_form', function () {
+                test.assertField(
+                    'title',
+                    '',
+                    'Page type modal available'
+                );
+            }).then(function () {
+                this.sendKeys('input[name="title"]', 'Two column layout');
+            }).then(function () {
+                test.assertField(
+                    'slug',
+                    'two-column-layout',
+                    'Slug generated correctly'
+                );
+            });
+        })
+        // submit the modal
+        .then(function () {
+            this.click('.cms-modal-item-buttons .cms-btn-action');
+        })
+        .waitForResource(/add_page_type/)
+        .waitForUrl(/page_types/)
+        .then(function () {
+            test.assertUrlMatch(/page_types\/two-column-layout/, 'Page Type created');
+        })
+        .thenOpen(globals.editUrl)
+        // create new page through Page > Add Page > New Page
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
+        })
+        // expand "Templates" menu item
+        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+            var position = this.getElementBounds(xPath('//a[.//span[text()[contains(.,"Add Page")]]]'));
+            // simulating mouseenter event
+            this.mouse.move(position.left + 1, position.top - 1);
+            this.mouse.move(position.left + 1, position.top + 1);
+            this.wait(10);
+        })
+        // wait till it expands
+        .waitForSelector('.cms-toolbar-item-navigation-hover .cms-toolbar-item-navigation-hover', function () {
+            // move right
+            this.mouse.move(
+                xPath('//a[.//span[text()[contains(.,"New Page")]]]')
+            );
+            this.click(
+                xPath('//a[.//span[text()[contains(.,"New Page")]]]')
+            );
+        })
+        // then with modal
+        .withFrame(0, function () {
+            casper.waitUntilVisible('#page_form', function () {
+                // need to get the value of correct option
+                var pageType = this.getElementAttribute(
+                    xPath('//option[text()[contains(.,"Two column layout")]]'),
+                    'value'
+                );
+                // fill the form
+                this.fill('#page_form', {
+                    title: 'New Shiny Page',
+                    slug: 'new-shiny-page',
+                    page_type: pageType
+                }, false);
+            });
+        })
+        // submit the page creation form
+        .then(function () {
+            this.click('.cms-modal-item-buttons .cms-btn-action');
+        })
+        // wait till it succeeds
+        .waitForResource(/cms\/page\/add/)
+        // and we are redirected to a newly created page
+        .waitForUrl(/new-shiny-page/)
+        .waitUntilVisible('.cms-toolbar-expanded')
+        .then(function () {
+            test.assertUrlMatch(/new-shiny-page/, 'Page was created');
+            test.assertSelectorHasText('.grid-12.alpha', 'Left column', 'Correct page type was used');
+            test.assertSelectorHasText('.grid-12.omega', 'Right column', 'Correct page type was used');
+        })
+        // cleanup before teardown
+        .then(cms.removePage({ title: 'Page Types' }))
+        .then(cms.removePage({ title: 'New Shiny Page' }))
         .run(function () {
             test.done();
         });
