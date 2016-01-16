@@ -102,7 +102,7 @@ Check spelling
 
 Run::
 
-    ``make spelling``
+    make spelling
 
 in the ``docs`` directory to conduct the checks.
 
