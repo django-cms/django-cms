@@ -6,7 +6,7 @@ API References
 cms.api
 *******
 
-Python APIs for creating CMS contents. This is done in :mod:`cms.api` and not
+Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
 on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers. Also the functions defined in this
 module do sanity checks on arguments.
@@ -54,7 +54,6 @@ Functions and constants
     Used for the ``limit_menu_visibility`` keyword argument to
     :func:`create_page`. Limits menu visibility to authenticated users.
 
-
 .. data:: VISIBILITY_ANONYMOUS
 
     Used for the ``limit_menu_visibility`` keyword argument to
@@ -73,7 +72,7 @@ Functions and constants
     :param string menu_title: Menu title for this page
     :param string slug: Slug for the page, by default uses a slugified version of *title*
     :param apphook: Application to hook on this page, must be a valid apphook
-    :type apphook: string or :class:`cms.app_base.CMSApp` subclass
+    :type apphook: string or :class:`cms.app_base.CMSApp` sub-class
     :param string apphook_namespace: Name of the apphook namespace
     :param string redirect: URL redirect
     :param string meta_description: Description of this page for SEO
@@ -84,7 +83,7 @@ Functions and constants
     :param datetime publication_date: Date to publish this page
     :param datetime publication_end_date: Date to unpublish this page
     :param bool in_navigation: Whether this page should be in the navigation or not
-    :param bool soft_root: Whether this page is a softroot or not
+    :param bool soft_root: Whether this page is a soft root or not
     :param string reverse_id: Reverse ID of this page (for template tags)
     :param string navigation_extenders: Menu to attach to this page. Must be a valid menu
     :param bool published: Whether this page should be published or not
@@ -121,7 +120,7 @@ Functions and constants
     :param placeholder: Placeholder to add the plugin to
     :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
     :param plugin_type: What type of plugin to add
-    :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` subclass, must be a valid plugin
+    :type plugin_type: string or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
     :param string language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param string position: Position to add this plugin to the placeholder, must be a valid django-mptt position
     :param target: Parent plugin. Must be plugin instance
@@ -251,7 +250,7 @@ cms.plugin_base
 
     .. attribute:: admin_preview
 
-        Defaults to ``False``, if ``True`` there will be a preview in the admin.
+        Defaults to ``False``, if ``True``, displays a preview in the admin.
 
     .. attribute:: change_form_template
 
@@ -302,7 +301,7 @@ cms.plugin_base
 
     .. method:: icon_src(instance)
 
-        Returns the url to the icon to be used for the given instance when that
+        Returns the URL to the icon to be used for the given instance when that
         instance is used inside a text plugin.
 
     .. method:: render(context, instance, placeholder)
@@ -378,7 +377,7 @@ cms.toolbar.toolbar
 
     .. attribute:: watch_models
 
-        A list of model this toolbar works on; used for redirections after editing
+        A list of model this toolbar works on; used for redirection after editing
         (:ref:`url_changes`).
 
     .. method:: add_item(item, position=None)
@@ -388,7 +387,7 @@ cms.toolbar.toolbar
         Adds an item, which must be an instance of
         :class:`cms.toolbar.items.BaseItem`, to the toolbar.
 
-        This method should only be used for custom item classes, as all builtin
+        This method should only be used for custom item classes, as all built-in
         item classes have higher level APIs.
 
         Read above for information on ``position``.
@@ -418,6 +417,14 @@ cms.toolbar.toolbar
 
 cms.toolbar.items
 =================
+
+.. important:: **Overlay** and **sideframe**
+
+    Then django CMS *sideframe* has been replaced with an *overlay* mechanism. The API still refers
+    to the ``sideframe``, because it is invoked in the same way, and what has changed is merely the
+    behaviour in the user's browser.
+
+    In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
 
 .. module:: cms.toolbar.items
 
@@ -478,7 +485,7 @@ cms.toolbar.items
     .. method:: find_items(item_type, **attributes)
 
         Returns a list of :class:`ItemSearchResult` objects matching all items
-        of ``item_type``, which must be a subclass of :class:`BaseItem`, where
+        of ``item_type``, which must be a sub-class of :class:`BaseItem`, where
         all attributes in ``attributes`` match.
 
     .. method:: find_first(item_type, **attributes)
@@ -490,16 +497,16 @@ cms.toolbar.items
 
     .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT, position=None)
 
-        Adds an item which opens ``url`` in the side frame and returns it.
+        Adds an item which opens ``url`` in the sideframe and returns it.
 
-        ``on_close`` can be set to ``None`` to do nothing when the side frame
+        ``on_close`` can be set to ``None`` to do nothing when the sideframe
         closes, :attr:`REFRESH_PAGE` to refresh the page when it
         closes or a URL to open once it closes.
 
     .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None)
 
         The same as :meth:`add_sideframe_item`, but opens the ``url`` in a
-        modal dialog instead of the side frame.
+        modal dialog instead of the sideframe.
 
         ``on_close`` can be set to ``None`` to do nothing when the side modal
         closes, :attr:`REFRESH_PAGE` to refresh the page when it
@@ -527,7 +534,7 @@ cms.toolbar.items
 
     .. attribute:: template
 
-        Must be set by subclasses and point to a Django template
+        Must be set by sub-classes and point to a Django template
 
     .. attribute:: side
 
@@ -576,7 +583,7 @@ cms.toolbar.items
 
 .. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT)
 
-    Item that opens ``url`` in side frame.
+    Item that opens ``url`` in sideframe.
 
 
 .. class:: AjaxItem(name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None, question=None, side=LEFT)
@@ -614,7 +621,7 @@ cms.toolbar.items
 
 .. class:: Button(name, url, active=False, disabled=False, extra_classes=None)
 
-    A button to be used with :class:`ButtonList`. Opens ``url`` when clicked.
+    A button to be used with :class:`ButtonList`. Opens ``url`` when selected.
 
 
 **********
@@ -637,6 +644,20 @@ menus.base
     :param bool visible: Optional, defaults to ``True``, whether this item is
                          visible or not.
 
+
+    .. attribute:: attr
+
+        A dictionary of various additional information describing the node.
+        Nodes that represent CMS pages have the following keys in attr:
+
+        * **auth_required** (*bool*) – is authentication required to access this page
+        * **is_page** (*bool*) – Always True
+        * **navigation_extenders** (*list*) – navigation extenders connected to this node (including Apphooks)
+        * **redirect_url** (*str*) – redirect URL of page (if any)
+        * **reverse_id** (*str*) – unique identifier for the page
+        * **soft_root** (*bool*) – whether page is a soft root
+        * **visible_for_authenticated** (*bool*) – visible for authenticated users
+        * **visible_for_anonymous** (*bool*) – visible for anonymous users
 
     .. method:: get_descendants
 

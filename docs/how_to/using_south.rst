@@ -33,7 +33,7 @@ For a very short crash course:
    script).
 #. Run the migration using ``manage.py migrate``. Your tables will be created
    in the database and Django will work as usual.
-#. Whenever you make changes to your models.py file, run
+#. Whenever you make changes to your ``models.py`` file, run
    ``manage.py schemamigration --auto <app name>`` to create a new migration
    file. Next run ``manage.py migrate`` to apply the newly created migration.
 

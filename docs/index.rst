@@ -23,7 +23,7 @@ create a site that is tailored to their precise needs.
 interface should refer to our :doc:`/user/index` section.
 
 **Web content developers** who want to learn more about django CMS, as well as
-how to install, configure and customize it for their own projects will can
+how to install, configure and customise it for their own projects will can
 refer to :doc:`/introduction/index`, :doc:`/how_to/index`, :doc:`/topics/index`
 and :doc:`/reference/index` sections.
 
@@ -35,7 +35,7 @@ django CMS is supported by a friendly and very knowledgeable community.
 
 Find us:
 
-* in our IRC channel, #django-cms, on irc.freenode.net
+* in our IRC channel, #django-cms, on ``irc.freenode.net``
 * on our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ for **general** django CMS questions and discussion
 * on our `django CMS developers email list <https://groups.google.com/forum/#!forum/django-cms-developers>`_ for discussions about the **development of django CMS**
 

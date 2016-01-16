@@ -118,7 +118,8 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     require_parent = False
     parent_classes = None
 
-    disable_child_plugin = False
+    disable_child_plugins = False
+    disable_child_plugin = False  # DEPRECATED: REMOVE IN CMS v3.3
 
     cache = get_cms_setting('PLUGIN_CACHE')
     system = False
@@ -155,6 +156,10 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             return self.get_render_template(context, instance, placeholder)
         elif getattr(self, 'render_template', False):
             return getattr(self, 'render_template', False)
+
+    @classmethod
+    def get_render_queryset(cls):
+        return cls.model._default_manager.all()
 
     def render(self, context, instance, placeholder):
         context['instance'] = instance

@@ -176,6 +176,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                 page = request.current_page
             plugin.cms_plugin_instance = instance
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
+            context['allowed_parent_classes'] = plugin.get_parent_classes(placeholder_slot, page)
             if plugin.render_plugin:
                 template = plugin._get_render_template(context, instance, placeholder)
                 if not template:
@@ -461,6 +462,43 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             Model.delete(self, *args, **kwargs)
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
+
+    def get_action_urls(self, js_compat=True):
+        if js_compat:
+            # TODO: Remove this condition
+            # once the javascript files have been refactored
+            # to use the new naming schema (ending in _url).
+            data = {
+                'edit_plugin': self.get_edit_url(),
+                'add_plugin': self.get_add_url(),
+                'delete_plugin': self.get_delete_url(),
+                'move_plugin': self.get_move_url(),
+                'copy_plugin': self.get_copy_url(),
+            }
+        else:
+            data = {
+                'edit_url': self.get_edit_url(),
+                'add_url': self.get_add_url(),
+                'delete_url': self.get_delete_url(),
+                'move_url': self.get_move_url(),
+                'copy_url': self.get_copy_url(),
+            }
+        return data
+
+    def get_add_url(self):
+        return self.add_url or self.placeholder.get_add_url()
+
+    def get_edit_url(self):
+        return self.edit_url or self.placeholder.get_edit_url(self.pk)
+
+    def get_delete_url(self):
+        return self.delete_url or self.placeholder.get_delete_url(self.pk)
+
+    def get_move_url(self):
+        return self.move_url or self.placeholder.get_move_url()
+
+    def get_copy_url(self):
+        return self.copy_url or self.placeholder.get_copy_url()
 
     @property
     def add_url(self):

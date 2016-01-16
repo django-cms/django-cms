@@ -15,7 +15,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import HttpResponseRedirect, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.translation import ugettext_lazy as _
 
 try:
     from collections import OrderedDict
@@ -24,11 +23,14 @@ except ImportError:
 
 
 class CMSToolbarLoginForm(AuthenticationForm):
-    username = forms.CharField(label=_("Username"), max_length=100)
 
     def __init__(self, *args, **kwargs):
-        kwargs['prefix'] = kwargs.get('prefix', 'cms')
         super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)
+        kwargs['prefix'] = kwargs.get('prefix', 'cms')
+        self.fields['username'].widget = forms.TextInput(
+            attrs = { 'required': 'required' })
+        self.fields['password'].widget = forms.PasswordInput(
+            attrs = { 'required': 'required' })
 
 
 class CMSToolbar(ToolbarAPIMixin):
@@ -59,6 +61,7 @@ class CMSToolbar(ToolbarAPIMixin):
         self.clipboard = None
         self.language = None
         self.toolbar_language = None
+        self.simple_structure_mode = get_cms_setting('TOOLBAR_SIMPLE_STRUCTURE_MODE')
         self.show_toolbar = True
         self.init_toolbar(request)
 
@@ -133,11 +136,12 @@ class CMSToolbar(ToolbarAPIMixin):
             try:
                 user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
             except UserSettings.DoesNotExist:
-                user_settings = UserSettings(language=self.language, user=self.request.user)
-                placeholder = Placeholder(slot="clipboard")
-                placeholder.save()
-                user_settings.clipboard = placeholder
-                user_settings.save()
+                placeholder = Placeholder.objects.create(slot="clipboard")
+                user_settings = UserSettings.objects.create(
+                    clipboard=placeholder,
+                    language=self.language,
+                    user=self.request.user,
+                )
         return user_settings
 
     def render_addons(self, context):
@@ -339,7 +343,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def _call_toolbar(self, func_name):
         with force_language(self.toolbar_language):
-            first = ('cms.cms_toolbar.BasicToolbar', 'cms.cms_toolbar.PlaceholderToolbar')
+            first = ('cms.cms_toolbars.BasicToolbar', 'cms.cms_toolbars.PlaceholderToolbar')
             for key in first:
                 toolbar = self.toolbars.get(key)
                 if not toolbar:

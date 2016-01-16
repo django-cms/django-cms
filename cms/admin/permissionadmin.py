@@ -22,6 +22,7 @@ for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
 
+
 class TabularInline(admin.TabularInline):
     pass
 
@@ -62,7 +63,7 @@ class PagePermissionInlineAdmin(TabularInline):
 
         # here an exception can be thrown
         try:
-            qs = PagePermission.objects.subordinate_to_user(request.user)
+            qs = self.model.objects.subordinate_to_user(request.user)
             return qs.filter(can_view=False)
         except NoPermissionsException:
             return self.objects.get_empty_query_set()
@@ -123,7 +124,7 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
         Returns a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.
         """
-        qs = PagePermission.objects.subordinate_to_user(request.user)
+        qs = self.model.objects.subordinate_to_user(request.user)
         return qs.filter(can_view=True)
 
 

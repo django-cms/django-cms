@@ -24,6 +24,33 @@ CLASSIFIERS = [
     'Framework :: Django :: 1.8',
 ]
 
+INSTALL_REQUIREMENTS = [
+    'Django>=1.6.9,<1.9',
+    'django-classy-tags>=0.5',
+    'html5lib>=0.90,!=0.9999,!=0.99999',
+    'django-formtools>=1.0',
+    'django-treebeard==3.0',
+    'django-sekizai>=0.7',
+    'djangocms-admin-style',
+]
+
+#
+# NOTE: divio/django-formtools is IDENTICAL to django/django-formtools except
+# that its Django requirement has been relaxed to >=Django>=1.6. This is because
+# this version of django CMS supports Django 1.6+. Internally, CMS will use
+# django.contrib.formtools when available, then look for the external version if
+# required. Unfortunately, SetupTools doesn't allow use to load the external
+# library when using Django 1.7+ only.
+#
+# Further note that dependency links do not work by default. Current versions of
+# Pip support it with the flag `--process-dependency-links`
+#
+# Remove these machinations in CMS v3.3 when Django 1.6 support is dropped.
+#
+DEPENDENCY_LINKS = [
+    "https://github.com/divio/django-formtools/archive/master.zip#egg=django-formtools",
+]
+
 setup(
     author='Patrick Lauber',
     author_email='digi@treepy.com',
@@ -35,14 +62,8 @@ setup(
     license='BSD License',
     platforms=['OS Independent'],
     classifiers=CLASSIFIERS,
-    install_requires=[
-        'Django>=1.6.9,<1.9',
-        'django-classy-tags>=0.5',
-        'html5lib>=0.90,!=0.9999,!=0.99999',
-        'django-treebeard==3.0',
-        'django-sekizai>=0.7',
-        'djangocms-admin-style'
-    ],
+    install_requires=INSTALL_REQUIREMENTS,
+    dependency_links=DEPENDENCY_LINKS,
     extras_require={
         'south': ['south>=1.0.0'],
     },

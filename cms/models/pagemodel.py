@@ -444,7 +444,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         menu_pool.clear(site_id=site.pk)
         return first_page
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         pages = [self.pk]
         if self.publisher_public_id:
             pages.append(self.publisher_public_id)
@@ -956,7 +956,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
             from cms.models.titlemodels import Title
 
             if version_id:
-                from reversion.models import Version
+                from cms.utils.reversion_hacks import Version
 
                 version = get_object_or_404(Version, pk=version_id)
                 revs = [related_version.object_version for related_version in version.revision.version_set.all()]
@@ -1293,12 +1293,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the previous revision
         """
-        import reversion
+        from cms.utils.reversion_hacks import reversion, Revision
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
         if self.revision_id:
-            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+            current_revision = Revision.objects.get(pk=self.revision_id)
         else:
             try:
                 current_version = versions[0]
@@ -1320,12 +1320,12 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         """
         Revert the current page to the next revision
         """
-        import reversion
+        from cms.utils.reversion_hacks import reversion, Revision
 
         # Get current reversion version by matching the reversion_id for the page
         versions = reversion.get_for_object(self)
         if self.revision_id:
-            current_revision = reversion.models.Revision.objects.get(pk=self.revision_id)
+            current_revision = Revision.objects.get(pk=self.revision_id)
         else:
             try:
                 current_version = versions[0]
@@ -1343,7 +1343,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         clean = self._apply_revision(next_revision)
         return Page.objects.get(pk=self.pk), clean
 
-    def _apply_revision(self, target_revision):
+    def _apply_revision(self, target_revision, set_dirty=False):
         """
         Revert to a specific revision
         """
@@ -1360,7 +1360,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         self.placeholders.all().delete()
 
         # populate the page status data from the target version
-        target_revision.revert(True)
+        target_revision.revert(delete=True)
         rev_page = get_object_or_404(Page, pk=self.pk)
         rev_page.revision_id = target_revision.pk
         rev_page.publisher_public_id = self.publisher_public_id
@@ -1390,6 +1390,8 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                         title.slug = old_title.slug
                         title.save()
                         clean = False
+            if set_dirty:
+                self.set_publisher_state(title.language, PUBLISHER_STATE_DIRTY)
         return clean
 
 

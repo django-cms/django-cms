@@ -2,7 +2,6 @@
 
 
 TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
-TEMPLATE_INHERITANCE_LABEL = 'Inherit the template of the nearest ancestor'
 REFRESH_PAGE = 'REFRESH_PAGE'
 URL_CHANGE = 'URL_CHANGE'
 RIGHT = object() # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.

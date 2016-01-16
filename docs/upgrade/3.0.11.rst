@@ -8,8 +8,8 @@
 What's new in 3.0.11
 ********************
 
-* Core support for multiple instances of the same apphook'ed application
-* The template tag `render_model_add` can now accept a model class as well as a
+* Core support for multiple instances of the same apphooked application
+* The template tag ``render_model_add`` can now accept a model class as well as a
   model instance
 
 Bug Fixes
@@ -24,8 +24,8 @@ Bug Fixes
 * Fixes an edge-case SQLite issue under Django 1.7
 * Fixes an issue where a confirmation dialog shows only some of the plugins to
   be deleted when using the "Empty All" context-menu item
-* Fixes an issue where deprecated 'mimetype' was used instead of 'contenttype'
-* Fixes an issue where `cms check` erroneous displays warnings when a plugin
+* Fixes an issue where deprecated ``mimetype`` was used instead of ``contenttype``
+* Fixes an issue where ``cms check`` erroneous displays warnings when a plugin
   uses class inheritance
 * Documentation updates
 

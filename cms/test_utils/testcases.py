@@ -2,6 +2,7 @@
 import json
 import sys
 import warnings
+from cms.utils.compat import DJANGO_1_6
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,7 +10,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, clear_url_caches
 from django.template.context import Context, RequestContext
 from django.test import testcases
 from django.test.client import RequestFactory
@@ -88,7 +89,6 @@ class BaseCMSTestCase(object):
         super(BaseCMSTestCase, self)._fixture_setup()
         self.create_fixtures()
         activate("en")
-
 
     def create_fixtures(self):
         pass
@@ -396,9 +396,32 @@ class BaseCMSTestCase(object):
             template_obj = Template(template)
             return template_obj.render(RequestContext(request, context))
 
+    def apphook_clear(self):
+        from cms.apphook_pool import apphook_pool
+        for name, label in list(apphook_pool.get_apphooks()):
+            if apphook_pool.apps[name].__class__.__module__ in sys.modules:
+                del sys.modules[apphook_pool.apps[name].__class__.__module__]
+        apphook_pool.clear()
+
+
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
     pass
 
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
+
+if DJANGO_1_6:
+    class ClearURLs(object):
+        @classmethod
+        def setUpClass(cls):
+            clear_url_caches()
+            super(ClearURLs, cls).setUpClass()
+
+        @classmethod
+        def tearDownClass(cls):
+            super(ClearURLs, cls).tearDownClass()
+            clear_url_caches()
+else:
+    class ClearURLs(object):
+        pass
