@@ -271,4 +271,4 @@ run search-and-replaces when items are moved in the structure.
 
 
 .. _restructuredText: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
-.. _Sphinx: http://sphinx.pocoo.org/
+.. _Sphinx: http://sphinx-doc.org//
