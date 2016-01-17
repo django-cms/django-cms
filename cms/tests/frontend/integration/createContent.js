@@ -99,6 +99,8 @@ casper.test.begin('User Add Content', function (test) {
         .then(function () {
             this.click('.cms-modal-buttons .cms-btn-action.default');
         })
+        .waitForResource(/edit-plugin/)
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })
