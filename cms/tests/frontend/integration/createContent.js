@@ -39,11 +39,16 @@ casper.test.begin('User Add Content', function (test) {
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.click('.cms-plugin-picker .cms-submenu-item [data-rel="add"]');
         })
-        .waitWhileVisible('.cms-modal-morphing')
-        .waitUntilVisible('.cms-modal-open', function () {
+        .waitUntilVisible('.cms-modal-morphing')
+        .withFrame(0, function () {
+            // wait until modal fully loads
+            return this.waitUntilVisible('#content');
+        })
+        .then(function () {
             this.setFilter('page.confirm', function () {
                 return true;
             });
+            // click on the "Cancel" button
             this.click('.cms-modal-item-buttons:last-child a');
         })
         .waitWhileVisible('.cms-modal-open', function () {
@@ -94,6 +99,8 @@ casper.test.begin('User Add Content', function (test) {
         .then(function () {
             this.click('.cms-modal-buttons .cms-btn-action.default');
         })
+        .waitForResource(/edit-plugin/)
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })

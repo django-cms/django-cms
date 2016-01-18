@@ -179,6 +179,7 @@ gulp.task('tests:integration', function (done) {
         'loginAdmin',
         'toolbar',
         'addFirstPage',
+        'wizard',
         'editMode',
         'sideframe',
         'createContent',
@@ -186,6 +187,8 @@ gulp.task('tests:integration', function (done) {
         'addNewUser',
         'newPage',
         'pageControl',
+        'permissions',
+        'pageTypes',
         'switchLanguage',
         'editContent',
         'editContentTools',
@@ -195,9 +198,10 @@ gulp.task('tests:integration', function (done) {
         'changeSettings',
         'disableToolbar',
         'dragndrop',
-        'clipboard',
         'history',
-        'revertLive'
+        'revertLive',
+        'narrowScreen',
+        'clipboard'
     ];
     var pre = ['setup'];
 

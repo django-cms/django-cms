@@ -1,7 +1,7 @@
 'use strict';
 
 // #############################################################################
-// Users managed via the admin panel
+// Page control
 
 var globals = require('./settings/globals');
 var randomString = require('./helpers/randomString').randomString;
@@ -303,9 +303,10 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
         })
         .waitForResource(/change-navigation/)
         // wait for reload
+        .wait(100)
         .waitForUrl(new RegExp(SECOND_PAGE_TITLE.toLowerCase()))
         // wait until we have the navigation displayed again
-        .waitForSelector('.nav', function () {
+        .waitUntilVisible('.nav', function () {
             test.assertExists(
                 xPath('//ul[@class="nav"]/li/a[contains(@href,"' + SECOND_PAGE_TITLE.toLowerCase() + '")]' +
                 '[contains(text(),"' + SECOND_PAGE_TITLE + '")]'),

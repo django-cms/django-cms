@@ -16,15 +16,16 @@ module.exports = function (casperjs) {
             return function () {
                 return this.thenOpen(globals.adminUrl).then(function () {
                     this.fill('#login-form', credentials ||  globals.credentials, true);
-                }).waitForSelector('#content');
+                }).waitForResource(/login/).thenEvaluate(function () {
+                    localStorage.clear();
+                });
             };
         },
 
         logout: function () {
             return function () {
-                return this.thenEvaluate(function () {
-                    localStorage.clear();
-                }).thenOpen(globals.adminLogoutUrl);
+                return this.thenOpen(globals.adminLogoutUrl)
+                    .waitForSelector('#content');
             };
         },
 
@@ -56,7 +57,7 @@ module.exports = function (casperjs) {
                         if (pageId) {
                             this.click('.tree .deletelink[href*="' + pageId + '"]');
                         } else {
-                            this.click('.tree .deletelink');
+                            this.click('.tree .deletelink'); // first one
                         }
                     })
                     .waitUntilVisible('input[type=submit]')
@@ -80,7 +81,8 @@ module.exports = function (casperjs) {
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
                         this.click('input[name="_save"]');
-                    });
+                    })
+                    .waitUntilVisible('.success');
             };
         },
 
@@ -90,6 +92,7 @@ module.exports = function (casperjs) {
          * @param {Object} opts
          * @param {String} opts.type type of the plugin to add
          * @param {Object} opts.content object containing fields and values
+         * @param {Object} [opts.parent] selector of the parent cms-draggable
          * @example
          *
          *     cms.addPlugin({
@@ -107,8 +110,40 @@ module.exports = function (casperjs) {
                     .waitUntilVisible('.cms-toolbar-expanded', function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
+                    // only add to placeholder if no parent specified
+                    .thenBypassIf(opts.parent, 1)
                     .waitUntilVisible('.cms-structure', function () {
                         this.click('.cms-structure .cms-submenu-add [data-tooltip="Add plugin"]');
+                    })
+                    // if parent specified - try to add to it
+                    .thenBypassUnless(opts.parent, 1)
+                    .then(function () {
+                        // if the parent is expanded - click on "Add plugin"
+                        if (this.visible(opts.parent)) {
+                            this.click(opts.parent + ' [data-tooltip="Add plugin"]');
+                        } else {
+                            // get full selector (css3, not jquery) of the closest placeholder
+                            var parentSelector = this.evaluate(function (selector) {
+                                return $(selector).closest('.cms-dragarea').parentsUntil('body')
+                                    .andSelf()
+                                    .map(function () {
+                                        return this.nodeName + ':nth-child(' + ($(this).index() + 1) + ')';
+                                    }).get().join('>');
+                            }, opts.parent);
+
+                            // check if "Expand all" is visible
+                            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
+                                this.click(parentSelector + ' .cms-dragbar-expand-all');
+                            } else {
+                                // if not visible, then first "Collapse all"
+                                this.click(parentSelector + ' .cms-dragbar-collapse-all');
+                                this.wait(100);
+                                this.click(parentSelector + ' .cms-dragbar-expand-all');
+                            }
+
+                            this.wait(100);
+                            this.click(opts.parent + ' [data-tooltip="Add plugin"]');
+                        }
                     })
                     .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
                         this.then(function () {
