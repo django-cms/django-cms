@@ -28,6 +28,9 @@ HELPER_SETTINGS = dict(
         },
     },
     PARLER_ENABLE_CACHING=False,
+    CMS_PAGE_CACHE=False,
+    CMS_PLACEHOLDER_CACHE=False,
+    CMS_PLUGIN_CACHE=False,
     # required for integration tests
     LOGIN_URL='/admin/login/?user-login=test',
     CMS_LANGUAGES={
