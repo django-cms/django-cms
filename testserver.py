@@ -54,8 +54,9 @@ HELPER_SETTINGS = dict(
         }
     },
     INSTALLED_APPS=[
-       'djangocms_text_ckeditor',
-       'djangocms_grid'
+        'reversion',
+        'djangocms_text_ckeditor',
+        'djangocms_grid',
     ],
     TEMPLATE_DIRS=(
         os.path.join(
