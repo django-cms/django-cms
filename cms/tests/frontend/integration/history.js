@@ -48,7 +48,7 @@ casper.test.begin('History', function (test) {
         // click on History
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click(
-                // mouse clicks on the Undo link
+                // mouse clicks on the History link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
@@ -62,9 +62,9 @@ casper.test.begin('History', function (test) {
         .waitForResource(/undo/)
         .waitWhileVisible('.cms-toolbar-expanded')
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-             // Clicking again on undo after resource have been loaded
+            // Clicking again on undo after resource have been loaded
             this.click(
-                // mouse clicks on the Undo link
+                // mouse clicks on the History link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
