@@ -195,7 +195,9 @@ gulp.task('tests:integration', function (done) {
         'changeSettings',
         'disableToolbar',
         'dragndrop',
-        'clipboard'
+        'clipboard',
+        'history',
+        'revertLive'
     ];
     var pre = ['setup'];
 
