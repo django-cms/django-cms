@@ -328,7 +328,7 @@ describe('CMS.Toolbar', function () {
         it('turns the disclosure triangle into correct position', function (done) {
             spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
                 expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
-                callback()
+                callback();
                 expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
             });
 
