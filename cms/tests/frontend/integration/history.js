@@ -53,7 +53,7 @@ casper.test.begin('History', function (test) {
             );
         })
         // click on Undo
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 // mouse clicks on the Undo link
                 xPath('//a[.//span[text()[contains(.,"Undo")]]]')
@@ -68,7 +68,7 @@ casper.test.begin('History', function (test) {
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 // mouse clicks on the Undo link
                 xPath('//a[.//span[text()[contains(.,"Undo")]]]')
@@ -92,7 +92,7 @@ casper.test.begin('History', function (test) {
             );
         })
         // click on Redo
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 // mouse clicks on the Redo link
                 xPath('//a[.//span[text()[contains(.,"Redo")]]]')
@@ -107,7 +107,7 @@ casper.test.begin('History', function (test) {
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 // mouse clicks on the redo link
                 xPath('//a[.//span[text()[contains(.,"Redo")]]]')
@@ -125,7 +125,7 @@ casper.test.begin('History', function (test) {
             this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
         })
         // Clicks on View history
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 // mouse clicks on the redo link
                 xPath('//a[.//span[text()[contains(.,"View history...")]]]')
