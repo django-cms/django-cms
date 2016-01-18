@@ -23,6 +23,7 @@ casper.test.tearDown(function (done) {
 casper.test.begin('Add First Page with wizard', function (test) {
     casper
         .start(globals.editUrl)
+        .waitForSelector('.cms-ready')
         .waitUntilVisible('.cms-modal', function () {
             this.click('.cms-modal .cms-modal-close');
         })

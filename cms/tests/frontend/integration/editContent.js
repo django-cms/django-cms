@@ -97,7 +97,7 @@ casper.test.begin('Edit content', function (test) {
         // check edit modal window appearance after double click in structure mode
         // double click on last plugin
         .then(function () {
-            this.mouse.doubleclick('.cms-draggable:last-child .cms-dragitem');
+            this.mouse.doubleclick('.cms-structure .cms-draggable:last-child .cms-dragitem');
         })
         // edit content inside opened editor modal
         .waitUntilVisible('.cms-modal-open')
