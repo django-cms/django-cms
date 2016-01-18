@@ -34,10 +34,10 @@ casper.test.begin('Revert History', function (test) {
         .waitForSelector('.cms-btn-publish-active', function () {
             this.click('.cms-btn-publish-active');
         })
-        // clicks on edit mode
         .waitForResource(/publish/)
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExist('.cms-btn-switch-edit', 'published page');
+            // clicks on edit mode
             this.click('.cms-btn-switch-edit');
         })
         // Adds a second plugin
@@ -47,7 +47,7 @@ casper.test.begin('Revert History', function (test) {
                 id_body: 'Second TextPlugin'
             }
         }))
-        // counds that there are two plugins in the placeholder
+        // counts that there are two plugins in the placeholder
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
@@ -73,6 +73,16 @@ casper.test.begin('Revert History', function (test) {
                 1,
                 'Reverted to live'
             );
+        })
+        .waitForSelector('.cms-toolbar-expanded', function () {
+            test.assertExist('.cms-btn-switch-save', 'view published exists');
+            // clicks on edit mode
+            this.click('.cms-btn-switch-save');
+        })
+        .waitForUrl(/edit_off/)
+        .waitWhileVisible('.cms-toolbar-expanded')
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertExist('.cms-btn-switch-edit', 'Not in Edit mode');
         })
         .run(function () {
             test.done();

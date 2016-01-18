@@ -6,6 +6,7 @@
 var globals = require('./settings/globals');
 var casperjs = require('casper');
 var cms = require('./helpers/cms')(casperjs);
+var xPath = casperjs.selectXPath;
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -46,47 +47,71 @@ casper.test.begin('History', function (test) {
         })
         // click on History
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
+            this.mouse.click(
+                // mouse clicks on the Undo link
+                xPath('//a[.//span[text()[contains(.,"History")]]]')
+            );
         })
         // click on Undo
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover li:first-child a');
+            this.mouse.click(
+                // mouse clicks on the Undo link
+                xPath('//a[.//span[text()[contains(.,"Undo")]]]')
+            );
         })
-        // Clicking again on undo after resource have been loaded
         .waitForResource(/undo/)
         .waitWhileVisible('.cms-toolbar-expanded')
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
+             // Clicking again on undo after resource have been loaded
+            this.mouse.click(
+                // mouse clicks on the Undo link
+                xPath('//a[.//span[text()[contains(.,"History")]]]')
+            );
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover li:first-child a');
-        // Counts plugins in the first placeholder if there's only one
+            this.mouse.click(
+                // mouse clicks on the Undo link
+                xPath('//a[.//span[text()[contains(.,"Undo")]]]')
+            );
         })
         .waitForResource(/undo/)
         .waitWhileVisible('.cms-toolbar-expanded')
         .waitUntilVisible('.cms-toolbar-expanded', function () {
+            // Counts plugins in the first placeholder if there's only one
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
                 1,
-                'second plugins is removed'
+                'Second plugin is removed'
             );
         })
         // click on History
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
+            this.mouse.click(
+                // mouse clicks on the History link
+                xPath('//a[.//span[text()[contains(.,"History")]]]')
+            );
         })
         // click on Redo
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover li:nth-child(2) a');
+            this.mouse.click(
+                // mouse clicks on the Redo link
+                xPath('//a[.//span[text()[contains(.,"Redo")]]]')
+            );
         })
         // Clicking again on redo after resource have been loaded
         .waitForResource(/redo/)
         .waitWhileVisible('.cms-toolbar-expanded')
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
+            this.mouse.click(
+                // mouse clicks on the History link
+                xPath('//a[.//span[text()[contains(.,"History")]]]')
+            );
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover li:nth-child(2) a');
+            this.mouse.click(
+                // mouse clicks on the redo link
+                xPath('//a[.//span[text()[contains(.,"Redo")]]]')
+            );
         })
         // Counts if there are two plugin in the first placeholder
         .waitForResource(/redo/)
@@ -103,10 +128,11 @@ casper.test.begin('History', function (test) {
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
             this.click('.cms-toolbar-item-navigation-hover li:nth-child(5) a');
         })
+        // Wait for modal
         .withFrame(0, function () {
             casper.waitForSelector('#change-history', function () {
                 test.assertExists('#change-history', 'The page creation wizard form is available');
-                // clicks on the second row
+                // clicks on the second row of the history table (which had one plugin)
                 this.click('tr:nth-child(2) th a ');
             })
             // waits that the form gets loaded
