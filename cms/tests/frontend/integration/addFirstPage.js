@@ -45,6 +45,7 @@ casper.test.begin('Add First Page with wizard', function (test) {
                 '1-content': content.text
             }, true);
         })
+        .waitForResource(/cms_wizard\/create/)
         .waitForSelector('.cms-ready', function () {
             test.assertSelectorHasText('.cms-plugin', content.text,
                 'The new page has been created and its content is correct');
