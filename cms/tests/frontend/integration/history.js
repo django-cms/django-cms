@@ -37,16 +37,13 @@ casper.test.tearDown(function (done) {
 casper.test.begin('History', function (test) {
     casper
         .start(globals.editUrl)
-
-        .then(function () {
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
                 2,
                 'Both plugins are in first placeholder'
             );
-        })
-        // click on History
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            // click on History
             this.click(
                 // mouse clicks on the History link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
