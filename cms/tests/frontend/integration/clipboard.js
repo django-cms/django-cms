@@ -71,6 +71,7 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
             test.assertElementCount('.cms-clipboard .cms-plugin', 1, '1 plugin in clipboard');
         })
 
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Example.com" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(1) > a');

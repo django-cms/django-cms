@@ -44,6 +44,8 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
                 'Current page is the correct one'
             );
         })
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -117,6 +119,8 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
         .then(function () {
             this.thenOpen(pageUrl);
         })
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -168,6 +172,7 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
             test.assertUrlMatch(/overwritten-url/, 'Url have been overwritten');
             test.assertTitleMatch(new RegExp(SECOND_PAGE_TITLE), 'Title is still the same');
         })
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -216,6 +221,8 @@ casper.test.begin('Page can be deleted', function (test) {
         .then(function () {
             this.thenOpen(pageUrl);
         })
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -234,7 +241,7 @@ casper.test.begin('Page can be deleted', function (test) {
         .waitForUrl(/en\//)
         // check that we were redirected to the root
         .then(function () {
-            test.assertUrlMatch(/en\//, 'Page was removed and user was redirected');
+            test.assertUrlMatch(/en\/$/, 'Page was removed and user was redirected');
             test.assertTitleMatch(/First page/, 'Title is still the same');
         })
         // try to open the page that we deleted
@@ -264,6 +271,8 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
                 'Page is in navigation'
             );
         })
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -347,6 +356,8 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         })
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
+        // wait till toolbar is visible
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -366,6 +377,7 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         })
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
