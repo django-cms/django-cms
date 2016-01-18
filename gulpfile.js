@@ -198,6 +198,8 @@ gulp.task('tests:integration', function (done) {
         'changeSettings',
         'disableToolbar',
         'dragndrop',
+        'history',
+        'revertLive',
         'narrowScreen',
         'clipboard'
     ];
