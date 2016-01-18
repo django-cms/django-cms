@@ -596,6 +596,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 return False
         return True
 
+    @create_revision()
     def post_add_plugin(self, request, placeholder, plugin):
         if is_installed('reversion') and placeholder.page:
             plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
@@ -612,6 +613,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
 
+    @create_revision()
     def post_edit_plugin(self, request, plugin):
         page = plugin.placeholder.page
 
@@ -640,6 +642,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
 
+    @create_revision()
     def post_delete_plugin(self, request, plugin):
         plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
         page = plugin.placeholder.page
@@ -654,6 +657,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, comment)
 
+    @create_revision()
     def post_clear_placeholder(self, request, placeholder):
         page = placeholder.page
         if page:
@@ -1417,23 +1421,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             return HttpResponse(json.dumps(results), content_type='application/json')
         else:
             return HttpResponseForbidden()
-
-    def add_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).add_plugin(*args, **kwargs)
-
-    def edit_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).edit_plugin(*args, **kwargs)
-
-    def delete_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).delete_plugin(*args, **kwargs)
-
-    def clear_placeholder(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).clear_placeholder(*args, **kwargs)
-
 
 
 admin.site.register(Page, PageAdmin)
