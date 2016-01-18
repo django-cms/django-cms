@@ -47,14 +47,14 @@ casper.test.begin('History', function (test) {
         })
         // click on History
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the Undo link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
         // click on Undo
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the Undo link
                 xPath('//a[.//span[text()[contains(.,"Undo")]]]')
             );
@@ -63,13 +63,13 @@ casper.test.begin('History', function (test) {
         .waitWhileVisible('.cms-toolbar-expanded')
         .waitUntilVisible('.cms-toolbar-expanded', function () {
              // Clicking again on undo after resource have been loaded
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the Undo link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the Undo link
                 xPath('//a[.//span[text()[contains(.,"Undo")]]]')
             );
@@ -86,14 +86,14 @@ casper.test.begin('History', function (test) {
         })
         // click on History
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the History link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
         // click on Redo
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the Redo link
                 xPath('//a[.//span[text()[contains(.,"Redo")]]]')
             );
@@ -102,13 +102,13 @@ casper.test.begin('History', function (test) {
         .waitForResource(/redo/)
         .waitWhileVisible('.cms-toolbar-expanded')
         .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the History link
                 xPath('//a[.//span[text()[contains(.,"History")]]]')
             );
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.mouse.click(
+            this.click(
                 // mouse clicks on the redo link
                 xPath('//a[.//span[text()[contains(.,"Redo")]]]')
             );
