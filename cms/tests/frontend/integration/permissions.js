@@ -46,7 +46,7 @@ casper.test.begin('Can set / unset "login required" for the page', function (tes
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         // opening "Permissions" menu item
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 xPath('//a[.//span[text()[contains(.,"Permissions")]]]')
             );
@@ -101,7 +101,7 @@ casper.test.begin('Can set / unset "login required" for the page', function (tes
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         // opening "Permissions" menu item
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 xPath('//a[.//span[text()[contains(.,"Permissions")]]]')
             );
