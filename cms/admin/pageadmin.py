@@ -617,6 +617,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(placeholder.page)
             helpers.make_revision_with_plugins(placeholder.page, request.user, message)
 
+    @create_revision()
     def post_copy_plugins(self, request, source_placeholder, target_placeholder, plugins):
         page = target_placeholder.page
         if page and is_installed('reversion'):
@@ -626,9 +627,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     def post_edit_plugin(self, request, plugin):
         page = plugin.placeholder.page
-        if page:
-            # if reversion is installed, save version of the page plugins
-            if is_installed('reversion') and page:
+
+        # if reversion is installed, save version of the page plugins
+        if page and is_installed('reversion'):
                 plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
                 message = _(
                     u"%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s") % {
@@ -639,11 +640,18 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                 self.cleanup_history(page)
                 helpers.make_revision_with_plugins(page, request.user, message)
 
+    @create_revision()
     def post_move_plugin(self, request, source_placeholder, target_placeholder, plugin):
-        page = target_placeholder.page
+        # order matters.
+        # We give priority to the target page but fallback to the source.
+        # This comes into play when moving plugins between static placeholders
+        # and non static placeholders.
+        page = target_placeholder.page or source_placeholder.page
+
         if page and is_installed('reversion'):
+            message = _(u"Moved plugins to %(placeholder)s") % {'placeholder': target_placeholder}
             self.cleanup_history(page)
-            helpers.make_revision_with_plugins(page, request.user, _(u"Plugins were moved"))
+            helpers.make_revision_with_plugins(page, request.user, message)
 
     def post_delete_plugin(self, request, plugin):
         plugin_name = force_text(plugin_pool.get_plugin(plugin.plugin_type).name)
@@ -1521,17 +1529,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         with create_revision():
             return super(PageAdmin, self).add_plugin(*args, **kwargs)
 
-    def copy_plugins(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).copy_plugins(*args, **kwargs)
-
     def edit_plugin(self, *args, **kwargs):
         with create_revision():
             return super(PageAdmin, self).edit_plugin(*args, **kwargs)
-
-    def move_plugin(self, *args, **kwargs):
-        with create_revision():
-            return super(PageAdmin, self).move_plugin(*args, **kwargs)
 
     def delete_plugin(self, *args, **kwargs):
         with create_revision():

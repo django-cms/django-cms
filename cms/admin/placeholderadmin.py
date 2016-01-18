@@ -387,7 +387,8 @@ class PlaceholderAdminMixin(object):
         # informed of the operation.
         target_placeholder_admin = self._get_attached_admin(target_placeholder)
 
-        if target_placeholder_admin:
+        if (target_placeholder_admin and
+                target_placeholder_admin.model != self.model):
             target_placeholder_admin.post_copy_plugins(
                 request,
                 source_placeholder=source_placeholder,
@@ -525,14 +526,18 @@ class PlaceholderAdminMixin(object):
 
         if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
-                inst, _plugin = plugin.get_plugin_instance()
-                source_plugins = inst.placeholder_ref.get_plugins()
-                new_plugins = copy_plugins.copy_plugins_to(
-                    source_plugins, placeholder, language)
+                parent_id = None
+                inst = plugin.get_plugin_instance()[0]
+                plugins = inst.placeholder_ref.get_plugins()
             else:
-                source_plugins = [plugin] + list(plugin.get_descendants())
-                new_plugins = copy_plugins.copy_plugins_to(
-                    source_plugins, placeholder, language, parent_id)
+                plugins = [plugin] + list(plugin.get_descendants())
+
+            new_plugins = copy_plugins.copy_plugins_to(
+                plugins,
+                placeholder,
+                language,
+                parent_plugin_id=parent_id,
+            )
 
             top_plugins = []
             top_parent = new_plugins[0][0].parent_id
@@ -587,15 +592,15 @@ class PlaceholderAdminMixin(object):
                 plugin.save()
                 plugin = plugin.move(sibling, pos='right')
 
+            plugins = [plugin] + list(plugin.get_descendants())
+
             # Don't neglect the children
-            for child in [plugin] + list(plugin.get_descendants()):
+            for child in plugins:
                 child.placeholder = placeholder
                 child.language = language
                 child.save()
 
         reorder_plugins(placeholder, parent_id, language, order)
-
-        self.post_move_plugin(request, source_placeholder, placeholder, plugin)
 
         # When this is executed we are in the admin class of the source placeholder
         # It can be a page or a model with a placeholder field.
@@ -605,13 +610,28 @@ class PlaceholderAdminMixin(object):
         # informed of the operation.
         target_placeholder_admin = self._get_attached_admin(placeholder)
 
-        if target_placeholder_admin:
-            target_placeholder_admin.post_move_plugin(
-                request,
-                source_placeholder=source_placeholder,
-                target_placeholder=placeholder,
-                plugins=plugin,
-            )
+        if move_a_copy:  # "paste"
+            self.post_copy_plugins(request, source_placeholder, placeholder, plugins)
+
+            if (target_placeholder_admin and
+                    target_placeholder_admin.model != self.model):
+                target_placeholder_admin.post_copy_plugins(
+                    request,
+                    source_placeholder=source_placeholder,
+                    target_placeholder=placeholder,
+                    plugins=plugins,
+                )
+        else:
+            self.post_move_plugin(request, source_placeholder, placeholder, plugin)
+
+            if (target_placeholder_admin and
+                    target_placeholder_admin.model != self.model):
+                target_placeholder_admin.post_move_plugin(
+                    request,
+                    source_placeholder=source_placeholder,
+                    target_placeholder=placeholder,
+                    plugin=plugin,
+                )
 
         try:
             language = request.toolbar.toolbar_language
