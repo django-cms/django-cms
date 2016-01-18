@@ -35,6 +35,7 @@ casper.test.begin('Revert History', function (test) {
             this.click('.cms-btn-publish-active');
         })
         .waitForResource(/publish/)
+        .waitWhileVisible('.cms-toolbar-expanded')
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExist('.cms-btn-switch-edit', 'published page');
             // clicks on edit mode
