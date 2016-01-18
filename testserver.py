@@ -31,6 +31,7 @@ HELPER_SETTINGS = dict(
     CMS_PAGE_CACHE=False,
     CMS_PLACEHOLDER_CACHE=False,
     CMS_PLUGIN_CACHE=False,
+    CMS_CACHE_DURATIONS = {'menus': 0, 'content': 0, 'permissions': 0},
     # required for integration tests
     LOGIN_URL='/admin/login/?user-login=test',
     CMS_LANGUAGES={
