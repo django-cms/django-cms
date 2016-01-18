@@ -126,7 +126,10 @@ casper.test.begin('History', function (test) {
         })
         // Clicks on View history
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
-            this.click('.cms-toolbar-item-navigation-hover li:nth-child(5) a');
+            this.click(
+                // mouse clicks on the redo link
+                xPath('//a[.//span[text()[contains(.,"View history...")]]]')
+            );
         })
         // Wait for modal
         .withFrame(0, function () {
