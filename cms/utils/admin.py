@@ -107,7 +107,7 @@ def render_admin_menu_item(request, page, template=None, language=None,
     from cms.utils import permissions
     languages = get_language_list(page.site_id)
     context = {
-        'has_add_permission': permissions.has_page_add_permission(request),
+        'has_add_permission': permissions.has_page_add_permission_from_request(request),
         'site_languages': languages,
         'open_nodes': open_nodes,
     }

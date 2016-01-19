@@ -94,36 +94,38 @@ class ToolbarTestBase(CMSTestCase):
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
 class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
-    @override_settings(CMS_APP_NAME=None)
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertTrue(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME=None)
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_cms_urls(self):
         page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME='cms')
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_hide_toolbar_in_non_cms_urls_toolbar_hide_unsetted(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertTrue(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME='cms')
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_hide_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertFalse(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME='cms')
     def test_app_setted_show_toolbar_in_cms_urls(self):
         page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
+
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_app_setted_hide_toolbar_in_cms_urls(self):
+        page = create_page('foo', 'col_two.html', 'en', published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
+        request = self.get_page_request(page, self.get_anon())
+        self.assertFalse(hasattr(request, 'toolbar'))
 
 
 @override_settings(CMS_PERMISSION=False)
@@ -146,7 +148,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + admin-menu + logout
         self.assertEqual(len(items), 3, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 9, admin_items)
+        self.assertEqual(len(admin_items), 10, admin_items)
 
     def test_no_page_superuser(self):
         request = self.get_page_request(None, self.get_superuser(), '/')
@@ -157,7 +159,7 @@ class ToolbarTests(ToolbarTestBase):
         # Logo + edit-mode + admin-menu + logout
         self.assertEqual(len(items), 3)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
-        self.assertEqual(len(admin_items), 10, admin_items)
+        self.assertEqual(len(admin_items), 11, admin_items)
 
     def test_anon(self):
         page = create_page('test', 'nav_playground.html', 'en')
@@ -466,7 +468,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         admin = toolbar.get_left_items()[0]
         lang = toolbar.get_left_items()[1]
-        self.assertEqual(len(admin.get_items()), 12)
+        self.assertEqual(len(admin.get_items()), 13)
         self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})

@@ -1,5 +1,6 @@
 === 3.2.1 (Unreleased) ===
 
+- Add support for django-reversion 1.10+
 - Fixed an issue with refreshing the UI when switching CMS language
 - Fixed an issue with sideframe urls not being remembered after reload
 - Added placeholder name to the edit tooltip
@@ -8,6 +9,8 @@
 - Fixed a tree corruption when pasting a nested plugin under another plugin.
 - Fix message with CMS version not showing up on hover in debug mode
 - Fix messages not being positioned correctly in debug mode
+- Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
+- Added attr['is_page']=True to CMS Page navigation nodes
 
 
 === 3.2.0 (2015-11-24) ===

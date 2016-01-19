@@ -99,7 +99,7 @@ class Placeholder(models.Model):
         Generic method to check the permissions for a request for a given key,
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
-          * 'add' and 'change' permissions on placeholder need either on add or change 
+          * 'add' and 'change' permissions on placeholder need either on add or change
             permission on attached object to be granted.
           * 'delete' need either on add, change or delete
         """
@@ -293,4 +293,4 @@ class Placeholder(models.Model):
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
 
-reversion_register(Placeholder)  # follow=["cmsplugin_set"] not following plugins since they are a spechial case
+reversion_register(Placeholder)

@@ -5,7 +5,7 @@ from django.contrib.admin import site
 from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.admin import UserAdmin
 from django.db import OperationalError
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
@@ -21,6 +21,7 @@ admin_class = UserAdmin
 for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
+
 
 class TabularInline(admin.TabularInline):
     pass
@@ -155,9 +156,9 @@ class GenericCmsPermissionAdmin(object):
         """
         fieldsets = deepcopy(self.fieldsets)
         perm_models = (
-            (Page, _('Page permissions')),
-            (PageUser, _('User & Group permissions')),
-            (PagePermission, _('Page permissions management')),
+            (Page, ugettext('Page permissions')),
+            (PageUser, ugettext('User & Group permissions')),
+            (PagePermission, ugettext('Page permissions management')),
         )
         for i, perm_model in enumerate(perm_models):
             model, title = perm_model

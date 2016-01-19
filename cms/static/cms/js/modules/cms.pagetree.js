@@ -751,7 +751,6 @@ var CMS = window.CMS || {};
 
             messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
         }
-
     });
 
     // shorthand for jQuery(document).ready();

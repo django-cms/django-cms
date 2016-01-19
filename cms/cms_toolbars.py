@@ -12,14 +12,17 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
-from cms.models import Title, Page
+from cms.models import CMSPlugin, Title, Page
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.i18n import get_language_tuple, force_language, get_language_dict
 from cms.utils.compat.dj import is_installed
 from cms.utils import get_cms_setting
-from cms.utils.permissions import get_user_sites_queryset
+from cms.utils.permissions import (
+    get_user_sites_queryset,
+    has_auth_page_permission,
+)
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
 
@@ -165,12 +168,15 @@ class BasicToolbar(CMSToolbar):
 
             # clipboard
             if self.toolbar.edit_mode or self.toolbar.build_mode:
+                # True if the clipboard exists and there's plugins in it.
+                clipboard_is_bound = self.get_clipboard_plugins().exists()
+
                 self._admin_menu.add_link_item(_('Clipboard...'), url='#',
                         extra_classes=['cms-clipboard-trigger'],
-                        disabled=not self.get_clipboard_plugins())
+                        disabled=not clipboard_is_bound)
                 self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
                         extra_classes=['cms-clipboard-empty'],
-                        disabled=not self.get_clipboard_plugins())
+                        disabled=not clipboard_is_bound)
                 self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
@@ -235,8 +241,9 @@ class BasicToolbar(CMSToolbar):
 
     def get_clipboard_plugins(self):
         self.populate()
+
         if not hasattr(self, "clipboard"):
-            return []
+            return CMSPlugin.objects.none()
         return self.clipboard.get_plugins()
 
     def render_addons(self, context):
@@ -248,6 +255,7 @@ class BasicToolbar(CMSToolbar):
 
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
+    _changed_admin_menu = None
     watch_models = [Page]
 
     # Helpers
@@ -284,8 +292,16 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            self.page_change_permission = can_change_page(self.request)
-
+            if not self.page and not get_cms_setting('PERMISSION'):
+                # We can't check permissions for an individual page
+                # and can't check global cms permissions because
+                # user opted out of them.
+                # So just check django auth permissions.
+                user = self.request.user
+                can_change = has_auth_page_permission(user, action='change')
+            else:
+                can_change = can_change_page(self.request)
+            self.page_change_permission = can_change
         return self.page_change_permission
 
     def page_is_pending(self, page, language):
@@ -432,7 +448,7 @@ class PageToolbar(CMSToolbar):
                                                 question=question % name, on_success=self.toolbar.REFRESH_PAGE)
 
     def change_admin_menu(self):
-        if self.has_page_change_permission():
+        if not self._changed_admin_menu and self.has_page_change_permission():
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             url = admin_reverse('cms_page_changelist')  # cms page admin
             params = {'language': self.toolbar.language}
@@ -440,6 +456,8 @@ class PageToolbar(CMSToolbar):
                 params['page_id'] = self.page.pk
             url = add_url_parameters(url, params)
             admin_menu.add_sideframe_item(_('Pages'), url=url, position=0)
+            # Used to prevent duplicates
+            self._changed_admin_menu = True
 
     def add_page_menu(self):
         if self.page and self.has_page_change_permission():
@@ -548,8 +566,7 @@ class PageToolbar(CMSToolbar):
             history_menu = self.toolbar.get_or_create_menu(HISTORY_MENU_IDENTIFIER, _('History'), position=2)
 
             if is_installed('reversion'):
-                import reversion
-                from reversion.models import Revision
+                from cms.utils.reversion_hacks import reversion, Revision
 
                 versions = reversion.get_for_object(self.page)
                 if self.page.revision_id:
