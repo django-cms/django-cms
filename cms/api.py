@@ -41,8 +41,7 @@ from menus.menu_pool import menu_pool
 # Helpers/Internals
 #===============================================================================
 
-
-def _generate_valid_slug(source, parent, language):
+def generate_valid_slug(source, parent, language):
     """
     Generate a valid slug for a page from source for the given language.
     Parent is passed so we can make sure the slug is unique for this level in
@@ -155,7 +154,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # set default slug:
     if not slug:
-        slug = _generate_valid_slug(title, parent, language)
+        slug = generate_valid_slug(title, parent, language)
 
     # validate parent
     if parent:
@@ -257,7 +256,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
 
     # set default slug:
     if not slug:
-        slug = _generate_valid_slug(title, parent, language)
+        slug = generate_valid_slug(title, parent, language)
 
     title = Title.objects.create(
         language=language,

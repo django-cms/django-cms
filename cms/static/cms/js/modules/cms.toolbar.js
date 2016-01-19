@@ -648,7 +648,6 @@ var CMS = window.CMS || {};
          * @private
          */
         _debug: function _debug() {
-            var that = this;
             var timeout = 1000;
             var timer = function () {};
 
@@ -657,7 +656,7 @@ var CMS = window.CMS || {};
             debug.on(this.mouseEnter + ' ' + this.mouseLeave, function (e) {
                 clearTimeout(timer);
 
-                if (e.type === that.mouseEnter) {
+                if (e.type === 'mouseenter') {
                     timer = setTimeout(function () {
                         CMS.API.Messages.open({
                             message: CMS.config.lang.debug

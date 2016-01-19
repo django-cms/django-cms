@@ -19,7 +19,7 @@ Open source enterprise content management system based on the django framework.
 
 .. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
    :target: http://demo.django-cms.org/
-   :alt: Try demo with Aldryn
+   :alt: Try demo with Aldryn Cloud
 
 .. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
    It's the branch for features that will go into the next django CMS feature release.
@@ -107,7 +107,7 @@ to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 Commercial support
 ******************
 
-This project is backed by `Divio <http://divio.ch/en/commercial-support/>`_.
+This project is backed by `Divio <https://www.divio.com/en/commercial-support/>`_.
 If you need help implementing or hosting django CMS, please contact us:
 sales@divio.com.
 

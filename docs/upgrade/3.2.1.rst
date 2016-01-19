@@ -1,0 +1,38 @@
+.. _upgrade-to-3.2.1:
+
+########################################
+3.2.1 release notes - Unreleased - Draft
+########################################
+
+*******************
+What's new in 3.2.1
+*******************
+
+Bug Fixes
+=========
+
+- Fixed an issue with refreshing the UI when switching CMS language
+- Fixed an issue with sideframe urls not being remembered after reload
+- Added placeholder name to the edit tooltip
+- Fix breadcrumb in page revision list
+- Fix clash with Foundation that caused "Add plugin" button to be unusable
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+
+
+Treebeard corruption
+====================
+
+Prior to 3.2.1 moving or pasting nested plugins would lead to some non-fatal tree corruptions,
+raising an error when adding plugins under the newly pasted plugins.
+
+To fix these problems, upgrade to 3.2.1 and then run ``manage.py cms fix-tree`` command to
+repair the tree.
+
+
+DjangoCMS Text CKEditor
+=======================
+
+Action required
+---------------
+CMS 3.2.1 is not compatible with djangocms-text-ckeditor < 2.8.1.
+If you're using djangocms-text-ckeditor, please upgrade to 2.8.1 or up.
