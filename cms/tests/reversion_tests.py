@@ -9,6 +9,7 @@ from djangocms_text_ckeditor.models import Text
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.encoding import force_str
 import reversion
 from reversion.models import Revision, Version
 
@@ -48,7 +49,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             response = self.client.post(URL_CMS_PAGE_ADD, self.page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
 
-            page = Page.objects.all()[0]
+            page = Page.objects.get_home().get_draft_object()
             placeholderpk = page.placeholders.get(slot="body").pk
             plugin_data = {
                 'plugin_type': "TextPlugin",
@@ -65,13 +66,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(edit_url, {"body": "Hello World"})
             self.assertEqual(response.status_code, 200)
-            txt = Text.objects.all()[0]
+            txt = Text.objects.get(placeholder=page.placeholders.get(slot="body"))
             self.assertEqual("Hello World", txt.body)
             self.txt = txt
             # change the content
             response = self.client.post(edit_url, {"body": "Bye Bye World"})
             self.assertEqual(response.status_code, 200)
-            txt = Text.objects.all()[0]
+            txt = Text.objects.get(placeholder=page.placeholders.get(slot="body"))
             self.assertEqual("Bye Bye World", txt.body)
             p_data = self.page_data.copy()
             response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk, p_data)
@@ -93,7 +94,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
             version = Version.objects.get(content_type=ctype, revision=revision)
-            page = Page.objects.all()[0]
+            page = Page.objects.get_home().get_draft_object()
 
             history_url = URL_CMS_PAGE_CHANGE % (page.pk) + "history/"
             response = self.client.get(history_url)
@@ -128,24 +129,25 @@ class ReversionTestCase(TransactionCMSTestCase):
             ctype = ContentType.objects.get_for_model(Page)
             revision = Revision.objects.all()[2]
             Version.objects.get(content_type=ctype, revision=revision)
-            page = Page.objects.all()[0]
+            page = Page.objects.get_home().get_draft_object()
 
             undo_url = admin_reverse("cms_page_undo", args=[page.pk])
             response = self.client.post(undo_url)
             self.assertEqual(response.status_code, 200)
-            page = Page.objects.all()[0]
+            self.assertEqual(force_str(response.content), force_str('ok'))
+            page = page.reload()
             self.assertTrue(page.revision_id != 0)
             rev = page.revision_id
             redo_url = admin_reverse("cms_page_redo", args=[page.pk])
             response = self.client.post(redo_url)
             self.assertEqual(response.status_code, 200)
-            page = Page.objects.all()[0]
+            page = Page.objects.get_home().get_draft_object()
             self.assertTrue(page.revision_id != rev)
-            txt = Text.objects.all()[0]
+            txt = Text.objects.get(placeholder=page.placeholders.get(slot="body"))
             edit_url = URL_CMS_PLUGIN_EDIT + str(txt.pk) + "/"
             response = self.client.post(edit_url, {"body": "Hello World2"})
             self.assertEqual(response.status_code, 200)
-            page = Page.objects.all()[0]
+            page = Page.objects.get_home().get_draft_object()
             self.assertEqual(page.revision_id, 0)
             self.assertEqual(2, CMSPlugin.objects.all().count())
             placeholderpk = page.placeholders.filter(slot="body")[0].pk

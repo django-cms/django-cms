@@ -25,7 +25,7 @@ from cms.publisher.errors import PublisherCantPublish
 from cms.utils import i18n, page as page_utils
 from cms.utils.conf import get_cms_setting
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.helpers import reversion_register
+from cms.utils.helpers import reversion_register, maybe_transaction
 from menus.menu_pool import menu_pool
 from treebeard.mp_tree import MP_Node
 
@@ -1351,46 +1351,50 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # Get current titles
         old_titles = list(self.title_set.all())
 
-        # remove existing plugins / placeholders in the current page version
-        placeholder_ids = self.placeholders.all().values_list('pk', flat=True)
-        plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
-        for plugin in plugins:
-            plugin._no_reorder = True
-            plugin.delete()
-        self.placeholders.all().delete()
+        try:
+            with maybe_transaction():
+                # remove existing plugins / placeholders in the current page version
+                placeholder_ids = self.placeholders.all().values_list('pk', flat=True)
+                plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids).order_by('-depth')
+                for plugin in plugins:
+                    plugin._no_reorder = True
+                    plugin.delete()
+                self.placeholders.all().delete()
 
-        # populate the page status data from the target version
-        target_revision.revert(True)
-        rev_page = get_object_or_404(Page, pk=self.pk)
-        rev_page.revision_id = target_revision.pk
-        rev_page.publisher_public_id = self.publisher_public_id
-        rev_page.save()
+                # populate the page status data from the target version
+                target_revision.revert(True)
+                rev_page = get_object_or_404(Page, pk=self.pk)
+                rev_page.revision_id = target_revision.pk
+                rev_page.publisher_public_id = self.publisher_public_id
+                rev_page.save()
 
-        # cleanup placeholders
-        new_placeholders = rev_page.placeholders.all()
-        slots = {}
-        for new_ph in new_placeholders:
-            if not new_ph.slot in slots:
-                slots[new_ph.slot] = new_ph
-            else:
-                if new_ph in placeholder_ids:
-                    new_ph.delete()
-                elif slots[new_ph.slot] in placeholder_ids:
-                    slots[new_ph.slot].delete()
+                # cleanup placeholders
+                new_placeholders = rev_page.placeholders.all()
+                slots = {}
+                for new_ph in new_placeholders:
+                    if not new_ph.slot in slots:
+                        slots[new_ph.slot] = new_ph
+                    else:
+                        if new_ph in placeholder_ids:
+                            new_ph.delete()
+                        elif slots[new_ph.slot] in placeholder_ids:
+                            slots[new_ph.slot].delete()
 
-        # check reverted titles for slug collisions
-        new_titles = rev_page.title_set.all()
-        clean = True
-        for title in new_titles:
-            try:
-                is_valid_url(title.path, rev_page)
-            except ValidationError:
-                for old_title in old_titles:
-                    if old_title.language == title.language:
-                        title.slug = old_title.slug
-                        title.save()
-                        clean = False
-        return clean
+                # check reverted titles for slug collisions
+                new_titles = rev_page.title_set.all()
+                clean = True
+                for title in new_titles:
+                    try:
+                        is_valid_url(title.path, rev_page)
+                    except ValidationError:
+                        for old_title in old_titles:
+                            if old_title.language == title.language:
+                                title.slug = old_title.slug
+                                title.save()
+                                clean = False
+                return clean
+        except:
+            return None
 
 
 def _reversion():
