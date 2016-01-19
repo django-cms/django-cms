@@ -113,14 +113,14 @@ module.exports = function (casperjs) {
                     // only add to placeholder if no parent specified
                     .thenBypassIf(opts.parent, 1)
                     .waitUntilVisible('.cms-structure', function () {
-                        this.click('.cms-structure .cms-submenu-add [data-tooltip="Add plugin"]');
+                        this.click('.cms-structure .cms-submenu-add [data-cms-tooltip="Add plugin"]');
                     })
                     // if parent specified - try to add to it
                     .thenBypassUnless(opts.parent, 1)
                     .then(function () {
                         // if the parent is expanded - click on "Add plugin"
                         if (this.visible(opts.parent)) {
-                            this.click(opts.parent + ' [data-tooltip="Add plugin"]');
+                            this.click(opts.parent + ' [data-cms-tooltip="Add plugin"]');
                         } else {
                             // get full selector (css3, not jquery) of the closest placeholder
                             var parentSelector = this.evaluate(function (selector) {
@@ -142,7 +142,7 @@ module.exports = function (casperjs) {
                             }
 
                             this.wait(100);
-                            this.click(opts.parent + ' [data-tooltip="Add plugin"]');
+                            this.click(opts.parent + ' [data-cms-tooltip="Add plugin"]');
                         }
                     })
                     .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
