@@ -345,7 +345,9 @@ Frontend
 ********
 
 The toolbar adds a class ``cms-ready`` to the **html** tag when ready. Additionally we add
-``cms-toolbar-expanded`` when the toolbar is visible (expanded).
+``cms-toolbar-expanded`` when the toolbar is fully expanded. We also add
+``cms-toolbar-expanding`` and ``cms-toolbar-collapsing`` classes while toolbar
+is animating.
 
 The toolbar also fires a JavaScript event called **cms-ready** on the document.
 You can listen to this event using jQuery::

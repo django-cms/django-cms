@@ -37,6 +37,7 @@ casper.test.begin('Switch language', function (test) {
             this.click('.cms-toolbar-item-navigation-hover a[href="/de/"]');
         })
         // no page should be here (warning message instead)
+        .wait(300)
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertSelectorHasText(
                 '.cms-screenblock-inner h1',

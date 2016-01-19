@@ -41,6 +41,7 @@ casper.test.begin('User Login (via Admin Panel)', function (test) {
 
             this.fill('#login-form', globals.credentials, true);
         })
+        .waitForResource(/login/)
         .thenOpen(globals.baseUrl, function () {
             test.assertExists('.cms-toolbar', 'Login via the admin form done');
         })

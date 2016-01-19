@@ -61,7 +61,7 @@ casper.test.begin('Revert History', function (test) {
             this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
         })
         // clicks on 'revert to live'
-        .waitUntilVisible('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             test.assertExist('.cms-toolbar-revert', 'Revert to live is enabled');
             this.click('.cms-toolbar-revert a');
         })

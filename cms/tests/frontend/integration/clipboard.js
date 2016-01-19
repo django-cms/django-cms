@@ -71,12 +71,13 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
             test.assertElementCount('.cms-clipboard .cms-plugin', 1, '1 plugin in clipboard');
         })
 
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Example.com" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(1) > a');
         })
         // opening "Clipboard" menu item
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 xPath('//a[.//span[text()[contains(.,"Clipboard")]]]')
             );
@@ -128,7 +129,7 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
             this.click('.cms-toolbar-item-navigation > li:nth-child(1) > a');
         })
         // opening "Clipboard" menu item
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 xPath('//a[.//span[text()[contains(.,"Clear clipboard")]]]')
             );

@@ -1,7 +1,16 @@
+=== 3.4.0 (Unreleased) ===
+
+* ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding``
+  and ``cms-toolbar-collapsing`` classes are added at the beginning of their
+  respective animations.
+
+
 === 3.3.0 (Unreleased) ===
 
 * Removed support for Django 1.6, 1.7 and python 2.6
 * Set the default value of CMSPlugin.position to 0 instead of null
+
 
 === 3.2.1 (Unreleased) ===
 
