@@ -468,7 +468,7 @@ describe('CMS.Sideframe', function () {
             sideframe.close();
             expect($.fn.animate).toHaveBeenCalledWith(
                 { width: 0 },
-                300,
+                150,
                 jasmine.any(Function)
             );
             expect(sideframe.ui.sideframe).toBeVisible();

@@ -394,6 +394,13 @@ describe('CMS.StructureBoard', function () {
             expect($.fn.trigger).toHaveBeenCalledWith('structureboard_hidden.sideframe');
         });
 
+        it('triggers `resize` event on the window', function () {
+            board.show();
+            spyOn($.fn, 'trigger');
+            board.hide();
+            expect($.fn.trigger).toHaveBeenCalledWith('resize');
+        });
+
         it('resizes the structureboard if type of structureboard is dynamic', function () {
             board.show();
             CMS.config.simpleStructureBoard = false;
