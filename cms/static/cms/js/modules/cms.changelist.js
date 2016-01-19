@@ -364,6 +364,12 @@
                 var tree;
                 var origin = window.location.protocol + '//' + window.location.hostname +
                     (window.location.port ? ':' + window.location.port : '');
+
+                // if staticPath points to a different domain, we should not
+                // force the origin #4929
+                if (that.options.settings.staticPath.match(/^(https?:)?\/\//i)) {
+                    origin = '';
+                }
                 // global initTree function
                 window.initTree = function () {
                     // jshint newcap: false

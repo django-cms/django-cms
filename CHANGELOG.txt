@@ -11,6 +11,8 @@
 - Fix messages not being positioned correctly in debug mode
 - Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
 - Added attr['is_page']=True to CMS Page navigation nodes
+- Fixed a bug where page tree styles didn't load from STATIC_URL that pointed
+  to a different host
 
 
 === 3.2.0 (2015-11-24) ===
