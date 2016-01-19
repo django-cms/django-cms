@@ -68,7 +68,7 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
-=== 3.1.4 ===
+=== 3.1.4 (2015-11-24) ===
 
 - Fixed a problem in ``0010_migrate_use_structure.py`` that broke some migration paths to Django 1.8
 - Fixed ``fix_tree`` command
@@ -173,7 +173,7 @@
 - Add "Structure mode" permission
 
 
-=== 3.0.16 ===
+=== 3.0.16 (2015-11-24) ===
 
 - Fixed JavaScript error when using ``PageSelectWidget``
 - Fixed whitespace markup issues in draft mode
