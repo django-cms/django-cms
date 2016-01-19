@@ -11,7 +11,8 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.core import urlresolvers
 from django.core.cache import cache
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import (
+    ValidationError, ImproperlyConfigured, ObjectDoesNotExist)
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
@@ -1356,10 +1357,14 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             position=1,
             language=settings.LANGUAGE_CODE,
         )
-        if hasattr(plugin, 'source'):
-            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
-        else:
-            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
+        # This try/except block allows older and newer versions of the
+        # djangocms-file plugin to work here.
+        try:
+            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile(
+                "UPPERCASE.jpg", b"content"), False)
+        except ObjectDoesNotExist:  # catches 'RelatedObjectDoesNotExist'
+            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile(
+                "UPPERCASE.jpg", b"content"), False)
         plugin.add_root(instance=plugin)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
