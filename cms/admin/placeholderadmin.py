@@ -554,6 +554,7 @@ class PlaceholderAdminMixin(object):
 
             if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
+
                 for plugin in top_plugins:
                     plugin.parent = parent
                     plugin.placeholder = placeholder
@@ -569,6 +570,9 @@ class PlaceholderAdminMixin(object):
                     order[copy_idx:0] = top_plugins_pks
                 else:
                     order.extend(top_plugins_pks)
+
+            # Set the plugin variable to point to the newly created plugin.
+            plugin = new_plugins[0][0]
         else:
             # Regular move
             if parent_id:
