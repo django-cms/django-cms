@@ -32,7 +32,7 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
         .waitUntilVisible('.cms-structure', function () {
-            this.click('.cms-submenu-add [data-tooltip="Add plugin"]');
+            this.click('.cms-submenu-add [data-cms-tooltip="Add plugin"]');
         })
 
         // cancel plugin creation and ensure no empty plugin
@@ -62,7 +62,7 @@ casper.test.begin('User Add Content', function (test) {
 
         // full plugin creation process
         .waitUntilVisible('.cms-structure', function () {
-            this.click('.cms-submenu-add [data-tooltip="Add plugin"]');
+            this.click('.cms-submenu-add [data-cms-tooltip="Add plugin"]');
         })
         .waitUntilVisible('.cms-plugin-picker .cms-submenu-item [data-rel="add"]', function () {
             this.sendKeys('.cms-quicksearch input', randomText);

@@ -38,11 +38,15 @@ casper.test.begin('Add first page with a wizard (doubleclick)', function (test) 
                 })
                 .waitForResource(/cms_wizard\/create/)
                 // wait until next step loads
-                .waitUntilVisible('#id_1-title', function () {
+                .waitUntilVisible('#cke_id_1-content', function () {
+                    // ckeditor textarea has to be done like this
+                    this.evaluate(function () {
+                        CMS.CKEditor.editor.setData('Some text');
+                    });
+
                     // submit the form from inside the modal
                     this.fill('.cms-content-wizard form', {
-                        '1-title': 'Homepage',
-                        '1-content': 'Some text'
+                        '1-title': 'Homepage'
                     }, true);
                 });
             });
@@ -94,11 +98,14 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
         .then(function () {
             casper.withFrame(0, function () {
                 // wait until next step loads
-                this.waitUntilVisible('#id_1-title', function () {
+                this.waitUntilVisible('#cke_id_1-content', function () {
+                    // ckeditor textarea has to be done like this
+                    this.evaluate(function () {
+                        CMS.CKEditor.editor.setData('Some subpage text');
+                    });
                     // fill, but do not submit form from inside the modal
                     this.fill('.cms-content-wizard form', {
-                        '1-title': 'Subpage',
-                        '1-content': 'Some subpage text'
+                        '1-title': 'Subpage'
                     });
                 });
             });
