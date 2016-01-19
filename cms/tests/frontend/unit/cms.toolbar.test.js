@@ -217,16 +217,22 @@ describe('CMS.Toolbar', function () {
         });
 
         it('turns the disclosure triangle into correct position', function (done) {
+            // have to cleanup here because previous test `animate` call isn't finished yet
+            toolbar.ui.body.removeClass('cms-toolbar-collapsing');
             spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
+                expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
                 expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanding');
                 callback();
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
                 expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
                 done();
             });
             toolbar.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
             toolbar.ui.body.removeClass('cms-toolbar-expanded');
             toolbar.open();
-            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
         });
     });
 
@@ -335,14 +341,18 @@ describe('CMS.Toolbar', function () {
             toolbar.open();
 
             $.fn.animate.and.callFake(function (opts, timeout, easing, callback) {
+                expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
                 expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-collapsing');
                 callback();
                 expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
                 done();
             });
 
             toolbar.close();
-            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
         });
     });
 

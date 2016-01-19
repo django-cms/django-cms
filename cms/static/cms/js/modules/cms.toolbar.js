@@ -446,8 +446,10 @@ var CMS = window.CMS || {};
                 'margin-top': 0
             });
             this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
+            this.ui.body.addClass('cms-toolbar-expanding');
             // animate html
             this.ui.body.animate({ 'margin-top': toolbarHeight - 10 + debugHeight }, speed, 'linear', function () {
+                that.ui.body.removeClass('cms-toolbar-expanding');
                 that.ui.body.addClass('cms-toolbar-expanded');
             });
             // set messages top to toolbar height
@@ -486,9 +488,10 @@ var CMS = window.CMS || {};
 
             this.ui.toolbar.css('margin-top', -toolbarHeight);
             this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+            this.ui.body.addClass('cms-toolbar-collapsing');
             // animate html
             this.ui.body.animate({ 'margin-top': (CMS.config.debug) ? 5 : 0 }, speed, 'linear', function () {
-                that.ui.body.removeClass('cms-toolbar-expanded');
+                that.ui.body.removeClass('cms-toolbar-expanded cms-toolbar-collapsing');
             });
             // set messages top to 0
             this.ui.messages.css('top', 0);
