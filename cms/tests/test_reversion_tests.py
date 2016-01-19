@@ -93,7 +93,7 @@ class ReversionTestCase(TransactionCMSTestCase):
 
     def get_staticplaceholder_admin(self):
         admin.autodiscover()
-        return admin.site._registry[Page]
+        return admin.site._registry[StaticPlaceholder]
 
     def get_post_request(self, data):
         return self.get_request(post_data=data)
