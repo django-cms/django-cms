@@ -18,14 +18,16 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
     'Framework :: Django',
     'Framework :: Django :: 1.6',
     'Framework :: Django :: 1.7',
     'Framework :: Django :: 1.8',
+    'Framework :: Django :: 1.9',
 ]
 
 INSTALL_REQUIREMENTS = [
-    'Django>=1.6.9,<1.9',
+    'Django>=1.6.9,<1.10',
     'django-classy-tags>=0.5',
     'html5lib>=0.90,!=0.9999,!=0.99999',
     'django-formtools>=1.0',
