@@ -147,3 +147,133 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Plugins with parent restriction cannot be pasted in incorrect parents', function (test) {
+    casper.start(globals.editUrl)
+        .waitUntilVisible('.cms-toolbar-expanded')
+        // creates 3 plugins - row > col + col
+        .then(cms.addPlugin({
+            type: 'Bootstrap3RowCMSPlugin',
+            content: {
+                id_create: 2,
+                id_create_xs_col: 12
+            }
+        }))
+        .thenOpen(globals.editUrl)
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertElementCount('.cms-structure .cms-draggable', 5, 'Five plugins present on the page');
+        })
+        // check that there is nothing now in the clipboard
+        .then(function () {
+            test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
+        })
+        // go to the Structure mode
+        .then(function () {
+            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
+        })
+        // expand all plugins
+        .then(function () {
+            var parentSelector = '.cms-dragarea:first-child';
+            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
+                this.click(parentSelector + ' .cms-dragbar-expand-all');
+            } else {
+                // if not visible, then first "Collapse all"
+                this.click(parentSelector + ' .cms-dragbar-collapse-all');
+                this.wait(100);
+                this.click(parentSelector + ' .cms-dragbar-expand-all');
+            }
+        })
+        // click settings for last content plugin (second column)
+        .waitUntilVisible('.cms-structure', function () {
+            // click settings for last content plugin
+            this.click('.cms-structure .cms-draggable .cms-draggable:last-child .cms-submenu-settings');
+        })
+        // select copy button from dropdown list
+        .waitUntilVisible(
+            '.cms-structure .cms-draggable .cms-draggable:last-child .cms-submenu-item a[data-rel="copy"]',
+            function () {
+                this.click('.cms-structure .cms-draggable .cms-draggable:last-child ' +
+                           '.cms-submenu-item a[data-rel="copy"]');
+            }
+        )
+        .waitForResource(/copy-plugins/)
+
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertExists(
+                '.cms-clipboard-containers [title*="Bootstrap3ColumnCMSPlugin"]',
+                'Correct plugin was copied'
+            );
+
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-submenu-item:has("[data-cms-icon=paste]")').length;
+            }, 7, 'There are 7 pasting areas');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-submenu-item-disabled:has("[data-cms-icon=paste]")').length;
+            }, 6, '6 items do not allow pasting');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                         ':has("[data-cms-icon=paste]")').length;
+            }, 1, '1 item does allow pasting');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                         ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
+                        .find('.cms-dragitem-text strong').eq(0).text();
+            }, 'Row', '1 item that does allow pasting is indeed a Row plugin');
+        })
+
+        // try to paste column in a column
+        .then(function () {
+            // click settings for last content plugin
+            this.click('.cms-structure .cms-draggable .cms-draggable:last-child .cms-submenu-settings');
+        })
+        // click on the paste button from dropdown list
+        .waitUntilVisible(
+            '.cms-structure .cms-draggable .cms-draggable:last-child .cms-submenu-item a[data-rel="paste"]',
+            function () {
+                this.mouse.click('.cms-structure .cms-draggable .cms-draggable:last-child ' +
+                           '.cms-submenu-item a[data-rel="paste"]');
+            }
+        )
+        // nothing should happen
+        .then(function () {
+            test.assertVisible('.cms-structure .cms-draggable .cms-draggable:last-child ' +
+                               '.cms-submenu-item a[data-rel="paste"]', 'Nothing happens');
+
+        })
+        .wait(2000, function () {
+            test.assertVisible('.cms-structure .cms-draggable .cms-draggable:last-child ' +
+                               '.cms-submenu-item a[data-rel="paste"]', 'Nothing at all');
+        })
+        .then(function () {
+            // click settings for the row plugin
+            this.click('.cms-dragarea > .cms-draggables > .cms-draggable:last-child .cms-submenu-settings');
+        })
+        // click on the paste button from dropdown list
+        .waitUntilVisible(
+            '.cms-dragarea > .cms-draggables > .cms-draggable:last-child .cms-submenu-item a[data-rel="paste"]',
+            function () {
+                this.mouse.click('.cms-dragarea > .cms-draggables > .cms-draggable:last-child ' +
+                                 '.cms-submenu-item a[data-rel="paste"]');
+            }
+        )
+
+        .waitForResource(/copy-plugins/)
+
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertElementCount('.cms-structure .cms-draggable', 6, 'Six plugins present on the page');
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggables .cms-draggable',
+                3,
+                'Three columns'
+            );
+        })
+
+        .then(cms.clearClipboard())
+
+        .run(function () {
+            test.done();
+        });
+});
