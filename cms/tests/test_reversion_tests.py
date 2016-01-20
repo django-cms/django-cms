@@ -111,8 +111,8 @@ class ReversionTestCase(TransactionCMSTestCase):
         # manual - Manual placeholder (created using a PlaceholderField)
         # static - Static placeholder (created using the staticplaceholder tag)
 
-        native_placeholder_page = create_page('test page', 'col_two.html', u'en')
-        native_placeholder = native_placeholder_page.placeholders.get(slot='col_sidebar')
+        native_placeholder_page = create_page('test page', 'simple.html', u'en')
+        native_placeholder = native_placeholder_page.placeholders.get(slot='placeholder')
         native_placeholder_pk = native_placeholder.pk
         native_placeholder_admin = self.get_page_admin()
         native_placeholder_versions = placeholder_versions.filter(object_id_int=native_placeholder_pk)
@@ -158,13 +158,13 @@ class ReversionTestCase(TransactionCMSTestCase):
         response = native_placeholder_admin.move_plugin(request)
         self.assertEqual(response.status_code, 200)
 
-        # Verify a new version for the native placeholder has been created
+        # assert a new version for the native placeholder has been created
         self.assertEqual(
             native_placeholder_versions.count(),
             native_placeholder_versions_initial_count + 1,
         )
 
-        # Assert revision comment was set correctly
+        # assert revision comment was set correctly
         self.assertEqual(
             Revision.objects.latest('pk').comment,
             'Moved plugins to %s' % force_text(manual_placeholder),
@@ -264,8 +264,8 @@ class ReversionTestCase(TransactionCMSTestCase):
         # manual - Manual placeholder (created using a PlaceholderField)
         # static - Static placeholder (created using the staticplaceholder tag)
 
-        native_placeholder_page = create_page('test page', 'col_two.html', u'en')
-        native_placeholder = native_placeholder_page.placeholders.get(slot='col_sidebar')
+        native_placeholder_page = create_page('test page', 'simple.html', u'en')
+        native_placeholder = native_placeholder_page.placeholders.get(slot='placeholder')
         native_placeholder_pk = native_placeholder.pk
         native_placeholder_admin = self.get_page_admin()
         native_placeholder_versions = placeholder_versions.filter(object_id_int=native_placeholder_pk)
@@ -299,7 +299,6 @@ class ReversionTestCase(TransactionCMSTestCase):
         link_plugin_versions = Version.objects.filter(
             content_type=link_plugin_c_type,
         )
-        link_plugin_versions_initial_count = link_plugin_versions.count()
 
         # copy plugin from manual to native placeholder
         request = self.get_post_request({
@@ -309,11 +308,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             'move_a_copy': 'true',
         })
         response = manual_placeholder_admin.move_plugin(request)
+
         self.assertEqual(response.status_code, 200)
 
+        # Point to the newly created text plugin
         link_plugin_pk = get_plugin_id_from_response(response)
 
-        # Verify a new version for the native placeholder has been created
+        # assert a new version for the native placeholder has been created
         self.assertEqual(
             native_placeholder_versions.count(),
             native_placeholder_versions_initial_count + 1,
@@ -322,7 +323,7 @@ class ReversionTestCase(TransactionCMSTestCase):
         # assert a new version for the link plugin has been created
         self.assertEqual(
             link_plugin_versions.filter(object_id_int=link_plugin_pk).count(),
-            link_plugin_versions_initial_count + 1,
+            1,
         )
 
         # Assert revision comment was set correctly
@@ -339,16 +340,16 @@ class ReversionTestCase(TransactionCMSTestCase):
             'move_a_copy': 'true',
         })
         response = native_placeholder_admin.move_plugin(request)
+
         self.assertEqual(response.status_code, 200)
 
+        # Point to the newly created text plugin
         link_plugin_pk = get_plugin_id_from_response(response)
 
         # assert revision count remains the same
         self.assertEqual(
             placeholder_versions.count(),
-            # We use 2 because there's two placeholders
-            # in the native placeholder page
-            placeholder_versions_initial_count + 2,
+            placeholder_versions_initial_count + 1,
         )
 
         # copy plugin from manual to static placeholder
@@ -359,16 +360,16 @@ class ReversionTestCase(TransactionCMSTestCase):
             'move_a_copy': 'true',
         })
         response = manual_placeholder_admin.move_plugin(request)
+
         self.assertEqual(response.status_code, 200)
 
+        # Point to the newly created text plugin
         link_plugin_pk = get_plugin_id_from_response(response)
 
         # assert revision count remains the same
         self.assertEqual(
             placeholder_versions.count(),
-            # We use 2 because there's two placeholders
-            # in the native placeholder page
-            placeholder_versions_initial_count + 2,
+            placeholder_versions_initial_count + 1,
         )
 
         # copy plugin from static to manual placeholder
@@ -384,9 +385,7 @@ class ReversionTestCase(TransactionCMSTestCase):
         # assert revision count remains the same
         self.assertEqual(
             placeholder_versions.count(),
-            # We use 2 because there's two placeholders
-            # in the native placeholder page
-            placeholder_versions_initial_count + 2,
+            placeholder_versions_initial_count + 1,
         )
 
         # copy plugin from static to native placeholder
@@ -397,11 +396,13 @@ class ReversionTestCase(TransactionCMSTestCase):
             'move_a_copy': 'true',
         })
         response = static_placeholder_admin.move_plugin(request)
+
         self.assertEqual(response.status_code, 200)
 
+        # Point to the newly created text plugin
         link_plugin_pk = get_plugin_id_from_response(response)
 
-        # Verify a new version for the native placeholder has been created
+        # assert a new version for the native placeholder has been created
         self.assertEqual(
             native_placeholder_versions.count(),
             native_placeholder_versions_initial_count + 2,
@@ -410,10 +411,10 @@ class ReversionTestCase(TransactionCMSTestCase):
         # assert a new version for the link plugin has been created
         self.assertEqual(
             link_plugin_versions.filter(object_id_int=link_plugin_pk).count(),
-            link_plugin_versions_initial_count + 1,
+            1,
         )
 
-        # Assert revision comment was set correctly
+        # assert revision comment was set correctly
         self.assertEqual(
             Revision.objects.latest('pk').comment,
             'Copied plugins to %s' % force_text(native_placeholder),
