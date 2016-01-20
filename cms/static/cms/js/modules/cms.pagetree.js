@@ -315,6 +315,14 @@ var CMS = window.CMS || {};
                 that._paste(e);
             });
 
+            // advanced settings link handling
+            this.ui.container.on(this.click, '.js-cms-tree-advanced-settings', function (e) {
+                if (e.shiftKey) {
+                    e.preventDefault();
+                    window.location.href = $(this).data('url');
+                }
+            });
+
             // additional event handlers
             this._setFilter();
             this._setTooltips();

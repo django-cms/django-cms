@@ -48,8 +48,6 @@
                 {% if has_change_permission and has_publish_permission %}
                     <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
                         class="cms-tree-lang-container js-cms-tree-tooltip-trigger"
-                        title="{% trans "Page settings (SHIFT-click for advanced settings)" %}"
-                        {# TODO implement alt click to advanced settings #}
                         {# INFO: delegate click event to parent window when in sideframe #}
                         {% if lang in page.languages %} target="_top"{% endif %}>
                         {# INFO: renders <span class="{cls}" title="{title}"></span> #}
@@ -98,7 +96,11 @@
         <div class="cms-tree-col">
             {% if has_change_permission %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                    <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-cogs"></span></a>
+                    <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" class="js-cms-tree-advanced-settings"
+                        data-url="{% url 'admin:cms_page_advanced' page.id %}"
+                        title="{% trans "Page settings (SHIFT-click for advanced settings)" %}">
+                        <span class="cms-icon cms-icon-cogs"></span>
+                    </a>
                 </div>
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy"
                     data-id="{{ page.pk }}"
