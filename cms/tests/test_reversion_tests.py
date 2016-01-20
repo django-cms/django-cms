@@ -10,11 +10,12 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+from cms.api import create_page
 from cms.models import Page, Title, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
-    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT
+    URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_DELETE
 from cms.utils.reversion_hacks import Revision, reversion, Version
 
 
@@ -230,6 +231,61 @@ class ReversionTestCase(TransactionCMSTestCase):
 
             # test that CMSPlugin subclasses are recovered
             self.assertEqual(Text.objects.all().count(), 1)
+
+    def test_recover_with_apphook(self):
+        """
+        Test that you can recover a page
+        """
+        from cms.utils.helpers import make_revision_with_plugins
+        from cms.utils.reversion_hacks import create_revision, revision_manager
+
+        self.assertEqual(Page.objects.count(), 2)
+
+        with self.login_user_context(self.user):
+
+            page_data = self.get_new_page_data_dbfields()
+            page_data['apphook'] = 'SampleApp'
+            page_data['apphook_namespace'] = 'SampleApp'
+
+            with create_revision():
+                # Need to create page manually to add apphooks
+                page = create_page(**page_data)
+
+                # Assert page has apphooks
+                self.assertEqual(page.application_urls, 'SampleApp')
+                self.assertEqual(page.application_namespace, 'SampleApp')
+
+                # Create revision
+                make_revision_with_plugins(page, user=None, message="Initial version")
+
+            page_pk = page.pk
+
+            # Delete the page through the admin
+            data = {'post': 'yes'}
+            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            # Assert page was truly deleted
+            self.assertEqual(Page.objects.filter(pk=page_pk).count(), 0)
+
+            versions_qs = revision_manager.get_deleted(Page).order_by("-pk")
+            version = versions_qs[0]
+
+            recover_url = URL_CMS_PAGE + "recover/%s/" % version.pk
+
+            # Recover deleted page
+            page_form_data = self.get_pagedata_from_dbfields(page_data)
+            self.client.post(recover_url, page_form_data)
+
+            # Verify page was recovered correctly
+            self.assertEqual(Page.objects.filter(pk=page_pk).count(), 1)
+
+            # Get recovered page
+            page = Page.objects.get(pk=page_pk)
+
+            # Verify apphook and apphook namespace are set on page.
+            self.assertEqual(page.application_urls, 'SampleApp')
+            self.assertEqual(page.application_namespace, 'SampleApp')
 
     def test_recover_path_collision(self):
         with self.login_user_context(self.user):

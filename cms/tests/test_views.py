@@ -127,6 +127,20 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'This page has no preview')
+
+            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+            self.assertEqual(response.status_code, 302)
+
+            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get('/en/?%s' % get_cms_setting('TOOLBAR_URL__BUILD'))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, 'This page has no preview')
+
+            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get('/en/?%s' % get_cms_setting('TOOLBAR_URL__DISABLE'))
+            self.assertEqual(response.status_code, 302)
 
     def test_login_required(self):
         create_page("page", "nav_playground.html", "en", published=True,
@@ -169,7 +183,6 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(user):
             response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
-
 
     def test_toolbar_switch_urls(self):
         user = self.get_superuser()

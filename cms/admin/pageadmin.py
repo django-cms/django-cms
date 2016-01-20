@@ -183,26 +183,26 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         position = request.GET.get('position', None)
 
         if 'recover' in request.path_info:
-            pk = obj.pk
+            tmp_page = Page(
+                path=None,
+                numchild=0,
+                depth=0,
+                site_id=obj.site_id,
+            )
+
+            # It's necessary to create a temporary page
+            # in order to calculate the tree attributes.
             if obj.parent_id:
-                try:
-                    parent = Page.objects.get(pk=obj.parent_id)
-                except Page.DoesNotExist:
-                    parent = None
+                tmp_page = obj.parent.add_child(instance=tmp_page)
             else:
-                parent = None
-            obj.pk = None
-            obj.path = None
-            obj.numchild = 0
-            obj.depth = 0
-            if parent:
-                saved_obj = parent.add_child(instance=obj)
-            else:
-                saved_obj = obj.add_root(instance=obj)
-            tmp_pk = saved_obj.pk
-            saved_obj.pk = pk
-            Page.objects.get(pk=tmp_pk).delete()
-            saved_obj.save(no_signals=True)
+                tmp_page = obj.add_root(instance=tmp_page)
+
+            obj.path = tmp_page.path
+            obj.numchild = tmp_page.numchild
+            obj.depth = tmp_page.depth
+
+            # Remove temporary page.
+            tmp_page.delete()
         else:
             if 'history' in request.path_info:
                 old_obj = self.model.objects.get(pk=obj.pk)
@@ -1541,7 +1541,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     except:
                         obj = None
         if obj:
-            if not request.toolbar or not request.toolbar.edit_mode:
+            if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode', False):
                 if isinstance(obj, Page):
                     if obj.get_public_object():
                         url = obj.get_public_object().get_absolute_url()

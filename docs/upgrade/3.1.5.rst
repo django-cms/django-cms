@@ -1,0 +1,35 @@
+.. _upgrade-to-3.1.5:
+
+########################################
+3.1.5 release notes - Unreleased - Draft
+########################################
+
+*******************
+What's new in 3.1.5
+*******************
+
+Bug Fixes
+=========
+
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+
+
+Treebeard corruption
+====================
+
+Prior to 3.1.5 moving or pasting nested plugins would lead to some non-fatal tree corruptions,
+raising an error when adding plugins under the newly pasted plugins.
+
+To fix these problems, upgrade to 3.1.5 and then run ``manage.py cms fix-tree`` command to
+repair the tree.
+
+
+DjangoCMS Text CKEditor
+=======================
+
+Action required
+---------------
+CMS 3.1.5 is not compatible with djangocms-text-ckeditor < 2.7.1.
+If you're using djangocms-text-ckeditor, please upgrade to 2.7.1 or up.
+Keep in mind that djangocms-text-ckeditor >= 2.8 is compatible only with
+CMS 3.2.x releases.
