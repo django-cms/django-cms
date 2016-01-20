@@ -153,9 +153,9 @@ class PlaceholderAdminMixin(object):
     def _get_attached_admin(self, placeholder):
         model = placeholder._get_attached_model()
 
-        if model and self.admin_site.is_registered(model):
-            return self.admin_site._registry[model]
-        return None
+        if not model:
+            return
+        return self.admin_site._registry.get(model)
 
     def get_urls(self):
         """

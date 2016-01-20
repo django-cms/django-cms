@@ -14,7 +14,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.encoding import force_text
 
-from cms.api import create_page
 from cms.models import Page, Title, Placeholder, StaticPlaceholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
