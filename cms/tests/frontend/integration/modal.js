@@ -6,7 +6,7 @@
 var globals = require('./settings/globals');
 var content = require('./settings/globals').content.page;
 var cms = require('./helpers/cms')();
-var moveMouse;
+var resizeButton;
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -25,88 +25,134 @@ casper.test.begin('Manipulate Modal', function (test) {
         .start(globals.editUrl)
         .waitUntilVisible('.cms-modal-open', function () {
             test.assertExist('.cms-modal-open', 'Modal is open');
-            this.click('.cms-icon-window');
+            this.click('.cms-modal-maximize');
         })
         .then(function () {
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
-            return $('.cms-modal-maximized').width();
-            }, 1280, 'Modal maximized');
+                return $('.cms-modal-open').width();
+            }, 1280, 'Modal maximized to corrent width');
+            // Page size is 1280x1024
+            test.assertEvalEquals(function () {
+                return $('.cms-modal-open').height();
+            }, 1024, 'Modal maximized to corrent height');
         })
-        // clicks on the window icon
+        // clicks on the ,maximize button
         .then(function () {
-           this.click('.cms-icon-window');
+            test.assertExists('.cms-icon-window', 'maximize icon exists');
+            this.click('.cms-modal-maximize');
         })
-        // clicks on the minimize window icon
+        // clicks on the minimize button icon
         .then(function () {
-           this.click('.cms-icon-minus');
+            test.assertExists('.cms-icon-minus', 'minimize icon exists');
+            this.click('.cms-modal-minimize');
         })
         // checks width of the minimized windows
         .then(function () {
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
-            return $('.cms-modal-open').width();
-            }, 396, 'Window is minimized');
+                return $('.cms-modal-open').width();
+            }, 396, 'Window is minimized to corrent width');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-modal-open').height();
+            }, 46, 'Window is minimized to corrent height');
         })
         // epands the window by clicking on the icon
         .then(function () {
-           this.click('.cms-icon-minus');
+            this.click('.cms-modal-minimize');
         })
-        // checks the default width of the windo
+        // checks the default height of the window
         .then(function () {
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
-            return $('.cms-modal-open').height();
-            }, 724, 'Modal opens with default width');
+                return $('.cms-modal-open').height();
+            }, 724, 'Modal opens with default height');
         })
         // Function expands
         .then(function () {
-            moveMouse = this.getElementBounds('.cms-modal-resize');
-             // Chose random numbe to expand the modal down
+            resizeButton = this.getElementBounds('.cms-modal-resize');
+            // Chose number to expand the modal with the given pixel down
             var expandModal = 30;
             var standardModal = 724;
             this.mouse.down('.cms-modal-resize');
-            this.mouse.move(moveMouse.left + moveMouse.width, moveMouse.top + (moveMouse.height / 2) + expandModal / 2);
-            this.mouse.up(moveMouse.left + moveMouse.width, moveMouse.top + (moveMouse.height / 2) + expandModal / 2);
+            this.mouse.move(resizeButton.left + resizeButton.width,
+            resizeButton.top + (resizeButton.height / 2) + expandModal / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width,
+            resizeButton.top + (resizeButton.height / 2) + expandModal / 2);
             test.assertEvalEquals(function () {
                 return $('.cms-modal-open').height();
             }, standardModal + expandModal, 'Modal resized bigger');
+            resizeButton = this.getElementBounds('.cms-modal-resize');
             // Reverses the height to standard height of the modal
             this.mouse.down('.cms-modal-resize');
-            this.mouse.move(moveMouse.left + moveMouse.width, moveMouse.top + (moveMouse.height / 2) - expandModal / 2);
-            this.mouse.up(moveMouse.left + moveMouse.width, moveMouse.top + (moveMouse.height / 2) - expandModal / 2);
+            this.mouse.move(resizeButton.left + resizeButton.width,
+            resizeButton.top + (resizeButton.height / 2) - expandModal / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width,
+            resizeButton.top + (resizeButton.height / 2) - expandModal / 2);
             test.assertEvalEquals(function () {
                 return $('.cms-modal-open').height();
-            }, standardModal - expandModal, 'Modal resized to standard again');
+            }, standardModal, 'Modal resized to standard again');
         })
         // function moves chosen element to the left
         .then(function () {
             this.click('.cms-modal-head');
-            moveMouse = this.getElementBounds('.cms-modal-head'); // moveMouse.left = 138px
+            resizeButton = this.getElementBounds('.cms-modal-head'); //
             this.mouse.down('.cms-modal-head');
             // Chose random numbe to move the modal to the left
             var movingLeft = 50;
-            this.mouse.move(moveMouse.left + moveMouse.width/ 2 - movingLeft, moveMouse.top + moveMouse.height / 2);
-            this.mouse.up(moveMouse.left + moveMouse.width/ 2 - movingLeft, moveMouse.top + moveMouse.height / 2);
-            moveMouse = this.getElementBounds('.cms-modal');
-            // checks if the modal moved 50px to the left from 138px
-            test.assertEquals(moveMouse.left, 138 - movingLeft, 'Modal moved');
+            var distanceLeft  = resizeButton.left;
+            this.mouse.move(resizeButton.left + resizeButton.width / 2 - movingLeft,
+            resizeButton.top + resizeButton.height / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width / 2 - movingLeft,
+            resizeButton.top + resizeButton.height / 2);
+            resizeButton = this.getElementBounds('.cms-modal');
+            // checks if the modal moved 50px
+            test.assertEquals(resizeButton.left, distanceLeft - movingLeft, 'Modal moved');
+            this.mouse.down('.cms-modal-head');
+            this.mouse.move(resizeButton.left + resizeButton.width / 2 + movingLeft,
+            resizeButton.top + resizeButton.height * 0);
+            this.mouse.up(resizeButton.left + resizeButton.width / 2 + movingLeft,
+            resizeButton.top + resizeButton.height * 0);
+            resizeButton = this.getElementBounds('.cms-modal-head');
+            test.assertEquals(resizeButton.left, distanceLeft, 'Modal back');
         })
-        // function checks min height of modal
+        // moves the modal diagonal
         .then(function () {
-            moveMouse = this.getElementBounds('.cms-modal-resize');
-             // Min height is 400px. 724px - 500px < 400
+            this.click('.cms-modal-head');
+            resizeButton = this.getElementBounds('.cms-modal-head'); //
+            this.mouse.down('.cms-modal-head');
+            // Chose random numbe to move the modal to the left
+            var distanceTop  = resizeButton.top;
+            var distanceLeft  = resizeButton.left;
+            var movingUp = 50;
+            var movingLeft = 20;
+            this.mouse.move(resizeButton.left + resizeButton.width / 2 - movingLeft,
+            resizeButton.top - movingUp + resizeButton.height / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width / 2 - movingLeft,
+            resizeButton.top - movingUp + resizeButton.height / 2);
+            resizeButton = this.getElementBounds('.cms-modal-head');
+            test.assertEquals(resizeButton.left, distanceLeft - movingLeft, 'Modal moved vertical');
+            test.assertEquals(resizeButton.top, distanceTop - movingUp, 'Modal moved vertical');
+        })
+        // check that modal cannot be resized to be smaller than default minimum dimensions
+        .then(function () {
+            resizeButton = this.getElementBounds('.cms-modal-resize');
+            // Min height is 400px. 724px - 500px < 400
             var resizeUp = 500;
             var standardModal = 724;
             this.mouse.down('.cms-modal-resize');
-            this.mouse.move(moveMouse.left + moveMouse.width, moveMouse.top + (moveMouse.height / 2) - resizeUp / 2);
-            this.mouse.up(moveMouse.left + moveMouse.width, moveMouse.top + (moveMouse.height / 2) - resizeUp / 2);
+            this.mouse.move(resizeButton.left + resizeButton.width,
+            resizeButton.top + (resizeButton.height / 2) - resizeUp / 2);
+            this.mouse.up(resizeButton.left + resizeButton.width,
+            resizeButton.top + (resizeButton.height / 2) - resizeUp / 2);
             // takes the current modal height
             var height = this.evaluate(function () {
                 return $('.cms-modal-open').height();
-            })
+            });
             // checks if the current modal height didn't turn below 400
-            test.assert(height !== standardModal - resizeUp, 'Modal reached min size' );
+            test.assert(height !== standardModal - resizeUp, 'Modal reached min size');
+            test.assert(height === 400, 'Modal reached 400px');
         })
         .run(function () {
             test.done();
