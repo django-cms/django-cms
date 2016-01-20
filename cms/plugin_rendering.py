@@ -166,7 +166,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if edit and editable:
         if not hasattr(request.toolbar, 'placeholder_list'):
             request.toolbar.placeholder_list = []
-        if placeholder.pk not in request.toolbar.placeholder_list:
+        if placeholder not in request.toolbar.placeholder_list:
             request.toolbar.placeholder_list.append(placeholder)
         toolbar_content = mark_safe(render_placeholder_toolbar(placeholder, context, name_fallback, save_language))
     if content:
