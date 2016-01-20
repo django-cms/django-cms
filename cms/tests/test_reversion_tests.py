@@ -249,8 +249,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             # Expects response to be a JSON response
             # with a structure like so:
             # {"urls": {"edit_plugin": "/en/admin/placeholderapp/example1/edit-plugin/3/"}
-
-            data = json.loads(response.content)
+            data = json.loads(response.content.decode('utf-8'))
             return data['urls']['edit_plugin'].split('/')[-2]
 
         placeholder_c_type = ContentType.objects.get_for_model(Placeholder)
