@@ -120,12 +120,13 @@
                     "error": "{% filter escapejs %}{% trans "Error:" %}{% endfilter %}",
                     "apphook": "{% filter escapejs %}{% trans "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks." %}{% endfilter %}",
                     "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
+                    "reload": "{% trans "Reload" %}",
                     "loading": "{% trans "Loading..." %}",
                     "newNode": "{% trans 'New node' %}",
                     "nodes": "{% trans 'nodes' %}"
                 },
                 "columns": [{
-                    "title": "{% trans 'Pages' %}",
+                    "title": "&nbsp;",
                     "key": "",
                     "width": "100%"
                 }, {
@@ -133,19 +134,19 @@
                     "key": "view",
                     "cls": "jstree-grid-cell-regular-options"
                 }, {
-                    "title": "{% trans 'View' %}",
+                    "title": "{{ _('View')|escapejs }}",
                     "key": "preview"
                 }, {% for lang in site_languages %}{
                     "title": "{{ lang|upper }}",
                     "key": "{{ lang }}"
                 }, {% endfor %} {
-                    "title": "{% trans 'Menu' %}",
+                    "title": "{{ _('Menu')|escapejs }}",
                     "key": "menu"
                 }, {
-                    "title": "{% trans 'Options' %}",
+                    "title": "{{ _('Actions')|escapejs }}",
                     "key": "options"
                 }, {
-                    "title": "{% trans 'Info' %}",
+                    "title": "{{ _('Info')|escapejs }}",
                     "key": "info"
                 }]
             }'>

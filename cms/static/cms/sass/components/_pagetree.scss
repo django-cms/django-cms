@@ -26,6 +26,10 @@
     display: inline-block;
 }
 
+.cms-tree-reload {
+    float: right;
+}
+
 // we need to add this to get drag & drop to work on internet explorer,
 // more specifically on a microsoft surface
 .jstree li {

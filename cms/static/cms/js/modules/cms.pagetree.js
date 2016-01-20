@@ -315,6 +315,20 @@ var CMS = window.CMS || {};
                 that._paste(e);
             });
 
+            // advanced settings link handling
+            this.ui.container.on(this.click, '.js-cms-tree-advanced-settings', function (e) {
+                if (e.shiftKey) {
+                    e.preventDefault();
+                    window.location.href = $(this).data('url');
+                }
+            });
+
+            // add events for error reload (messagelist)
+            this.ui.document.on(this.click, '.messagelist .cms-tree-reload', function (e) {
+                e.preventDefault();
+                that._reloadHelper();
+            });
+
             // additional event handlers
             this._setFilter();
             this._setTooltips();
@@ -526,7 +540,7 @@ var CMS = window.CMS || {};
                     url: that.options.urls.copy.replace('{id}', data.id),
                     data: data
                 }).done(function () {
-                    CMS.API.Helpers.reloadBrowser();
+                    that._reloadHelper();
                 }).fail(function (error) {
                     that.showError(error.statusText);
                 });
@@ -668,7 +682,7 @@ var CMS = window.CMS || {};
                         CMS.API.Helpers.reloadBrowser(false, false, true);
                     } else {
                         // otherwise simply reload the page
-                        CMS.API.Helpers.reloadBrowser();
+                        that._reloadHelper();
                     }
                 }).fail(function (error) {
                     that.showError(error.statusText);
@@ -738,6 +752,21 @@ var CMS = window.CMS || {};
         },
 
         /**
+         * Checks if we should reload the iframe or entire window. For this we
+         * need to skip `CMS.API.Helpers.reloadBrowser();`.
+         *
+         * @method _reloadHelper
+         * @private
+         */
+        _reloadHelper: function _reloadHelper() {
+            if (window.self !== window.top) {
+                window.location.reload();
+            } else {
+                CMS.API.Helpers.reloadBrowser();
+            }
+        },
+
+        /**
          * Displays an error within the django UI.
          *
          * @method showError
@@ -746,11 +775,19 @@ var CMS = window.CMS || {};
         showError: function showError(message) {
             var messages = $('.messagelist');
             var breadcrumb = $('.breadcrumbs');
-            var tpl = '<ul class="messagelist"><li class="error">{msg}</li></ul>';
+            var reload = this.options.lang.reload;
+            var tpl = '' +
+                '<ul class="messagelist">' +
+                '   <li class="error">' +
+                '       {msg} ' +
+                '       <a href="#reload" class="cms-tree-reload"> ' + reload + ' </a>' +
+                '   </li>' +
+                '</ul>';
             var msg = tpl.replace('{msg}', '<strong>' + this.options.lang.error + '</strong> ' + message);
 
             messages.length ? messages.replaceWith(msg) : breadcrumb.after(msg);
         }
+
     });
 
     // shorthand for jQuery(document).ready();
