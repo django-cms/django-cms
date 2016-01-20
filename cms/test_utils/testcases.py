@@ -258,7 +258,7 @@ class BaseCMSTestCase(object):
             return
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
-    def copy_page(self, page, target_page, position='last-child'):
+    def copy_page(self, page, target_page, position=0):
         from cms.utils.page import get_available_slug
 
         data = {
@@ -271,17 +271,13 @@ class BaseCMSTestCase(object):
 
         response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEqual(response.status_code, 200)
-        # Altered to reflect the new django-js jsonified response messages
-        expected = {"status": 200, "content": "ok"}
-        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
-
         title = page.title_set.all()[0]
         copied_slug = get_available_slug(title)
-        if position in ('first-child', 'last-child'):
-            parent = target_page
-        else:
-            parent = target_page.parent
+        parent = target_page
         copied_page = self.assertObjectExist(Page.objects, title_set__slug=copied_slug, parent=parent)
+        # Altered to reflect the new django-js jsonified response messages
+        expected = {"id": copied_page.pk}
+        self.assertEqual(json.loads(response.content.decode('utf8')), expected)
         return copied_page
 
     def move_page(self, page, target_page, position="first-child"):
