@@ -134,19 +134,19 @@
                     "key": "view",
                     "cls": "jstree-grid-cell-regular-options"
                 }, {
-                    "title": "{% trans 'View' %}",
+                    "title": "{{ _('View')|escapejs }}",
                     "key": "preview"
                 }, {% for lang in site_languages %}{
                     "title": "{{ lang|upper }}",
                     "key": "{{ lang }}"
                 }, {% endfor %} {
-                    "title": "{% trans 'Menu' %}",
+                    "title": "{{ _('Menu')|escapejs }}",
                     "key": "menu"
                 }, {
-                    "title": "{% trans 'Actions' %}",
+                    "title": "{{ _('Actions')|escapejs }}",
                     "key": "options"
                 }, {
-                    "title": "{% trans 'Info' %}",
+                    "title": "{{ _('Info')|escapejs }}",
                     "key": "info"
                 }]
             }'>
