@@ -5,9 +5,9 @@
 
 var globals = require('./settings/globals');
 var randomString = require('./helpers/randomString').randomString;
-var cms = require('./helpers/cms')();
-var xPath = require('casper').selectXPath;
-
+var casperjs = require('casper');
+var xPath = casperjs.selectXPath;
+var cms = require('./helpers/cms')(casperjs);
 // random text string for filtering and content purposes
 var randomText = randomString({ length: 50, withWhitespaces: false });
 
@@ -106,6 +106,31 @@ casper.test.begin('User Add Content', function (test) {
         })
         .waitUntilVisible('.cms-plugin', function () {
             test.assertSelectorHasText('.cms-plugin p', randomText, 'Newly created text plugin can be seen on page');
+        })
+        .run(function () {
+            test.done();
+        });
+});
+
+casper.test.begin('Can switch mode by triggering space', function (test) {
+    casper
+        .start(globals.editUrl)
+        .then(cms.addPlugin({
+            type: 'TextPlugin',
+            content: {
+                id_body: 'sample text'
+            }
+        }))
+        .then(function () {
+            // triggers space
+            this.sendKeys('html', casper.page.event.key.Space);
+            // checks the name of the page which gets shown only on content mode
+            test.assertNotVisible('.cms-structure',  'switch via space worked');
+        })
+        .then(function () {
+            // triggers space again
+            this.sendKeys('html', casper.page.event.key.Space);
+            test.assertVisible('.cms-structure',  'switch via space worked');
         })
         .run(function () {
             test.done();
