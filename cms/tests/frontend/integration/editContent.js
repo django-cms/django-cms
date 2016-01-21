@@ -37,9 +37,7 @@ casper.test.begin('Edit content', function (test) {
     casper
         .start(globals.editUrl)
         // make sure we are in content mode
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
-        })
+        .then(cms.switchTo('content'))
         // check edit modal window appearance after double click in content mode
         // double click on last added plugin content
         .waitUntilVisible('.cms-toolbar-expanded', function () {
@@ -75,9 +73,7 @@ casper.test.begin('Edit content', function (test) {
             );
         })
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
 
         // check edit modal window appearance after Edit button click in structure mode
         // click to Edit button for last plugin
@@ -114,9 +110,8 @@ casper.test.begin('Edit content', function (test) {
             this.click('.cms-modal-buttons .cms-btn-action.default');
         })
         // go to the Content mode
-        .waitWhileVisible('.cms-modal-open', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
-        })
+        .waitWhileVisible('.cms-modal-open')
+        .then(cms.switchTo('content'))
         // check for applied changes
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             // ensure content updated with new one

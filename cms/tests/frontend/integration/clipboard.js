@@ -41,9 +41,7 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
     casper
         .start(globals.editUrl)
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         // click settings for last content plugin
         .waitUntilVisible('.cms-structure', function () {
             // save initial number of content plugins
@@ -169,9 +167,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
             test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
         })
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         // expand all plugins
         .then(function () {
             var parentSelector = '.cms-dragarea:first-child';
@@ -303,9 +299,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
             test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
         })
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         // expand all plugins
         .then(function () {
             var parentSelector = '.cms-dragarea:first-child';
@@ -453,9 +447,7 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
             test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
         })
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         // expand all plugins
         .then(function () {
             var parentSelector = '.cms-dragarea:first-child';
@@ -592,9 +584,7 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
             test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
         })
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         // expand all plugins
         .then(function () {
             var parentSelector = '.cms-dragarea:first-child';
