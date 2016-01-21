@@ -148,7 +148,8 @@ casper.test.begin('Copy plugin from the structure board', function (test) {
         });
 });
 
-casper.test.begin('Plugins with parent restriction cannot be pasted in incorrect parents', function (test) {
+casper.test.begin('Plugins with parent restriction cannot be pasted ' +
+                  'in incorrect parents (paste button)', function (test) {
     casper.start(globals.editUrl)
         .waitUntilVisible('.cms-toolbar-expanded')
         // creates 3 plugins - row > col + col
@@ -268,6 +269,143 @@ casper.test.begin('Plugins with parent restriction cannot be pasted in incorrect
                 '.cms-structure .cms-draggables .cms-draggables .cms-draggable',
                 3,
                 'Three columns'
+            );
+        })
+
+        .then(cms.clearClipboard())
+
+        .run(function () {
+            test.done();
+        });
+});
+
+casper.test.begin('Plugins with child restriction cannot accept other children (paste button)', function (test) {
+    casper.start(globals.editUrl)
+        .waitUntilVisible('.cms-toolbar-expanded')
+        // creates 3 plugins - row > col + col
+        .then(cms.addPlugin({
+            type: 'Bootstrap3RowCMSPlugin',
+            content: {
+                id_create: 2,
+                id_create_xs_col: 12
+            }
+        }))
+        .thenOpen(globals.editUrl)
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertElementCount('.cms-structure .cms-draggable', 5, 'Five plugins present on the page');
+        })
+        // check that there is nothing now in the clipboard
+        .then(function () {
+            test.assertElementCount('.cms-clipboard .cms-plugin', 0, 'No plugins in clipboard');
+        })
+        // go to the Structure mode
+        .then(function () {
+            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
+        })
+        // expand all plugins
+        .then(function () {
+            var parentSelector = '.cms-dragarea:first-child';
+            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
+                this.click(parentSelector + ' .cms-dragbar-expand-all');
+            } else {
+                // if not visible, then first "Collapse all"
+                this.click(parentSelector + ' .cms-dragbar-collapse-all');
+                this.wait(100);
+                this.click(parentSelector + ' .cms-dragbar-expand-all');
+            }
+        })
+
+        // click settings for first content plugin (Test text)
+        .waitUntilVisible('.cms-structure', function () {
+            // click settings first content plugin (Test text)
+            this.click('.cms-dragarea > .cms-draggables > .cms-draggable .cms-submenu-settings');
+        })
+        // select copy button from dropdown list
+        .waitUntilVisible(
+            '.cms-dragarea > .cms-draggables > .cms-draggable .cms-submenu-item a[data-rel="copy"]',
+            function () {
+                this.click('.cms-dragarea > .cms-draggables > .cms-draggable ' +
+                           '.cms-submenu-item a[data-rel="copy"]');
+            }
+        )
+        .waitForResource(/copy-plugins/)
+        .waitUntilVisible('.cms-toolbar-expanded')
+        // check that there is something now in the clipboard
+        .then(function () {
+            test.assertElementCount('.cms-clipboard .cms-plugin', 1, '1 plugin in clipboard');
+            test.assertExists(
+                '.cms-clipboard-containers [title*="TextPlugin"]',
+                'Correct plugin was copied'
+            );
+        })
+        // check that we can't paste into a row
+        .then(function () {
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                         ':has("[data-cms-icon=paste]")').length;
+            }, 2, '2 plugins do allow pasting');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                         ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
+                        .find('.cms-dragitem-text strong').eq(0).text();
+            }, 'Column', 'First item that does allow pasting is a Col plugin');
+
+            test.assertEvalEquals(function () {
+                return $('.cms-structure .cms-draggables .cms-submenu-item:not(.cms-submenu-item-disabled)' +
+                         ':has("[data-cms-icon=paste]")').closest('.cms-draggable')
+                        .find('.cms-dragitem-text strong').eq(1).text();
+            }, 'Column', 'Another item that does allow pasting is a Col plugin');
+        })
+        // try to paste it in a row
+        .then(function () {
+            // click settings for the row plugin
+            this.click('.cms-dragarea > .cms-draggables > .cms-draggable:last-child .cms-submenu-settings');
+        })
+        // click on the paste button from dropdown list
+        .waitUntilVisible(
+            '.cms-dragarea > .cms-draggables > .cms-draggable:last-child .cms-submenu-item a[data-rel="paste"]',
+            function () {
+                this.mouse.click('.cms-dragarea > .cms-draggables > .cms-draggable:last-child ' +
+                                 '.cms-submenu-item a[data-rel="paste"]');
+            }
+        )
+
+        // nothing should happen
+        .then(function () {
+            test.assertVisible('.cms-dragarea > .cms-draggables > .cms-draggable:last-child ' +
+                               '.cms-submenu-item a[data-rel="paste"]', 'Nothing happens');
+
+        })
+        .wait(2000, function () {
+            test.assertVisible('.cms-dragarea > .cms-draggables > .cms-draggable:last-child ' +
+                               '.cms-submenu-item a[data-rel="paste"]', 'Nothing at all');
+        })
+
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // click settings for last content plugin (second column)
+        .waitUntilVisible('.cms-structure', function () {
+            // click settings for last content plugin
+            this.click('.cms-structure .cms-draggable .cms-draggable:last-child .cms-submenu-settings');
+        })
+        // select paste button from dropdown list
+        .waitUntilVisible(
+            '.cms-structure .cms-draggable .cms-draggable:last-child .cms-submenu-item a[data-rel="paste"]',
+            function () {
+                this.click('.cms-structure .cms-draggable .cms-draggable:last-child ' +
+                           '.cms-submenu-item a[data-rel="paste"]');
+            }
+        )
+
+        .waitForResource(/copy-plugins/)
+
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertElementCount('.cms-structure .cms-draggable', 6, 'Six plugins present on the page');
+            test.assertElementCount(
+                '.cms-structure .cms-draggables .cms-draggables .cms-draggable:last-child .cms-draggables ' +
+                '.cms-dragitem-text[title*="TextPlugin"]',
+                1,
+                'Text plugin is successfully pasted in the column'
             );
         })
 
