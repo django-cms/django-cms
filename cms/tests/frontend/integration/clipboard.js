@@ -169,17 +169,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
         // go to the Structure mode
         .then(cms.switchTo('structure'))
         // expand all plugins
-        .then(function () {
-            var parentSelector = '.cms-dragarea:first-child';
-            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            } else {
-                // if not visible, then first "Collapse all"
-                this.click(parentSelector + ' .cms-dragbar-collapse-all');
-                this.wait(100);
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            }
-        })
+        .then(cms.expandPlaceholderPlugins('.cms-dragarea:first-child'))
         // click settings for last content plugin (second column)
         .waitUntilVisible('.cms-structure', function () {
             // click settings for last content plugin
@@ -301,17 +291,7 @@ casper.test.begin('Plugins with parent restriction cannot be pasted ' +
         // go to the Structure mode
         .then(cms.switchTo('structure'))
         // expand all plugins
-        .then(function () {
-            var parentSelector = '.cms-dragarea:first-child';
-            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            } else {
-                // if not visible, then first "Collapse all"
-                this.click(parentSelector + ' .cms-dragbar-collapse-all');
-                this.wait(100);
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            }
-        })
+        .then(cms.expandPlaceholderPlugins('.cms-dragarea:first-child'))
         // click settings for last content plugin (second column)
         .waitUntilVisible('.cms-structure', function () {
             // click settings for last content plugin
@@ -449,17 +429,7 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
         // go to the Structure mode
         .then(cms.switchTo('structure'))
         // expand all plugins
-        .then(function () {
-            var parentSelector = '.cms-dragarea:first-child';
-            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            } else {
-                // if not visible, then first "Collapse all"
-                this.click(parentSelector + ' .cms-dragbar-collapse-all');
-                this.wait(100);
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            }
-        })
+        .then(cms.expandPlaceholderPlugins('.cms-dragarea:first-child'))
 
         // click settings for first content plugin (Test text)
         .waitUntilVisible('.cms-structure', function () {
@@ -586,17 +556,7 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
         // go to the Structure mode
         .then(cms.switchTo('structure'))
         // expand all plugins
-        .then(function () {
-            var parentSelector = '.cms-dragarea:first-child';
-            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            } else {
-                // if not visible, then first "Collapse all"
-                this.click(parentSelector + ' .cms-dragbar-collapse-all');
-                this.wait(100);
-                this.click(parentSelector + ' .cms-dragbar-expand-all');
-            }
-        })
+        .then(cms.expandPlaceholderPlugins('.cms-dragarea:first-child'))
 
         // click settings for first content plugin (Test text)
         .waitUntilVisible('.cms-structure', function () {
