@@ -98,7 +98,7 @@
             {% endcomment %}
             {% url "admin:login" as login_url %}
             {% url "admin:index" as admin_index_url %}
-            window.location.href = '{% firstof login_url admin_index_url %}?next=/{{ LANGUAGE_CODE }}/?{{ cms_edit_on }}';
+            window.location.href = '{% firstof login_url admin_index_url %}?next={% if LANGUAGE_CODE %}/{{ LANGUAGE_CODE }}{% endif %}/?{{ cms_edit_on }}';
         {% endif %}
     </script>
 </body>

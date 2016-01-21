@@ -1,22 +1,38 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-05 10:16-0500\n"
+"POT-Creation-Date: 2016-01-19 14:54-0500\n"
 "PO-Revision-Date: 2015-10-31 12:28+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: English (http://www.transifex.com/divio/django-cms/language/en/)\n"
+"Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
+"en/)\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: static/cms/js/dist/bundle.admin.base.min.js:4
+#: static/cms/js/dist/bundle.toolbar.min.js:4
+msgid "show"
+msgstr ""
+
+#: static/cms/js/dist/bundle.admin.base.min.js:4
+#: static/cms/js/dist/bundle.toolbar.min.js:4
+msgid "hide"
+msgstr ""
+
+#: static/cms/js/dist/bundle.admin.base.min.js:4
+#: static/cms/js/dist/bundle.toolbar.min.js:4
+msgid "toggle"
+msgstr ""
 
 #: static/cms/js/dist/bundle.admin.changeform.min.js:1
 #: static/cms/js/modules/cms.changeform.js:75
