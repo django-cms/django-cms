@@ -684,7 +684,6 @@ casper.test.begin('Plugins with child restriction cannot accept other children (
             test.assertElementCount('.cms-structure .cms-draggable', 5, 'Pasting plugin was not successful');
         })
 
-
         // try to paste into a column
         .waitUntilVisible('.cms-modal-frame .cms-clipboard-containers', function () {
             column = this.getElementBounds('.cms-structure .cms-draggable .cms-draggable:first-child');
