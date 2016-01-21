@@ -17,6 +17,7 @@ from cms.constants import PAGE_TYPES_ID
 from cms.exceptions import NoPermissionsException
 from cms.models import Page, Title
 from cms.models.titlemodels import EmptyTitle
+from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.compat.dj import is_installed
 from cms.utils.urlutils import static_with_version
@@ -263,17 +264,19 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             # If the user provided content, then use that instead.
             content = self.cleaned_data.get('content')
-            if content and permissions.has_plugin_permission(
-                    self.user, get_cms_setting('WIZARD_CONTENT_PLUGIN'), "add"):
-                placeholder = self.get_first_placeholder(page)
-                if placeholder:
-                    add_plugin(**{
-                        'placeholder': placeholder,
-                        'plugin_type': get_cms_setting('WIZARD_CONTENT_PLUGIN'),
-                        'language': self.language_code,
-                        get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY'): content
-
-                    })
+            plugin_type = get_cms_setting('WIZARD_CONTENT_PLUGIN')
+            plugin_body = get_cms_setting('WIZARD_CONTENT_PLUGIN_BODY')
+            if plugin_type in plugin_pool.plugins and plugin_body:
+                if content and permissions.has_plugin_permission(
+                        self.user, plugin_type, "add"):
+                    placeholder = self.get_first_placeholder(page)
+                    if placeholder:
+                        add_plugin(**{
+                            'placeholder': placeholder,
+                            'plugin_type': plugin_type,
+                            'language': self.language_code,
+                            plugin_body: content,
+                        })
 
         if is_installed('reversion'):
             from cms.utils.helpers import make_revision_with_plugins
