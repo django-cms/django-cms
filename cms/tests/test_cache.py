@@ -65,7 +65,7 @@ class CacheTestCase(CMSTestCase):
         ]
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
-            with self.assertNumQueries(FuzzyInt(13, 17)):
+            with self.assertNumQueries(FuzzyInt(13, 20)):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
@@ -107,7 +107,7 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
             render = template.render(rctx)
-        with self.assertNumQueries(FuzzyInt(14, 18)):
+        with self.assertNumQueries(FuzzyInt(14, 19)):
             response = self.client.get('/en/')
             resp1 = response.content.decode('utf8').split("$$$")[1]
 

@@ -101,7 +101,8 @@ def render_admin_menu_item(request, page, template=None, language=None,
         template = "admin/cms/page/tree/menu_fragment.html"
 
     if not page.pk:
-        return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
+        # Not found - tree will remove item
+        return HttpResponse(NOT_FOUND_RESPONSE)
 
     # languages
     from cms.utils import permissions

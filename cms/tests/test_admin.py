@@ -567,44 +567,6 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(cl.full_result_count, 5)
         self.assertEqual(cl.result_count, 3)
 
-    def test_changelist_tree(self):
-        """ This test checks for proper jstree cookie unquoting.
-
-        It should be converted to a selenium test to actually test the jstree behaviour.
-        Cookie set below is just a forged example (from live session)
-        """
-        admin_user = self.get_superuser()
-        first_level_page = create_page('level1', 'nav_playground.html', 'en')
-        second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user, published=True, parent=first_level_page)
-        second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
-                                               created_by=admin_user, published=True,
-                                               parent=self.reload(first_level_page))
-        third_level_page = create_page('level3', "nav_playground.html", "en",
-                                       created_by=admin_user, published=True, parent=second_level_page_top)
-
-        url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
-
-        if get_user_model().USERNAME_FIELD == 'email':
-            self.client.login(username='admin@django-cms.org', password='admin@django-cms.org')
-        else:
-            self.client.login(username='admin', password='admin')
-
-        self.client.cookies['djangocms_nodes_open'] = 'page_1%2Cpage_2'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["open_menu_trees"], [1, 2])
-        # tests descendants method for the lazy load ajax call
-        url = "%s%d/en/descendants/" % (url, first_level_page.pk)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        # should include both direct descendant pages
-        self.assertContains(response, 'id="page_%s"' % second_level_page_top.pk)
-        self.assertContains(response, 'id="page_%s"' % second_level_page_bottom.pk)
-        # but not any further down the tree
-        self.assertNotContains(response, 'id="page_%s"' % third_level_page.pk)
-        self.assertNotContains(response, 'None')
-
     def test_unihandecode_doesnt_break_404_in_admin(self):
         self.get_superuser()
 
@@ -615,34 +577,6 @@ class AdminTestCase(AdminTestsBase):
 
         response = self.client.get('/en/admin/cms/page/1/?language=en')
         self.assertEqual(response.status_code, 404)
-
-    def test_tree_displays_in_correct_language(self):
-        '''
-        Test to prove and protect that the page titles in the tree are
-        displayed in the currently set language.
-        '''
-        admin_guy, normal_guy = self._get_guys(use_global_permissions=False)
-        site = Site.objects.get(pk=1)
-
-        en_title = "EN Page"
-        es_title = "ES Pagina"
-
-        # Create a page in en
-        page = create_page(en_title, "nav_playground.html", "en", site=site, created_by=admin)
-        # Add a es-mx translation for this page
-        create_title("es-mx", es_title, page, slug="es_pagina")
-
-        url = admin_reverse('cms_%s_changelist' % Page._meta.model_name)
-        url_pat = '<a href="{0}/{1}/preview/"[^>]*><span>{2}</span></a>'
-
-        with self.login_user_context(admin_guy):
-            # Check the EN version of the tree...
-            response = self.client.get(url, {'language': 'en'})
-            self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'en', en_title, ))
-
-            # Check the ES version of the tree...
-            response = self.client.get(url, {'language': 'es-mx'})
-            self.assertRegexpMatches(str(response.content), url_pat.format(page.pk, 'es-mx', es_title, ))
 
     def test_empty_placeholder_in_correct_language(self):
         """
@@ -779,9 +713,6 @@ class AdminTests(AdminTestsBase):
             request = self.get_request(post_data={'no': 'data'})
             old = page.in_navigation
             response = self.admin_class.change_innavigation(request, page.pk)
-            # These asserts are for #3589
-            self.assertContains(response, 'lang="en"')
-            self.assertContains(response, './%s/en/preview/' % page.pk)
             self.assertEqual(response.status_code, 200)
             page = self.reload(page)
             self.assertEqual(old, not page.in_navigation)

@@ -10,7 +10,7 @@ from django import template
 from django.conf import settings
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 
 register = template.Library()
