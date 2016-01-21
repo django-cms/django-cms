@@ -10,11 +10,11 @@ var cms = require('./helpers/cms')(casperjs);
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login())
-        .then(cms.addPage({ title: 'home' }))
+        .then(cms.addPage({ title: 'spaceSwitch' }))
         .then(cms.addPlugin({
             type: 'TextPlugin',
             content: {
-                id_body: 'Revert to Live'
+                id_body: 'sample text'
             }
         }))
         .run(done);
@@ -27,7 +27,7 @@ casper.test.tearDown(function (done) {
         .run(done);
 });
 
-casper.test.begin('Revert History', function (test) {
+casper.test.begin('Switch mode with space', function (test) {
     casper
         .start(globals.editUrl)
         // publishes page
@@ -41,23 +41,33 @@ casper.test.begin('Revert History', function (test) {
             // clicks on edit mode
             this.click('.cms-btn-switch-edit');
         })
-
+        // counts the element in structure mode
         .waitUntilVisible('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
                 1,
-                'second plugins gets added and shown'
+                'plugin is created'
             );
         })
-
-        .then(function() {
-            var e = $.Event("keydown");
-            e.which = 32;
-            $(this).trigger(e);
-        });
-
-
-
+        .then(function () {
+            // triggers space
+            this.sendKeys('html', casper.page.event.key.Space);
+            // checks the name of the page which gets shown only on content mode
+            test.assertEquals(this.fetchText('.nav li a'),
+            'spaceSwitch', 'switch via space worked');
+        })
+        .then(function () {
+            // triggers space again
+            this.sendKeys('html', casper.page.event.key.Space);
+        })
+            // counts the placeholder
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
+            test.assertElementCount(
+                '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
+                1,
+                'switched back to structure'
+            );
+        })
         .run(function () {
             test.done();
         });
