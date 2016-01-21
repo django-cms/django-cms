@@ -72,13 +72,13 @@ describe('CMS.Toolbar', function () {
             toolbar = new CMS.Toolbar();
             toolbar.ui.document.on('cms-ready', function () {
                 // expect this to happen
+                jasmine.clock().uninstall();
                 done();
             });
             expect(toolbar._initialStates).not.toHaveBeenCalled();
             jasmine.clock().tick(200);
             expect(toolbar._initialStates).toHaveBeenCalled();
             expect(toolbar.ui.body).toHaveClass('cms-ready');
-            jasmine.clock().uninstall();
         });
 
         it('sets the "ready" data on the toolbar ui', function () {
@@ -184,7 +184,8 @@ describe('CMS.Toolbar', function () {
             expect($.fn.animate).toHaveBeenCalledWith(
                 jasmine.any(Object),
                 200,
-                'linear'
+                'linear',
+                jasmine.any(Function)
             );
             // here we have to use toBeCloseTo because different browsers report different values
             // e.g. FF reports 45.16666
@@ -207,19 +208,31 @@ describe('CMS.Toolbar', function () {
             expect($.fn.animate).toHaveBeenCalledWith(
                 jasmine.any(Object),
                 200,
-                'linear'
+                'linear',
+                jasmine.any(Function)
             );
             // here we have to use toBeCloseTo because different browsers report different values
             // e.g. FF reports 45.16666
             expect($.fn.animate.calls.mostRecent().args[0]['margin-top']).toBeCloseTo(60, 0);
         });
 
-        it('turns the disclosure triangle into correct position', function () {
+        it('turns the disclosure triangle into correct position', function (done) {
+            // have to cleanup here because previous test `animate` call isn't finished yet
+            toolbar.ui.body.removeClass('cms-toolbar-collapsing');
+            spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
+                expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanding');
+                callback();
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
+                done();
+            });
             toolbar.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
             toolbar.ui.body.removeClass('cms-toolbar-expanded');
             toolbar.open();
-            expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
-            expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
         });
     });
 
@@ -253,6 +266,9 @@ describe('CMS.Toolbar', function () {
         });
 
         it('does not close toolbar if it is locked', function () {
+            spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
+                callback();
+            });
             toolbar.open();
             toolbar._lock(true);
             // can only check it this way, since we don't propagate
@@ -285,7 +301,9 @@ describe('CMS.Toolbar', function () {
 
             expect($.fn.animate).toHaveBeenCalledWith(
                 { 'margin-top': 0 },
-                200
+                200,
+                'linear',
+                jasmine.any(Function)
             );
             // here we have to use toBeCloseTo because different browsers report different values
             // e.g. FF reports -55.16666
@@ -307,15 +325,34 @@ describe('CMS.Toolbar', function () {
 
             expect($.fn.animate).toHaveBeenCalledWith(
                 { 'margin-top': 5 },
-                200
+                200,
+                'linear',
+                jasmine.any(Function)
             );
         });
 
-        it('turns the disclosure triangle into correct position', function () {
+        it('turns the disclosure triangle into correct position', function (done) {
+            spyOn($.fn, 'animate').and.callFake(function (opts, timeout, easing, callback) {
+                expect(toolbar.ui.toolbarTrigger).toHaveClass('cms-toolbar-trigger-expanded');
+                callback();
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
+            });
+
             toolbar.open();
+
+            $.fn.animate.and.callFake(function (opts, timeout, easing, callback) {
+                expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-expanded');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
+                expect(toolbar.ui.body).toHaveClass('cms-toolbar-collapsing');
+                callback();
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-collapsing');
+                expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanding');
+                done();
+            });
+
             toolbar.close();
-            expect(toolbar.ui.toolbarTrigger).not.toHaveClass('cms-toolbar-trigger-expanded');
-            expect(toolbar.ui.body).not.toHaveClass('cms-toolbar-expanded');
         });
     });
 

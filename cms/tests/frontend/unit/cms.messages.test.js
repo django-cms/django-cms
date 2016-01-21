@@ -116,8 +116,10 @@ describe('CMS.Messages', function () {
         it('positions message correctly if debug toolbar is present', function () {
             CMS.config.debug = true;
             spyOn($.fn, 'animate').and.callFake(function (opts) {
+                // it uses same value, because toolbar itself
+                // if using margin-top: 5px to move when debug is true
                 expect(opts).toEqual({
-                    'top': 51
+                    'top': 46
                 });
             });
 

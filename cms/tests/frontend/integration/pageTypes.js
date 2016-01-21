@@ -97,12 +97,12 @@ casper.test.begin('PageType can be created and used', function (test) {
             parent: '.cms-dragarea:first-child .cms-draggable .cms-draggable:last-child'
         }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         // opening "Save as Page Type" menu item
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             this.click(
                 xPath('//a[.//span[text()[contains(.,"Save as Page Type")]]]')
             );
@@ -141,7 +141,7 @@ casper.test.begin('PageType can be created and used', function (test) {
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         // expand "Templates" menu item
-        .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             var position = this.getElementBounds(xPath('//a[.//span[text()[contains(.,"Add Page")]]]'));
             // simulating mouseenter event
             this.mouse.move(position.left + 1, position.top - 1);
@@ -149,7 +149,7 @@ casper.test.begin('PageType can be created and used', function (test) {
             this.wait(10);
         })
         // wait till it expands
-        .waitForSelector('.cms-toolbar-item-navigation-hover .cms-toolbar-item-navigation-hover', function () {
+        .wait(10, function () {
             // move right
             this.mouse.move(
                 xPath('//a[.//span[text()[contains(.,"New Page")]]]')

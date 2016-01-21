@@ -436,6 +436,7 @@ var CMS = window.CMS || {};
          * @param {Number} [opts.duration] time in milliseconds for toolbar to animate
          */
         _show: function _show(opts) {
+            var that = this;
             var speed = opts && opts.duration !== undefined ? opts.duration : this.options.toolbarDuration;
             var debugHeight = $('.cms-debug-bar').height() || 0;
             var toolbarHeight = $('.cms-toolbar').height() + 10;
@@ -445,9 +446,12 @@ var CMS = window.CMS || {};
                 'margin-top': 0
             });
             this.ui.toolbarTrigger.addClass('cms-toolbar-trigger-expanded');
+            this.ui.body.addClass('cms-toolbar-expanding');
             // animate html
-            this.ui.body.addClass('cms-toolbar-expanded');
-            this.ui.body.animate({ 'margin-top': toolbarHeight - 10 + debugHeight }, speed, 'linear');
+            this.ui.body.animate({ 'margin-top': toolbarHeight - 10 + debugHeight }, speed, 'linear', function () {
+                that.ui.body.removeClass('cms-toolbar-expanding');
+                that.ui.body.addClass('cms-toolbar-expanded');
+            });
             // set messages top to toolbar height
             this.ui.messages.css('top', toolbarHeight - 10);
         },
@@ -474,6 +478,7 @@ var CMS = window.CMS || {};
         _hide: function _hide() {
             var speed = this.options.toolbarDuration;
             var toolbarHeight = $('.cms-toolbar').height() + 10;
+            var that = this;
 
             this.ui.toolbar.css('transition', 'margin-top ' + speed + 'ms');
             // cancel if sideframe is active
@@ -481,11 +486,13 @@ var CMS = window.CMS || {};
                 return false;
             }
 
-            this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
             this.ui.toolbar.css('margin-top', -toolbarHeight);
+            this.ui.toolbarTrigger.removeClass('cms-toolbar-trigger-expanded');
+            this.ui.body.addClass('cms-toolbar-collapsing');
             // animate html
-            this.ui.body.removeClass('cms-toolbar-expanded');
-            this.ui.body.animate({ 'margin-top': (CMS.config.debug) ? 5 : 0 }, speed);
+            this.ui.body.animate({ 'margin-top': (CMS.config.debug) ? 5 : 0 }, speed, 'linear', function () {
+                that.ui.body.removeClass('cms-toolbar-expanded cms-toolbar-collapsing');
+            });
             // set messages top to 0
             this.ui.messages.css('top', 0);
         },
@@ -641,7 +648,6 @@ var CMS = window.CMS || {};
          * @private
          */
         _debug: function _debug() {
-            var that = this;
             var timeout = 1000;
             var timer = function () {};
 
@@ -650,7 +656,7 @@ var CMS = window.CMS || {};
             debug.on(this.mouseEnter + ' ' + this.mouseLeave, function (e) {
                 clearTimeout(timer);
 
-                if (e.type === that.mouseEnter) {
+                if (e.type === 'mouseenter') {
                     timer = setTimeout(function () {
                         CMS.API.Messages.open({
                             message: CMS.config.lang.debug

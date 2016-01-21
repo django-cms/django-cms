@@ -169,6 +169,7 @@ casper.test.begin('Publishing dates', function (test) {
         // going to the newly created page url and checking that it hasn't been published yet
         .thenOpen(pageUrl, function () {
             test.assertTitleMatch(/Page not found/, 'The page is not yet available');
+            this.echo('Now waiting 1.5 minutes');
         })
         // trying the same in a minute and a half (to be completely sure)
         .wait(90000)

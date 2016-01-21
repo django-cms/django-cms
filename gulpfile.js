@@ -17,6 +17,7 @@ var jscs = require('gulp-jscs');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var KarmaServer = require('karma').Server;
+var child_process = require('child_process');
 var spawn = require('child_process').spawn;
 
 var argv = require('minimist')(process.argv.slice(2));
@@ -198,6 +199,8 @@ gulp.task('tests:integration', function (done) {
         'changeSettings',
         'disableToolbar',
         'dragndrop',
+        'history',
+        'revertLive',
         'narrowScreen',
         'clipboard',
         'modal'
@@ -213,6 +216,14 @@ gulp.task('tests:integration', function (done) {
         return PROJECT_PATH.tests + '/integration/' + file + '.js';
     });
 
+    // npm install -g casper-summoner
+    if (argv && argv.summon) {
+        child_process.execSync('casper-summoner ' + tests.join(' '));
+        tests = tests.map(function (file) {
+            return file.replace('.js', '.summoned.js');
+        });
+    }
+
     var casperChild = spawn('./node_modules/.bin/casperjs', ['test', '--web-security=no'].concat(tests));
 
     casperChild.stdout.on('data', function (data) {
@@ -220,6 +231,10 @@ gulp.task('tests:integration', function (done) {
     });
 
     casperChild.on('close', function (code) {
+        if (argv && argv.summon) {
+            child_process.execSync('rm ' + tests.join(' '));
+        }
+
         done(code);
     });
 });

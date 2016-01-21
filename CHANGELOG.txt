@@ -1,12 +1,28 @@
+=== 3.4.0 (Unreleased) ===
+
+* ``cms-toolbar-expanded`` class is only added now when toolbar is fully
+  expanded and not at the beginning of the animation. ``cms-toolbar-expanding``
+  and ``cms-toolbar-collapsing`` classes are added at the beginning of their
+  respective animations.
+
+
 === 3.3.0 (Unreleased) ===
 
 * Removed support for Django 1.6, 1.7 and python 2.6
 * Set the default value of CMSPlugin.position to 0 instead of null
 
+
 === 3.2.1 (Unreleased) ===
 
 - Fixed an issue with refreshing the UI when switching CMS language
 - Fixed an issue with sideframe urls not being remembered after reload
+- Added placeholder name to the edit tooltip
+- Fix breadcrumb in page revision list
+- Fix clash with Foundation that caused "Add plugin" button to be unusable
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+- Fix message with CMS version not showing up on hover in debug mode
+- Fix messages not being positioned correctly in debug mode
+- Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
 
 
 === 3.2.0 (2015-11-24) ===

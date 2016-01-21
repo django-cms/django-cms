@@ -12,32 +12,32 @@
             <div class="cms-submenu-btn cms-submenu-add cms-btn
                 {% if not allow_children %} cms-btn-disabled{% endif %}">
                 {% if not allow_children %}
-                <span class="cms-hover-tooltip" data-tooltip="{% trans "You cannot add plugins to this plugin." %}"></span>
+                <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You cannot add plugins to this plugin." %}"></span>
                 {% else %}
-                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Add plugin" %}"></span>
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Add plugin" %}"></span>
                 {% endif %}
             </div>
             <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
-                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Edit" %}"></span>
+                <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
             </div>
             <div class="cms-submenu cms-submenu-settings cms-submenu-btn cms-btn"></div>
         {% else %}
             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-plugin-disabled" tabindex="-1"
-                data-tooltip="{% trans "This plugin cannot be moved or edited outside of its parent" %}">
+                data-cms-tooltip="{% trans "This plugin cannot be moved or edited outside of its parent" %}">
                 <span class="cms-icon cms-icon-lock"></span>
             </div>
         {% endif %}
         <div class="cms-submenu-dropdown cms-submenu-dropdown-settings">
             <div class="cms-dropdown-inner">
-                <div class="cms-submenu-item"><a data-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
-                <div class="cms-submenu-item"><a data-icon="copy" data-rel="copy" href="#">{% trans "Copy" %}</a></div>
+                <div class="cms-submenu-item"><a data-cms-icon="scissors" data-rel="cut" href="#">{% trans "Cut" %}</a></div>
+                <div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">{% trans "Copy" %}</a></div>
                 <div class="cms-submenu-item">
-                    <a data-icon="paste" data-rel="paste" href="#">{% trans "Paste" %}</a>
-                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-empty cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "Clipboard is empty." %}"></span>
-                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-restricted cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "This plugin does not allow plugins of this type as nested plugins." %}"></span>
-                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-tooltip="{% trans "This plugin cannot have nested plugins." %}"></span>
+                    <a data-cms-icon="paste" data-rel="paste" href="#">{% trans "Paste" %}</a>
+                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-empty cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Clipboard is empty." %}"></span>
+                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-restricted cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "This plugin does not allow plugins of this type as nested plugins." %}"></span>
+                    <span class="cms-submenu-item-paste-tooltip cms-submenu-item-paste-tooltip-disabled cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "This plugin cannot have nested plugins." %}"></span>
                 </div>
-                <div class="cms-submenu-item"><a data-icon="bin" data-rel="delete" href="#">{% trans "Delete" %}</a></div>
+                <div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="delete" href="#">{% trans "Delete" %}</a></div>
                 {% extra_menu_items plugin %}
             </div>
         </div>
