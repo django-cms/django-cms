@@ -202,7 +202,8 @@ gulp.task('tests:integration', function (done) {
         'history',
         'revertLive',
         'narrowScreen',
-        'clipboard'
+        'clipboard',
+        'spaceSwitch'
     ];
     var pre = ['setup'];
 
