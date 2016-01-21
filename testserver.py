@@ -59,6 +59,8 @@ HELPER_SETTINGS = dict(
         'reversion',
         'djangocms_text_ckeditor',
         'djangocms_grid',
+        'filer',
+        'aldryn_bootstrap3',
     ],
     TEMPLATE_DIRS=(
         os.path.join(
