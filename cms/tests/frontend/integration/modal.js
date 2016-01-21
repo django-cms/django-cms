@@ -37,7 +37,7 @@ casper.test.begin('Manipulate Modal', function (test) {
                 return $('.cms-modal-open').height();
             }, 1024, 'Modal maximized to corrent height');
         })
-        // clicks on the ,maximize button
+        // clicks on the maximize button
         .then(function () {
             test.assertExists('.cms-icon-window', 'maximize icon exists');
             this.click('.cms-modal-maximize');
@@ -58,7 +58,7 @@ casper.test.begin('Manipulate Modal', function (test) {
                 return $('.cms-modal-open').height();
             }, 46, 'Window is minimized to corrent height');
         })
-        // epands the window by clicking on the icon
+        // expands the modal by clicking on the icon
         .then(function () {
             this.click('.cms-modal-minimize');
         })
@@ -68,6 +68,9 @@ casper.test.begin('Manipulate Modal', function (test) {
             test.assertEvalEquals(function () {
                 return $('.cms-modal-open').height();
             }, 724, 'Modal opens with default height');
+            test.assertEvalEquals(function () {
+                return $('.cms-modal-open').width();
+            }, 980, 'Modal opens with default width');
         })
         // Function expands
         .then(function () {
