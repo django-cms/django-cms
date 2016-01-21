@@ -28,9 +28,7 @@ casper.test.tearDown(function (done) {
 casper.test.begin('User Add Content', function (test) {
     casper
         .start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         .waitUntilVisible('.cms-structure', function () {
             this.click('.cms-submenu-add [data-cms-tooltip="Add plugin"]');
         })
@@ -53,12 +51,12 @@ casper.test.begin('User Add Content', function (test) {
         })
         .waitWhileVisible('.cms-modal-open', function () {
             this.removeAllFilters('page.confirm');
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
         })
+        .then(cms.switchTo('content'))
         .waitWhileVisible('.cms-structure', function () {
             test.assertSelectorDoesntHaveText('.cms-plugin p', randomText, 'Empty plugin hasn\'t been created');
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
         })
+        .then(cms.switchTo('structure'))
 
         // full plugin creation process
         .waitUntilVisible('.cms-structure', function () {
@@ -100,10 +98,7 @@ casper.test.begin('User Add Content', function (test) {
             this.click('.cms-modal-buttons .cms-btn-action.default');
         })
         .waitForResource(/edit-plugin/)
-        .waitUntilVisible('.cms-toolbar-expanded')
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?edit"]');
-        })
+        .then(cms.switchTo('content'))
         .waitUntilVisible('.cms-plugin', function () {
             test.assertSelectorHasText('.cms-plugin p', randomText, 'Newly created text plugin can be seen on page');
         })

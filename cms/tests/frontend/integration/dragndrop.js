@@ -41,9 +41,7 @@ casper.test.begin('Drag plugin to another placeholder', function (test) {
             test.assertElementCount('.cms-structure .cms-draggable', 4);
         })
         // make sure we are in structure mode
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         .waitUntilVisible('.cms-structure')
         // check that the plugins are in correct placeholders
         .then(function () {
@@ -84,9 +82,7 @@ casper.test.begin('Drag plugin to another placeholder', function (test) {
             return this.reload();
         })
         // check after reload
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         .then(function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
@@ -122,9 +118,7 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
             test.assertElementCount('.cms-structure .cms-draggable', 4);
         })
         // make sure we are in structure mode
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         .waitUntilVisible('.cms-structure')
         // expand the multi columns plugin
         .thenBypassIf(function () {
@@ -165,9 +159,7 @@ casper.test.begin('Move plugins inside a plugin', function (test) {
             this.reload();
         })
         // check after reload
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         .then(function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
@@ -207,9 +199,7 @@ casper.test.begin('Try to move a plugin to restricted area (not allowed)', funct
             test.assertElementCount('.cms-structure .cms-draggable', 4);
         })
         // make sure we are in structure mode
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
         .waitUntilVisible('.cms-structure')
         // expand the multi columns plugin
         .thenBypassIf(function () {

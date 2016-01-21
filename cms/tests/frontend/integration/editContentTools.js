@@ -42,9 +42,7 @@ casper.test.begin('Edit utils page content', function (test) {
         .start(globals.editUrl)
 
         // go to the Structure mode
-        .then(function () {
-            this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
-        })
+        .then(cms.switchTo('structure'))
 
         // CHECK COPY UTIL
         // click settings for last content plugin

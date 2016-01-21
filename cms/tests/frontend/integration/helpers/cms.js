@@ -195,6 +195,53 @@ module.exports = function (casperjs) {
                     })
                     .waitForResource(/clear/);
             };
+        },
+
+        /**
+         * Switches structureboard to a specific mode.
+         *
+         * @function switchTo
+         * @param {String} view 'structure' or 'content'
+         */
+        switchTo: function (view) {
+            var url;
+            if (view === 'structure') {
+                url = 'build';
+            } else if (view === 'content') {
+                url = 'edit';
+            } else {
+                throw new Error('Invalid arguments passed to cms.switchTo, should be either "structure" or "content"');
+            }
+            return function () {
+                return this.waitUntilVisible('.cms-toolbar-expanded')
+                    .then(function () {
+                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
+                    });
+            };
+        },
+
+        /**
+         * Expands all plugins in the given placeholder.
+         *
+         * @function expandPlaceholderPlugins
+         * @param {String} selector placeholder selector
+         */
+        expandPlaceholderPlugins: function (selector) {
+            return function () {
+                return this.then(function () {
+                    // if "Expand all" is visible then
+                    if (this.visible(selector + ' .cms-dragbar-expand-all')) {
+                        this.click(selector + ' .cms-dragbar-expand-all');
+                    } else if (this.visible(selector + ' .cms-dragbar-collapse-all')) {
+                        // if not visible, then first "Collapse all"
+                        this.click(selector + ' .cms-dragbar-collapse-all');
+                        this.wait(100);
+                        this.click(selector + ' .cms-dragbar-expand-all');
+                    } else {
+                        throw new Error('Given placeholder has no plugins');
+                    }
+                });
+            };
         }
     };
 };
