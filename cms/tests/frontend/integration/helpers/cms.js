@@ -218,6 +218,30 @@ module.exports = function (casperjs) {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
                     });
             };
+        },
+
+        /**
+         * Expands all plugins in the given placeholder.
+         *
+         * @function expandPlaceholderPlugins
+         * @param {String} selector placeholder selector
+         */
+        expandPlaceholderPlugins: function (selector) {
+            return function () {
+                return this.then(function () {
+                    // if "Expand all" is visible then
+                    if (this.visible(selector + ' .cms-dragbar-expand-all')) {
+                        this.click(selector + ' .cms-dragbar-expand-all');
+                    } else if (this.visible(selector + ' .cms-dragbar-collapse-all')) {
+                        // if not visible, then first "Collapse all"
+                        this.click(selector + ' .cms-dragbar-collapse-all');
+                        this.wait(100);
+                        this.click(selector + ' .cms-dragbar-expand-all');
+                    } else {
+                        throw new Error('Given placeholder has no plugins');
+                    }
+                });
+            };
         }
     };
 };
