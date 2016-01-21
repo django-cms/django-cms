@@ -195,6 +195,29 @@ module.exports = function (casperjs) {
                     })
                     .waitForResource(/clear/);
             };
+        },
+
+        /**
+         * Switches structureboard to a specific mode.
+         *
+         * @function switchTo
+         * @param {String} view 'structure' or 'content'
+         */
+        switchTo: function (view) {
+            var url;
+            if (view === 'structure') {
+                url = 'build';
+            } else if (view === 'content') {
+                url = 'edit';
+            } else {
+                throw new Error('Invalid arguments passed to cms.switchTo, should be either "structure" or "content"');
+            }
+            return function () {
+                return this.waitUntilVisible('.cms-toolbar-expanded')
+                    .then(function () {
+                        this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
+                    });
+            };
         }
     };
 };
