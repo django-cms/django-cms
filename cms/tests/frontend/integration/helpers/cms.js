@@ -39,7 +39,7 @@ module.exports = function (casperjs) {
         removePage: function (opts) {
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
-                    .waitUntilVisible('.tree .deletelink')
+                    .waitUntilVisible('.cms-pagetree [href*="delete"]')
                     .then(function () {
                         var pageId;
                         if (opts && opts.title) {
@@ -55,9 +55,9 @@ module.exports = function (casperjs) {
                             }, opts.title);
                         }
                         if (pageId) {
-                            this.click('.tree .deletelink[href*="' + pageId + '"]');
+                            this.click('.cms-pagetree [href*="delete"][href*="' + pageId + '"]');
                         } else {
-                            this.click('.tree .deletelink'); // first one
+                            this.click('.cms-pagetree [href*="delete"]'); // first one
                         }
                     })
                     .waitUntilVisible('input[type=submit]')
