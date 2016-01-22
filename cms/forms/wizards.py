@@ -188,9 +188,11 @@ class CreateCMSPageForm(BaseCMSPageForm):
             parent = None
 
         slug = self.cleaned_data['slug']
-        if not slug:
-            title = self.cleaned_data['title']
-            slug = generate_valid_slug(title, parent, self.language_code)
+        if slug:
+            starting_point = slug
+        else:
+            starting_point = self.cleaned_data['title']
+        slug = generate_valid_slug(starting_point, parent, self.language_code)
         if not slug:
             raise forms.ValidationError("Please provide a valid slug.")
         return slug
