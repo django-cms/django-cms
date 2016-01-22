@@ -73,7 +73,7 @@ var JS_BUNDLES = {
     'bundle.admin.pagetree.min.js': [
         PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
         PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
-        PROJECT_PATH.js + '/modules/cms.pagetree.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.js'
     ],
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/polyfills/bind.js',
@@ -202,7 +202,8 @@ gulp.task('tests:integration', function (done) {
         'revertLive',
         'narrowScreen',
         'clipboard',
-        'modal'
+        'modal',
+        'pagetree'
     ];
     var pre = ['setup'];
 
