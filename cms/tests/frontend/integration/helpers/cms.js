@@ -36,23 +36,17 @@ module.exports = function (casperjs) {
          * @param {String} [opts.title] Name of the page to delete
          */
         removePage: function (opts) {
+            var that = this;
             return function () {
                 return this.thenOpen(globals.adminPagesUrl)
                     .waitUntilVisible('.cms-pagetree [href*="delete"]')
+                    .then(that.expandPageTree())
                     .then(function () {
                         var pageId;
                         if (opts && opts.title) {
-                            // important to pass single param, because casper acts
-                            // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
-                            pageId = this.evaluate(function (title) {
-                                return CMS.$('.col1 a > span').map(function () {
-                                    var span = $(this);
-                                    if (span.text().trim() === title) {
-                                        return span.closest('li').attr('id').split('_')[1];
-                                    }
-                                }).get()[0];
-                            }, opts.title);
+                            pageId = that.getPageId(opts.title);
                         }
+
                         if (pageId) {
                             this.click('.cms-pagetree [href*="delete"][href*="' + pageId + '"]');
                         } else {
@@ -103,6 +97,7 @@ module.exports = function (casperjs) {
          */
         addPlugin: function (opts) {
             var xPath = casperjs.selectXPath;
+            var that = this;
 
             return function () {
                 return this.thenOpen(globals.editUrl)
@@ -130,15 +125,7 @@ module.exports = function (casperjs) {
                                     }).get().join('>');
                             }, opts.parent);
 
-                            // check if "Expand all" is visible
-                            if (this.visible(parentSelector + ' .cms-dragbar-expand-all')) {
-                                this.click(parentSelector + ' .cms-dragbar-expand-all');
-                            } else {
-                                // if not visible, then first "Collapse all"
-                                this.click(parentSelector + ' .cms-dragbar-collapse-all');
-                                this.wait(100);
-                                this.click(parentSelector + ' .cms-dragbar-expand-all');
-                            }
+                            that.expandPlaceholderPlugins(parentSelector);
 
                             this.wait(100);
                             this.click(opts.parent + ' [data-cms-tooltip="Add plugin"]');
@@ -241,6 +228,65 @@ module.exports = function (casperjs) {
                     }
                 });
             };
+        },
+
+        /**
+         * Opens the sideframe. Toolbar has to be there.
+         *
+         * @function openSideframe
+         */
+        openSideframe: function () {
+            return function () {
+                return this.waitUntilVisible('.cms-toolbar-expanded', function () {
+                    // open "Example.com" menu
+                    this.click('.cms-toolbar-item-navigation li:first-child a');
+                })
+                // open "Administration"
+                .waitForSelector('.cms-toolbar-item-navigation-hover', function () {
+                    this.click('.cms-toolbar-item-navigation-hover a[href*="/admin/cms/page"]');
+                })
+                // wait until sideframe is open
+                .waitUntilVisible('.cms-sideframe-frame');
+            };
+        },
+
+        /**
+         * Recursively expands the page tree to operate on page nodes.
+         *
+         * @function expandPageTree
+         */
+        expandPageTree: function () {
+            var that = this;
+            return function () {
+                return this.then(function () {
+                    if (this.visible('.jstree-closed')) {
+                        this.click('.jstree-closed > .jstree-ocl');
+                        // there's no clear way to check if the page was loading
+                        // or was already in the DOM
+                        return casper.wait(1000).then(that.expandPageTree());
+                    }
+                });
+            };
+        },
+
+        /**
+         * Returns pageId. Page has to be visible in the page tree. See `expandPageTree`.
+         *
+         * @function getPageId
+         * @param {String} title page title
+         * @return {String|Boolean} page id as a string or false if couldn't be found
+         */
+        getPageId: function (title) {
+            // important to pass single param, because casper acts
+            // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
+            return casper.evaluate(function (title) {
+                return CMS.$('.jstree-anchor').map(function () {
+                    var anchor = $(this);
+                    if (anchor.text().trim() === title) {
+                        return anchor.parent().data('id');
+                    }
+                }).get()[0];
+            }, title);
         }
     };
 };
