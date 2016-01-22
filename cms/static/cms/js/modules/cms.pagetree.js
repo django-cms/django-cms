@@ -793,7 +793,14 @@ var CMS = window.CMS || {};
     // shorthand for jQuery(document).ready();
     $(function () {
         // load cms settings beforehand
-        CMS.config = {};
+        // have to set toolbar to "expanded" by default
+        // otherwise initialization will be incorrect when you
+        // go first to pages and then to normal page
+        CMS.config = {
+            settings: {
+                toolbar: 'expanded'
+            }
+        };
         CMS.settings = CMS.API.Helpers.getSettings();
         // autoload the pagetree
         new CMS.PageTree();
