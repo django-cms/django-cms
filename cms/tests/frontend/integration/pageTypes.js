@@ -57,7 +57,7 @@ casper.test.begin('Different page template can be applied', function (test) {
                 xPath('//a[.//span[text()[contains(.,"Standard page")]]]')
             );
         })
-        .waitForResource(/change_template/)
+        .waitForResource(/change-template/)
         .waitForSelector('.cms-ready', function () {
             test.assertSelectorHasText(
                 '.cms-toolbar-item-navigation-active',
