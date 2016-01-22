@@ -124,7 +124,7 @@ casper.test.begin('Can switch mode by triggering space', function (test) {
         .then(function () {
             // triggers space
             this.sendKeys('html', casper.page.event.key.Space);
-            // checks the name of the page which gets shown only on content mode
+            // checks if we are not in structure mode anymore
             test.assertNotVisible('.cms-structure',  'switch via space worked');
         })
         .then(function () {
