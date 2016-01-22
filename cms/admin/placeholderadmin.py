@@ -149,6 +149,14 @@ class FrontendEditableAdminMixin(object):
 
 
 class PlaceholderAdminMixin(object):
+
+    def _get_attached_admin(self, placeholder):
+        model = placeholder._get_attached_model()
+
+        if not model:
+            return
+        return self.admin_site._registry.get(model)
+
     def get_urls(self):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
@@ -368,7 +376,26 @@ class PlaceholderAdminMixin(object):
                     'language': plugin.language, 'placeholder_id': plugin.placeholder_id
                 }
             )
+
         self.post_copy_plugins(request, source_placeholder, target_placeholder, plugins)
+
+        # When this is executed we are in the admin class of the source placeholder
+        # It can be a page or a model with a placeholder field.
+        # Because of this we need to get the admin class instance of the
+        # target placeholder and call post_copy_plugins() on it.
+        # By doing this we make sure that both the source and target are
+        # informed of the operation.
+        target_placeholder_admin = self._get_attached_admin(target_placeholder)
+
+        if (target_placeholder_admin and
+                target_placeholder_admin.model != self.model):
+            target_placeholder_admin.post_copy_plugins(
+                request,
+                source_placeholder=source_placeholder,
+                target_placeholder=target_placeholder,
+                plugins=plugins,
+            )
+
         json_response = {'plugin_list': reduced_list, 'reload': reload_required}
         return HttpResponse(json.dumps(json_response), content_type='application/json')
 
@@ -499,14 +526,18 @@ class PlaceholderAdminMixin(object):
 
         if move_a_copy:  # "paste"
             if plugin.plugin_type == "PlaceholderPlugin":
-                inst, _plugin = plugin.get_plugin_instance()
-                source_plugins = inst.placeholder_ref.get_plugins()
-                new_plugins = copy_plugins.copy_plugins_to(
-                    source_plugins, placeholder, language)
+                parent_id = None
+                inst = plugin.get_plugin_instance()[0]
+                plugins = inst.placeholder_ref.get_plugins()
             else:
-                source_plugins = [plugin] + list(plugin.get_descendants())
-                new_plugins = copy_plugins.copy_plugins_to(
-                    source_plugins, placeholder, language, parent_id)
+                plugins = [plugin] + list(plugin.get_descendants())
+
+            new_plugins = copy_plugins.copy_plugins_to(
+                plugins,
+                placeholder,
+                language,
+                parent_plugin_id=parent_id,
+            )
 
             top_plugins = []
             top_parent = new_plugins[0][0].parent_id
@@ -523,6 +554,7 @@ class PlaceholderAdminMixin(object):
 
             if parent_id:
                 parent = CMSPlugin.objects.get(pk=parent_id)
+
                 for plugin in top_plugins:
                     plugin.parent = parent
                     plugin.placeholder = placeholder
@@ -538,6 +570,9 @@ class PlaceholderAdminMixin(object):
                     order[copy_idx:0] = top_plugins_pks
                 else:
                     order.extend(top_plugins_pks)
+
+            # Set the plugin variable to point to the newly created plugin.
+            plugin = new_plugins[0][0]
         else:
             # Regular move
             if parent_id:
@@ -561,15 +596,46 @@ class PlaceholderAdminMixin(object):
                 plugin.save()
                 plugin = plugin.move(sibling, pos='right')
 
+            plugins = [plugin] + list(plugin.get_descendants())
+
             # Don't neglect the children
-            for child in [plugin] + list(plugin.get_descendants()):
+            for child in plugins:
                 child.placeholder = placeholder
                 child.language = language
                 child.save()
 
         reorder_plugins(placeholder, parent_id, language, order)
 
-        self.post_move_plugin(request, source_placeholder, placeholder, plugin)
+        # When this is executed we are in the admin class of the source placeholder
+        # It can be a page or a model with a placeholder field.
+        # Because of this we need to get the admin class instance of the
+        # target placeholder and call post_move_plugin() on it.
+        # By doing this we make sure that both the source and target are
+        # informed of the operation.
+        target_placeholder_admin = self._get_attached_admin(placeholder)
+
+        if move_a_copy:  # "paste"
+            self.post_copy_plugins(request, source_placeholder, placeholder, plugins)
+
+            if (target_placeholder_admin and
+                    target_placeholder_admin.model != self.model):
+                target_placeholder_admin.post_copy_plugins(
+                    request,
+                    source_placeholder=source_placeholder,
+                    target_placeholder=placeholder,
+                    plugins=plugins,
+                )
+        else:
+            self.post_move_plugin(request, source_placeholder, placeholder, plugin)
+
+            if (target_placeholder_admin and
+                    target_placeholder_admin.model != self.model):
+                target_placeholder_admin.post_move_plugin(
+                    request,
+                    source_placeholder=source_placeholder,
+                    target_placeholder=placeholder,
+                    plugin=plugin,
+                )
 
         try:
             language = request.toolbar.toolbar_language

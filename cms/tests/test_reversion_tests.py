@@ -1,19 +1,23 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
+import json
 import shutil
 from os.path import join
+from cms.api import add_plugin, create_page
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.models import Text
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.encoding import force_text
 
-from cms.api import create_page
-from cms.models import Page, Title, Placeholder
+from cms.models import Page, Title, Placeholder, StaticPlaceholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
+from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_DELETE
 from cms.utils.reversion_hacks import Revision, reversion, Version
@@ -36,6 +40,7 @@ class BasicReversionTestCase(CMSTestCase):
 
 
 class ReversionTestCase(TransactionCMSTestCase):
+
     def setUp(self):
         u = self._create_user("test", True, True)
 
@@ -76,6 +81,344 @@ class ReversionTestCase(TransactionCMSTestCase):
             page.publish('en')
 
         self.user = u
+
+    def get_example_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[Example1]
+
+    def get_page_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[Page]
+
+    def get_staticplaceholder_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[StaticPlaceholder]
+
+    def get_post_request(self, data):
+        return self.get_request(post_data=data)
+
+    def test_revision_on_plugin_move(self):
+        from cms.plugin_pool import plugin_pool
+
+        placeholder_c_type = ContentType.objects.get_for_model(Placeholder)
+        placeholder_versions = Version.objects.filter(content_type=placeholder_c_type)
+
+        LinkPluginModel = plugin_pool.get_plugin('LinkPlugin').model
+        link_plugin_c_type = ContentType.objects.get_for_model(LinkPluginModel)
+
+        # three placeholder types
+        # native - native CMS placeholder (created using a placeholder tag)
+        # manual - Manual placeholder (created using a PlaceholderField)
+        # static - Static placeholder (created using the staticplaceholder tag)
+
+        native_placeholder_page = create_page('test page', 'simple.html', u'en')
+        native_placeholder = native_placeholder_page.placeholders.get(slot='placeholder')
+        native_placeholder_pk = native_placeholder.pk
+        native_placeholder_admin = self.get_page_admin()
+        native_placeholder_versions = placeholder_versions.filter(object_id_int=native_placeholder_pk)
+        native_placeholder_versions_initial_count = native_placeholder_versions.count()
+
+        example = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four',
+        )
+        manual_placeholder = example.placeholder
+        manual_placeholder_admin = self.get_example_admin()
+
+        static_placeholder_obj = StaticPlaceholder.objects.create(
+            name='static',
+            code='static',
+            site_id=1,
+        )
+        static_placeholder = static_placeholder_obj.draft
+        static_placeholder_admin = self.get_staticplaceholder_admin()
+
+        data = {
+            'placeholder': native_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+
+        # Add plugin to feature
+        link_plugin = add_plugin(**data)
+        link_plugin_pk = link_plugin.pk
+        link_plugin_versions = Version.objects.filter(
+            content_type=link_plugin_c_type,
+            object_id_int=link_plugin_pk,
+        )
+        link_plugin_versions_initial_count = link_plugin_versions.count()
+
+        # move plugin to manual placeholder
+        request = self.get_post_request({
+            'placeholder_id': manual_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+        })
+        response = native_placeholder_admin.move_plugin(request)
+        self.assertEqual(response.status_code, 200)
+
+        # assert a new version for the native placeholder has been created
+        self.assertEqual(
+            native_placeholder_versions.count(),
+            native_placeholder_versions_initial_count + 1,
+        )
+
+        # assert revision comment was set correctly
+        self.assertEqual(
+            Revision.objects.latest('pk').comment,
+            'Moved plugins to %s' % force_text(manual_placeholder),
+        )
+
+        # move plugin back to native
+        request = self.get_post_request({
+            'placeholder_id': native_placeholder_pk,
+            'plugin_id': link_plugin_pk,
+        })
+        response = manual_placeholder_admin.move_plugin(request)
+        self.assertEqual(response.status_code, 200)
+
+        # assert a new version for the native placeholder has been created
+        self.assertEqual(
+            native_placeholder_versions.count(),
+            native_placeholder_versions_initial_count + 2,
+        )
+
+        # assert a new version for the link plugin has been created
+        self.assertEqual(
+            link_plugin_versions.count(),
+            link_plugin_versions_initial_count + 1,
+        )
+
+        # assert revision comment was set correctly
+        self.assertEqual(
+            Revision.objects.latest('pk').comment,
+            'Moved plugins to %s' % force_text(native_placeholder),
+        )
+
+        # move plugin to static placeholder
+        request = self.get_post_request({
+            'placeholder_id': static_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+        })
+        response = native_placeholder_admin.move_plugin(request)
+        self.assertEqual(response.status_code, 200)
+
+        # assert a new version for the native placeholder has been created
+        self.assertEqual(
+            native_placeholder_versions.count(),
+            native_placeholder_versions_initial_count + 3,
+        )
+
+        # assert revision comment was set correctly
+        self.assertEqual(
+            Revision.objects.latest('pk').comment,
+            'Moved plugins to %s' % force_text(static_placeholder),
+        )
+
+        # move plugin back to native
+        request = self.get_post_request({
+            'placeholder_id': native_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+        })
+        response = static_placeholder_admin.move_plugin(request)
+        self.assertEqual(response.status_code, 200)
+
+        # assert a new version for the native placeholder has been created
+        self.assertEqual(
+            native_placeholder_versions.count(),
+            native_placeholder_versions_initial_count + 4,
+        )
+
+        # assert a new version for the link plugin has been created
+        self.assertEqual(
+            link_plugin_versions.count(),
+            link_plugin_versions_initial_count + 2,
+        )
+
+        # assert revision comment was set correctly
+        self.assertEqual(
+            Revision.objects.latest('pk').comment,
+            'Moved plugins to %s' % force_text(native_placeholder),
+        )
+
+    def test_revision_on_plugin_move_a_copy(self):
+        from cms.plugin_pool import plugin_pool
+
+        def get_plugin_id_from_response(response):
+            # Expects response to be a JSON response
+            # with a structure like so:
+            # {"urls": {"edit_plugin": "/en/admin/placeholderapp/example1/edit-plugin/3/"}
+            data = json.loads(response.content.decode('utf-8'))
+            return data['urls']['edit_plugin'].split('/')[-2]
+
+        placeholder_c_type = ContentType.objects.get_for_model(Placeholder)
+        placeholder_versions = Version.objects.filter(content_type=placeholder_c_type)
+        placeholder_versions_initial_count = placeholder_versions.count()
+
+        LinkPluginModel = plugin_pool.get_plugin('LinkPlugin').model
+        link_plugin_c_type = ContentType.objects.get_for_model(LinkPluginModel)
+
+        # three placeholder types
+        # native - native CMS placeholder (created using a placeholder tag)
+        # manual - Manual placeholder (created using a PlaceholderField)
+        # static - Static placeholder (created using the staticplaceholder tag)
+
+        native_placeholder_page = create_page('test page', 'simple.html', u'en')
+        native_placeholder = native_placeholder_page.placeholders.get(slot='placeholder')
+        native_placeholder_pk = native_placeholder.pk
+        native_placeholder_admin = self.get_page_admin()
+        native_placeholder_versions = placeholder_versions.filter(object_id_int=native_placeholder_pk)
+        native_placeholder_versions_initial_count = native_placeholder_versions.count()
+
+        example = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four',
+        )
+        manual_placeholder = example.placeholder
+        manual_placeholder_admin = self.get_example_admin()
+
+        static_placeholder_obj = StaticPlaceholder.objects.create(
+            name='static',
+            code='static',
+            site_id=1,
+        )
+        static_placeholder = static_placeholder_obj.draft
+        static_placeholder_admin = self.get_staticplaceholder_admin()
+
+        # Add plugin to manual placeholder
+        data = {
+            'placeholder': manual_placeholder,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+
+        link_plugin = add_plugin(**data)
+        link_plugin_versions = Version.objects.filter(
+            content_type=link_plugin_c_type,
+        )
+
+        # copy plugin from manual to native placeholder
+        request = self.get_post_request({
+            'placeholder_id': native_placeholder.pk,
+            'plugin_id': link_plugin.pk,
+            'plugin_order': ['__COPY__'],
+            'move_a_copy': 'true',
+        })
+        response = manual_placeholder_admin.move_plugin(request)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Point to the newly created text plugin
+        link_plugin_pk = get_plugin_id_from_response(response)
+
+        # assert a new version for the native placeholder has been created
+        self.assertEqual(
+            native_placeholder_versions.count(),
+            native_placeholder_versions_initial_count + 1,
+        )
+
+        # assert a new version for the link plugin has been created
+        self.assertEqual(
+            link_plugin_versions.filter(object_id_int=link_plugin_pk).count(),
+            1,
+        )
+
+        # Assert revision comment was set correctly
+        self.assertEqual(
+            Revision.objects.latest('pk').comment,
+            'Copied plugins to %s' % force_text(native_placeholder),
+        )
+
+        # copy plugin from native to manual placeholder
+        request = self.get_post_request({
+            'placeholder_id': manual_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+            'plugin_order': ['__COPY__'],
+            'move_a_copy': 'true',
+        })
+        response = native_placeholder_admin.move_plugin(request)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Point to the newly created text plugin
+        link_plugin_pk = get_plugin_id_from_response(response)
+
+        # assert revision count remains the same
+        self.assertEqual(
+            placeholder_versions.count(),
+            placeholder_versions_initial_count + 1,
+        )
+
+        # copy plugin from manual to static placeholder
+        request = self.get_post_request({
+            'placeholder_id': static_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+            'plugin_order': ['__COPY__'],
+            'move_a_copy': 'true',
+        })
+        response = manual_placeholder_admin.move_plugin(request)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Point to the newly created text plugin
+        link_plugin_pk = get_plugin_id_from_response(response)
+
+        # assert revision count remains the same
+        self.assertEqual(
+            placeholder_versions.count(),
+            placeholder_versions_initial_count + 1,
+        )
+
+        # copy plugin from static to manual placeholder
+        request = self.get_post_request({
+            'placeholder_id': manual_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+            'plugin_order': ['__COPY__'],
+            'move_a_copy': 'true',
+        })
+        response = static_placeholder_admin.move_plugin(request)
+        self.assertEqual(response.status_code, 200)
+
+        # assert revision count remains the same
+        self.assertEqual(
+            placeholder_versions.count(),
+            placeholder_versions_initial_count + 1,
+        )
+
+        # copy plugin from static to native placeholder
+        request = self.get_post_request({
+            'placeholder_id': native_placeholder.pk,
+            'plugin_id': link_plugin_pk,
+            'plugin_order': ['__COPY__'],
+            'move_a_copy': 'true',
+        })
+        response = static_placeholder_admin.move_plugin(request)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Point to the newly created text plugin
+        link_plugin_pk = get_plugin_id_from_response(response)
+
+        # assert a new version for the native placeholder has been created
+        self.assertEqual(
+            native_placeholder_versions.count(),
+            native_placeholder_versions_initial_count + 2,
+        )
+
+        # assert a new version for the link plugin has been created
+        self.assertEqual(
+            link_plugin_versions.filter(object_id_int=link_plugin_pk).count(),
+            1,
+        )
+
+        # assert revision comment was set correctly
+        self.assertEqual(
+            Revision.objects.latest('pk').comment,
+            'Copied plugins to %s' % force_text(native_placeholder),
+        )
 
     def test_revert(self):
         """
