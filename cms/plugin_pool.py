@@ -38,9 +38,66 @@ class PluginPool(object):
         self.plugins = {}
         self.patched = False
 
+    def validate_templates(self, plugin=None):
+        """
+        Plugins templates are validated at this stage
+
+        """
+        if plugin:
+            plugins = [plugin]
+        else:
+            plugins = self.plugins.values()
+        for plugin in plugins:
+            if (plugin.render_plugin and not type(plugin.render_plugin) == property
+                    or hasattr(plugin.model, 'render_template')
+                    or hasattr(plugin, 'get_render_template')):
+                if (plugin.render_template is None and
+                        not hasattr(plugin.model, 'render_template') and
+                        not hasattr(plugin, 'get_render_template')):
+                    raise ImproperlyConfigured(
+                        "CMS Plugins must define a render template, "
+                        "a get_render_template method or "
+                        "set render_plugin=False: %s" % plugin
+                    )
+                # If plugin class defines get_render_template we cannot
+                # statically check for valid template file as it depends
+                # on plugin configuration and context.
+                # We cannot prevent developer to shoot in the users' feet
+                elif not hasattr(plugin, 'get_render_template'):
+                    from django.template import loader
+
+                    template = ((hasattr(plugin.model, 'render_template') and
+                                plugin.model.render_template) or
+                                plugin.render_template)
+                    if isinstance(template, six.string_types) and template:
+                        try:
+                            loader.get_template(template)
+                        except TemplateDoesNotExist as e:
+                            # Note that the template loader will throw
+                            # TemplateDoesNotExist if the plugin's render_template
+                            # does in fact exist, but it includes a template that
+                            # doesn't.
+                            if six.text_type(e) == template:
+                                raise ImproperlyConfigured(
+                                    "CMS Plugins must define a render template (%s) that exists: %s"
+                                    % (plugin, template)
+                                )
+                            else:
+                                pass
+                        except TemplateSyntaxError:
+                            pass
+            else:
+                if plugin.allow_children:
+                    raise ImproperlyConfigured(
+                        "CMS Plugins can not define render_plugin=False and allow_children=True: %s"
+                        % plugin
+                    )
+
     def register_plugin(self, plugin):
         """
         Registers the given plugin(s).
+
+        Static sanity checks is also performed.
 
         If a plugin is already registered, this will raise PluginAlreadyRegistered.
         """
@@ -49,50 +106,6 @@ class PluginPool(object):
                 "CMS Plugins must be subclasses of CMSPluginBase, %r is not."
                 % plugin
             )
-        if (plugin.render_plugin and not type(plugin.render_plugin) == property
-                or hasattr(plugin.model, 'render_template')
-                or hasattr(plugin, 'get_render_template')):
-            if (plugin.render_template is None and
-                    not hasattr(plugin.model, 'render_template') and
-                    not hasattr(plugin, 'get_render_template')):
-                raise ImproperlyConfigured(
-                    "CMS Plugins must define a render template, "
-                    "a get_render_template method or "
-                    "set render_plugin=False: %s" % plugin
-                )
-            # If plugin class defines get_render_template we cannot
-            # statically check for valid template file as it depends
-            # on plugin configuration and context.
-            # We cannot prevent developer to shoot in the users' feet
-            elif not hasattr(plugin, 'get_render_template'):
-                from django.template import loader
-
-                template = ((hasattr(plugin.model, 'render_template') and
-                            plugin.model.render_template) or
-                            plugin.render_template)
-                if isinstance(template, six.string_types) and template:
-                    try:
-                        loader.get_template(template)
-                    except TemplateDoesNotExist as e:
-                        # Note that the template loader will throw
-                        # TemplateDoesNotExist if the plugin's render_template
-                        # does in fact exist, but it includes a template that
-                        # doesn't.
-                        if six.text_type(e) == template:
-                            raise ImproperlyConfigured(
-                                "CMS Plugins must define a render template (%s) that exists: %s"
-                                % (plugin, template)
-                            )
-                        else:
-                            pass
-                    except TemplateSyntaxError:
-                        pass
-        else:
-            if plugin.allow_children:
-                raise ImproperlyConfigured(
-                    "CMS Plugins can not define render_plugin=False and allow_children=True: %s"
-                    % plugin
-                )
         plugin_name = plugin.__name__
         if plugin_name in self.plugins:
             raise PluginAlreadyRegistered(
