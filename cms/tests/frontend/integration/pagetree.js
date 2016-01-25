@@ -157,7 +157,7 @@ casper.test.begin('Pages can be reordered', function (test) {
         });
 });
 
-casper.test.begin('Pages can be nested', function (test) {
+casper.test.begin('Pages can be nested / unnested', function (test) {
     casper
         .then(cms.addPage({ title: 'Homepage' }))
         .then(cms.addPage({ title: 'Second' }))
@@ -190,6 +190,27 @@ casper.test.begin('Pages can be nested', function (test) {
                           '/following-sibling::ul[contains(@class, "jstree-children")]' +
                           '[./li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
                     'Second page is now nested into the Homepage'
+                );
+            }).waitForResource(/move-page/, function () {
+                test.assertExists('.cms-tree-node-success', 'Success icon showed up');
+            }).wait(1050, function () {
+                test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
+            })
+            // currently failing
+            .thenBypass(4)
+            .then(function () {
+                drop = this.getElementBounds(
+                    xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]')
+                );
+
+                this.mouse.down(xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Second")]'));
+                this.mouse.move(drop.left + 10, drop.top + drop.height - 1);
+            }).then(function () {
+                this.mouse.up(drop.left + 10, drop.top + drop.height - 1);
+                test.assertExists(
+                    xPath('//li[./a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]]' +
+                          '/following-sibling::li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                    'Pages are back in their initial order'
                 );
             }).waitForResource(/move-page/, function () {
                 test.assertExists('.cms-tree-node-success', 'Success icon showed up');
