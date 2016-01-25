@@ -112,7 +112,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
 });
 
 casper.test.begin('Pages can be reordered', function (test) {
-    casper
+    casper.start()
         .then(cms.addPage({ title: 'Homepage' }))
         .then(cms.addPage({ title: 'Second' }))
         .thenOpen(globals.baseUrl)
@@ -158,7 +158,7 @@ casper.test.begin('Pages can be reordered', function (test) {
 });
 
 casper.test.begin('Pages can be nested / unnested', function (test) {
-    casper
+    casper.start()
         .then(cms.addPage({ title: 'Homepage' }))
         .then(cms.addPage({ title: 'Second' }))
         .thenOpen(globals.baseUrl)
