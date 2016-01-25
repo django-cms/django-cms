@@ -66,8 +66,30 @@ module.exports = function (casperjs) {
         * @public
         * @param {Object} opts
         * @param {String} opts.title name of the page
+        * @param {String} [opts.title] name of the parent page
         */
         addPage: function (opts) {
+            var that = this;
+
+            if (opts.parent) {
+                return function () {
+                    return this.thenOpen(globals.adminPagesUrl)
+                        .waitUntilVisible('.cms-pagetree')
+                        .then(that.expandPageTree())
+                        .then(function () {
+                            var pageId = that.getPageId(opts.parent);
+                            // add nested page
+                            this.click('a[href*="/admin/cms/page/add/?target=' + pageId + '"]');
+                        })
+                        .waitForSelector('#page_form', function () {
+                            this.sendKeys('#id_title', opts.title);
+                            this.click('input[name="_save"]');
+                        })
+                        .waitUntilVisible('.success');
+                };
+            }
+
+            // add page as usual
             return function () {
                 return this.thenOpen(globals.adminPagesUrl + 'add/')
                     .waitUntilVisible('#id_title')
