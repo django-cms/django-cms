@@ -110,3 +110,49 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Pages can be reordered', function (test) {
+    casper
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var drop;
+            casper.waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    xPath('//li[./a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]]' +
+                          '/following-sibling::li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                    'Pages are in correct order initially'
+                );
+
+                // usually to drag stuff in the iframe you have to calculate the position of the frame
+                // and then the position of the thing inside frame, but here sideframe is opened at 0, 0
+                // so this should be enough
+                drop = this.getElementBounds(
+                    xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Second")]')
+                );
+
+                this.mouse.down(xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]'));
+                this.mouse.move(drop.left + drop.width / 2, drop.top + drop.height - 3);
+            }).then(function () {
+                this.mouse.up(drop.left + drop.width / 2, drop.top + drop.height - 3);
+                test.assertExists(
+                    xPath('//li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
+                          '/following-sibling::li' +
+                          '[./a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]]'),
+                    'Pages are in correct order after move'
+                );
+            }).waitForResource(/move-page/, function () {
+                test.assertExists('.cms-tree-node-success', 'Success icon showed up');
+            }).wait(1050, function () {
+                test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
+            });
+        })
+        .then(cms.removePage({ title: 'Homepage' }))
+        .then(cms.removePage({ title: 'Second' }))
+        .run(function () {
+            test.done();
+        });
+});
