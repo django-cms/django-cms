@@ -168,16 +168,17 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             return None
 
-    def clean_slug(self):
+    def clean(self):
         """
         Validates that either the slug is provided, or that slugification from
         `title` produces a valid slug.
         :return:
         """
-        if 'sub_page' in self.cleaned_data:
-            sub_page = self.cleaned_data['sub_page']
-        else:
-            sub_page = False
+        cleaned_data = super(CreateCMSPageForm, self).clean()
+
+        slug = cleaned_data.get("slug")
+        sub_page = cleaned_data.get("sub_page")
+        title = cleaned_data.get("title")
 
         if self.page:
             if sub_page:
@@ -187,15 +188,17 @@ class CreateCMSPageForm(BaseCMSPageForm):
         else:
             parent = None
 
-        slug = self.cleaned_data['slug']
         if slug:
             starting_point = slug
+        elif title:
+            starting_point = title
         else:
-            starting_point = self.cleaned_data['title']
+            starting_point = _(u"page")
         slug = generate_valid_slug(starting_point, parent, self.language_code)
         if not slug:
             raise forms.ValidationError("Please provide a valid slug.")
-        return slug
+        cleaned_data["slug"] = slug
+        return cleaned_data
 
     def save(self, **kwargs):
         from cms.api import create_page, add_plugin
