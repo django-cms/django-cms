@@ -11,6 +11,9 @@
 - Fix message with CMS version not showing up on hover in debug mode
 - Fix messages not being positioned correctly in debug mode
 - Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
+- Added attr['is_page']=True to CMS Page navigation nodes
+- Fixed a bug where page tree styles didn't load from STATIC_URL that pointed
+  to a different host
 
 
 === 3.2.0 (2015-11-24) ===
@@ -68,7 +71,7 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
-=== 3.1.4 ===
+=== 3.1.4 (2015-11-24) ===
 
 - Fixed a problem in ``0010_migrate_use_structure.py`` that broke some migration paths to Django 1.8
 - Fixed ``fix_tree`` command
@@ -173,7 +176,7 @@
 - Add "Structure mode" permission
 
 
-=== 3.0.16 ===
+=== 3.0.16 (2015-11-24) ===
 
 - Fixed JavaScript error when using ``PageSelectWidget``
 - Fixed whitespace markup issues in draft mode

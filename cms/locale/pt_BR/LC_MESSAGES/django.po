@@ -17,15 +17,16 @@
 # Marcelo Soares <marcelo.rs@gmail.com>, 2015
 # Massa <massa_@msn.com>, 2015
 # Rafael Duarte Trevisan <rafa.trevisan@gmail.com>, 2013
+# Rodrigo Macedo <rodrigomacedo@rmsolucoeseminformatica.com>, 2015
 # Rodrigo <rprior@infranology.com.br>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
-"PO-Revision-Date: 2015-11-11 17:31+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/digi604/django-cms/language/pt_BR/)\n"
+"PO-Revision-Date: 2015-12-29 21:09+0000\n"
+"Last-Translator: Rodrigo Macedo <rodrigomacedo@rmsolucoeseminformatica.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1343,17 +1344,17 @@ msgstr "Página em:"
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(counter)s resultado"
+msgstr[1] "%(counter)s resultados"
 
 #: templates/admin/cms/page/tree/base.html:108
 #, python-format
 msgid "%(full_result_count)s total"
-msgstr ""
+msgstr "%(full_result_count)s total"
 
 #: templates/admin/cms/page/tree/base.html:108
 msgid "Show all"
-msgstr ""
+msgstr "Mostrar tudo"
 
 #: templates/admin/cms/page/tree/base.html:123
 msgid "Filter:"
@@ -1373,7 +1374,7 @@ msgstr "Filtro"
 
 #: templates/admin/cms/page/tree/base_header.html:8
 msgid "View"
-msgstr ""
+msgstr "Visualizar"
 
 #: templates/admin/cms/page/tree/base_header.html:12
 msgid "Menu"
@@ -1566,7 +1567,7 @@ msgstr "Editar"
 
 #: templates/cms/toolbar/dragitem.html:22
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Este plugin não pode ser movido ou editado fora de seu pai"
 
 #: templates/cms/toolbar/dragitem.html:33
 msgid "Clipboard is empty."
