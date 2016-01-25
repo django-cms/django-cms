@@ -271,3 +271,102 @@ casper.test.begin('Pages cannot be published if it does not have a title and slu
         });
 });
 
+casper.test.begin('Pages can be published/unpublished if it does have a title and slug', function (test) {
+    var pageId;
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                pageId = cms.getPageId('Homepage');
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
+                    'Page is published by default in main lang'
+                );
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
+                    'Page is not published by default in another language'
+                );
+            })
+            // then edit the page to have german translation
+            .then(function () {
+                this.click('.js-cms-tree-advanced-settings[href*="' + pageId + '"]');
+            })
+            .waitUntilVisible('#page_form', function () {
+                this.click('#debutton');
+            })
+            .waitForSelector('#debutton.selected', function () {
+                this.sendKeys('#id_title', 'Startseite');
+                this.click('input[name="_save"]');
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                // FIXME this shouldn't be empty, should be unpublished
+                this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty');
+            })
+            .waitUntilVisible('.cms-tree-tooltip-container', function () {
+                test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
+
+                this.click('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
+            })
+            .waitForResource(/publish/)
+            .then(function () {
+                // FIXME should not do this manually, reload should happen automatically
+                this.reload();
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.published',
+                    'Page was published in German because it does have a title and slug'
+                );
+            })
+            .then(function () {
+                this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"]');
+            })
+            .waitUntilVisible('.cms-tree-tooltip-container', function () {
+                this.click('.cms-tree-tooltip-container-open a[href*="/de/unpublish/"]');
+            })
+            .waitForResource(/unpublish/)
+            .then(function () {
+                // FIXME should not do this manually, reload should happen automatically
+                this.reload();
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    // FIXME should be "unpublished" not empty
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
+                    'Page in German was unpublished'
+                );
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
+                    'Page is published in English'
+                );
+            })
+            .then(function () {
+                this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"]');
+            })
+            .waitUntilVisible('.cms-tree-tooltip-container', function () {
+                this.click('.cms-tree-tooltip-container-open a[href*="/en/unpublish/"]');
+            })
+            .waitForResource(/unpublish/)
+            .then(function () {
+                // FIXME should not do this manually, reload should happen automatically
+                this.reload();
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    // FIXME should be "unpublished" not empty
+                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.empty',
+                    'Page in English was unpublished'
+                );
+            });
+        })
+        .then(cms.removePage({ title: 'Homepage' }))
+        .run(function () {
+            test.done();
+        });
+});
