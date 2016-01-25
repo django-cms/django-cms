@@ -196,7 +196,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             }).wait(1050, function () {
                 test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
             })
-            // currently failing
+            // FIXME currently failing
             .thenBypass(4)
             .then(function () {
                 drop = this.getElementBounds(
