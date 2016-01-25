@@ -193,7 +193,7 @@ class CreateCMSPageForm(BaseCMSPageForm):
         elif title:
             starting_point = title
         else:
-            starting_point = _(u"page")
+            starting_point = _("page")
         slug = generate_valid_slug(starting_point, parent, self.language_code)
         if not slug:
             raise forms.ValidationError("Please provide a valid slug.")
