@@ -224,3 +224,50 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Pages cannot be published if it does not have a title and slug', function (test) {
+    var pageId;
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                pageId = cms.getPageId('Homepage');
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
+                    'Page is published by default in main lang'
+                );
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
+                    'Page is not published by default in another language'
+                );
+            })
+            .then(function () {
+                this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty');
+            })
+            .waitUntilVisible('.cms-tree-tooltip-container', function () {
+                test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
+
+                this.click('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
+            })
+            .waitForResource(/publish/)
+            .then(function () {
+                // here should be some kind of error
+                this.reload();
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
+                    'Page was not published in German because it does not have a title and slug'
+                );
+            });
+        })
+        .then(cms.removePage({ title: 'Homepage' }))
+        .run(function () {
+            test.done();
+        });
+});
+
