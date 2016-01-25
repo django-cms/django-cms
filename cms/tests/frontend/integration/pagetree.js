@@ -218,8 +218,8 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
                 test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
             });
         })
-        .then(cms.removePage({ title: 'Homepage' }))
         .then(cms.removePage({ title: 'Second' }))
+        .then(cms.removePage({ title: 'Homepage' }))
         .run(function () {
             test.done();
         });
