@@ -61,7 +61,8 @@ module.exports = function (casperjs) {
         },
 
         /**
-        * Adds the page
+        * Adds the page. Optionally added page can be nested into
+        * a parent with given title (first in a list of equal titles taken).
         *
         * @public
         * @param {Object} opts
@@ -102,7 +103,8 @@ module.exports = function (casperjs) {
         },
 
         /**
-         * Adds the plugin (currently to the first placeholder)
+         * Adds the plugin. If the parent is not specified, plugin
+         * is added to the first placeholder on the page.
          *
          * @param {Object} opts
          * @param {String} opts.type type of the plugin to add
