@@ -605,10 +605,10 @@ class PluginsTestCase(PluginsTestBaseCase):
             page_en.publish('en')
 
     def test_plugin_validation(self):
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRender)
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
-        plugin_pool.register_plugin(DynTemplate)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.validate_templates, NonExisitngRenderTemplate)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.validate_templates, NoRender)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.validate_templates, NoRenderButChildren)
+        plugin_pool.validate_templates(DynTemplate)
 
     def test_remove_plugin_before_published(self):
         """
@@ -758,8 +758,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
 
         inheritfrompage = api.create_page('page to inherit from',
-                                      'nav_playground.html',
-                                      'en')
+                                          'nav_playground.html',
+                                          'en')
 
         body = inheritfrompage.placeholders.get(slot="body")
 
@@ -776,9 +776,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         inheritfrompage.publish('en')
 
         page = api.create_page('inherit from page',
-                           'nav_playground.html',
-                           'en',
-                           published=True)
+                               'nav_playground.html',
+                               'en',
+                               published=True)
 
         inherited_body = page.placeholders.get(slot="body")
 
@@ -800,8 +800,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = api.create_page('page to inherit from',
-                                      'nav_playground.html',
-                                      'en', published=True)
+                                          'nav_playground.html',
+                                          'en', published=True)
 
         body = inheritfrompage.placeholders.get(slot="body")
         empty_plugin = CMSPlugin(
@@ -815,7 +815,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         inherited_body = other_page.placeholders.get(slot="body")
 
         api.add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
-                   from_page=inheritfrompage, from_language='en')
+                       from_page=inheritfrompage, from_language='en')
 
         api.add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
         # this should not fail, even if there in an empty plugin
@@ -831,9 +831,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         for i in range(0, 10):
             text_plugin = Text.objects.get(pk=text_plugin.pk)
             link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
-                                           target=text_plugin,
-                                           name="A Link %d" % i,
-                                           url="http://django-cms.org"))
+                                               target=text_plugin,
+                                               name="A Link %d" % i,
+                                               url="http://django-cms.org"))
             text_plugin.text.body += '<img src="/static/cms/img/icons/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
                 link_plugins[-1].name,
                 link_plugins[-1].pk,
@@ -1052,7 +1052,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_get_plugins_for_page(self):
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                              slug="page1", published=True, in_navigation=True)
+                                  slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
         # This placeholder is not in the template.
@@ -1213,13 +1213,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         toolbar plugin struct for those given parent Plugins
         """
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
+                                   dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
         GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
         KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {'render_plugin':False})
 
         expected_struct = {'module': u'Generic',
-                            'name': u'Parent Classes Plugin',
-                            'value': 'ParentClassesPlugin'}
+                           'name': u'Parent Classes Plugin',
+                           'value': 'ParentClassesPlugin'}
 
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.register_plugin(plugin)
@@ -1229,23 +1229,23 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         from cms.utils.placeholder import get_toolbar_plugin_struct
         toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
-                                                    placeholder.slot,
-                                                    page,
-                                                    parent=GenericParentPlugin)
+                                                   placeholder.slot,
+                                                   page,
+                                                   parent=GenericParentPlugin)
         self.assertTrue(expected_struct in toolbar_struct)
 
         toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
-                                                    placeholder.slot,
-                                                    page,
-                                                    parent=KidnapperPlugin)
+                                                   placeholder.slot,
+                                                   page,
+                                                   parent=KidnapperPlugin)
         self.assertFalse(expected_struct in toolbar_struct)
 
         toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin, GenericParentPlugin],
-                                                    placeholder.slot,
-                                                    page)
+                                                   placeholder.slot,
+                                                   page)
         expected_struct = {'module': u'Generic',
-                            'name': u'Generic Parent Plugin',
-                            'value': 'GenericParentPlugin'}
+                           'name': u'Generic Parent Plugin',
+                           'value': 'GenericParentPlugin'}
         self.assertTrue(expected_struct in toolbar_struct)
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.unregister_plugin(plugin)
@@ -1254,7 +1254,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
-                                    dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
+                                  dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
         plugin_pool.register_plugin(ChildClassesPlugin)
         plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
@@ -1270,14 +1270,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(['LinkPlugin', 'PicturePlugin'],
-                                plugin.get_child_classes(placeholder.slot, page))
+                             plugin.get_child_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ChildClassesPlugin)
 
     def test_plugin_parent_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['TextPlugin'], render_plugin=False))
+                                   dict(parent_classes=['TextPlugin'], render_plugin=False))
         plugin_pool.register_plugin(ParentClassesPlugin)
         plugin = api.add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
@@ -1293,7 +1293,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(['TestPlugin'],
-                                plugin.get_parent_classes(placeholder.slot, page))
+                             plugin.get_parent_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ParentClassesPlugin)
 
     def test_plugin_translatable_content_getter_setter(self):
