@@ -44,6 +44,7 @@ def setup():
     """
     Gather all checks and validations
     """
+    from cms.plugin_pool import plugin_pool
     if DJANGO_1_6:
         # While setup is called both in all the Django versions only 1.6-
         # requires paching the AppCache. 1.7 provides a cleaner way to handle
@@ -53,10 +54,12 @@ def setup():
 
         def get_models_patched(self, **kwargs):
             ret_value = old_get_models(self, **kwargs)
-            from cms.plugin_pool import plugin_pool
             plugin_pool.set_plugin_meta()
             return ret_value
 
         loading.AppCache.get_models = get_models_patched
+    else:
+        plugin_pool.set_plugin_meta()
     validate_dependencies()
     validate_settings()
+    plugin_pool.validate_templates()
