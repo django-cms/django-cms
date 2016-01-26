@@ -1021,7 +1021,11 @@ var CMS = window.CMS || {};
                             that.copyPlugin(this.options, el.attr('data-language'));
                             break;
                         case 'copy':
-                            that.copyPlugin();
+                            if (!el.parent().hasClass('cms-submenu-item-disabled')) {
+                                that.copyPlugin();
+                            } else {
+                                CMS.API.Toolbar.hideLoader();
+                            }
                             break;
                         case 'cut':
                             that.cutPlugin();

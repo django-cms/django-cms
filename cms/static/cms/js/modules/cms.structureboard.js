@@ -14,11 +14,14 @@ var CMS = window.CMS || {};
         function actualizeEmptyPlaceholders() {
             placeholders.each(function () {
                 var placeholder = $(this);
+                var copyAll = placeholder.find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
                 if (placeholder
                     .find('> .cms-draggables')
                     .children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
                     placeholder.removeClass('cms-dragarea-empty');
+                    copyAll.removeClass('cms-submenu-item-disabled');
                 } else {
+                    copyAll.addClass('cms-submenu-item-disabled');
                     placeholder.addClass('cms-dragarea-empty');
                 }
             });
