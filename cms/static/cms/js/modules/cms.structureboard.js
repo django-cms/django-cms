@@ -19,8 +19,10 @@ var CMS = window.CMS || {};
                     .find('> .cms-draggables')
                     .children('.cms-draggable:not(.cms-draggable-is-dragging)').length) {
                     placeholder.removeClass('cms-dragarea-empty');
+                    // enable "copy contents" of the placeholder when it's empty
                     copyAll.removeClass('cms-submenu-item-disabled');
                 } else {
+                    // disable "copy contents" of the placeholder when it's empty
                     copyAll.addClass('cms-submenu-item-disabled');
                     placeholder.addClass('cms-dragarea-empty');
                 }
