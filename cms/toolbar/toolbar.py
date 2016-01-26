@@ -228,7 +228,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def get_object_public_url(self):
         if self.obj:
-            with force_language(self.request.LANGUAGE_CODE):
+            with force_language(self.language):
                 try:
                     return self.obj.get_public_url()
                 except:
@@ -237,7 +237,7 @@ class CMSToolbar(ToolbarAPIMixin):
 
     def get_object_draft_url(self):
         if self.obj:
-            with force_language(self.request.LANGUAGE_CODE):
+            with force_language(self.language):
                 try:
                     return self.obj.get_draft_url()
                 except:
