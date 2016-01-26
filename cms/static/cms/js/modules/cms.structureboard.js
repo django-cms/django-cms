@@ -561,7 +561,10 @@ var CMS = window.CMS || {};
                         if (original.length === 0 || original.data('settings') === null) {
                             return false;
                         }
-                        var parent_bounds = original.data('settings').plugin_parent_restriction;
+                        var parent_bounds = $.grep(original.data('settings').plugin_parent_restriction, function (r) {
+                            // special case when PlaceholderPlugin has a parent restriction named "0"
+                            return r !== '0';
+                        });
                         var type = original.data('settings').plugin_type;
                         // prepare variables for bound
                         var holderId = that.getId(placeholder.closest('.cms-dragarea'));

@@ -328,7 +328,10 @@ var CMS = window.CMS || {};
 
                 var bounds = this.options.plugin_restriction;
                 var type = clipboardPlugin.data('settings').plugin_type;
-                var parent_bounds = clipboardPlugin.data('settings').plugin_parent_restriction;
+                var parent_bounds = $.grep(clipboardPlugin.data('settings').plugin_parent_restriction, function (r) {
+                    // special case when PlaceholderPlugin has a parent restriction named "0"
+                    return r !== '0';
+                });
                 var currentPluginType = this.options.plugin_type;
 
                 if ((bounds.length && $.inArray(type, bounds) === -1) ||
