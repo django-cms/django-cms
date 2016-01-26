@@ -14,7 +14,9 @@ from cms.api import create_page, create_page_user, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import (
+    CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
+)
 from cms.utils.permissions import set_current_user
 
 
@@ -163,9 +165,9 @@ class PermissionFormTestCase(CMSTestCase):
                             can_change=True)
 
         with self.login_user_context(self.get_superuser()):
-            response = self.client.get("/en/admin/cms/page/%s/permission-settings/" % page.pk)
+            response = self.client.get(URL_CMS_PAGE_PERMISSION_CHANGE % page.pk)
             self.assertEqual(response.status_code, 200)
-            response = self.client.get("/en/admin/cms/page/%s/permissions/" % page.pk)
+            response = self.client.get(URL_CMS_PAGE_PERMISSIONS % page.pk)
             self.assertEqual(response.status_code, 200)
 
         with self.settings(CMS_RAW_ID_USERS=True):

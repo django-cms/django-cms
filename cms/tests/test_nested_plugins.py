@@ -10,14 +10,11 @@ from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
+from cms.test_utils.testcases import URL_CMS_PLUGIN_PAGE_MOVE, URL_CMS_PLUGIN_PAGE_ADD
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.i18n import force_language
 from cms.utils.plugins import reorder_plugins
-
-
-URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
-URL_CMS_ADD_PLUGIN = u'/en/admin/cms/page/%d/add-plugin/'
 
 
 class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
@@ -891,8 +888,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 post_data = {
                     'placeholder_id': page_one_ph_three.id,
                     'plugin_id': text_plugin_two.id,
-                    'plugin_language':'en',
-                    'plugin_parent':'',
+                    'plugin_language': 'en',
+                    'plugin_parent': '',
 
                 }
                 plugin_class = text_plugin_two.get_plugin_class_instance()
@@ -900,7 +897,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                     'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
                     'urls': action_urls,
                 }
-                edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
+                edit_url = URL_CMS_PLUGIN_PAGE_MOVE % page_one.id
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(json.loads(response.content.decode('utf8')), expected)
@@ -1057,7 +1054,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 'plugin_parent': text_plugin_en.pk,
 
             }
-            add_url = URL_CMS_ADD_PLUGIN % page_one.pk
+            add_url = URL_CMS_PLUGIN_PAGE_ADD % page_one.pk
             response = self.client.post(add_url, post_data)
             self.assertEqual(response.status_code, 200)
         link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)

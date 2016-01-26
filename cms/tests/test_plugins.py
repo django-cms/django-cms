@@ -11,7 +11,8 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.core import urlresolvers
 from django.core.cache import cache
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import (
+    ValidationError, ImproperlyConfigured, ObjectDoesNotExist)
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
@@ -37,7 +38,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD,
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH)
+    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGIN_DELETE, URL_CMS_PLUGINS_COPY)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -289,14 +290,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
         expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
             "breadcrumb": [
                 {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
                     "title": "Text"
                 }
             ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
+            'delete': URL_CMS_PLUGIN_DELETE % pk
         }
         output = json.loads(response.content.decode('utf8'))
         self.assertEqual(output, expected)
@@ -1356,10 +1357,14 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             position=1,
             language=settings.LANGUAGE_CODE,
         )
-        if hasattr(plugin, 'source'):
-            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
-        else:
-            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
+        # This try/except block allows older and newer versions of the
+        # djangocms-file plugin to work here.
+        try:
+            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile(
+                "UPPERCASE.jpg", b"content"), False)
+        except ObjectDoesNotExist:  # catches 'RelatedObjectDoesNotExist'
+            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile(
+                "UPPERCASE.jpg", b"content"), False)
         plugin.add_root(instance=plugin)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
@@ -1423,14 +1428,14 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
         expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
             "breadcrumb": [
                 {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
                     "title": "Articles"
                 }
             ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
+            'delete': URL_CMS_PLUGIN_DELETE % pk
         }
         self.assertEqual(json.loads(response.content.decode('utf8')), expected)
         # now edit the plugin
@@ -1470,14 +1475,14 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
         expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
             "breadcrumb": [
                 {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
                     "title": "Articles"
                 }
             ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
+            'delete': URL_CMS_PLUGIN_DELETE % pk
         }
         self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
@@ -1555,7 +1560,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'target_language': self.SECOND_LANG,
             'source_language': self.FIRST_LANG,
         }
-        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        response = self.client.post(URL_CMS_PLUGINS_COPY, copy_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf8').count('"position":'), 1)
         # assert copy success
@@ -1569,7 +1574,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 class PluginCopyRelationsTestCase(PluginsTestBaseCase):
     """Test the suggestions in the docs for copy_relations()"""
-    
+
     def setUp(self):
         self.super_user = self._create_user("test", True, True)
         self.FIRST_LANG = settings.LANGUAGES[0][0]
@@ -1583,7 +1588,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         self.page2 = api.create_page(**page_data2)
         self.placeholder1 = self.page1.placeholders.get(slot='body')
         self.placeholder2 = self.page2.placeholders.get(slot='body')
-    
+
     def test_copy_fk_from_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,
@@ -1606,7 +1611,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
             new_public_count,
             old_public_count + 1
         )
-    
+
     def test_copy_m2m_to_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,

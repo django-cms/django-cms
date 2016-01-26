@@ -25,7 +25,7 @@ Requirements
 * `Django`_ 1.6.9 or later, 1.7.x, 1.8.x
 * `South`_ 1.0.1 or higher (Only required up to Django 1.6)
 * `django-classy-tags`_ 0.6.2 or higher
-* `django-treebeard`_ 3.0
+* `django-treebeard`_ 3.0 (for Django 1.6) or 4.0 (for Django 1.7 and up)
 * `django-sekizai`_ 0.8.2 or higher
 * `html5lib`_ 0.99 or 0.999
 * `djangocms-admin-style`_

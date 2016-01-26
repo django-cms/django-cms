@@ -30,7 +30,6 @@ def register_draft_only(model_class, fields, follow, format):
     version of the reversion register function that only registers drafts and
     ignores public models
     """
-
     if revision_manager.is_registered(model_class):
         raise RegistrationError(
             "%r has already been registered with Reversion." % model_class)

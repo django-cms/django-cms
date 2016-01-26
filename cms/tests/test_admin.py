@@ -2,8 +2,6 @@
 from __future__ import with_statement
 import json
 import datetime
-from cms import api
-from cms.utils.urlutils import admin_reverse
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
@@ -24,6 +22,7 @@ from cms.admin.change_list import CMSChangeList
 from cms.admin.forms import PageForm, AdvancedSettingsForm
 from cms.admin.pageadmin import PageAdmin
 from cms.admin.permissionadmin import PagePermissionInlineAdmin
+from cms import api
 from cms.api import create_page, create_title, add_plugin, assign_user_to_page, publish_page
 from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import UserSettings, StaticPlaceholder
@@ -33,11 +32,16 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE, URL_CMS_TRANSLATION_DELETE
+from cms.test_utils.testcases import (
+    CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE,URL_CMS_TRANSLATION_DELETE,
+    URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PERMISSIONS,
+    URL_CMS_PAGE_ADD, URL_CMS_PAGE_PUBLISHED
+)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_cms_setting
 from cms.utils.i18n import force_language
 from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.urlutils import admin_reverse
 
 
 class AdminTestsBase(CMSTestCase):
@@ -81,7 +85,7 @@ class AdminTestCase(AdminTestsBase):
     def test_extension_not_in_admin(self):
         admin_user, staff = self._get_guys()
         with self.login_user_context(admin_user):
-            request = self.get_request('/admin/cms/page/1/', 'en',)
+            request = self.get_request(URL_CMS_PAGE_CHANGE % 1, 'en',)
             response = site.index(request)
             self.assertNotContains(response, '/mytitleextension/')
             self.assertNotContains(response, '/mypageextension/')
@@ -440,7 +444,7 @@ class AdminTestCase(AdminTestsBase):
 
     def test_change_template(self):
         admin_user, staff = self._get_guys()
-        request = self.get_request('/admin/cms/page/1/', 'en')
+        request = self.get_request(URL_CMS_PAGE_CHANGE % 1, 'en')
         request.method = "POST"
         pageadmin = site._registry[Page]
         with self.login_user_context(staff):
@@ -464,7 +468,7 @@ class AdminTestCase(AdminTestsBase):
             self.assertTemplateUsed(response, 'admin/login.html')
         else:
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, '/en/admin/login/?next=/en/admin/cms/page/%s/permissions/' % page.pk)
+            self.assertRedirects(response, '/en/admin/login/?next=%s' % (URL_CMS_PAGE_PERMISSIONS % page.pk))
         admin_user = self.get_superuser()
         with self.login_user_context(admin_user):
             response = self.client.get(url)
@@ -613,7 +617,7 @@ class AdminTestCase(AdminTestsBase):
         else:
             self.client.login(username='admin', password='admin')
 
-        response = self.client.get('/en/admin/cms/page/1/?language=en')
+        response = self.client.get(URL_CMS_PAGE_CHANGE_LANGUAGE % (1, 'en'))
         self.assertEqual(response.status_code, 404)
 
     def test_tree_displays_in_correct_language(self):
@@ -1433,7 +1437,7 @@ class AdminFormsTests(AdminTestsBase):
 
     def test_missmatching_site_parent_dotsite(self):
         site0 = Site.objects.create(domain='foo.com', name='foo.com')
-        site1 = Site.objects.create(domain='foo.com', name='foo.com')
+        site1 = Site.objects.create(domain='foo2.com', name='foo.com')
         parent_page = Page.objects.create(
             template='nav_playground.html',
             site=site0)
@@ -1613,8 +1617,9 @@ class AdminFormsTests(AdminTestsBase):
                 'language': 'en'
             }
             response = self.client.post(
-                "/en/admin/cms/page/add/?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=en" % (
-                    page_types.pk, page.pk), data=page_data)
+                "%s?target=%s&position=first-child&add_page_type=1&copy_target=%s&language=en" % (
+                    URL_CMS_PAGE_ADD, page_types.pk, page.pk
+                ), data=page_data)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Page.objects.count(), 4)
             self.assertEqual(CMSPlugin.objects.count(), 6)
@@ -1664,11 +1669,11 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         with self.login_user_context(user):
             with self.assertNumQueries(FuzzyInt(18, 33)):
-                force_text(self.client.get('/en/admin/cms/page/'))
+                force_text(self.client.get(URL_CMS_PAGE))
 
     def test_smart_link_published_pages(self):
         admin, staff_guy = self._get_guys()
-        page_url = '/en/admin/cms/page/published-pages/' # Not sure how to achieve this with reverse...
+        page_url = URL_CMS_PAGE_PUBLISHED  # Not sure how to achieve this with reverse...
 
         with self.login_user_context(staff_guy):
             multi_title_page = create_page('main_title', 'col_two.html', 'en', published=True,

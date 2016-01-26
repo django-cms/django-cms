@@ -3,6 +3,7 @@ from __future__ import with_statement
 import json
 import shutil
 from os.path import join
+
 from cms.api import add_plugin, create_page
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -18,8 +19,10 @@ from cms.models import Page, Title, Placeholder, StaticPlaceholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.fileapp.models import FileModel
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD, \
+from cms.test_utils.testcases import (
+    CMSTestCase, TransactionCMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD,
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_DELETE
+)
 from cms.utils.reversion_hacks import Revision, reversion, Version
 
 
@@ -435,7 +438,7 @@ class ReversionTestCase(TransactionCMSTestCase):
             version = Version.objects.get(content_type=ctype, revision=revision)
             page = Page.objects.all()[0]
 
-            history_url = URL_CMS_PAGE_CHANGE % (page.pk) + "history/"
+            history_url = '%s%s/%s/' % (URL_CMS_PAGE, str(page.pk), "history")
             response = self.client.get(history_url)
             self.assertEqual(response.status_code, 200)
 
@@ -563,17 +566,16 @@ class ReversionTestCase(TransactionCMSTestCase):
             recover_url = URL_CMS_PAGE + "recover/"
             response = self.client.get(recover_url)
             self.assertEqual(response.status_code, 200)
-
             recover_url += "%s/" % version.pk
             response = self.client.get(recover_url)
             self.assertEqual(response.status_code, 200)
             response = self.client.post(recover_url, self.page_data)
-            self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
             self.assertEqual(Page.objects.all().count(), 1)
             self.assertEqual(CMSPlugin.objects.all().count(), 1)
 
             # test that CMSPlugin subclasses are recovered
             self.assertEqual(Text.objects.all().count(), 1)
+            self.assertRedirects(response, URL_CMS_PAGE_CHANGE % page_pk)
 
     def test_recover_with_apphook(self):
         """

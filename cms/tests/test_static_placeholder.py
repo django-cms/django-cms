@@ -15,9 +15,6 @@ from cms.utils.i18n import force_language
 from cms.utils.urlutils import admin_reverse
 
 
-URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
-
-
 class StaticPlaceholderTestCase(PluginsTestBaseCase):
     @property
     def admin_class(self):

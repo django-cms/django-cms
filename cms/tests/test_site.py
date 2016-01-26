@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 import copy
-from cms.utils.urlutils import admin_reverse
 
 from django.contrib.sites.models import Site
 
 from cms.api import create_page
 from cms.models import Page, Placeholder
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE
 from cms.utils import get_cms_setting
-from cms.test_utils.testcases import CMSTestCase
+from cms.utils.urlutils import admin_reverse
 
 
 class SiteTestCase(CMSTestCase):
@@ -37,7 +37,7 @@ class SiteTestCase(CMSTestCase):
         with self.settings(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
 
-            response = self.client.get("/en/admin/cms/page/?site__exact=%s" % self.site3.pk)
+            response = self.client.get("%s?site__exact=%s" % (URL_CMS_PAGE, self.site3.pk))
             self.assertEqual(response.status_code, 200)
             create_page("page_3b", "nav_playground.html", "de", site=self.site3)
 

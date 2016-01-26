@@ -10,11 +10,7 @@ from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plug
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
-from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
 
-
-# these are always called before all other plugin context processors
-from sekizai.helpers import Watcher
 
 DEFAULT_PLUGIN_CONTEXT_PROCESSORS = (
     plugin_meta_context_processor,
@@ -61,7 +57,7 @@ def render_plugin(context, instance, placeholder, template, processors=None, cur
     if isinstance(template, six.string_types):
         content = render_to_string(template, context)
     elif (isinstance(template, Template) or (hasattr(template, 'template') and
-         hasattr(template, 'render') and isinstance(template.template, Template))):
+          hasattr(template, 'render') and isinstance(template.template, Template))):
         content = template.render(context)
     else:
         content = ''
@@ -104,9 +100,13 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     during rendering. This is primarily used for the "as" variant of the
     render_placeholder tag.
     """
+    from cms.utils.placeholder import get_placeholder_conf, restore_sekizai_context
+    from cms.utils.plugins import get_plugins
+    # these are always called before all other plugin context processors
+    from sekizai.helpers import Watcher
+
     if not placeholder:
         return
-    from cms.utils.plugins import get_plugins
     context = context_to_copy.new(context_to_copy)
     context.push()
     request = context['request']
@@ -139,7 +139,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if get_cms_setting('PLACEHOLDER_CACHE') and use_cache:
         if not edit and placeholder and not hasattr(placeholder, 'cache_checked'):
             cached_value = get_placeholder_cache(placeholder, lang)
-            if not cached_value is None:
+            if cached_value is not None:
                 restore_sekizai_context(context, cached_value['sekizai'])
                 return mark_safe(cached_value['content'])
     if page:
