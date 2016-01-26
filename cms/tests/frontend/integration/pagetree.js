@@ -370,3 +370,190 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
             test.done();
         });
 });
+
+casper.test.begin('Pages can be copied and pasted', function (test) {
+    casper.start()
+        // .then(cms.addPage({ title: 'Homepage' }))
+        // .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var secondPageId;
+            casper.waitUntilVisible('.cms-pagetree')
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        xPath('//a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        'Second page is nested into the Homepage'
+                    );
+
+                    secondPageId = cms.getPageId('Second');
+
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    test.assertElementCount(
+                        xPath('//*[self::div or self::span]' +
+                              '[contains(@class, "cms-tree-item-helpers")]' +
+                              '[not(contains(@class, "cms-hidden"))]' +
+                              '[./a[contains(text(), "Paste")]]'),
+                        3,
+                        'Three possible paste targets'
+                    );
+                })
+                // click on it again
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                    test.assertElementCount(
+                        xPath('//*[self::div or self::span]' +
+                              '[contains(@class, "cms-tree-item-helpers")]' +
+                              '[not(contains(@class, "cms-hidden"))]' +
+                              '[./a[contains(text(), "Paste")]]'),
+                        0,
+                        'Paste buttons hide when clicked on copy again'
+                    );
+                    // open them again
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                })
+                // then try to paste into itself
+                .then(function () {
+                    this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
+                })
+                // FIXME should be possible
+                .then(function () {
+                    test.assertVisible('.error', 'Error shown');
+                })
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Homepage') + '"]');
+                })
+                .waitUntilVisible('.cms-dialog', function () {
+                    test.assertVisible('.cms-dialog', 'Dialog shows up');
+                    test.assertSelectorHasText('.cms-dialog', 'Copy options', 'Copy options dialog shows up');
+                    test.assertExists(
+                        xPath('//a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
+                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        'Copy page placeholder is visible in the tree'
+                    );
+                    test.assertElementCount(
+                        xPath('//*[self::div or self::span]' +
+                              '[contains(@class, "cms-tree-item-helpers")]' +
+                              '[not(contains(@class, "cms-hidden"))]' +
+                              '[./a[contains(text(), "Paste")]]'),
+                        0,
+                        'Paste buttons hide when dialog is shown up'
+                    );
+                })
+                .then(function () {
+                    // click on cancel - nothing should happen
+                    this.click('.cms-dialog .cancel');
+                })
+                .waitWhileVisible('.cms-dialog', function () {
+                    test.assertNotVisible('.cms-dialog', 'Dialog closed');
+                    test.assertDoesntExist(
+                        xPath('//a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
+                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        'Copy page placeholder is no longer visible in the tree'
+                    );
+                })
+                // try to copy into parent
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    // click on "Paste" to homepage
+                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Homepage') + '"]');
+                })
+                .waitUntilVisible('.cms-dialog', function () {
+                    this.click('.cms-dialog .default.submit');
+                })
+                .waitForResource(/copy-page/)
+                .waitForUrl(/page/) // need to wait for reload
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath('//a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
+                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        'Second page was copied into the homepage'
+                    );
+                })
+                // FIXME doesn't work
+                .thenBypass(2)
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath('//a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
+                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        'Second page was copied into the homepage'
+                    );
+                })
+                // FIXME should be removed
+                .then(function () {
+                    // click on cancel - nothing should happen
+                    this.click('.cms-dialog .cancel');
+                })
+                // try to copy into root
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    // click on "Paste" to root
+                    this.click('.cms-tree-item-helpers a[href="#root"]');
+                })
+                .waitUntilVisible('.cms-dialog', function () {
+                    this.click('.cms-dialog .default.submit');
+                })
+                .waitForResource(/copy-page/)
+                .waitForUrl(/page/) // need to wait for reload
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(
+                            '//li[./a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
+                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]'
+                        ),
+                        'Second page was copied into the root'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree')
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        xPath(
+                            '//li[./a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
+                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]'
+                        ),
+                        'Second page was copied into the root'
+                    );
+                });
+        })
+        // .then(cms.removePage({ title: 'Second' }))
+        // .then(cms.removePage({ title: 'Homepage' }))
+        .run(function () {
+            test.done();
+        });
+});
