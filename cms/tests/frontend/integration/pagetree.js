@@ -373,8 +373,8 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
 
 casper.test.begin('Pages can be copied and pasted', function (test) {
     casper.start()
-        // .then(cms.addPage({ title: 'Homepage' }))
-        // .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
         .thenOpen(globals.baseUrl)
         .then(cms.openSideframe())
         // switch to sideframe
@@ -549,10 +549,64 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         ),
                         'Second page was copied into the root'
                     );
+                })
+                // then try to copy sibling into a sibling
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    // click on "Paste" to last sibling
+                    var pages = cms._getPageIds('Second');
+                    this.click('.cms-tree-item-helpers a[data-id="' + pages[pages.length - 1] + '"]');
+                })
+                .waitUntilVisible('.cms-dialog', function () {
+                    this.click('.cms-dialog .default.submit');
+                })
+                .waitForResource(/copy-page/)
+                .waitForUrl(/page/) // need to wait for reload
+                .waitUntilVisible('.cms-pagetree')
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        // check that tree looks like this
+                        // - Homepage
+                        //     - Second
+                        // - Second
+                        //     - Homepage
+                        //         - Second
+                        xPath(
+                            '//li[./a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
+                            '/following-sibling::li/a[contains(text(), "Second")]' +
+                            '/following-sibling::ul/li/a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul/li/a[contains(text(), "Second")]'
+                        ),
+                        'Homepage was copied into last "Second" page'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree')
+                .then(function () {
+                    test.assertExists(
+                        xPath(
+                            '//li[./a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
+                            '/following-sibling::li/a[contains(text(), "Second")]' +
+                            '/following-sibling::ul/li/a[contains(text(), "Homepage")]' +
+                            '/following-sibling::ul/li/a[contains(text(), "Second")]'
+                        ),
+                        'Homepage was copied into last "Second" page'
+                    );
                 });
         })
-        // .then(cms.removePage({ title: 'Second' }))
-        // .then(cms.removePage({ title: 'Homepage' }))
+        // remove two top level pages
+        .then(cms.removePage())
+        .then(cms.removePage())
         .run(function () {
             test.done();
         });
