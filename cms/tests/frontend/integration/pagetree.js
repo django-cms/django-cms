@@ -550,7 +550,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         'Second page was copied into the root'
                     );
                 })
-                // then try to copy sibling into a sibling
+                // then try to copy sibling into a sibling (homepage into sibling "second" page)
                 .then(function () {
                     this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
                 })
