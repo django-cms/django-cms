@@ -163,14 +163,21 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
+        request = None
+        current_app = None
+        if context:
+            request = context.get('request', None)
+            if request:
+                current_app = getattr(request, 'current_app', None)
+            if not current_app:
+                current_app = context.current_app if context else None
+
         if instance and not (admin and not plugin.admin_preview):
             if not placeholder or not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
-            current_app = context.current_app if context else None
             context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
-            request = context.get('request', None)
             page = None
             if request:
                 page = request.current_page
@@ -183,17 +190,16 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            return render_plugin(context, instance, placeholder, template, processors, context.current_app)
+            return render_plugin(context, instance, placeholder, template, processors, current_app)
         else:
             from cms.middleware.toolbar import toolbar_plugin_processor
 
             if processors and toolbar_plugin_processor in processors:
                 if not placeholder:
                     placeholder = self.placeholder
-                current_app = context.current_app if context else None
                 context = PluginContext(context, self, placeholder, current_app=current_app)
                 template = None
-                return render_plugin(context, self, placeholder, template, processors, context.current_app)
+                return render_plugin(context, self, placeholder, template, processors, current_app)
         return ""
 
     def get_media_path(self, filename):

@@ -8,6 +8,10 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+try:
+    from django.utils import unittest
+except ImportError:
+    import unittest
 
 from django.conf import settings
 from django.contrib.auth import get_user_model, authenticate, login
@@ -17,7 +21,6 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
-from django.utils import unittest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait

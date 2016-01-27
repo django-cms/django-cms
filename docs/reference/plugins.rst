@@ -29,14 +29,16 @@ Can this plugin have child plugins? Or can other plugins be placed inside this
 plugin? If set to ``True`` you are responsible to render the children in your
 plugin template.
 
-Please use something like this or something similar::
+Please use something like this or something similar:
+
+.. code-block:: html+django
 
     {% load cms_tags %}
     <div class="myplugin">
-    {{ instance.my_content }}
-    {% for plugin in instance.child_plugin_instances %}
-         {% render_plugin plugin %}
-    {% endfor %}
+        {{ instance.my_content }}
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
     </div>
 
 
@@ -206,6 +208,14 @@ plugin template.
 By default this method will add ``instance`` and ``placeholder`` to the
 context, which means for simple plugins, there is no need to overwrite this
 method.
+
+If you overwrite this method it's recommended to always populate the context
+with default values by calling the render method of the super class::
+
+    def render(self, context, instance, placeholder):
+        context = super(MyPlugin, self).render(context, instance, placeholder)
+        ...
+        return context
 
 
 get_render_template

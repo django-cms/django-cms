@@ -265,7 +265,7 @@ Now we need to change our plugin definition to use this model, so our new
         cache = False
 
         def render(self, context, instance, placeholder):
-            context['instance'] = instance
+            context = super(HelloPlugin, self).render(context, instance, placeholder)
             return context
 
     plugin_pool.register_plugin(HelloPlugin)
@@ -420,10 +420,10 @@ admin form for your foreign key references::
         inlines = (ItemInlineAdmin,)
 
         def render(self, context, instance, placeholder):
+            context = super(ArticlePlugin, self).render(context, instance, placeholder)
             items = instance.associated_item.all()
             context.update({
                 'items': items,
-                'instance': instance,
             })
             return context
 
@@ -642,7 +642,9 @@ Nested Plugins
 You can nest CMS Plugins in themselves. There's a few things required to
 achieve this functionality:
 
-`models.py`::
+``models.py``:
+
+.. code-block:: python
 
     class ParentPlugin(CMSPlugin):
         # add your fields here
@@ -650,7 +652,10 @@ achieve this functionality:
     class ChildPlugin(CMSPlugin):
         # add your fields here
 
-`cms_plugins.py`::
+
+``cms_plugins.py``:
+
+.. code-block:: python
 
     from .models import ParentPlugin, ChildPlugin
 
@@ -659,11 +664,12 @@ achieve this functionality:
         name = 'Parent'
         model = ParentPlugin
         allow_children = True  # This enables the parent plugin to accept child plugins
-        # child_classes = ['ChildCMSPlugin']  # You can also specify a list of plugins that are accepted as children,
-                                                or leave it away completely to accept all
+        # You can also specify a list of plugins that are accepted as children,
+        # or leave it away completely to accept all
+        # child_classes = ['ChildCMSPlugin']
 
         def render(self, context, instance, placeholder):
-            context['instance'] = instance
+            context = super(ParentCMSPlugin, self).render(context, instance, placeholder)
             return context
 
     plugin_pool.register_plugin(ParentCMSPlugin)
@@ -674,17 +680,20 @@ achieve this functionality:
         name = 'Child'
         model = ChildPlugin
         require_parent = True  # Is it required that this plugin is a child of another plugin?
-        # parent_classes = ['ParentCMSPlugin']  # You can also specify a list of plugins that are accepted as parents,
-                                                or leave it away completely to accept all
+        # You can also specify a list of plugins that are accepted as parents,
+        # or leave it away completely to accept all
+        # parent_classes = ['ParentCMSPlugin']
 
         def render(self, context, instance, placeholder):
-            context['instance'] = instance
+            context = super(ChildCMSPlugin, self).render(context, instance, placeholder)
             return context
 
     plugin_pool.register_plugin(ChildCMSPlugin)
 
 
-`parent.html`::
+``parent.html``:
+
+.. code-block:: html+django
 
     {% load cms_tags %}
 
@@ -695,7 +704,9 @@ achieve this functionality:
     </div>
 
 
-`child.html`::
+`child.html`:
+
+.. code-block:: html+django
 
     <div class="plugin child">
         {{ instance }}
@@ -729,8 +740,7 @@ Example::
         render_template = "cms/plugins/alias.html"
 
         def render(self, context, instance, placeholder):
-            context['instance'] = instance
-            context['placeholder'] = placeholder
+            context = super(AliasPlugin, self).render(context, instance, placeholder)
             if instance.plugin_id:
                 plugins = instance.plugin.get_descendants(include_self=True).order_by('placeholder', 'tree_id', 'level',
                                                                                       'position')

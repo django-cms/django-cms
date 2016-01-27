@@ -217,7 +217,7 @@ class PageSubmitRow(InclusionTag):
         save_as = context['save_as']
         basic_info = context.get('advanced_settings', False)
         advanced_settings = context.get('basic_info', False)
-        language = context['language']
+        language = context.get('language', '')
         return {
             # TODO check this (old code: opts.get_ordered_objects() )
             'onclick_attrib': (opts and change

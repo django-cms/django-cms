@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
-from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
 
 
 class PlaceholderField(models.ForeignKey):
 
-    def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
+    def __init__(self, slotname, default_width=None, actions=None, **kwargs):
+        from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
+
+        if not actions:
+            actions = PlaceholderNoAction
+
         if kwargs.get('related_name', None) == '+':
             raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
         if not callable(slotname):
@@ -31,6 +35,8 @@ class PlaceholderField(models.ForeignKey):
         return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), default_width=self.default_width)
 
     def _get_placeholder_slot(self, model_instance):
+        from cms.utils.placeholder import validate_placeholder_name
+
         if callable(self.slotname):
             slotname = self.slotname(model_instance)
             validate_placeholder_name(slotname)

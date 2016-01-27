@@ -12,6 +12,7 @@ from django.utils.translation import get_language
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.i18n import force_language, get_language_list
 
 
@@ -109,16 +110,23 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None, nested=Fals
         path = path.lstrip('^')
         regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
         if isinstance(pattern, RegexURLResolver):
-            # this is an 'include', recurse!
-            resolver = RegexURLResolver(regex, 'cms_appresolver',
-                                        pattern.default_kwargs, pattern.app_name, pattern.namespace)
-            resolver.page_id = page_id
             # include default_args
             args = pattern.default_kwargs
             if default_args:
                 args.update(default_args)
-            # see lines 243 and 236 of urlresolvers.py to understand the next line
-            resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+            if DJANGO_1_8:
+                # this is an 'include', recurse!
+                resolver = RegexURLResolver(regex, 'cms_appresolver',
+                                            pattern.default_kwargs, pattern.app_name, pattern.namespace)
+                # see lines 243 and 236 of urlresolvers.py to understand the next line
+                resolver._urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+            else:
+                # see lines 243 and 236 of urlresolvers.py to understand the next line
+                urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
+                # this is an 'include', recurse!
+                resolver = RegexURLResolver(regex, urlconf_module,
+                                            pattern.default_kwargs, pattern.app_name, pattern.namespace)
+            resolver.page_id = page_id
         else:
             # Re-do the RegexURLPattern with the new regular expression
             args = pattern.default_args
