@@ -35,7 +35,7 @@
             <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
-                <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %}>
+                <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% trans "View on site" %}">
                     <span>{% trans "View on site" %}</span>
                 </a>
             </div>
@@ -89,9 +89,9 @@
                     <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
                 {% endif %}
                     {% if page.in_navigation %}
-                        <span class="cms-icon cms-icon-check-square" title="{% trans "not in menu" %}"></span>
+                        <span class="cms-icon cms-icon-check-square" title="{% trans "in menu" %}"></span>
                     {% else %}
-                        <span class="cms-icon cms-icon-minus-square" title="{% trans "in menu" %}"></span>
+                        <span class="cms-icon cms-icon-minus-square" title="{% trans "not in menu" %}"></span>
                     {% endif %}
                 {% if has_change_permission %}
                     </a>
@@ -112,22 +112,26 @@
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy"
                     data-id="{{ page.pk }}"
                     data-apphook="{{ page.application_urls|default_if_none:'' }}">
-                    <a href="#"><span class="cms-icon cms-icon-copy"></span></a>
+                    <a href="#" title="{% trans 'Copy' %}"><span class="cms-icon cms-icon-copy"></span></a>
                 </div>
             {% endif %}
             {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                    <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child"><span class="cms-icon cms-icon-plus"></span></a>
+                    <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child" title="{% trans 'Add Child' %}">
+                        <span class="cms-icon cms-icon-plus"></span>
+                    </a>
                 </div>
             {% endif %}
             {% if has_move_page_permission %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-cut">
-                    <a href="#"><span class="cms-icon cms-icon-scissors"></span></a>
+                    <a href="#" title="{% trans 'Cut' %}"><span class="cms-icon cms-icon-scissors"></span></a>
                 </div>
             {% endif %}
             {% if has_delete_permission %}
                 <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
-                    <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}"><span class="cms-icon cms-icon-bin"></span></a>
+                    <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}" title="{% trans 'Delete' %}">
+                        <span class="cms-icon cms-icon-bin"></span>
+                    </a>
                 </div>
             {% endif %}
         </div>
