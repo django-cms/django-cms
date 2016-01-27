@@ -301,6 +301,19 @@ module.exports = function (casperjs) {
          * @return {String|Boolean} page id as a string or false if couldn't be found
          */
         getPageId: function (title) {
+            return this._getPageIds(title)[0];
+        },
+
+        /**
+         * Returns pageIds of all the pages with same title.
+         * Pages has to be visible in the page tree. See `expandPageTree`.
+         *
+         * @function _getPageIds
+         * @private
+         * @param {String} title page title
+         * @return {String[]|Boolean} page ids as an array of strings or false if couldn't be found
+         */
+        _getPageIds: function (title) {
             // important to pass single param, because casper acts
             // weirdly with single key objects https://github.com/n1k0/casperjs/issues/353
             return casper.evaluate(function (title) {
@@ -309,7 +322,7 @@ module.exports = function (casperjs) {
                     if (anchor.text().trim() === title) {
                         return anchor.parent().data('id');
                     }
-                }).get()[0];
+                }).toArray();
             }, title);
         }
     };
