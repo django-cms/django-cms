@@ -11,6 +11,7 @@
 - Fix message with CMS version not showing up on hover in debug mode
 - Fix messages not being positioned correctly in debug mode
 - Fixed an issue where plugin parent restrictions where not respected when pasting a plugin.
+- Fixed an issue where "Copy all" menu item could've been clicked on empty placeholder
 - Added attr['is_page']=True to CMS Page navigation nodes
 - Fixed a bug where page tree styles didn't load from STATIC_URL that pointed
   to a different host
