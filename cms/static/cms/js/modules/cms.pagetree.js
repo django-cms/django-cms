@@ -634,6 +634,7 @@ var CMS = window.CMS || {};
             var containerCls = '.js-cms-tree-tooltip-container';
             var triggers;
             var containers;
+            var index;
 
             // attach event to the trigger
             this.ui.container.on(this.click, triggerCls, function (e) {
@@ -642,9 +643,18 @@ var CMS = window.CMS || {};
 
                 triggers = $(triggerCls);
                 containers = $(containerCls);
+                index = triggers.index(this);
 
-                containers.removeClass('cms-tree-tooltip-container-open')
-                    .eq(triggers.index(this))
+                // cancel if opened tooltip is triggered again
+                if (containers.eq(index).is(':visible')) {
+                    containers.removeClass('cms-tree-tooltip-container-open');
+                    return false;
+                }
+
+                // otherwise show the dropdown
+                containers
+                    .removeClass('cms-tree-tooltip-container-open')
+                    .eq(index)
                     .addClass('cms-tree-tooltip-container-open');
 
                 that.ui.document.one(that.click, function () {
