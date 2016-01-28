@@ -389,7 +389,6 @@ var CMS = window.CMS || {};
                 copyToId = '#';
             }
 
-            // decide on copy action
             if (this.cache.type === 'cut') {
                 this.ui.tree.jstree('cut', copyFromId);
             } else {
@@ -651,8 +650,7 @@ var CMS = window.CMS || {};
                     return false;
                 }
 
-                // special filtering for languages, we need to check if
-                // published or unpublished should even be shown
+                // we need to create context awareness for the tooltip actions
                 that._setPublishingButtons(
                     triggers.eq(index),
                     containers.eq(index)
@@ -676,7 +674,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Handles if "Publish" or "unpublish" should be shown.
+         * Handles if "Publish" or "Unpublish" should be shown.
          *
          * @method _setPublishingButtons
          * @private
