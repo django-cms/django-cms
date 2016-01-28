@@ -389,7 +389,6 @@ var CMS = window.CMS || {};
                 copyToId = '#';
             }
 
-            // TODO it is currently not possible to copy/cut a node to the root
             if (this.cache.type === 'cut') {
                 this.ui.tree.jstree('cut', copyFromId);
             } else {
@@ -634,6 +633,7 @@ var CMS = window.CMS || {};
             var containerCls = '.js-cms-tree-tooltip-container';
             var triggers;
             var containers;
+            var index;
 
             // attach event to the trigger
             this.ui.container.on(this.click, triggerCls, function (e) {
@@ -642,9 +642,24 @@ var CMS = window.CMS || {};
 
                 triggers = $(triggerCls);
                 containers = $(containerCls);
+                index = triggers.index(this);
 
-                containers.removeClass('cms-tree-tooltip-container-open')
-                    .eq(triggers.index(this))
+                // cancel if opened tooltip is triggered again
+                if (containers.eq(index).is(':visible')) {
+                    containers.removeClass('cms-tree-tooltip-container-open');
+                    return false;
+                }
+
+                // we need to create context awareness for the tooltip actions
+                that._setPublishingButtons(
+                    triggers.eq(index),
+                    containers.eq(index)
+                );
+
+                // otherwise show the dropdown
+                containers
+                    .removeClass('cms-tree-tooltip-container-open')
+                    .eq(index)
                     .addClass('cms-tree-tooltip-container-open');
 
                 that.ui.document.one(that.click, function () {
@@ -656,6 +671,35 @@ var CMS = window.CMS || {};
             this.ui.container.on(this.click, containerCls, function (e) {
                 e.stopImmediatePropagation();
             });
+        },
+
+        /**
+         * Handles if "Publish" or "Unpublish" should be shown.
+         *
+         * @method _setPublishingButtons
+         * @private
+         * @param {jQuery} trigger originated trigger
+         * @param {jQuery} container originated container
+         */
+        _setPublishingButtons: function _setPublishingButtons(trigger, container) {
+            var cls = trigger.find('span').attr('class');
+            var publish = container.find('a').eq(1);
+            var unpublish = container.find('a').eq(2);
+
+            switch (cls) {
+                case 'unpublished':
+                    publish.show();
+                    unpublish.hide();
+                    break;
+                case 'published':
+                    publish.hide();
+                    unpublish.show();
+                    break;
+                case 'empty':
+                case 'dirty':
+                    publish.show();
+                    unpublish.show();
+            }
         },
 
         /**
@@ -799,6 +843,9 @@ var CMS = window.CMS || {};
         CMS.config = {
             settings: {
                 toolbar: 'expanded'
+            },
+            urls: {
+                settings: $('.js-cms-pagetree').data('settings-url')
             }
         };
         CMS.settings = CMS.API.Helpers.getSettings();
