@@ -332,7 +332,11 @@
         box-sizing: border-box;
         overflow: visible;
     }
+
+    // disable highlight on iOS devices
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
 // wrapper added by jstree
 .jstree-grid-wrapper {
     box-sizing: border-box;
