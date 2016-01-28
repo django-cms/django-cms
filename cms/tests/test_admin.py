@@ -1461,7 +1461,7 @@ class AdminFormsTests(AdminTestsBase):
         }
         form = PageForm(data=new_page_data, files=None)
         self.assertFalse(form.is_valid())
-        site0 = Site.objects.create(domain='foo.com', name='foo.com')
+        site0 = Site.objects.create(domain='foo.com', name='foo.com', pk=2)
         page1 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "fr", site=site0)
 
         new_page_data = {
