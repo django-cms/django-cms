@@ -845,7 +845,7 @@ var CMS = window.CMS || {};
                 toolbar: 'expanded'
             },
             urls: {
-                settings: $('.js-cms-pagetree').data('settings')
+                settings: $('.js-cms-pagetree').data('settings-url')
             }
         };
         CMS.settings = CMS.API.Helpers.getSettings();

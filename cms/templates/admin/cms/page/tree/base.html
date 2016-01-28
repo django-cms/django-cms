@@ -149,7 +149,7 @@
                     "title": "{{ _('Info')|escapejs }}",
                     "key": "info"
                 }]
-            }' data-settings="{% cms_admin_url "cms_usersettings_session_store" %}">
+            }' data-settings-url="{% cms_admin_url "cms_usersettings_session_store" %}">
                 <ul>
                     {% if cl.is_filtered or request.GET.q %}
                         {# INFO: load html data source when filtering #}
