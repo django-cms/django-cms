@@ -8,6 +8,7 @@ from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_processors import (plugin_meta_context_processor, mark_safe_plugin_processor)
 from cms.utils import get_language_from_request
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import iterload_objects
 
@@ -31,10 +32,10 @@ class PluginContext(Context):
     """
 
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
-        if current_app:
-            super(PluginContext, self).__init__(dict_)
-        else:
+        if DJANGO_1_7:
             super(PluginContext, self).__init__(dict_, current_app=current_app)
+        else:
+            super(PluginContext, self).__init__(dict_)
         if not processors:
             processors = []
         for processor in DEFAULT_PLUGIN_CONTEXT_PROCESSORS:
