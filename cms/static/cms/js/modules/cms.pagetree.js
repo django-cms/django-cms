@@ -843,6 +843,9 @@ var CMS = window.CMS || {};
         CMS.config = {
             settings: {
                 toolbar: 'expanded'
+            },
+            urls: {
+                settings: $('.js-cms-pagetree').data('settings')
             }
         };
         CMS.settings = CMS.API.Helpers.getSettings();

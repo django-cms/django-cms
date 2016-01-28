@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags cms_static %}
+{% load i18n admin_list admin_static admin_urls cms_admin cms_js_tags cms_static cms_tags %}
 
 {# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
@@ -149,7 +149,7 @@
                     "title": "{{ _('Info')|escapejs }}",
                     "key": "info"
                 }]
-            }'>
+            }' data-settings="{% cms_admin_url "cms_usersettings_session_store" %}">
                 <ul>
                     {% if cl.is_filtered or request.GET.q %}
                         {# INFO: load html data source when filtering #}
