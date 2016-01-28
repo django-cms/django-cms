@@ -8,6 +8,13 @@
 What's new in 3.2.1
 *******************
 
+Improvements
+============
+
+- Adds initial support for Django 1.9
+- Updates to work with Django Reversion 1.10+ (required by Django 1.9)
+
+
 Bug Fixes
 =========
 
@@ -22,11 +29,12 @@ Bug Fixes
 Treebeard corruption
 ====================
 
-Prior to 3.2.1 moving or pasting nested plugins would lead to some non-fatal tree corruptions,
-raising an error when adding plugins under the newly pasted plugins.
+Prior to 3.2.1 moving or pasting nested plugins would lead to some non-fatal
+tree corruptions, raising an error when adding plugins under the newly
+pasted plugins.
 
-To fix these problems, upgrade to 3.2.1 and then run ``manage.py cms fix-tree`` command to
-repair the tree.
+To fix these problems, upgrade to 3.2.1 and then run ``manage.py cms fix-tree``
+command to repair the tree.
 
 
 DjangoCMS Text CKEditor
