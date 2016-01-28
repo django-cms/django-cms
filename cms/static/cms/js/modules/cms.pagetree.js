@@ -389,7 +389,7 @@ var CMS = window.CMS || {};
                 copyToId = '#';
             }
 
-            // TODO it is currently not possible to copy/cut a node to the root
+            // decide on copy action
             if (this.cache.type === 'cut') {
                 this.ui.tree.jstree('cut', copyFromId);
             } else {
