@@ -4,8 +4,11 @@
 # 
 # Translators:
 # danirus <danirus@eml.cc>, 2011
+# danirus <danirus@eml.cc>, 2011
+# mariocesar <mariocesar.c50@gmail.com>, 2011
 # mariocesar <mariocesar.c50@gmail.com>, 2011
 # Pedro Gracia <lasarux@neuroomante.com>, 2011
+# rafadev <rafadev@gmail.com>, 2011
 # rafadev <rafadev@gmail.com>, 2011
 msgid ""
 msgstr ""

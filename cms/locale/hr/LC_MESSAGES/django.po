@@ -5,6 +5,7 @@
 # Translators:
 # Damir <damir.arbula@gmail.com>, 2013-2015
 # legendri <legendri@gmail.com>, 2012
+# legendri <legendri@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

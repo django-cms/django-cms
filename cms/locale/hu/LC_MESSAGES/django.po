@@ -4,11 +4,14 @@
 # 
 # Translators:
 # Attila Kovacs <akal.mailbox@gmail.com>, 2013
+# fazekasda <fazekasda@gmail.com>, 2012
 # fazekasda <fazekasda@gmail.com>, 2013-2014
 # fazekasda <fazekasda@gmail.com>, 2012
 # Szabo L. <lortechnet@gmail.com>, 2013
 # Tibor Balogh, 2014
 # Tibor Balogh, 2014
+# Tibor Balogh, 2014
+# Viktor Nagy, 2013
 # Viktor Nagy, 2013
 msgid ""
 msgstr ""

@@ -6,6 +6,7 @@
 # slam <little_pea@list.ru>, 2013
 # Mattias Lindvall <mattias.lindvall@gmail.com>, 2013
 # Roger Pons <rogerpons@gmail.com>, 2013
+# slam <little_pea@list.ru>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

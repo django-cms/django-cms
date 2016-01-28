@@ -6,8 +6,9 @@
 # paitsi <jiippana@gmail.com>, 2013
 # Juha-Matti Tapio <jmtapio@verkkotelakka.net>, 2013
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2013-2014
+# Klaus Dahlén <klaus.dahlen@gmail.com>, 2011,2013-2014
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
+# paitsi <jiippana@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

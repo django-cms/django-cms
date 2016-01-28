@@ -5,6 +5,7 @@
 # Translators:
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
+# Roman Kozlovskyi <krzroman@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

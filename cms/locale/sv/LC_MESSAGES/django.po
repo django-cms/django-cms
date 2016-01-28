@@ -5,15 +5,21 @@
 # Translators:
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
+# Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # hula <fredrik@1px.se>, 2014
 # hannseman <hannseman@gmail.com>, 2011
 # hannseman <hannseman@gmail.com>, 2011
+# hula <fredrik@1px.se>, 2014
 # jakob.hedman <jakob.hedman@gmail.com>, 2014
 # jakob.hedman <jakob.hedman@gmail.com>, 2014
+# jakob.hedman <jakob.hedman@gmail.com>, 2014
+# joelbitar <joel@joelbitar.se>, 2014
 # joelbitar <joel@joelbitar.se>, 2014
 # Mattias Lindvall <mattias.lindvall@gmail.com>, 2013
 # osterberg <mikael@osterberg.me>, 2015
 # ooskar <oskar@1px.se>, 2014
+# ooskar <oskar@1px.se>, 2014
+# osterberg <mikael@osterberg.me>, 2015
 # Patrik Gärdeman <patrik.gardeman@gmail.com>, 2011
 # Simon Hedberg <simon@in-formation.se>, 2011
 # tapetersen <tobias.alex.petersen@gmail.com>, 2011

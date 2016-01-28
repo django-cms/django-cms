@@ -5,6 +5,7 @@
 # Translators:
 # Jakub Dorňák <jdornak@redhat.com>, 2013
 # xlu <xlu@seznam.cz>, 2013
+# xlu <xlu@seznam.cz>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
