@@ -1,8 +1,8 @@
 .. _upgrade-to-3.1.5:
 
-########################################
-3.1.5 release notes - Unreleased - Draft
-########################################
+###################
+3.1.5 release notes
+###################
 
 *******************
 What's new in 3.1.5
@@ -12,7 +12,16 @@ Bug Fixes
 =========
 
 - Fixed a tree corruption when pasting a nested plugin under another plugin.
-
+- Improve CMSPluginBase.render documentation
+- Fix CMSEditableObject context generation which generates to errors with django-classy-tags 0.7.1
+- Fix error in toolbar when LocaleMiddleware is not used
+- Move templates validation in app.ready
+- Fix ExtensionToolbar when language is removed but titles still exists
+- Fix pages menu missing on fresh install 3.1
+- Fix incorrect language on placeholder text for redirect field
+- Fix PageSelectWidget JS syntax
+- Fix redirect when disabling toolbar
+- Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
 
 Treebeard corruption
 ====================

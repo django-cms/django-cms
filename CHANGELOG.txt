@@ -74,6 +74,21 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
+=== 3.1.5 (2016-01-29) ===
+
+- Fixed a tree corruption when pasting a nested plugin under another plugin.
+- Improve CMSPluginBase.render documentation
+- Fix CMSEditableObject context generation which generates to errors with django-classy-tags 0.7.1
+- Fix error in toolbar when LocaleMiddleware is not used
+- Move templates validation in app.ready
+- Fix ExtensionToolbar when language is removed but titles still exists
+- Fix pages menu missing on fresh install 3.1
+- Fix incorrect language on placeholder text for redirect field
+- Fix PageSelectWidget JS syntax
+- Fix redirect when disabling toolbar
+- Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
+
+
 === 3.1.4 (2015-11-24) ===
 
 - Fixed a problem in ``0010_migrate_use_structure.py`` that broke some migration paths to Django 1.8
@@ -622,6 +637,3 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - docs updated
 - permissions now working in multisite environment
 - home is now graphically designated in tree-view
-
-==== 2.0.0 (2009-11-12) ====
-
