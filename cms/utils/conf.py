@@ -37,7 +37,6 @@ DEFAULTS = {
     # Whether to use raw ID lookups for users when PERMISSION is True
     'RAW_ID_USERS': False,
     'PUBLIC_FOR': 'all',
-    'CONTENT_CACHE_DURATION': 60,
     'APPHOOKS': [],
     'TOOLBARS': [],
     'SITE_CHOICES_CACHE_KEY': 'CMS:site_choices',
@@ -70,11 +69,14 @@ DEFAULTS = {
 
 
 def get_cache_durations():
-    return {
-        'menus': getattr(settings, 'MENU_CACHE_DURATION', 60 * 60),
-        'content': get_cms_setting('CONTENT_CACHE_DURATION'),
+    """
+    Returns the setting: CMS_CACHE_DURATIONS or the defaults.
+    """
+    return getattr(settings, 'CMS_CACHE_DURATIONS', {
+        'menus': 60 * 60,
+        'content': 60,
         'permissions': 60 * 60,
-    }
+    })
 
 
 @default('CMS_MEDIA_ROOT')
