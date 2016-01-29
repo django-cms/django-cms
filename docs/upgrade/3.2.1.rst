@@ -14,6 +14,7 @@ Improvements
 - Adds initial support for Django 1.9
 - Updates to work with Django Reversion 1.10+ (required by Django 1.9)
 
+- Add Django and Python versions to debug bar info tooltip
 
 Bug Fixes
 =========
