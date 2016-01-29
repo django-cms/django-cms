@@ -41,27 +41,15 @@ if __name__ == '__main__':
         os.path.join(os.path.dirname(__file__), 'cms', 'test_utils')
     )
 
-    INSTALLED_APPS = [
-        'debug_toolbar',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'djangocms_admin_style',
-        'django.contrib.admin',
-        'django.contrib.sites',
-        'django.contrib.staticfiles',
-        'django.contrib.messages',
-        'treebeard',
-        'cms',
-        'menus',
+    PLUGIN_APPS = [
         'djangocms_text_ckeditor',
         'djangocms_column',
         'djangocms_picture',
         'djangocms_file',
         'djangocms_googlemap',
+        'djangocms_inherit',
         'djangocms_teaser',
         'djangocms_video',
-        'djangocms_inherit',
         'djangocms_style',
         'djangocms_link',
         'cms.test_utils.project.sampleapp',
@@ -76,19 +64,34 @@ if __name__ == '__main__':
         'cms.test_utils.project.bunch_of_plugins',
         'cms.test_utils.project.extensionapp',
         'cms.test_utils.project.mti_pluginapp',
+    ]
+
+    INSTALLED_APPS = [
+        'debug_toolbar',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'djangocms_admin_style',
+        'django.contrib.admin',
+        'django.contrib.sites',
+        'django.contrib.staticfiles',
+        'django.contrib.messages',
+        'treebeard',
+        'cms',
+        'menus',
         'reversion',
         'sekizai',
         'hvad',
         'better_test',
-    ]
+    ] + PLUGIN_APPS
 
     dynamic_configs = {
         'TEMPLATES': [{
             'NAME': 'django',
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
             'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
             'OPTIONS': {
+                'debug': True,
                 'context_processors': [
                     "django.contrib.auth.context_processors.auth",
                     'django.contrib.messages.context_processors.messages',
@@ -101,14 +104,18 @@ if __name__ == '__main__':
                     "sekizai.context_processors.sekizai",
                     "django.template.context_processors.static",
                 ],
-                'debug': True,
+                'loaders': (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                )
             }
-        }],
-    }
+        }
+    ]}
 
-    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture',
-               'djangocms_style', 'djangocms_teaser', 'djangocms_video')
+    plugins = ('djangocms_column', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
+               'djangocms_teaser', 'djangocms_video')
 
     migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
     if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
@@ -128,6 +135,10 @@ if __name__ == '__main__':
                 return 'notmigrations'
 
         dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
+    if 'test' in sys.argv:
+        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    else:
+        SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
     app_manage.main(
         ['cms', 'menus'],
@@ -145,7 +156,7 @@ if __name__ == '__main__':
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             }
         },
-        SESSION_ENGINE="django.contrib.sessions.backends.cache",
+        SESSION_ENGINE=SESSION_ENGINE,
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
@@ -170,6 +181,7 @@ if __name__ == '__main__':
         STATIC_URL='/static/',
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        PLUGIN_APPS=PLUGIN_APPS,
         MIDDLEWARE_CLASSES=[
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',

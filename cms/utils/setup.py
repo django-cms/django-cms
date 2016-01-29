@@ -12,8 +12,8 @@ def validate_dependencies():
         raise ImproperlyConfigured('django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.')
 
     if app_is_installed('reversion'):
-        from reversion.admin import VersionAdmin
-        if not hasattr(VersionAdmin, 'get_urls'):
+        from cms.utils.reversion_hacks import ModelAdmin
+        if not hasattr(ModelAdmin, 'get_urls'):
             raise ImproperlyConfigured('django CMS requires newer version of reversion (VersionAdmin must contain get_urls method)')
 
 
@@ -39,5 +39,8 @@ def setup():
     """
     Gather all checks and validations
     """
+    from cms.plugin_pool import plugin_pool
+    plugin_pool.set_plugin_meta()
     validate_dependencies()
     validate_settings()
+    plugin_pool.validate_templates()

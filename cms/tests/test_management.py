@@ -27,9 +27,8 @@ TEST_INSTALLED_APPS = [
     "cms",
     "menus",
     "sekizai",
-    "cms.test_utils.project.sampleapp",
     "treebeard",
-]
+] + settings.PLUGIN_APPS
 if settings.AUTH_USER_MODEL == "emailuserapp.EmailUser":
     TEST_INSTALLED_APPS.append("cms.test_utils.project.emailuserapp")
 if settings.AUTH_USER_MODEL == "customuserapp.User":

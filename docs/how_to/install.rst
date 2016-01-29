@@ -24,7 +24,7 @@ Requirements
 * `Python`_ 2.7, 3.3 or 3.4.
 * `Django`_ 1.8.x
 * `django-classy-tags`_ 0.6.2 or higher
-* `django-treebeard`_ 3.0
+* `django-treebeard`_ 3.0 (for Django 1.6) or 4.0 (for Django 1.7 and up)
 * `django-sekizai`_ 0.8.2 or higher
 * `html5lib`_ 0.99 or 0.999
 * `djangocms-admin-style`_

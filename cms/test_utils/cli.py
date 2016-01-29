@@ -45,7 +45,6 @@ def configure(db_url, **extra):
         },
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
-        TEMPLATE_DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
         DATABASES={
             'default': DB
@@ -93,7 +92,6 @@ def configure(db_url, **extra):
             'djangocms_text_ckeditor',
             'djangocms_column',
             'djangocms_picture',
-            'djangocms_file',
             'djangocms_googlemap',
             'djangocms_teaser',
             'djangocms_video',
@@ -261,9 +259,9 @@ def configure(db_url, **extra):
         {
             'NAME': 'django',
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
             'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
             'OPTIONS': {
+                'debug': True,
                 'context_processors': [
                     "django.contrib.auth.context_processors.auth",
                     'django.contrib.messages.context_processors.messages',
@@ -276,13 +274,18 @@ def configure(db_url, **extra):
                     "sekizai.context_processors.sekizai",
                     "django.template.context_processors.static",
                 ],
+                'loaders': (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                )
             }
         }
     ]
 
-    plugins = ('djangocms_column', 'djangocms_file', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture',
-               'djangocms_style', 'djangocms_teaser', 'djangocms_video')
+    plugins = ('djangocms_column', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
+               'djangocms_teaser', 'djangocms_video')
 
     defaults['MIGRATION_MODULES'] = _get_migration_modules(plugins)
     if not defaults.get('TESTS_MIGRATE', False):
