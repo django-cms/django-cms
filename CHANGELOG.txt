@@ -4,6 +4,7 @@
 - Add support for django-reversion 1.10+ (required by Django 1.9+).
 - Add placeholder name to the edit tooltip.
 - Add attr['is_page']=True to CMS Page navigation nodes.
+- Add Django and Python versions to debug bar info tooltip
 - Fix an issue with refreshing the UI when switching CMS language.
 - Fix an issue with sideframe urls not being remembered after reload.
 - Fix breadcrumb in page revision list.
