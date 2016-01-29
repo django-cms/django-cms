@@ -8,6 +8,10 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+try:
+    from django.utils import unittest
+except ImportError:
+    import unittest
 
 import django
 from django.conf import settings
@@ -17,8 +21,6 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import clear_url_caches
 from django.test.utils import override_settings
-from django.utils import unittest
-from django.utils.importlib import import_module
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
@@ -38,6 +40,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.compat import DJANGO_1_6
 from cms.utils.conf import get_cms_setting
+from cms.utils.django_load import import_module
 
 if DJANGO_1_6:
     from django.test import LiveServerTestCase as StaticLiveServerTestCase

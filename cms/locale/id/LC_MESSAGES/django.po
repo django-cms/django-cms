@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Gunawan Ariyanto <Gunawan.Ariyanto@ums.ac.id>, 2014
+# Gunawan Ariyanto <Gunawan.Ariyanto@ums.ac.id>, 2014
 # Oby Sumampouw <osumampouw@gmail.com>, 2014
 msgid ""
 msgstr ""

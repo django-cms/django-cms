@@ -4,6 +4,7 @@
 # 
 # Translators:
 # adrien.delhorme, 2014
+# adrien.delhorme, 2014
 # Alexandre Cloquet <Alexandre.cloquet@gmail.com>, 2014-2015
 # Antoine Nguyen <tonio@ngyn.org>, 2011
 # asnoun samir <samir.asnoun@gmail.com>, 2015
@@ -18,9 +19,12 @@
 # Gabriel Le Breton <lebreton.gabriel@gmail.com>, 2015
 # Gonzo id <littlebmxdevil@gmail.com>, 2014-2015
 # Jérôme Place <djayp83@hotmail.com>, 2014-2015
+# kalvn <screamflydream@gmail.com>, 2014
+# mbi0 <marco@cruncher.ch>, 2013
 # mbi0 <marco@cruncher.ch>, 2013
 # Patrick Lauber <patrick.lauber@divio.ch>, 2014
 # kalvn <screamflydream@gmail.com>, 2014
+# Sébastien Fievet <zyegfryed@gmail.com>, 2013
 # Sébastien Fievet <zyegfryed@gmail.com>, 2013
 msgid ""
 msgstr ""

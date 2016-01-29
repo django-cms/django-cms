@@ -40,9 +40,12 @@ from django.views.decorators.http import require_POST
 
 from cms.admin.change_list import CMSChangeList
 from cms.admin.dialog.views import get_copy_dialog
-from cms.admin.forms import (PageForm, AdvancedSettingsForm, PagePermissionForm,
-                             PublicationDatesForm)
-from cms.admin.permissionadmin import (PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin)
+from cms.admin.forms import (
+    PageForm, AdvancedSettingsForm, PagePermissionForm, PublicationDatesForm
+)
+from cms.admin.permissionadmin import (
+    PERMISSION_ADMIN_INLINES, PagePermissionInlineAdmin, ViewRestrictionInlineAdmin
+)
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
@@ -445,7 +448,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             extra_context = self.update_language_tab_context(request, obj, context)
 
         tab_language = get_language_from_request(request)
-
         extra_context.update(self.get_unihandecode_context(tab_language))
 
         response = super(PageAdmin, self).change_view(
@@ -833,13 +835,17 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
     # Reversion 1.9+ no longer uses these two methods to save revision, but we still need them
     # as we do not use signals
-    def log_addition(self, request, object):
+    def log_addition(self, request, object, message=None):
         """Sets the version meta information."""
         if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
-            self.revision_context_manager.set_comment(_("Initial version."))
-        super(PageAdmin, self).log_addition(request, object)
+            self.revision_context_manager.set_comment(INITIAL_COMMENT)
+        # Same code as reversion 1.9
+        try:
+            super(PageAdmin, self).log_addition(request, object, INITIAL_COMMENT)
+        except TypeError:  # Django < 1.9 pragma: no cover
+            super(PageAdmin, self).log_addition(request, object)
 
     def log_change(self, request, object, message):
         """Sets the version meta information."""
@@ -1250,7 +1256,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                     revision = version.revision
                     revision.delete()
                     deleted.append(revision.pk)
-                    # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
+            # delete all publish revisions that are more then MAX_PAGE_PUBLISH_REVERSIONS
             publish_limit = get_cms_setting("MAX_PAGE_PUBLISH_REVERSIONS")
             if publish_limit and publish:
                 deleted = []

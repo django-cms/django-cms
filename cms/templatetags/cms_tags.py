@@ -903,7 +903,6 @@ class CMSEditableObject(InclusionTag):
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
         # would cause a perfomance hit for no reason
-        extra_context.update(context)
         if self._is_editable(context.get('request', None)):
             extra_context.update(self._get_editable_context(
                 extra_context, instance, language, edit_fields, view_method,

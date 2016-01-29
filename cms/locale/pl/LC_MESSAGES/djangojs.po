@@ -4,6 +4,7 @@
 # 
 # Translators:
 # angularcircle, 2012
+# angularcircle, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

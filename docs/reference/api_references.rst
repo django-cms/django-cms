@@ -309,6 +309,15 @@ cms.plugin_base
         This method returns the context to be used to render the template
         specified in :attr:`render_template`.
 
+        It's recommended to always populate the context with default values
+        by calling the render method of the super class::
+
+            def render(self, context, instance, placeholder):
+                context = super(MyPlugin, self).render(context, instance, placeholder)
+                ...
+                return context
+
+
         :param context: Current template context.
         :param instance: Plugin instance that is being rendered.
         :param placeholder: Name of the placeholder the plugin is in.

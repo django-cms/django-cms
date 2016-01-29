@@ -5,7 +5,9 @@
 # Translators:
 # Kristian Øllegaard <kristian@oellegaard.com>, 2011
 # Kristian Øllegaard <kristian@oellegaard.com>, 2011
+# Kristian Øllegaard <kristian@oellegaard.com>, 2011
 # valberg <valberg@orn.li>, 2014
+# valberg <valberg@orn.li>, 2011,2013-2014
 # valberg <valberg@orn.li>, 2011
 # valberg <valberg@orn.li>, 2013
 # valberg <valberg@orn.li>, 2011

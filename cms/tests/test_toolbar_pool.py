@@ -1,5 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.datastructures import SortedDict
+try:
+    from collections import OrderedDict
+except:
+    from django.utils.datastructures import SortedDict as OrderedDict
 
 from cms import api
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
@@ -35,7 +38,7 @@ class ToolbarPoolTests(CMSTestCase):
         pool.register(TestToolbar)
         pool.register(CMSToolbar)
 
-        test_toolbar = SortedDict()
+        test_toolbar = OrderedDict()
         test_toolbar['cms.tests.test_toolbar_pool.TestToolbar'] = TestToolbar
         test_toolbar['cms.toolbar_base.CMSToolbar'] = CMSToolbar
         self.assertEqual(list(test_toolbar.keys()), list(pool.toolbars.keys()))

@@ -11,7 +11,8 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.core import urlresolvers
 from django.core.cache import cache
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import (
+    ValidationError, ImproperlyConfigured, ObjectDoesNotExist)
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.forms.widgets import Media
@@ -37,7 +38,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PLUGIN_MOVE, URL_CMS_PAGE_ADD,
     URL_CMS_PLUGIN_ADD, URL_CMS_PLUGIN_EDIT, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH)
+    URL_CMS_PLUGIN_REMOVE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGIN_DELETE, URL_CMS_PLUGINS_COPY)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -289,14 +290,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
         expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
             "breadcrumb": [
                 {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
                     "title": "Text"
                 }
             ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
+            'delete': URL_CMS_PLUGIN_DELETE % pk
         }
         output = json.loads(response.content.decode('utf8'))
         self.assertEqual(output, expected)
@@ -604,10 +605,10 @@ class PluginsTestCase(PluginsTestBaseCase):
             page_en.publish('en')
 
     def test_plugin_validation(self):
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NonExisitngRenderTemplate)
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRender)
-        self.assertRaises(ImproperlyConfigured, plugin_pool.register_plugin, NoRenderButChildren)
-        plugin_pool.register_plugin(DynTemplate)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.validate_templates, NonExisitngRenderTemplate)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.validate_templates, NoRender)
+        self.assertRaises(ImproperlyConfigured, plugin_pool.validate_templates, NoRenderButChildren)
+        plugin_pool.validate_templates(DynTemplate)
 
     def test_remove_plugin_before_published(self):
         """
@@ -757,8 +758,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
 
         inheritfrompage = api.create_page('page to inherit from',
-                                      'nav_playground.html',
-                                      'en')
+                                          'nav_playground.html',
+                                          'en')
 
         body = inheritfrompage.placeholders.get(slot="body")
 
@@ -775,9 +776,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         inheritfrompage.publish('en')
 
         page = api.create_page('inherit from page',
-                           'nav_playground.html',
-                           'en',
-                           published=True)
+                               'nav_playground.html',
+                               'en',
+                               published=True)
 
         inherited_body = page.placeholders.get(slot="body")
 
@@ -799,8 +800,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_inherit_plugin_with_empty_plugin(self):
         inheritfrompage = api.create_page('page to inherit from',
-                                      'nav_playground.html',
-                                      'en', published=True)
+                                          'nav_playground.html',
+                                          'en', published=True)
 
         body = inheritfrompage.placeholders.get(slot="body")
         empty_plugin = CMSPlugin(
@@ -814,7 +815,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         inherited_body = other_page.placeholders.get(slot="body")
 
         api.add_plugin(inherited_body, InheritPagePlaceholderPlugin, 'en', position='last-child',
-                   from_page=inheritfrompage, from_language='en')
+                       from_page=inheritfrompage, from_language='en')
 
         api.add_plugin(inherited_body, "TextPlugin", "en", body="foobar")
         # this should not fail, even if there in an empty plugin
@@ -830,9 +831,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         for i in range(0, 10):
             text_plugin = Text.objects.get(pk=text_plugin.pk)
             link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
-                                           target=text_plugin,
-                                           name="A Link %d" % i,
-                                           url="http://django-cms.org"))
+                                               target=text_plugin,
+                                               name="A Link %d" % i,
+                                               url="http://django-cms.org"))
             text_plugin.text.body += '<img src="/static/cms/img/icons/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
                 link_plugins[-1].name,
                 link_plugins[-1].pk,
@@ -1051,7 +1052,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_get_plugins_for_page(self):
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                              slug="page1", published=True, in_navigation=True)
+                                  slug="page1", published=True, in_navigation=True)
         ph_en = page_en.placeholders.get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm inside an existing placeholder.")
         # This placeholder is not in the template.
@@ -1212,13 +1213,13 @@ class PluginsTestCase(PluginsTestBaseCase):
         toolbar plugin struct for those given parent Plugins
         """
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
+                                   dict(parent_classes=['GenericParentPlugin'], render_plugin=False))
         GenericParentPlugin = type('GenericParentPlugin', (CMSPluginBase,), {'render_plugin':False})
         KidnapperPlugin = type('KidnapperPlugin', (CMSPluginBase,), {'render_plugin':False})
 
         expected_struct = {'module': u'Generic',
-                            'name': u'Parent Classes Plugin',
-                            'value': 'ParentClassesPlugin'}
+                           'name': u'Parent Classes Plugin',
+                           'value': 'ParentClassesPlugin'}
 
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.register_plugin(plugin)
@@ -1228,23 +1229,23 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         from cms.utils.placeholder import get_toolbar_plugin_struct
         toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
-                                                    placeholder.slot,
-                                                    page,
-                                                    parent=GenericParentPlugin)
+                                                   placeholder.slot,
+                                                   page,
+                                                   parent=GenericParentPlugin)
         self.assertTrue(expected_struct in toolbar_struct)
 
         toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin],
-                                                    placeholder.slot,
-                                                    page,
-                                                    parent=KidnapperPlugin)
+                                                   placeholder.slot,
+                                                   page,
+                                                   parent=KidnapperPlugin)
         self.assertFalse(expected_struct in toolbar_struct)
 
         toolbar_struct = get_toolbar_plugin_struct([ParentClassesPlugin, GenericParentPlugin],
-                                                    placeholder.slot,
-                                                    page)
+                                                   placeholder.slot,
+                                                   page)
         expected_struct = {'module': u'Generic',
-                            'name': u'Generic Parent Plugin',
-                            'value': 'GenericParentPlugin'}
+                           'name': u'Generic Parent Plugin',
+                           'value': 'GenericParentPlugin'}
         self.assertTrue(expected_struct in toolbar_struct)
         for plugin in [ParentClassesPlugin, GenericParentPlugin, KidnapperPlugin]:
             plugin_pool.unregister_plugin(plugin)
@@ -1253,7 +1254,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
-                                    dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
+                                  dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
         plugin_pool.register_plugin(ChildClassesPlugin)
         plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
@@ -1269,14 +1270,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(['LinkPlugin', 'PicturePlugin'],
-                                plugin.get_child_classes(placeholder.slot, page))
+                             plugin.get_child_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ChildClassesPlugin)
 
     def test_plugin_parent_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['TextPlugin'], render_plugin=False))
+                                   dict(parent_classes=['TextPlugin'], render_plugin=False))
         plugin_pool.register_plugin(ParentClassesPlugin)
         plugin = api.add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
         plugin = plugin.get_plugin_class_instance()
@@ -1292,7 +1293,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             self.assertEqual(['TestPlugin'],
-                                plugin.get_parent_classes(placeholder.slot, page))
+                             plugin.get_parent_classes(placeholder.slot, page))
         plugin_pool.unregister_plugin(ParentClassesPlugin)
 
     def test_plugin_translatable_content_getter_setter(self):
@@ -1356,10 +1357,14 @@ class FileSystemPluginTests(PluginsTestBaseCase):
             position=1,
             language=settings.LANGUAGE_CODE,
         )
-        if hasattr(plugin, 'source'):
-            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
-        else:
-            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile("UPPERCASE.jpg", b"content"), False)
+        # This try/except block allows older and newer versions of the
+        # djangocms-file plugin to work here.
+        try:
+            plugin.file.save("UPPERCASE.JPG", SimpleUploadedFile(
+                "UPPERCASE.jpg", b"content"), False)
+        except ObjectDoesNotExist:  # catches 'RelatedObjectDoesNotExist'
+            plugin.source.save("UPPERCASE.JPG", SimpleUploadedFile(
+                "UPPERCASE.jpg", b"content"), False)
         plugin.add_root(instance=plugin)
         self.assertNotEquals(plugin.get_icon_url().find('jpg'), -1)
 
@@ -1423,14 +1428,14 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
         expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
             "breadcrumb": [
                 {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
                     "title": "Articles"
                 }
             ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
+            'delete': URL_CMS_PLUGIN_DELETE % pk
         }
         self.assertEqual(json.loads(response.content.decode('utf8')), expected)
         # now edit the plugin
@@ -1470,14 +1475,14 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 200)
         pk = CMSPlugin.objects.all()[0].pk
         expected = {
-            "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+            "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
             "breadcrumb": [
                 {
-                    "url": "/en/admin/cms/page/edit-plugin/%s/" % pk,
+                    "url": URL_CMS_PLUGIN_EDIT + "%s/" % pk,
                     "title": "Articles"
                 }
             ],
-            'delete': '/en/admin/cms/page/delete-plugin/%s/' % pk
+            'delete': URL_CMS_PLUGIN_DELETE % pk
         }
         self.assertEqual(json.loads(response.content.decode('utf8')), expected)
 
@@ -1555,7 +1560,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
             'target_language': self.SECOND_LANG,
             'source_language': self.FIRST_LANG,
         }
-        response = self.client.post(URL_CMS_PAGE + "copy-plugins/", copy_data)
+        response = self.client.post(URL_CMS_PLUGINS_COPY, copy_data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content.decode('utf8').count('"position":'), 1)
         # assert copy success
@@ -1569,7 +1574,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
 
 class PluginCopyRelationsTestCase(PluginsTestBaseCase):
     """Test the suggestions in the docs for copy_relations()"""
-    
+
     def setUp(self):
         self.super_user = self._create_user("test", True, True)
         self.FIRST_LANG = settings.LANGUAGES[0][0]
@@ -1583,7 +1588,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         self.page2 = api.create_page(**page_data2)
         self.placeholder1 = self.page1.placeholders.get(slot='body')
         self.placeholder2 = self.page2.placeholders.get(slot='body')
-    
+
     def test_copy_fk_from_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,
@@ -1606,7 +1611,7 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
             new_public_count,
             old_public_count + 1
         )
-    
+
     def test_copy_m2m_to_model(self):
         plugin = api.add_plugin(
             placeholder=self.placeholder1,

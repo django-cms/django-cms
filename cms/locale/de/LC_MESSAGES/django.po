@@ -7,12 +7,15 @@
 # Angelo Dini <finalangeljp@hotmail.com>, 2015
 # Arne Schauf <transifex@asmaps.de>, 2014
 # Michael P. Jung <michael.jung@terreon.de>, 2013
+# Chive <kim@smuzey.ch>, 2015
+# death_ashaman <admiral_proton@yahoo.de>, 2014
 # Diana Dünki <diana.duenki@divio.ch>, 2015
 # Hendrik Richter <hendrikr@gnome.org>, 2014
 # Jonas Obrist <me@ojii.ch>, 2011
 # Chive <kim@smuzey.ch>, 2015
 # Martin Koistinen <mkoistinen@gmail.com>, 2015
 # Michael P. Jung <michael.jung@terreon.de>, 2013
+# o.zander <oliver.zander@gmail.com>, 2014
 # o.zander <oliver.zander@gmail.com>, 2014
 # Patrick Lauber <patrick.lauber@divio.ch>, 2012-2015
 # Peter Bittner <django@bittner.it>, 2015

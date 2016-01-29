@@ -13,7 +13,8 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static_with_version "admin/js/jquery.min.js" %}"></script>
-    <script type="text/javascript" src="{% static_with_version "admin/js/jquery.init.js" %}"></script>
+    <script type="text/javascript" src="{% static_with_version "cms/js/modules/jquery.noconflict.pre.js" %}"></script>
+    <script type="text/javascript" src="{% static_with_version "cms/js/libs/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static_with_version "cms/js/modules/jquery.noconflict.post.js" %}"></script>
     {{ form.media }}
 {% endblock %}

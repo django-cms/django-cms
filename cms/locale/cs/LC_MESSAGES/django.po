@@ -8,6 +8,7 @@
 # Jakub Dorňák <jdornak@redhat.com>, 2013
 # Jiří Vírava <appukonrad@gmail.com>, 2014-2015
 # Joe Darkless <darkless69@gmail.com>, 2015
+# koren <honza@kekorenum.com>, 2015
 # Martin Koistinen <mkoistinen@gmail.com>, 2015
 # Martin Quarda <martin@quarda.cz>, 2014
 # xlu <xlu@seznam.cz>, 2013

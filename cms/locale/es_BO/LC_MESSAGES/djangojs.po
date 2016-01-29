@@ -5,6 +5,7 @@
 # Translators:
 # Edwin Caldon <edycop@gmail.com>, 2011
 # mariocesar <mariocesar.c50@gmail.com>, 2011
+# mariocesar <mariocesar.c50@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

@@ -4,9 +4,11 @@
 # 
 # Translators:
 # Bjorn Pettersen <bjorn@tkbe.org>, 2015
+# fivethreeo <oyvind.saltvik@gmail.com>, 2011
 # Kim Silkebækken <kim@silkebaekken.net>, 2014
 # Kim Silkebækken <kim@silkebaekken.net>, 2014
 # fivethreeo <oyvind.saltvik@gmail.com>, 2011
+# Sindre Myren <smyrman@gmail.com>, 2011
 # Sindre Myren <smyrman@gmail.com>, 2011
 msgid ""
 msgstr ""

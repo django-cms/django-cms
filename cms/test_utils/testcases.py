@@ -2,7 +2,7 @@
 import json
 import sys
 import warnings
-from cms.utils.compat import DJANGO_1_6
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_8
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -26,20 +26,32 @@ from cms.utils.permissions import set_current_user
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
-URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE, "%d/")
+URL_CMS_PAGE_CHANGE_BASE = urljoin(URL_CMS_PAGE, "%d/")
+if DJANGO_1_8:
+    URL_CMS_PAGE_CHANGE = URL_CMS_PAGE_CHANGE_BASE
+else:
+    URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
 URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
 URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
+URL_CMS_PAGE_PERMISSIONS = urljoin(URL_CMS_PAGE, "%d/permissions/")
+URL_CMS_PAGE_PUBLISHED = urljoin(URL_CMS_PAGE, "published-pages/")
+URL_CMS_PAGE_MOVE = urljoin(URL_CMS_PAGE, "%d/move-page/")
 URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
-URL_CMS_PAGE_CHANGE_TEMPLATE = URL_CMS_PAGE_CHANGE + "change_template/"
-URL_CMS_PAGE_PUBLISH = URL_CMS_PAGE_CHANGE + "%s/publish/"
-URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete/")
+URL_CMS_PAGE_CHANGE_TEMPLATE = urljoin(URL_CMS_PAGE_CHANGE, "change_template/")
+URL_CMS_PAGE_PUBLISH = urljoin(URL_CMS_PAGE_CHANGE_BASE, "%s/publish/")
+URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete/")
 URL_CMS_PLUGIN_ADD = urljoin(URL_CMS_PAGE, "add-plugin/")
 URL_CMS_PLUGIN_EDIT = urljoin(URL_CMS_PAGE, "edit-plugin/")
 URL_CMS_PLUGIN_MOVE = urljoin(URL_CMS_PAGE, "move-plugin/")
+URL_CMS_PLUGIN_PAGE_MOVE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "move-plugin/")
+URL_CMS_PLUGIN_PAGE_ADD = urljoin(URL_CMS_PAGE_CHANGE_BASE, "add-plugin/")
 URL_CMS_PLUGIN_REMOVE = urljoin(URL_CMS_PAGE, "delete-plugin/")
-URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE, "delete-translation/")
+URL_CMS_PLUGIN_DELETE = urljoin(URL_CMS_PAGE, "delete-plugin/%s/")
+URL_CMS_PLUGINS_COPY = urljoin(URL_CMS_PAGE, "copy-plugins/")
+URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translation/")
+URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
-URL_CMS_PAGE_HISTORY = urljoin(URL_CMS_PAGE_CHANGE, "history/%d/")
+URL_CMS_PAGE_HISTORY = urljoin(URL_CMS_PAGE_CHANGE_BASE, "history/%d/")
 URL_CMS_PLUGIN_HISTORY_EDIT = urljoin(URL_CMS_PAGE_HISTORY, "edit-plugin/")
 
 

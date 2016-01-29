@@ -10,6 +10,7 @@
 # cafe-click <cafeclick@rocketmail.com>, 2013
 # farshad <akbari.farshad@gmail.com>, 2014
 # hadiazaddel <hadiazaddel@chmail.ir>, 2014
+# hadiazaddel <hadiazaddel@chmail.ir>, 2014
 # Matin M. <moosaei.matin@aol.com>, 2013
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Mohamad Fazeli <caci96@gmail.com>, 2015

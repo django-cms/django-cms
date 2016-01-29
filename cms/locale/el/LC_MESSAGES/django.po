@@ -4,10 +4,12 @@
 # 
 # Translators:
 # Anastasiadis Stavros <anastasiadis.st00@gmail.com>, 2014
+# dotoree <vdotoree@yahoo.gr>, 2014
 # George Petsagourakis <petsagouris@gmail.com>, 2013
 # Kostas Papadimitriou <vinilios@gmail.com>, 2011
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
 # dotoree <vdotoree@yahoo.gr>, 2014
+# xouskarle <xouskarle@gmail.com>, 2013
 # xouskarle <xouskarle@gmail.com>, 2013
 msgid ""
 msgstr ""

@@ -253,6 +253,7 @@ class BasicToolbar(CMSToolbar):
         context.pop()
         return [clipboard]
 
+
 @toolbar_pool.register
 class PageToolbar(CMSToolbar):
     _changed_admin_menu = None

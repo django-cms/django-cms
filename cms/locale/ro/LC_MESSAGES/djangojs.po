@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

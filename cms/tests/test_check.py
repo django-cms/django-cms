@@ -6,7 +6,7 @@ import os
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateSyntaxError, base
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
 from cms.api import add_plugin
 from cms.models.pluginmodel import CMSPlugin
@@ -14,7 +14,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_6, DJANGO_1_7, DJANGO_1_8
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
@@ -51,7 +51,7 @@ class CheckAssertMixin(object):
             self.assertEqual(getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key)))
 
 
-class CheckTests(CheckAssertMixin, SimpleTestCase):
+class CheckTests(CheckAssertMixin, TestCase):
     def test_test_confs(self):
         self.assertCheck(True, errors=0, warnings=0)
 
@@ -84,9 +84,14 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             base.libraries = old_libraries
             base.templatetags_modules = old_templatetags_modules
             apps.unset_available_apps()
-        else:
+        elif DJANGO_1_8:
             from django.apps import apps
             base.get_templatetags_modules.cache_clear()
+            apps.set_available_apps(['cms', 'menus'])
+            self.assertCheck(False, errors=2)
+            apps.unset_available_apps()
+        else:
+            from django.apps import apps
             apps.set_available_apps(['cms', 'menus'])
             self.assertCheck(False, errors=2)
             apps.unset_available_apps()
