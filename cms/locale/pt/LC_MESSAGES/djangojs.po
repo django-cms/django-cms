@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Vítor Figueiró <vfigueiro@gmail.com>, 2012
+# Vítor Figueiró <vfigueiro@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

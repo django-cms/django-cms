@@ -5,6 +5,7 @@
 # Translators:
 # Manuel Alejandro Núñez Liz <alejandro@toporojo.es>, 2013
 # Pablo, 2015
+# Pablo, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

@@ -5,6 +5,7 @@
 # Translators:
 # Eirik Krogstad <eirikkr@gmail.com>, 2013
 # Sindre Myren <smyrman@gmail.com>, 2011
+# Sindre Myren <smyrman@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Bayarkhuu Bataa, 2013
+# Bayarkhuu Bataa, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

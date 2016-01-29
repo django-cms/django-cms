@@ -4,6 +4,7 @@
 # 
 # Translators:
 # neo64bit <neo64bit@gmail.com>, 2011
+# neo64bit <neo64bit@gmail.com>, 2011
 # simonv <vidmar.simon@gmail.com>, 2011
 msgid ""
 msgstr ""

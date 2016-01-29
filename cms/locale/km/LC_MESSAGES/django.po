@@ -5,6 +5,8 @@
 # Translators:
 # pykhmer <admin@pykhmer.org>, 2011
 # Sovichet Tep, 2011
+# Sovichet Tep, 2011
+# vireax, 2011
 # vireax, 2011
 msgid ""
 msgstr ""
