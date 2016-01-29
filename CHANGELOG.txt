@@ -505,7 +505,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Detect plugin migrations layout in tests
 - Fix some treebeard corruption issues
 
-=== 3.1.5 (Unreleased) ===
+=== 3.1.5 (2016-01-29) ===
 
 - Fixed a tree corruption when pasting a nested plugin under another plugin.
 - Improve CMSPluginBase.render documentation
