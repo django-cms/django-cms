@@ -54,7 +54,7 @@ from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
 
-DJANGO_VERSION = django.__version__
+DJANGO_VERSION = django.get_version()
 PYTHON_VERSION = python_version()
 
 register = template.Library()
