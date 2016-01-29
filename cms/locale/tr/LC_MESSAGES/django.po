@@ -6,13 +6,14 @@
 # Ahmet Çakır <bursoft@gmail.com>, 2013
 # Cem Yıldız <cem.yildiz@yandex.ru>, 2015
 # Cem Yıldız <cem.yildiz@yandex.ru>, 2015
-# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
+# Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013-2014
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013
 # Cumhur Korkut <cumhurkorkut@gmail.com>, 2013
 # İsmail Aslan <iaslan@gmail.com>, 2015
 # Mehmet Özgür Bayhan <mozgurbayhan@gmail.com>, 2013
 # Mehmet Özgür Bayhan <mozgurbayhan@gmail.com>, 2013
 # Mustafa Arıcı <>, 2012
+# mustafaimer <mustafaimer@gmail.com>, 2011
 # mustafaimer <mustafaimer@gmail.com>, 2011
 # Şeref R. Ayar <serefayar@gmail.com>, 2013
 # suleyman <posta@suleymans.com>, 2011

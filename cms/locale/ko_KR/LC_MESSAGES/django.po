@@ -4,6 +4,8 @@
 # 
 # Translators:
 # daeyong <daeyong@gmail.com>, 2013,2015
+# daeyong <daeyong@gmail.com>, 2013,2015
+# enoch2110 <enoch2110@me.com>, 2014
 # enoch2110 <enoch2110@me.com>, 2014
 msgid ""
 msgstr ""

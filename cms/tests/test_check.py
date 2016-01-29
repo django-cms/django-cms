@@ -69,6 +69,11 @@ class CheckTests(CheckAssertMixin, TestCase):
             apps.set_available_apps(['cms', 'menus'])
             self.assertCheck(False, errors=2)
             apps.unset_available_apps()
+        elif DJANGO_1_8:
+            from django.apps import apps
+            apps.set_available_apps(['cms', 'menus'])
+            self.assertCheck(False, errors=2)
+            apps.unset_available_apps()
         else:
             from django.apps import apps
             apps.set_available_apps(['cms', 'menus'])

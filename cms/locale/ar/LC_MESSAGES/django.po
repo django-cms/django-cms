@@ -8,6 +8,7 @@
 # Bashar Al-Abdulhadi, 2013-2014
 # Jonas Obrist <me@ojii.ch>, 2011
 # SHENKAR <sheeennn@gmail.com>, 2014
+# SHENKAR <sheeennn@gmail.com>, 2014
 # Waleed Eliass <waleed.elias@gmail.com>, 2014
 # Yousef Alsalem <sarebtech@gmail.com>, 2013
 msgid ""

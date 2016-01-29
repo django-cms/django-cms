@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models

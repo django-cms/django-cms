@@ -26,7 +26,7 @@ $(document).ready(function () {
             'tree': '{% language request.toolbar.language %}{% cms_admin_url "cms_page_changelist" %}{% endlanguage %}'
         },
         'lang': {
-            'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}{% endblocktrans %}',
+            'debug': '{% blocktrans %}Development version using django CMS {{ cms_version }}, Django {{ django_version }}, Python {{ python_version }}{% endblocktrans %}',
             'cancel': '{% trans "Cancel" %}',
             'error': '<strong>{% trans "The following error occured:" %}</strong> ',
             'success': '{% trans "Action successfull... reloading." %}',

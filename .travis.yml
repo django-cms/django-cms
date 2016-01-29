@@ -88,6 +88,7 @@ matrix:
     - python: 2.7
       env: DJANGO=1.8 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
     - python: 2.7
+
       env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
 
     - python: 3.4

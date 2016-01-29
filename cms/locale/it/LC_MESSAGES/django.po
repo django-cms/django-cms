@@ -5,18 +5,22 @@
 # Translators:
 # Marco Badan <marco.badan@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Francesco Moggia <f.moggia@gmail.com>, 2013
 # yakky <i.spalletti@nephila.it>, 2011
 # yakky <i.spalletti@nephila.it>, 2013-2015
 # yakky <i.spalletti@nephila.it>, 2012
 # karim79 <karim@gorjux.net>, 2011
+# Marco Badan <marco.badan@gmail.com>, 2011
 # Marco Barberis <mbarberis@gmail.com>, 2011
+# mbi0 <marco@cruncher.ch>, 2013
 # mbi0 <marco@cruncher.ch>, 2013
 # Saverio <saverio.brancaccio@gmail.com>, 2014
 # Stefano Brentegani <sbrentegani@gmail.com>, 2013-2014
 # Stefano Brentegani <sbrentegani@gmail.com>, 2011
-# Stefano Brentegani <sbrentegani@gmail.com>, 2014-2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2011,2014-2015
 # Tania Monti <tania.monti@gmx.it>, 2013
+# yakky <i.spalletti@nephila.it>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
