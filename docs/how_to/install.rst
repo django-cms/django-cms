@@ -81,9 +81,7 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ (Check the `Compatible Django Versions`_ page in the
-  django-reversion docs to find the version compatible with the version of
-  Django you're using.)
+* `django-reversion`_ 1.10 to support versions of your content
 
   .. note::
 

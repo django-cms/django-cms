@@ -6,9 +6,10 @@
 # Joel Fernandes <mail@joelfernandes.net>, 2014
 # jumpifzero <jumpifzero@gmail.com>, 2011
 # Mike C. <miguelmclara@gmail.com>, 2012
+# Mike C. <miguelmclara@gmail.com>, 2012
 # Rui <ruiguerra@gmail.com>, 2014
 # Vítor Figueiró <vfigueiro@gmail.com>, 2012
-# Vítor Figueiró <vfigueiro@gmail.com>, 2013-2015
+# Vítor Figueiró <vfigueiro@gmail.com>, 2012-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

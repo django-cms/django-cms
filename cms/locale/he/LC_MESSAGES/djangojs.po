@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Daniel Braun <dbraun86@gmail.com>, 2013
+# Daniel Braun <dbraun86@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

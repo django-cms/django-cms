@@ -5,6 +5,7 @@
 # Translators:
 # Mattias Lindvall <mattias.lindvall@gmail.com>, 2013
 # ooskar <oskar@1px.se>, 2014
+# ooskar <oskar@1px.se>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

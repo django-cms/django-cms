@@ -7,7 +7,8 @@
 # Marco Barberis <mbarberis@gmail.com>, 2011
 # Stefano Brentegani <sbrentegani@gmail.com>, 2013
 # Stefano Brentegani <sbrentegani@gmail.com>, 2011
-# Stefano Brentegani <sbrentegani@gmail.com>, 2015
+# Stefano Brentegani <sbrentegani@gmail.com>, 2011,2013,2015
+# yakky <i.spalletti@nephila.it>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

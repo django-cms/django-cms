@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Sovichet Tep, 2011
+# Sovichet Tep, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
