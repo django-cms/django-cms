@@ -1,0 +1,24 @@
+.. _upgrade-to-3.3:
+
+#################
+3.3 release notes
+#################
+
+django CMS 3.3 has been planned largely as a consolidation release, to build on the progress made
+in 3.2 and pave the way for the future ones.
+
+The largest major changes is dropped support for Django 1.6 and 1.7, and Python 2.6.
+
+.. _whats_new_3.3:
+
+*****************
+What's new in 3.3
+*****************
+
+* Set the default value of CMSPlugin.position to 0 instead of null
+
+.. _backward_incompatible_3.3:
+
+*****************************
+Backward incompatible changes
+*****************************

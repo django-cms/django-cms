@@ -21,13 +21,13 @@ integrated django CMS into your project, you should be able to follow the
 Requirements
 ************
 
-* `Python`_ 2.7, 3.3 or 3.4.
-* `Django`_ 1.8.x
-* `django-classy-tags`_ 0.6.2 or higher
-* `django-treebeard`_ 3.0 (for Django 1.6) or 4.0 (for Django 1.7 and up)
+* `Python`_ 2.7, 3.3, 3.4 or 3.5.
+* `Django`_ 1.8.x, 1.9.x
+* `django-classy-tags`_ 0.7.0 or higher
+* `django-treebeard`_ 4.0
 * `django-sekizai`_ 0.8.2 or higher
-* `html5lib`_ 0.99 or 0.999
-* `djangocms-admin-style`_
+* `html5lib`_ 0.9999999
+* `djangocms-admin-style`_ 1.0 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
 
@@ -51,7 +51,7 @@ minimal additional configuration and are well-proven.
 Text Editors
 ------------
 
-* `Django CMS CKEditor`_ for a WYSIWYG editor 2.4.0 or higher
+* `Django CMS CKEditor`_ for a WYSIWYG editor 2.8.1 or higher
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
