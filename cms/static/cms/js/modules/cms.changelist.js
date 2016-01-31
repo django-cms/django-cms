@@ -281,7 +281,16 @@
                         type: 'post',
                         url: $(this).prop('href'),
                         success: function () {
-                            CMS.API.Helpers.reloadBrowser();
+                            if (window.self !== window.top) {
+                                // if we're in the sideframe we have to actually
+                                // check if we are publishing a page we're currently in
+                                // because if the slug did change we would need to
+                                // redirect to that new slug
+                                CMS.API.Helpers.reloadBrowser(false, false, true);
+                            } else {
+                                // otherwise simply reload the page
+                                CMS.API.Helpers.reloadBrowser();
+                            }
                         },
                         error: function (request) {
                             throw new Error(request);
@@ -355,6 +364,12 @@
                 var tree;
                 var origin = window.location.protocol + '//' + window.location.hostname +
                     (window.location.port ? ':' + window.location.port : '');
+
+                // if staticPath points to a different domain, we should not
+                // force the origin #4929
+                if (that.options.settings.staticPath.match(/^(https?:)?\/\//i)) {
+                    origin = '';
+                }
                 // global initTree function
                 window.initTree = function () {
                     // jshint newcap: false

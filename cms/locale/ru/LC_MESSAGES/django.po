@@ -5,9 +5,14 @@
 # Translators:
 # Alex <alex@sms-pr.ru>, 2013
 # andrewkoltsov <andrewkoltsov@gmail.com>, 2014
+# andrewkoltsov <andrewkoltsov@gmail.com>, 2014
+# andrey_shipilov <tezro.gb@gmail.com>, 2011
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
+# ha7y <maxvyaznikov@gmail.com>, 2014
+# koodjo <koodjo@mail.ru>, 2012
 # koodjo <koodjo@mail.ru>, 2012
 # Leonid Dworzanski <eperzhand@gmail.com>, 2015
 # Leonid Kurbatov <llenchikk@rambler.ru>, 2013-2014
@@ -16,7 +21,10 @@
 # Oleg Rybkin <okfish@yandex.ru>, 2014-2015
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # Roman Bor <inactive+romans74@transifex.com>, 2013
+# Roman Bor <inactive+romans74@transifex.com>, 2013
 # Sergey Komarov <sjkomarov@gmail.com>, 2013
+# Sergey Komarov <sjkomarov@gmail.com>, 2013
+# slam <little_pea@list.ru>, 2013
 # andrey_shipilov <tezro.gb@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -25,7 +33,7 @@ msgstr ""
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Russian (http://www.transifex.com/digi604/django-cms/language/ru/)\n"
+"Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

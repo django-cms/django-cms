@@ -22,6 +22,7 @@ for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
 
+
 class TabularInline(admin.TabularInline):
     pass
 
@@ -141,6 +142,34 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
 
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
+
+    def get_list_filter(self, request):
+        threshold = get_cms_setting('RAW_ID_USERS')
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+        filter_copy = deepcopy(self.list_filter)
+        if threshold:
+            filter_copy.remove('user')
+        return filter_copy
+
+    @classproperty
+    def raw_id_fields(cls):
+        # Dynamically set raw_id_fields based on settings
+        threshold = get_cms_setting('RAW_ID_USERS')
+
+        # Given a fresh django-cms install and a django settings with the
+        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+        # django throws an OperationalError when running
+        # ./manage migrate
+        # because auth_user doesn't exists yet
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+
+        return ['user'] if threshold else []
 
 
 class GenericCmsPermissionAdmin(object):

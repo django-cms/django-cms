@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models
+from django.db.models import ManyToManyField
 from django.template.defaultfilters import title
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +10,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import LanguageError
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
-from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 from cms.utils.urlutils import admin_reverse
 
 
@@ -52,6 +52,7 @@ class Placeholder(models.Model):
                 plugin.delete(no_mp=True)
 
     def get_label(self):
+        from cms.utils.placeholder import get_placeholder_conf
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
         name = _(name)
         return name
@@ -153,6 +154,14 @@ class Placeholder(models.Model):
         return render_placeholder(self, context, lang=lang, editable=editable,
                                   use_cache=use_cache)
 
+    def _get_related_objects(self):
+        fields = self._meta._get_fields(
+            forward=False, reverse=True,
+            include_parents=True,
+            include_hidden=False,
+        )
+        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+
     def _get_attached_fields(self):
         """
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
@@ -160,7 +169,8 @@ class Placeholder(models.Model):
         from cms.models import CMSPlugin
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
-            for rel in self._meta.get_all_related_objects():
+            relations = self._get_related_objects()
+            for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
@@ -178,8 +188,7 @@ class Placeholder(models.Model):
         from cms.models import CMSPlugin, StaticPlaceholder, Page
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
-            relations = self._meta.get_all_related_objects()
-
+            relations = self._get_related_objects()
             for rel in relations:
                 parent = rel.related_model
                 if parent == Page or parent == StaticPlaceholder:
@@ -278,9 +287,11 @@ class Placeholder(models.Model):
 
     @property
     def actions(self):
+        from cms.utils.placeholder import PlaceholderNoAction
+
         if not hasattr(self, '_actions_cache'):
             field = self._get_attached_field()
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
 
-reversion_register(Placeholder)  # follow=["cmsplugin_set"] not following plugins since they are a spechial case
+reversion_register(Placeholder)

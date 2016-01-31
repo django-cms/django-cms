@@ -106,6 +106,7 @@ def page_to_node(page, home, cut):
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
     attr = {
+        'is_page': True,
         'soft_root': page.soft_root,
         'auth_required': page.login_required,
         'reverse_id': page.reverse_id,
@@ -209,7 +210,7 @@ class CMSMenu(Menu):
                 home = page
             if first and page.pk != home.pk:
                 home_cut = True
-            if (home_cut and (page.parent_id == home.pk or 
+            if (home_cut and (page.parent_id == home.pk or
                     page.parent_id in home_children)):
                 home_children.append(page.pk)
             if ((page.pk == home.pk and home.in_navigation)
