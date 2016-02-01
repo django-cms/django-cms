@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from datetime import datetime
 from itertools import chain
-
+from platform import python_version
 from copy import copy
 
 try:
@@ -9,6 +10,7 @@ try:
 except ImportError:
     from django.utils.datastructures import SortedDict as OrderedDict
 
+import django
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -52,6 +54,8 @@ from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
 
+DJANGO_VERSION = django.get_version()
+PYTHON_VERSION = python_version()
 
 register = template.Library()
 
@@ -658,6 +662,8 @@ class CMSToolbar(RenderBlock):
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
         context['cms_version'] =  __version__
+        context['django_version'] = DJANGO_VERSION
+        context['python_version'] = PYTHON_VERSION
         context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         context['cms_edit_off'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         if toolbar and toolbar.show_toolbar:
