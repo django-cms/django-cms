@@ -14,7 +14,7 @@ Improvements
 - Add support for Django 1.9 (with some deprecation warnings).
 - Add support for django-reversion 1.10+ (required by Django 1.9+).
 - Add placeholder name to the edit tooltip.
-- Add attr['is_page']=True to CMS Page navigation nodes.
+- Add ``attr['is_page']=True`` to CMS Page navigation nodes.
 - Add Django and Python versions to debug bar info tooltip
 
 Bug Fixes
@@ -28,7 +28,7 @@ Bug Fixes
 - Fix message with CMS version not showing up on hover in debug mode.
 - Fix messages not being positioned correctly in debug mode.
 - Fix an issue where plugin parent restrictions where not respected when pasting a plugin.
-- Fix an issue where "Copy all" menu item could've been clicked on empty placeholder.
+- Fix an issue where "Copy all" menu item could have been clicked on empty placeholder.
 - Fix a bug where page tree styles didn't load from STATIC_URL that pointed to a different host.
 - Fix an issue where the side-frame wouldn't refresh under some circumstances.
 - Honor CMS_RAW_ID_USERS in GlobalPagePermissionAdmin.
