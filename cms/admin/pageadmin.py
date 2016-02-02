@@ -1151,7 +1151,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             else:
                 # But, just in case...
                 try:
-                    tb_target = target.get_children().filter(
+                    tb_target = tb_target.get_children().filter(
                         publisher_is_draft=True, site=site)[position]
                     tb_position = "left"
                 except IndexError:
