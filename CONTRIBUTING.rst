@@ -31,6 +31,9 @@ People interested in developing for the django CMS should join the
 `django-cms-developers`_ mailing list as well as heading over to #django-cms on
 the `freenode`_ IRC network for help and to discuss the development.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 You may also be interested in following `@djangocmsstatus`_ on twitter to get
 the GitHub commits as well as the hudson build reports. There is also a
 `@djangocms`_ account for less technical announcements.
