@@ -41,7 +41,7 @@ class ToolbarPool(object):
         if toolbar.__module__.split('.')[-1] == 'cms_toolbar':
             warnings.warn('cms_toolbar.py filename is deprecated, '
                           'and it will be removed in version 3.4; '
-                          'please rename it to cms_toolbar.py', DeprecationWarning)
+                          'please rename it to cms_toolbars.py', DeprecationWarning)
         if not self.force_register and get_cms_setting('TOOLBARS'):
             return toolbar
         from cms.toolbar_base import CMSToolbar
