@@ -675,7 +675,7 @@ class ToolbarTests(ToolbarTestBase):
         if items is not None:
             sub_menu = list(force_text(getattr(item, 'name', '|'))
                     for item in menu[name].get_items())
-            self.assertEqual(sub_menu, items)
+            self.assertEqual(sorted(sub_menu), sorted(items))
 
     def test_remove_language(self):
         page = create_page("toolbar-page", "nav_playground.html", "en",
