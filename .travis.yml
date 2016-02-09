@@ -43,10 +43,11 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
 
 install:
-  - pip install -q -r "test_requirements/django-$DJANGO.txt" xvfbwrapper
-  - if [ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]; then pip
+  - pip install -q -r "test_requirements/django-$DJANGO.txt"
+  - if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install 'xvfbwrapper<0.2.7'; else pip install xvfbwrapper; fi
+  - if [[ $DATABASE_URL == 'postgres://postgres@127.0.0.1/djangocms_test' ]]; then pip
     install -q psycopg2 ; fi
-  - if [ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]; then pip install
+  - if [[ $DATABASE_URL == 'mysql://root@127.0.0.1/djangocms_test' ]]; then pip install
     -q mysqlclient ; fi
 
 script: coverage run --rcfile=.coverage.rc develop.py test --migrate --xvfb
@@ -185,3 +186,4 @@ matrix:
       env: DJANGO=1.9 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' SELENIUM=1 AUTH_USER_MODEL='customuserapp.User'
 
   fast_finish: true
+
