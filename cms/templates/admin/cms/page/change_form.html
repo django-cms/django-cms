@@ -80,6 +80,10 @@
 </form>
 </div>
 
+{% block admin_change_form_document_ready %}
+{{ block.super }}
+{% endblock %}
+
 {% for url in unihandecode_urls %}<script src="{{ url }}" type="text/javascript"></script>{% endfor %}
 {% if unihandecode_urls %}
 <script>
