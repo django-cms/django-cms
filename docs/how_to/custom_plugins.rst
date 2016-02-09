@@ -776,7 +776,6 @@ Example::
             urlpatterns = [
                 url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
             ]
-            urlpatterns = patterns('', *urlpatterns)
             return urlpatterns
 
         def create_alias(self, request):
@@ -873,4 +872,3 @@ For Django migrations add this:
             run_before = [
                 ('cms', '0004_auto_20140924_1038')
             ]
-
