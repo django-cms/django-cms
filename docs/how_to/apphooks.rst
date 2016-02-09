@@ -55,12 +55,13 @@ a page and open the advanced settings tab. Select your new apphook under
 If you attached the app to a page with the url ``/hello/world/`` and the app has
 a ``urls.py`` that looks like this::
 
-    from django.conf.urls import *
+    from django.conf.urls import url
+    from sampleapp.views import main_view, sample_view
 
-    urlpatterns = patterns('sampleapp.views',
-        url(r'^$', 'main_view', name='app_main'),
-        url(r'^sublevel/$', 'sample_view', name='app_sublevel'),
-    )
+    urlpatterns = [
+        url(r'^$', main_view, name='app_main'),
+        url(r'^sublevel/$', sample_view, name='app_sublevel'),
+    ]
 
 The ``main_view`` should now be available at ``/hello/world/`` and the
 ``sample_view`` has the URL ``/hello/world/sublevel/``.
@@ -308,9 +309,7 @@ will look like this::
 
     class OscarApp(CMSApp):
         name = _("Oscar")
-        urls = [
-            patterns('', *application.urls[0])
-        ]
+        urls = application.urls[0]
         exclude_permissions = ['dashboard']
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
