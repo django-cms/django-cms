@@ -46,7 +46,7 @@ If a user comes back to a previously visited page, the language will be same sin
 
 By default if someone visits a page at `http://www.mysite.fr/` django determines the language as follow:
 
-- language in url
+- language in URL
 - language in session
 - language in cookie
 - language in from browser
@@ -58,7 +58,7 @@ https://docs.djangoproject.com/en/dev/topics/i18n/translation/#how-django-discov
 When visiting a page that is only English and French with a German browser, the language from LANGUAGE_CODE will be used.
 If this is English, but the visitor only speaks French, the visitor will have to switch the language.
 Visiting the same page now again after some time, will show it in English again, because the browser session which was
-used to store the language selection doesn't exist anymore. To prevent this issue, a middleware exists which stores the
+used to store the language selection doesn't exist any more. To prevent this issue, a middleware exists which stores the
 language selection in a cookie. Add the following middleware to `MIDDLEWARE_CLASSES`:
 
     `cms.middleware.language.LanguageCookieMiddleware`
@@ -131,7 +131,7 @@ the German version then the language chooser will redirect to ``/``. The same
 goes for urls that are not handled by the cms and display a language chooser.
 
 ********************************************
-Automated slug generation unicode characters
+Automated slug generation Unicode characters
 ********************************************
 
 If your site has languages which use non-ASCII character sets, you might want

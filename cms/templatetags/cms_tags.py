@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from datetime import datetime
 from itertools import chain
-
+from platform import python_version
 from copy import copy
 
 try:
@@ -9,6 +10,7 @@ try:
 except ImportError:
     from django.utils.datastructures import SortedDict as OrderedDict
 
+import django
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -52,6 +54,8 @@ from cms.utils.page_resolver import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name, get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.urlutils import admin_reverse
 
+DJANGO_VERSION = django.get_version()
+PYTHON_VERSION = python_version()
 
 register = template.Library()
 
@@ -329,9 +333,12 @@ class RenderPlugin(InclusionTag):
         #
         request = context['request']
         toolbar = getattr(request, 'toolbar', None)
-        if toolbar and toolbar.edit_mode and placeholder.has_change_permission(request) and getattr(placeholder, 'is_editable', True):
+        if (toolbar and getattr(toolbar, "edit_mode", False) and
+                getattr(toolbar, "show_toolbar", False) and
+                placeholder.has_change_permission(request) and
+                getattr(placeholder, 'is_editable', True)):
             from cms.middleware.toolbar import toolbar_plugin_processor
-            processors = (toolbar_plugin_processor,)
+            processors = (toolbar_plugin_processor, )
         else:
             processors = None
         return processors
@@ -580,7 +587,8 @@ def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None
             raise
         return {'content': ''}
     watcher = Watcher(context)
-    content = render_placeholder(placeholder, context, placeholder_name, use_cache=cache_result)
+    content = render_placeholder(placeholder, context, placeholder_name, lang=lang,
+                                 use_cache=cache_result)
     changes = watcher.get_changes()
     if cache_result:
         set_placeholder_page_cache(page_lookup, lang, site_id, placeholder_name,
@@ -654,6 +662,10 @@ class CMSToolbar(RenderBlock):
         if request and 'cms-toolbar-login-error' in request.GET:
             context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
         context['cms_version'] =  __version__
+        context['django_version'] = DJANGO_VERSION
+        context['python_version'] = PYTHON_VERSION
+        context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        context['cms_edit_off'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         if toolbar and toolbar.show_toolbar:
             language = toolbar.toolbar_language
             with force_language(language):
@@ -708,7 +720,8 @@ class CMSEditableObject(InclusionTag):
 
     def _is_editable(self, request):
         return (request and hasattr(request, 'toolbar') and
-                request.toolbar.edit_mode)
+                request.toolbar.edit_mode and
+                request.toolbar.show_toolbar)
 
     def get_template(self, context, **kwargs):
         if self._is_editable(context.get('request', None)):

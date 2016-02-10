@@ -217,7 +217,7 @@ class PageSubmitRow(InclusionTag):
         save_as = context['save_as']
         basic_info = context.get('advanced_settings', False)
         advanced_settings = context.get('basic_info', False)
-        language = context['language']
+        language = context.get('language', '')
         return {
             # TODO check this (old code: opts.get_ordered_objects() )
             'onclick_attrib': (opts and change
@@ -261,6 +261,25 @@ class CMSAdminIconBase(Tag):
 
 
 register.tag(CMSAdminIconBase)
+
+
+@register.inclusion_tag('cms/toolbar/plugin.html', takes_context=True)
+def render_plugin_toolbar_config(context, plugin, placeholder_slot=None):
+    page = context['request'].current_page
+    cms_plugin = plugin.get_plugin_class_instance()
+
+    if placeholder_slot is None:
+        placeholder_slot = plugin.placeholder.slot
+
+    child_classes = cms_plugin.get_child_classes(placeholder_slot, page)
+    parent_classes = cms_plugin.get_parent_classes(placeholder_slot, page)
+
+    context.update({
+        'allowed_child_classes': child_classes,
+        'allowed_parent_classes': parent_classes,
+        'instance': plugin
+    })
+    return context
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)

@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load admin_static cms_static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="cms-content-wizard">
+        {% block wizard %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static_with_version "cms/js/modules/jquery.noconflict.pre.js" %}"></script>
+    <script type="text/javascript" src="{% static_with_version "cms/js/libs/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static_with_version "cms/js/modules/jquery.noconflict.post.js" %}"></script>
+    {{ form.media }}
+{% endblock %}

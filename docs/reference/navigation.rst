@@ -12,8 +12,8 @@ menu:
 * :ttag:`show_sub_menu`
 * :ttag:`show_breadcrumb`
 
-To use any of these templatetags, you need to have ``{% load menu_tags %}`` in
-your template before the line on which you call the templatetag.
+To use any of these template tags, you need to have ``{% load menu_tags %}`` in
+your template before the line on which you call the template tag.
 
 .. note::
 
@@ -85,7 +85,7 @@ show_menu_below_id
 ******************
 
 If you have set an id in the advanced settings of a page, you can display the
-submenu of this page with a template tag. For example, we have a page called
+sub-menu of this page with a template tag. For example, we have a page called
 meta that is not displayed in the navigation and that has the id "meta"::
 
     <ul>
@@ -98,7 +98,7 @@ You can give it the same optional parameters as ``show_menu``::
         {% show_menu_below_id "meta" 0 100 100 100 "myapp/menu.html" %}
     </ul>
 
-Unlike :ttag:`show_menu`, however, soft roots will not affect the menu when 
+Unlike :ttag:`show_menu`, however, soft roots will not affect the menu when
 using :ttag:`show_menu_below_id`.
 
 
@@ -110,17 +110,17 @@ show_sub_menu
 
 Displays the sub menu of the current page (as a nested list).
 
-The first argument, ``levels`` (default=100), specifies how many levels deep
+The first argument, ``levels`` (``default=100``), specifies how many levels deep
 the sub menu should be displayed.
 
-The second argument, ``root_level`` (default=None), specifies at what level, if
+The second argument, ``root_level`` (``default=None``), specifies at what level, if
 any, the menu should have its root. For example, if root_level is 0 the menu
 will start at that level regardless of what level the current page is on.
 
-The third argument, ``nephews`` (default=100), specifies how many levels of
+The third argument, ``nephews`` (``default=100``), specifies how many levels of
 nephews (children of siblings) are shown.
 
-Fourth argument, ``template`` (default=menu/sub_menu.html), is the template
+Fourth argument, ``template`` (``default=menu/sub_menu.html``), is the template
 used by the tag; if you want to use a different template you **must** supply
 default values for ``root_level`` and ``nephews``.
 
@@ -167,7 +167,7 @@ In this case you may need to provide your own breadcrumb via the template.
 This is mostly needed for pages like login, logout and third-party apps.
 This can easily be accomplished by a block you overwrite in your templates.
 
-For example in your base.html::
+For example in your ``base.html``::
 
     <ul>
         {% block breadcrumb %}

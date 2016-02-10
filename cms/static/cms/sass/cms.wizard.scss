@@ -1,0 +1,75 @@
+@charset "utf-8";
+/*!
+ * @copyright: https://github.com/divio/django-cms
+ */
+
+//##############################################################################
+// IMPORT SETTINGS
+@import "settings/all";
+@import "mixins/all";
+
+//##############################################################################
+// WIZARD
+
+$wizard-padding: 20px 25px !important;
+$wizard-input-size: 16px;
+
+.cms-content-wizard {
+    .clear {
+        clear: both;
+        overflow: hidden;
+    }
+
+    .errornote {
+        box-sizing: border-box;
+        display: block;
+        width: 100%;
+    }
+
+    // choice options used in cms/wizards/start.html
+    .choice-wrapper {
+        clear: both;
+        overflow: hidden;
+        margin: -1%;
+    }
+    .choice {
+        @include button-variant($btn-default-color, $btn-default-bgcolor, $btn-default-border, false);
+        box-sizing: border-box;
+        position: relative;
+
+        text-transform: none;
+        height: 85px;
+        padding: $wizard-padding;
+        margin: 1% !important;
+
+        // tablet and up
+        @media (min-width: $screen-tablet) {
+            float: left !important;
+            width: 48% !important;
+        }
+
+        input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .info {
+            display: block;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        &.active {
+            border-color: $btn-action-border;
+            background: lighten($btn-action-bgcolor, 45%);
+        }
+    }
+}

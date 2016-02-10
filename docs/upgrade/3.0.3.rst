@@ -30,8 +30,8 @@ Apphook Permissions
 
 Apphooks have now by default the same permissions as the page they are attached to.
 This means if a page has for example a login required enabled all views in the apphook
-will have the same behavior.
+will have the same behaviour.
 
-Docs on how to disable or customize this behavior have a look here:
+Docs on how to disable or customise this behaviour have a look here:
 
 :ref:`apphook_permissions`

@@ -4,10 +4,9 @@
 <div class="submit-row"{% if is_popup %} style="overflow: auto;"{% endif %}>
     <input type="submit" name="_save" class="default" value="{% trans 'Save' %}"/>
     {% if not add %}
-    <p class="deletelink-box">
-        <a href="delete/" class="deletelink">{% trans "Delete" %}</a>
-    </p>
+        <p class="deletelink-box">
+            <a href="delete/" class="deletelink">{% trans "Delete" %}</a>
+        </p>
     {% endif %}
-
 </div>
 {% endblock %}

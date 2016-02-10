@@ -1,0 +1,102 @@
+//##############################################################################
+// #WELCOME
+//
+// Shown when there is no page available
+.cms-welcome-bg {
+    // specific admin background color
+    background: $gray-lightest;
+}
+.cms-welcome {
+    color: $gray-darker;
+    width: $welcome-width;
+    min-width: $welcome-min-width;
+    margin: 0 auto;
+
+    a {
+        color: $color-primary;
+        &:hover,
+        &:active,
+        &:focus {
+            text-decoration: underline;
+        }
+    }
+
+    .cms-hidden {
+        display: none;
+    }
+
+    .cms-welcome-section,
+    .cms-welcome-footer {
+        box-sizing: border-box;
+        width: $welcome-width;
+        min-width: $welcome-min-width;
+        margin: 0 auto;
+    }
+
+    // header area
+    .cms-welcome-header {
+        text-align: center;
+    }
+
+    .cms-welcome-heading {
+        color: $gray-light;
+        font-size: 22px;
+        font-weight: 200;
+        text-align: center;
+        padding: 40px 0 15px;
+        border-bottom: 1px solid $gray-lighter;
+        .cms-icon {
+            color: $color-success;
+        }
+    }
+
+    .cms-welcome-logo,
+    .cms-welcome-logo:hover {
+        @extend %icon;
+        @include icon(logo);
+        font-size: 35px;
+        text-decoration: none;
+        margin: 50px auto 30px;
+        color: $gray;
+        &:before {
+            color: black;
+            transition: color $speed-base;
+        }
+        &:hover:before {
+            color: $color-primary;
+        }
+    }
+
+    // section area
+    .cms-welcome-section {
+        box-shadow: 0 0 5px $gray-lighter;
+        padding: $padding-large;
+        margin-bottom: 5px;
+        background: $white;
+        h2 {
+            font-size: $font-size-large;
+            font-weight: bold;
+            margin: 0 0 15px;
+        }
+        p {
+            padding: 5px 0;
+        }
+    }
+
+    // footer area
+    .cms-welcome-links {
+        padding: 10px 5px;
+        margin: 0 0 15px;
+        border-bottom: 1px solid $gray-lighter;
+        a {
+            padding: 0 5px;
+        }
+    }
+
+    .cms-welcome-notes {
+        font-size: $font-size-small;
+        line-height: 16px;
+        color: $gray-light;
+        padding: 5px 10px;
+    }
+}

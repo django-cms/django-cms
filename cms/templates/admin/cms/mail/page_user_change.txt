@@ -2,6 +2,6 @@
 {% load i18n %}
 
 {% block content %}
-	{% trans 'Username:' %} {{ user.username }}
-	{% trans 'Password:' %} {{ password }}
+    {% trans 'Username:' %} {{ user.username }}
+    {% trans 'Password:' %} {{ password }}
 {% endblock %}

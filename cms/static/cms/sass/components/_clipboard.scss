@@ -1,0 +1,69 @@
+//##############################################################################
+// CLIPBOARD
+
+.cms-clipboard {
+    display: none;
+}
+
+.cms-clipboard-containers {
+    display: none !important;
+    // custom style for draggable item
+    .cms-dragarea {
+        padding-top: $padding-base;
+    }
+    .cms-draggable {
+        display: block !important;
+        position: relative;
+        top: 0;
+        left: 0;
+        border-radius: $border-radius-base;
+        cursor: move;
+    }
+    .cms-draggable .cms-dragitem {
+        line-height: $structure-dragitem-fullheight;
+        height: $structure-dragitem-fullheight;
+        padding-left: $padding-large;
+    }
+    .cms-draggable .cms-dragitem .cms-submenu-btn {
+        display: none !important;
+    }
+    .cms-draggable .cms-dragitem-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-right: 40px;
+    }
+
+    .cms-plugins {
+        display: none;
+    }
+    .cms-droppable {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: z(structure, content, empty, droppable);
+        color: darken($gray-lighter, 15%);
+        line-height: $structure-dragitem-height;
+        height: auto;
+        margin: 0;
+        border: 2px solid $color-primary;
+        border-radius: $border-radius-base;
+        background-color: mix(white, $color-primary, 90%);
+        box-shadow: none;
+        transform: translateY(0) !important;
+        &:before {
+            display: none;
+        }
+    }
+}
+
+.cms-modal-markup .cms-clipboard-containers {
+    display: block !important;
+    .cms-is-dragging {
+        display: block !important;
+        opacity: 0.3;
+    }
+}

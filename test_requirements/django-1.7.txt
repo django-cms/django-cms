@@ -1,8 +1,7 @@
 -r requirements_base.txt
 django>=1.7,<1.8
-django-reversion>=1.8,<1.9
-django-classy-tags>=0.5
-django-sekizai>=0.7
-djangocms-text-ckeditor>=2.7.1
+djangocms-text-ckeditor>=2.8.1
+django-reversion==1.10,<1.11
 django-hvad==1.4
+django-formtools
 django-debug-toolbar<=1.4

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.db.models import ManyToManyField
+
 from cms.utils.compat import DJANGO_1_7
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
@@ -10,7 +12,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.exceptions import LanguageError
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
-from cms.utils.placeholder import PlaceholderNoAction, get_placeholder_conf
 from cms.utils.urlutils import admin_reverse
 
 
@@ -53,6 +54,7 @@ class Placeholder(models.Model):
                 plugin.delete(no_mp=True)
 
     def get_label(self):
+        from cms.utils.placeholder import get_placeholder_conf
         name = get_placeholder_conf("name", self.slot, default=title(self.slot))
         name = _(name)
         return name
@@ -99,13 +101,31 @@ class Placeholder(models.Model):
         Generic method to check the permissions for a request for a given key,
         the key can be: 'add', 'change' or 'delete'. For each attached object
         permission has to be granted either on attached model or on attached object.
+          * 'add' and 'change' permissions on placeholder need either on add or change
+            permission on attached object to be granted.
+          * 'delete' need either on add, change or delete
         """
         if getattr(request, 'user', None) and request.user.is_superuser:
             return True
-        if self.page:
-            return self._get_object_permission(self.page, request, key)
-        for obj in self._get_attached_objects():
-            return self._get_object_permission(obj, request, key)
+        perm_keys = {
+            'add': ('add', 'change',),
+            'change': ('add', 'change',),
+            'delete': ('add', 'change', 'delete'),
+        }
+        if key not in perm_keys:
+            raise Exception("%s is not a valid perm key. "
+                            "'Only 'add', 'change' and 'delete' are allowed" % key)
+        objects = [self.page] if self.page else self._get_attached_objects()
+        obj_perm = None
+        for obj in objects:
+            obj_perm = False
+            for key in perm_keys[key]:
+                if self._get_object_permission(obj, request, key):
+                    obj_perm = True
+                    break
+            if not obj_perm:
+                return False
+        return obj_perm
 
     def _get_object_permission(self, obj, request, key):
         if not getattr(request, 'user', None):
@@ -136,6 +156,17 @@ class Placeholder(models.Model):
         return render_placeholder(self, context, lang=lang, editable=editable,
                                   use_cache=use_cache)
 
+    def _get_related_objects(self):
+        if DJANGO_1_7:
+            return list(self._meta.get_all_related_objects())
+        else:
+            fields = self._meta._get_fields(
+                forward=False, reverse=True,
+                include_parents=True,
+                include_hidden=False,
+            )
+            return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+
     def _get_attached_fields(self):
         """
         Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
@@ -143,7 +174,8 @@ class Placeholder(models.Model):
         from cms.models import CMSPlugin
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
-            for rel in self._meta.get_all_related_objects():
+            relations = self._get_related_objects()
+            for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
@@ -164,8 +196,7 @@ class Placeholder(models.Model):
         from cms.models import CMSPlugin, StaticPlaceholder, Page
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
-            relations = self._meta.get_all_related_objects()
-
+            relations = self._get_related_objects()
             for rel in relations:
                 if DJANGO_1_7:
                     parent = rel.model
@@ -270,9 +301,11 @@ class Placeholder(models.Model):
 
     @property
     def actions(self):
+        from cms.utils.placeholder import PlaceholderNoAction
+
         if not hasattr(self, '_actions_cache'):
             field = self._get_attached_field()
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
 
-reversion_register(Placeholder)  # follow=["cmsplugin_set"] not following plugins since they are a spechial case
+reversion_register(Placeholder)
