@@ -1,30 +1,26 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import os
 import dj_database_url
 
 import django
 from django.utils import six
 
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
-
 gettext = lambda s: s
 
 urlpatterns = []
 
 
-def _detect_migration_layout(apps):
-    SOUTH_MODULES = {}
-    DJANGO_MODULES = {}
-
+def _get_migration_modules(apps):
+    modules = {}
     for module in apps:
+        module_name = '%s.migrations_django' % module
         try:
-            __import__('%s.migrations_django' % module)
-            DJANGO_MODULES[module] = '%s.migrations_django' % module
-            SOUTH_MODULES[module] = '%s.migrations' % module
-        except Exception:
+            __import__(module_name)
+        except ImportError:
             pass
-    return DJANGO_MODULES, SOUTH_MODULES
+        else:
+            modules[module] = module_name
+    return modules
 
 
 def configure(db_url, **extra):
@@ -203,12 +199,12 @@ def configure(db_url, **extra):
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'MultiColumnPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
             'col_left': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
                             'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
                             'MultiColumnPlugin', 'StylePlugin', 'EmptyPlugin'),
                 'name': gettext("left column"),
@@ -220,9 +216,9 @@ def configure(db_url, **extra):
                 },
             },
             'col_right': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin',
-                            'StylePlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {
@@ -259,82 +255,50 @@ def configure(db_url, **extra):
     from django.utils.functional import empty
     settings._wrapped = empty
     defaults.update(extra)
-
-    if DJANGO_1_7:
-        defaults.update(dict(
-            TEMPLATE_CONTEXT_PROCESSORS=[
-                "django.contrib.auth.context_processors.auth",
-                'django.contrib.messages.context_processors.messages',
-                "django.core.context_processors.i18n",
-                "django.core.context_processors.debug",
-                "django.core.context_processors.request",
-                "django.core.context_processors.media",
-                'django.core.context_processors.csrf',
-                "cms.context_processors.cms_settings",
-                "sekizai.context_processors.sekizai",
-                "django.core.context_processors.static",
-            ],
-            TEMPLATE_LOADERS=(
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-                'django.template.loaders.eggs.Loader',
-            ),
-            TEMPLATE_DIRS=[
-                os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
-            ],
-            TEMPLATE_DEBUG=True,
-        ))
-    else:
-        defaults['TEMPLATES'] = [
-            {
-                'NAME': 'django',
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
-                'OPTIONS': {
-                    'debug': True,
-                    'context_processors': [
-                        "django.contrib.auth.context_processors.auth",
-                        'django.contrib.messages.context_processors.messages',
-                        "django.template.context_processors.i18n",
-                        "django.template.context_processors.debug",
-                        "django.template.context_processors.request",
-                        "django.template.context_processors.media",
-                        'django.template.context_processors.csrf',
-                        "cms.context_processors.cms_settings",
-                        "sekizai.context_processors.sekizai",
-                        "django.template.context_processors.static",
-                    ],
-                    'loaders': (
-                        'django.template.loaders.filesystem.Loader',
-                        'django.template.loaders.app_directories.Loader',
-                        'django.template.loaders.eggs.Loader',
-                    )
-                }
+    defaults['TEMPLATES'] = [
+        {
+            'NAME': 'django',
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
+            'OPTIONS': {
+                'debug': True,
+                'context_processors': [
+                    "django.contrib.auth.context_processors.auth",
+                    'django.contrib.messages.context_processors.messages',
+                    "django.template.context_processors.i18n",
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.template.context_processors.media",
+                    'django.template.context_processors.csrf',
+                    "cms.context_processors.cms_settings",
+                    "sekizai.context_processors.sekizai",
+                    "django.template.context_processors.static",
+                ],
+                'loaders': (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                )
             }
-        ]
+        }
+    ]
 
     plugins = ('djangocms_column', 'djangocms_googlemap',
                'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
                'djangocms_teaser', 'djangocms_video')
 
-    DJANGO_MIGRATION_MODULES, SOUTH_MIGRATION_MODULES = _detect_migration_layout(plugins)
+    defaults['MIGRATION_MODULES'] = _get_migration_modules(plugins)
+    if not defaults.get('TESTS_MIGRATE', False):
+        # Disable migrations
+        class DisableMigrations(object):
 
-    if DJANGO_1_6:
-        defaults['INSTALLED_APPS'].append('south')
-        defaults['SOUTH_MIGRATION_MODULES'] = SOUTH_MIGRATION_MODULES
-    else:
-        defaults['MIGRATION_MODULES'] = DJANGO_MIGRATION_MODULES
-        if not defaults.get('TESTS_MIGRATE', False):
-            # Disable migrations for Django 1.7+
-            class DisableMigrations(object):
+            def __contains__(self, item):
+                return True
 
-                def __contains__(self, item):
-                    return True
+            def __getitem__(self, item):
+                return "notmigrations"
 
-                def __getitem__(self, item):
-                    return "notmigrations"
-
-            defaults['MIGRATION_MODULES'] = DisableMigrations()
+        defaults['MIGRATION_MODULES'] = DisableMigrations()
 
     if 'AUTH_USER_MODEL' in extra:
         custom_user_app = 'cms.test_utils.project.' + extra['AUTH_USER_MODEL'].split('.')[0]
@@ -353,12 +317,4 @@ def configure(db_url, **extra):
             defaults.update(loads(extra_settings))
 
     settings.configure(**defaults)
-    if DJANGO_1_6:
-        from south.management.commands import patch_for_test_db_setup
-
-        patch_for_test_db_setup()
-        from django.contrib import admin
-
-        admin.autodiscover()
-    else:
-        django.setup()
+    django.setup()

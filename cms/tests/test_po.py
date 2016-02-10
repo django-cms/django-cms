@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from cms.test_utils.util.context_managers import TemporaryDirectory
 from django.core.management.base import CommandError
 from django.core.management.commands.compilemessages import has_bom

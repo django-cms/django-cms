@@ -215,7 +215,7 @@ Model's instance will be able to add some placeholders or plugins to existing Mo
 Model permissions are usually added through the default Django ``auth`` application and its admin
 interface. Object-level permission can be handled by writing a custom authentication backend as
 described in `django docs
-<https://docs.djangoproject.com/en/1.7/topics/auth/customizing/#handling-object-permissions>`_
+<https://docs.djangoproject.com/en/stable/topics/auth/customizing/#handling-object-permissions>`_
 
 For example, if there is a ``UserProfile`` model that contains a ``PlaceholderField`` then the
 custom backend can refer to a ``has_perm`` method (on the model) that grants all rights to current

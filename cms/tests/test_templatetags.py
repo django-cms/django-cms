@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from copy import deepcopy
 import os
 from classytags.tests import DummyParser, DummyTokens
@@ -27,7 +26,6 @@ from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_cms_setting, get_site_id
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.placeholder import get_placeholders
 from sekizai.context import SekizaiContext
 
@@ -269,11 +267,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request = RequestFactory().get('/')
         request.user = self.get_staff_user_with_no_permissions()
         request.current_page = page
-        if DJANGO_1_7:
-            override = {'TEMPLATE_DIRS': [template_dir], 'CMS_TEMPLATES': []}
-        else:
-            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-            override['TEMPLATES'][0]['DIRS'] = [template_dir]
+        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+        override['TEMPLATES'][0]['DIRS'] = [template_dir]
         with self.settings(**override):
             template = Template(
                 "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}")

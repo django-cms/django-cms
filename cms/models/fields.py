@@ -64,15 +64,6 @@ class PlaceholderField(models.ForeignKey):
             data = self._get_new_placeholder(instance)
         super(PlaceholderField, self).save_form_data(instance, data)
 
-    def south_field_triple(self):
-        "Returns a suitable description of this field for South."
-        # We'll just introspect ourselves, since we inherit.
-        from south.modelsinspector import introspector
-        field_class = "django.db.models.fields.related.ForeignKey"
-        args, kwargs = introspector(self)
-        # That's our definition!
-        return (field_class, args, kwargs)
-
     def contribute_to_class(self, cls, name):
         super(PlaceholderField, self).contribute_to_class(cls, name)
         if not hasattr(cls._meta, 'placeholder_field_names'):
@@ -99,10 +90,3 @@ class PageField(models.ForeignKey):
         }
         defaults.update(kwargs)
         return super(PageField, self).formfield(**defaults)
-
-    def south_field_triple(self):
-        "Returns a suitable description of this field for South."
-        from south.modelsinspector import introspector
-        field_class = "django.db.models.fields.related.ForeignKey"
-        args, kwargs = introspector(self)
-        return (field_class, args, kwargs)

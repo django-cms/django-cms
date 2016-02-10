@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from django.core.cache import cache
 from django.template import Template, RequestContext
 from django.test.utils import override_settings

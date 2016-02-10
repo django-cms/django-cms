@@ -4,9 +4,6 @@ from functools import wraps
 import json
 import sys
 
-from django.utils.formats import localize
-
-from cms.utils.compat import DJANGO_1_7
 
 import django
 from django.contrib.admin.helpers import AdminForm
@@ -15,16 +12,10 @@ from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IncorrectLookupParameters
-try:
-    from django.contrib.admin.utils import get_deleted_objects, quote
-except ImportError:
-    from django.contrib.admin.util import get_deleted_objects, quote
+from django.contrib.admin.utils import get_deleted_objects, quote
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-try:
-    from django.contrib.sites.shortcuts import get_current_site
-except ImportError:
-    from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.db import router, transaction
 from django.db.models import Q
@@ -32,6 +23,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpRespons
 from django.shortcuts import render, get_object_or_404
 from django.template.defaultfilters import escape
 from django.utils.encoding import force_text
+from django.utils.formats import localize
 from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
@@ -1264,28 +1256,16 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             'using': using
         }
 
-        if DJANGO_1_7:
-            deleted_objects, perms_needed = get_deleted_objects(
-                [titleobj],
-                titleopts,
-                **kwargs
-            )[:2]
-            to_delete_plugins, perms_needed_plugins = get_deleted_objects(
-                saved_plugins,
-                pluginopts,
-                **kwargs
-            )[:2]
-        else:
-            deleted_objects, __, perms_needed = get_deleted_objects(
-                [titleobj],
-                titleopts,
-                **kwargs
-            )[:3]
-            to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
-                saved_plugins,
-                pluginopts,
-                **kwargs
-            )[:3]
+        deleted_objects, __, perms_needed = get_deleted_objects(
+            [titleobj],
+            titleopts,
+            **kwargs
+        )[:3]
+        to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
+            saved_plugins,
+            pluginopts,
+            **kwargs
+        )[:3]
 
         deleted_objects.append(to_delete_plugins)
         perms_needed = set(list(perms_needed) + list(perms_needed_plugins))

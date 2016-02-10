@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import sys
 
 from django.contrib.admin.models import CHANGE, LogEntry
@@ -18,7 +17,7 @@ from cms.appresolver import applications_page_check, clear_app_resolvers, get_ap
 from cms.cms_toolbars import PlaceholderToolbar
 from cms.models import Title, Page
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.testcases import CMSTestCase, ClearURLs
+from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
@@ -32,7 +31,7 @@ NS_APP_NAME = 'NamespacedApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
 
 
-class ApphooksTestCase(ClearURLs, CMSTestCase):
+class ApphooksTestCase(CMSTestCase):
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()
@@ -692,7 +691,7 @@ class ApphooksTestCase(ClearURLs, CMSTestCase):
             self.apphook_clear()
 
 
-class ApphooksPageLanguageUrlTestCase(ClearURLs, CMSTestCase):
+class ApphooksPageLanguageUrlTestCase(CMSTestCase):
     def setUp(self):
         clear_app_resolvers()
         clear_url_caches()

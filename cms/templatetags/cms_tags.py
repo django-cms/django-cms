@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
-
+from collections import OrderedDict
+from copy import copy
 from datetime import datetime
 from itertools import chain
 from platform import python_version
-from copy import copy
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from django.utils.datastructures import SortedDict as OrderedDict
 
 import django
 from django import template
