@@ -405,6 +405,12 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix whitespace markup issues in draft mode
 - Detect plugin migrations layout in tests
 
+=== 3.0.17 (unreleased) ===
+
+- Fix ExtensionToolbar when language is removed but titles still exists…
+- Fix PageSelectWidget JS syntax
+- Fix cache settings
+
 === 3.1 (2015-04-20) ===
 
 - Remove django-mptt in favor of django-treebeard
@@ -518,3 +524,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fix PageSelectWidget JS syntax
 - Fix redirect when disabling toolbar
 - Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
+
+=== 3.1.6 (unreleased) ===
+
+- Fix cache settings
