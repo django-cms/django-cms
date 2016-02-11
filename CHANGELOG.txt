@@ -74,6 +74,11 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
+=== 3.1.6 (unreleased) ===
+
+- Fix cache settings
+
+
 === 3.1.5 (2016-01-29) ===
 
 - Fixed a tree corruption when pasting a nested plugin under another plugin.
@@ -192,6 +197,13 @@
 - Add templatetag render_plugin_block
 - Add templatetag render_model_add_block
 - Add "Structure mode" permission
+
+
+=== 3.0.17 (unreleased) ===
+
+- Fix ExtensionToolbar when language is removed but titles still exists…
+- Fix PageSelectWidget JS syntax
+- Fix cache settings
 
 
 === 3.0.16 (2015-11-24) ===

@@ -210,3 +210,4 @@ matrix:
       env: DJANGO=1.9 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test' SELENIUM=0
 
   fast_finish: true
+
