@@ -23,7 +23,7 @@ File
 
 Available on `GitHub (divio/djangocms-file) <http://github.com/divio/djangocms-file>`_ and on `PyPi (djangocms-file) <https://pypi.python.org/pypi/djangocms-file>`_.
 
-Allows you to upload a file. A filetype icon will be assigned based on the file
+Allows you to upload a file. A file-type icon will be assigned based on the file
 extension.
 
 Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
@@ -37,7 +37,7 @@ setting in your project's ``settings.py`` file::
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 You might consider using `django-filer`_ with `django filer CMS plugin`_ and its
@@ -87,7 +87,7 @@ and on `PyPi (djangocms-googlemap) <https://pypi.python.org/pypi/djangocms-googl
 
 Displays a map of an address on your page.
 
-Both address and coordinates are supported to center the map; zoom level and
+Both address and coordinates are supported to centre the map; zoom level and
 route planner can be set when adding/editing plugin in the admin.
 
 .. versionadded:: 2.3.2
@@ -98,7 +98,7 @@ route planner can be set when adding/editing plugin in the admin.
     Zoom level is set via a select field which ensure only legal values are used.
 
 .. note:: Due to the above change, `level` field is now marked as `NOT NULL`,
-    and a datamigration has been introduced to modify existing googlemap plugin
+    and a data migration has been introduced to modify existing Googlemap plugin
     instance to set the default value if `level` if is `NULL`.
 
 Please install it using ``pip`` or similar and be sure you have the following in the :setting:`django:INSTALLED_APPS`
@@ -134,10 +134,10 @@ setting in your project's ``settings.py`` file::
     )
 
 There are several solutions for Python and Django out there to automatically
-resize your pictures, you can find some on `Django Packages`_ and compare them
+re-size your pictures, you can find some on `Django Packages`_ and compare them
 there.
 
-In your project template directory create a folder called ``djangocms_picture/plugins`` and
+In your project template directory create a folder called ``cms/plugins`` and
 in it create a file called ``picture.html``. Here is an example
 ``picture.html`` template using `easy-thumbnails`_:
 
@@ -161,7 +161,7 @@ it was placed in.
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 .. note:: In order to improve clarity, some Picture fields have been omitted in
@@ -196,7 +196,7 @@ settings in your project's ``settings.py`` file::
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media
@@ -226,9 +226,9 @@ Video
 Available on `GitHub (divio/djangocms-video) <http://github.com/divio/djangocms-video>`_
 and on `PyPi (djangocms-video) <https://pypi.python.org/pypi/djangocms-video>`_.
 
-Plays Video Files or Youtube / Vimeo Videos. Uses the `OSFlashVideoPlayer
+Plays Video Files or YouTube / Vimeo Videos. Uses the `OSFlashVideoPlayer
 <http://github.com/FlashJunior/OSFlashVideoPlayer>`_. When uploading videos use either
-.flv files or h264 encoded video files.
+``.flv`` files or H264 encoded video files.
 
 Please install it using ``pip`` or similar and be sure you have the following in your project's
 :setting:`django:INSTALLED_APPS` setting::
@@ -239,8 +239,8 @@ Please install it using ``pip`` or similar and be sure you have the following in
         # ...
     )
 
-There are some settings you can set in your settings.py to overwrite some
-default behavior:
+There are some settings you can set in your ``settings.py`` to overwrite some
+default behaviour:
 
 * ``VIDEO_AUTOPLAY`` ((default: ``False``)
 * ``VIDEO_AUTOHIDE`` (default: ``False``)
@@ -258,7 +258,7 @@ default behavior:
 
 You should take care that the directory defined by the configuration setting
 :setting:`CMS_PAGE_MEDIA_PATH` (by default ``cms_page_media/`` relative to
-:setting:`django:MEDIA_ROOT`) is writable by the user under which django will be
+:setting:`django:MEDIA_ROOT`) is writeable by the user under which django will be
 running.
 
 .. note:: For more advanced use cases where you would like to upload your media

@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
+
 import sys
 from django.core.management import color_style
 from django.core.urlresolvers import clear_url_caches
 from django.core.signals import request_finished
 from cms.models import Title
+from cms.utils.apphook_reload import mark_urlconf_as_changed
 
 
 DISPATCH_UID = 'cms-restart'
+
+
+def trigger_server_restart(**kwargs):
+    """
+    Marks the URLs as stale so that they can be reloaded.
+    """
+    mark_urlconf_as_changed()
 
 
 def apphook_pre_title_checker(instance, **kwargs):
@@ -34,7 +43,7 @@ def apphook_post_page_checker(page):
 
 def apphook_post_title_checker(instance, **kwargs):
     """
-    Check if applciation_urls and path changed on the instance
+    Check if application_urls and path changed on the instance
     """
     if instance.publisher_is_draft:
         return
@@ -107,7 +116,8 @@ def debug_server_restart(**kwargs):
             from imp import reload
             reload(cms.urls)
     if not 'test' in sys.argv:
-        msg = 'Application url changed and urls_need_reloading signal fired. Please reload the urls.py or restart the server\n'
+        msg = 'Application url changed and urls_need_reloading signal fired. ' \
+              'Please reload the urls.py or restart the server.\n'
         styles = color_style()
         msg = styles.NOTICE(msg)
         sys.stderr.write(msg)

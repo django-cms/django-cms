@@ -1,65 +1,65 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_static admin_list cms_admin cms_js_tags %}
+{% load i18n admin_static admin_list cms_admin cms_js_tags cms_static %}
 
 {% block title %}{% trans "List of pages" %}{% endblock %}
 {% block bodyclass %}change-list{% endblock %}
 
 {% if not is_popup %}{% block breadcrumbs %}
 <div class="breadcrumbs">
-	<a href="../../">{% trans "Home" %}</a> &rsaquo;
-	<a href="../">{{ app_label|capfirst|escape }}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
-	{% if request.REQUEST.q %}
-	&rsaquo; {% trans "Search" %}
-	{% endif %}
+    <a href="../../">{% trans "Home" %}</a> &rsaquo;
+    <a href="../">{% firstof cl.opts.app_config.verbose_name app_label|capfirst|escape %}</a> &rsaquo; {{ opts.verbose_name_plural|capfirst|escape }}
+    {% if request.REQUEST.q %}
+    &rsaquo; {% trans "Search" %}
+    {% endif %}
 </div>
 {% endblock %}{% endif %}
 
 {% block coltype %}flex{% endblock %}
 {% block extrastyle %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static "cms/css/cms.base.css" %}" type="text/css" />
-<link rel="stylesheet" href="{% static "cms/css/cms.pagetree.css" %}" type="text/css" />
-<link rel="stylesheet" href="{% static "cms/js/jstree/tree_component.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static_with_version "cms/css/cms.base.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static_with_version "cms/css/cms.pagetree.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static_with_version "cms/js/jstree/tree_component.css" %}" type="text/css" />
 {% if cl.is_filtered %}
-<link rel="stylesheet" href="{% static "cms/js/jstree/themes/default/style.css" %}" type="text/css" />
+<link rel="stylesheet" href="{% static_with_version "cms/js/jstree/themes/default/style.css" %}" type="text/css" />
 {% endif %}
 {% endblock extrastyle %}
 
 {% block extrahead %}
 {{ block.super }}
-{% block jquery %}<script src="{% static "cms/js/libs/jquery.min.js" %}" type="text/javascript"></script>{% endblock jquery %}
-<script src="{% static "cms/js/libs/class.min.js" %}" type="text/javascript"></script>
-<!-- load changelist -->
-<script src="{% static "cms/js/modules/jquery.ui.custom.js" %}" type="text/javascript"></script>
-<script src="{% static "cms/js/modules/cms.base.js" %}" type="text/javascript"></script>
-<script src="{% static "cms/js/modules/cms.changelist.js" %}" type="text/javascript"></script>
-<!-- load jstree -->
-<script src="{% static "cms/js/jstree/_lib/_all.js" %}" type="text/javascript"></script>
-<script src="{% static "cms/js/jstree/tree_component.js" %}" type="text/javascript"></script>
+{% block jquery %}{% endblock %}
+{# load nonconflict pre and post files to fix conflict if there is another jQuery loaded #}
+{# the code is included by a external file because the code has to be loaded into a python file where the wizard is loaded as well #}
+<script src="{% static_with_version "cms/js/modules/jquery.noconflict.pre.js" %}" type="text/javascript"></script>
+<script src="{% static_with_version "cms/js/dist/bundle.admin.base.min.js" %}" type="text/javascript"></script>
+{# load changelist and jstree #}
+<script src="{% static_with_version "cms/js/dist/bundle.admin.changelist.min.js" %}" type="text/javascript"></script>
 <script>
 (function($) {
 // CMS.$ will be passed for $
 $(document).ready(function () {
-	// bind csrf token to the header
-	CMS.API.Helpers.csrf('{{ csrf_token }}');
+    // bind csrf token to the header
+    CMS.API.Helpers.csrf('{{ csrf_token }}');
 
-	// initialize tree
-	new CMS.TreeManager({
-		'settings': {
-			'permission': {{ CMS_PERMISSION|bool }},
-			'debug': {{ DEBUG|bool }},
-			'filtered': {{ cl.is_filtered|bool }}
-		},
-		'lang': {
-			'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
-			'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
-			'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
-			'publish': '{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}'
-		}
-	});
+    // initialize tree
+    new CMS.TreeManager({
+        'settings': {
+            'staticPath': '{{ STATIC_URL }}',
+            'permission': {{ CMS_PERMISSION|bool }},
+            'debug': {{ DEBUG|bool }},
+            'filtered': {{ cl.is_filtered|bool }}
+        },
+        'lang': {
+            'success': '{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}',
+            'changes': '{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}',
+            'error': '{% filter escapejs %}{% trans "An error occured. Please reload the page" %}{% endfilter %}',
+            'publish': '{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}'
+        }
+    });
 });
 })(CMS.$);
 </script>
+<script src="{% static_with_version "cms/js/modules/jquery.noconflict.post.js" %}" type="text/javascript"></script>
 {% endblock extrahead %}
 
 {% block content %}
@@ -68,16 +68,16 @@ $(document).ready(function () {
 
 {% block object-tools %}
 
-	<ul class="object-tools">
-		{% if has_recover_permission %}
-			<li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
-		{% endif %}
-		{% if has_add_permission %}
-		<li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
-		{% endif %}
-	</ul>
+    <ul class="object-tools">
+        {% if has_recover_permission %}
+            <li><a href="recover/" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a></li>
+        {% endif %}
+        {% if has_add_permission %}
+        <li><a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</a></li>
+        {% endif %}
+    </ul>
 
-	<div id="loader-message">{% trans "Loading..." %}</div>
+    <div id="loader-message">{% trans "Loading..." %}</div>
 
 {% endblock %}
 <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
@@ -85,21 +85,22 @@ $(document).ready(function () {
 
 <form action="." method="post">
 {% if cl.has_access_to_multiple_sites %}
-	<div id="site-selector">{% trans "Pages on:" %}
-		<select id="site-select" name="site__exact">
-			{% for site in cl.sites %}
-			<option {% ifequal site.pk cl.current_site.pk %}selected {% endifequal %}value="{{ site.pk }}">{{ site.name }}</option>
-			{% endfor %}
-		</select>
-		<input type="hidden" id="site-copy" name="copy" />
-		{% csrf_token %}
-	</div>
+    <div id="site-selector">{% trans "Pages on:" %}
+        <select id="site-select" name="site__exact">
+            {% for site in cl.sites %}
+            <option {% if site.pk == cl.current_site.pk %}selected {% endif %}value="{{ site.pk }}">{{ site.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="hidden" id="site-copy" name="copy" />
+        {% csrf_token %}
+    </div>
 {% else %}
-	<input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
+    <input type="hidden" id="site-select" value="{{ cl.sites.0.pk }}">
 {% endif %}
 </form>
 
 {% search_form cl %}
+
 {% endblock %}
 {% block date_hierarchy %}{% date_hierarchy cl %}{% endblock %}
 
@@ -109,7 +110,7 @@ $(document).ready(function () {
 <div id="changelist-filter" style="display:none;">
 <h2>{% trans 'Filter' %}</h2>
 {% for spec in cl.filter_specs %}
-	{% clean_admin_list_filter cl spec %}
+    {% clean_admin_list_filter cl spec %}
 {% endfor %}
 </div>
 {% endif %}

@@ -3,9 +3,9 @@ Caching
 #######
 
 
-*****
-Setup
-*****
+******
+Set-up
+******
 
 To setup caching configure a caching backend in django.
 
@@ -51,7 +51,7 @@ Settings
 ========
 
 Caching is set default to true.
-Have a look at the following settings to enable/disable various caching behaviors:
+Have a look at the following settings to enable/disable various caching behaviours:
 
 - :setting:`CMS_PAGE_CACHE`
 - :setting:`CMS_PLACEHOLDER_CACHE`

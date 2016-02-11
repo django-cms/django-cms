@@ -30,9 +30,9 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx']
+extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo']
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/2.6', None),
+    'python': ('http://docs.python.org/3/', None),
     'django': ('http://readthedocs.org/docs/django/en/latest/', None),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
@@ -73,6 +73,10 @@ release = cms.__version__
 # a list of supported languages.
 language = "en"
 
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+exclude_patterns = ['build', 'env']
+
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
 #today = ''
@@ -106,6 +110,8 @@ pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
+
+todo_include_todos = True
 
 
 # -- Options for HTML output ---------------------------------------------------
@@ -224,3 +230,18 @@ latex_documents = [
 
 # If false, no module index is generated.
 #latex_use_modindex = True
+
+# -- Options for LaTeX output --------------------------------------------------
+
+# Spelling check needs an additional module that is not installed by default.
+# Add it only if spelling check is requested so docs can be generated without it.
+if 'spelling' in sys.argv:
+    extensions.append("sphinxcontrib.spelling")
+
+# Spelling language.
+spelling_lang = 'en_GB'
+
+# Location of word list.
+spelling_word_list_filename = 'spelling_wordlist'
+
+spelling_ignore_pypi_package_names = True

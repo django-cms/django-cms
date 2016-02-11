@@ -11,46 +11,50 @@ Django models) can also be edited through django CMS's frontend editing interfac
 convenient for the user because it saves having to switch between frontend and admin views.
 
 Using this interface, model instance values that can be edited show the "Double-click to edit"
-hint on hover. Double-clicking opens a pop-up window containing the changeform for that model.
+hint on hover. Double-clicking opens a pop-up window containing the change form for that model.
+
+.. note::
+
+    This interface is not currently available for touch-screen users, but will be improved in
+    future releases.
 
 .. warning::
 
-    Templatetags used by this feature mark as safe the content of the rendered
+    Template tags used by this feature mark as safe the content of the rendered
     model attribute. This may be a security risk if used on fields which may
-    hold non-trusted content. Be aware, and use the templatetags accordingly.
+    hold non-trusted content. Be aware, and use the template tags accordingly.
 
 
 .. warning::
 
     This feature is only partially compatible with django-hvad: using
     ``render_model`` with hvad-translated fields (say
-    {% render_model object 'translated_field' %} return error if the
+    ``{% render_model object 'translated_field' %}`` returns an error if the
     hvad-enabled object does not exists in the current language.
     As a workaround ``render_model_icon`` can be used instead.
 
 .. _render_model_templatetags:
 
-************
-Templatetags
-************
+*************
+Template tags
+*************
 
-This feature relies on four templatetags sharing common code:
+This feature relies on four template tags sharing common code. All require that you ``{% load
+cms_tags %}`` in your template:
 
-* :ttag:`render_model`
-* :ttag:`render_model_icon`
-* :ttag:`render_model_add`
-* :ttag:`render_model_block`
+* :ttag:`render_model` (for editing a specific field)
+* :ttag:`render_model_block` (for editing any of the fields in a defined block)
+* :ttag:`render_model_icon` (for editing a field represented by another value, such as an image)
+* :ttag:`render_model_add` (for adding an instance of the specified model)
 
-Look at the tag-specific page for a detailed reference; in the examples
-below ``render_model`` is assumed.
-
+Look at the tag-specific page for more detailed reference and discussion of limitations and caveats.
 
 ****************
 Page titles edit
 ****************
 
 For CMS pages you can edit the titles from the frontend; according to the
-attribute specified a overridable default field will be editable.
+attribute specified a default field, which can also be overridden, will be editable.
 
 Main title::
 
@@ -82,7 +86,7 @@ Page menu edit
 
 By using the special keyword ``changelist`` as edit field the frontend
 editing will show the page tree; a common pattern for this is to enable
-changes in the menu by wrapping the menu templatetags:
+changes in the menu by wrapping the menu template tags:
 
 .. code-block:: html+django
 
@@ -97,7 +101,7 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-cms-page-changelist-1">
+    <div class="cms-plugin cms-plugin-cms-page-changelist-1">
         <h3>Menu</h3>
         <ul>
             <li><a href="/">Home</a></li>
@@ -127,9 +131,7 @@ Configure the model's admin class
 =================================
 
 Configure your admin class by adding the ``FrontendEditableAdminMixin`` mixin to it (see
-:mod:`Django admin documentation <django.contrib.admin>` for general Django admin information).
-
-::
+:mod:`Django admin documentation <django.contrib.admin>` for general Django admin information)::
 
     from cms.admin.placeholderadmin import FrontendEditableAdminMixin
     from django.contrib import admin
@@ -141,7 +143,7 @@ Configure your admin class by adding the ``FrontendEditableAdminMixin`` mixin to
 The ordering is important: as usual, **mixins must come first**.
 
 Then set up the templates where you want to expose the model for editing, adding a ``render_model``
-templatetag::
+template tag::
 
     {% load cms_tags %}
 
@@ -175,7 +177,7 @@ Set up the template
 -------------------
 
 Then add comma separated list of fields (or just the name of one field) to
-the templatetag::
+the template tag::
 
     {% load cms_tags %}
 
@@ -188,7 +190,7 @@ the templatetag::
 Special attributes
 ==================
 
-The ``attribute`` argument of the templatetag is not required to be a model field,
+The ``attribute`` argument of the template tag is not required to be a model field,
 property or method can also be used as target; in case of a method, it will be
 called with request as argument.
 
@@ -204,7 +206,7 @@ model-specific editing workflow.
 The custom view can be passed either as a named url (``view_url`` parameter)
 or as name of a method (or property) on the instance being edited
 (``view_method`` parameter).
-In case you provide ``view_method`` it will be called whenever the templatetag is
+In case you provide ``view_method`` it will be called whenever the template tag is
 evaluated with ``request`` as parameter.
 
 The custom view does not need to obey any specific interface; it will get
@@ -251,7 +253,7 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms_plugin cms_plugin-myapp-mymodel-changelist-1">
+    <div class="cms-plugin cms-plugin-myapp-mymodel-changelist-1">
         My Model Instance Name
     </div>
 
@@ -262,8 +264,8 @@ Will render to:
 Filters
 *******
 
-If you need to apply filters to the output value of the templatetag, add quoted
-sequence of filters as in Django :ttag:`django:filter` templatetag:
+If you need to apply filters to the output value of the template tag, add quoted
+sequence of filters as in Django :ttag:`django:filter` template tag:
 
 .. code-block:: html+django
 
@@ -279,7 +281,7 @@ sequence of filters as in Django :ttag:`django:filter` templatetag:
 Context variable
 ****************
 
-The templatetag output can be saved in a context variable for later use, using
+The template tag output can be saved in a context variable for later use, using
 the standard `as` syntax:
 
 .. code-block:: html+django

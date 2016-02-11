@@ -1,15 +1,15 @@
 coverage==3.7.1
 python-coveralls==2.5.0
-docopt==0.6.2
 unittest-xml-reporting==1.11.0
-sphinx
-Pillow==2.7.0
-html5lib>=0.90,!=0.9999,!=0.99999
-django-treebeard==3.0
+Pillow==3.0
+html5lib>0.99999
+django-treebeard==4.0
 argparse
 dj-database-url
 selenium
-djangocms-admin-style==0.2.7
+djangocms-admin-style>=1.0
+django-sekizai>=0.9
+django-classy-tags>=0.7
 -e git+git://github.com/divio/djangocms-column.git#egg=djangocms-column
 -e git+git://github.com/divio/djangocms-style.git#egg=djangocms-style
 -e git+git://github.com/divio/djangocms-file.git#egg=djangocms-file
@@ -20,4 +20,10 @@ djangocms-admin-style==0.2.7
 -e git+git://github.com/divio/djangocms-teaser.git#egg=djangocms-teaser
 -e git+git://github.com/divio/djangocms-video.git#egg=djangocms-video
 -e git+git://github.com/divio/djangocms-link.git#egg=djangocms-link
+https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
+https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
+sphinx
+sphinxcontrib-spelling
 pyflakes
+pyenchant
+

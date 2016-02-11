@@ -1,22 +1,23 @@
 {% extends "admin/cms/page/change_form.html" %}
-{% load i18n %}
+{% load i18n cms_tags admin_urls %}
 
 {% block breadcrumbs %}
-<div class="breadcrumbs">
-	<a href="../../../../../">{% trans "Home" %}</a> &rsaquo;
-	<a href="../../../../">{{ app_label|capfirst|escape }}</a> &rsaquo;
-	<a href="../../../">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
-	<a href="../../">{{ original|truncatewords:"18" }}</a> &rsaquo;
-	<a href="../">{% trans "History" %}</a> &rsaquo;
-	{% blocktrans with opts.verbose_name as verbose_name %}Revert {{ verbose_name }}{% endblocktrans %}
-</div>
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
+        <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
+        <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a> &rsaquo;
+        <a href="{% url opts|admin_urlname:'recoverlist' %}">{{ original|truncatewords:"18" }}</a> &rsaquo;
+        {# FIXME need to add correct history django url #}
+        <a href="../">{% trans "History" %}</a> &rsaquo;
+        {% blocktrans with opts.verbose_name as verbose_name %}Revert {{ verbose_name }}{% endblocktrans %}
+    </div>
 {% endblock %}
 
 {% block content %}
-{% with 1 as is_popup %}{{ block.super }}{% endwith %}
+    {% with 1 as is_popup %}{{ block.super }}{% endwith %}
 {% endblock %}
 
 {% block form_top %}
-<p>{% blocktrans %}Press the save button below to revert to this version of the object.{% endblocktrans %}</p>
-{{ block.super }}
+    <p>{% blocktrans %}Press the save button below to revert to this version of the object.{% endblocktrans %}</p>
+    {{ block.super }}
 {% endblock %}

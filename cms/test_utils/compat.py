@@ -10,7 +10,17 @@ def _skipIf(check, message=''):
             return meth
     return _deco
 
+try:
+    from django.utils import unittest as djut
+except ImportError:
+    djut = None
+
 if hasattr(stdut, 'skipIf'):
     skipIf = stdut.skipIf
 else:
     skipIf = _skipIf
+
+if hasattr(stdut, 'skipUnless'):
+    skipUnless = stdut.skipUnless
+elif hasattr(djut, 'skipUnless'):
+    skipUnless = djut.skipUnless
