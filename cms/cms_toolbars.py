@@ -421,30 +421,32 @@ class PageToolbar(CMSToolbar):
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
             add = [l for l in languages.items() if l not in remove]
             copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
-            if add:
+
+            if add or remove or copy:
                 language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
+
+            if add:
+                add_plugins_menu = language_menu.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER+'-add', _('Add Translation'))
                 page_change_url = admin_reverse('cms_page_change', args=(self.page.pk,))
-                title = _('Add %(language)s Translation')
                 for code, name in add:
                     url = add_url_parameters(page_change_url, language=code)
-                    language_menu.add_modal_item(title % {'language': name}, url=url)
+                    add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
-                language_menu.add_break(REMOVE_PAGE_LANGUAGE_BREAK)
+                remove_plugins_menu = language_menu.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER+'-del', _('Delete Translation'))
                 translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
-                title = _('Delete %(language)s Translation')
                 disabled = len(remove) == 1
                 for code, name in remove:
                     url = add_url_parameters(translation_delete_url, language=code)
-                    language_menu.add_modal_item(title % {'language': name}, url=url, disabled=disabled)
+                    remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
-                language_menu.add_break(COPY_PAGE_LANGUAGE_BREAK)
-                page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
-                title = _('Copy all plugins from %s')
+                copy_plugins_menu = language_menu.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER+'-copy', _('Copy all plugins'))
+                title = _('from %s')
                 question = _('Are you sure you want copy all plugins from %s?')
+                page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
                 for code, name in copy:
-                    language_menu.add_ajax_item(title % name, action=page_copy_url,
+                    copy_plugins_menu.add_ajax_item(title % name, action=page_copy_url,
                                                 data={'source_language': code, 'target_language': self.current_lang},
                                                 question=question % name, on_success=self.toolbar.REFRESH_PAGE)
 
