@@ -154,7 +154,7 @@ Similarly for title extensions::
                 # cycle through the title list
                 for title_extension, url in urls:
                     # adds toolbar items
-                    sub_menu.add_modal_item('icon for title %s' % self._page().get_title(),
+                    sub_menu.add_modal_item('icon for title %s' % self._get_page().get_title(),
                                             url=url, disabled=not self.toolbar.edit_mode)
 
 For details see the :ref:`reference <simplified_extension_toolbar>`
