@@ -199,6 +199,13 @@
 - Add "Structure mode" permission
 
 
+=== 3.0.17 (unreleased) ===
+
+- Fix ExtensionToolbar when language is removed but titles still exists…
+- Fix PageSelectWidget JS syntax
+- Fix cache settings
+
+
 === 3.0.16 (2015-11-24) ===
 
 - Fixed JavaScript error when using ``PageSelectWidget``
