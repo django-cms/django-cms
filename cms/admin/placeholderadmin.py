@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
-from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION
+from cms.constants import PLUGIN_COPY_ACTION, PLUGIN_MOVE_ACTION, SLUG_REGEXP
 from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
@@ -73,7 +73,6 @@ class FrontendEditableAdminMixin(object):
         """
         Register the url for the single field edit view
         """
-        from cms.urls import SLUG_REGEXP
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
@@ -161,7 +160,6 @@ class PlaceholderAdminMixin(object):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
-        from cms.urls import SLUG_REGEXP
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
         pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [

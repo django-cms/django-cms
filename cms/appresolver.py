@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
+from django.db import OperationalError
+
 from cms.utils.compat import DJANGO_1_8
 
 try:
@@ -209,6 +211,8 @@ def get_app_patterns():
         current_site = Site.objects.get_current()
     except Site.DoesNotExist:
         current_site = None
+    except OperationalError:
+        return []
     included = []
 
     # we don't have a request here so get_page_queryset() can't be used,
