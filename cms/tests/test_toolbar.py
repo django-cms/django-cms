@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import datetime
 from operator import attrgetter
 import re
@@ -28,7 +27,7 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
                                                          detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
-                                      ClearURLs, URL_CMS_USERSETTINGS)
+                                      URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
@@ -93,7 +92,7 @@ class ToolbarTestBase(CMSTestCase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
-class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
+class ToolbarMiddlewareTest(ToolbarTestBase):
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
@@ -203,7 +202,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div class="cms-submenu-item cms-submenu-item-title"><span>Generic</span>')
 
-    def test_markup_flash_custom_module(self):
+    def test_markup_link_custom_module(self):
         superuser = self.get_superuser()
         create_page("toolbar-page", "col_two.html", "en", published=True)
         with self.login_user_context(superuser):

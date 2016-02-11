@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.db.models import ManyToManyField
-
-from cms.utils.compat import DJANGO_1_7
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models
+from django.db.models import ManyToManyField
 from django.template.defaultfilters import title
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -157,15 +155,12 @@ class Placeholder(models.Model):
                                   use_cache=use_cache)
 
     def _get_related_objects(self):
-        if DJANGO_1_7:
-            return list(self._meta.get_all_related_objects())
-        else:
-            fields = self._meta._get_fields(
-                forward=False, reverse=True,
-                include_parents=True,
-                include_hidden=False,
-            )
-            return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        fields = self._meta._get_fields(
+            forward=False, reverse=True,
+            include_parents=True,
+            include_hidden=False,
+        )
+        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
     def _get_attached_fields(self):
         """
@@ -179,10 +174,7 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
@@ -198,20 +190,14 @@ class Placeholder(models.Model):
             self._attached_field_cache = None
             relations = self._get_related_objects()
             for rel in relations:
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent == Page or parent == StaticPlaceholder:
                     relations.insert(0, relations.pop(relations.index(rel)))
             for rel in relations:
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                if DJANGO_1_7:
-                    parent = rel.model
-                else:
-                    parent = rel.related_model
+                parent = rel.related_model
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:

@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from copy import deepcopy
 import re
 import sys
@@ -14,9 +13,8 @@ from django.test.utils import override_settings
 from cms.api import create_page, create_title, publish_page
 from cms.models import PagePermission, UserSettings, Placeholder
 from cms.page_rendering import _handle_no_page
-from cms.test_utils.testcases import CMSTestCase, ClearURLs
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 from menus.menu_pool import menu_pool
@@ -204,7 +202,7 @@ class ViewTests(CMSTestCase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
-class ContextTests(ClearURLs, CMSTestCase):
+class ContextTests(CMSTestCase):
 
     def test_context_current_page(self):
         """
@@ -214,14 +212,9 @@ class ContextTests(ClearURLs, CMSTestCase):
         from django.template import context
 
         page_template = "nav_playground.html"
-        if DJANGO_1_7:
-            original_context = {'TEMPLATE_CONTEXT_PROCESSORS': settings.TEMPLATE_CONTEXT_PROCESSORS}
-            override = {'TEMPLATE_CONTEXT_PROCESSORS': list(settings.TEMPLATE_CONTEXT_PROCESSORS)}
-            override['TEMPLATE_CONTEXT_PROCESSORS'].remove("cms.context_processors.cms_settings")
-        else:
-            original_context = {'TEMPLATES': settings.TEMPLATES}
-            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-            override['TEMPLATES'][0]['OPTIONS']['context_processors'].remove("cms.context_processors.cms_settings")
+        original_context = {'TEMPLATES': settings.TEMPLATES}
+        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'].remove("cms.context_processors.cms_settings")
         page = create_page("page", page_template, "en", published=True)
         page_2 = create_page("page-2", page_template, "en", published=True,
                              parent=page)

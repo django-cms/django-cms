@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import json
 
 from djangocms_text_ckeditor.models import Text
@@ -223,7 +222,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
         original_plugins = (placeholder.get_plugins().order_by('position', 'path'))
 
-        CMSPlugin.objects.update(position=None)
+        CMSPlugin.objects.update(position=0)
         CMSPlugin.fix_tree()
 
         new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))

@@ -1,18 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
-from cms.utils.compat import DJANGO_1_8
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Python < 2.7
-    from django.utils.datastructures import SortedDict as OrderedDict
-try:
-    from importlib import import_module
-except ImportError:
-    # Python < 2.7
-    from django.utils.importlib import import_module
+from collections import OrderedDict
+from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -24,6 +12,7 @@ from django.utils.translation import get_language
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.i18n import force_language, get_language_list
 
 

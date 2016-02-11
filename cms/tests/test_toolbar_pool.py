@@ -1,8 +1,6 @@
+from collections import OrderedDict
+
 from django.core.exceptions import ImproperlyConfigured
-try:
-    from collections import OrderedDict
-except:
-    from django.utils.datastructures import SortedDict as OrderedDict
 
 from cms import api
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered

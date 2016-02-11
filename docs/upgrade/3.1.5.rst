@@ -41,4 +41,3 @@ Action required
 CMS 3.1.5 is not compatible with djangocms-text-ckeditor < 2.7.1.
 If you're using djangocms-text-ckeditor, please upgrade to 2.7.1 or up.
 Keep in mind that djangocms-text-ckeditor >= 2.8 is compatible only with
-CMS 3.2.x releases.

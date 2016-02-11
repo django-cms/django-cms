@@ -2,7 +2,6 @@
 import json
 import sys
 import warnings
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_8
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,8 +9,9 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse, clear_url_caches
-from django.template.context import Context, RequestContext
+from django.core.urlresolvers import reverse
+from django.template import engines
+from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.utils.timezone import now
@@ -21,6 +21,7 @@ from menus.menu_pool import menu_pool
 
 from cms.models import Page
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.permissions import set_current_user
 
 
@@ -399,14 +400,8 @@ class BaseCMSTestCase(object):
     assertWarns = failUnlessWarns
 
     def render_template_obj(self, template, context, request):
-        try:
-            from django.template import engines
-            template_obj = engines['django'].from_string(template)
-            return template_obj.render(context, request)
-        except ImportError:
-            from django.template import Template
-            template_obj = Template(template)
-            return template_obj.render(RequestContext(request, context))
+        template_obj = engines['django'].from_string(template)
+        return template_obj.render(context, request)
 
     def apphook_clear(self):
         from cms.apphook_pool import apphook_pool
@@ -422,18 +417,3 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 class TransactionCMSTestCase(BaseCMSTestCase, testcases.TransactionTestCase):
     pass
-
-if DJANGO_1_6:
-    class ClearURLs(object):
-        @classmethod
-        def setUpClass(cls):
-            clear_url_caches()
-            super(ClearURLs, cls).setUpClass()
-
-        @classmethod
-        def tearDownClass(cls):
-            super(ClearURLs, cls).tearDownClass()
-            clear_url_caches()
-else:
-    class ClearURLs(object):
-        pass

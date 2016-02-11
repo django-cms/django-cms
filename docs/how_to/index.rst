@@ -15,7 +15,6 @@ the same territory as the :doc:`/introduction/index`, but in more detail.
     templates
     extending_page_title
     toolbar
-    using_south
     testing
     placeholders
     caching

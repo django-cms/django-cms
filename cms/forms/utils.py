@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-from collections import defaultdict
-try:
-    from collections import OrderedDict
-except ImportError:
-    from django.utils.datastructures import SortedDict as OrderedDict
+from collections import OrderedDict, defaultdict
 
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save, post_delete

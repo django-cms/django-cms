@@ -293,8 +293,8 @@ clause.
     You cannot name your model fields the same as any installed plugins lower-
     cased model name, due to the implicit one-to-one relation Django uses for
     sub-classed models. If you use all core plugins, this includes: ``file``,
-    ``flash``, ``googlemap``, ``link``, ``picture``, ``snippetptr``,
-    ``teaser``, ``twittersearch``, ``twitterrecententries`` and ``video``.
+    ``googlemap``, ``link``, ``picture``, ``snippetptr``, ``teaser``,
+    ``twittersearch``, ``twitterrecententries`` and ``video``.
 
     Additionally, it is *recommended* that you avoid using ``page`` as a model
     field, as it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`,
@@ -776,7 +776,6 @@ Example::
             urlpatterns = [
                 url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
             ]
-            urlpatterns = patterns('', *urlpatterns)
             return urlpatterns
 
         def create_alias(self, request):
@@ -873,4 +872,3 @@ For Django migrations add this:
             run_before = [
                 ('cms', '0004_auto_20140924_1038')
             ]
-

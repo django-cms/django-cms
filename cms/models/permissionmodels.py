@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.apps import apps
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
@@ -10,25 +11,15 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
-from cms.utils.compat import DJANGO_1_6
 from cms.utils.helpers import reversion_register
 
 # Cannot use contrib.auth.get_user_model() at compile time.
 user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)
 User = None
-if DJANGO_1_6:
-    from django.utils import importlib
-    for app in settings.INSTALLED_APPS:
-        if app.endswith(user_app_name):
-            user_app_models = importlib.import_module(app + ".models")
-            User = getattr(user_app_models, user_model_name)
-            break
-else:
-    from django.apps import apps
-    try:
-        User = apps.get_registered_model(user_app_name, user_model_name)
-    except KeyError:
-        pass
+try:
+    User = apps.get_registered_model(user_app_name, user_model_name)
+except KeyError:
+    pass
 if User is None:
     raise ImproperlyConfigured(
         "You have defined a custom user model %s, but the app %s is not "
