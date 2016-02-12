@@ -178,7 +178,7 @@ def render_placeholder(placeholder, context_to_copy, name_fallback="Placeholder"
     if content:
         content = mark_safe("".join(content))
     elif default:
-        #should be nodelist from a template
+        # should be nodelist from a template
         content = mark_safe(default.render(context_to_copy))
     else:
         content = ''
