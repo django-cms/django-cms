@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-from operator import attrgetter
 import re
 
 from django.contrib import admin
