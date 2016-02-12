@@ -677,15 +677,18 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(sorted(sub_menu), sorted(items))
 
     def test_remove_language(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en",
-                           published=True)
+        page = create_page(
+            "toolbar-page", "nav_playground.html", "en", published=True
+        )
         create_title(title="de page", language="de", page=page)
         create_title(title="fr page", language="fr", page=page)
 
         request = self.get_page_request(page, self.get_staff(), '/', edit=True)
 
-        self.assertMenuItems(request, LANGUAGE_MENU_IDENTIFIER,
-            'Delete Translation', ['German...', 'English...', 'French...'])
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Delete Translation',
+            ['German...', 'English...', 'French...']
+        )
 
         reduced_langs = {
             1: [
@@ -704,19 +707,48 @@ class ToolbarTests(ToolbarTestBase):
         }
 
         with self.settings(CMS_LANGUAGES=reduced_langs):
-            self.assertMenuItems(request, LANGUAGE_MENU_IDENTIFIER,
-                'Delete Translation', ['English...', 'French...'])
+            self.assertMenuItems(
+                request, LANGUAGE_MENU_IDENTIFIER, 'Delete Translation',
+                ['English...', 'French...']
+            )
 
     def test_add_language(self):
         page = create_page("tbp", "nav_playground.html", "en", published=True)
         request = self.get_page_request(page, self.get_staff(), '/', edit=True)
-        self.assertMenuItems(request, LANGUAGE_MENU_IDENTIFIER,
-            'Add Translation', [u'German...', u'Brazilian Portuguese...', u'French...', u'Espa\xf1ol...'])
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
+            [u'German...', u'Brazilian Portuguese...', u'French...', u'Espa\xf1ol...']
+        )
 
         create_title(title="de page", language="de", page=page)
         create_title(title="fr page", language="fr", page=page)
-        self.assertMenuItems(request, LANGUAGE_MENU_IDENTIFIER,
-            'Add Translation', [u'Brazilian Portuguese...', u'Espa\xf1ol...'])
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
+            [u'Brazilian Portuguese...', u'Espa\xf1ol...']
+        )
+
+    def test_copy_plugins(self):
+        page = create_page("tbp", "nav_playground.html", "en", published=True)
+        create_title('de', 'de page', page)
+        add_plugin(page.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
+        create_title('fr', 'fr page', page)
+        add_plugin(page.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
+        page.publish('de')
+        page.publish('fr')
+
+        staff = self.get_staff()
+
+        request = self.get_page_request(page, staff, '/', edit=True)
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
+            [u'from German', u'from French']
+        )
+
+        request = self.get_page_request(page, staff, '/', edit=True, lang_code='de')
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
+            [u'from English', u'from French']
+        )
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
