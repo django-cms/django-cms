@@ -668,12 +668,15 @@ class ToolbarTests(ToolbarTestBase):
     def assertMenuItems(self, request, menu_id, name, items=None):
         toolbar = CMSToolbar(request)
         toolbar.populate()
-        menu = dict((force_text(getattr(item, 'name', '|')), item)
-                for item in toolbar.get_menu(menu_id).get_items())
+        menu = dict(
+            (force_text(getattr(item, 'name', '|')), item)
+            for item in toolbar.get_menu(menu_id).get_items()
+        )
         self.assertIn(name, list(menu))
         if items is not None:
-            sub_menu = list(force_text(getattr(item, 'name', '|'))
-                    for item in menu[name].get_items())
+            sub_menu = list(
+                force_text(getattr(item, 'name', '|')) for item in menu[name].get_items()
+            )
             self.assertEqual(sorted(sub_menu), sorted(items))
 
     def test_remove_language(self):
