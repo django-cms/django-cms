@@ -2,7 +2,7 @@
 from __future__ import with_statement
 
 from django.core.cache import cache
-from django.template import Template, RequestContext
+from django.template import Template
 from django.test.utils import override_settings
 from sekizai.context import SekizaiContext
 
@@ -168,10 +168,6 @@ class RenderingTestCase(CMSTestCase):
         self.test_page5 = self.reload(p5.publisher_public)
         self.test_page6 = self.reload(p6.publisher_public)
 
-    def get_context(self, page, context_vars={}):
-        request = self.get_request(page)
-        return RequestContext(request, context_vars)
-
     def get_request(self, page, *args, **kwargs):
         request = super(RenderingTestCase, self).get_request(*args, **kwargs)
         request.current_page = page
@@ -182,10 +178,9 @@ class RenderingTestCase(CMSTestCase):
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, template, page, context_vars={}):
-        c = self.get_context(page, context_vars)
-        t = Template(template)
-        r = t.render(c)
-        return self.strip_rendered(r)
+        request = self.get_request(page)
+        output = self.render_template_obj(template, context_vars, request)
+        return self.strip_rendered(output)
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def test_details_view(self):
