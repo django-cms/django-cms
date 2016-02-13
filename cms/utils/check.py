@@ -319,10 +319,15 @@ def check_copy_relations(output):
                         c_to_s(extension),
                         c_to_s(rel.related.parent_model),
                     ))
+                elif DJANGO_1_8:
+                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                        c_to_s(extension),
+                        c_to_s(rel.related.model),
+                    ))
                 else:
                     section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        extension,
-                        rel.remote_field,
+                        c_to_s(extension),
+                        c_to_s(rel.remote_field.model),
                     ))
             for rel in extension._get_related_objects():
                 if rel.model != extension:
