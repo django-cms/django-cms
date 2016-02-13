@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models import signals, Model
+from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import six, timezone
@@ -22,6 +22,7 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.plugin_rendering import PluginContext, render_plugin
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.helpers import reversion_register
 from cms.utils.urlutils import admin_reverse
 
@@ -376,6 +377,18 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         have to do this themselves!
         """
         pass
+
+    @classmethod
+    def _get_related_objects(cls):
+        if DJANGO_1_7:
+            return list(cls._meta.get_all_related_objects())
+        else:
+            fields = cls._meta._get_fields(
+                forward=False, reverse=True,
+                include_parents=True,
+                include_hidden=False,
+            )
+            return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
     def has_change_permission(self, request):
         page = self.placeholder.page if self.placeholder else None
