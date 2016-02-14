@@ -276,7 +276,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_start_plugins = CMSPlugin.objects.all().count()
 
         out = StringIO()
-        management.call_command('cms', 'copy-lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
+        )
         pages = Page.objects.on_site(site).drafts()
         for page in pages:
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
@@ -324,7 +326,10 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_start_plugins = CMSPlugin.objects.filter(placeholder__in=phs).count()
 
         out = StringIO()
-        management.call_command('cms', 'copy-site', '--from-site=%s' % site_1_pk, '--to-site=%s' % site_2_pk, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'site', '--from-site=%s' % site_1_pk, '--to-site=%s' % site_2_pk,
+            stdout=out
+        )
         for page in Page.objects.on_site(site_1_pk).drafts():
             page.publish('en')
         for page in Page.objects.on_site(site_2_pk).drafts():
@@ -375,7 +380,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         create_title("de", "root page de", root_page)
 
         out = StringIO()
-        management.call_command('cms', 'copy-lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
+        )
         pages = Page.objects.on_site(site).drafts()
         for page in pages:
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
@@ -403,7 +410,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         add_plugin(ph, "TextPlugin", "de", body="Hello World")
 
         out = StringIO()
-        management.call_command('cms', 'copy-lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
+        )
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # one placeholder (with 7 plugins) is skipped, so the difference must be 6
@@ -428,7 +437,10 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         text_de_orig, _ = root_plugins.get(language='de', plugin_type='TextPlugin').get_plugin_instance()
 
         out = StringIO()
-        management.call_command('cms', 'copy-lang', '--from-lang=en', '--to-lang=de', '--force', interactive=False, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--force', interactive=False,
+            stdout=out
+        )
 
         CMSPlugin.objects.filter(placeholder=root_page.placeholders.get(slot="body"))
 
@@ -444,7 +456,10 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         """
         site = 1
         out = StringIO()
-        management.call_command('cms', 'copy-lang', '--from-lang=de', '--to-lang=fr', verbosity=3, interactive=False, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=de', '--to-lang=fr', verbosity=3,
+            interactive=False, stdout=out
+        )
         text = out.getvalue()
         page_count = Page.objects.on_site(site).drafts().count() + 1
         for idx in range(1, page_count):
@@ -475,7 +490,10 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_site2_plugins = CMSPlugin.objects.all().count() - number_start_plugins
 
         out = StringIO()
-        management.call_command('cms', 'copy-lang', '--from-lang=de', '--to-lang=fr', '--site=%s' % site_active, interactive=False, stdout=out)
+        management.call_command(
+            'cms', 'copy', 'lang', '--from-lang=de', '--to-lang=fr', '--site=%s' % site_active,
+            interactive=False, stdout=out
+        )
 
         for page in Page.objects.on_site(site_other).drafts():
             self.assertEqual(origina_site1_langs[page.pk], set(page.get_languages()))
@@ -495,6 +513,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
     def test_copy_bad_languages(self):
         out = StringIO()
         with self.assertRaises(CommandError) as command_error:
-            management.call_command('cms', 'copy-lang', '--from-lang=it', '--to-lang=fr', interactive=False, stdout=out)
+            management.call_command(
+                'cms', 'copy', 'lang', '--from-lang=it', '--to-lang=fr', interactive=False,
+                stdout=out
+            )
 
         self.assertEqual(str(command_error.exception), 'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')

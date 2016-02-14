@@ -89,12 +89,24 @@ It has two sub-commands:
     The uninstall commands **permanently delete** data from your database.
     You should make a backup of your database before using them!
 
+.. _cms-copy-command:
+
+``cms copy``
+============
+
+The ``copy`` command is used to copy content from one language or site to antther.
+
+It has two sub-commands:
+
+* ``cms copy lang`` copy content to a given language.
+* ``cms copy site`` copy pages and content to a given site.
+
 .. _cms-copy-lang-command:
 
-``cms copy-lang``
+``cms copy lang``
 =================
 
-The ``copy-lang`` subcommand can be used to copy content (titles and plugins)
+The ``copy lang`` subcommand can be used to copy content (titles and plugins)
 from one language to another.
 By default the subcommand copy content from the current site
 (e.g. the value of ``SITE_ID``) and only if the target
@@ -115,14 +127,14 @@ It accepts the following options
 
 Example::
 
-    cms copy-lang --from-lang=en --to-lang=de --force --site=2 --verbosity=2
+    cms copy lang --from-lang=en --to-lang=de --force --site=2 --verbosity=2
 
 .. _cms-copy-site-command:
 
-``cms copy-site``
+``cms copy site``
 =================
 
-The ``copy-site`` subcommand can be used to copy content (pages and plugins)
+The ``copy site`` subcommand can be used to copy content (pages and plugins)
 from one site to another.
 The subcommand copy content from the ``from-site`` to ``to-site``; please note
 that static placeholders are copied as they are shared across sites.
@@ -136,7 +148,7 @@ You must provide two arguments:
 
 Example::
 
-    cms copy-site --from-site=1 --to-site=2
+    cms copy site --from-site=1 --to-site=2
 
 *******************
 Moderation commands

@@ -10,8 +10,7 @@ from .subcommands.moderator import ModeratorCommand
 from .subcommands.publisher_publish import PublishCommand
 from .subcommands.tree import FixTreeCommand
 from .subcommands.uninstall import UninstallCommand
-from .subcommands.copy_lang import CopyLangCommand
-from .subcommands.copy_site import CopySiteCommand
+from .subcommands.copy import CopyCommand
 from .subcommands.delete_orphaned_plugins import DeleteOrphanedPluginsCommand
 
 
@@ -19,8 +18,7 @@ class Command(SubcommandsCommand):
     command_name = 'cms'
     subcommands = OrderedDict((
         ('check', CheckInstallation),
-        ('copy-lang', CopyLangCommand),
-        ('copy-site', CopySiteCommand),
+        ('copy', CopyCommand),
         ('delete-orphaned-plugins', DeleteOrphanedPluginsCommand),
         ('fix-tree', FixTreeCommand),
         ('list', ListCommand),
