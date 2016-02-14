@@ -40,16 +40,21 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
 
-    If a template is given, it will try
-    CMS_PLACEHOLDER_CONF['template placeholder'] and
-    CMS_PLACEHOLDER_CONF['placeholder'], if no template is given only the latter
-    is checked.
+    Resulting value will be the last from:
+
+    CMS_PLACEHOLDER_CONF['*'] (global)
+    CMS_PLACEHOLDER_CONF['template'] (if template is given)
+    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
     if placeholder:
         keys = []
         if template:
             keys.append("%s %s" % (template, placeholder))
         keys.append(placeholder)
+        if template:
+            keys.append(template)
+        keys.append('*')
         for key in keys:
             conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
             if not conf:
