@@ -817,8 +817,8 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
 
-@override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
 class EditModelTemplateTagTest(ToolbarTestBase):
+    urls = 'cms.test_utils.project.placeholderapp_urls'
     edit_fields_rx = "(\?|&amp;)edit_fields=%s"
 
     def tearDown(self):
