@@ -5,7 +5,8 @@
 // handled through theming after the "PAGETREE THEME" section in this file.
 
 .cms-pagetree-container {
-    overflow: auto;
+    // overflow: auto;
+    
     margin-bottom: $pagetree-bottom-offset;
 }
 .cms-pagetree-container,
