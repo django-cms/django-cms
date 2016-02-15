@@ -94,7 +94,7 @@ It has two sub-commands:
 ``cms copy``
 ============
 
-The ``copy`` command is used to copy content from one language or site to antther.
+The ``copy`` command is used to copy content from one language or site to another.
 
 It has two sub-commands:
 
