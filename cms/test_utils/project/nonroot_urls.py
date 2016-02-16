@@ -32,7 +32,6 @@ else:
         url(r'^content/', include('cms.urls')),
     )
 
-
 if settings.DEBUG and is_installed('debug_toolbar'):
     import debug_toolbar
     urlpatterns += [

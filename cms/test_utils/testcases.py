@@ -403,7 +403,7 @@ class BaseCMSTestCase(object):
             if isinstance(template, string_types):
                 template = engines['django'].from_string(template)
             return template.render(context, request)
-        except ImportError:
+        except ImportError:  # DJANGO_1_7
             from django.template import Template
             if isinstance(template, string_types):
                 template = Template(template)

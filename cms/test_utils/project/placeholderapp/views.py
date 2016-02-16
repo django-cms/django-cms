@@ -15,8 +15,8 @@ def example_view(request):
     return render(request, 'placeholderapp.html', context)
 
 
-def _base_detail(request, instance, template_name='detail.html', item_name="char_1",
-                 template_string='',):
+def _base_detail(request, instance, template_name='detail.html',
+                 item_name="char_1", template_string='',):
     context = {}
     context['instance'] = instance
     context['instance_class'] = instance.__class__()
