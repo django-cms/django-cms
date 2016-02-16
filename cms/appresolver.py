@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
 
-from django.db import OperationalError
+from django.db import OperationalError, ProgrammingError
 
 from cms.utils.compat import DJANGO_1_8
 
@@ -211,7 +211,8 @@ def get_app_patterns():
         current_site = Site.objects.get_current()
     except Site.DoesNotExist:
         current_site = None
-    except OperationalError:
+    except (OperationalError, ProgrammingError):
+        # ignore if DB is not ready
         return []
     included = []
 
