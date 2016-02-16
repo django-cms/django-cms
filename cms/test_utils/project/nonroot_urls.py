@@ -34,11 +34,6 @@ else:
         url(r'^example/$', example_view, name='example_view'),
     )
 
-else:
-    urlpatterns += i18n_patterns(
-        url(r'^admin/', include(admin.site.urls)),
-        url(r'^content/', include('cms.urls')),
-    )
 
 if settings.DEBUG and is_installed('debug_toolbar'):
     import debug_toolbar
