@@ -26,4 +26,4 @@ sphinx
 sphinxcontrib-spelling
 pyflakes
 pyenchant
-
+mock>=1.3.0,<2.0.0

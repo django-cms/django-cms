@@ -4,6 +4,7 @@ import datetime
 from operator import attrgetter
 import re
 
+from mock import patch, Mock
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -57,7 +58,7 @@ class ToolbarTestBase(CMSTestCase):
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)
-        if hasattr(request,'toolbar'):
+        if hasattr(request, 'toolbar'):
             request.toolbar.populate()
         return request
 
@@ -120,12 +121,31 @@ class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
+    @override_settings(CMS_TOOLBAR_HIDE=False)
+    def test_is_cms_request_true_if_setting_toolbar_hide_false(self):
+        request = self.get_page_request(None, self.get_anon(), '/')
+        assert ToolbarMiddleware().is_cms_request(request) is True
+
     @override_settings(CMS_TOOLBAR_HIDE=True)
-    def test_app_setted_hide_toolbar_in_cms_urls(self):
-        page = create_page('foo', 'col_two.html', 'en', published=True)
-        page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
-        request = self.get_page_request(page, self.get_anon())
-        self.assertFalse(hasattr(request, 'toolbar'))
+    def test_is_cms_request_false_if_request_url_cannot_resolve(self):
+        request = self.get_page_request(None, self.get_anon(), '/bad_path')
+        assert ToolbarMiddleware().is_cms_request(request) is False
+
+    @patch('cms.middleware.toolbar.resolve')
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_is_cms_request_false_if_resolved_url_name_is_not_cms_url(
+        self, mock_resolve
+    ):
+        mock_resolve.return_value = Mock(url_name='some-page')
+        assert ToolbarMiddleware().is_cms_request(Mock(())) is False
+
+    @patch('cms.middleware.toolbar.resolve')
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_is_cms_request_true_if_resolved_url_name_is_cms_url(
+        self, mock_resolve
+    ):
+        mock_resolve.return_value = Mock(url_name='pages-root')
+        assert ToolbarMiddleware().is_cms_request(Mock()) is True
 
 
 @override_settings(CMS_PERMISSION=False)
