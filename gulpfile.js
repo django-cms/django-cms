@@ -42,7 +42,6 @@ var PROJECT_PATTERNS = {
     ],
     sass: [
         PROJECT_PATH.sass + '/**/*.{scss,sass}',
-        PROJECT_PATH.js + '/libs/jstree/themes/**/*.{scss,sass}',
     ],
     icons: [
         PROJECT_PATH.icons + '/src/*.svg'
