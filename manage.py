@@ -342,9 +342,9 @@ if __name__ == '__main__':
         CMS_PERMISSION=True,
         CMS_PUBLIC_FOR='all',
         CMS_CACHE_DURATIONS={
-            'menus': 0,
-            'content': 0,
-            'permissions': 0,
+            'menus': 60,
+            'content': 60,
+            'permissions': 60,
         },
         CMS_APPHOOKS=[],
         CMS_PLUGIN_PROCESSORS=(),
