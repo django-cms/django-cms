@@ -191,6 +191,16 @@ def get_patterns_for_title(path, title):
 
 
 def get_app_patterns():
+    try:
+        return _get_app_patterns()
+    except (OperationalError, ProgrammingError):
+        # ignore if DB is not ready
+        # Starting with Django 1.9 this code gets called even when creating
+        # or running migrations. So in many cases the DB will not be ready yet.
+        return []
+
+
+def _get_app_patterns():
     """
     Get a list of patterns for all hooked apps.
 
@@ -211,9 +221,6 @@ def get_app_patterns():
         current_site = Site.objects.get_current()
     except Site.DoesNotExist:
         current_site = None
-    except (OperationalError, ProgrammingError):
-        # ignore if DB is not ready
-        return []
     included = []
 
     # we don't have a request here so get_page_queryset() can't be used,
