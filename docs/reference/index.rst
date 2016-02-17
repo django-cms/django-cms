@@ -5,7 +5,7 @@ Reference
 Technical reference material.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     configuration
     navigation
