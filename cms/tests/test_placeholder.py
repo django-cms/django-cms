@@ -30,17 +30,19 @@ from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
+from cms.test_utils.project.placeholderapp.exceptions import PlaceholderHookException
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
     Example1,
     MultilingualExample1,
     TwoPlaceholderExample,
-)
+    CharPksExample)
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
@@ -998,6 +1000,10 @@ class PlaceholderAdminTestBase(CMSTestCase):
         admin.autodiscover()
         return admin.site._registry[Example1]
 
+    def get_charpk_example_admin(self):
+        admin.autodiscover()
+        return admin.site._registry[CharPksExample]
+
     def get_post_request(self, data):
         return self.get_request(post_data=data)
 
@@ -1151,6 +1157,102 @@ class PlaceholderAdminTest(PlaceholderAdminTestBase):
                 self.assertEqual(response.status_code, 200)
                 text_plugin = Text.objects.get(pk=plugin_id)
                 self.assertEqual('Hello World', text_plugin.body)
+
+    def test_placeholder_post_move_hook_resolve(self):
+        # We test that moving a plugin from placeholder A
+        # registered with admin A calls the move plugin hooks
+        # on the target placeholder's registered admin.
+        example_admin = self.get_admin()
+
+        exception = PlaceholderHookException
+        message = 'move plugin hook has been called.'
+
+        example_1 = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four',
+        )
+        placeholder_1 = example_1.placeholder
+
+        example_2 = CharPksExample.objects.create(
+            char_1='one',
+            slug='two',
+        )
+        placeholder_2 = example_2.placeholder_1
+
+        data = {
+            'placeholder': placeholder_1,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+
+        # Add plugin to placeholder 1
+        plugin = add_plugin(**data)
+
+        superuser = self.get_superuser()
+
+        with UserLoginContext(self, superuser):
+            with self.assertRaisesMessage(exception, message):
+                # move plugin to placeholder_2
+                # this will cause the Example1 admin
+                # to resolve the attached model/admin of the target placeholder
+                # and call it's hook.
+                request = self.get_post_request({
+                    'placeholder_id': placeholder_2.pk,
+                    'plugin_id': plugin.pk,
+                })
+                example_admin.move_plugin(request)
+
+    def test_placeholder_post_copy_hook_resolve(self):
+        # We test that copying a plugin from placeholder A
+        # registered with admin A calls the copy plugin hooks
+        # on the target placeholder's registered admin.
+        example_admin = self.get_admin()
+
+        exception = PlaceholderHookException
+        message = 'copy plugin hook has been called.'
+
+        example_1 = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four',
+        )
+        placeholder_1 = example_1.placeholder
+
+        example_2 = CharPksExample.objects.create(
+            char_1='one',
+            slug='two',
+        )
+        placeholder_2 = example_2.placeholder_1
+
+        data = {
+            'placeholder': placeholder_1,
+            'plugin_type': 'LinkPlugin',
+            'language': 'en',
+        }
+
+        # Add plugin to placeholder 1
+        plugin = add_plugin(**data)
+
+        superuser = self.get_superuser()
+
+        with UserLoginContext(self, superuser):
+            with self.assertRaisesMessage(exception, message):
+                # move plugin to placeholder_2
+                # this will cause the Example1 admin
+                # to resolve the attached model/admin of the target placeholder
+                # and call it's hook.
+                request = self.get_post_request({
+                    'source_language': plugin.language,
+                    'source_placeholder_id': placeholder_1.pk,
+                    'source_plugin_id': plugin.pk,
+                    'target_language': plugin.language,
+                    'target_placeholder_id': placeholder_2.pk,
+                })
+                request.toolbar = CMSToolbar(request)
+                example_admin.copy_plugins(request)
 
 
 class PlaceholderPluginPermissionTests(PlaceholderAdminTestBase):
@@ -1346,6 +1448,13 @@ class PlaceholderConfTests(TestCase):
 
 
 class PlaceholderI18NTest(CMSTestCase):
+
+    def _get_url(self, app, model, pk):
+        if DJANGO_1_8:
+            return '/de/admin/%s/%s/%d/' % (app, model, pk)
+        else:
+            return '/de/admin/%s/%s/%d/change/' % (app, model, pk)
+
     def _testuser(self):
         User = get_user_model()
         u = User(is_staff=True, is_active=True, is_superuser=True)
@@ -1359,7 +1468,7 @@ class PlaceholderI18NTest(CMSTestCase):
         self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/multilingualexample1/%d/' % ex.pk)
+        response = self.client.get(self._get_url('placeholderapp', 'multilingualexample1', ex.pk))
         self.assertContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_no_tabs(self):
@@ -1372,7 +1481,7 @@ class PlaceholderI18NTest(CMSTestCase):
         self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/example1/%d/' % ex.pk)
+        response = self.client.get(self._get_url('placeholderapp', 'example1', ex.pk))
         self.assertNotContains(response, '<input type="hidden" class="language_button selected" name="de" />')
 
     def test_placeholder_tabs(self):
@@ -1385,6 +1494,6 @@ class PlaceholderI18NTest(CMSTestCase):
         self._testuser()
         self.client.login(username='test', password='test')
 
-        response = self.client.get('/de/admin/placeholderapp/twoplaceholderexample/%d/' % ex.pk)
+        response = self.client.get(self._get_url('placeholderapp', 'twoplaceholderexample', ex.pk))
         self.assertNotContains(response,
                                """<input type="button" onclick="trigger_lang_button(this,'./?language=en');" class="language_button selected" id="debutton" name="en" value="English">""")

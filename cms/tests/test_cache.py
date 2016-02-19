@@ -107,7 +107,7 @@ class CacheTestCase(CMSTestCase):
         rctx = RequestContext(request)
         with self.assertNumQueries(4):
             render = template.render(rctx)
-        with self.assertNumQueries(FuzzyInt(14, 18)):
+        with self.assertNumQueries(FuzzyInt(14, 19)):
             response = self.client.get('/en/')
             resp1 = response.content.decode('utf8').split("$$$")[1]
 

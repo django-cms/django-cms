@@ -26,7 +26,9 @@ Community
 
 You can join us online:
 
-* in our IRC channel, #django-cms, on ``irc.freenode.net``
+* in our IRC channel, #django-cms, on ``irc.freenode.net``. If you don't have an IRC client, you can
+  `join our IRC channel using the KiwiIRC web client
+  <https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
 * on our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ for
   **general** django CMS questions and discussion
 * on our `django CMS developers email list

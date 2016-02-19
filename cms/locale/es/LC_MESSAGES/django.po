@@ -3,22 +3,30 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# 2lopez <roberto.lopez.lopez@gmail.com>, 2013
 # Adolfo Gómez <dkmaster@dkmon.com>, 2014
 # Cynthia, 2015
+# Cynthia, 2015
+# danirus <danirus@eml.cc>, 2011
 # danirus <danirus@eml.cc>, 2011
 # Diego Romero Pozo <romero.pozo2012@gmail.com>, 2015
 # Adolfo Gómez <dkmaster@dkmon.com>, 2014
 # Eduardo Ludi <eduludi@gmail.com>, 2013
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
 # mariocesar <mariocesar.c50@gmail.com>, 2011
+# mariocesar <mariocesar.c50@gmail.com>, 2011
 # Óscar M. Lage <info@oscarmlage.com>, 2013
+# Pablo, 2015
 # Pablo, 2015
 # Pavel Nunez <pndeschamps@gmail.com>, 2013
 # Pedro Gracia <lasarux@neuroomante.com>, 2011
 # rafadev <rafadev@gmail.com>, 2011
+# rafadev <rafadev@gmail.com>, 2011
 # 2lopez <roberto.lopez.lopez@gmail.com>, 2013
 # xyos <slayerjairo@gmail.com>, 2011
 # Williams Mendez <wmendez27@gmail.com>, 2012
+# Williams Mendez <wmendez27@gmail.com>, 2012
+# xyos <slayerjairo@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
@@ -26,7 +34,7 @@ msgstr ""
 "POT-Creation-Date: 2015-11-11 18:31+0100\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
-"Language-Team: Spanish (http://www.transifex.com/digi604/django-cms/language/es/)\n"
+"Language-Team: Spanish (http://www.transifex.com/divio/django-cms/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

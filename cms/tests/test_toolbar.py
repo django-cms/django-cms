@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import datetime
-from operator import attrgetter
 import re
 
 from django.contrib import admin
@@ -14,6 +13,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils.functional import lazy
 from django.utils.translation import ugettext_lazy as _, override
+from django.utils.encoding import force_text
 
 from cms.api import create_page, create_title, add_plugin
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
@@ -26,7 +26,8 @@ from cms.test_utils.project.placeholderapp.views import (detail_view, detail_vie
                                                          detail_view_multi,
                                                          detail_view_multi_unfiltered, ClassDetail)
 from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE)
+                                      URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE,
+                                      URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
@@ -92,36 +93,38 @@ class ToolbarTestBase(CMSTestCase):
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.nonroot_urls')
 class ToolbarMiddlewareTest(ToolbarTestBase):
-    @override_settings(CMS_APP_NAME=None)
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertTrue(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME=None)
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_cms_urls(self):
         page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME='cms')
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_hide_toolbar_in_non_cms_urls_toolbar_hide_unsetted(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertTrue(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME='cms')
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_hide_toolbar_in_non_cms_urls(self):
         request = self.get_page_request(None, self.get_anon(), '/')
         self.assertFalse(hasattr(request, 'toolbar'))
 
-    @override_settings(CMS_APP_NAME='cms')
     def test_app_setted_show_toolbar_in_cms_urls(self):
         page = create_page('foo', 'col_two.html', 'en', published=True)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
+
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_app_setted_hide_toolbar_in_cms_urls(self):
+        page = create_page('foo', 'col_two.html', 'en', published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
+        request = self.get_page_request(page, self.get_anon())
+        self.assertFalse(hasattr(request, 'toolbar'))
 
 
 @override_settings(CMS_PERMISSION=False)
@@ -479,7 +482,7 @@ class ToolbarTests(ToolbarTestBase):
     def test_user_settings(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/admin/cms/usersettings/')
+            response = self.client.get(URL_CMS_USERSETTINGS)
             self.assertEqual(response.status_code, 200)
 
     def test_remove_lang(self):
@@ -662,21 +665,33 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
 
-    def test_remove_language(self):
-        item_name = attrgetter('name')
+    def assertMenuItems(self, request, menu_id, name, items=None):
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        menu = dict(
+            (force_text(getattr(item, 'name', '|')), item)
+            for item in toolbar.get_menu(menu_id).get_items()
+        )
+        self.assertIn(name, list(menu))
+        if items is not None:
+            sub_menu = list(
+                force_text(getattr(item, 'name', '|')) for item in menu[name].get_items()
+            )
+            self.assertEqual(sorted(sub_menu), sorted(items))
 
-        page = create_page("toolbar-page", "nav_playground.html", "en",
-                           published=True)
+    def test_remove_language(self):
+        page = create_page(
+            "toolbar-page", "nav_playground.html", "en", published=True
+        )
         create_title(title="de page", language="de", page=page)
         create_title(title="fr page", language="fr", page=page)
 
         request = self.get_page_request(page, self.get_staff(), '/', edit=True)
-        toolbar = CMSToolbar(request)
-        toolbar.populate()
-        meu = toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
-        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete German')]))
-        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete English')]))
-        self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete French')]))
+
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Delete Translation',
+            ['German...', 'English...', 'French...']
+        )
 
         reduced_langs = {
             1: [
@@ -695,12 +710,48 @@ class ToolbarTests(ToolbarTestBase):
         }
 
         with self.settings(CMS_LANGUAGES=reduced_langs):
-            toolbar = CMSToolbar(request)
-            toolbar.populate()
-            meu = toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
-            self.assertFalse(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete German')]))
-            self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete English')]))
-            self.assertTrue(any([item for item in meu.get_items() if hasattr(item, 'name') and item_name(item).startswith('Delete French')]))
+            self.assertMenuItems(
+                request, LANGUAGE_MENU_IDENTIFIER, 'Delete Translation',
+                ['English...', 'French...']
+            )
+
+    def test_add_language(self):
+        page = create_page("tbp", "nav_playground.html", "en", published=True)
+        request = self.get_page_request(page, self.get_staff(), '/', edit=True)
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
+            [u'German...', u'Brazilian Portuguese...', u'French...', u'Espa\xf1ol...']
+        )
+
+        create_title(title="de page", language="de", page=page)
+        create_title(title="fr page", language="fr", page=page)
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
+            [u'Brazilian Portuguese...', u'Espa\xf1ol...']
+        )
+
+    def test_copy_plugins(self):
+        page = create_page("tbp", "nav_playground.html", "en", published=True)
+        create_title('de', 'de page', page)
+        add_plugin(page.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
+        create_title('fr', 'fr page', page)
+        add_plugin(page.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
+        page.publish('de')
+        page.publish('fr')
+
+        staff = self.get_staff()
+
+        request = self.get_page_request(page, staff, '/', edit=True)
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
+            [u'from German', u'from French']
+        )
+
+        request = self.get_page_request(page, staff, '/', edit=True, lang_code='de')
+        self.assertMenuItems(
+            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
+            [u'from English', u'from French']
+        )
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user

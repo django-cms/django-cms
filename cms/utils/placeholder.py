@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from collections import namedtuple
 import operator
 import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList, Variable, engines
+from django.template import TemplateSyntaxError, NodeList, Variable, Context, Template, engines
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
@@ -28,7 +27,12 @@ def _get_nodelist(tpl):
 
 
 def get_context():
-    return namedtuple('Context', 'template')(namedtuple('Template', 'engine')(engines.all()[0]))
+    if engines is not None:
+        context = Context()
+        context.template = Template('')
+        return context
+    else:
+        return {}
 
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):

@@ -103,6 +103,9 @@ Getting Help
 Please head over to our IRC channel, #django-cms, on irc.freenode.net or write
 to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 ******************
 Commercial support
 ******************
@@ -120,5 +123,5 @@ Credits
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
 * JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
-  `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 515 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!

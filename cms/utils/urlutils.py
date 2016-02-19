@@ -93,6 +93,5 @@ def admin_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None,
         urlconf=urlconf,
         args=args,
         kwargs=kwargs,
-        prefix=prefix,
         current_app=current_app
     )
