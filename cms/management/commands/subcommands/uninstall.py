@@ -26,7 +26,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
             else:
                 confirm = 'yes'
             if confirm == 'yes':
-                queryset.update(application_urls=None)
+                queryset.update(application_urls=None, application_namespace=None)
                 self.stdout.write(u'%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
         else:
             self.stdout.write(u'no %r apphooks found\n' % label)
