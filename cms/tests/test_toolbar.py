@@ -96,7 +96,7 @@ class ToolbarTestBase(CMSTestCase):
 class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_non_cms_urls(self):
-        request = self.get_page_request(None, self.get_anon(), '/')
+        request = self.get_page_request(None, self.get_anon(), '/en/example/')
         self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
@@ -107,25 +107,27 @@ class ToolbarMiddlewareTest(ClearURLs, ToolbarTestBase):
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_hide_toolbar_in_non_cms_urls_toolbar_hide_unsetted(self):
-        request = self.get_page_request(None, self.get_anon(), '/')
+        request = self.get_page_request(None, self.get_anon(), '/en/example/')
         self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_hide_toolbar_in_non_cms_urls(self):
-        request = self.get_page_request(None, self.get_anon(), '/')
+        request = self.get_page_request(None, self.get_anon(), '/en/example/')
         self.assertFalse(hasattr(request, 'toolbar'))
 
+    @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_show_toolbar_in_cms_urls(self):
         page = create_page('foo', 'col_two.html', 'en', published=True)
+        page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=True)
-    def test_app_setted_hide_toolbar_in_cms_urls(self):
+    def test_app_setted_show_toolbar_in_cms_urls_subpage(self):
         page = create_page('foo', 'col_two.html', 'en', published=True)
         page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
         request = self.get_page_request(page, self.get_anon())
-        self.assertFalse(hasattr(request, 'toolbar'))
+        self.assertTrue(hasattr(request, 'toolbar'))
 
 
 @override_settings(CMS_PERMISSION=False)
