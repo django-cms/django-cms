@@ -1,3 +1,7 @@
+=== 3.2.2 (Unreleased) ===
+
+* Fix ToolbarMiddleware.is_cms_request logic
+
 === 3.2.1 (2016-01-29) ===
 
 - Add support for Django 1.9 (with some deprecation warnings).
