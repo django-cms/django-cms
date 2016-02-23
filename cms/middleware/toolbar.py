@@ -2,6 +2,7 @@
 """
 Edit Toolbar middleware
 """
+from classytags.utils import flatten_context
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
@@ -41,7 +42,7 @@ def toolbar_plugin_processor(instance, placeholder, rendered_content, original_c
     original_context.update(data)
     plugin_class = instance.get_plugin_class()
     template = plugin_class.frontend_edit_template
-    output = render_to_string(template, original_context).strip()
+    output = render_to_string(template, flatten_context(original_context)).strip()
     original_context.pop()
     return output
 

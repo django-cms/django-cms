@@ -1023,7 +1023,7 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
         data = self.get_context(context, **kwargs)
         data['content'] = mark_safe(kwargs['nodelist'].render(data))
         data['rendered_content'] = data['content']
-        output = render_to_string(template, data)
+        output = render_to_string(template, flatten_context(data))
         context.pop()
         if kwargs.get('varname'):
             context[kwargs['varname']] = output

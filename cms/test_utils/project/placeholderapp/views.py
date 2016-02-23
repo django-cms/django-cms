@@ -24,9 +24,10 @@ def _base_detail(request, instance, template_name='detail.html',
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(instance)
     if template_string:
+        context = RequestContext(request=request, dict_=context)
         if DJANGO_1_7:
             template = Template(template_string)
-            return HttpResponse(template.render(RequestContext(request=request, dict_=context)))
+            return HttpResponse(template.render(context))
         else:
             from django.template.engine import Engine
             engine = Engine.get_default()
@@ -88,11 +89,10 @@ class ClassDetail(DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if self.template_string:
+            context = RequestContext(request=self.request, dict_=context)
             if DJANGO_1_7:
                 template = Template(self.template_string)
-                return HttpResponse(template.render(
-                    RequestContext(request=self.request, dict_=context)
-                ))
+                return HttpResponse(template.render(context))
             else:
                 from django.template.engine import Engine
                 engine = Engine.get_default()

@@ -219,6 +219,6 @@ def render_placeholder_toolbar(placeholder, context, name_fallback, save_languag
     context['placeholder'] = placeholder
     context['language'] = save_language
     context['page'] = page
-    toolbar = render_to_string("cms/toolbar/placeholder.html", context)
+    toolbar = render_to_string("cms/toolbar/placeholder.html", flatten_context(context))
     context.pop()
     return toolbar
