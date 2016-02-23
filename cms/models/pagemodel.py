@@ -193,19 +193,26 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
         # do not mark the page as dirty after page moves
         self._publisher_keep_state = True
 
-        # readability counts :)
-        is_inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
+        is_inherited_template = (
+            self.template == constants.TEMPLATE_INHERITANCE_MAGIC)
 
         # make sure move_page does not break when using INHERIT template
         # and moving to a top level position
-        if position in ('left', 'right') and not target.parent and is_inherited_template:
+        if (position in ('left', 'right') and not target.parent and
+                is_inherited_template):
             self.template = self.get_template()
             if target.publisher_public_id and position == 'right':
                 public = target.publisher_public
-                if target.get_root().get_next_sibling().pk == public.get_root().pk:
-                    target = target.publisher_public
+                target_root = target.get_root()
+                if target_root.get_next_sibling():
+                    if target_root.get_next_sibling() == public.get_root():
+                        target = public
+                    else:
+                        logger.warning('tree may need rebuilding: '
+                                       'run `manage.py cms fix-tree`')
                 else:
-                    logger.warning('tree may need rebuilding: run manage.py cms fix-tree')
+                    # target's root is last 'root' node, switch to 'left'
+                    position = 'left'
         if position == 'first-child' or position == 'last-child':
             self.parent_id = target.pk
         else:
