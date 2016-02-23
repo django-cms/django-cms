@@ -28,7 +28,7 @@ CLASSIFIERS = [
 
 INSTALL_REQUIREMENTS = [
     'Django>=1.6.9,<1.10',
-    'django-classy-tags>=0.5',
+    'django-classy-tags>=0.7.2',
     'html5lib>=0.90,!=0.9999,!=0.99999',
     'django-formtools>=1.0',
     'django-treebeard>=3.0',
