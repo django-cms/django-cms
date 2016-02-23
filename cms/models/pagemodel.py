@@ -672,7 +672,7 @@ class Page(six.with_metaclass(PageMetaClass, MP_Node)):
                 if page.publisher_public.parent_id in publish_ids:
                     page.publisher_public.parent.title_cache = {}
                     page.publisher_public.parent.title_cache[language] = publish_ids[page.publisher_public.parent_id]
-                if page.publisher_public.parent.is_published(language):
+                if page.publisher_public.parent and page.publisher_public.parent.is_published(language):
                     if page.publisher_public_id in publish_ids:
                         public_title = publish_ids[page.publisher_public_id]
                     else:
