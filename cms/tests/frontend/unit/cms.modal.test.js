@@ -519,4 +519,70 @@ describe('CMS.Modal', function () {
             modal.close();
         });
     });
+
+    describe('._events()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                spyOn(modal, 'minimize');
+                spyOn(modal, 'maximize');
+                spyOn(modal, '_startMove');
+                spyOn(modal, '_startResize');
+                spyOn(modal, 'close');
+                spyOn(modal, '_changeIframe');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('attaches new events', function () {
+            expect(modal.ui.minimizeButton).not.toHandle(modal.click);
+            expect(modal.ui.minimizeButton).not.toHandle(modal.touchEnd);
+            expect(modal.ui.maximizeButton).not.toHandle(modal.click);
+            expect(modal.ui.maximizeButton).not.toHandle(modal.touchEnd);
+            expect(modal.ui.title).not.toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.title).not.toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.title).not.toHandle(modal.doubleClick);
+            expect(modal.ui.resize).not.toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.resize).not.toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.closeAndCancel).not.toHandle(modal.click);
+            expect(modal.ui.closeAndCancel).not.toHandle(modal.touchEnd);
+            expect(modal.ui.breadcrumb).not.toHandle(modal.click);
+            modal._events();
+            expect(modal.ui.minimizeButton).toHandle(modal.click);
+            expect(modal.ui.minimizeButton).toHandle(modal.touchEnd);
+            expect(modal.ui.maximizeButton).toHandle(modal.click);
+            expect(modal.ui.maximizeButton).toHandle(modal.touchEnd);
+            expect(modal.ui.title).toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.title).toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.title).toHandle(modal.doubleClick);
+            expect(modal.ui.resize).toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.resize).toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.closeAndCancel).toHandle(modal.click);
+            expect(modal.ui.closeAndCancel).toHandle(modal.touchEnd);
+            expect(modal.ui.breadcrumb).toHandle(modal.click);
+        });
+
+        // it('removes previous events', function () {
+        //     var spy = jasmine.createSpy();
+        //
+        //     modal._events();
+        //     modal.ui.minimizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
+        // });
+    });
 });
