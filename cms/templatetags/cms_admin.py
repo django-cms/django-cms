@@ -93,6 +93,11 @@ def is_published(page, language):
         return False
 
 
+@register.filter
+def is_dirty(page, language):
+    return page.is_dirty(language)
+
+
 class ShowLazyAdminMenu(InclusionTag):
     name = 'show_lazy_admin_menu'
     template = 'admin/cms/page/tree/lazy_child_menu.html'
