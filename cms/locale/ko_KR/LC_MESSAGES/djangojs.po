@@ -4,6 +4,7 @@
 # 
 # Translators:
 # daeyong <daeyong@gmail.com>, 2013
+# daeyong <daeyong@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"

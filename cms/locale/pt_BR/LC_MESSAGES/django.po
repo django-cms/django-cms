@@ -6,7 +6,9 @@
 # Andre Manzano <andremanzano@gmail.com>, 2014
 # Cleber de Souza Corrêa <cscorrea@gmail.com>, 2014
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2011
+# Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2011
 # Felipe Bessa Coelho <fcoelho_9@hotmail.com>, 2014
+# felipemocruha <felipemocruha@gmail.com>, 2013
 # felipemocruha <felipemocruha@gmail.com>, 2013
 # Guilherme Vierno <guilhermevierno@gmail.com>, 2015
 # Henrique Bastos <henrique@bastos.net>, 2013

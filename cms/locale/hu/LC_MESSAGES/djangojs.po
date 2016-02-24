@@ -4,6 +4,7 @@
 # 
 # Translators:
 # fazekasda <fazekasda@gmail.com>, 2012
+# fazekasda <fazekasda@gmail.com>, 2012
 # Szabo L. <lortechnet@gmail.com>, 2013
 msgid ""
 msgstr ""

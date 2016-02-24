@@ -5,9 +5,13 @@
 # Translators:
 # Catalin Dragomirescu <diversesite@gmail.com>, 2014
 # costel <costel@vrancea.org>, 2014
+# costel <costel@vrancea.org>, 2014
+# Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # IlieLipan <ilie_lipan@yahoo.com>, 2012
+# IlieLipan <ilie_lipan@yahoo.com>, 2012
 # Julian C <jcuotpc@gmail.com>, 2014
+# vially <vially2006@gmail.com>, 2014
 # vially <vially2006@gmail.com>, 2014
 msgid ""
 msgstr ""

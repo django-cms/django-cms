@@ -3,11 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# angularcircle, 2012-2013
 # angularcircle, 2013
 # angularcircle, 2012
 # ar4s <arkadiusz.adamski@gmail.com>, 2014-2015
 # Arkadiusz Błasiak <ares1112@gmail.com>, 2015
 # Jakub Paczkowski <jakub@paczkowski.eu>, 2013
+# ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
@@ -15,6 +17,7 @@
 # Rafał Łopatka <rafal.lopatka@outlook.com>, 2015
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014-2015
+# sebastian1 <sebastian@kalinowski.eu>, 2012
 # sebastian1 <sebastian@kalinowski.eu>, 2012
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014
 # Robert Weglarek <weglarek.robert@gmail.com>, 2014

@@ -4,6 +4,8 @@
 # 
 # Translators:
 # Kim Silkebækken <kim@silkebaekken.net>, 2014
+# Kim Silkebækken <kim@silkebaekken.net>, 2014
+# Sindre Myren <smyrman@gmail.com>, 2011
 # Sindre Myren <smyrman@gmail.com>, 2011
 msgid ""
 msgstr ""
