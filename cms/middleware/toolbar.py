@@ -62,7 +62,7 @@ class ToolbarMiddleware(object):
         except:
             return False
 
-        return match.app_name in ('pages-root', 'pages-details-by-slug')
+        return match.url_name in ('pages-root', 'pages-details-by-slug')
 
     def process_request(self, request):
         """
