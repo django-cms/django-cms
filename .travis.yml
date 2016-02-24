@@ -35,7 +35,7 @@ env:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
     - FRONTEND=1 INTEGRATION=1 DJANGO=1.8 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
-    - FRONTEND=1 INTEGRATION=1 DJANGO=1.9 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
+    # - FRONTEND=1 INTEGRATION=1 DJANGO=1.9 DATABASE_URL='sqlite://localhost/testdb.sqlite' SELENIUM=0 MIGRATE_OPTION='--migrate'
 
 before_script:
   - pip freeze
