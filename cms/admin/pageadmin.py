@@ -137,7 +137,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # Deprecated in 3.2.1, please use ".../change-template/..." instead
             pat(r'^([0-9]+)/change_template/$', self.change_template),
             pat(r'^([0-9]+)/change-template/$', self.change_template),
-            pat(r'^([0-9]+)/([a-z\-]+)/is_dirty/$', self.get_is_dirty),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -944,20 +943,6 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(page, request.user, message)
         return HttpResponse(force_text(_("The template was successfully changed")))
-
-    @require_POST
-    def get_is_dirty(self, request, page_id, language):
-        """
-        Simple API for getting the dirty state of a page.
-        """
-        page = get_object_or_404(self.model, pk=page_id)
-        return HttpResponse(
-                json.dumps({
-                    'is_dirty': page.is_dirty(language),
-                    'is_new_dirty': page.is_new_dirty(),
-                }),
-                content_type='application/json'
-        )
 
     @require_POST
     @transaction.atomic
