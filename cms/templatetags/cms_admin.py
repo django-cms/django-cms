@@ -98,6 +98,20 @@ def is_dirty(page, language):
     return page.is_dirty(language)
 
 
+@register.filter
+def all_ancestors_are_published(page, language):
+    """
+    Returns False if any of the ancestors of page (and language) are
+    unpublished, otherwise True.
+    """
+    page = page.parent
+    while page:
+        if not page.is_published(language):
+            return False
+        page = page.parent
+    return True
+
+
 class ShowLazyAdminMenu(InclusionTag):
     name = 'show_lazy_admin_menu'
     template = 'admin/cms/page/tree/lazy_child_menu.html'
