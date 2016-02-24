@@ -257,6 +257,37 @@ describe('cms.base.js', function () {
                 expect(win.parent.location.reload).toHaveBeenCalled();
             });
 
+            it('calls itself if there is no url and response matches current location', function () {
+                var win = createFakeWindow();
+                win = $.extend(true, {}, win, win.parent);
+                win.parent = false;
+                createWindowSpy(win);
+                win.CMS.config.request.url = '/my-url';
+                win.location.pathname = '/something'
+                spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
+                // for some reason jasmine.Ajax.install() didn't work here
+                // presumably because of window.parent shenanigans.
+                spyOn($, 'ajax').and.callFake(function (opts) {
+                    opts.success('/something');
+                });
+
+                expect(CMS.API.Helpers.reloadBrowser(false, false, true)).toEqual(false);
+                expect($.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+                    type: 'GET',
+                    async: false,
+                    url: '/my-url',
+                    data: {
+                        model: 'model',
+                        pk: 'pk'
+                    }
+                }));
+
+                expect(CMS.API.Helpers.reloadBrowser.calls.count()).toEqual(2);
+                expect(CMS.API.Helpers.reloadBrowser.calls.mostRecent().args).toEqual([]);
+                expect(win.CMS.API.locked).toEqual(false);
+                expect(win.location.reload).toHaveBeenCalled();
+            });
+
             it('uses correct timeout', function () {
                 var win = createFakeWindow();
                 createWindowSpy(win);
