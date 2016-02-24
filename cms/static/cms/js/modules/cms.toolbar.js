@@ -46,6 +46,20 @@ var CMS = window.CMS || {};
                  */
                 this.navigation = new CMS.Navigation();
 
+                /**
+                 * @property {Object} _position
+                 * @property {Number} _position.top current position of the toolbar
+                 * @property {Number} _position.top position when toolbar became non-sticky
+                 * @property {Boolean} _position.isSticky is toolbar sticky?
+                 * @see _handleLongMenus
+                 * @private
+                 */
+                this._position = {
+                    top: 0,
+                    stickyTop: 0,
+                    isSticky: true
+                };
+
                 // states
                 this.click = 'click.cms.toolbar';
                 this.touchStart = 'touchstart.cms.toolbar';
@@ -55,6 +69,7 @@ var CMS = window.CMS || {};
                 this.mouseEnter = 'mouseenter.cms.toolbar';
                 this.mouseLeave = 'mouseleave.cms.toolbar';
                 this.resize = 'resize.cms.toolbar';
+                this.scroll = 'scroll.cms.toolbar';
                 this.key = 'keydown.cms.toolbar keyup.cms.toolbar';
 
                 this.timer = function () {};
@@ -194,6 +209,7 @@ var CMS = window.CMS || {};
                             return false;
                         } else {
                             el.addClass(hover);
+                            that._handleLongMenus();
                         }
 
                         // activate hover selection
@@ -247,8 +263,10 @@ var CMS = window.CMS || {};
                             el.find('> ul').show();
                             // add parent class
                             parent.addClass(hover);
+                            that._handleLongMenus();
                         } else {
                             lists.find('ul ul').hide();
+                            that._handleLongMenus();
                         }
 
                         // Remove stale submenus
@@ -273,6 +291,7 @@ var CMS = window.CMS || {};
                         that.ui.document.off(that.click);
                         that.ui.toolbar.off(that.click, reset);
                         that.ui.structureBoard.off(that.click);
+                        that._handleLongMenus();
                     }
                 });
 
@@ -329,6 +348,11 @@ var CMS = window.CMS || {};
                         });
                     });
                 });
+
+                this.ui.window.on(
+                    [this.resize, this.scroll].join(' '),
+                    CMS.API.Helpers.throttle($.proxy(this._handleLongMenus, this), 10)
+                );
             },
 
             /**
@@ -756,8 +780,82 @@ var CMS = window.CMS || {};
                 setInterval(function () {
                     $(window).trigger(that.resize);
                 }, interval);
-            }
+            },
 
+            /**
+             * Handles the case when opened menu doesn't fit the screen.
+             *
+             * @method _handleLongMenus
+             * @private
+             */
+            _handleLongMenus: function _handleLongMenus() {
+                var openMenus = $('.cms-toolbar-item-navigation-hover > ul');
+                if (!openMenus.length) {
+                    this._stickToolbar();
+                    return;
+                }
+
+                var positions = openMenus.toArray().map(function (item) {
+                    var el = $(item);
+
+                    return $.extend({}, el.position(), { height: el.height() });
+                });
+                var windowHeight = this.ui.window.height();
+
+                this._position.top = this.ui.window.scrollTop();
+
+                var shouldUnstickToolbar = positions.some(function (item) {
+                    return item.top + item.height > windowHeight;
+                });
+
+                if (shouldUnstickToolbar && this._position.top >= this._position.stickyTop) {
+                    if (this._position.isSticky) {
+                        this._unstickToolbar();
+                    }
+                } else {
+                    this._stickToolbar();
+                }
+            },
+
+            /**
+             * Resets toolbar to the normal position.
+             *
+             * @method _stickToolbar
+             * @private
+             */
+            _stickToolbar: function _stickToolbar() {
+                this._position.stickyTop = 0;
+                this._position.isSticky = true;
+                this.ui.toolbar.removeClass('cms-toolbar-non-sticky');
+                this.ui.toolbar.css({
+                    'top': 0,
+                    'margin-top': ''
+                });
+            },
+
+            /**
+             * Positions toolbar absolutely so the long menus can be scrolled
+             * (toolbar goes away from the screen if required)
+             *
+             * @method _unstickToolbar
+             * @private
+             */
+            _unstickToolbar: function _unstickToolbar() {
+                var htmlMargin = parseInt($('html').css('margin-top'), 10);
+
+                this._position.stickyTop = this._position.top;
+                this.ui.toolbar.addClass('cms-toolbar-non-sticky');
+                // have to do the !important because of "debug" toolbar
+                this.ui.toolbar[0].style.setProperty(
+                    'top',
+                    (this._position.stickyTop + (CMS.config.debug ? 5 : -5)) + 'px',
+                    'important'
+                );
+                this.ui.toolbar.css({
+                    'margin-top': -(htmlMargin + ((CMS.config.debug ? 5 : 0)))
+                });
+                this._position.isSticky = false;
+            }
         });
     });
 })(CMS.$);

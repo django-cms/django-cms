@@ -1,6 +1,7 @@
 === 3.2.2 (Unreleased) ===
 
-* Fix ToolbarMiddleware.is_cms_request logic
+- Fix ToolbarMiddleware.is_cms_request logic
+- Fix bottom items in very long menus not being accessible
 
 === 3.2.1 (2016-01-29) ===
 
