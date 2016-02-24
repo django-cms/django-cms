@@ -61,12 +61,18 @@
                         </a>
                         {# hide if page is empty #}
                         {% if lang in page.languages %}
-                            <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
-                                <span class="cms-icon cms-icon-check-o"></span> {% trans "Publish" %}
-                            </a>
-                            <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
-                                <span class="cms-icon cms-icon-forbidden"></span> {% trans "Unpublish" %}
-                            </a>
+                            {% if not page.parent or page.parent and page.parent|is_published:lang %}
+                                {% if page|is_dirty:lang or not page|is_published:lang %}
+                                    <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
+                                        <span class="cms-icon cms-icon-check-o"></span> {% trans "Publish" %}
+                                    </a>
+                                {% endif %}
+                                {% if page|is_published:lang %}
+                                    <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
+                                        <span class="cms-icon cms-icon-forbidden"></span> {% trans "Unpublish" %}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
                         {% else %}
                             <a href="{% url 'admin:cms_page_change' page.id %}?language={{ lang }}">
                                 <span class="cms-icon cms-icon-cogs"></span> {% trans "Configure" %}

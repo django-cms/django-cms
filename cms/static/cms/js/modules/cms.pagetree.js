@@ -564,12 +564,6 @@ var CMS = window.CMS || {};
                     return false;
                 }
 
-                // we need to create context awareness for the tooltip actions
-                that._setPublishingButtons(
-                    triggers.eq(index),
-                    containers.eq(index)
-                );
-
                 // otherwise show the dropdown
                 containers
                     .removeClass('cms-tree-tooltip-container-open')
@@ -585,35 +579,6 @@ var CMS = window.CMS || {};
             this.ui.container.on(this.click, containerCls, function (e) {
                 e.stopImmediatePropagation();
             });
-        },
-
-        /**
-         * Handles if "Publish" or "Unpublish" should be shown.
-         *
-         * @method _setPublishingButtons
-         * @private
-         * @param {jQuery} trigger originated trigger
-         * @param {jQuery} container originated container
-         */
-        _setPublishingButtons: function _setPublishingButtons(trigger, container) {
-            var cls = trigger.find('span').attr('class');
-            var publish = container.find('a').eq(1);
-            var unpublish = container.find('a').eq(2);
-
-            switch (cls) {
-                case 'unpublished':
-                    publish.show();
-                    unpublish.hide();
-                    break;
-                case 'published':
-                    publish.hide();
-                    unpublish.show();
-                    break;
-                case 'empty':
-                case 'dirty':
-                    publish.show();
-                    unpublish.show();
-            }
         },
 
         /**
