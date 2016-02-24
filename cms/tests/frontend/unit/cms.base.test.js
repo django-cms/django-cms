@@ -263,7 +263,7 @@ describe('cms.base.js', function () {
                 win.parent = false;
                 createWindowSpy(win);
                 win.CMS.config.request.url = '/my-url';
-                win.location.pathname = '/something'
+                win.location.pathname = '/something';
                 spyOn(CMS.API.Helpers, 'reloadBrowser').and.callThrough();
                 // for some reason jasmine.Ajax.install() didn't work here
                 // presumably because of window.parent shenanigans.
