@@ -925,6 +925,15 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_search_pages(self):
         """
         Test search for pages
+        To be fully useful, this testcase needs to have the following different
+        Plugin configurations within the project:
+            * unaltered cmsplugin_ptr
+            * cmsplugin_ptr with related_name='+'
+            * cmsplugin_ptr with related_query_name='+'
+            * cmsplugin_ptr with related_query_name='whatever_foo'
+            * cmsplugin_ptr with related_name='whatever_bar'
+            * cmsplugin_ptr with related_query_name='whatever_foo' and related_name='whatever_bar'
+        Those plugins are in cms/test_utils/project/pluginapp/revdesc/models.py
         """
         page = api.create_page("page", "nav_playground.html", "en")
 
@@ -932,9 +941,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
         text.save()
         page.publish('en')
-        pages = Page.objects.search("hi")
-        self.assertEqual(pages.count(), 0)
-        self.assertEqual(Page.objects.search("hello").count(),1)
+        self.assertEqual(Page.objects.search("hi").count(), 0)
+        self.assertEqual(Page.objects.search("hello").count(), 1)
 
     def test_empty_plugin_is_not_ignored(self):
         page = api.create_page("page", "nav_playground.html", "en")
