@@ -578,11 +578,30 @@ describe('CMS.Modal', function () {
             expect(modal.ui.breadcrumb).toHandle(modal.click);
         });
 
-        // it('removes previous events', function () {
-        //     var spy = jasmine.createSpy();
-        //
-        //     modal._events();
-        //     modal.ui.minimizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
-        // });
+        it('removes previous events', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.minimizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
+            modal.ui.maximizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
+            modal.ui.title.on(modal.pointerDown + ' ' + modal.doubleClick, spy);
+            modal.ui.resize.on(modal.pointerDown, spy);
+            modal.ui.closeAndCancel.on(modal.click + ' ' + modal.touchEnd, spy);
+            modal.ui.breadcrumb.on(modal.click, 'a', spy);
+
+            modal._events();
+
+            expect(modal.ui.minimizeButton).not.toHandleWith(modal.click, spy);
+            expect(modal.ui.minimizeButton).not.toHandleWith(modal.touchEnd, spy);
+            expect(modal.ui.maximizeButton).not.toHandleWith(modal.click, spy);
+            expect(modal.ui.maximizeButton).not.toHandleWith(modal.touchEnd, spy);
+            expect(modal.ui.title).not.toHandleWith(modal.pointerDown.split(' ')[0], spy);
+            expect(modal.ui.title).not.toHandleWith(modal.pointerDown.split(' ')[1], spy);
+            expect(modal.ui.title).not.toHandleWith(modal.doubleClick, spy);
+            expect(modal.ui.resize).not.toHandleWith(modal.pointerDown.split(' ')[0], spy);
+            expect(modal.ui.resize).not.toHandleWith(modal.pointerDown.split(' ')[1], spy);
+            expect(modal.ui.closeAndCancel).not.toHandleWith(modal.click, spy);
+            expect(modal.ui.closeAndCancel).not.toHandleWith(modal.touchEnd, spy);
+            expect(modal.ui.breadcrumb).not.toHandleWith(modal.click, spy);
+        });
     });
 });
