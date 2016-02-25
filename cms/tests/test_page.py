@@ -630,10 +630,10 @@ class PagesTestCase(CMSTestCase):
             self.copy_page(page_b, page_b)
         self.assertEqual(Page.objects.drafts().count(), 5)
         self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
-        page_d = Page.objects.filter(parent=page_b)[1]
+        page_d = Page.objects.filter(parent=page_b)[0]
         page_e = Page.objects.get(parent=page_d)
-        self.assertEqual(page_d.path, '000100010002')
-        self.assertEqual(page_e.path, '0001000100020001')
+        self.assertEqual(page_d.path, '000100010001')
+        self.assertEqual(page_e.path, '0001000100010001')
         page_e.delete()
         page_d.delete()
         with self.login_user_context(self.get_superuser()):
@@ -645,8 +645,7 @@ class PagesTestCase(CMSTestCase):
         page_b = page_b.reload()
         page_c = page_c.reload()
         with self.login_user_context(self.get_superuser()):
-            self.copy_page(page_b, page_c, position="left")
-        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+            self.copy_page(page_b, page_c, position=0)
 
     def test_public_exceptions(self):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
@@ -760,7 +759,7 @@ class PagesTestCase(CMSTestCase):
                              self.get_pages_root() + page_data2['slug'] + "/" + page_data3['slug'] + "/")
             # set page2 as root and check path of 1 and 3
             response = self.client.post(URL_CMS_PAGE_MOVE % page2.pk,
-                                        {"target": page1.pk, "position": "left"})
+                                        {"position": "0"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
             self.assertEqual(page1.get_path(), page_data1['slug'])

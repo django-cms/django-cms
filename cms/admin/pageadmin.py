@@ -25,7 +25,8 @@ try:
     from django.contrib.sites.shortcuts import get_current_site
 except ImportError:
     from django.contrib.sites.models import get_current_site
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import (MultipleObjectsReturned, ObjectDoesNotExist,
+                                    PermissionDenied, ValidationError)
 from django.db import router, transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
@@ -133,8 +134,9 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/undo/$', self.undo),
             pat(r'^([0-9]+)/redo/$', self.redo),
+            # Deprecated in 3.2.1, please use ".../change-template/..." instead
             pat(r'^([0-9]+)/change_template/$', self.change_template),
-            pat(r'^([0-9]+)/([a-z\-]+)/descendants/$', self.descendants),  # menu html for page descendants
+            pat(r'^([0-9]+)/change-template/$', self.change_template),
             pat(r'^([0-9]+)/([a-z\-]+)/edit-field/$', self.edit_title_fields),
             pat(r'^([0-9]+)/([a-z\-]+)/publish/$', self.publish_page),
             pat(r'^([0-9]+)/([a-z\-]+)/unpublish/$', self.unpublish),
@@ -143,6 +145,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             pat(r'^add-page-type/$', self.add_page_type),
             pat(r'^published-pages/$', self.get_published_pagelist),
             url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
+            url(r'^get-tree/$', self.get_tree, name="get_tree"),
         ]
 
         if plugin_pool.get_all_plugins():
@@ -945,31 +948,93 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @transaction.atomic
     def move_page(self, request, page_id, extra_context=None):
         """
-        Move the page to the requested target, at the given position
+        Move the page to the requested target, at the given position.
+
+        NOTE: We have to change from one "coordinate system" to another to
+        adapt JSTree to Django Treebeard.
+
+        If the Tree looks like this:
+
+            <root>
+               ⊢ …
+               ⊢ …
+               ⊢ Page 4
+                   ⊢ Page 5 (position 0)
+                   ⊢ …
+
+        For example,
+            target=4, position=1 => target=5, position="right"
+            target=4, position=0 => target=4, position="first-child"
+
         """
         target = request.POST.get('target', None)
-        position = request.POST.get('position', None)
-        if target is None or position is None:
-            return HttpResponseRedirect(admin_reverse('cms_page_change', args=(page_id,)))
+        position = request.POST.get('position', 0)
+        site_id = request.POST.get('site', None)
+
+        try:
+            position = int(position)
+        except (TypeError, ValueError):
+            position = 0
 
         try:
             page = self.model.objects.get(pk=page_id)
-            target = self.model.objects.get(pk=target)
         except self.model.DoesNotExist:
             return jsonify_request(HttpResponseBadRequest("error"))
 
-        # does he haves permissions to do this...?
-        if not page.has_move_page_permission(request) or \
-                not target.has_add_permission(request):
+        try:
+            site = Site.objects.get(id=int(site_id))
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if target is None:
+            # Special case: If «target» is not provided, it means to let the
+            # page become a new root node.
+            try:
+                tb_target = Page.get_root_nodes().filter(
+                    publisher_is_draft=True, site=site)[position]
+                if page.is_sibling_of(tb_target) and page.path < tb_target.path:
+                    tb_position = "right"
+                else:
+                    tb_position = "left"
+            except IndexError:
+                # Move page to become the last root node.
+                tb_target = Page.get_last_root_node()
+                tb_position = "right"
+        else:
+            try:
+                target = tb_target = self.model.objects.get(pk=int(target), site=site)
+            except (TypeError, ValueError, self.model.DoesNotExist):
+                return jsonify_request(HttpResponseBadRequest("error"))
+            if position == 0:
+                tb_position = "first-child"
+            else:
+                try:
+                    tb_target = target.get_children().filter(
+                        publisher_is_draft=True, site=site)[position]
+                    if page.is_sibling_of(tb_target) and page.path < tb_target.path:
+                        tb_position = "right"
+                    else:
+                        tb_position = "left"
+                except IndexError:
+                    tb_position = "last-child"
+
+        # Does the user have permissions to do this...?
+        if not page.has_move_page_permission(request) or (
+                    target and not target.has_add_permission(request)):
             return jsonify_request(
-                HttpResponseForbidden(force_text(_("Error! You don't have permissions to move this page. Please reload the page"))))
-            # move page
-        page.move_page(target, position)
+                HttpResponseForbidden(
+                    force_text(_("Error! You don't have permissions to move "
+                                 "this page. Please reload the page"))))
+
+        page.move_page(tb_target, tb_position)
         if is_installed('reversion'):
             self.cleanup_history(page)
-            helpers.make_revision_with_plugins(page, request.user, _("Page moved"))
+            helpers.make_revision_with_plugins(
+                page, request.user, _("Page moved"))
 
-        return jsonify_request(HttpResponse(admin_utils.render_admin_menu_item(request, page).content))
+        return jsonify_request(
+            HttpResponse(admin_utils.render_admin_menu_item(request, page)))
 
     def get_permissions(self, request, page_id):
         page = get_object_or_404(self.model, id=page_id)
@@ -1031,37 +1096,75 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
     @transaction.atomic
     def copy_page(self, request, page_id, extra_context=None):
         """
-        Copy the page and all its plugins and descendants to the requested target, at the given position
-        """
-        context = {}
-        page = Page.objects.get(pk=page_id)
+        Copy the page and all its plugins and descendants to the requested
+        target, at the given position
 
+        NOTE: We have to change from one "coordinate system" to another to
+        adapt JSTree to Django Treebeard. See comments in move_page().
+
+        NOTE: This code handles more cases then are *currently* supported in
+        the UI, specifically, the target should never be None and the position
+        should never be non-zero. These are implemented, however, because we
+        intend to support these cases later.
+        """
         target = request.POST.get('target', None)
         position = request.POST.get('position', None)
-        site = request.POST.get('site', None)
-        if target is not None and position is not None and site is not None:
+        site_id = request.POST.get('site', None)
+        copy_permissions = request.POST.get('copy_permissions', False)
+
+        try:
+            page = self.model.objects.get(pk=page_id)
+        except self.model.DoesNotExist:
+            return jsonify_request(HttpResponseBadRequest("Error"))
+
+        try:
+            position = int(position)
+        except (TypeError, ValueError):
+            position = 0
+        try:
+            site = Site.objects.get(id=int(site_id))
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if target is None:
+            # Special case: If «target» is not provided, it means to create the
+            # new page as a root node.
             try:
-                target = self.model.objects.get(pk=target)
-                # does he have permissions to copy this page under target?
-                assert target.has_add_permission(request)
-                site = Site.objects.get(pk=site)
-            except (ObjectDoesNotExist, AssertionError):
-                return HttpResponse("error")
+                tb_target = Page.get_root_nodes().filter(
+                    publisher_is_draft=True, site=site)[position]
+                tb_position = "left"
+            except IndexError:
+                # New page to become the last root node.
+                tb_target = Page.get_last_root_node()
+                tb_position = "right"
+        else:
+            try:
+                tb_target = self.model.objects.get(pk=int(target), site=site)
+                assert tb_target.has_add_permission(request)
+            except (TypeError, ValueError, self.model.DoesNotExist,
+                    AssertionError):
+                return jsonify_request(HttpResponseBadRequest("Error"))
+            if position == 0:
+                # This is really the only possible value for position.
+                tb_position = "first-child"
             else:
+                # But, just in case...
                 try:
-                    permissions = request.GET.get('copy_permissions', False)
-                    if not permissions:
-                        permissions = request.POST.get('copy_permissions', False)
-                    kwargs = {
-                        'copy_permissions': permissions,
-                    }
-                    page.copy_page(target, site, position, **kwargs)
-                    return jsonify_request(HttpResponse("ok"))
-                except ValidationError:
-                    exc = sys.exc_info()[1]
-                    return jsonify_request(HttpResponseBadRequest(exc.messages))
-        context.update(extra_context or {})
-        return HttpResponseRedirect(admin_reverse('cms_page_changelist'))
+                    tb_target = tb_target.get_children().filter(
+                        publisher_is_draft=True, site=site)[position]
+                    tb_position = "left"
+                except IndexError:
+                    tb_position = "last-child"
+        try:
+            new_page = page.copy_page(tb_target, site, tb_position,
+                                      copy_permissions=copy_permissions)
+            results = {"id": new_page.pk}
+            return HttpResponse(
+                json.dumps(results), content_type='application/json')
+        except ValidationError:
+            exc = sys.exc_info()[1]
+            return jsonify_request(HttpResponseBadRequest(exc.messages))
 
     @require_POST
     @transaction.atomic
@@ -1113,7 +1216,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             # create a new publish reversion
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
@@ -1214,7 +1317,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
 
         if 'node' in request.GET or 'node' in request.POST:
             # if request comes from tree..
-            return admin_utils.render_admin_menu_item(request, page)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page))
 
         # TODO: This should never fail, but it may be a POF
         path = page.get_absolute_url(language=language)
@@ -1357,20 +1460,52 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if page.has_change_permission(request):
             page.toggle_in_navigation()
             language = request.GET.get('language') or get_language_from_request(request)
-            return admin_utils.render_admin_menu_item(request, page, language=language)
+            return HttpResponse(admin_utils.render_admin_menu_item(request, page, language=language))
         return HttpResponseForbidden(force_text(_("You do not have permission to change this page's in_navigation status")))
 
-    def descendants(self, request, page_id, language):
+    def get_tree(self, request):
         """
-        Get html for descendants of given page
-        Used for lazy loading pages in cms.changelist.js
+        Get html for the descendants (only) of given page or if no page_id is
+        provided, all the root nodes.
+
+        Used for lazy loading pages in cms.pagetree.js
 
         Permission checks is done in admin_utils.get_admin_menu_item_context
         which is called by admin_utils.render_admin_menu_item.
         """
-        page = get_object_or_404(self.model, pk=page_id)
-        return admin_utils.render_admin_menu_item(request, page,
-                                                  template="admin/cms/page/tree/lazy_menu.html", language=language)
+        page_id = request.GET.get('pageId', None)
+        site_id = request.GET.get('site', None)
+        language = request.GET.get('language', None)
+        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
+
+        try:
+            site_id = int(site_id)
+            site = Site.objects.get(id=site_id)
+        except (TypeError, ValueError, MultipleObjectsReturned,
+                ObjectDoesNotExist):
+            site = get_current_site(request)
+
+        if language is None:
+            language = (request.GET.get('language') or
+                        get_language_from_request(request))
+
+        if page_id:
+            page = get_object_or_404(self.model, pk=int(page_id))
+            pages = list(page.get_children())
+        else:
+            pages = Page.get_root_nodes().filter(site=site,
+                                                 publisher_is_draft=True)
+
+        template = "admin/cms/page/tree/lazy_menu.html"
+        response = u""
+        for page in pages:
+            response += admin_utils.render_admin_menu_item(
+                request, page,
+               template=template,
+               language=language,
+               open_nodes=open_nodes,
+           )
+        return HttpResponse(response)
 
     def add_page_type(self, request):
         site = Site.objects.get_current()
