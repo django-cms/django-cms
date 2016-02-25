@@ -202,7 +202,16 @@ var CMS = window.CMS || {};
             // store moved position node
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
                 if (!that.cache.type || that.cache.type === 'cut') {
-                    that._moveNode(that._getNodePosition(obj));
+                    that._moveNode(that._getNodePosition(obj)).done(function () {
+                        var instance = that.ui.tree.jstree();
+
+                        instance._hide_grid(instance.get_node(obj.parent));
+                        if (obj.parent === '#') {
+                            instance.refresh();
+                        } else {
+                            instance.refresh_node(obj.parent);
+                        }
+                    });
                 } else {
                     that._copyNode(obj);
                 }
@@ -378,13 +387,14 @@ var CMS = window.CMS || {};
          * @param {Number} [opts.id] current element id for url matching
          * @param {Number} [opts.target] target sibling or parent
          * @param {Number} [opts.position] either `left`, `right` or `last-child`
+         * @returns {$.Deferred} ajax request object
          * @private
          */
         _moveNode: function _moveNode(obj) {
             var that = this;
             obj.site = that.options.site;
 
-            $.ajax({
+            return $.ajax({
                 method: 'post',
                 url: that.options.urls.move.replace('{id}', obj.id),
                 data: obj
