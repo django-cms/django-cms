@@ -205,6 +205,7 @@ Here is an example of a simple modifier that places a Page's attribute in the co
 
     menu_pool.register_modifier(MyMode)
 
+
 It has a method :meth:`~menus.base.Modifier.modify` that should return a list
 of :class:`~menus.base.NavigationNode` instances.
 :meth:`~menus.base.Modifier.modify` should take the following arguments:
