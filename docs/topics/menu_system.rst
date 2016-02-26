@@ -132,6 +132,9 @@ Nodes are assembled in a tree. Each node is an instance of the :py:class:`menus.
 
 A NavigationNode has attributes such as URL, title, parent and children - as one would expect in a navigation tree.
 
+It also has an ``attr`` attribute, a dictionary that's provided for you to add arbitrary attributes
+to, rather than placing them directly on the node itself, where they might clash with something.
+
 .. warning::
     You can't assume that a :py:class:`menus.base.NavigationNode` represents a django CMS Page. Firstly, some nodes may
     represent objects from other applications. Secondly, you can't expect to be able to access Page objects via
