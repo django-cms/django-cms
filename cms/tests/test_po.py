@@ -54,6 +54,10 @@ class PoTest(TestCase):
             shutil.copytree(SOURCE_DIR, os.path.join(tmpdir, 'locale'))
             olddir = os.getcwd()
             os.chdir(tmpdir)
-            ok, stderr = compile_messages()
-            os.chdir(olddir)
+            try:
+                ok, stderr = compile_messages()
+            except Exception, e:
+                ok, stderr = False, "{}: {} ({})".format(type(e), e, tmpdir)
+            finally:
+                os.chdir(olddir)
         self.assertTrue(ok, stderr)
