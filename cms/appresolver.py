@@ -22,12 +22,11 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
                                       RegexURLPattern)
 from django.utils import six
-from django.utils.translation import get_language
+from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
-from cms.utils.i18n import force_language, get_language_list
-
+from cms.utils.i18n import get_language_list
 
 APP_RESOLVERS = []
 
@@ -245,7 +244,7 @@ def _get_app_patterns():
             hooked_applications[title.page_id] = {}
         app = apphook_pool.get_apphook(title.page.application_urls)
         app_ns = app.app_name, title.page.application_namespace
-        with force_language(title.language):
+        with override(title.language):
             hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs

@@ -1028,6 +1028,23 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
                                  "this page. Please reload the page"))))
 
         page.move_page(tb_target, tb_position)
+
+        # Force an update the published/unpublished state of this page and
+        # its descendants.
+        for language in page.get_languages():
+            published = page.get_title_obj(language).published
+            if page.parent:
+                if page.parent.get_title_obj(language).published and published:
+                    page.publish(language)
+                else:
+                    page.parent.mark_descendants_pending(language)
+
+            else:
+                if published:
+                    page.publish(language)
+                else:
+                    page.mark_descendants_pending(language)
+
         if is_installed('reversion'):
             self.cleanup_history(page)
             helpers.make_revision_with_plugins(
