@@ -101,8 +101,8 @@ var CMS = {
              *     ajax request to figure out if the browser should reload current page,
              *     move to another one, or do nothing.
              * @param {Object} [data] optional data to be passed instead of one provided by request config
-             * @param {Object} [data.model=CMS.config.request.model]
-             * @param {Object} [data.pk=CMS.config.request.pk]
+             * @param {String} [data.model=CMS.config.request.model]
+             * @param {String|Number} [data.pk=CMS.config.request.pk]
              */
             reloadBrowser: function (url, timeout, ajax, data) {
                 var that = this;
