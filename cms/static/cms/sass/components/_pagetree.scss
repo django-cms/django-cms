@@ -6,7 +6,7 @@
 
 .cms-pagetree-container {
     // overflow: auto;
-    
+
     margin-bottom: $pagetree-bottom-offset;
 }
 .cms-pagetree-container,
@@ -387,9 +387,7 @@
     .jstree-children {
         margin-left: $pagetree-nesting-padding;
     }
-    .jstree-open > .jstree-ocl,
-    .jstree-closed > .jstree-ocl {
-        cursor: pointer;
+    .jstree-ocl {
         float: left;
         position: relative;
         left: -$pagetree-nesting-padding;
@@ -397,6 +395,10 @@
         color: $gray-light;
         padding: 15px 10px 10px 0;
         @extend %icon;
+    }
+    .jstree-open > .jstree-ocl,
+    .jstree-closed > .jstree-ocl {
+        cursor: pointer;
         &:after {
             content: "";
             display: block;
