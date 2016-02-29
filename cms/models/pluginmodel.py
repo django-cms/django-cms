@@ -55,7 +55,9 @@ class PluginModelBase(ModelBase):
         if 'cmsplugin_ptr' not in attrs:
             for field  in new_class._meta.fields:
                 if field.name == 'cmsplugin_ptr':
-                    field.rel.related_name = '+'
+                    field.rel.related_name = '{0}_{1}'.format(
+                        new_class._meta.app_label, new_class._meta.model_name
+                    )
 
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
