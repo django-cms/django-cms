@@ -298,7 +298,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * RHelper to process the paste event.
+         * Helper to process the paste event.
          *
          * @method _paste
          * @private
