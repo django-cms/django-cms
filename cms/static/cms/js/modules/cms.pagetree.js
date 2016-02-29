@@ -298,7 +298,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * RHelper to process the paste event.
+         * Helper to process the paste event.
          *
          * @method _paste
          * @private
@@ -323,6 +323,8 @@ var CMS = window.CMS || {};
             }
 
             this.ui.tree.jstree('paste', copyToId, 'last');
+            this.cache.type = null;
+            this.cache.target = null;
         },
 
         /**
