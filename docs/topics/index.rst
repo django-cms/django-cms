@@ -1,3 +1,5 @@
+.. _key-topics:
+
 ##########
 Key topics
 ##########
