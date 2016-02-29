@@ -205,12 +205,14 @@ var CMS = window.CMS || {};
             this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
                 if (!that.cache.type || that.cache.type === 'cut') {
                     that._moveNode(that._getNodePosition(obj)).done(function () {
-                        var instance = that.ui.tree.jstree();
+                        var instance = that.ui.tree.jstree(true);
 
                         instance._hide_grid(instance.get_node(obj.parent));
                         if (obj.parent === '#') {
                             instance.refresh();
                         } else {
+                            // have to refresh parent, because refresh only
+                            // refreshes children of the node, never the node itself
                             instance.refresh_node(obj.parent);
                         }
                     });
