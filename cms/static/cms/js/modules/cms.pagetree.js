@@ -323,6 +323,8 @@ var CMS = window.CMS || {};
             }
 
             this.ui.tree.jstree('paste', copyToId, 'last');
+            this.cache.type = null;
+            this.cache.target = null;
         },
 
         /**
