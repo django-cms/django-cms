@@ -120,6 +120,8 @@ var CMS = window.CMS || {};
                         // we are requesting a specific node
                         if (node.id !== '#') {
                             obj.pageId = that._storeNodeId(node.data.id);
+                        } else {
+                            obj.pageId = null;
                         }
 
                         // we need to store the opened items inside the localstorage
