@@ -68,7 +68,9 @@ class PageManager(PublisherManager):
         plugins = plugin_pool.get_all_plugins()
         for plugin in plugins:
             cmsplugin = plugin.model
-            if hasattr(cmsplugin, 'search_fields'):
+            if (hasattr(cmsplugin, 'search_fields') and
+                    cmsplugin.cmsplugin_ptr.field.rel.related_name and
+                    cmsplugin.cmsplugin_ptr.field.rel.related_name != '+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
                         'placeholders__cmsplugin__{0}_{1}__{2}__icontains'.format(
