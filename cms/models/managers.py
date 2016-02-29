@@ -70,8 +70,10 @@ class PageManager(PublisherManager):
             cmsplugin = plugin.model
             if hasattr(cmsplugin, 'search_fields'):
                 for field in cmsplugin.search_fields:
-                    qp |= Q(**{'placeholders__cmsplugin__%s__%s__icontains' % \
-                               (cmsplugin.__name__.lower(), field): q})
+                    qp |= Q(**{
+                        'placeholders__cmsplugin__{0}_{1}__{2}__icontains'.format(
+                            cmsplugin._meta.app_label, cmsplugin._meta.model_name, field
+                        ): q})
         if language:
             qt &= Q(title_set__language=language)
             qp &= Q(cmsplugin__language=language)
