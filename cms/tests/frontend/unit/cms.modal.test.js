@@ -1111,20 +1111,77 @@ describe('CMS.Modal', function () {
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
+                modal.ui.modal.show();
                 spyOn(modal, '_stopMove');
                 done();
             });
         });
         afterEach(function () {
             modal.ui.body.removeAttr('data-touch-action');
+            modal.ui.body.off(modal.pointerMove);
+            modal.ui.body.off(modal.pointerUp);
             fixture.cleanup();
         });
 
-        it('returns false if modal is maximized');
-        it('returns false if modal is minimized');
-        it('shows the shim');
-        it('adds stopMove handler');
-        it('adds mousemove handler that repositions the modal');
-        it('adds data-touch-action attribute');
+        it('returns false if modal is maximized', function () {
+            modal.maximized = true;
+            expect(modal._startMove()).toEqual(false);
+        });
+
+        it('returns false if modal is minimized', function () {
+            modal.minimized = true;
+            expect(modal._startMove()).toEqual(false);
+        });
+
+        it('shows the shim', function () {
+            expect(modal.ui.shim).not.toBeVisible();
+            modal._startMove();
+            expect(modal.ui.shim).toBeVisible();
+        });
+
+        it('adds stopMove handler', function () {
+            modal._startMove();
+            modal.ui.body.trigger(modal.pointerUp.split(' ')[0]);
+            expect(modal._stopMove).toHaveBeenCalled();
+            modal.ui.body.trigger(modal.pointerUp.split(' ')[1]);
+            expect(modal._stopMove).toHaveBeenCalledTimes(2);
+        });
+
+        it('adds mousemove handler that repositions the modal', function (done) {
+            var event = $.Event(modal.pointerMove, {
+                originalEvent: {
+                    pageX: 23,
+                    pageY: 28
+                }
+            });
+
+            spyOn($.fn, 'position').and.returnValue({
+                left: 20,
+                top: 30
+            });
+
+            spyOn($.fn, 'css').and.callFake(function (props) {
+                expect(props).toEqual({
+                    left: 20 - (100 - 23),
+                    top: 30 - (100 - 28)
+                });
+                done();
+            });
+
+            modal._startMove({
+                originalEvent: {
+                    pageX: 100,
+                    pageY: 100
+                }
+            });
+
+            modal.ui.body.trigger(event);
+        });
+
+        it('adds data-touch-action attribute', function () {
+            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+            modal._startMove();
+            expect(modal.ui.body).toHaveAttr('data-touch-action');
+        });
     });
 });
