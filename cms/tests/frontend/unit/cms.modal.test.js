@@ -1094,4 +1094,37 @@ describe('CMS.Modal', function () {
             expect(spy).not.toHaveBeenCalled();
         });
     });
+
+    describe('_startMove()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                spyOn(modal, '_stopMove');
+                done();
+            });
+        });
+        afterEach(function () {
+            modal.ui.body.removeAttr('data-touch-action');
+            fixture.cleanup();
+        });
+
+        it('returns false if modal is maximized');
+        it('returns false if modal is minimized');
+        it('shows the shim');
+        it('adds stopMove handler');
+        it('adds mousemove handler that repositions the modal');
+        it('adds data-touch-action attribute');
+    });
 });
