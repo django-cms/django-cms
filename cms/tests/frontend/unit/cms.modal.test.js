@@ -581,6 +581,8 @@ describe('CMS.Modal', function () {
         it('removes previous events', function () {
             var spy = jasmine.createSpy();
 
+            modal.ui.breadcrumb.html('<a></a>');
+
             modal.ui.minimizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
             modal.ui.maximizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
             modal.ui.title.on(modal.pointerDown + ' ' + modal.doubleClick, spy);
@@ -590,18 +592,54 @@ describe('CMS.Modal', function () {
 
             modal._events();
 
-            expect(modal.ui.minimizeButton).not.toHandleWith(modal.click, spy);
-            expect(modal.ui.minimizeButton).not.toHandleWith(modal.touchEnd, spy);
-            expect(modal.ui.maximizeButton).not.toHandleWith(modal.click, spy);
-            expect(modal.ui.maximizeButton).not.toHandleWith(modal.touchEnd, spy);
-            expect(modal.ui.title).not.toHandleWith(modal.pointerDown.split(' ')[0], spy);
-            expect(modal.ui.title).not.toHandleWith(modal.pointerDown.split(' ')[1], spy);
-            expect(modal.ui.title).not.toHandleWith(modal.doubleClick, spy);
-            expect(modal.ui.resize).not.toHandleWith(modal.pointerDown.split(' ')[0], spy);
-            expect(modal.ui.resize).not.toHandleWith(modal.pointerDown.split(' ')[1], spy);
-            expect(modal.ui.closeAndCancel).not.toHandleWith(modal.click, spy);
-            expect(modal.ui.closeAndCancel).not.toHandleWith(modal.touchEnd, spy);
-            expect(modal.ui.breadcrumb).not.toHandleWith(modal.click, spy);
+            modal.ui.minimizeButton.trigger(modal.click);
+            modal.ui.minimizeButton.trigger(modal.touchEnd);
+            modal.ui.maximizeButton.trigger(modal.click);
+            modal.ui.maximizeButton.trigger(modal.touchEnd);
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[1]);
+            modal.ui.title.trigger(modal.doubleClick);
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[1]);
+            modal.ui.closeAndCancel.trigger(modal.click);
+            modal.ui.closeAndCancel.trigger(modal.touchEnd);
+            modal.ui.breadcrumb.find('a').trigger(modal.click);
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('calls correct methods', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.breadcrumb.html('<a></a>');
+
+            modal._events();
+
+            modal.ui.minimizeButton.trigger(modal.click);
+            modal.ui.minimizeButton.trigger(modal.touchEnd);
+            expect(modal.minimize.calls.count()).toEqual(2);
+
+            modal.ui.maximizeButton.trigger(modal.click);
+            modal.ui.maximizeButton.trigger(modal.touchEnd);
+            expect(modal.maximize.calls.count()).toEqual(2);
+
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[1]);
+            expect(modal._startMove.calls.count()).toEqual(2);
+
+            modal.ui.title.trigger(modal.doubleClick);
+            expect(modal.maximize.calls.count()).toEqual(3);
+
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[1]);
+            expect(modal._startResize.calls.count()).toEqual(2);
+
+            modal.ui.closeAndCancel.trigger(modal.click);
+            modal.ui.closeAndCancel.trigger(modal.touchEnd);
+            expect(modal.close.calls.count()).toEqual(2);
+
+            modal.ui.breadcrumb.find('a').trigger(modal.click);
+            expect(modal._changeIframe.calls.count()).toEqual(1);
         });
     });
 });
