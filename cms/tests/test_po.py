@@ -7,12 +7,19 @@ import os
 import shutil
 import subprocess
 import sys
+import time, warnings
 
 THIS_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))
 
 
 def compile_messages():
+    # check if gettext is installed
+    try:
+        pipe = subprocess.Popen(['msgfmt', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except OSError as e:
+        raise CommandError('Unable to run msgfmt (gettext) command. You probably don\'t have gettext installed. {}'.format(e))
+
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
@@ -56,8 +63,6 @@ class PoTest(TestCase):
             os.chdir(tmpdir)
             try:
                 ok, stderr = compile_messages()
-            except Exception, e:
-                ok, stderr = False, "{}: {} ({})".format(type(e), e, tmpdir)
             finally:
                 os.chdir(olddir)
         self.assertTrue(ok, stderr)
