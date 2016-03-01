@@ -519,4 +519,363 @@ describe('CMS.Modal', function () {
             modal.close();
         });
     });
+
+    describe('._events()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                spyOn(modal, 'minimize');
+                spyOn(modal, 'maximize');
+                spyOn(modal, '_startMove');
+                spyOn(modal, '_startResize');
+                spyOn(modal, 'close');
+                spyOn(modal, '_changeIframe');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('attaches new events', function () {
+            expect(modal.ui.minimizeButton).not.toHandle(modal.click);
+            expect(modal.ui.minimizeButton).not.toHandle(modal.touchEnd);
+            expect(modal.ui.maximizeButton).not.toHandle(modal.click);
+            expect(modal.ui.maximizeButton).not.toHandle(modal.touchEnd);
+            expect(modal.ui.title).not.toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.title).not.toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.title).not.toHandle(modal.doubleClick);
+            expect(modal.ui.resize).not.toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.resize).not.toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.closeAndCancel).not.toHandle(modal.click);
+            expect(modal.ui.closeAndCancel).not.toHandle(modal.touchEnd);
+            expect(modal.ui.breadcrumb).not.toHandle(modal.click);
+            modal._events();
+            expect(modal.ui.minimizeButton).toHandle(modal.click);
+            expect(modal.ui.minimizeButton).toHandle(modal.touchEnd);
+            expect(modal.ui.maximizeButton).toHandle(modal.click);
+            expect(modal.ui.maximizeButton).toHandle(modal.touchEnd);
+            expect(modal.ui.title).toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.title).toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.title).toHandle(modal.doubleClick);
+            expect(modal.ui.resize).toHandle(modal.pointerDown.split(' ')[0]);
+            expect(modal.ui.resize).toHandle(modal.pointerDown.split(' ')[1]);
+            expect(modal.ui.closeAndCancel).toHandle(modal.click);
+            expect(modal.ui.closeAndCancel).toHandle(modal.touchEnd);
+            expect(modal.ui.breadcrumb).toHandle(modal.click);
+        });
+
+        it('removes previous events', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.breadcrumb.html('<a></a>');
+
+            modal.ui.minimizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
+            modal.ui.maximizeButton.on(modal.click + ' ' + modal.touchEnd, spy);
+            modal.ui.title.on(modal.pointerDown + ' ' + modal.doubleClick, spy);
+            modal.ui.resize.on(modal.pointerDown, spy);
+            modal.ui.closeAndCancel.on(modal.click + ' ' + modal.touchEnd, spy);
+            modal.ui.breadcrumb.on(modal.click, 'a', spy);
+
+            modal._events();
+
+            modal.ui.minimizeButton.trigger(modal.click);
+            modal.ui.minimizeButton.trigger(modal.touchEnd);
+            modal.ui.maximizeButton.trigger(modal.click);
+            modal.ui.maximizeButton.trigger(modal.touchEnd);
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[1]);
+            modal.ui.title.trigger(modal.doubleClick);
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[1]);
+            modal.ui.closeAndCancel.trigger(modal.click);
+            modal.ui.closeAndCancel.trigger(modal.touchEnd);
+            modal.ui.breadcrumb.find('a').trigger(modal.click);
+
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('calls correct methods', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.breadcrumb.html('<a></a>');
+
+            modal._events();
+
+            modal.ui.minimizeButton.trigger(modal.click);
+            modal.ui.minimizeButton.trigger(modal.touchEnd);
+            expect(modal.minimize.calls.count()).toEqual(2);
+
+            modal.ui.maximizeButton.trigger(modal.click);
+            modal.ui.maximizeButton.trigger(modal.touchEnd);
+            expect(modal.maximize.calls.count()).toEqual(2);
+
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.title.trigger(modal.pointerDown.split(' ')[1]);
+            expect(modal._startMove.calls.count()).toEqual(2);
+
+            modal.ui.title.trigger(modal.doubleClick);
+            expect(modal.maximize.calls.count()).toEqual(3);
+
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[0]);
+            modal.ui.resize.trigger(modal.pointerDown.split(' ')[1]);
+            expect(modal._startResize.calls.count()).toEqual(2);
+
+            modal.ui.closeAndCancel.trigger(modal.click);
+            modal.ui.closeAndCancel.trigger(modal.touchEnd);
+            expect(modal.close.calls.count()).toEqual(2);
+
+            modal.ui.breadcrumb.find('a').trigger(modal.click);
+            expect(modal._changeIframe.calls.count()).toEqual(1);
+        });
+    });
+
+    describe('_calculateNewPosition()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.window = $('<div style="width: 2000px; height: 2000px;"></div>').prependTo(fixture.el);
+                // have to show the modal so the css values can be retrieved
+                modal.ui.modal.show();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('fits the modal to the screen if there is enough space', function () {
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            modal.ui.window.css({
+                width: 1500,
+                height: 1500
+            });
+
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1200,
+                height: 1200,
+                top: 750,
+                left: 750
+            });
+        });
+
+        it('respects params', function () {
+            modal.ui.window.css({
+                width: 900,
+                height: 500
+            });
+            // so it resets to middle of the screen
+            spyOn($.fn, 'css').and.returnValue(0);
+
+            expect(modal._calculateNewPosition({
+                width: 300,
+                height: 300
+            })).toEqual({
+                width: 300,
+                height: 300,
+                top: 250,
+                left: 450
+            });
+
+            expect(modal._calculateNewPosition({
+                width: 1000,
+                height: 500
+            })).toEqual({
+                width: 1000,
+                height: 500,
+                top: 250,
+                left: 450
+            });
+        });
+
+        it('respects minWidth and minHeight', function () {
+            modal.ui.window.css({
+                width: 900,
+                height: 500
+            });
+            // so it resets to middle of the screen
+            spyOn($.fn, 'css').and.returnValue(0);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 800,
+                height: 400,
+                top: 250,
+                left: 450
+            });
+        });
+
+
+        it('handles 50% left and top position case', function () {
+            spyOn($.fn, 'css').and.returnValue('50%');
+
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+        });
+
+        it('moves modal to the middle of the screen if it does not fit the screen', function () {
+            spyOn($.fn, 'css').and.returnValue(850);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.returnValue(2000 - 850);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 850,
+                    top: 2000 - 850
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 2000 - 850,
+                    top: 850
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 849,
+                    top: 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 2000 - 849,
+                    top: 2000 - 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 849,
+                    top: 2000 - 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 2000 - 849,
+                    top: 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+        });
+
+        it('maximizes the modal if it goes out of the screen', function () {
+            expect(modal.triggerMaximized).not.toEqual(true);
+            modal.ui.window.css({
+                width: 900,
+                height: 500
+            });
+            // so it resets to middle of the screen
+            spyOn($.fn, 'css').and.returnValue(0);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 800,
+                height: 400,
+                top: 250,
+                left: 450
+            });
+            expect(modal.triggerMaximized).not.toEqual(true);
+
+            expect(modal._calculateNewPosition({ width: 900 })).toEqual({
+                width: 900,
+                height: 400,
+                top: 250,
+                left: 450
+            });
+            expect(modal.triggerMaximized).toEqual(true);
+
+            modal.triggerMaximized = false;
+
+            expect(modal._calculateNewPosition({ height: 500 })).toEqual({
+                width: 800,
+                height: 500,
+                top: 250,
+                left: 450
+            });
+            expect(modal.triggerMaximized).toEqual(true);
+        });
+    });
 });
