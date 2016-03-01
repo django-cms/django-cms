@@ -878,4 +878,139 @@ describe('CMS.Modal', function () {
             expect(modal.triggerMaximized).toEqual(true);
         });
     });
+
+    describe('_show()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                spyOn(modal, 'maximize');
+                spyOn(modal, 'close');
+                spyOn(modal, 'trigger');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('add morphing class if modal is already open', function (done) {
+            modal.ui.modal.show();
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-morphing');
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-open');
+
+            modal.ui.modal.addClass('cms-modal-open');
+            modal.ui.modal.one('cmsTransitionEnd', function () {
+                setTimeout(function () {
+                    expect(modal.ui.modal).not.toHaveClass('cms-modal-morphing');
+                    done();
+                }, 0);
+            });
+            modal._show({});
+            expect(modal.ui.modal).toHaveClass('cms-modal-morphing');
+        });
+
+        it('positions modal by given params', function (done) {
+            spyOn($.fn, 'css');
+            modal.ui.modal.one('cmsTransitionEnd', function () {
+                setTimeout(function () {
+                    expect($.fn.css).toHaveBeenCalledWith({
+                        'margin-left': -10,
+                        'margin-top': -1.5
+                    });
+                    done();
+                }, 0)
+            });
+            modal._show({
+                width: 20,
+                height: 3,
+                top: 123,
+                left: 456
+            });
+
+            expect($.fn.css).toHaveBeenCalledWith({
+                'display': 'block',
+                'width': 20,
+                'height': 3,
+                'top': 123,
+                'left': 456,
+                'margin-left': -10,
+                'margin-top': -1.5
+            });
+        });
+
+        it('maximizes the modal if required', function (done) {
+            modal.ui.modal.one('cmsTransitionEnd', function () {
+                setTimeout(function () {
+                    expect(modal.maximize).toHaveBeenCalled();
+                    done();
+                }, 0)
+            });
+            modal.triggerMaximized = true;
+            modal._show({});
+        });
+
+        it('does not maximize the modal if not required', function (done) {
+            modal.ui.modal.one('cmsTransitionEnd', function () {
+                setTimeout(function () {
+                    expect(modal.maximize).not.toHaveBeenCalled();
+                    done();
+                }, 0)
+            });
+            modal.triggerMaximized = false;
+            modal._show({});
+        });
+
+        it('triggers cms.modal.shown', function () {
+            modal.ui.modal.one('cmsTransitionEnd', function () {
+                setTimeout(function () {
+                    expect(modal.trigger).toHaveBeenCalledWith('cms.modal.shown');
+                    done();
+                }, 0)
+            });
+            modal._show({});
+        });
+
+        it('adds an event handler to close the modal by pressing ESC', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.body.on('keydown.cms.close', spy);
+            modal.options.onClose = 'stuff';
+
+            modal._show({});
+
+            var wrongEvent = $.Event('keydown.cms.close', { keyCode: CMS.KEYS.SPACE });
+            modal.ui.body.trigger(wrongEvent);
+            expect(spy).not.toHaveBeenCalled();
+            expect(modal.close).not.toHaveBeenCalled();
+            expect(modal.options.onClose).toEqual('stuff');
+
+            var correctEvent = $.Event('keydown.cms.close', { keyCode: CMS.KEYS.ESC });
+            modal.ui.body.trigger(correctEvent);
+            expect(spy).not.toHaveBeenCalled();
+            expect(modal.close).toHaveBeenCalled();
+            expect(modal.options.onClose).toEqual(null);
+        });
+
+        it('focuses the modal', function () {
+            spyOn($.fn, 'focus');
+
+            modal._show({});
+            expect($.fn.focus).toHaveBeenCalled();
+            expect($.fn.focus.calls.mostRecent().object).toEqual(modal.ui.modal);
+        });
+    });
+
 });
