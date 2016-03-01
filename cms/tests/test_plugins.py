@@ -829,21 +829,19 @@ class PluginsTestCase(PluginsTestBaseCase):
         text_plugin = api.add_plugin(ph, "TextPlugin", "en", body="Hello World")
         link_plugins = []
         for i in range(0, 10):
-            text_plugin = Text.objects.get(pk=text_plugin.pk)
             link_plugins.append(api.add_plugin(ph, "LinkPlugin", "en",
                                                target=text_plugin,
                                                name="A Link %d" % i,
                                                url="http://django-cms.org"))
-            text_plugin.text.body += '<img src="/static/cms/img/icons/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
+            text_plugin.body += '<img src="/static/cms/img/icons/plugins/link.png" alt="Link - %s" id="plugin_obj_%d" title="Link - %s" />' % (
                 link_plugins[-1].name,
                 link_plugins[-1].pk,
                 link_plugins[-1].name,
             )
         text_plugin.save()
-        txt = text_plugin.text
         ph = Placeholder.objects.get(pk=ph.pk)
-        txt.body = '\n'.join(['<img id="plugin_obj_%d" src=""/>' % l.cmsplugin_ptr_id for l in link_plugins])
-        txt.save()
+        text_plugin.body = '\n'.join(['<img id="plugin_obj_%d" src=""/>' % l.cmsplugin_ptr_id for l in link_plugins])
+        text_plugin.save()
         text_plugin = self.reload(text_plugin)
 
         with self.assertNumQueries(2):
