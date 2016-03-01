@@ -7,7 +7,6 @@ import os
 import shutil
 import subprocess
 import sys
-import time, warnings
 
 THIS_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))
