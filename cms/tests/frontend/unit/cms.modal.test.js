@@ -931,7 +931,7 @@ describe('CMS.Modal', function () {
                         'margin-top': -1.5
                     });
                     done();
-                }, 0)
+                }, 0);
             });
             modal._show({
                 width: 20,
@@ -956,7 +956,7 @@ describe('CMS.Modal', function () {
                 setTimeout(function () {
                     expect(modal.maximize).toHaveBeenCalled();
                     done();
-                }, 0)
+                }, 0);
             });
             modal.triggerMaximized = true;
             modal._show({});
@@ -967,18 +967,18 @@ describe('CMS.Modal', function () {
                 setTimeout(function () {
                     expect(modal.maximize).not.toHaveBeenCalled();
                     done();
-                }, 0)
+                }, 0);
             });
             modal.triggerMaximized = false;
             modal._show({});
         });
 
-        it('triggers cms.modal.shown', function () {
+        it('triggers cms.modal.shown', function (done) {
             modal.ui.modal.one('cmsTransitionEnd', function () {
                 setTimeout(function () {
                     expect(modal.trigger).toHaveBeenCalledWith('cms.modal.shown');
                     done();
-                }, 0)
+                }, 0);
             });
             modal._show({});
         });
@@ -1036,7 +1036,6 @@ describe('CMS.Modal', function () {
                 done();
             });
         });
-
         afterEach(function () {
             fixture.cleanup();
         });
