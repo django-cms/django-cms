@@ -73,8 +73,8 @@ class PageManager(PublisherManager):
                     cmsplugin.cmsplugin_ptr.field.rel.related_name != '+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
-                        'placeholders__cmsplugin__{0}_{1}__{2}__icontains'.format(
-                            cmsplugin._meta.app_label, cmsplugin._meta.model_name, field
+                        'placeholders__cmsplugin__{0}__{1}__icontains'.format(
+                            cmsplugin.cmsplugin_ptr.field.rel.related_name, field
                         ): q})
         if language:
             qt &= Q(title_set__language=language)
