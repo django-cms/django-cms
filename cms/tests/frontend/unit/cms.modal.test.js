@@ -1013,4 +1013,86 @@ describe('CMS.Modal', function () {
         });
     });
 
+    describe('_hide()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                spyOn(modal, 'maximize');
+                spyOn(modal, 'minimize');
+                spyOn(modal, 'close');
+                spyOn(modal, 'trigger');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('empties the frame', function () {
+            modal.ui.frame.html('<div></div>');
+            expect(modal.ui.frame).not.toBeEmpty();
+            modal._hide();
+            expect(modal.ui.frame).toBeEmpty();
+        });
+
+        it('removes loader', function () {
+            modal.ui.modalBody.addClass('cms-loader');
+            expect(modal.ui.modalBody).toHaveClass('cms-loader');
+            modal._hide();
+            expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
+        });
+
+        it('triggers cms.modal.closed', function () {
+            jasmine.clock().install();
+            modal._hide({ duration: 10000000 });
+            expect(modal.trigger).not.toHaveBeenCalled();
+            jasmine.clock().tick(modal.options.duration);
+            expect(modal.trigger).toHaveBeenCalledWith('cms.modal.closed');
+            jasmine.clock().uninstall();
+        });
+
+        it('resets minimize state', function () {
+            jasmine.clock().install();
+            modal.minimized = true;
+            modal._hide();
+            expect(modal.minimize).not.toHaveBeenCalled();
+            jasmine.clock().tick(modal.options.duration);
+            expect(modal.minimize).toHaveBeenCalled();
+            jasmine.clock().uninstall();
+        });
+
+        it('resets maximize state', function () {
+            jasmine.clock().install();
+            modal.maximized = true;
+            modal._hide();
+            expect(modal.maximize).not.toHaveBeenCalled();
+            jasmine.clock().tick(modal.options.duration);
+            expect(modal.maximize).toHaveBeenCalled();
+            jasmine.clock().uninstall();
+        });
+        it('removes the handler to close by ESC', function () {
+            var spy = jasmine.createSpy();
+
+            modal.ui.body.on('keydown.cms.close', spy);
+            expect(modal.ui.body).toHandle('keydown.cms.close');
+
+            modal._hide();
+            expect(modal.ui.body).not.toHandle('keydown.cms.close');
+            modal.ui.body.trigger('keydown.cms.close');
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
 });
