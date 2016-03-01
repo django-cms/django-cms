@@ -642,4 +642,240 @@ describe('CMS.Modal', function () {
             expect(modal._changeIframe.calls.count()).toEqual(1);
         });
     });
+
+    describe('_calculateNewPosition()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.window = $('<div style="width: 2000px; height: 2000px;"></div>').prependTo(fixture.el);
+                // have to show the modal so the css values can be retrieved
+                modal.ui.modal.show();
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('fits the modal to the screen if there is enough space', function () {
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            modal.ui.window.css({
+                width: 1500,
+                height: 1500
+            });
+
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1200,
+                height: 1200,
+                top: 750,
+                left: 750
+            });
+        });
+
+        it('respects params', function () {
+            modal.ui.window.css({
+                width: 900,
+                height: 500
+            });
+            // so it resets to middle of the screen
+            spyOn($.fn, 'css').and.returnValue(0);
+
+            expect(modal._calculateNewPosition({
+                width: 300,
+                height: 300
+            })).toEqual({
+                width: 300,
+                height: 300,
+                top: 250,
+                left: 450
+            });
+
+            expect(modal._calculateNewPosition({
+                width: 1000,
+                height: 500
+            })).toEqual({
+                width: 1000,
+                height: 500,
+                top: 250,
+                left: 450
+            });
+        });
+
+        it('respects minWidth and minHeight', function () {
+            modal.ui.window.css({
+                width: 900,
+                height: 500
+            });
+            // so it resets to middle of the screen
+            spyOn($.fn, 'css').and.returnValue(0);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 800,
+                height: 400,
+                top: 250,
+                left: 450
+            });
+        });
+
+
+        it('handles 50% left and top position case', function () {
+            spyOn($.fn, 'css').and.returnValue('50%');
+
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+        });
+
+        it('moves modal to the middle of the screen if it does not fit the screen', function () {
+            spyOn($.fn, 'css').and.returnValue(850);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.returnValue(2000 - 850);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 850,
+                    top: 2000 - 850
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 2000 - 850,
+                    top: 850
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: undefined,
+                left: undefined
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 849,
+                    top: 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 2000 - 849,
+                    top: 2000 - 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 849,
+                    top: 2000 - 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+
+            $.fn.css.and.callFake(function (prop) {
+                return {
+                    left: 2000 - 849,
+                    top: 849
+                }[prop];
+            });
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 1700,
+                height: 1700,
+                top: 1000,
+                left: 1000
+            });
+        });
+
+        it('maximizes the modal if it goes out of the screen', function () {
+            expect(modal.triggerMaximized).not.toEqual(true);
+            modal.ui.window.css({
+                width: 900,
+                height: 500
+            });
+            // so it resets to middle of the screen
+            spyOn($.fn, 'css').and.returnValue(0);
+            expect(modal._calculateNewPosition({})).toEqual({
+                width: 800,
+                height: 400,
+                top: 250,
+                left: 450
+            });
+            expect(modal.triggerMaximized).not.toEqual(true);
+
+            expect(modal._calculateNewPosition({ width: 900 })).toEqual({
+                width: 900,
+                height: 400,
+                top: 250,
+                left: 450
+            });
+            expect(modal.triggerMaximized).toEqual(true);
+
+            modal.triggerMaximized = false;
+
+            expect(modal._calculateNewPosition({ height: 500 })).toEqual({
+                width: 800,
+                height: 500,
+                top: 250,
+                left: 450
+            });
+            expect(modal.triggerMaximized).toEqual(true);
+        });
+    });
 });
