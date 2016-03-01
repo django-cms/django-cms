@@ -618,7 +618,17 @@ var CMS = window.CMS || {};
                         // check if we are publishing a page we're currently in
                         // because if the slug did change we would need to
                         // redirect to that new slug
-                        CMS.API.Helpers.reloadBrowser(false, false, true);
+                        // Problem here is that in case of the apphooked page
+                        // the model and pk are empty and reloadBrowser doesn't really
+                        // do anything - so here we specifically force the data
+                        // to be the data about the page and not the model
+                        var parent = (window.parent ? window.parent : window);
+                        var data = {
+                            // FIXME shouldn't be hardcoded
+                            model: 'cms.page',
+                            pk: parent.CMS.config.request.page_id
+                        };
+                        CMS.API.Helpers.reloadBrowser(false, false, true, data);
                     } else {
                         // otherwise simply reload the page
                         that._reloadHelper();
