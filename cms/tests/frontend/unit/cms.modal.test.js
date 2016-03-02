@@ -1419,4 +1419,68 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
         });
     });
+
+    describe('_setBreadcrumb()', function () {
+        var modal;
+        var validBreadcrumbs = [
+            { title: 'first', url: '#first' },
+            { title: 'second', url: '#second' },
+            { title: 'last', url: '#last' }
+        ];
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('returns false if there is no breadcrumbs', function () {
+            expect(modal._setBreadcrumb()).toEqual(false);
+        });
+
+        it('returns false if there is only one breadcrumb', function () {
+            expect(modal._setBreadcrumb([])).toEqual(false);
+            expect(modal._setBreadcrumb([{}])).toEqual(false);
+        });
+
+        it('returns false if first breadcrumb does not have title', function () {
+            expect(modal._setBreadcrumb([{}, { title: 'breadcrumb', url: '#' }])).toEqual(false);
+        });
+
+        it('adds class to the modal', function () {
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-has-breadcrumb');
+            modal._setBreadcrumb(validBreadcrumbs);
+            expect(modal.ui.modal).toHaveClass('cms-modal-has-breadcrumb');
+        });
+
+        it('creates appropriate markup for breadcrumbs', function () {
+            expect(modal.ui.breadcrumb.html()).toEqual('');
+            modal._setBreadcrumb(validBreadcrumbs);
+            expect(modal.ui.breadcrumb.html()).toEqual([
+                '<a href="#first" class=""><span>first</span></a>',
+                '<a href="#second" class=""><span>second</span></a>',
+                '<a href="#last" class="active"><span>last</span></a>'
+            ].join(''));
+        });
+
+        it('makes last breadcrumb active', function () {
+            modal._setBreadcrumb(validBreadcrumbs);
+            expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
+        });
+    });
 });
