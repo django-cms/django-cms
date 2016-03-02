@@ -979,7 +979,7 @@ default
 
 If True, the toolbar is hidden in the pages out django CMS.
 
-.. versionchanged:: 3.2.1: CMS_APP_NAME has been removed as it's not required anymore.
+.. versionchanged:: 3.2.1: CMS_APP_NAME has been removed as it's no longer required.
 
 
 CMS_DEFAULT_X_FRAME_OPTIONS

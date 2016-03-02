@@ -152,22 +152,26 @@ A modifier can change the properties of existing nodes or rearrange entire
 menus.
 
 
-An example use-case
-===================
+Example use-cases
+=================
 
 A simple example: you have a news application that publishes pages
 independently of django CMS. However, you would like to integrate the
 application into the menu structure of your site, so that at appropriate
 places a *News* node appears in the navigation menu.
 
-In such a case, a Navigation Modifier is the solution.
+In another example, you might want a particular attribute of your ``Pages`` to be available in
+menu templates. In order to keep menu nodes lightweight (which can be important in a site with
+thousands of pages) they only contain the minimum attributes required to generate a usable menu.
 
+In both cases, a Navigation Modifier is the solution - in the first case, to add a new node at the
+appropriate place, and in the second, to add a new attribute - on the ``attr`` attribute, rather
+than directly on the ``NavigationNode``, to help avoid conflicts - to all nodes in the menu.
 
 How it works
 ============
 
-Normally, you'd want to place modifiers in your application's
-``cms_menus.py``.
+Place your modifiers in your application's ``cms_menus.py``.
 
 To make your modifier available, it then needs to be registered with
 ``menus.menu_pool.menu_pool``.
@@ -175,25 +179,32 @@ To make your modifier available, it then needs to be registered with
 Now, when a page is loaded and the menu generated, your modifier will
 be able to inspect and modify its nodes.
 
-A simple modifier looks something like this::
+Here is an example of a simple modifier that places a Page's attribute in the corresponding
+``NavigationNode``::
 
     from menus.base import Modifier
     from menus.menu_pool import menu_pool
+
+    from cms.models import Page
 
     class MyMode(Modifier):
         """
 
         """
         def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+            # if the menu is not yet cut, don't do anything
             if post_cut:
                 return nodes
-            count = 0
+            # otherwise loop over the nodes
             for node in nodes:
-                node.counter = count
-                count += 1
+                # does this node represent a Page?
+                if node.attr["is_page"]:
+                    # if so, put its changed_by attribute on the node
+                    node.attr["changed_by"] = Page.objects.get(id=node.id).changed_by
             return nodes
 
     menu_pool.register_modifier(MyMode)
+
 
 It has a method :meth:`~menus.base.Modifier.modify` that should return a list
 of :class:`~menus.base.NavigationNode` instances.
