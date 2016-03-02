@@ -1371,4 +1371,52 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).toHaveAttr('data-touch-action');
         });
     });
+
+    describe('_stopResize()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                modal._startResize();
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('hides the shim', function () {
+            expect(modal.ui.shim).toBeVisible();
+            modal._stopResize();
+            expect(modal.ui.shim).not.toBeVisible();
+        });
+
+        it('removes event handlers', function () {
+            expect(modal.ui.body).toHandle(modal.pointerMove);
+            expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[0]);
+            expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[1]);
+            modal._stopResize();
+            expect(modal.ui.body).not.toHandle(modal.pointerMove);
+            expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[0]);
+            expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
+        });
+
+        it('removes data-touch-action attribute', function () {
+            expect(modal.ui.body).toHaveAttr('data-touch-action');
+            modal._stopResize();
+            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+        });
+    });
 });
