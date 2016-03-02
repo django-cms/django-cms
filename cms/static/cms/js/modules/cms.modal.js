@@ -553,7 +553,7 @@ var CMS = window.CMS || {};
         },
 
         /**
-         * Initiates the stop move event from `_startResize`.
+         * Initiates the stop move event from `_startMove`.
          *
          * @method _stopMove
          * @private

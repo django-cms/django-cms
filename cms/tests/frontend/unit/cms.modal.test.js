@@ -1026,6 +1026,7 @@ describe('CMS.Modal', function () {
                 hideLoader: jasmine.createSpy()
             };
             $(function () {
+                jasmine.clock().install();
                 modal = new CMS.Modal({
                     modalDuration: 0
                 });
@@ -1038,6 +1039,7 @@ describe('CMS.Modal', function () {
         });
         afterEach(function () {
             fixture.cleanup();
+            jasmine.clock().uninstall();
         });
 
         it('empties the frame', function () {
@@ -1055,32 +1057,26 @@ describe('CMS.Modal', function () {
         });
 
         it('triggers cms.modal.closed', function () {
-            jasmine.clock().install();
             modal._hide({ duration: 10000000 });
             expect(modal.trigger).not.toHaveBeenCalled();
             jasmine.clock().tick(modal.options.duration);
             expect(modal.trigger).toHaveBeenCalledWith('cms.modal.closed');
-            jasmine.clock().uninstall();
         });
 
         it('resets minimize state', function () {
-            jasmine.clock().install();
             modal.minimized = true;
             modal._hide();
             expect(modal.minimize).not.toHaveBeenCalled();
             jasmine.clock().tick(modal.options.duration);
             expect(modal.minimize).toHaveBeenCalled();
-            jasmine.clock().uninstall();
         });
 
         it('resets maximize state', function () {
-            jasmine.clock().install();
             modal.maximized = true;
             modal._hide();
             expect(modal.maximize).not.toHaveBeenCalled();
             jasmine.clock().tick(modal.options.duration);
             expect(modal.maximize).toHaveBeenCalled();
-            jasmine.clock().uninstall();
         });
         it('removes the handler to close by ESC', function () {
             var spy = jasmine.createSpy();
@@ -1230,6 +1226,149 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).toHaveAttr('data-touch-action');
             modal._stopMove();
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+        });
+    });
+
+    describe('_startResize()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                spyOn(modal, '_stopResize');
+                spyOn(modal, 'close');
+                done();
+            });
+        });
+        afterEach(function () {
+            modal.ui.body.removeAttr('data-touch-action');
+            modal.ui.body.off(modal.pointerMove);
+            modal.ui.body.off(modal.pointerUp);
+            fixture.cleanup();
+        });
+
+        it('returns false if the modal is maximized', function () {
+            modal.maximized = true;
+            expect(modal._startResize()).toEqual(false);
+        });
+
+        it('shows the shim', function () {
+            expect(modal.ui.shim).not.toBeVisible();
+            modal._startResize();
+            expect(modal.ui.shim).toBeVisible();
+        });
+
+        it('adds handler for pointermove to reposition the modal', function () {
+            expect(modal.ui.body).not.toHandle(modal.pointerMove);
+            modal._startResize();
+            expect(modal.ui.body).toHandle(modal.pointerMove);
+        });
+
+        it('does not let the modal to be resized smaller than min height or min width', function (done) {
+            var events = [
+                $.Event(modal.pointerMove, {
+                    originalEvent: {
+                        pageX: 900,
+                        pageY: 900
+                    }
+                }),
+                $.Event(modal.pointerMove, {
+                    originalEvent: {
+                        pageX: 950,
+                        pageY: 700
+                    }
+                }),
+                $.Event(modal.pointerMove, {
+                    originalEvent: {
+                        pageX: 999,
+                        pageY: 999
+                    }
+                })
+            ];
+
+            modal.ui.modal.hide();
+
+            spyOn($.fn, 'width').and.returnValue(1000);
+            spyOn($.fn, 'height').and.returnValue(1000);
+            spyOn($.fn, 'show');
+            spyOn($.fn, 'position').and.returnValue({
+                left: 0,
+                top: 0
+            });
+
+            modal._startResize({
+                originalEvent: {
+                    pageX: 1000,
+                    pageY: 1000
+                }
+            });
+
+            var eventsHappened = 0;
+            spyOn($.fn, 'css').and.callFake(function (props) {
+                switch (eventsHappened) {
+                    case 0: {
+                        expect(props).toEqual({
+                            width: 1000 - 100 * 2,
+                            height: 1000 - 100 * 2,
+                            left: 100,
+                            top: 100
+                        });
+                        break;
+                    }
+                    case 1: {
+                        expect(props).toEqual({
+                            width: 1000 - 50 * 2,
+                            height: 1000 - 300 * 2,
+                            left: 50,
+                            top: 300
+                        });
+                        break;
+                    }
+                    case 2: {
+                        expect(props).toEqual({
+                            width: 1000 - 1 * 2,
+                            height: 1000 - 1 * 2,
+                            left: 1,
+                            top: 1
+                        });
+                        done();
+                        break;
+                    }
+                }
+                eventsHappened++;
+            });
+
+            events.forEach(function (event) {
+                modal.ui.body.trigger(event);
+            });
+        });
+
+        it('adds handler for pointerup to stop resizing', function () {
+            expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[0]);
+            expect(modal.ui.body).not.toHandle(modal.pointerUp.split(' ')[1]);
+            modal._startResize();
+            expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[0]);
+            expect(modal.ui.body).toHandle(modal.pointerUp.split(' ')[1]);
+            modal.ui.body.trigger(modal.pointerUp.split(' ')[0]);
+            modal.ui.body.trigger(modal.pointerUp.split(' ')[1]);
+            expect(modal._stopResize).toHaveBeenCalledTimes(2);
+        });
+
+        it('adds data-touch-action attribute', function () {
+            expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+            modal._startResize();
+            expect(modal.ui.body).toHaveAttr('data-touch-action');
         });
     });
 });
