@@ -2,6 +2,7 @@ from django.views.i18n import javascript_catalog
 from django.views.static import serve
 
 from cms.utils import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import is_installed
 from django.conf import settings
 from django.conf.urls import include, url
@@ -19,9 +20,14 @@ urlpatterns = [
     url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
 ]
 
-urlpatterns += i18n_patterns('',
-    url(r'^', include('cms.test_utils.project.third_cms_urls_for_apphook_tests')),
-)
+if DJANGO_1_7:
+    urlpatterns += i18n_patterns('',
+        url(r'^', include('cms.test_utils.project.third_cms_urls_for_apphook_tests')),
+    )
+else:
+    urlpatterns += i18n_patterns(
+        url(r'^', include('cms.test_utils.project.third_cms_urls_for_apphook_tests')),
+    )
 
 
 if settings.DEBUG and is_installed('debug_toolbar'):

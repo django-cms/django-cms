@@ -2,6 +2,9 @@
 import json
 import sys
 import warnings
+
+from django.utils.six import string_types
+
 from cms.utils.compat import DJANGO_1_6, DJANGO_1_8
 
 from django.conf import settings
@@ -397,12 +400,14 @@ class BaseCMSTestCase(object):
     def render_template_obj(self, template, context, request):
         try:
             from django.template import engines
-            template_obj = engines['django'].from_string(template)
-            return template_obj.render(context, request)
-        except ImportError:
+            if isinstance(template, string_types):
+                template = engines['django'].from_string(template)
+            return template.render(context, request)
+        except ImportError:  # DJANGO_1_7
             from django.template import Template
-            template_obj = Template(template)
-            return template_obj.render(RequestContext(request, context))
+            if isinstance(template, string_types):
+                template = Template(template)
+            return template.render(RequestContext(request, context))
 
     def apphook_clear(self):
         from cms.apphook_pool import apphook_pool

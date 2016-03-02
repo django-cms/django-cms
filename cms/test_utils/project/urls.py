@@ -10,6 +10,7 @@ from django.views.i18n import javascript_catalog
 
 from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2, LoginForm3
 from cms.test_utils.project.placeholderapp.views import example_view
 from cms.test_utils.project.sampleapp.views import plain_view
@@ -26,18 +27,33 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += i18n_patterns('',
-    url(r'^sample/login_other/$', login,
-        kwargs={'authentication_form': LoginForm2}),
-    url(r'^sample/login/$', login,
-        kwargs={'authentication_form': LoginForm}),
-    url(r'^sample/login3/$', login,
-        kwargs={'authentication_form': LoginForm3}),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^example/$', example_view),
-    url(r'^plain_view/$', plain_view),
-    url(r'^', include('cms.urls')),
-)
+
+if DJANGO_1_7:
+    urlpatterns += i18n_patterns('',
+        url(r'^sample/login_other/$', login,
+            kwargs={'authentication_form': LoginForm2}),
+        url(r'^sample/login/$', login,
+            kwargs={'authentication_form': LoginForm}),
+        url(r'^sample/login3/$', login,
+            kwargs={'authentication_form': LoginForm3}),
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^example/$', example_view),
+        url(r'^plain_view/$', plain_view),
+        url(r'^', include('cms.urls')),
+    )
+else:
+    urlpatterns += i18n_patterns(
+        url(r'^sample/login_other/$', login,
+            kwargs={'authentication_form': LoginForm2}),
+        url(r'^sample/login/$', login,
+            kwargs={'authentication_form': LoginForm}),
+        url(r'^sample/login3/$', login,
+            kwargs={'authentication_form': LoginForm3}),
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^example/$', example_view),
+        url(r'^plain_view/$', plain_view),
+        url(r'^', include('cms.urls')),
+    )
 
 
 if settings.DEBUG and is_installed('debug_toolbar'):

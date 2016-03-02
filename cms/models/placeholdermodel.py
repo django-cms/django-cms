@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db.models import ManyToManyField
 
-from cms.utils.compat import DJANGO_1_7
+from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename
 from django.db import models
@@ -255,8 +255,12 @@ class Placeholder(models.Model):
         """
         Returns a list of objects attached to this placeholder.
         """
-        return [obj for field in self._get_attached_fields()
-                for obj in getattr(self, field.related.get_accessor_name()).all()]
+        if DJANGO_1_8:
+            return [obj for field in self._get_attached_fields()
+                    for obj in getattr(self, field.related.get_accessor_name()).all()]
+        else:
+            return [obj for field in self._get_attached_fields()
+                    for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
 
     def page_getter(self):
         if not hasattr(self, '_page'):

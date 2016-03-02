@@ -8,6 +8,7 @@ from django.views.i18n import javascript_catalog
 from django.views.static import serve
 
 from cms.test_utils.project.placeholderapp.views import example_view
+from cms.utils.compat import DJANGO_1_7
 from cms.utils.conf import get_cms_setting
 
 admin.autodiscover()
@@ -22,11 +23,19 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += i18n_patterns('',
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^example/$', example_view),
-    url(r'^', include('cms.urls')),
-)
+
+if DJANGO_1_7:
+    urlpatterns += i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^example/$', example_view),
+        url(r'^', include('cms.urls')),
+    )
+else:
+    urlpatterns += i18n_patterns(
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^example/$', example_view),
+        url(r'^', include('cms.urls')),
+    )
 
 
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
