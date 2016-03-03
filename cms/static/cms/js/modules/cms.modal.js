@@ -687,6 +687,7 @@ var CMS = window.CMS || {};
             var row;
             var tmp;
 
+            // istanbul ignore else
             if (!djangoSuit) {
                 row = iframe.contents().find('.submit-row:eq(0)');
             } else {
@@ -720,6 +721,7 @@ var CMS = window.CMS || {};
 
             // if there are no given buttons within the submit-row area
             // scan deeper within the form itself
+            // istanbul ignore next
             if (!buttons.length) {
                 row = iframe.contents().find('body:not(.change-list) #content form:eq(0)');
                 buttons = row.find('input[type="submit"], button[type="submit"]');

@@ -1483,4 +1483,140 @@ describe('CMS.Modal', function () {
             expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
         });
     });
+
+    describe('_setButtons()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.config = {
+                lang: {
+                    cancel: 'Cancel!'
+                }
+            };
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                spyOn(modal, '_loadIframe');
+                spyOn(modal, 'close');
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('renders buttons from the iframe to the modal', function () {
+            expect(modal.ui.modalButtons).toBeEmpty();
+            modal._setButtons($('.buttons-test-iframe'));
+            expect(modal.ui.modalButtons).not.toBeEmpty();
+            expect(modal.ui.modalButtons.html()).toEqual([
+                '<div class="cms-modal-buttons-inner">',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a href="#" class="cms-btn cms-btn-action default">default</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a href="#" class="cms-btn undefined">whatever correct</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a href="#" class="cms-btn undefined">link</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a href="#" class="cms-btn cms-btn-caution deletelink">caution</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a href="#" class="cms-btn">Cancel!</a>',
+                    '</div>',
+                '</div>'
+            ].join(''));
+        });
+
+        it('adds handlers to the newly created buttons', function () {
+            modal._setButtons($('.buttons-test-iframe'));
+            expect(modal.ui.modalButtons.find('a')).toHandle(modal.click);
+            expect(modal.ui.modalButtons.find('a')).toHandle(modal.touchEnd);
+            var spy = jasmine.createSpy();
+            spyOn($.fn, 'hide');
+
+            $('.buttons-test-iframe').find('a, input, button').on('click', function (e) {
+                e.preventDefault();
+                spy();
+            });
+
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(2) a').trigger(modal.click);
+            expect(modal._loadIframe).toHaveBeenCalledWith({
+                url: jasmine.stringMatching(/#go$/),
+                name: 'link'
+            });
+            expect(spy).not.toHaveBeenCalled();
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(0) a').trigger(modal.touchEnd);
+            expect(spy).toHaveBeenCalledTimes(1);
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(true);
+
+            modal.saved = false;
+            modal.hideFrame = undefined;
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(1) a').trigger(modal.touchEnd);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            expect($.fn.hide).not.toHaveBeenCalled();
+            modal.saved = false;
+            modal.hideFrame = undefined;
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(3) a').trigger(modal.touchEnd);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(modal.saved).toEqual(true);
+            expect(modal.hideFrame).toEqual(undefined);
+            expect($.fn.hide.calls.mostRecent().object.selector)
+                .toEqual(modal.ui.modal.find('.cms-modal-frame iframe').selector);
+
+            modal.saved = false;
+            modal.hideFrame = undefined;
+            modal.options = {
+                onClose: 'something'
+            };
+            expect(modal.close).not.toHaveBeenCalled();
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(4) a').trigger(modal.click);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+            expect(modal.close).toHaveBeenCalled();
+            expect(modal.options.onClose).toEqual(false);
+            expect($.fn.hide).toHaveBeenCalledTimes(1);
+        });
+
+        it('adds submit handlers to the form', function () {
+            modal._setButtons($('.buttons-test-iframe'));
+            var spy = jasmine.createSpy();
+
+            var form = $('#iframe-form').on('submit', function (e) {
+                e.preventDefault();
+            });
+
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            form.trigger('submit');
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            modal.hideFrame = true;
+            form.trigger('submit');
+            expect(modal.saved).toEqual(true);
+            expect(modal.hideFrame).toEqual(true);
+        });
+    });
 });
