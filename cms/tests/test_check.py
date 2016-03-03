@@ -65,12 +65,6 @@ class CheckTests(CheckAssertMixin, TestCase):
     def test_no_sekizai(self):
         if DJANGO_1_8:
             from django.apps import apps
-            base.get_templatetags_modules.cache_clear()
-            apps.set_available_apps(['cms', 'menus'])
-            self.assertCheck(False, errors=2)
-            apps.unset_available_apps()
-        elif DJANGO_1_8:
-            from django.apps import apps
             apps.set_available_apps(['cms', 'menus'])
             self.assertCheck(False, errors=2)
             apps.unset_available_apps()

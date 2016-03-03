@@ -688,14 +688,9 @@ class PlaceholderAdminMixin(object):
             "app_label": app_label,
         }
         request.current_app = self.admin_site.name
-        if DJANGO_1_7:
-            return TemplateResponse(
-                request, "admin/cms/page/plugin/delete_confirmation.html", context, current_app=self.admin_site.name
-            )
-        else:
-            return TemplateResponse(
-                request, "admin/cms/page/plugin/delete_confirmation.html", context
-            )
+        return TemplateResponse(
+            request, "admin/cms/page/plugin/delete_confirmation.html", context
+        )
 
     @xframe_options_sameorigin
     def clear_placeholder(self, request, placeholder_id):

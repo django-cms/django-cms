@@ -1,12 +1,12 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import RequestContext
+from django.template.engine import Engine
 from django.template.base import Template
 from django.views.generic import DetailView
 from cms.test_utils.project.placeholderapp.models import (
     Example1, MultilingualExample1, CharPksExample)
 from cms.utils import get_language_from_request
-from cms.utils.compat import DJANGO_1_7
 
 
 def example_view(request):
@@ -25,14 +25,9 @@ def _base_detail(request, instance, template_name='detail.html',
         request.toolbar.set_object(instance)
     if template_string:
         context = RequestContext(request=request, dict_=context)
-        if DJANGO_1_7:
-            template = Template(template_string)
-            return HttpResponse(template.render(context))
-        else:
-            from django.template.engine import Engine
-            engine = Engine.get_default()
-            template = engine.from_string(template_string)
-            return HttpResponse(template.render(context))
+        engine = Engine.get_default()
+        template = engine.from_string(template_string)
+        return HttpResponse(template.render(context))
     else:
         return render(request, template_name, context)
 
@@ -90,14 +85,9 @@ class ClassDetail(DetailView):
     def render_to_response(self, context, **response_kwargs):
         if self.template_string:
             context = RequestContext(request=self.request, dict_=context)
-            if DJANGO_1_7:
-                template = Template(self.template_string)
-                return HttpResponse(template.render(context))
-            else:
-                from django.template.engine import Engine
-                engine = Engine.get_default()
-                template = engine.from_string(self.template_string)
-                return HttpResponse(template.render(context))
+            engine = Engine.get_default()
+            template = engine.from_string(self.template_string)
+            return HttpResponse(template.render(context))
         else:
             return super(ClassDetail, self).render_to_response(context, **response_kwargs)
 

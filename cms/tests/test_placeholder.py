@@ -41,7 +41,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
@@ -721,20 +721,14 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         that content will be added twice.
         """
         template = get_template("placeholder_tests/test_super_extends_2.html")
-        if DJANGO_1_7:
-            output = template.render(Context({}))
-        else:
-            output = template.render({})
+        output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
-        if DJANGO_1_7:
-            output = template.render(Context({}))
-        else:
-            output = template.render({})
+        output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
