@@ -315,9 +315,9 @@ will look like this::
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
 .. __: https://github.com/tangentlabs/django-oscar/blob/0.7.2/oscar/apps/dashboard/nav.py#L57
 
-************************************************
+***********************************************
 Automatically restart server on apphook changes
-************************************************
+***********************************************
 
 As mentioned above, whenever you:
 

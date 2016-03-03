@@ -25,9 +25,9 @@ language of your pages - then you may need to use a ``TitleExtension``.
 On the other hand if the extension you'd like to create is the same for all of the different
 languages of the page, then you may be fine using a ``PageExtension``.
 
-******************************
+***************************
 Implement a basic extension
-******************************
+***************************
 
 Three basic steps are required:
 
@@ -167,12 +167,12 @@ Here's a simple version for our example::
     Otherwise, the implementation is similar.
 
 
-*******************
+****************
 Using extensions
-*******************
+****************
 
 In templates
-=============================
+============
 
 To access a page extension in page templates you can simply access the
 appropriate related_name field that is now available on the Page object.
@@ -202,7 +202,7 @@ above.
 
 
 With menus
-===========================
+==========
 
 Like most other Page attributes, extensions are not represented in the menu ``NavigationNodes``,
 and therefore menu templates will not have access to them by default.

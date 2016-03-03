@@ -157,14 +157,14 @@ Don't forget that show_menu recurses - so it will do *all* of the below for *eac
     * :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()`
         * :py:meth:`menus.menu_pool.MenuPool.get_nodes()`
             * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's ``cms_menus.py``, and registers:
- 				* Menu classes, placing them in the ``self.menus`` dict
-				* Modifier classes, placing them in the self.modifiers list
+                * Menu classes, placing them in the ``self.menus`` dict
+                * Modifier classes, placing them in the self.modifiers list
             * :py:meth:`menus.menu_pool.MenuPool._build_nodes()`
                 * checks the cache to see if it should return cached nodes
                 * loops over the Menus in self.menus (note: by default the only generator is :py:class:`cms.menu.CMSMenu`); for each:
-				    * call its :py:meth:`get_nodes()` - the menu generator
-				    * :py:meth:`menus.menu_pool._build_nodes_inner_for_one_menu()`
-				    * adds all nodes into a big list
+                    * call its :py:meth:`get_nodes()` - the menu generator
+                    * :py:meth:`menus.menu_pool._build_nodes_inner_for_one_menu()`
+                    * adds all nodes into a big list
             * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()`
                 * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
                 * loops over each node, comparing its URL with the request.path_info, and marks the best match as ``selected``

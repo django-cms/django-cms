@@ -109,6 +109,6 @@ If in doubt, ask on the #django-cms IRC channel on `freenode`_ or the
 
 .. _security@django-cms.org: mailto:security@django-cms.org
 .. _django-cms-developers: http://groups.google.com/group/django-cms-developers
-.. _freenode : http://freenode.net/
-.. _@djangocms : https://twitter.com/djangocms
+.. _freenode: http://freenode.net/
+.. _@djangocms: https://twitter.com/djangocms
 

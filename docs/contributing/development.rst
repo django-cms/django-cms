@@ -83,7 +83,7 @@ from other members of the community should be reviewed and discussed by more
 than one core developer before being accepted.
 
 Current core developers
-===============================
+=======================
 
 * Angelo Dini http://github.com/finalangel
 * Benjamin Wohlwend http://github.com/piquadrat
