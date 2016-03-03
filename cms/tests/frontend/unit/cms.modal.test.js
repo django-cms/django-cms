@@ -1,3 +1,4 @@
+/* global document */
 'use strict';
 
 describe('CMS.Modal', function () {
@@ -12,6 +13,7 @@ describe('CMS.Modal', function () {
         expect(CMS.Modal.prototype.close).toEqual(jasmine.any(Function));
         expect(CMS.Modal.prototype.minimize).toEqual(jasmine.any(Function));
         expect(CMS.Modal.prototype.maximize).toEqual(jasmine.any(Function));
+        expect(CMS.Modal._setupCtrlEnterSave).toEqual(jasmine.any(Function));
     });
 
     describe('instance', function () {
@@ -78,6 +80,9 @@ describe('CMS.Modal', function () {
             delete CMS._newPlugin;
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
+            };
+            CMS.API.Messages = {
+                open: jasmine.createSpy()
             };
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
@@ -1417,6 +1422,439 @@ describe('CMS.Modal', function () {
             expect(modal.ui.body).toHaveAttr('data-touch-action');
             modal._stopResize();
             expect(modal.ui.body).not.toHaveAttr('data-touch-action');
+        });
+    });
+
+    describe('_setBreadcrumb()', function () {
+        var modal;
+        var validBreadcrumbs = [
+            { title: 'first', url: '#first' },
+            { title: 'second', url: '#second' },
+            { title: 'last', url: '#last' }
+        ];
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('returns false if there is no breadcrumbs', function () {
+            expect(modal._setBreadcrumb()).toEqual(false);
+        });
+
+        it('returns false if there is only one breadcrumb', function () {
+            expect(modal._setBreadcrumb([])).toEqual(false);
+            expect(modal._setBreadcrumb([{}])).toEqual(false);
+        });
+
+        it('returns false if first breadcrumb does not have title', function () {
+            expect(modal._setBreadcrumb([{}, { title: 'breadcrumb', url: '#' }])).toEqual(false);
+        });
+
+        it('adds class to the modal', function () {
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-has-breadcrumb');
+            modal._setBreadcrumb(validBreadcrumbs);
+            expect(modal.ui.modal).toHaveClass('cms-modal-has-breadcrumb');
+        });
+
+        it('creates appropriate markup for breadcrumbs', function () {
+            expect(modal.ui.breadcrumb.html()).toEqual('');
+            modal._setBreadcrumb(validBreadcrumbs);
+            // depending on the browser classes can be in different places or
+            // not exist at all
+            expect(modal.ui.breadcrumb.html()).toMatch(new RegExp([
+                '<a href="#first"\( class=""\)\?><span>first</span></a>',
+                '<a href="#second"\( class=""\)\?><span>second</span></a>',
+                '<a\( class="active"\)\? href="#last"\( class="active"\)\?><span>last</span></a>'
+            ].join('')));
+        });
+
+        it('makes last breadcrumb active', function () {
+            modal._setBreadcrumb(validBreadcrumbs);
+            expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
+        });
+    });
+
+    describe('_setButtons()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.config = {
+                lang: {
+                    cancel: 'Cancel!'
+                }
+            };
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                spyOn(modal, '_loadIframe');
+                spyOn(modal, 'close');
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('renders buttons from the iframe to the modal', function () {
+            expect(modal.ui.modalButtons).toBeEmpty();
+            modal._setButtons($('.buttons-test-iframe'));
+            expect(modal.ui.modalButtons).not.toBeEmpty();
+            expect(modal.ui.modalButtons.html()).toMatch(new RegExp([
+                '<div class="cms-modal-buttons-inner">',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a\( href="#"\)\? class="cms-btn cms-btn-action default"\( href="#"\)\?>default</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a\( href="#"\)\? class="cms-btn undefined"\( href="#"\)\?>whatever correct</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a\( href="#"\)\? class="cms-btn undefined"\( href="#"\)\?>link</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a\( href="#"\)\? class="cms-btn cms-btn-caution deletelink"\( href="#"\)\?>caution</a>',
+                    '</div>',
+                    '<div class="cms-modal-item-buttons">',
+                        '<a\( href="#"\)\? class="cms-btn"\( href="#"\)\?>Cancel!</a>',
+                    '</div>',
+                '</div>'
+            ].join('')));
+        });
+
+        it('adds handlers to the newly created buttons', function () {
+            modal._setButtons($('.buttons-test-iframe'));
+            expect(modal.ui.modalButtons.find('a')).toHandle(modal.click);
+            expect(modal.ui.modalButtons.find('a')).toHandle(modal.touchEnd);
+            var spy = jasmine.createSpy();
+            spyOn($.fn, 'hide');
+
+            $('.buttons-test-iframe').find('a, input, button').on('click', function (e) {
+                e.preventDefault();
+                spy();
+            });
+
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(2) a').trigger(modal.click);
+            expect(modal._loadIframe).toHaveBeenCalledWith({
+                url: jasmine.stringMatching(/#go$/),
+                name: 'link'
+            });
+            expect(spy).not.toHaveBeenCalled();
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(0) a').trigger(modal.touchEnd);
+            expect(spy).toHaveBeenCalledTimes(1);
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(true);
+
+            modal.saved = false;
+            modal.hideFrame = undefined;
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(1) a').trigger(modal.touchEnd);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            expect($.fn.hide).not.toHaveBeenCalled();
+            modal.saved = false;
+            modal.hideFrame = undefined;
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(3) a').trigger(modal.touchEnd);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(modal.saved).toEqual(true);
+            expect(modal.hideFrame).toEqual(undefined);
+            expect($.fn.hide.calls.mostRecent().object.selector)
+                .toEqual(modal.ui.modal.find('.cms-modal-frame iframe').selector);
+
+            modal.saved = false;
+            modal.hideFrame = undefined;
+            modal.options = {
+                onClose: 'something'
+            };
+            expect(modal.close).not.toHaveBeenCalled();
+            modal.ui.modalButtons.find('.cms-modal-item-buttons:eq(4) a').trigger(modal.click);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+            expect(modal.close).toHaveBeenCalled();
+            expect(modal.options.onClose).toEqual(false);
+            expect($.fn.hide).toHaveBeenCalledTimes(1);
+        });
+
+        it('adds submit handlers to the form', function () {
+            modal._setButtons($('.buttons-test-iframe'));
+            var spy = jasmine.createSpy();
+
+            var form = $('#iframe-form').on('submit', function (e) {
+                e.preventDefault();
+            });
+
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            form.trigger('submit');
+            expect(modal.saved).toEqual(false);
+            expect(modal.hideFrame).toEqual(undefined);
+
+            modal.hideFrame = true;
+            form.trigger('submit');
+            expect(modal.saved).toEqual(true);
+            expect(modal.hideFrame).toEqual(true);
+        });
+    });
+
+    describe('_deletePlugin()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.config = {
+                csrf: 'CSRF!',
+                lang: {
+                    confirmEmpty: '({1}) plugin is empty. Remove it?'
+                }
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                spyOn(modal, '_hide');
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('makes ajax request to delete new plugin', function (done) {
+            CMS.API.Toolbar.openAjax = function (ajax) {
+                expect(ajax).toEqual({
+                    url: '/delete-url',
+                    post: '{ "csrfmiddlewaretoken": "CSRF!" }',
+                    text: '(TestPlugin) plugin is empty. Remove it?',
+                    callback: jasmine.any(Function)
+                });
+                ajax.callback();
+                expect(CMS._newPlugin).toEqual(false);
+                done();
+            };
+
+            CMS._newPlugin = {
+                'delete': '/delete-url',
+                breadcrumb: [{
+                    title: 'TestPlugin'
+                }]
+            };
+            modal._deletePlugin();
+        });
+
+        it('hides the modal if the correct param is passed', function (done) {
+            CMS.API.Toolbar.openAjax = function (ajax) {
+                expect(ajax).toEqual({
+                    url: '/delete-url',
+                    post: '{ "csrfmiddlewaretoken": "CSRF!" }',
+                    text: '(ShmestPlugin) plugin is empty. Remove it?',
+                    callback: jasmine.any(Function)
+                });
+                ajax.callback();
+                expect(CMS._newPlugin).toEqual(false);
+                expect(modal._hide).toHaveBeenCalled();
+                done();
+            };
+
+            CMS._newPlugin = {
+                'delete': '/delete-url',
+                breadcrumb: [
+                    { title: 'TestPlugin' },
+                    { title: 'ShmestPlugin' }
+                ]
+            };
+            modal._deletePlugin({ hideAfter: true });
+        });
+    });
+
+    describe('_changeIframe()', function () {
+        var modal;
+        var breadcrumbs = [
+            { title: 'first', url: '#first' },
+            { title: 'second', url: '#second' },
+            { title: 'last', url: '#last' }
+        ];
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                modal._setBreadcrumb(breadcrumbs);
+                spyOn(modal, '_loadIframe');
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('returns false if element was active', function () {
+            expect(modal._changeIframe(modal.ui.breadcrumb.find('a:last'))).toEqual(false);
+        });
+        it('changes the class if element was not active', function () {
+            expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
+            modal._changeIframe(modal.ui.breadcrumb.find('a:first'));
+            expect(modal.ui.breadcrumb.find('a:last')).not.toHaveClass('active');
+            expect(modal.ui.breadcrumb.find('a:first')).toHaveClass('active');
+        });
+        it('loads the iframe', function () {
+            modal._changeIframe(modal.ui.breadcrumb.find('a:first'));
+            expect(modal._loadIframe).toHaveBeenCalledWith({
+                url: '#first'
+            });
+        });
+        it('changes titlePrefix', function () {
+            expect(modal.ui.titlePrefix.text()).toEqual('');
+            modal._changeIframe(modal.ui.breadcrumb.find('a:eq(1)'));
+            expect(modal.ui.titlePrefix.text()).toEqual('second');
+        });
+    });
+
+    describe('CMS.Modal._setupCtrlEnterSave()', function () {
+        var spy;
+        var button;
+        var doc = $(document);
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            $(function () {
+                spy = jasmine.createSpy();
+                button = $('<div class="cms-btn-action"></div>')
+                    .on('click', spy);
+                button.appendTo('.cms-modal-buttons');
+                done();
+            });
+        });
+        afterEach(function () {
+            doc.off('keydown.cms.submit keyup.cms.submit');
+            fixture.cleanup();
+        });
+
+        it('adds handlers to the document', function () {
+            expect(doc).not.toHandle('keydown.cms.submit');
+            expect(doc).not.toHandle('keyup.cms.submit');
+            CMS.Modal._setupCtrlEnterSave(document);
+            expect(doc).toHandle('keydown.cms.submit');
+            expect(doc).toHandle('keyup.cms.submit');
+        });
+
+        it('triggers modal action if ctrl+enter is pressed on win', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not trigger modal action if ctrl+enter is pressed on mac', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('triggers modal action if cmd+enter is pressed on mac', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(1);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(2);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(3);
+        });
+
+        it('does not trigger modal action if cmd+enter is pressed on win', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 });
