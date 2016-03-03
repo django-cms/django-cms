@@ -1705,6 +1705,59 @@ describe('CMS.Modal', function () {
         });
     });
 
+    describe('_changeIframe()', function () {
+        var modal;
+        var breadcrumbs = [
+            { title: 'first', url: '#first' },
+            { title: 'second', url: '#second' },
+            { title: 'last', url: '#last' }
+        ];
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                modal._setBreadcrumb(breadcrumbs);
+                spyOn(modal, '_loadIframe');
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('returns false if element was active', function () {
+            expect(modal._changeIframe(modal.ui.breadcrumb.find('a:last'))).toEqual(false);
+        });
+        it('changes the class if element was not active', function () {
+            expect(modal.ui.breadcrumb.find('a:last')).toHaveClass('active');
+            modal._changeIframe(modal.ui.breadcrumb.find('a:first'));
+            expect(modal.ui.breadcrumb.find('a:last')).not.toHaveClass('active');
+            expect(modal.ui.breadcrumb.find('a:first')).toHaveClass('active');
+        });
+        it('loads the iframe', function () {
+            modal._changeIframe(modal.ui.breadcrumb.find('a:first'));
+            expect(modal._loadIframe).toHaveBeenCalledWith({
+                url: '#first'
+            });
+        });
+        it('changes titlePrefix', function () {
+            expect(modal.ui.titlePrefix.text()).toEqual('');
+            modal._changeIframe(modal.ui.breadcrumb.find('a:eq(1)'));
+            expect(modal.ui.titlePrefix.text()).toEqual('second');
+        });
+    });
+
     describe('CMS.Modal._setupCtrlEnterSave()', function () {
         var spy;
         var button;
