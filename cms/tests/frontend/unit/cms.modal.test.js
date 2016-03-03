@@ -79,6 +79,9 @@ describe('CMS.Modal', function () {
             CMS.API.Tooltip = {
                 hide: jasmine.createSpy()
             };
+            CMS.API.Messages = {
+                open: jasmine.createSpy()
+            };
             CMS.API.Toolbar = {
                 open: jasmine.createSpy(),
                 showLoader: jasmine.createSpy(),
@@ -1471,11 +1474,13 @@ describe('CMS.Modal', function () {
         it('creates appropriate markup for breadcrumbs', function () {
             expect(modal.ui.breadcrumb.html()).toEqual('');
             modal._setBreadcrumb(validBreadcrumbs);
-            expect(modal.ui.breadcrumb.html()).toEqual([
-                '<a href="#first" class=""><span>first</span></a>',
-                '<a href="#second" class=""><span>second</span></a>',
-                '<a href="#last" class="active"><span>last</span></a>'
-            ].join(''));
+            // depending on the browser classes can be in different places or
+            // not exist at all
+            expect(modal.ui.breadcrumb.html()).toMatch(new RegExp([
+                '<a href="#first"\( class=""\)\?><span>first</span></a>',
+                '<a href="#second"\( class=""\)\?><span>second</span></a>',
+                '<a\( class="active"\)\? href="#last"\( class="active"\)\?><span>last</span></a>'
+            ].join('')));
         });
 
         it('makes last breadcrumb active', function () {
@@ -1519,25 +1524,25 @@ describe('CMS.Modal', function () {
             expect(modal.ui.modalButtons).toBeEmpty();
             modal._setButtons($('.buttons-test-iframe'));
             expect(modal.ui.modalButtons).not.toBeEmpty();
-            expect(modal.ui.modalButtons.html()).toEqual([
+            expect(modal.ui.modalButtons.html()).toMatch(new RegExp([
                 '<div class="cms-modal-buttons-inner">',
                     '<div class="cms-modal-item-buttons">',
-                        '<a href="#" class="cms-btn cms-btn-action default">default</a>',
+                        '<a\( href="#"\)\? class="cms-btn cms-btn-action default"\( href="#"\)\?>default</a>',
                     '</div>',
                     '<div class="cms-modal-item-buttons">',
-                        '<a href="#" class="cms-btn undefined">whatever correct</a>',
+                        '<a\( href="#"\)\? class="cms-btn undefined"\( href="#"\)\?>whatever correct</a>',
                     '</div>',
                     '<div class="cms-modal-item-buttons">',
-                        '<a href="#" class="cms-btn undefined">link</a>',
+                        '<a\( href="#"\)\? class="cms-btn undefined"\( href="#"\)\?>link</a>',
                     '</div>',
                     '<div class="cms-modal-item-buttons">',
-                        '<a href="#" class="cms-btn cms-btn-caution deletelink">caution</a>',
+                        '<a\( href="#"\)\? class="cms-btn cms-btn-caution deletelink"\( href="#"\)\?>caution</a>',
                     '</div>',
                     '<div class="cms-modal-item-buttons">',
-                        '<a href="#" class="cms-btn">Cancel!</a>',
+                        '<a\( href="#"\)\? class="cms-btn"\( href="#"\)\?>Cancel!</a>',
                     '</div>',
                 '</div>'
-            ].join(''));
+            ].join('')));
         });
 
         it('adds handlers to the newly created buttons', function () {
