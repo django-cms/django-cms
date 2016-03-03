@@ -1,3 +1,4 @@
+/* global document */
 'use strict';
 
 describe('CMS.Modal', function () {
@@ -12,6 +13,7 @@ describe('CMS.Modal', function () {
         expect(CMS.Modal.prototype.close).toEqual(jasmine.any(Function));
         expect(CMS.Modal.prototype.minimize).toEqual(jasmine.any(Function));
         expect(CMS.Modal.prototype.maximize).toEqual(jasmine.any(Function));
+        expect(CMS.Modal._setupCtrlEnterSave).toEqual(jasmine.any(Function));
     });
 
     describe('instance', function () {
@@ -1700,6 +1702,106 @@ describe('CMS.Modal', function () {
                 ]
             };
             modal._deletePlugin({ hideAfter: true });
+        });
+    });
+
+    describe('CMS.Modal._setupCtrlEnterSave()', function () {
+        var spy;
+        var button;
+        var doc = $(document);
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            $(function () {
+                spy = jasmine.createSpy();
+                button = $('<div class="cms-btn-action"></div>')
+                    .on('click', spy);
+                button.appendTo('.cms-modal-buttons');
+                done();
+            });
+        });
+        afterEach(function () {
+            doc.off('keydown.cms.submit keyup.cms.submit');
+            fixture.cleanup();
+        });
+
+        it('adds handlers to the document', function () {
+            expect(doc).not.toHandle('keydown.cms.submit');
+            expect(doc).not.toHandle('keyup.cms.submit');
+            CMS.Modal._setupCtrlEnterSave(document);
+            expect(doc).toHandle('keydown.cms.submit');
+            expect(doc).toHandle('keyup.cms.submit');
+        });
+
+        it('triggers modal action if ctrl+enter is pressed on win', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(1);
+        });
+
+        it('does not trigger modal action if ctrl+enter is pressed on mac', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: false, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { ctrlKey: true, keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('triggers modal action if cmd+enter is pressed on mac', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('mac');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(1);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(2);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).toHaveBeenCalledTimes(3);
+        });
+
+        it('does not trigger modal action if cmd+enter is pressed on win', function () {
+            spyOn(String.prototype, 'toLowerCase').and.returnValue('win');
+            CMS.Modal._setupCtrlEnterSave(document);
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_LEFT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_RIGHT }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
+
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keydown', { keyCode: CMS.KEYS.ENTER }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.CMD_FIREFOX }));
+            doc.trigger($.Event('keyup', { keyCode: CMS.KEYS.ENTER }));
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 });
