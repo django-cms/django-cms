@@ -1,6 +1,4 @@
 from django.core.management.base import NoArgsCommand
-from django.utils.six.moves import input
-
 from cms.management.commands.subcommands.list import plugin_report
 
 
@@ -16,7 +14,7 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
         instances (as will happen if a plugin is inserted into a placeholder,
         but not saved).
         """
-        self.stdout.write(u"Obtaining plugin report\n")
+        self.stdout.write("Obtaining plugin report\n")
         uninstalled_instances = []
         unsaved_instances = []
 
@@ -29,9 +27,9 @@ class DeleteOrphanedPluginsCommand(NoArgsCommand):
                 unsaved_instances.append(instance)
 
         if options.get('interactive'):
-            confirm = input("""
-You have requested to delete any instances of uninstalled plugins and empty plugin instances.
-There are %d uninstalled plugins and %d empty plugins.
+            confirm = raw_input("""
+You have requested to delete any instances of uninstalled plugins and unsaved plugin instances.
+There are %d uninstalled plugins and %d unsaved_plugins.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), len(unsaved_instances)))
         else:
@@ -39,7 +37,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), le
 
         if confirm == 'yes':
             # delete items whose plugin is uninstalled and items with unsaved instances
-            self.stdout.write(u"... deleting any instances of uninstalled plugins and empty plugin instances\n")
+            self.stdout.write("... deleting any instances of uninstalled plugins and unsaved plugin instances\n")
 
             for instance in uninstalled_instances:
                 instance.delete()
@@ -47,5 +45,5 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), le
             for instance in unsaved_instances:
                 instance.delete()
 
-            self.stdout.write(u"Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n" % (len(uninstalled_instances), len(unsaved_instances)))
-            self.stdout.write(u"all done\n")
+            self.stdout.write("Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n" % (len(uninstalled_instances), len(unsaved_instances)))
+            self.stdout.write("all done\n")

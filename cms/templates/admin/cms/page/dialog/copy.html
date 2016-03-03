@@ -1,0 +1,34 @@
+{% extends "admin/cms/page/dialog/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans 'Copy options' %}{% endblock %}
+
+{% block header %}<p>{% blocktrans %}Choose copy options{% endblocktrans %}</p>{% endblock %}
+	
+{% block script %}<script type="text/javascript">
+(function($) {
+	$(document).ready(function() {
+		// change submit states, open dialog
+		$('#{{ dialog_id }}').dialog({
+			bgiframe: true,
+			autoOpen: true,
+			height: 200,
+			width: 400,
+			modal: true,
+			buttons: {
+				Cancel: function() {
+					$(this).dialog('close');
+				},
+				OK: function() {
+					formData = {}; 
+					$.each($('#{{ dialog_id }}-form').formToArray(), function(i, item){
+						formData[item.name] = item.value;
+					});
+					$.callbackCall("{{ callback }}", formData);
+					$(this).dialog('close');
+				}
+			}, 
+		});
+	});
+})(jQuery);
+</script>{% endblock %}

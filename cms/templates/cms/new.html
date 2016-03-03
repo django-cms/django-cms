@@ -1,0 +1,69 @@
+{% load url from future %}<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en" xml:lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1" />
+	<title>Welcome to django CMS</title>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
+	<style type="text/css">
+	/*<![CDATA[*/
+		html,body,div,span,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,form,fieldset,legend,label,input,textarea,table,caption,tbody,tfoot,thead,tr,th,td,cite,pre,strong,em,img,a,p,blockquote,q,code,dfn,samp,kbd,var,del,ins,sub,sup,acronym,abbr,address,applet,object,iframe { font-size:100%; font-style:normal; font-weight:normal; text-align:left; vertical-align:baseline; margin:0; padding:0; border:none; background:transparent; }
+		html { font-size:100.01%; -webkit-text-size-adjust:none; }
+		body { color:#999; font:75%/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif; margin:0; }
+
+		.clear { clear:both; display:block; width:0; height:0; overflow:hidden; visibility:hidden; }
+
+		#main { width:940px; margin:0 auto; padding-top:5%; }
+		#main .box-left { float:left; width:55%; }
+		#main .box-right { float:left; width:41%; padding:50px 2% 0; min-height:300px; }
+		#main .box-right p { text-align:right; }
+		#main .foot { text-align:right; padding-right:2%; }
+		#main .padding-top { padding-top:20px; }
+		#main .info { padding-top:5px; }
+
+		a { color:#5b80b2; font-weight:bold; text-decoration:none; }
+		a:hover { text-decoration:underline; }
+		h1, h2 { font-size:25px; font-weight:bold; line-height:1.2; text-align:right; }
+		h1 { color:#666; }
+		code { color:#000; }
+
+		.link, .link-inverted { float:right; overflow:auto; }
+		.link, .link-inverted,
+		.link:hover, .link-inverted:hover { font-size:17px; padding:10px 20px; margin:0 0 0 10px; text-decoration:none; -moz-border-radius:5px; -webkit-border-radius:5px; border-radius:5px; }
+		.link { color:#5b80b2; border:1px solid #eee; background:#f9f9f9;
+			background:-webkit-gradient(linear, 0 0, 0 bottom, from(#ffffff), to(#fafafa)); background:-moz-linear-gradient(#ffffff, #fafafa); background:linear-gradient(#ffffff, #fafafa); }
+		.link:hover,
+		.link-inverted { color:#fff; border:1px solid #5b80b2; background:#5b80b2; 
+			background:-webkit-gradient(linear, 0 0, 0 bottom, from(#7b99c1), to(#557299)); background:-moz-linear-gradient(#7b99c1, #557299); background:linear-gradient(#7b99c1, #557299); }
+		.link-inverted:hover { background:#365176; border:1px solid #365176;
+			background:-webkit-gradient(linear, 0 0, 0 bottom, from(#5b80b2), to(#365176)); background:-moz-linear-gradient(#5b80b2, #365176); background:linear-gradient(#5b80b2, #365176); }
+	/*]]>*/
+	</style>
+</head>
+<body>
+	<div id="main">
+		<div class="box-left">
+			<p><img src="{{ STATIC_URL }}cms/images/pony.jpg" alt="" />&nbsp;</p>
+		</div>
+		<div class="box-right">
+			<h1>Welcome to the django CMS!<br />Here is what to do next:</h1>
+			<p>&nbsp;</p>
+			<h2>Log into the <a href="{% url 'admin:index' %}">admin</a> interface and start <a href="{% url 'admin:cms_page_add' %}">adding</a> some pages!</h2>
+			<p class="info">Make sure you publish them.</p>
+			<p>&nbsp;</p>
+			<p class="padding-top">
+				<a href="https://www.django-cms.org/" class="link-inverted">Django-CMS.org</a>
+				<a href="http://docs.django-cms.org/" class="link">Documentation</a>
+			</p>
+		</div>
+		<div class="clear"></div>
+		<p class="foot padding-top">
+			If you don't see the django CMS logo at the end of this line make sure you linked the <code>static/cms</code> folder 
+			to your static files: <img src="{{ STATIC_URL }}cms/images/logo.jpg" alt="here should be a logo" height="20" /></p>
+		<p class="foot">
+			You're seeing this message because you have <code>DEBUG = True</code> in your 
+			django settings file and haven't added any pages yet. Get to work!"
+		</p>
+	</div>
+</body>
+</html>

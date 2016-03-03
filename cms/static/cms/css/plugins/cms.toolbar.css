@@ -1,0 +1,142 @@
+@charset "utf-8";
+/**
+ * @author:		Angelo Dini
+ * @copyright:	http://www.divio.ch under the BSD Licence
+ */
+
+/*##################################################|*/
+/* #TOOLBAR# */
+#cms_toolbar { position:absolute; left:0; top:0; z-index:99999; width:100%; } /* needs ie fix for pos fixed */
+.cms_toolbar { position:fixed; left:0; top:0; z-index:99999; width:100%; } /* needs ie fix for pos fixed */
+#cms_toolbar-toolbar { width:100%; height:42px; border-bottom:1px solid #ddd !important;
+	position:relative; left:0; top:0; z-index:999999; min-width:960px;
+	background:#fff url('../../images/toolbar/toolbar_bg.gif') repeat-x left bottom; }
+
+.cms_toolbar-left { float:left; }
+.cms_toolbar-right { float:right; padding-right:48px !important; }
+
+/* #TOOLBAR/reset# */
+.cms_reset div, .cms_reset p, .cms_reset a, .cms_reset a:hover, .cms_reset a:active, .cms_reset a:focus,
+.cms_reset form, .cms_reset fieldset, .cms_reset label, .cms_reset input, .cms_reset textarea, .cms_reset select,
+.cms_reset ul, .cms_reset li {
+	font:normal 13px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif; color:#666; font-weight:normal; text-decoration:none;
+	text-align:left; border:none; padding:0; margin:0; outline:none; }
+
+/* #TOOLBAR/general# */
+#cms_toolbar fieldset { float:left; }
+
+/* #TOOLBAR/toggle# */
+#cms_toolbar-toggle { cursor:pointer; position:absolute; width:30px; right:8px; top:0; z-index:9999999; padding-top:8px !important; }
+
+/* #TOOLBAR/buttons# */
+.cms_toolbar-btn_left { float:left; color:#5b80b2; float:left; height:26px; overflow:hidden; line-height:1.2 !important;
+	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -42px; }
+.cms_toolbar-btn_right { float:left; color:#5b80b2 !important; cursor:pointer;
+	padding:5px 8px 5px !important; margin-right:0 !important;
+	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat right -68px; }
+.cms_toolbar-btn_left:hover, .cms_toolbar-btn-active { background-position:left -94px !important; }
+.cms_toolbar-btn_left:hover .cms_toolbar-btn_right, .cms_toolbar-btn-active .cms_toolbar-btn_right { color:#385e92 !important; background-position:right -120px !important; }
+
+.cms_toolbar_icon { float:left; text-indent:-1000px; overflow:hidden; background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left top; }
+.cms_toolbar_icon-hide { display:none; float:left; text-indent:-1000px; overflow:hidden; }
+.cms_toolbar_icon-enabled { width:16px; }
+.cms_toolbar_title { float:left; }
+
+/* #TOOLBAR/buttons/icons# */
+.cms_toolbar_icon-toggle .cms_toolbar_icon { width:12px; background-position:-3px -150px; }
+.cms_toolbar_icon-toggle:hover .cms_toolbar_icon { background-position:-3px -176px; }
+.cms_toolbar-collapsed .cms_toolbar_icon-toggle .cms_toolbar_icon { background-position:-21px -150px; }
+.cms_toolbar-collapsed .cms_toolbar_icon-toggle:hover .cms_toolbar_icon { background-position:-21px -176px; }
+
+.cms_toolbar-btn_right .cms_toolbar_icon-more { float:left; width:14px; text-indent:-1000px; overflow:hidden; background-position:-72px -150px; }
+.cms_toolbar-btn_right:hover .cms_toolbar_icon-more { background-position:-72px -176px; }
+
+/* #TOOLBAR/buttons/logout# */
+.cms_toolbar-item_logout .cms_toolbar_icon { width:16px; background:url('../../images/toolbar/icons/icon_lock.png') no-repeat left center; }
+
+/*##################################################|*/
+/* #TOOLBAR/items# */
+.cms_toolbar-item { float:left; display:none; padding:0 0 0 10px !important; position:relative; left:0; top:0; z-index:999; }
+.cms_toolbar-item_logout, .cms_toolbar-item_page, .cms_toolbar-item_admin, #cms_toolbar-item_login,
+.cms_toolbar-item_templates { padding-top:8px !important; }
+
+/* #TOOLBAR/items/logo# */
+.cms_toolbar-item_logo { padding-right:5px !important; }
+.cms_toolbar-item_logo .cms_toolbar-item_logo-link { float:left; cursor:pointer; text-indent:-1000px; overflow:hidden;
+	width:105px; height:42px; background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left top; }
+.cms_toolbar-item_logo .cms_toolbar-item_logo-link:hover { background-position:-120px top; }
+
+/* #TOOLBAR/items/login# */
+#cms_toolbar-item_login label { float:left; cursor:pointer; padding:4px 10px 0 0; width: auto; }
+#cms_toolbar-item_login div { float:left; }
+#cms_toolbar-item_login div input { color:#000; width:150px; border:1px solid #ddd; padding:4px 5px; margin-right:10px; margin-top:0;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
+#cms_toolbar-item_login div input:hover { border:1px solid #999; }
+.cms_toolbar_error input[type=text], .cms_toolbar_error input[type=password] { border:1px solid #f99 !important; }
+
+/* #TOOLBAR/items/switcher# */
+.cms_toolbar-item_switcher { padding-top:9px !important; }
+.cms_toolbar-item_switcher-label { float:left; padding-top:3px; padding-right:10px; }
+.cms_toolbar-item_switcher-link { float:left; width:80px; height:24px; text-indent:-1000px; overflow:hidden; }
+.cms_toolbar-item_switcher-link span { float:left; width:80px; height:24px;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px;
+	background:url('../../images/toolbar/sprite_toolbar.png') no-repeat left -198px; }
+
+/* #TOOLBAR/items/custom# */
+/*.cms_toolbar-item_page .cms_toolbar-item_list li { min-width:300px; }*/
+.cms_toolbar-item_moderator { padding-top:8px !important; }
+.cms_toolbar-item_moderator a { background-position:left -225px; }
+.cms_toolbar-item_moderator a span { background-position:right -251px; color:#eee; }
+.cms_toolbar-item_moderator a:hover span { color:#385e92; }
+
+.cms_toolbar-item_revert { padding-top:8px !important; }
+
+/* #TOOLBAR/list# */
+.cms_toolbar-item_list { display:none; list-style:none; padding:0; margin:0; min-width:230px; overflow:hidden;
+	position:absolute; top:35px; z-index:1000; zoom:1;
+	border:1px solid #ddd; background:#fff !important;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
+.cms_toolbar-left .cms_toolbar-item_list { left:0; }
+.cms_toolbar-right .cms_toolbar-item_list { right:0; }
+.cms_toolbar-item_list li { padding:0; zoom:1; }
+.cms_toolbar-item_list li a { display:block; padding:4px 10px !important; zoom:1; white-space:nowrap; }
+/*.cms_toolbar-item_list li a span { float:left; text-indent:-1000px; overflow:hidden; }*/
+.cms_toolbar-item_list li a:hover { color:#fff !important; background:#5b80b2 !important; }
+.cms_toolbar-item_list li:first-child a { -webkit-border-radius:4px 4px 0 0; -moz-border-radius:4px 4px 0 0; border-radius:4px 4px 0 0; }
+.cms_toolbar-item_list li:last-child a { -webkit-border-radius:0 0 4px 4px; -moz-border-radius:0 0 4px 4px; border-radius:0 0 4px 4px; }
+.cms_toolbar-item_list li:only-child a { -webkit-border-radius:4px; -moz-border-radius:4px; border-radius:4px; }
+.cms_toolbar-item_list li.active a { background:#ddd; }
+
+.cms_toolbar-item_list .cms_toolbar-item_admin { padding-top:0 !important; }
+
+/* #TOOLBAR/list/icons# */
+.cms_toolbar-item_list .cms_toolbar_icon { width:18px; margin-right:4px; background-position:left 1px; }
+
+/* #TOOLBAR/status# */
+.cms_toolbar-item_status { padding-top:8px !important; }
+.cms_toolbar-item_status p { color:#5b80b2 !important; margin:0; padding:3px 10px !important; border:1px solid #ddd !important; background:#fff;
+	-webkit-border-radius:5px; -moz-border-radius:5px; border-radius:5px; }
+.cms_toolbar-item_status em { color:#000; }
+
+/*##################################################|*/
+/* #TOOLBAR/IE# */
+
+/* #TOOLBAR/IE7# */
+*+html .cms_toolbar-item_list { width:210px; }
+*+html .cms_toolbar-item_list { top:42px; }
+*+html .cms_toolbar-item_templates ul { width:375px; }
+
+*+html .cms_toolbar-btn { position:relative; z-index:999 !important; zoom:1; }
+
+/* #TOOLBAR/IE6# */
+*html .cms_toolbar-item_list { width:210px; }
+*html .cms_toolbar-item_list { top:42px; }
+*html .cms_toolbar-item_templates ul { width:375px; }
+
+*html .cms_toolbar-btn { position:relative; z-index:999 !important; zoom:1; }
+*html .cms_toolbar-btn_left, *html .cms_toolbar-btn_right, *html .cms_toolbar_icon, *html .cms_toolbar-item_switcher-link span,
+*html .cms_toolbar-item_logo .cms_toolbar-item_logo-link {
+	background-image: url('../../images/toolbar/sprite_toolbar-ie.png');
+}
+*html #cms_toolbar-toggle .cms_toolbar_icon-toggle { width:12px; }
+*html .cms_toolbar_icon-more { padding-right:6px;  }

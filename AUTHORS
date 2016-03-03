@@ -5,493 +5,240 @@ Current or previous core committers:
 * Chris Glass
 * Daniele Procida
 * Eric Robitaille
-* Iacopo Spalletti
 * Jonas Obrist
-* Martin Koistinen
 * Patrick Lauber
-* Paulo Alvarado
 * Peter Ciciman
 * Stefan Foulis
 * Øyvind Saltvik
 
-
 Current and previous core designers:
 
 * Christian Bertschy
-* Matthias Nüesch
 
-
-Contributors (based on gitlog):
+Contributors (in alphabetical order):
 
 * A. Bram Neijt
-* AQNOUCH Mohammed
-* Aaron Fay
+* aaloy
 * Aaron Renner
-* Aaron Spike
+* aball
 * Adi Sieker
-* Admin Adminaras
-* Adrien Brunet
-* Adrián Ribao Martínez
+* Adrián Ribao
 * Alberto Paro
-* Ales Kocjancic
-* Ales Zabala Alava (Shagi)
-* Alessandro Pasotti
 * Alessandro Ronchi
+* Ales Zabala Alava (Shagi)
+* Aleš Kocjančič
 * Alex Cucu
-* Alex Marandon
 * Alexandre Leray
 * Alexey Subbotin
 * Alvin Mites
-* Anatoly Ivanov
-* Andi Albrecht
-* Andre Bossard
-* Andrea Stagi
-* Andrei Avram
-* Andrei Fokau
+* Andrew Cassidy
 * Andrew Schoen
-* Angelo Dini
-* Antoine Catton
+* angular_circle
 * Anton Parkhomenko
-* Arcady Usov
+* Antoni Aloy López
 * Arne Gellhaus
-* Arne Schauf
 * Artem Skoretskiy
 * Arthur Debert
-* Artis Avotins
 * Aymeric Augustin
-* Basile LEGAL
+* Batiste Bieler
+* behrooz
 * Behrooz Nobakht
-* Belegnar
-* Ben Northway
-* Ben Stähli
-* Benjamin
-* Benjamin Liles
 * Benjamin Wohlwend
-* Bernardo Cabezas Serra
+* benjaoming
 * Bernd Zeimetz
 * Bertrand Bordage
-* Bitdeli Chef
+* beshrkayali
 * Bjorn Sandberg
 * Bob Karreman
 * Bouke Haarsma
-* Brad Walker
 * Braden MacDonald
-* Brian Schott
+* brightwhitefox
 * Calvin Cheng
-* Carlo Ascani
-* Carlos de Paula
 * Chanita Siridechkun
-* Charlie Denton
 * Charpentier Johan
 * Cheng-Chia Tseng
 * Chris Adams
-* Chris Franklin
-* Chris Glass
 * Chris Hughes
-* Chris Jones
 * Chris Wesseling
-* Chris Wilson
-* Christian Strappazzon
 * Christof Hagedorn
-* Christopher Grebs
-* Christos Kopanos
-* Claudio Bartolini
-* Colin Wirz
-* Conrado Buhrer
-* Corey Farwell
-* Craig Ricciuto
-* Craig de Stigter
-* DZ
+* Conrado Bührer
 * DaNmarner
-* Damian Moore
-* Damir Arbula
-* DamirArbula
 * Daniel Barden
-* Daniele Procida
-* Danilo Bargen
-* Darii Denis
-* Darii Denis Home
-* Dario Albanesi
-* Darren Pearce
 * Darryl Woods
-* Dave Bell
-* Dave Hall
-* David Grant
 * David Jean Louis
-* David Lam
-* David Lee
 * David Thompson
-* Davide Setti
+* deshack
 * Diógenes Augusto Fernandes Hermínio
-* Dmitry Akinin
-* Dmitry Gorelik
-* Dmytro Gorelik
-* Donatas
-* Donatas Kučinskas
-* Douwe van der Meij
-* Dries Desmet
-* Dylann CORDEL
-* DylannCordel
+* dstufft
+* DZ
+* eged
 * Egor V. Nazarkin
-* Ekrem SEREN
-* Elias Probst
-* Eric Amador
-* Eric Eldredge
-* Eric Robitaille
-* Erik Allik
+* Ekrem Seren
 * Erlend Dalen
-* Eugene MechanisM
+* Eric Eldredge
+* Erik Allik
+* Eugen MechanisM
 * Evandro Miquelito
+* Evgeny Demchenko
 * F. Gabriel Gosselin
+* f4nt
+* fcurella
 * Filip Kazimierczak
-* FinalAngel
 * Frank Bieniek
-* FrankBie
 * Gabe Jackson
 * Gabriel Hurley
 * GaretJax
-* Geoffrey Fairchild
 * Geoffrey Hing
 * George Marshall
 * Gerard Świderski
-* Germano Gabbianelli
-* Gilles Lenfant
-* Gleb Chipiga
-* Gregory Klupar
+* guandalino
 * Hamish Downer
-* Hans Andersen
-* Henning Sprang
+* hedberg
 * Herbert Poul
-* Horst Gutmann
+* homebrew79
+* hysia
 * Iacopo Spalletti
 * Ian Lewis
-* Ionel Maries Cristian
-* Ivan Vershigora
+* indexofire
+* Ionel Cristian Maries
 * Iván Raskovsky
+* Ivan Vershigora
+* izi
 * J. Cliff Dyer
 * Jacob Rief
-* Jakob Hedman
 * Jameel Al-Aziz
 * James Richards
-* James Rutherford
-* Jana Deutschlaender
 * Jannis Leidel
 * Janusz Harkot
-* Jared Proffitt
 * Jason Brown
 * Jason Davies
 * Jason Jenkins
-* Jason Robinson
-* Jeffrey Goettsch
-* JensDiemer
-* Jeroen Noten
-* Jessica Tallon
-* Jimmy Lam
+* Jason Zylks
+* Javi Nievas
 * Johannes Bornhold
-* John Bazik
 * John-Scott Atlakson
-* Jon Prindiville
-* Jonas Obrist
-* Jonathan Liuti
 * Jonathan Stoppani
-* Jorge Vargas
-* Jos van Velzen
+* jordanjambazov
+* Jorge Vargas (elpargo)
 * Joseph Bergantine
-* Joseph Melettukunnel
-* Josh Kalderimis
-* Josh Schneier
-* João Luiz Lorencetti
-* Julien Poissonnier
-* Kalle Bronsen
-* Kegan Holtzhausen
+* kar1m
 * Keryn Knight
-* Kevin Richardson
-* Kim Thoenen
+* Kim Blomqvist
+* kochin
 * Kristian Øllegaard
-* L-A Iscla
+* Krzysztof Bandurski
+* kunitoki
 * Lars Smit
 * Lars van de Kerkhof
-* Lio Mendonca
-* Lionardo Mendonça
-* Loriana Indelicato
+* limpbrains :P
+* littlepea
 * Lucas Vogelsang
 * Lucio Asnaghi
-* Luis Diego Garcia
 * Luke Crooks
 * Luke Plant
-* MW
+* m000
 * Maik Lustenberger
 * Manolis Stamatogiannakis
 * Manuel Schmidt
 * Marc-Olivier Titeux
 * Marco Bonetti
-* Marco Paolini
 * Marco Rimoldi
-* Marijn Goedegebure
 * Mark Rogers
-* Markus Holtermann
-* Markus Zapke-Gründemann
-* Marti Raudsepp
-* Martin
-* Martin Bambas
+* Martin Bommeli
 * Martin Brochhaus
 * Martin Koistinen
 * Martin Kosír
-* Martin Owens
-* Martin Pajuste
-* Matas Dailyda
-* Mateusz Dereniowski
-* Mateusz Marzantowicz
+* martinkosir
+* mathijs
 * Matt Chisholm
-* Matteo Rosati
-* Mattia Larentis
-* Max Shkurygin
 * Maxim Bodyansky
 * Maxime Haineault
+* mbouchar
+* mcosta
 * Mel Collins
+* meers
 * MerLex
 * Michael P. Jung
-* Michael Thornhill
-* Mike Dory
 * Mike Johnson
-* Mikko Ahlroth
-* Milo Price
 * Mitar
 * Mokys
-* Morgan Wahl
-* Motiejus Jakštys
-* Mykhailo Kolesnyk
-* Nelson Brochado
-* Nick Jones
-* Oliver Zander
-* Olivier Larchevêque
-* Olivier Le Brouster
+* mrlundis
+* MW
+* neoprolog
+* Nickolay V. Shmyrev
 * Orne Brocaar
-* Oyvind Saltvik
-* Pankrat
-* Paolo Leggio
+* padelt
+* Paolo
 * Pascal Mouret
-* Patrick Arminio
-* Patrick Lauber
 * Patrick Toal
 * Patryk Zawadzki
 * Paul van der Linden
 * Paulo
 * Paulo Alvarado
 * Pavel Puchkin
+* pbgc
 * Pedro Gracia
 * Pete Loggie
-* Peter Farrell
-* Peter J. Farrell
-* Peter Landry
 * Peter-Paul van Gemerden
 * Petteri
 * Philipp Bosch
-* Philipp Zedler
+* philomat
+* phuihock
 * Pigletto
+* pigletto
 * Piotr Kilczuk
-* Rafal Radulski
-* Rainer Koirikivi
-* Rajesh
-* Rajesh K.
-* Rajesh P.
+* poweredbypenguins
 * Rebecca Breu
 * Remco Wendt
 * Restless Being
 * Richard Barran
+* rizumu
 * Robert Barsch
 * Robert Buchholz
 * Robert Clark
-* Robert Feldbinder
 * Robert Pogorzelski
-* Roberto
-* Roberto Bampi
 * Robin Lewis
 * Rodolfo Carvalho
-* Roman Kozlovskiy
-* Russ Ferriday
-* SachaMPS
-* Sam Manzi
-* Samuel Lahti
-* Samuel Luescher
+* rtpm
 * Samuel Lüscher
-* Schoen
+* Scott Barnham
+* sealibora
 * Sean Bleier
-* Sebastian Braun
 * Seth Buntin
 * Seyhun Akyurek
-* Shahar Or
 * Shatalov Vadim
+* shed
 * Shinya Okano
-* Simon Charette
+* shulcsm
 * Simon Hedberg
 * Simon Meers
-* Sophie Leroy
-* Stavros Korokithakis
-* Stefan Foulis
-* Stefan Wehrmeyer
-* Stefano Brentegani
-* Stefano Crosta
-* Stefano Morandi
-* Steffen Jasper
-* Stephan
-* Stephan Hepper
-* Stephan Herzog
-* Stephan Jaekel
-* Stephen Muss
-* Stephen Paulger
-* Stephen Watkin
-* Steve Steiner
-* Steven Laroche
-* Sylvain Fankhauser
-* Tadas Dailyda
-* Tanel Külaots
-* Thomas Parslow
-* Thomas Remmert
-* Thomas Woolford
-* Tim Anderegg
-* Tim Davies
-* Tim Graham
-* Tino de Bruijn
-* Tobias von Klipstein
-* Tom
-* Tom Berger
-* Tom S
-* Tom V
-* Tom Wardill
-* Tom de Simone
-* Ulrich Petri
-* User
-* Vadim Lopatyuk
-* Vadim Sikora
-* Venelin Stoykov
-* Viktor Nagy
-* Viliam Segeda
-* Vinit (Vermicelli on IRC)
-* Vinod Kurup
-* Vladimir Bolshakov
-* Vladyslav
-* Wayne Moore
-* Xavier Fernandez
-* Xavier Ordoquy
-* Yann Malet
-* Yosuke Ikeda
-* Yuri van der Meer
-* aaloy
-* aball
-* angular_circle
-* behrooz
-* benjaoming
-* benzkji
-* beshrkayali
-* brightwhitefox
-* casio
-* centralniak
-* cip
-* creakings
-* daniele
-* darbula
-* derek73
-* deshack
-* digi604
-* divio
-* dlamotte
-* dstufft
-* eged
-* ericr
-* evildmp
-* f4nt
-* fcurella
-* febsn
-* fivethreeo
-* fj
-* floppya
-* frost-nzcr4
-* furiousdave
-* genti94
-* gentleShark
-* guandalino
-* hedberg
-* henning
-* hjkelly
-* hysia
-* ikudryavtsev
-* indexofire
-* izi
-* jalaziz
-* jordanjambazov
-* kater169
-* kblomqvist
-* kochin
-* kunitoki
-* littlepea
-* lovmat
-* lug
-* m000
-* maiklust
-* marco federighi
-* marcor
-* martinkosir
-* mathijs
-* mbouchar
-* mcosta
-* meers
-* mikek
-* motleytech
-* mrlundis
-* mvaerle
-* neoprolog
-* nikolas
-* nsh
-* o-zander
-* ojii
-* padelt
-* pascal.beyeler
-* patricklauber
-* paul
-* pbgc
-* pcicman
-* peterfarrell
-* pgcd
-* philomat
-* phuihock
-* piquadrat
-* pumalo
-* raidsan
-* requires.io
-* rizumu
-* robint
-* root
-* rtpm
-* sbussetti
-* scottbarnham
-* sealibora
-* shed
-* shulcsm
+* Simon Charette
 * sleytr
 * spookylukey
-* srj55
 * ssteinerX
-* stefanfoulis
-* tdelam
-* tehfink
+* Stavros Korokithakis
+* Stephan Jaekel
+* Stephen Muss
+* Steve R. Jones
+* Steve Steiner
+* Tanel Külaots
+* Thomas Parslow
 * timesong
+* Tim Davies
+* Tino de Bruijn
 * tiret
-* unknown
-* vinit kumar
-* vvangelovski
+* Tom de Simone
+* Ulrich Petri
+* Vasil Vangelovski
+* Viliam Segeda
 * wangJunjie
+* Wayne Moore
 * wid
 * wildermesser
-* xie wei
-* xray7224
-* yann.malet@gmail.com
-* ychouinard
+* Yann Malet
 * yedpodtrzitko
 * yohanboniface
-* zandeez
+* Yosuke Ikeda
+* Yuri van der Meer
 * zundoya
-* Óscar M. Lage
-* Øyvind Saltvik
-* Žan Anderle
 * Антон Евжаков

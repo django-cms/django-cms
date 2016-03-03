@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% load cms_tags %}
-
-{% block content %}
-<h2 class="page_title">{% render_model request.current_page "page_title" %}</h2>
-<h1>{% render_model instance "char_1"  %}</h1> {% render_model_add instance_class %}
-{% render_model instance "char_2" "char_1,char_2" %}
-{% render_placeholder instance.placeholder %}
-{% endblock content %}

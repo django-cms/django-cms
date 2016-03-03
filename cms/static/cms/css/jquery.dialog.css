@@ -1,0 +1,126 @@
+/* This file skins dialog */
+
+.ui-dialog-overlay { background-color: black; filter:alpha(opacity=40); opacity:.4; }
+
+.ui-dialog,
+.ui-dialog {
+	background-color: white;
+	border: 1px solid #ccc; 
+}
+
+.ui-dialog .ui-dialog-titlebar,
+.ui-dialog .ui-dialog-titlebar {
+	border-bottom: 1px solid #ccc;
+	background: #7CA0C7 url(../images/jquery/default-bg.gif) repeat-x scroll left top;
+	padding: 0px;
+	height: 28px;
+	_height: 29px;
+}
+
+.ui-draggable .ui-dialog-titlebar,
+.ui-draggable .ui-dialog-titlebar {
+	cursor: move;
+}
+
+.ui-draggable-disabled .ui-dialog-titlebar,
+.ui-draggable-disabled .ui-dialog-titlebar {
+	cursor: default;
+}
+
+.ui-dialog .ui-dialog-titlebar-close,
+.ui-dialog .ui-dialog-titlebar-close {
+	width: 18px;
+	height: 18px;
+	background: url(../images/jquery/dialog-titlebar-close.png) no-repeat;
+	position:absolute;
+	top: 5px;
+	right: 7px;
+	cursor: default;
+}
+
+.ui-dialog .ui-dialog-titlebar-close span,
+.ui-dialog .ui-dialog-titlebar-close span {
+	display: none;
+}
+
+.ui-dialog .ui-dialog-titlebar-close-hover,
+.ui-dialog .ui-dialog-titlebar-close-hover {
+	background: url(../images/jquery/dialog-titlebar-close-hover.png) no-repeat;
+}
+
+.ui-dialog .ui-dialog-title,
+.ui-dialog .ui-dialog-title {
+	margin-left: 5px;
+	color: white;
+	font-weight: bold;
+	position: relative;
+	top: 7px;
+	left: 4px;
+}
+
+.ui-dialog .ui-dialog-content,
+.ui-dialog .ui-dialog-content {
+	margin: 1.2em;
+}
+
+.ui-dialog .ui-dialog-buttonpane,
+.ui-dialog .ui-dialog-buttonpane {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	text-align: right;
+	background: white url(../images/jquery/nav-bg.gif) repeat-x scroll 0 100%;
+	border-top: 1px solid #ccc;
+}
+
+.ui-dialog .ui-dialog-buttonpane button,
+.ui-dialog .ui-dialog-buttonpane button {
+	margin: 6px;
+	background: white url(../images/jquery/nav-bg.gif) repeat-x scroll center bottom;
+	border-color: #ddd #aaa #aaa #ddd;
+	border-style: solid;
+	border-width: 1px;
+	color: black;
+	padding: 3px;
+}
+
+.ui-dialog .ui-dialog-buttonpane button.default {
+	background: #7CA0C7 url(../images/jquery/default-bg.gif) repeat-x scroll center bottom;
+	border: 2px solid #5B80B2;
+	font-weight: bold;
+	color: white;
+}
+
+/* Dialog handle styles */
+.ui-dialog .ui-resizable-n,
+.ui-dialog .ui-resizable-n { cursor: n-resize; height: 6px; width: 100%; top: 0px; left: 0px; background: transparent url(../images/jquery/dialog-n.gif) repeat scroll center top; }
+
+.ui-dialog .ui-resizable-s,
+.ui-dialog .ui-resizable-s { cursor: s-resize; height: 8px; width: 100%; bottom: 0px; left: 0px; background: transparent url(../images/jquery/dialog-s.gif) repeat scroll center top; }
+
+.ui-dialog .ui-resizable-e,
+.ui-dialog .ui-resizable-e { cursor: e-resize; width: 7px; right: 0px; top: 0px; height: 100%; background: transparent url(../images/jquery/dialog-e.gif) repeat scroll right center; }
+
+.ui-dialog .ui-resizable-w,
+.ui-dialog .ui-resizable-w { cursor: w-resize; width: 7px; left: 0px; top: 0px; height: 100%; background: transparent url(../images/jquery/dialog-w.gif) repeat scroll right center; }
+
+.ui-dialog .ui-resizable-se,
+.ui-dialog .ui-resizable-se { cursor: se-resize; width: 9px; height: 9px; right: 0px; bottom: 0px; background: transparent url(../images/jquery/dialog-se.gif); }
+
+.ui-dialog .ui-resizable-sw,
+.ui-dialog .ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: 0px; bottom: 0px; background: transparent url(../images/jquery/dialog-sw.gif); }
+
+.ui-dialog .ui-resizable-nw,
+.ui-dialog .ui-resizable-nw { cursor: nw-resize; width: 9px; height: 29px; left: 0px; top: 0px; background: transparent url(../images/jquery/dialog-nw.gif); }
+
+.ui-dialog .ui-resizable-ne,
+.ui-dialog .ui-resizable-ne { cursor: ne-resize; width: 9px; height: 29px; right: 0px; top: 0px; background: transparent url(../images/jquery/dialog-ne.gif); }
+
+
+.ui-dialog div.row {
+	margin-bottom: 6px;
+}
+
+.ui-dialog div.row input.wide {
+	width: 100%;
+}

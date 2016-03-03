@@ -1,0 +1,80 @@
+{% load i18n sekizai_tags %}
+
+{% addtoblock "js" %}
+  <script type="text/javascript" src="https://maps-api-ssl.google.com/maps/api/js?v=3&sensor=true"></script>
+{% endaddtoblock %}
+
+{% addtoblock "js" %}
+  <script type="text/javascript">
+    (function () {
+      // save settings form plugin
+      var container = 'google-map-{{ object.pk }}';
+      var latlng = new google.maps.LatLng(46.94708, 7.445975); // default to switzerland
+
+      var title = "{{ object.get_title }}";
+      var address = "{{ object.address }}, {{ object.zipcode }} {{ object.city }}";
+
+      var options = {
+        zoom: {{ object.zoom }},
+        mapTypeId: google.maps.MapTypeId.ROADMAP /* ROADMAP, SATELLITE, HYBRID or TERRAIN */
+      };
+
+      {% if object.get_lat_lng %}
+        // load latlng from given lat lng settings
+        latlng = new google.maps.LatLng({{ object.get_lat_lng|join:", " }});
+        initGoogleMaps(latlng);
+      {% else %}
+        // load latlng from given address
+        var geocoder = new google.maps.Geocoder();
+          geocoder.geocode({'address': address}, function (results, status) {
+            // check if address can be found if not show default (var latlng)
+            if(status == google.maps.GeocoderStatus.OK) latlng = results[0].geometry.location;
+            initGoogleMaps(latlng);
+          });
+      {% endif %}
+
+      // initialize google maps
+      function initGoogleMaps(latlng) {
+        // overwrite options
+        options.center = latlng;
+        // initialize google map
+        var map = new google.maps.Map(document.getElementById(container), options);
+        // create marker
+        var marker = new google.maps.Marker({
+          'position': options.center,
+          'map': map,
+          'title': title
+        });
+        // prepare info window
+        var infowindow = new google.maps.InfoWindow({
+          content: "<strong>" + title + "</strong> \
+                    <br />" + address {% if object.content %} + "<br /> \
+                    <br /><em>{{ object.content }}</em>"{% endif %}
+        });
+        // show info window
+        infowindow.open(map, marker);
+      }
+    })();
+  </script>
+{% endaddtoblock %}
+
+<div class="plugin_googlemap">
+  {% if object.get_title %}<h2>{{ object.get_title }}</h2>{% endif %}
+
+  <div id="google-map-{{ object.pk }}" class="google-map-container"
+       style="width: {{ object.width }}; height: {{ object.height }};"></div>
+
+  {% if object.route_planer %}
+    <form action="http://maps.google.com/" method="get" class="frm google-map-routeplaner">
+      <fieldset>
+        <h3 class="nospace">{{ object.route_planer_title }}:</h3>
+        <p>
+          <label for="saddr-{{ object.pk }}">{% trans "Your address: " %}</label>
+          <input type="text" id="saddr-{{ object.pk }}" name="saddr" class="input_text" />
+          <span class="btn"><input type="submit" value="{% trans 'Calculate route' %}" /></span>
+          <input type="hidden" name="daddr" value="{{ object.address }}, {{ object.zipcode }} {{ object.city }}" />
+        </p>
+      </fieldset>
+    </form>
+  {% endif %}
+</div>

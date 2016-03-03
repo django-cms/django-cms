@@ -1,0 +1,33 @@
+{% load i18n sekizai_tags %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}admin/js/jquery.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/jquery.tweet.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script type="text/javascript">
+//<![CDATA[
+(function namespacing(CMS) {
+	CMS.$(document).ready(function () {
+		$('#twitter-container-{{ object.pk }}').tweet({
+			username: '{{ object.twitter_user }}',
+			avatar_size: {% if request.is_secure %}null{% else %}32{% endif %},
+			count: {{ object.count }},
+			join_text: 'auto',
+			auto_join_text_default: '{% trans "we said," %}',
+			auto_join_text_ed: '{% trans "we" %}',
+			auto_join_text_ing: '{% trans "we were" %}',
+			auto_join_text_reply: '{% trans "we replied to" %}',
+			auto_join_text_url: '{% trans "we were checking out" %}',
+			loading_text: '{% trans "loading tweets..." %}'
+			// this replaces twitter_search.html
+			{% if object.query %},query: '{{ object.query }}'{% endif %}
+		});
+	});
+})(window.CMS);
+//]]>
+</script>
+{% endaddtoblock %}
+
+<div class="plugin_twitter">
+	<h2>{{ object.title }} <a href="https://www.twitter.com/{{ object.twitter_user }}" class="twitter-icon">{% trans "Twitter" %}</a></h2>
+	<div id="twitter-container-{{ object.pk }}"></div>
+	{% if object.twitter_user %}<p><a href="https://www.twitter.com/{{ object.twitter_user }}" class="twitter-link">{{ object.link_hint }}</a></p>{% endif %}
+</div>

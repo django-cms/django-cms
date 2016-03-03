@@ -1,0 +1,119 @@
+{% load i18n %}
+<script type="text/javascript">
+//<![CDATA]
+
+// Global var, for storing callbacks, see below.
+var editPluginPopupCallbacks = {};
+
+{% include "cms/plugins/widgets/widget_lib.js" %}
+
+(function namespacing(CMS) {
+	CMS.$(document).ready(function () {
+		// scroll to top
+		scrollTo(0, 0);
+		
+		// init wysiwyg
+		$('#id_{{ name }}').wymeditor({
+			lang: '{{ language }}',
+			skin: 'django',
+			skinPath: "{{ STATIC_URL }}cms/js/wymeditor/skins/django/",
+			updateSelector: 'input[type=submit],',
+			updateEvent: 'click',
+			logoHtml: '',
+			toolsItems: [
+					{{ WYM_TOOLS }}
+				],
+			containersItems: [
+					{{ WYM_CONTAINERS }}
+				],
+			classesItems: [
+					{{ WYM_CLASSES }}
+				],
+			editorStyles: [
+				{{ WYM_STYLES }}
+				],
+			{% if WYM_STYLESHEET %}
+			stylesheet:
+				{{ WYM_STYLESHEET }}
+			,
+			{% endif %}
+			postInit: function(wym) {
+				 //wym.resizable({handles: "s", maxHeight: 600});
+				//construct the insertLinkButton html
+				html = get_plugin_html()
+				//add the button to the tools box
+				$(wym._box)
+				.find(wym._options.toolsSelector + wym._options.toolsListSelector)
+				.append(html);
+				// Enable the placeholderbridge plugin, to allow
+				// the placeholder controls to talk to editor
+				wym.placeholderbridge({'name': '{{ name }}'});
+				init_buttons("{{ name }}");
+			},
+			//handle click event on dialog's submit button
+			postInitDialog: function( wym, wdw ) {
+		 
+			}
+		});
+
+		/* onclick for 'Insert object' */
+		function init_buttons(placeholder){
+			$('span.insert-object').click(function(){
+				var select = $(this).parent().children("select");
+				var pluginvalue = select.attr('value');
+				var splits = window.location.href.split("?")[0].split("/");
+				var parent_id = Number(splits[splits.length - 2]);
+				var language = $('#id_language').attr('value');
+				
+				if (pluginvalue == "") {
+					alert("{% filter escapejs %}{% trans "Please select a plugin type." %}{% endfilter %}");
+					return;
+				}
+				
+				var texteditor = get_editor(placeholder);
+				if (texteditor == null || texteditor.insertText == null) {
+					alert("{% filter escapejs %}{% trans "Text editor does not support inserting objects." %}{% endfilter %}");
+					return;
+				}
+				// First create db instance using AJAX post back
+				add_plugin(pluginvalue, parent_id, language);
+				
+			}).css("cursor", "pointer").css("margin", "5px");
+			
+			/* onclick for 'Edit selected object' */
+			$('span.edit-object').click(function(){
+				var texteditor = get_editor(placeholder);
+				if (texteditor == null || texteditor.selectedObject == null) {
+					alert("{% filter escapejs %}{% trans "Text editor does not support editing objects." %}{% endfilter %}");
+					return;
+				}
+				var imgobj = texteditor.selectedObject();
+				if (imgobj == null) {
+					alert("{% filter escapejs %}{% trans "No object selected." %}{% endfilter %}");
+					return;
+				}
+				if (imgobj.id == null || imgobj.id.indexOf("plugin_obj_") != 0) {
+					alert("{% filter escapejs %}{% trans "Not a plugin object" %}{% endfilter %}");
+					return;
+				}
+				var plugin_id = imgobj.id.substr("plugin_obj_".length);
+				edit_plugin(plugin_id);
+			}).css("cursor", "pointer").css("margin","5px");
+		}
+	});
+
+	function get_plugin_html(){
+		html = '<li class="wym_tools_plugins">'
+			+ '<select name="plugins" unselectable="on">'
+			+ '<option value="" selected="selected">{% filter escapejs %}{% trans "Available Plugins" %}{% endfilter %}</option>'{% for p in installed_plugins %}
+			+ '<option value="{{ p.value }}">{{ p.name }}</option>'{% endfor %}
+			+ '</select>'
+			+ '<span class="insert-object addlink" unselectable="on">{% filter escapejs %}{% trans "Insert plugin" %}{% endfilter %}</span>'
+			+ '<span class="edit-object changelink" unselectable="on">{% filter escapejs %}{% trans "Edit selected plugin" %}{% endfilter %}</span>'
+			+ '</li>';
+	return html;
+	}
+})(window.CMS);
+
+//]]>
+</script>

@@ -1,0 +1,124 @@
+select[name="plugins"] {
+	width: 150px;
+}
+
+.plugin-holder-nopage{
+}
+
+.plugin-holder-config{
+    border-top: 0px;
+}
+
+.form-row label.plugin-holder-config-label{
+    width: 300px;
+}
+
+.plugin-holder .form-row{
+	padding:0;
+}
+.plugin-holder label{
+	display:none;
+}
+
+.plugin-editor, .plugin-list-holder{
+	float:left;
+}
+
+.plugin-list-holder ul, .plugin-list-holder li, .plugin-list-holder ul.plugin-list{
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+
+.plugin-holder .plugin-editor label{
+	display:block;
+}
+
+.plugin-holder{
+	background:url(../images/pluginlist-holder-bg.gif) repeat-y;		
+}
+
+.plugin-list-holder{
+	width:300px;
+}
+.plugin-list-holder select{
+	clear:both;
+}
+.plugin-list-holder .plugin-select-holder{
+	padding:10px;
+}
+.plugin-list-holder .add-plugin, .plugin-list-holder .copy-plugins {
+	margin-left:10px;
+	cursor:pointer;
+}
+
+ul.plugin-list{min-height:5px;_height:5px;}
+
+ul.plugin-list li{
+	clear:both;	
+	border-bottom:1px solid #DEDEDC;
+	margin-right:1px;
+	height:28px;
+	background:#fff url(../images/sitemap-li-bg.jpg) repeat-x 0px 0px;
+	line-height:27px;
+	cursor:pointer;
+	color:#5B80B2;
+}
+
+ul.plugin-list li.active{
+	margin-right:0px;
+	background-position:0px 7777px;
+}
+
+
+ul.plugin-list .drag{
+	display:block;
+	float:left;
+	background:url(../images/sitemap-li-drag.gif) no-repeat 0px 0px;
+	display:block;
+	height:28px;
+	width:20px;
+}
+ul.plugin-list .text{
+	float:left;
+	width:255px;
+	height:25px;
+	overflow: hidden;
+}
+ul.plugin-list span.delete{
+	float:left;
+	height:28px;
+	width:15px;
+	background:url(../images/pluginlist-delete.png) no-repeat 0px 0px;
+	text-indent:-7777px;
+	cursor:pointer;	
+	_background:none;
+	_filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/media/cms/images/pluginlist-delete.png',sizingMethod='crop');	
+}
+
+ul.plugin-list li:hover{background-position:0px -100px; color:#fff;}
+ul.plugin-list li:hover .drag{background-position:0px -40px;}
+ul.plugin-list li:hover span.delete{background-position:0px -40px;}
+
+
+ul.plugin-list li.active:hover{background-position:0px -100px; color:#fff;}
+ul.plugin-list li.active:hover .drag{background-position:0px -40px;}
+
+
+.plugin-editor{
+	width:auto;
+/*	margin-right:-310px;300*/
+	margin-left:300px;
+	/*margin:10px 0px 10px 310px;*/
+	padding:0px;
+	float:none;
+}
+
+.plugin-editor iframe{
+	border:none;
+	margin:0;
+	padding:0;
+	width:100%;
+	height:auto;
+	text-align: right;
+}

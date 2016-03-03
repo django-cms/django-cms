@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 from cms.utils.conf import get_cms_setting
-from cms.utils import get_template_from_request
+from django.conf import settings
 
-
-def cms_settings(request):
+def media(request):
     """
-    Adds cms-related variables to the context.
+    Adds media-related context variables to the context.
     """
-
-    return {
-        'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-        'CMS_TEMPLATE': lambda: get_template_from_request(request),
-    }
+    return {'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL')}

@@ -1,8 +1,6 @@
 {% extends "base.html" %}
-{% load cms_tags %}
-
+{% load placeholder_tags %}
 {% block content %}
-{# static_placeholder "logo" #}
 {% for example in examples %}
     <div>{% render_placeholder example.placeholder %}</div>
 {% empty %}

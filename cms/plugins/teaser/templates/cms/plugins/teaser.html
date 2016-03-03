@@ -1,0 +1,11 @@
+{% load i18n %}
+<h2>{{ object.title|title }}</h2>
+{% if object.image %}
+	{% if link %}<a href="{{ link }}">{% endif %}
+		<img src="{{ object.image.url }}" alt="{{ object.title }}"/>
+	{% if link %}</a>{% endif %}
+{% endif %}
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% endif %}
+{% if link %}<a href="{{ link }}">{% trans "more" %} &#187;</a>{% endif %}

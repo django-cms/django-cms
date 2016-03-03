@@ -1,28 +1,25 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.conf.urls import include, url
-
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import get_app_patterns
-from cms.constants import SLUG_REGEXP
 from cms.views import details
-
+from django.conf import settings
+from django.conf.urls.defaults import url, patterns
 
 if settings.APPEND_SLASH:
-    regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
+    reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)/$', details, name='pages-details-by-slug')
 else:
-    regexp = r'^(?P<slug>%s)$' % SLUG_REGEXP
+    reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)$', details, name='pages-details-by-slug')
+
+urlpatterns = [
+    # Public pages
+    url(r'^$', details, {'slug':''}, name='pages-root'),
+    reg,
+]
 
 if apphook_pool.get_apphooks():
-    # If there are some application urls, use special resolver,
-    # so we will have standard reverse support.
-    urlpatterns = get_app_patterns()
-else:
-    urlpatterns = []
-
-
-urlpatterns.extend([
-    url(r'^cms_wizard/', include('cms.wizards.urls')),
-    url(regexp, details, name='pages-details-by-slug'),
-    url(r'^$', details, {'slug': ''}, name='pages-root'),
-])
+    """If there are some application urls, add special resolver, so we will
+    have standard reverse support.
+    """
+    from cms.appresolver import get_app_patterns
+    urlpatterns = get_app_patterns() + urlpatterns
+    
+urlpatterns = patterns('', *urlpatterns)

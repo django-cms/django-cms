@@ -1,0 +1,9 @@
+<div id="{{ dialog_id }}" title="{% block title %}{{ title }}{% endblock %}">
+	{% block content %}
+		{% block header %}{% endblock %}
+		
+		{% block form %}{% if form %}<form id="{{ dialog_id }}-form">{% csrf_token %}{{ form.as_p }}</form>{% endif %}{% endblock %}
+	{% endblock %}
+</div>
+
+{% block script %}{% endblock %}

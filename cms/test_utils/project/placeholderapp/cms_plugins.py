@@ -1,23 +1,16 @@
 from cms.plugin_pool import plugin_pool
-from cms.plugin_base import CMSPluginBase, PluginMenuItem
+from cms.plugin_base import CMSPluginBase
+from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-
 class EmptyPlugin(CMSPluginBase):
-    name = "Empty Plugin"
+    name = _("Test Plugin")
     text_enabled = True
-    render_plugin = False
 
     def render(self, context, instance, placeholder):
         return context
 
     def icon_src(self, instance):
-        return settings.STATIC_URL + u"cms/img/icons/plugins/image.png"
-
-    def get_extra_placeholder_menu_items(self, request, placeholder):
-        return [
-            PluginMenuItem('Extra item - not usable', '/some/url/', 'any-data'),
-            PluginMenuItem('Other item - not usable', '/some/other/url/', 'any-data', action='ajax_add'),
-        ]
+        return settings.STATIC_URL + u"plugins/empty-image-file.png"
 
 plugin_pool.register_plugin(EmptyPlugin)

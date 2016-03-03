@@ -1,0 +1,86 @@
+{% extends 'admin/change_form.html' %}
+{% load cms_admin %}
+
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript">
+(function($) {
+    $(document).ready(function() {
+		$("#id_name").focus();
+		$("#id_name").change(function() { this._changed = true; });
+		$('#id_code').change(function() { this._changed = true; });
+    });
+	// global functions
+	trigger_lang_button = function(e, url) {
+		var changed = false;
+		var question = '';
+		var answer = '';
+
+		if($('iframe').length){
+			changed = true;
+		}
+
+		if (changed) {
+			question = gettext("Are you sure you want to change tabs without saving the page first?");
+			answer = confirm(question);
+		}else{
+			answer = true;
+		}
+
+		if (!answer) {
+			return false;
+		} else {
+			window.location = url;
+		}
+	}
+})(django.jQuery);
+</script>
+<style type="text/css">
+	<!--
+	.language_button {
+		font-weight:bold;
+		margin-bottom:-1px;
+		border-color:#ddd #aaa #ccc #ddd !important;
+		border:1px;
+		background:#fff url('{% cms_admin_icon_base %}nav-bg.gif') repeat-x center bottom !important;
+	}
+
+	#lang_tab_content h2.header {
+		margin:0;
+		padding:2px 5px 3px 5px;
+		font-size:11px;
+		text-align:left;
+		font-weight:bold;
+		background:#7ca0c7 url('{% cms_admin_icon_base %}default-bg.gif') repeat-x left top;
+		color:#fff;
+	}
+
+	.notfilled {
+		color: #808080 !important;
+	}
+	-->
+</style>
+{% endblock %}
+
+{% block field_sets %}
+	<div style="display: none;"><input type="hidden" name="language" value="{{ language }}" id="id_language"/></div>
+
+	{% if show_language_tabs %}
+		<div id="page_form_lang_tabs">
+			{% for lang_code, lang_name in language_tabs %}
+				<input type="button" onclick="trigger_lang_button(this,'./?language={{lang_code}}');"
+					   class="language_button {% ifequal lang_code language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endifequal %}"
+					   id="debutton" name="{{lang_code}}" value="{{lang_name}}" />
+			{% endfor %}
+		</div>
+	{% endif %}
+
+	<div id="lang_tab_content">
+		{% if show_language_tabs %}
+			<h2 class="header"></h2>
+		{% endif %}
+
+		{{ block.super }}
+
+	</div>
+{% endblock %}

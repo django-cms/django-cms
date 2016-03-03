@@ -1,67 +1,53 @@
 # -*- coding: utf-8 -*-
-from cms.forms.fields import PageSelectFormField
+from cms.forms.fields import PageSelectFormField, PlaceholderFormField
+from cms.forms.widgets import PlaceholderPluginEditorWidget
+from cms.models.pagemodel import Page
 from cms.models.placeholdermodel import Placeholder
+from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 from django.db import models
+from django.utils.text import capfirst
 
 
 class PlaceholderField(models.ForeignKey):
-
-    def __init__(self, slotname, default_width=None, actions=None, **kwargs):
-        from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
-
-        if not actions:
-            actions = PlaceholderNoAction
-
+    def __init__(self, slotname, default_width=None, actions=PlaceholderNoAction, **kwargs):
+        validate_placeholder_name(slotname)
         if kwargs.get('related_name', None) == '+':
             raise ValueError("PlaceholderField does not support disabling of related names via '+'.")
-        if not callable(slotname):
-            validate_placeholder_name(slotname)
         self.slotname = slotname
         self.default_width = default_width
         self.actions = actions()
         kwargs.update({'null': True})  # always allow Null
-        kwargs.update({'editable': False}) # never allow edits in admin
-        # We hard-code the `to` argument for ForeignKey.__init__
-        # since a PlaceholderField can only be a ForeignKey to a Placeholder
-        kwargs['to'] = 'cms.Placeholder'
-        super(PlaceholderField, self).__init__(**kwargs)
+        super(PlaceholderField, self).__init__(Placeholder, **kwargs)
 
-    def deconstruct(self):
-        name, path, args, kwargs = super(PlaceholderField, self).deconstruct()
-        kwargs['slotname'] = self.slotname
-        return name, path, args, kwargs
+    def formfield(self, **kwargs):
+        """
+        Returns a django.forms.Field instance for this database Field.
+        """
+        return self.formfield_for_admin(None, lambda qs: qs, **kwargs)
 
-    def _get_new_placeholder(self, instance):
-        return Placeholder.objects.create(slot=self._get_placeholder_slot(instance), default_width=self.default_width)
+    def formfield_for_admin(self, request, filter_func, **kwargs):
+        defaults = {'label': capfirst(self.verbose_name), 'help_text': self.help_text}
+        defaults.update(kwargs)
+        widget = PlaceholderPluginEditorWidget(request, filter_func)
+        widget.choices = []
+        return PlaceholderFormField(required=False, widget=widget, **defaults)
 
-    def _get_placeholder_slot(self, model_instance):
-        from cms.utils.placeholder import validate_placeholder_name
-
-        if callable(self.slotname):
-            slotname = self.slotname(model_instance)
-            validate_placeholder_name(slotname)
-        else:
-            slotname = self.slotname
-        return slotname
+    def _get_new_placeholder(self):
+        return Placeholder.objects.create(slot=self.slotname,
+            default_width=self.default_width)
 
     def pre_save(self, model_instance, add):
         if not model_instance.pk:
-            setattr(model_instance, self.name, self._get_new_placeholder(model_instance))
-        else:
-            slot = self._get_placeholder_slot(model_instance)
-            placeholder = getattr(model_instance, self.name)
-            if not placeholder:
-                setattr(model_instance, self.name, self._get_new_placeholder(model_instance))
-                placeholder = getattr(model_instance, self.name)
-            if placeholder.slot != slot:
-                placeholder.slot = slot
-                placeholder.save()
+            setattr(model_instance, self.name, self._get_new_placeholder())
         return super(PlaceholderField, self).pre_save(model_instance, add)
 
     def save_form_data(self, instance, data):
-        data = getattr(instance, self.name, '')
-        if not isinstance(data, Placeholder):
-            data = self._get_new_placeholder(instance)
+        if not instance.pk:
+            data = self._get_new_placeholder()
+        else:
+            data = getattr(instance, self.name)
+            if not isinstance(data, Placeholder):
+                data = self._get_new_placeholder()
         super(PlaceholderField, self).save_form_data(instance, data)
 
     def south_field_triple(self):
@@ -86,12 +72,12 @@ class PlaceholderField(models.ForeignKey):
 
 class PageField(models.ForeignKey):
     default_form_class = PageSelectFormField
+    default_model_class = Page
 
     def __init__(self, **kwargs):
-        # We hard-code the `to` argument for ForeignKey.__init__
-        # since a PageField can only be a ForeignKey to a Page
-        kwargs['to'] = 'cms.Page'
-        super(PageField, self).__init__(**kwargs)
+        # we call ForeignKey.__init__ with the Page model as parameter...
+        # a PageField can only be a ForeignKey to a Page
+        super(PageField, self).__init__(self.default_model_class, **kwargs)
 
     def formfield(self, **kwargs):
         defaults = {

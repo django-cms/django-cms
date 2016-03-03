@@ -5,9 +5,7 @@ permission system.
 This middleware is required only when CMS_PERMISSION = True.
 """
 
-
 class CurrentUserMiddleware(object):
     def process_request(self, request):
         from cms.utils.permissions import set_current_user
-
         set_current_user(getattr(request, 'user', None))

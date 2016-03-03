@@ -1,0 +1,113 @@
+/* DOTS */
+.tree .tree-default, 
+.tree .tree-default ul {
+	background-image:url("dot.gif");
+}
+.tree .tree-default li {
+	background-image:url("li.gif");
+}
+.tree .tree-default li.last {
+	background-image:url("lastli.gif");
+	background-color:white !important;
+}
+
+/* OPEN or CLOSED */
+.tree .tree-default li.open {
+	background:url("fminus.gif") 0px 0px no-repeat;
+}
+
+.tree .tree-default li.closed {
+	background:url("fplus.gif") 0px 0px no-repeat;
+}
+
+.tree .tree-default #dragged li.open {
+	background:url("fplus.gif") 5px 5px no-repeat;
+}
+
+/* RIGHT TO LEFT SUPPORT */
+.rtl .tree-default li {
+	margin-right:1px;
+}
+.rtl .tree-default li.last {
+	background-image:url("lastli_rtl.gif");
+	margin-right:0;
+	padding-right:16px;
+}
+.rtl .tree-default li.open {
+	background:url("fminus_rtl.gif") right 6px no-repeat;
+	margin-right:0;
+	padding-right:16px;
+}
+.rtl .tree-default li.closed {
+	background:url("fplus_rtl.gif") right 4px no-repeat;
+	margin-right:0;
+	padding-right:16px;
+}
+.rtl .tree-default #dragged li.open {
+	background-position: right 5px;
+}
+
+/* DEFAULT ICON */
+.tree .tree-default li a.title{
+	background-image:url("f.png");
+}
+
+/* CONTEXT MENU 
+.tree .tree-default .context {
+	width:160px;
+	background:#F0F0F0 url("context.gif") 22px 0 repeat-y;
+	border:1px solid silver;
+}
+.tree .tree-default .context a, 
+.tree .tree-default .context a:hover {
+	text-decoration:none;
+	color:black;
+	text-indent:26px;
+	line-height:20px;
+	background-repeat: no-repeat;
+	background-position: 3px center;
+	padding:1px 0;
+}
+.tree .tree-default .context a:hover {
+	background-color: #e7f4f9;
+	border:1px solid #d8f0fa;
+	background-position: 2px center;
+	padding:0;
+	text-indent:25px;
+}
+
+.tree .tree-default .context .separator {
+	background:#FFFFFF;;
+	border-top:1px solid #E0E0E0;
+	font-size:1px;
+	height:1px;
+	line-height:1px;
+	margin:0 2px 0 24px;
+	min-height:1px;
+	display:block;
+}
+*/
+
+/*
+.tree .tree-default a:hover{
+	background-color:transparent;
+	border-color:#fff;
+	
+}*/
+
+
+#sitemap li div{display:inline;}
+#sitemap li .cont{
+	display:block;
+	height:28px;
+	border:1px solid #DEDEDC;
+	border-top:none;
+	border-right:none;
+	overflow:hidden;
+}
+#sitemap li .col1{	
+	float:left;
+}
+#sitemap li .col2{
+	float:right;
+}

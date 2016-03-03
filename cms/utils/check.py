@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import with_statement
-from contextlib import contextmanager
 import inspect
-from itertools import chain
-import os
-
+from contextlib import contextmanager
+from cms import constants
+from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_pool import plugin_pool
+from cms.utils import get_cms_setting
+from cms.management.commands.subcommands.list import plugin_report
 from django.conf import settings
-from django.template.base import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
-
-from cms import constants
-from cms.models import AliasPluginModel
-from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7, DJANGO_1_8
-from cms.utils.compat.dj import is_installed, get_app_paths
-
 
 SUCCESS = 1
 WARNING = 2
@@ -165,21 +159,14 @@ def define_check(func):
 @define_check
 def check_sekizai(output):
     with output.section("Sekizai") as section:
-        if is_installed('sekizai'):
+        if 'sekizai' in settings.INSTALLED_APPS:
             section.success("Sekizai is installed")
         else:
             section.error("Sekizai is not installed, could not find 'sekizai' in INSTALLED_APPS")
-        if DJANGO_1_7:
-            if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
-                section.success("Sekizai template context processor is installed")
-            else:
-                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
+        if 'sekizai.context_processors.sekizai' in settings.TEMPLATE_CONTEXT_PROCESSORS:
+            section.success("Sekizai template context processor is installed")
         else:
-            processors = list(chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
-            if 'sekizai.context_processors.sekizai' in processors:
-                section.success("Sekizai template context processor is installed")
-            else:
-                section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATES option context_processors")
+            section.error("Sekizai template context processor is not installed, could not find 'sekizai.context_processors.sekizai' in TEMPLATE_CONTEXT_PROCESSORS")
 
         for template, _ in get_cms_setting('TEMPLATES'):
             if template == constants.TEMPLATE_INHERITANCE_MAGIC:
@@ -193,7 +180,6 @@ def check_sekizai(output):
         else:
             section.finish_error("Sekizai configuration has errors")
 
-
 @define_check
 def check_i18n(output):
     with output.section("Internationalization") as section:
@@ -201,43 +187,9 @@ def check_i18n(output):
             section.success("New style CMS_LANGUAGES")
         else:
             section.warn("Old style (tuple based) CMS_LANGUAGES, please switch to the new (dictionary based) style")
-        if getattr(settings, 'LANGUAGE_CODE', '').find('_') > -1:
-            section.warn("LANGUAGE_CODE must contain a valid language code, not a locale (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % getattr(settings, 'LANGUAGE_CODE', ''))
-        for lang in getattr(settings, 'LANGUAGES', ()):
-            if lang[0].find('_') > -1:
-                section.warn("LANGUAGES must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang[0])
-        if settings.SITE_ID == hash(settings.SITE_ID):
-            for site, items in get_cms_setting('LANGUAGES').items():
-                if type(site) == int:
-                    for lang in items:
-                        if lang['code'].find('_') > -1:
-                            section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: 'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
-        else:
-            section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
         for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES', 'CMS_FRONTEND_LANGUAGES']:
             if hasattr(settings, deprecated):
                 section.warn("Deprecated setting %s found. This setting is now handled in the new style CMS_LANGUAGES and can be removed" % deprecated)
-
-
-@define_check
-def check_middlewares(output):
-    with output.section("Middlewares") as section:
-        required_middlewares = (
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-            'cms.middleware.language.LanguageCookieMiddleware',
-        )
-        for middleware in required_middlewares:
-            if middleware not in settings.MIDDLEWARE_CLASSES:
-                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
-
 
 @define_check
 def check_deprecated_settings(output):
@@ -253,7 +205,6 @@ def check_deprecated_settings(output):
 
 @define_check
 def check_plugin_instances(output):
-    from cms.management.commands.subcommands.list import plugin_report
     with output.section("Plugin instances") as section:
         # get the report
         report = plugin_report()
@@ -265,21 +216,15 @@ def check_plugin_instances(output):
                 section.error("%s has instances but is no longer installed" % plugin_type["type"] )
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
-                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
+                section.error("%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))                
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
             section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if your site works, you should run the 'manage.py cms list plugins' \ncommand and then the 'manage.py cms delete_orphaned_plugins' command. \nThis will alter your database; read the documentation before using it.")
 
-
 @define_check
 def check_copy_relations(output):
-    from cms.plugin_pool import plugin_pool
-    from cms.extensions import extension_pool
-    from cms.extensions.models import BaseExtension
-    from cms.models.pluginmodel import CMSPlugin
-
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
@@ -301,88 +246,16 @@ def check_copy_relations(output):
                     c_to_s(plugin_class),
                     c_to_s(rel.model),
                 ))
-            for rel in plugin_class._get_related_objects():
-                if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
+            for rel in plugin_class._meta.get_all_related_objects():
+                if rel.model != CMSPlugin:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),
                     ))
-
-        for extension in chain(extension_pool.page_extensions, extension_pool.title_extensions):
-            if get_class('copy_relations', extension) is not BaseExtension:
-                # OK, looks like there is a 'copy_relations' defined in the
-                # extension... move along...
-                continue
-            for rel in extension._meta.many_to_many:
-                if DJANGO_1_7:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.related.parent_model),
-                    ))
-                elif DJANGO_1_8:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.related.model),
-                    ))
-                else:
-                    section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.remote_field.model),
-                    ))
-            for rel in extension._get_related_objects():
-                if rel.model != extension:
-                    section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.model),
-                    ))
-
         if not section.warnings:
-            section.finish_success('All plugins and page/title extensions have "copy_relations" method if needed.')
+            section.finish_success('All plugins have "copy_relations" method if needed.')
         else:
-            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins/extensions.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations or https://django-cms.readthedocs.org/en/latest/extending_cms/extending_page_title.html#handling-relations.')
-
-
-def _load_all_templates(directory):
-    """
-    Loads all templates in a directory (recursively) and yields tuples of
-    template tokens and template paths.
-    """
-    if os.path.exists(directory):
-        for name in os.listdir(directory):
-            path = os.path.join(directory, name)
-            if os.path.isdir(path):
-                for template in _load_all_templates(path):
-                    yield template
-            elif path.endswith('.html'):
-                with open(path, 'rb') as fobj:
-                    source = fobj.read().decode(settings.FILE_CHARSET)
-                    if DJANGO_1_8:
-                        lexer = Lexer(source, path)
-                    else:
-                        lexer = Lexer(source)
-                    yield lexer.tokenize(), path
-
-@define_check
-def deprecations(output):
-    # deprecated placeholder_tags scan (1 in 3.1)
-    if DJANGO_1_7:
-        templates_dirs = list(getattr(settings, 'TEMPLATE_DIRS', []))
-    else:
-        templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
-    templates_dirs.extend(
-        [os.path.join(path, 'templates') for path in get_app_paths()]
-    )
-    with output.section('Usage of deprecated placeholder_tags') as section:
-        for template_dir in templates_dirs:
-            for tokens, path in _load_all_templates(template_dir):
-                for token in tokens:
-                    if token.token_type == TOKEN_BLOCK:
-                        bits = token.split_contents()
-                        if bits[0] == 'load' and 'placeholder_tags' in bits:
-                            section.warn(
-                                'Usage of deprecated template tag library '
-                                'placeholder tags in template %s' % path
-                            )
+            section.finish_success('Some plugins do not define a "copy_relations" method.\nThis might lead to data loss when publishing or copying plugins.\nSee https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations')
 
 
 def check(output):
@@ -402,7 +275,7 @@ def check(output):
     for checker in CHECKERS:
         checker(output)
     output.write_line()
-    with output.section("OVERALL RESULTS"):
+    with output.section("OVERALL RESULTS") as section:
         if output.errors:
             output.write_stderr_line(output.colorize("%s errors!" % output.errors, opts=['bold'], fg='red'))
         if output.warnings:

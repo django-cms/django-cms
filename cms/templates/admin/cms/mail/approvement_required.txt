@@ -1,0 +1,11 @@
+{% extends 'admin/cms/mail/base.txt' %}
+{% load i18n %}
+
+{% block content %}
+{% blocktrans %}Page <a href="{{ admin_url }}">{{ page }}</a> may require approvement by you.{% endblocktrans %}
+	
+{% if page.pagemoderatorstate_set.count %}{% trans 'Last changes' %}
+--------------------
+{% include 'admin/cms/page/moderation_messages.html' %}
+{% endif %}	
+{% endblock %}

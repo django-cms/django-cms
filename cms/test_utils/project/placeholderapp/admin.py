@@ -1,38 +1,100 @@
-from cms.admin.placeholderadmin import PlaceholderAdminMixin, FrontendEditableAdminMixin
-from cms.test_utils.project.placeholderapp.models import (
-    Example1, MultilingualExample1,
-    TwoPlaceholderExample, CharPksExample
-)
-from cms.test_utils.project.placeholderapp.exceptions import PlaceholderHookException
-
+from cms.admin.placeholderadmin import PlaceholderAdmin
+from cms.test_utils.project.placeholderapp.models import (Example1, Example2,
+    Example3, Example4, Example5, MultilingualExample1)
 from django.contrib import admin
 from hvad.admin import TranslatableAdmin
 
 
-class ExampleAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.ModelAdmin):
-    frontend_editable_fields = ("char_1", "char_2")
+class MixinAdmin(admin.ModelAdmin):
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        """
+        Hook for specifying the form Field instance for a given database Field
+        instance.
+
+        If kwargs are given, they're passed to the form Field's constructor.
+        """
+        # silly test that placeholderadmin doesn't fuck stuff up
+        request = kwargs.pop('request', None)
+        return super(MixinAdmin, self).formfield_for_dbfield(db_field, request=request, **kwargs)
 
 
-class CharPksAdmin(FrontendEditableAdminMixin, PlaceholderAdminMixin, admin.ModelAdmin):
-    frontend_editable_fields = ("char_1",)
-
-    def post_copy_plugins(self, *args, **kwargs):
-        raise PlaceholderHookException('copy plugin hook has been called.')
-
-    def post_move_plugin(self, *args, **kwargs):
-        raise PlaceholderHookException('move plugin hook has been called.')
-
-
-class TwoPlaceholderExampleAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
+class Example1Admin(PlaceholderAdmin, MixinAdmin):
     pass
 
 
-class MultilingualAdmin(FrontendEditableAdminMixin, TranslatableAdmin,
-                        PlaceholderAdminMixin, admin.ModelAdmin):
-    frontend_editable_fields = ("char_1", "char_2")
+class Example2Admin(PlaceholderAdmin):
+    fieldsets = (
+        ('Placeholder + more fields', {
+            'classes': ('wide',),
+            'fields': ('char_1', 'placeholder', 'char_2',)
+        }),
+        ('Other fields', {
+            'classes': ('wide',),
+            'fields': ('char_3', 'char_4',)
+        }),
+    )
 
 
-admin.site.register(Example1, ExampleAdmin)
-admin.site.register(CharPksExample, CharPksAdmin)
-admin.site.register(TwoPlaceholderExample, TwoPlaceholderExampleAdmin)
+class Example3Admin(PlaceholderAdmin):
+    fieldsets = (
+        ('Only chars', {
+            'classes': ('wide',),
+            'fields': ('char_1', 'char_2',)
+        }),
+        (u'Only Placeholder with rigth classes', {
+            'classes': ('plugin-holder', 'plugin-holder-nopage',),
+            'fields': ('placeholder',)
+        }),
+        ('Only chars', {
+            'classes': ('wide',),
+            'fields': ('char_3', 'char_4',)
+        }),
+    )
+
+
+class Example4Admin(PlaceholderAdmin):
+    render_placeholder_language_tabs = False
+
+    fieldsets = (
+        ('Only chars', {
+            'classes': ('wide',),
+            'fields': ('char_1', 'char_2',)
+        }),
+        (u'Only Placeholder, with wrong classes', {
+            'classes': ('wide', 'plugin-holder-nopage',),
+            'fields': ('placeholder',)
+        }),
+        ('Only chars', {
+            'classes': ('wide',),
+            'fields': ('char_3', 'char_4',)
+        }),
+    )
+
+
+class Example5Admin(PlaceholderAdmin):
+    fieldsets = (
+        ('Only chars', {
+            'classes': ('wide',),
+            'fields': ('char_1', 'char_2',)
+        }),
+        (u'Two Placeholder, with right classes', {
+            'classes': ('plugin', 'plugin-holder-nopage',),
+            'fields': ('placeholder_1', 'placeholder_2',)
+        }),
+        ('Only chars', {
+            'classes': ('wide',),
+            'fields': ('char_3', 'char_4',)
+        }),
+    )
+
+
+class MultilingualAdmin(TranslatableAdmin, PlaceholderAdmin):
+    pass
+
+
+admin.site.register(Example1, Example1Admin)
+admin.site.register(Example2, Example2Admin)
+admin.site.register(Example3, Example3Admin)
+admin.site.register(Example4, Example4Admin)
+admin.site.register(Example5, Example5Admin)
 admin.site.register(MultilingualExample1, MultilingualAdmin)

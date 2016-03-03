@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% load cms_tags %}
-
-{% block content %}
-<h2 class="page_title">{% render_model request.current_page "page_title" %} {% render_model_add instance_class %}</h2>
-{% for example in examples %}
-<h2><a href="{{example.get_absolute_url}}">{{example}}</a></h2>
-{% endfor %}
-{% endblock content %}

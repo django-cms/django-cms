@@ -1,0 +1,91 @@
+/*
+ * WYMeditor : what you see is What You Mean web-based editor
+ * Copyright (c) 2005 - 2009 Jean-Francois Hovinne, http://www.wymeditor.org/
+ * Dual licensed under the MIT (MIT-license.txt)
+ * and GPL (GPL-license.txt) licenses.
+ *
+ * For further information visit:
+ *        http://www.wymeditor.org/
+ *
+ * File Name:
+ *        wymeditor.css
+ *        Main editor css file.
+ *        See the documentation for more info.
+ *
+ * File Authors:
+ *        Jean-Francois Hovinne (jf.hovinne a-t wymeditor dotorg)
+ *        Daniel Reszka (d.reszka a-t wymeditor dotorg)
+*/
+
+/* VISUAL FEEDBACK */
+
+/* basic */
+  body  { background: #e1e8f1;}
+
+/* make HTML blocs visible */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  ul,
+  ol,
+  table,
+  blockquote,
+  pre           { background: #FFFFFF no-repeat 2px 2px;
+                  padding:8px 5px 5px;
+                  margin:10px; }
+  td            { background: #F0F4F8; }
+  th            { background: #ffffcc; }
+  ul,
+  ol            { border-left:20px solid #B9C4D0; padding:0px 5px; }
+  caption       { background: #E4E4B0; padding: 5px; font-weight: bold; }
+  table         { font-size: 12px; width: 500px; }
+  td            { width: 25%; }
+  blockquote    { margin-left: 30px; }
+  pre           { background-color:transparent; border: 1px solid white; }
+
+/* Gecko min height fix */
+  td            { height: 1.6em; }
+
+/* labels */
+  p         { background-image: url(lbl-p.png); }
+  h1        { background-image: url(lbl-h1.png); }
+  h2        { background-image: url(lbl-h2.png); }
+  h3        { background-image: url(lbl-h3.png); }
+  h4        { background-image: url(lbl-h4.png); }
+  h5        { background-image: url(lbl-h5.png); }
+  h6        { background-image: url(lbl-h6.png); }
+  blockquote{ background-image: url(lbl-blockquote.png); }
+  pre       { background-image: url(lbl-pre.png); }
+
+/* specific HTML elements */
+  caption   { text-align: left; }
+  img       { margin-right: 5px;
+              border-style: solid;
+              border-color: gray;
+              border-width: 0; }
+  a img     { border-width: 1px; border-color: blue; }
+  acronym   { border: 1px solid gray; }
+  span      { background-color: #eef; }
+
+/* visual feedback for non-valid nesting of elements*/
+  h1 h1, h1 h2, h1 h3, h1 h4, h1 h5, h1 h6, h1 p, h1 pre, h1 address,
+  h2 h1, h2 h2, h2 h3, h2 h4, h2 h5, h2 h6, h2 p, h2 pre, h2 address,
+  h3 h1, h3 h2, h3 h3, h3 h4, h3 h5, h3 h6, h3 p, h3 pre, h3 address,
+  h4 h1, h4 h2, h4 h3, h4 h4, h4 h5, h4 h6, h4 p, h4 pre, h4 address,
+  h5 h1, h5 h2, h5 h3, h5 h4, h5 h5, h5 h6, h5 p, h5 pre, h5 address,
+  h6 h1, h6 h2, h6 h3, h6 h4, h6 h4, h6 h6, h6 p, h6 pre, h6 address,
+  p h1, p h2, p h3, p h4, p h5, p h6, p pre, p address,
+  pre h1, pre h2, pre h3, pre h4, pre h5, pre h6, pre p, pre pre, pre address,
+  address h1, address h2, address h3, address h4, address h5, address h6,
+  address p, address pre, address address
+  { background-color: #ff9999 !important;
+    border: 1px solid red !important;
+    font-size: 12px !important;
+    font-weight: normal; }
+
+/* Spacer BRs shouldn't add much whitespace */
+br { height: 5px; line-height: 5px; }

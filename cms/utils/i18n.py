@@ -7,7 +7,7 @@ from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
-from cms.utils.conf import get_cms_setting, get_site_id
+from cms.utils.conf import get_cms_setting
 
 
 @contextmanager
@@ -20,7 +20,7 @@ def force_language(new_lang):
 
 
 def get_languages(site_id=None):
-    site_id = get_site_id(site_id)
+    site_id = get_site(site_id)
     result = get_cms_setting('LANGUAGES').get(site_id)
     if not result:
         result = []
@@ -61,34 +61,57 @@ def get_current_language():
     return get_language_code(language_code)
 
 
+def get_site(site):
+    if site is None:
+        return settings.SITE_ID
+    else:
+        try:
+            return int(site)
+        except TypeError:
+            return site.pk
+
+
 def get_language_list(site_id=None):
     """
     :return: returns a list of iso2codes for this site
     """
-    return ([lang['code'] for lang in get_languages(site_id)] if settings.USE_I18N
-            else [settings.LANGUAGE_CODE])
+    if not settings.USE_I18N:
+        return [settings.LANGUAGE_CODE]
+    languages = []
+    for language in get_languages(site_id):
+        languages.append(language['code'])
+    return languages
 
 
 def get_language_tuple(site_id=None):
     """
     :return: returns an list of tuples like the old CMS_LANGUAGES or the LANGUAGES for this site
     """
-    return [(lang['code'], lang['name']) for lang in get_languages(site_id)]
+    languages = []
+    for language in get_languages(site_id):
+        languages.append((language['code'], language['name']))
+    return languages
 
 
 def get_language_dict(site_id=None):
     """
     :return: returns an dict of cms languages
     """
-    return dict(get_language_tuple(site_id))
+    languages = {}
+    for language in get_languages(site_id):
+        languages[language['code']] = language['name']
+    return languages
 
 
 def get_public_languages(site_id=None):
     """
     :return: list of iso2codes of public languages for this site
     """
-    return [lang['code'] for lang in get_language_objects(site_id)
-            if lang.get('public', True)]
+    languages = []
+    for language in get_language_objects(site_id):
+        if language.get("public", True):
+            languages.append(language['code'])
+    return languages
 
 
 def get_language_object(language_code, site_id=None):
@@ -139,10 +162,7 @@ def get_fallback_languages(language, site_id=None):
     """
     returns a list of fallback languages for the given language
     """
-    try:
-        language = get_language_object(language, site_id)
-    except LanguageError:
-        language = get_languages(site_id)[0]
+    language = get_language_object(language, site_id)
     return language.get('fallbacks', [])
 
 
@@ -173,5 +193,7 @@ def is_language_prefix_patterns_used():
     Returns `True` if the `LocaleRegexURLResolver` is used
     at root level of the urlpatterns, else it returns `False`.
     """
-    return any(isinstance(url_pattern, LocaleRegexURLResolver)
-               for url_pattern in get_resolver(None).url_patterns)
+    for url_pattern in get_resolver(None).url_patterns:
+        if isinstance(url_pattern, LocaleRegexURLResolver):
+            return True
+    return False

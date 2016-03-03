@@ -1,0 +1,49 @@
+{% load i18n sekizai_tags %}
+{% addtoblock "js" %}<script type="text/javascript" src="{{ STATIC_URL }}cms/js/libs/swfobject.min.js"></script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script type="text/javascript">
+//<![CDATA[
+(function () {
+	// save settings
+	var flashvars = { lang: '{{ LANGUAGE_CODE }}' };
+	var params = { menu: 'false', wmode: 'opaque' };
+	var attributes = {
+		id: 'flash-plugin-swf-{{ object.id }}',
+		name: 'flash-plugin-name-{{ object.id }}'
+	};
+	// replace flash_plugin object through swfobject
+	swfobject.embedSWF('{{ object.file.url }}', 'flash-plugin-{{ object.id }}', '{{ object.get_width }}', '{{ object.get_height }}', '9', '{{ STATIC_URL }}cms/swf/expressInstall.swf', flashvars, params, attributes);
+})();
+//]]>
+</script>
+{% endaddtoblock %}
+
+<div class="plugin_flash">
+	<object id="flash-plugin-{{ object.id }}" width="{{ object.get_width }}" height="{{ object.get_height }}" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+		<param name="movie" value="{{ object.file.url }}"/>
+		<param name="allowFullScreen" value="true" />
+		<param name="allowScriptAccess" value="always" />
+		<param name="allowFullScreen" value="true" />
+		<param name="quality" value="autohigh" />
+		<param name="wmode" value="opaque" />
+		<param name="flashvars" value="lang={{ LANGUAGE_CODE }}" />
+			<!--[if !IE]>-->
+			<object width="{{ object.get_width }}" height="{{ object.get_height }}" data="{{ object.file.url }}" type="application/x-shockwave-flash">
+			<param name="allowFullScreen" value="true" />
+			<param name="allowScriptAccess" value="always" />
+			<param name="allowFullScreen" value="true" />
+			<param name="quality" value="autohigh" />
+			<param name="wmode" value="opaque" />
+			<param name="flashvars" value="lang={{ LANGUAGE_CODE }}" />
+			<!--<![endif]-->
+		<!-- alternate content -->
+		{% trans "Missing flash plugin. Please download the latest Adobe Flash Player: " %}<br />
+		<a href="https://www.adobe.com/go/getflashplayer">
+			<img alt="{% trans 'Get Adobe Flash Player' %}" src="{{ STATIC_URL }}cms/images/plugins/get_flash_player.gif" />
+		</a>
+		<!-- /alternate content -->
+			<!--[if !IE]>-->
+			</object>
+			<!--<![endif]-->
+	</object>
+</div>
