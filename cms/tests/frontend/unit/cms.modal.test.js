@@ -1619,4 +1619,82 @@ describe('CMS.Modal', function () {
             expect(modal.hideFrame).toEqual(true);
         });
     });
+
+    describe('_deletePlugin()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.config = {
+                csrf: 'CSRF!',
+                lang: {
+                    confirmEmpty: '({1}) plugin is empty. Remove it?'
+                }
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal({
+                    modalDuration: 0
+                });
+                modal.ui.modal.show();
+                spyOn(modal, '_hide');
+                done();
+            });
+        });
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('makes ajax request to delete new plugin', function (done) {
+            CMS.API.Toolbar.openAjax = function (ajax) {
+                expect(ajax).toEqual({
+                    url: '/delete-url',
+                    post: '{ "csrfmiddlewaretoken": "CSRF!" }',
+                    text: '(TestPlugin) plugin is empty. Remove it?',
+                    callback: jasmine.any(Function)
+                });
+                ajax.callback();
+                expect(CMS._newPlugin).toEqual(false);
+                done();
+            };
+
+            CMS._newPlugin = {
+                'delete': '/delete-url',
+                breadcrumb: [{
+                    title: 'TestPlugin'
+                }]
+            };
+            modal._deletePlugin();
+        });
+
+        it('hides the modal if the correct param is passed', function (done) {
+            CMS.API.Toolbar.openAjax = function (ajax) {
+                expect(ajax).toEqual({
+                    url: '/delete-url',
+                    post: '{ "csrfmiddlewaretoken": "CSRF!" }',
+                    text: '(ShmestPlugin) plugin is empty. Remove it?',
+                    callback: jasmine.any(Function)
+                });
+                ajax.callback();
+                expect(CMS._newPlugin).toEqual(false);
+                expect(modal._hide).toHaveBeenCalled();
+                done();
+            };
+
+            CMS._newPlugin = {
+                'delete': '/delete-url',
+                breadcrumb: [
+                    { title: 'TestPlugin' },
+                    { title: 'ShmestPlugin' }
+                ]
+            };
+            modal._deletePlugin({ hideAfter: true });
+        });
+    });
 });
