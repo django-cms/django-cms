@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.forms.utils import get_site_choices, get_page_choices
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
+from cms.utils.compat import DJANGO_1_7
 
 
 class SuperLazyIterator(object):
@@ -59,7 +60,7 @@ class PageSelectFormField(forms.MultiValueField):
             return Page.objects.get(pk=page_id)
         return None
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         is_empty = data and (len(data) >= 2 and data[1] in [None, ''])
 
         if isinstance(self.widget, RelatedFieldWidgetWrapper):
@@ -70,7 +71,13 @@ class PageSelectFormField(forms.MultiValueField):
             # this will cause django to always return True because of the '1'
             # so we simply follow django's default behavior when initial is None and data is "empty"
             data = ['' for x in range(0, len(data))]
-        return super(PageSelectFormField, self)._has_changed(initial, data)
+        if DJANGO_1_7:
+            return super(PageSelectFormField, self)._has_changed(initial, data)
+        else:
+            return super(PageSelectFormField, self).has_changed(initial, data)
+
+    def _has_changed(self, initial, data):
+        return self.has_changed(initial, data)
 
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget

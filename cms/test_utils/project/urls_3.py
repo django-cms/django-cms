@@ -1,6 +1,7 @@
 
 from cms.test_utils.project.placeholderapp.views import example_view
 from cms.utils.conf import get_cms_setting
+from cms.utils.compat import DJANGO_1_7
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -23,11 +24,19 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += i18n_patterns('',
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^example/$', example_view),
-    url(r'^', include('cms.urls')),
-)
+
+if DJANGO_1_7:
+    urlpatterns += i18n_patterns('',
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^example/$', example_view),
+        url(r'^', include('cms.urls')),
+    )
+else:
+    urlpatterns += i18n_patterns(
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^example/$', example_view),
+        url(r'^', include('cms.urls')),
+    )
 
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar

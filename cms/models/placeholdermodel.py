@@ -8,6 +8,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import LanguageError
+from cms.utils.compat import DJANGO_1_8
 from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
@@ -241,8 +242,12 @@ class Placeholder(models.Model):
         """
         Returns a list of objects attached to this placeholder.
         """
-        return [obj for field in self._get_attached_fields()
-                for obj in getattr(self, field.related.get_accessor_name()).all()]
+        if DJANGO_1_8:
+            return [obj for field in self._get_attached_fields()
+                    for obj in getattr(self, field.related.get_accessor_name()).all()]
+        else:
+            return [obj for field in self._get_attached_fields()
+                    for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
 
     def page_getter(self):
         if not hasattr(self, '_page'):

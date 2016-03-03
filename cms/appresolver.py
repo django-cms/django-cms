@@ -7,14 +7,14 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import (RegexURLResolver, Resolver404, reverse,
                                       RegexURLPattern)
+from django.db import OperationalError, ProgrammingError
 from django.utils import six
-from django.utils.translation import get_language
+from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils.compat import DJANGO_1_8
-from cms.utils.i18n import force_language, get_language_list
-
+from cms.utils.i18n import get_language_list
 
 APP_RESOLVERS = []
 
@@ -178,6 +178,16 @@ def get_patterns_for_title(path, title):
 
 
 def get_app_patterns():
+    try:
+        return _get_app_patterns()
+    except (OperationalError, ProgrammingError):
+        # ignore if DB is not ready
+        # Starting with Django 1.9 this code gets called even when creating
+        # or running migrations. So in many cases the DB will not be ready yet.
+        return []
+
+
+def _get_app_patterns():
     """
     Get a list of patterns for all hooked apps.
 
@@ -222,7 +232,7 @@ def get_app_patterns():
             hooked_applications[title.page_id] = {}
         app = apphook_pool.get_apphook(title.page.application_urls)
         app_ns = app.app_name, title.page.application_namespace
-        with force_language(title.language):
+        with override(title.language):
             hooked_applications[title.page_id][title.language] = (app_ns, get_patterns_for_title(path, title), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs

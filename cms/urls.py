@@ -4,10 +4,9 @@ from django.conf.urls import include, url
 
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_patterns
+from cms.constants import SLUG_REGEXP
 from cms.views import details
 
-# This is a constant, really, but must live here due to import order
-SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
 
 if settings.APPEND_SLASH:
     regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
