@@ -1,8 +1,17 @@
-=== 3.2.2 (Unreleased) ===
+=== 3.2.2 (2016-03-02) ===
 
+- Substantial improvements to the page tree and significant reduction of reloads
+- Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
+- Documentation improvements
+- Improve the display and useability of the language menu, especially in cases
+  where there are many languages.
+- Fix an issue relating to search fields in plugins
+- Fix an issue where the app-resolver would trigger locales into migrations
+- Fix cache settings
 - Fix ToolbarMiddleware.is_cms_request logic
-- Fix bottom items in very long menus not being accessible
-- Fixed more Django 1.9 deprecations
+- Fix numerous Django 1.9 deprecations
+- Numerous other improvements to overall stability and code quality
+
 
 === 3.2.1 (2016-01-29) ===
 
