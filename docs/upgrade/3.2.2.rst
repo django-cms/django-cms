@@ -13,8 +13,8 @@ Improvements
 
 - Substantial "under-the-hood" improvements to the page tree resulting in
   significant reduction of page-tree reloads and generally cleaner code
-- Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
-- Improve the display and useability of the language menu, especially in cases
+- Update jsTree version to 3.2.1 with slight adaptions to the page tree
+- Improve the display and usability of the language menu, especially in cases
   where there are many languages
 - Documentation improvements
 
@@ -51,8 +51,8 @@ field is declared in the CMSPlugin base class and is populated on instantiation
 using the lower-cased model name of the CMSPlugin subclass that is
 being registered.
 
-A subclass to CMSPlugin can declare their own cmsplugin_ptr field to immediately
-fix this issue. The easiest solution is to declare this field with a
+A subclass to ``CMSPlugin`` can declare their own ``cmsplugin_ptr`` field to
+immediately fix this issue. The easiest solution is to declare this field with a
 ``related_name`` of "+". In typical Django fashion, this will suppress the
 back-reference and prevent any collisions. However, if the back-reference is
 required for some reason (very rare), then we recommend using the pattern

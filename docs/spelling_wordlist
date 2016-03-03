@@ -17,6 +17,7 @@ dev
 fallback
 fallbacks
 js
+jsTree
 practices
 rc
 regexps
