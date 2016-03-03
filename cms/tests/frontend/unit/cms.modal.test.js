@@ -1857,4 +1857,384 @@ describe('CMS.Modal', function () {
             expect(spy).not.toHaveBeenCalled();
         });
     });
+
+    describe('_loadIframe()', function () {
+        var modal;
+        beforeEach(function (done) {
+            fixture.load('modal.html');
+            delete CMS._newPlugin;
+            CMS.API.Tooltip = {
+                hide: jasmine.createSpy()
+            };
+            CMS.API.Messages = {
+                open: jasmine.createSpy()
+            };
+            CMS.API.Toolbar = {
+                open: jasmine.createSpy(),
+                showLoader: jasmine.createSpy(),
+                hideLoader: jasmine.createSpy()
+            };
+            $(function () {
+                modal = new CMS.Modal();
+                modal.ui.modal.show();
+                spyOn(modal, 'reloadBrowser');
+                spyOn(modal, '_setBreadcrumb');
+                spyOn(modal, '_setButtons');
+                spyOn(CMS.Modal, '_setupCtrlEnterSave');
+                spyOn(modal, 'close');
+                done();
+            });
+        });
+
+        afterEach(function () {
+            fixture.cleanup();
+        });
+
+        it('adds appropriate classes', function () {
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-iframe');
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-markup');
+            expect(modal.ui.modalBody).not.toHaveClass('cms-loader');
+
+            modal.ui.modal.addClass('cms-modal-markup');
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+
+            expect(modal.ui.modal).toHaveClass('cms-modal-iframe');
+            expect(modal.ui.modal).not.toHaveClass('cms-modal-markup');
+            expect(modal.ui.modalBody).toHaveClass('cms-loader');
+        });
+
+        it('adds correct title while loading', function () {
+            expect(modal.ui.titlePrefix.text()).toEqual('');
+            expect(modal.ui.titleSuffix.text()).toEqual('');
+
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+
+            expect(modal.ui.titlePrefix.text()).toEqual('');
+            expect(modal.ui.titleSuffix.text()).toEqual('');
+
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html',
+                title: 'Test title'
+            });
+
+            expect(modal.ui.titlePrefix.text()).toEqual('Test title');
+            expect(modal.ui.titleSuffix.text()).toEqual('');
+        });
+
+        it('opens error message and closes the iframe if its contents cannot be accessed', function (done) {
+            spyOn($.fn, 'contents').and.callFake(function () {
+                throw new Error('Cannot access contents');
+            });
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.close).toHaveBeenCalled();
+                expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                    message: '<strong>Error: Cannot access contents</strong>',
+                    error: true
+                });
+                done();
+            });
+        });
+
+        it('sets up ctrl + enter save', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(CMS.Modal._setupCtrlEnterSave).toHaveBeenCalledWith(
+                    modal.ui.frame.find('iframe')[0].contentDocument
+                );
+                done();
+            });
+        });
+
+        it('shows and hides the loader', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+            expect(CMS.API.Toolbar.hideLoader).not.toHaveBeenCalled();
+            expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(CMS.API.Toolbar.hideLoader).toHaveBeenCalledTimes(1);
+                expect(CMS.API.Toolbar.showLoader).toHaveBeenCalledTimes(1);
+                done();
+            });
+        });
+
+        it('shows messages if iframe contains them', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(CMS.API.Messages.open).toHaveBeenCalledWith({
+                    message: 'Django CMS is amazing!'
+                });
+                done();
+            });
+        });
+
+        it('adds cms-admin cms-admin-modal classes to the iframe body', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect($(this).contents().find('body')).toHaveClass('cms-admin');
+                expect($(this).contents().find('body')).toHaveClass('cms-admin-modal');
+                done();
+            });
+        });
+
+        it('does not reload the page if not required', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.reloadBrowser).not.toHaveBeenCalled();
+                done();
+            });
+        });
+        it('does not reload the page if not required', function (done) {
+            modal.enforceReload = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.reloadBrowser).not.toHaveBeenCalled();
+                done();
+            });
+        });
+
+        it('does reload the page if required', function (done) {
+            modal.enforceReload = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.reloadBrowser).toHaveBeenCalledWith();
+                done();
+            });
+        });
+
+        it('does not close the modal if not required', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.close).not.toHaveBeenCalled();
+                done();
+            });
+        });
+        it('does not close the modal if not required', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.close).not.toHaveBeenCalled();
+                done();
+            });
+        });
+
+        it('does not close the modal if not required', function (done) {
+            modal.enforceClose = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.close).not.toHaveBeenCalled();
+                done();
+            });
+        });
+
+        it('closes the modal if required', function (done) {
+            modal.enforceClose = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.close).toHaveBeenCalledTimes(1);
+                done();
+            });
+        });
+
+        it('resets django viewsitelink to open in the top level window', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.close).not.toHaveBeenCalled();
+                expect($(this).contents().find('.viewsitelink')).toHaveAttr('target', '_top');
+                done();
+            });
+        });
+
+        it('sets the buttons', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal._setButtons).toHaveBeenCalledWith($(this));
+                done();
+            });
+        });
+
+        it('does not reset the saved state if there is no form errors', function (done) {
+            modal.saved = 'custom';
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.saved).toEqual('custom');
+                done();
+            });
+        });
+
+        it('resets the saved state if there is a form error loaded in the iframe', function (done) {
+            modal.saved = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_errornote.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.saved).toEqual(false);
+                done();
+            });
+        });
+
+        it('resets the saved state if there is a form error loaded in the iframe', function (done) {
+            modal.saved = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_errorlist.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.saved).toEqual(false);
+                done();
+            });
+        });
+
+        it('reloads browser if iframe was saved and there is no delete confirmation', function (done) {
+            modal.saved = true;
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.reloadBrowser).toHaveBeenCalledWith(
+                    jasmine.any(String),
+                    false,
+                    true
+                );
+                done();
+            });
+        });
+
+        it('reloads browser if iframe was saved and there is no delete confirmation', function (done) {
+            modal.saved = true;
+            modal.options.onClose = '/custom-on-close';
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.reloadBrowser).toHaveBeenCalledWith(
+                    '/custom-on-close',
+                    false,
+                    true
+                );
+                done();
+            });
+        });
+
+        it('updates the title of the modal if required', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.ui.titlePrefix.text()).toEqual('I am a title');
+                expect(modal.ui.titleSuffix.text()).toEqual('');
+                expect($(this).contents().find('h1').length).toEqual(1);
+                done();
+            });
+        });
+
+        it('updates the title of the modal if required', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html',
+                title: 'Test title'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.ui.titlePrefix.text()).toEqual('Test title');
+                expect(modal.ui.titleSuffix.text()).toEqual('I am a title');
+                expect($(this).contents().find('h1').length).toEqual(1);
+                done();
+            });
+        });
+
+        it('updates the title of the modal if required', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html',
+                title: '     '
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect(modal.ui.titlePrefix.text()).toEqual('I am a title');
+                expect(modal.ui.titleSuffix.text()).toEqual('');
+                expect($(this).contents().find('h1').length).toEqual(1);
+                done();
+            });
+        });
+
+        it('sets iframe data ready', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+            });
+            expect(modal.ui.frame.find('iframe').data('ready')).toEqual(undefined);
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect($(this).data('ready')).toEqual(true);
+                done();
+            });
+        });
+
+        it('adds keydown event to close the modal if ESC is pressed inside of the iframe', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+            });
+            modal.ui.modal.find('iframe').on('load', function () {
+                var body = $(this).contents().find('body');
+                expect(body).toHandle('keydown.cms');
+
+                body.on('keydown.cms', function (e) {
+                    if (modal.close.calls.count()) {
+                        done();
+                    }
+                });
+
+                body.trigger($.Event('keydown', { keyCode: CMS.KEYS.SPACE }));
+                body.trigger($.Event('keydown', { keyCode: CMS.KEYS.ESC }));
+            });
+        });
+
+        it('does not adjust content if object-tools are not available', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
+            });
+            spyOn($.fn, 'css');
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect($.fn.css).not.toHaveBeenCalledWith('padding-top', 38);
+                done();
+            });
+        });
+
+        it('adjusts content if object-tools available', function (done) {
+            modal._loadIframe({
+                url: '/base/cms/tests/frontend/unit/html/modal_iframe_title.html'
+            });
+            spyOn($.fn, 'css');
+            modal.ui.modal.find('iframe').on('load', function () {
+                expect($.fn.css).toHaveBeenCalledWith('padding-top', 38);
+                done();
+            });
+        });
+    });
 });

@@ -873,10 +873,12 @@ var CMS = window.CMS || {};
                 }
 
                 CMS.Modal._setupCtrlEnterSave(document);
+                // istanbul ignore else
                 if (iframe[0].contentWindow && iframe[0].contentWindow.document) {
                     CMS.Modal._setupCtrlEnterSave(iframe[0].contentWindow.document);
                 }
                 // for ckeditor we need to go deeper
+                // istanbul ignore next
                 if (iframe[0].contentWindow && iframe[0].contentWindow.CMS && iframe[0].contentWindow.CMS.CKEditor) {
                     $(iframe[0].contentWindow.document).ready(function () {
                         // setTimeout is required to battle CKEditor initialisation
@@ -945,6 +947,7 @@ var CMS = window.CMS || {};
                     innerTitle = iframe.contents().find('#content h1:eq(0)');
 
                     // case when there is no prefix
+                    // istanbul ignore next: never happens
                     if (opts.title === undefined && that.ui.titlePrefix.text() === '') {
                         bc = iframe.contents().find('.breadcrumbs').contents();
                         that.ui.titlePrefix.text(bc.eq(bc.length - 1).text().replace('›', '').trim());
