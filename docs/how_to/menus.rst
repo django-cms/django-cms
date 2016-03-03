@@ -165,7 +165,7 @@ menu templates. In order to keep menu nodes lightweight (which can be important 
 thousands of pages) they only contain the minimum attributes required to generate a usable menu.
 
 In both cases, a Navigation Modifier is the solution - in the first case, to add a new node at the
-appropriate place, and in the second, to add a new attribute - on the ``attr`` attibute, rather
+appropriate place, and in the second, to add a new attribute - on the ``attr`` attribute, rather
 than directly on the ``NavigationNode``, to help avoid conflicts - to all nodes in the menu.
 
 How it works
@@ -203,7 +203,9 @@ Here is an example of a simple modifier that places a Page's attribute in the co
                     node.attr["changed_by"] = Page.objects.get(id=node.id).changed_by
             return nodes
 
-menu_pool.register_modifier(MyMode)
+    menu_pool.register_modifier(MyMode)
+
+
 It has a method :meth:`~menus.base.Modifier.modify` that should return a list
 of :class:`~menus.base.NavigationNode` instances.
 :meth:`~menus.base.Modifier.modify` should take the following arguments:

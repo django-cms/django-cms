@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
 ]
 
-urlpatterns += i18n_patterns('',
+urlpatterns += i18n_patterns(
     url(r'^detail/(?P<id>[0-9]+)/$', detail_view, name="detail"),
     url(r'^detail/(?P<pk>[0-9]+)/$', detail_view, name="example_detail"),
     url(r'^detail_multi/(?P<id>[0-9]+)/$', detail_view_multi, name="detail_multi"),

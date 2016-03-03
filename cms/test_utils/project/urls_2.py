@@ -22,7 +22,8 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += i18n_patterns('',
+
+urlpatterns += i18n_patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^example/$', example_view),
     url(r'^', include('cms.urls')),

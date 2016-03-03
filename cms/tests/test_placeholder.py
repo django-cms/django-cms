@@ -10,7 +10,6 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.template import TemplateSyntaxError, Template
-from django.template.context import Context, RequestContext
 from django.template.loader import get_template
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
@@ -218,41 +217,37 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         self.assertRaises(TemplateSyntaxError, get_placeholders, 'placeholder_tests/test_eleven.html')
 
     def test_placeholder_tag(self):
-        template = Template("{% load cms_tags %}{% render_placeholder placeholder %}")
-        ctx = Context()
-        self.assertEqual(template.render(ctx), "")
         request = self.get_request('/', language=settings.LANGUAGES[0][0])
-        rctx = RequestContext(request)
-        self.assertEqual(template.render(rctx), "")
+
+        template = "{% load cms_tags %}{% render_placeholder placeholder %}"
+        output = self.render_template_obj(template, {}, request)
+        self.assertEqual(output, "")
+
         placeholder = Placeholder.objects.create(slot="test")
-        rctx['placeholder'] = placeholder
-        self.assertEqual(template.render(rctx), "")
+        output = self.render_template_obj(template, {'placeholder': placeholder}, request)
+        self.assertEqual(output, "")
         self.assertEqual(placeholder.cmsplugin_set.count(), 0)
+
         add_plugin(placeholder, "TextPlugin", settings.LANGUAGES[0][0], body="test")
         self.assertEqual(placeholder.cmsplugin_set.count(), 1)
-        rctx = RequestContext(request)
         placeholder = self.reload(placeholder)
-        rctx.update({'placeholder': placeholder})
-        self.assertEqual(template.render(rctx).strip(), "test")
+        output = self.render_template_obj(template, {'placeholder': placeholder}, request)
+        self.assertEqual(output, "test")
 
     def test_placeholder_tag_language(self):
-        template = Template("{% load cms_tags %}{% render_placeholder placeholder language language %}")
+        template = "{% load cms_tags %}{% render_placeholder placeholder language language %}"
         placeholder = Placeholder.objects.create(slot="test")
         add_plugin(placeholder, "TextPlugin", 'en', body="English")
         add_plugin(placeholder, "TextPlugin", 'de', body="Deutsch")
         request = self.get_request('/')
-        rctx = RequestContext(request)
-        rctx.update({
-            'placeholder': placeholder,
-            'language': 'en'
-        })
-        self.assertEqual(template.render(rctx).strip(), "English")
+
+        output = self.render_template_obj(template, {'placeholder': placeholder, 'language': 'en'}, request)
+        self.assertEqual(output.strip(), "English")
+
         del placeholder._plugins_cache
-        rctx.update({
-            'placeholder': placeholder,
-            'language': 'de'
-        })
-        self.assertEqual(template.render(rctx).strip(), "Deutsch")
+
+        output = self.render_template_obj(template, {'placeholder': placeholder, 'language': 'de'}, request)
+        self.assertEqual(output.strip(), "Deutsch")
 
     def test_get_placeholder_conf(self):
         TEST_CONF = {
@@ -561,7 +556,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             content = render_placeholder(placeholder, context)
             self.assertRegexpMatches(content, "^<p>en default body 1</p>\s*<p>en default body 2</p>$")
 
-
     def test_plugins_children_prepopulate(self):
         """
         Validate a default textplugin with a nested default link plugin
@@ -608,7 +602,6 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
             self.assertEqual(plugins[1].plugin_type, 'LinkPlugin')
             self.assertEqual(plugins[2].plugin_type, 'LinkPlugin')
             self.assertTrue(plugins[1].parent == plugins[2].parent and plugins[1].parent == plugins[0])
-
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
@@ -727,16 +720,15 @@ class PlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
         will be executed twice, and if it adds content to {{block.super}},
         that content will be added twice.
         """
-
         template = get_template("placeholder_tests/test_super_extends_2.html")
-        output = template.render(Context({}))
+        output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
         get_placeholders("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
-        output = template.render(Context({}))
+        output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
