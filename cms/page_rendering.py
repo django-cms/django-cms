@@ -2,7 +2,6 @@
 from django.conf import settings
 from django.core.urlresolvers import resolve, Resolver404
 from django.http import Http404
-from django.template import RequestContext
 from django.template.response import TemplateResponse
 
 from cms import __version__

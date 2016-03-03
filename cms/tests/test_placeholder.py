@@ -9,7 +9,7 @@ from django.contrib.messages.storage import default_storage
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.template import TemplateSyntaxError, Template, Context
+from django.template import TemplateSyntaxError, Template
 from django.template.loader import get_template
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings

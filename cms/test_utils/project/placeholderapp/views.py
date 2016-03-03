@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import RequestContext
 from django.template.engine import Engine
-from django.template.base import Template
 from django.views.generic import DetailView
 from cms.test_utils.project.placeholderapp.models import (
     Example1, MultilingualExample1, CharPksExample)

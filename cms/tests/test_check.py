@@ -4,7 +4,6 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import base
 from django.test import TestCase
 
 from cms.api import add_plugin

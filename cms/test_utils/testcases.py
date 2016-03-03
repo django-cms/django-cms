@@ -14,7 +14,6 @@ from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
-from django.utils.six import string_types
 from django.utils.timezone import now
 from django.utils.translation import activate
 from django.utils.six.moves.urllib.parse import unquote, urljoin
