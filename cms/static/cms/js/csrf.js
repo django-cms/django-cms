@@ -34,7 +34,7 @@ $.ajaxSetup({
 					}
 					if(!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url)) || base_doc_url == base_settings_url) {
 						// Only send the token to relative URLs i.e. locally.
-						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+						xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken3'));
 						settings.csrfTokenSet = true;
 					}
 				}
@@ -58,7 +58,7 @@ beforeSend: function(xhr, settings) {
 if (typeof(settings.csrfTokenSet) !== undefined && settings.csrfTokenSet) {
     // CSRF token has already been set elsewhere so we won't touch it.
     return true;
-} 
+}
 function getCookie(name) {
 var cookieValue = null;
 if (document.cookie && document.cookie != '') {
