@@ -263,12 +263,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
         page.publish(language)
 
     if with_revision:
-        from cms.admin.pageadmin import INITIAL_COMMENT
+        from cms.constants import REVISION_INITIAL_COMMENT
 
         _create_revision(
             obj=page,
             user=_thread_locals.user,
-            message=INITIAL_COMMENT,
+            message=REVISION_INITIAL_COMMENT,
         )
 
     del _thread_locals.user

@@ -22,8 +22,7 @@ from cms.api import (
     publish_page,
 )
 from cms.apphook_pool import apphook_pool
-from cms.admin.pageadmin import INITIAL_COMMENT
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import REVISION_INITIAL_COMMENT, TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.models.titlemodels import Title
 from cms.models.permissionmodels import GlobalPagePermission
@@ -282,7 +281,7 @@ class PythonAPITests(TestCase):
         # assert revision comment was set correctly
         self.assertEqual(
             latest_revision.comment,
-            INITIAL_COMMENT,
+            REVISION_INITIAL_COMMENT,
         )
 
         # assert revision user was set correctly

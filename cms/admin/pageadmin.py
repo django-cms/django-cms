@@ -40,7 +40,11 @@ from cms.admin.permissionadmin import (
 )
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.admin.views import revert_plugins
-from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_PENDING
+from cms.constants import (
+    PAGE_TYPES_ID,
+    PUBLISHER_STATE_PENDING,
+    REVISION_INITIAL_COMMENT,
+)
 from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, StaticPlaceholder
 from cms.models.managers import PagePermissionsPermissionManager
 from cms.plugin_pool import plugin_pool
@@ -92,7 +96,6 @@ else:  # pragma: no cover
         return ReversionContext()
 
 PUBLISH_COMMENT = "Publish"
-INITIAL_COMMENT = "Initial version."
 
 
 class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
@@ -832,10 +835,10 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
         if is_installed('reversion') and not hasattr(self, 'get_revision_data'):
             adapter = self.revision_manager.get_adapter(object.__class__)
             self.revision_context_manager.add_to_context(self.revision_manager, object, adapter.get_version_data(object))
-            self.revision_context_manager.set_comment(INITIAL_COMMENT)
+            self.revision_context_manager.set_comment(REVISION_INITIAL_COMMENT)
         # Same code as reversion 1.9
         try:
-            super(PageAdmin, self).log_addition(request, object, INITIAL_COMMENT)
+            super(PageAdmin, self).log_addition(request, object, REVISION_INITIAL_COMMENT)
         except TypeError:  # Django < 1.9 pragma: no cover
             super(PageAdmin, self).log_addition(request, object)
 
@@ -1259,7 +1262,7 @@ class PageAdmin(PlaceholderAdminMixin, ModelAdmin):
             versions_qs = Version.objects.filter(content_type=content_type, object_id_int=page.pk)
             history_limit = get_cms_setting("MAX_PAGE_HISTORY_REVERSIONS")
             deleted = []
-            for version in versions_qs.exclude(revision__comment__in=(INITIAL_COMMENT,  PUBLISH_COMMENT)).order_by(
+            for version in versions_qs.exclude(revision__comment__in=(REVISION_INITIAL_COMMENT,  PUBLISH_COMMENT)).order_by(
                         '-revision__pk')[history_limit - 1:]:
                 if not version.revision_id in deleted:
                     revision = version.revision
