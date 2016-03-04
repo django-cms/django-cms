@@ -335,11 +335,11 @@ var CMS = window.CMS || {};
                     });
                 });
 
-                this.ui.window.on(
-                    [this.resize, this.scroll].join(' '),
-                    CMS.API.Helpers.throttle($.proxy(this._handleLongMenus, this), 10)
-                );
             });
+            this.ui.window.on(
+                [this.resize, this.scroll].join(' '),
+                CMS.API.Helpers.throttle($.proxy(this._handleLongMenus, this), 10)
+            );
         },
 
         /**
