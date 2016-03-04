@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from classytags.utils import flatten_context
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -249,7 +249,7 @@ class BasicToolbar(CMSToolbar):
     def render_addons(self, context):
         context.push()
         context['local_toolbar'] = self
-        clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', context))
+        clipboard = mark_safe(render_to_string('cms/toolbar/clipboard.html', flatten_context(context)))
         context.pop()
         return [clipboard]
 

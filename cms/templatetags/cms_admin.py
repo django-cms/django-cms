@@ -10,7 +10,7 @@ from django import template
 from django.conf import settings
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 
 register = template.Library()
@@ -63,7 +63,6 @@ class TreePublishRow(Tag):
                 cls = "published"
                 text = _("published")
         else:
-
             if language in page.languages:
                 public_pending = page.publisher_public_id and page.publisher_public.get_publisher_state(
                         language) == PUBLISHER_STATE_PENDING
@@ -92,6 +91,25 @@ def is_published(page, language):
                 language) == PUBLISHER_STATE_PENDING:
             return True
         return False
+
+
+@register.filter
+def is_dirty(page, language):
+    return page.is_dirty(language)
+
+
+@register.filter
+def all_ancestors_are_published(page, language):
+    """
+    Returns False if any of the ancestors of page (and language) are
+    unpublished, otherwise True.
+    """
+    page = page.parent
+    while page:
+        if not page.is_published(language):
+            return False
+        page = page.parent
+    return True
 
 
 class ShowLazyAdminMenu(InclusionTag):
@@ -160,20 +178,13 @@ def boolean_icon(value):
 def is_restricted(page, request):
     if get_cms_setting('PERMISSION'):
         if hasattr(page, 'permission_restricted'):
-            icon = boolean_icon(bool(page.permission_restricted))
+            text = bool(page.permission_restricted)
         else:
             all_perms = list(get_any_page_view_permissions(request, page))
-            icon = boolean_icon(bool(all_perms))
-        return mark_safe(
-            ugettext('<span>%(icon)s</span>') % {
-                'icon': icon,
-            })
+            text = bool(all_perms)
+        return text
     else:
-        icon = boolean_icon(None)
-        return mark_safe(
-            ugettext('<span>%(icon)s</span>') % {
-                'icon': icon,
-            })
+        return boolean_icon(None)
 
 
 @register.filter

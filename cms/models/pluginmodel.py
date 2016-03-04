@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models import signals, Model
+from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import six, timezone
@@ -376,6 +376,15 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         have to do this themselves!
         """
         pass
+
+    @classmethod
+    def _get_related_objects(cls):
+        fields = cls._meta._get_fields(
+            forward=False, reverse=True,
+            include_parents=True,
+            include_hidden=False,
+        )
+        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
     def has_change_permission(self, request):
         page = self.placeholder.page if self.placeholder else None

@@ -26,7 +26,7 @@ It has two sub-commands:
 * ``cms list apphooks`` lists all apphooks that are used in your project.
 
 ``cms list plugins`` will issue warnings when it finds orphaned plugins (see
-``cms delete_orphaned_plugins`` below).
+``cms delete-orphaned-plugins`` below).
 
 
 .. _cms-check-command:
@@ -43,12 +43,12 @@ Plugin and apphook management commands
 
 .. _cms-delete-orphaned-plugins-command:
 
-``cms delete_orphaned_plugins``
+``cms delete-orphaned-plugins``
 ===============================
 
 .. warning::
 
-    The ``delete_orphaned_plugins`` command **permanently deletes** data from
+    The ``delete-orphaned-plugins`` command **permanently deletes** data from
     your database. You should make a backup of your database before using it!
 
 Identifies and deletes orphaned plugins.
@@ -63,7 +63,7 @@ pages (and therefore plugins), which includes ``cms moderator on`` as well as pa
 copy operations in the admin.
 
 It is advised to run ``cms list plugins`` periodically, and ``cms
-delete_orphaned_plugins`` when required.
+delete-orphaned-plugins`` when required.
 
 ``cms uninstall``
 =================
@@ -89,12 +89,24 @@ It has two sub-commands:
     The uninstall commands **permanently delete** data from your database.
     You should make a backup of your database before using them!
 
+.. _cms-copy-command:
+
+``cms copy``
+============
+
+The ``copy`` command is used to copy content from one language or site to another.
+
+It has two sub-commands:
+
+* ``cms copy lang`` copy content to a given language.
+* ``cms copy site`` copy pages and content to a given site.
+
 .. _cms-copy-lang-command:
 
-``cms copy-lang``
+``cms copy lang``
 =================
 
-The ``copy-lang`` subcommand can be used to copy content (titles and plugins)
+The ``copy lang`` subcommand can be used to copy content (titles and plugins)
 from one language to another.
 By default the subcommand copy content from the current site
 (e.g. the value of ``SITE_ID``) and only if the target
@@ -103,40 +115,40 @@ options you can change this.
 
 You must provide two arguments:
 
-* ``from_language``: the language to copy the content from;
-* ``to_language``: the language to copy the content to.
+* ``--from-lang``: the language to copy the content from;
+* ``--to-lang``: the language to copy the content to.
 
 It accepts the following options
 
-* ``force-copy``: set to copy content even if a placeholder already has content;
+* ``--force``: set to copy content even if a placeholder already has content;
   if set, copied content will be appended to the original one;
-* ``site``: specify a SITE_ID to operate on sites different from the current one;
-* ``verbose``: set for more verbose output.
+* ``--site``: specify a SITE_ID to operate on sites different from the current one;
+* ``--verbosity``: set for more verbose output.
 
 Example::
 
-    cms copy-lang en de force-copy site=2 verbose
+    cms copy lang --from-lang=en --to-lang=de --force --site=2 --verbosity=2
 
 .. _cms-copy-site-command:
 
-``cms copy-site``
+``cms copy site``
 =================
 
-The ``copy-site`` subcommand can be used to copy content (pages and plugins)
+The ``copy site`` subcommand can be used to copy content (pages and plugins)
 from one site to another.
-The subcommand copy content from the ``from_site`` to ``to_site``; please note
+The subcommand copy content from the ``from-site`` to ``to-site``; please note
 that static placeholders are copied as they are shared across sites.
 The whole source tree is copied, in the root of the target website.
 Existing pages on the target website are not modified.
 
 You must provide two arguments:
 
-* ``from_site``: the site to copy the content from;
-* ``to_site``: the site to copy the content to.
+* ``--from-site``: the site to copy the content from;
+* ``--to-site``: the site to copy the content to.
 
 Example::
 
-    cms copy-site 1 2
+    cms copy site --from-site=1 --to-site=2
 
 *******************
 Moderation commands
@@ -154,10 +166,10 @@ used moderation in the past.
     This command **alters data** in your database. You should make a backup of
     your database before using it! **Never** run this command without first
     checking for orphaned plugins, using the ``cms list plugins`` command, and
-    if necessary ``delete_orphaned_plugins``. Running  ``cms moderator`` with
+    if necessary ``delete-orphaned-plugins``. Running  ``cms moderator`` with
     orphaned plugins will fail and leave bad data in your database.
 
-``cms publisher_publish``
+``cms publisher-publish``
 =========================
 
 If you want to publish many pages at once, this command can help you. By default,
@@ -165,30 +177,30 @@ this command publishes drafts for all public pages.
 
 It accepts the following options
 
-* ``unpublished``: set to publish all drafts, including unpublished ones;
+* ``--unpublished``: set to publish all drafts, including unpublished ones;
   if not set, only already published pages will be republished.
-* ``language``: specify a language code to publish pages in only one language;
+* ``-l``, ``--language``: specify a language code to publish pages in only one language;
   if not specified, this command publishes all page languages;
-* ``site``: specify a site id to publish pages for specified site only;
+* ``--site``: specify a site id to publish pages for specified site only;
   if not specified, this command publishes pages for all sites;
 
 
 Example::
 
     #publish drafts for public pages in all languages
-    publisher_publish
+    cms publisher-publish
 
     #publish all drafts in all pages
-    cms publisher_publish --unpublished
+    cms publisher-publish --unpublished
 
     #publish drafts for public pages in deutsch
-    cms publisher_publish --language=de
+    cms publisher-publish --language=de
 
     #publish all drafts in deutsch
-    cms publisher_publish --unpublished --language=de
+    cms publisher-publish --unpublished --language=de
 
     #publish all drafts in deutsch, but only for site with id=2
-    cms publisher_publish --unpublished --language=de --site=2
+    cms publisher-publish --unpublished --language=de --site=2
 
 .. warning::
 
@@ -199,6 +211,17 @@ Example::
 Maintenance and repair
 **********************
 
+.. _fix-tree:
+
+``fix-tree``
+============
+
+Occasionally, the pages and plugins tree can become corrupted.
+Typical symptoms include problems when trying to copy or delete plugins or pages.
+
+This commands will fix small corruptions by recalculating the tree information from
+ the other parameters
+
 .. _fix-mptt:
 
 ``fix-mptt``
@@ -208,4 +231,4 @@ Occasionally, the MPTT tree can become corrupted (this is one of the reasons for
 away from MPTT to MP in django CMS 3.1 </upgrade/3.1>`). Typical symptoms include problems when
 trying to copy or delete plugins or pages.
 
-Once a database has been migrated from MPTT to MP, there is no use for this command.
+This command has been removed in django CMS 3.1 </upgrade/3.1>` and replaced with `fix-tree`_.

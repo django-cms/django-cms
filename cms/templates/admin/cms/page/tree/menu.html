@@ -1,16 +1,201 @@
-{% load cms_admin i18n %}
+{% load i18n cms_admin admin_urls %}
 
-<li id="page_{{page.pk}}" class="{% if cl.is_filtered %}leaf{% endif %}{% if has_move_page_permission %} moveable{% endif %}"{% if metadata %} mdata="{{ metadata }}{% endif %}" rel="{% if page.level == 0 %}topnode{% else %}node{% endif %}">
-    {% include "admin/cms/page/tree/menu_item.html" %}
-    {% with page.childrens as children %}
-    {% if children %}
-    <ul{% if page.last %} class="last"{% endif %}>
-        {% if page.id in open_menu_trees %}
+{# INFO: columns are defined in base.html options #}
+<li class="cms-tree-node {{ css_class }}
+    {% if page.pk in open_nodes %} jstree-open{% elif children %} jstree-closed{% endif %}
+    {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
+    {% if page.level == 0 %} cms-tree-node-top{% endif %}
+    {% if cl.is_filtered %} cms-tree-node-filtered{% endif %}
+    {% if not CMS_PERMISSION or has_add_permission %} cms-tree-node-root-allow-children{% endif %}
+    "
+    data-id="{{ page.pk }}"
+    data-slug="{{ page.get_slug }}"
+    data-colview='
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-icons">
+                {% if page.is_home %}<span class="cms-icon cms-icon-home" title="{% trans 'home' %}">{% endif %}
+                {% if page.soft_root %}
+                    <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                        <span class="cms-icon cms-icon-sitemap" title="{% trans 'softroot' %}">
+                    </a>
+                {% endif %}
+                {% if page.application_urls %}
+                    <a href="{% url 'admin:cms_page_advanced' page.id %}">
+                        <span class="cms-icon cms-icon-puzzle" title="{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}">
+                    </a>
+                {% endif %}
+            </div>
+            <div class="cms-tree-item cms-tree-item-helpers cms-hidden">
+                <a href="#" data-id="{{ page.pk }}"><span class="cms-icon cms-icon-alias"></span> {% trans "Paste" %}</a>
+            </div>
+        </div>
+    '
+    data-colpreview='
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-preview
+                {# INFO: highlight active icon when in sidebar mode #}
+                {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
+                <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"{% if lang in page.languages %} target="_top"{% endif %} title="{% trans "View on site" %}">
+                    <span>{% trans "View on site" %}</span>
+                </a>
+            </div>
+        </div>
+    '
+    {% for lang in site_languages %}
+    data-col{{ lang|lower }}='
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-lang">
+                {% if has_change_permission and has_publish_permission %}
+                    <a href="{% url 'admin:cms_page_preview_page' page.id lang %}"
+                        class="cms-tree-lang-container js-cms-tree-tooltip-trigger"
+                        {# INFO: delegate click event to parent window when in sideframe #}
+                        {% if lang in page.languages %} target="_top"{% endif %}>
+                        {# INFO: renders <span class="{cls}" title="{title}"></span> #}
+                        {% tree_publish_row page lang %}
+                    </a>
+
+                    <div class="cms-tree-tooltip-container js-cms-tree-tooltip-container">
+                        <h3>{% trans "Pick an action:" %}</h3>
+                        <a href="{% url 'admin:cms_page_preview_page' page.id lang %}" target="_top">
+                            <span class="cms-icon cms-icon-eye" title="{% blocktrans with lang|upper as language %}Edit this page in {{ language }} {% endblocktrans %}"></span> {% trans "Preview" %}
+                        </a>
+                        {# hide if page is empty #}
+                        {% if lang in page.languages %}
+                            {% if page|all_ancestors_are_published:lang %}
+                                {% if page|is_dirty:lang or not page|is_published:lang %}
+                                    <a href="{% url 'admin:cms_page_publish_page' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
+                                        <span class="cms-icon cms-icon-check-o"></span> {% trans "Publish" %}
+                                    </a>
+                                {% endif %}
+                                {% if page|is_published:lang %}
+                                    <a href="{% url 'admin:cms_page_unpublish' page.id lang %}?redirect_language={{ preview_language }}{% if request.GET.page_id %}&amp;redirect_page_id={{ request.GET.page_id }}{% endif %}" class="js-cms-tree-lang-trigger">
+                                        <span class="cms-icon cms-icon-forbidden"></span> {% trans "Unpublish" %}
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'admin:cms_page_change' page.id %}?language={{ lang }}">
+                                <span class="cms-icon cms-icon-cogs"></span> {% trans "Configure" %}
+                            </a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <span class="cms-tree-lang-container">
+                        {% tree_publish_row page lang %}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    '
+    {% endfor %}
+    data-colmenu='
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-menu js-cms-tree-item-menu">
+                {% if has_change_permission %}
+                    <a href="{% url 'admin:cms_page_change_innavigation' page.id %}?language={{ lang }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
+                {% endif %}
+                    {% if page.in_navigation %}
+                        <span class="cms-icon cms-icon-check-square" title="{% trans "in menu" %}"></span>
+                    {% else %}
+                        <span class="cms-icon cms-icon-minus-square" title="{% trans "not in menu" %}"></span>
+                    {% endif %}
+                {% if has_change_permission %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    '
+    data-coloptions='
+        <div class="cms-tree-col">
+            {% if has_change_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}" class="js-cms-tree-advanced-settings"
+                        data-url="{% url 'admin:cms_page_advanced' page.id %}"
+                        title="{% trans "Page settings (SHIFT-click for advanced settings)" %}">
+                        <span class="cms-icon cms-icon-cogs"></span>
+                    </a>
+                </div>
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-copy"
+                    data-id="{{ page.pk }}"
+                    data-apphook="{{ page.application_urls|default_if_none:'' }}">
+                    <a href="#" title="{% trans 'Copy' %}"><span class="cms-icon cms-icon-copy"></span></a>
+                </div>
+            {% endif %}
+            {% if has_add_permission and has_add_page_permission or has_add_on_same_level_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_add' %}?target={{ page.id }}&amp;position=last-child" title="{% trans 'Add Child' %}">
+                        <span class="cms-icon cms-icon-plus"></span>
+                    </a>
+                </div>
+            {% endif %}
+            {% if has_move_page_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark js-cms-tree-item-cut">
+                    <a href="#" title="{% trans 'Cut' %}"><span class="cms-icon cms-icon-scissors"></span></a>
+                </div>
+            {% endif %}
+            {% if has_delete_permission %}
+                <div class="cms-tree-item cms-tree-item-icons cms-tree-item-icons-dark">
+                    <a href="{% url 'admin:cms_page_delete' page.id %}?language={{ preview_language }}" title="{% trans 'Delete' %}">
+                        <span class="cms-icon cms-icon-bin"></span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    '
+    data-colinfo='
+        <div class="cms-tree-col">
+            <div class="cms-tree-item cms-tree-item-info">
+                <a href="{% url 'admin:cms_page_change' page.id %}?language={{ preview_language }}"
+                    class="cms-tree-info-container js-cms-tree-tooltip-trigger">
+                    <span class="cms-icon cms-icon-info"></span>
+                </a>
+
+                <div class="cms-tree-tooltip-container js-cms-tree-tooltip-container">
+                    <h3>{% trans "Information:" %}</h3>
+                    <div class="cms-tree-tooltip-wrapper">
+                        {% if page.publication_date %}
+                            <p><strong>{% trans "publication date" %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
+                        {% endif %}
+                        {% if page.publication_end_date %}
+                            <p><strong>{% trans "publication end date" %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
+                        {% endif %}
+                        <p>
+                            <strong>{% trans "is restricted" %}:</strong>
+                            {% if page|is_restricted:request %}
+                                {% trans "Yes" %}
+                            {% else %}
+                                {% trans "No" %}
+                            {% endif %}
+                        </p>
+                        {% if page.changed_by %}
+                            <p><strong>{% trans "last change by" %}:</strong> {{ page.changed_by }}</p>
+                        {% endif %}
+                        {% if page.get_template_display %}
+                            <p><strong>{% trans "template" %}:</strong> {{ page.get_template_display }}</p>
+                        {% endif %}
+                        {% if metadata %}
+                            <p><strong>{% trans "meta" %}:</strong> {{ metadata }}</p>
+                        {% endif %}
+                        {% if page.site %}
+                            <p><strong>{% trans "site" %}:</strong> {{ page.site }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    '
+    >
+
+    {% language preview_language %}
+        {{ page.get_admin_tree_title }}
+    {% endlanguage %}
+
+    {# INFO render children #}
+    {% if page.pk in open_nodes and children %}
+        <ul>
             {% for child in children %}
-                {% show_admin_menu child %}
+                {% show_lazy_admin_menu child %}
             {% endfor %}
-        {% endif %}
-    </ul>
+        </ul>
     {% endif %}
-    {% endwith %}
 </li>

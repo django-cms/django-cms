@@ -19,9 +19,10 @@ urlpatterns = [
     url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
 ]
 
-urlpatterns += i18n_patterns('',
+urlpatterns += i18n_patterns(
     url(r'^', include('cms.test_utils.project.cms_urls_for_apphook_tests')),
 )
+
 
 if settings.DEBUG and is_installed('debug_toolbar'):
     import debug_toolbar
