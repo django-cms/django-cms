@@ -60,7 +60,7 @@ Functions and constants
     :func:`create_page`. Limits menu visibility to anonymous (not authenticated) users.
 
 
-.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child")
+.. function:: create_page(title, template, language, menu_title=None, slug=None, apphook=None, apphook_namespace=None, redirect=None, meta_description=None, created_by='python-api', parent=None, publication_date=None, publication_end_date=None, in_navigation=False, soft_root=False, reverse_id=None, navigation_extenders=None, published=False, site=None, login_required=False, limit_visibility_in_menu=VISIBILITY_ALL, position="last-child", overwrite_url=None, xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False)
 
     Creates a :class:`cms.models.pagemodel.Page` instance and returns it. Also
     creates a :class:`cms.models.titlemodel.Title` instance for the specified
@@ -94,9 +94,11 @@ Functions and constants
     :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
+    :param integer xframe_options: X Frame Option value for clickjacking protection
+    :param bool with_revision: Whether to create a revision for the new page.
 
 
-.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None)
+.. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None, with_revision=False)
 
     Creates a :class:`cms.models.titlemodel.Title` instance and returns it.
 
@@ -111,6 +113,7 @@ Functions and constants
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.pagemodel.Page` instance
     :param string overwrite_url: Overwritten path for this page
+    :param bool with_revision: Whether to create a revision for the new page.
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
