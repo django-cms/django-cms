@@ -26,7 +26,8 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-urlpatterns += i18n_patterns('',
+
+urlpatterns += i18n_patterns(
     url(r'^sample/login_other/$', login,
         kwargs={'authentication_form': LoginForm2}),
     url(r'^sample/login/$', login,

@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, print_function, unicode_literals
+
 from django.core.management.base import LabelCommand
 from django.utils.six.moves import input
 
-from cms.management.commands.subcommands.base import SubcommandsCommand
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 
+from .base import SubcommandsCommand
+
 
 class UninstallApphooksCommand(LabelCommand):
-    args = "APPHOK_NAME"
+    args = 'APPHOK_NAME'
+    command_name = 'apphooks'
     label = 'apphook name (eg SampleApp)'
-    help = 'Uninstalls (sets to null) specified apphooks for all pages'
+    help_string = 'Uninstalls (sets to null) specified apphooks for all pages'
 
     def handle_label(self, label, **options):
         queryset = Page.objects.filter(application_urls=label)
@@ -27,15 +31,17 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
                 confirm = 'yes'
             if confirm == 'yes':
                 queryset.update(application_urls=None)
-                self.stdout.write(u'%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
+                self.stdout.write('%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
         else:
-            self.stdout.write(u'no %r apphooks found\n' % label)
+            self.stdout.write('no %r apphooks found\n' % label)
 
 
 class UninstallPluginsCommand(LabelCommand):
-    args = "PLUGIN_NAME"
+    args = 'PLUGIN_NAME'
+    command_name = 'plugins'
     label = 'plugin name (eg SamplePlugin)'
-    help = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
+    help_string = 'Uninstalls (deletes) specified plugins from the CMSPlugin model'
+    missing_args_message = 'foo bar'
 
     def handle_label(self, label, **options):
         plugin_pool.get_all_plugins()
@@ -52,15 +58,17 @@ Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
                 confirm = 'yes'
             if confirm == 'yes':
                 queryset.delete()
-                self.stdout.write(u'%d %r plugins uninstalled\n' % (number_of_plugins, label))
+                self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
             else:
-                self.stdout.write(u'Aborted')
+                self.stdout.write('Aborted')
         else:
-            self.stdout.write(u'no %r plugins found\n' % label)
+            self.stdout.write('no %r plugins found\n' % label)
 
 
 class UninstallCommand(SubcommandsCommand):
-    help = 'Uninstall commands'
+    help_string = 'Uninstall objects instances of the following types:'
+    command_name = 'uninstall'
+    missing_args_message = 'foo bar'
     subcommands = {
         'apphooks': UninstallApphooksCommand,
         'plugins': UninstallPluginsCommand

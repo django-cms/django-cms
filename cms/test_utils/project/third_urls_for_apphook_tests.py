@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^jsi18n/(?P<packages>\S+?)/$', javascript_catalog),
 ]
 
-urlpatterns += i18n_patterns('',
+urlpatterns += i18n_patterns(
     url(r'^', include('cms.test_utils.project.third_cms_urls_for_apphook_tests')),
 )
 
