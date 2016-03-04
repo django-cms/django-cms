@@ -65,7 +65,7 @@ var CMS = window.CMS || {};
             this.mouseEnter = 'mouseenter.cms.toolbar';
             this.mouseLeave = 'mouseleave.cms.toolbar';
             this.resize = 'resize.cms.toolbar';
-            this.scroll= 'scroll.cms.toolbar';
+            this.scroll = 'scroll.cms.toolbar';
             this.key = 'keydown.cms.toolbar keyup.cms.toolbar';
 
             this.timer = function () {};
