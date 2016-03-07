@@ -94,7 +94,7 @@ Functions and constants
     :type limit_menu_visibility: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
     :param string position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param string overwrite_url: Overwritten path for this page
-    :param integer xframe_options: X Frame Option value for clickjacking protection
+    :param integer xframe_options: X Frame Option value for Clickjacking protection
     :param bool with_revision: Whether to create a revision for the new page.
 
 
