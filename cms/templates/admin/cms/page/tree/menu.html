@@ -42,7 +42,7 @@
         </div>
     '
     {% for lang in site_languages %}
-    data-col{{ lang|lower }}='
+    data-col{{ lang|lower|cut:'-' }}='
 
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
