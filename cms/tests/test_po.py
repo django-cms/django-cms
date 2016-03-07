@@ -1,4 +1,3 @@
-from __future__ import with_statement
 from cms.test_utils.util.context_managers import TemporaryDirectory
 from django.core.management.base import CommandError
 from django.core.management.commands.compilemessages import has_bom
@@ -13,6 +12,12 @@ SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))
 
 
 def compile_messages():
+    # check if gettext is installed
+    try:
+        pipe = subprocess.Popen(['msgfmt', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except OSError as e:
+        raise CommandError('Unable to run msgfmt (gettext) command. You probably don\'t have gettext installed. {}'.format(e))
+
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
         from django.conf import settings
@@ -54,6 +59,8 @@ class PoTest(TestCase):
             shutil.copytree(SOURCE_DIR, os.path.join(tmpdir, 'locale'))
             olddir = os.getcwd()
             os.chdir(tmpdir)
-            ok, stderr = compile_messages()
-            os.chdir(olddir)
+            try:
+                ok, stderr = compile_messages()
+            finally:
+                os.chdir(olddir)
         self.assertTrue(ok, stderr)

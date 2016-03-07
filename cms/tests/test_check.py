@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 from copy import deepcopy
 import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import TemplateSyntaxError, base
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
 from cms.api import add_plugin
 from cms.models.pluginmodel import CMSPlugin
@@ -14,7 +12,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
+from cms.utils.compat import DJANGO_1_8
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 
@@ -51,7 +49,7 @@ class CheckAssertMixin(object):
             self.assertEqual(getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key)))
 
 
-class CheckTests(CheckAssertMixin, SimpleTestCase):
+class CheckTests(CheckAssertMixin, TestCase):
     def test_test_confs(self):
         self.assertCheck(True, errors=0, warnings=0)
 
@@ -64,39 +62,20 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             self.assertCheck(True, warnings=1, errors=0)
 
     def test_no_sekizai(self):
-        if DJANGO_1_6:
-            with self.settings(INSTALLED_APPS=['cms', 'menus']):
-                old_libraries = base.libraries
-                base.libraries = {}
-                old_templatetags_modules = base.templatetags_modules
-                base.templatetags_modules = []
-                self.assertRaises(TemplateSyntaxError, check, TestOutput())
-                base.libraries = old_libraries
-                base.templatetags_modules = old_templatetags_modules
-        elif DJANGO_1_7:
+        if DJANGO_1_8:
             from django.apps import apps
             apps.set_available_apps(['cms', 'menus'])
-            old_libraries = base.libraries
-            base.libraries = {}
-            old_templatetags_modules = base.templatetags_modules
-            base.templatetags_modules = []
-            self.assertRaises(TemplateSyntaxError, check, TestOutput())
-            base.libraries = old_libraries
-            base.templatetags_modules = old_templatetags_modules
+            self.assertCheck(False, errors=2)
             apps.unset_available_apps()
         else:
             from django.apps import apps
-            base.get_templatetags_modules.cache_clear()
             apps.set_available_apps(['cms', 'menus'])
             self.assertCheck(False, errors=2)
             apps.unset_available_apps()
 
     def test_no_sekizai_template_context_processor(self):
-        if DJANGO_1_7:
-            override = {'TEMPLATE_CONTEXT_PROCESSORS': []}
-        else:
-            override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-            override['TEMPLATES'][0]['OPTIONS']['context_processors'] = []
+        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = []
         with self.settings(**override):
             self.assertCheck(False, errors=2)
 
@@ -171,14 +150,10 @@ class CheckTests(CheckAssertMixin, SimpleTestCase):
             'project',
             'alt_templates'
         )
-        if DJANGO_1_7:
-            with self.settings(TEMPLATE_DIRS=[alt_dir], CMS_TEMPLATES=[]):
-                self.assertCheck(True, warnings=1, errors=0)
-        else:
-            NEWTEMPLATES = deepcopy(settings.TEMPLATES)
-            NEWTEMPLATES[0]['DIRS'] = [alt_dir]
-            with self.settings(TEMPLATES=NEWTEMPLATES, CMS_TEMPLATES=[]):
-                self.assertCheck(True, warnings=1, errors=0)
+        NEWTEMPLATES = deepcopy(settings.TEMPLATES)
+        NEWTEMPLATES[0]['DIRS'] = [alt_dir]
+        with self.settings(TEMPLATES=NEWTEMPLATES, CMS_TEMPLATES=[]):
+            self.assertCheck(True, warnings=1, errors=0)
 
     def test_non_numeric_site_id(self):
         self.assertCheck(True, warnings=0, errors=0)

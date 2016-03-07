@@ -9,6 +9,13 @@ mode into your application, and provide your users with a streamlined editing ex
 
 For the toolbar API reference, please refer to :ref:`toolbar-api-reference`.
 
+.. important:: **Overlay** and **sideframe**
+
+    Then django CMS *sideframe* has been replaced with an *overlay* mechanism. The API still refers
+    to the ``sideframe``, because it is invoked in the same way, and what has changed is merely the
+    behaviour in the user's browser.
+
+    In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
 
 ***********
 Registering
@@ -249,10 +256,10 @@ certain admin functions for managing office locations in a project::
             url = reverse('admin:offices_office_add')
             office_menu.add_modal_item(_('Add New Office'), url=url)
 
-            # Add a break in the submenus
+            # Add a break in the sub-menus
             office_menu.add_break()
 
-            # More submenus...
+            # More sub-menus...
             url = reverse('admin:offices_state_changelist')
             office_menu.add_sideframe_item(_('States List'), url=url)
 
@@ -301,7 +308,7 @@ website.
 For example, suppose you are viewing a blog entry, and the toolbar allows the blog slug or URL to
 be edited. The toolbar will watch the ``django.contrib.admin.models.LogEntry`` model and detect if
 you create or edit an object in the admin via modal or sideframe view. After the modal or sideframe
-closes it will redirect to the new url of the object.
+closes it will redirect to the new URL of the object.
 
 To set this behaviour manually you can set the ``request.toolbar.set_object()`` function on which you can set the current object.
 
@@ -344,3 +351,4 @@ The toolbar also fires a JavaScript event called **cms-ready** on the document.
 You can listen to this event using jQuery::
 
     CMS.$(document).on('cms-ready', function () { ... });
+

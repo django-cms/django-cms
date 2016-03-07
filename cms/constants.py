@@ -2,7 +2,6 @@
 
 
 TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
-TEMPLATE_INHERITANCE_LABEL = 'Inherit the template of the nearest ancestor'
 REFRESH_PAGE = 'REFRESH_PAGE'
 URL_CHANGE = 'URL_CHANGE'
 RIGHT = object() # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
@@ -24,3 +23,7 @@ VISIBILITY_USERS = 1
 VISIBILITY_ANONYMOUS = 2
 
 PAGE_USERNAME_MAX_LENGTH = 255
+
+REVISION_INITIAL_COMMENT = "Initial version."
+
+SLUG_REGEXP = '[0-9A-Za-z-_.//]+'

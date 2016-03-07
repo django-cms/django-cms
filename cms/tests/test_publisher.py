@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -31,7 +29,7 @@ class PublisherCommandTests(TestCase):
     def test_command_line_should_raise_without_superuser(self):
         with self.assertRaises(CommandError):
             com = PublishCommand()
-            com.handle_noargs()
+            com.handle()
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
@@ -42,7 +40,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -65,7 +63,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -90,7 +88,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', include_unpublished=True)
+            call_command('cms', 'publisher-publish', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -121,7 +119,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', language='de')
+            call_command('cms', 'publisher-publish', language='de')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -155,7 +153,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', language='de', include_unpublished=True)
+            call_command('cms', 'publisher-publish', language='de', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -194,7 +192,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEqual(not_drafts, 1)
@@ -224,7 +222,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -260,7 +258,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
 
         public = Page.objects.public()[0]
         languages = sorted(public.title_set.values_list('language', flat=True))
@@ -282,7 +280,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', site=siteB.id)
+            call_command('cms', 'publisher-publish', site=siteB.id)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -313,7 +311,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -344,7 +342,7 @@ class PublishingTests(TestCase):
         with self.login_user_context(superuser):
             response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], "http://testserver/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+            self.assertTrue(response['Location'].endswith("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
 
     def test_publish_single(self):
         name = self._testMethodName
@@ -399,6 +397,12 @@ class PublishingTests(TestCase):
                     response = self.client.post(admin_reverse("cms_page_publish_page", args=[page.pk, 'en']))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.get(pk=page.pk)
+
+    def test_publish_missing_page(self):
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            response = self.client.post(admin_reverse("cms_page_publish_page", args=[999999, 'en']))
+            self.assertEqual(response.status_code, 404)
 
     def test_publish_child_first(self):
         parent = self.create_page('parent', published=False)
@@ -531,9 +535,18 @@ class PublishingTests(TestCase):
         pageC = self.create_page('pageC', published=False, parent=pageA)
         pageB = self.create_page('pageB', published=False, parent=pageA)
         page = page.reload()
+        pageA = pageA.reload()
+        pageB = pageB.reload()
+        pageC = pageC.reload()
         pageA.publish('en')
+        page = page.reload()
+        pageB = pageB.reload()
+        pageC = pageC.reload()
         pageB.publish('en')
+        page = page.reload()
+        pageC = pageC.reload()
         pageC.publish('en')
+        page = page.reload()
         page.publish('en')
 
         drafts = Page.objects.filter(publisher_is_draft=True).order_by('path')
@@ -543,7 +556,6 @@ class PublishingTests(TestCase):
         for draft in drafts:
             self.assertEqual(draft.publisher_public_id, publics[x].pk)
             x += 1
-
 
     def test_unpublish_unpublish(self):
         name = self._testMethodName

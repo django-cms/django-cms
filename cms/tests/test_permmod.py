@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-from django.utils.http import urlencode
-
 from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
-from django.contrib.admin.util import unquote
+from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
@@ -13,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.utils.http import urlencode
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
@@ -32,7 +30,7 @@ from cms.test_utils.util.context_managers import disable_logger
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_path
-from cms.utils.permissions import (has_page_add_permission,
+from cms.utils.permissions import (has_page_add_permission_from_request,
                                    has_page_change_permission,
                                    has_generic_permission)
 
@@ -1122,11 +1120,13 @@ class GlobalPermissionTests(CMSTestCase):
                                       is_superuser=True)
         superuser.set_password("super")
         superuser.save()
+
+        site_1 = Site.objects.get(pk=1)
+        site_2 = Site.objects.create(domain='example2.com', name='example2.com')
+
+        SITES = [site_1, site_2]
+
         # create 2 staff users
-        SITES = [
-            Site.objects.get(pk=1),
-            Site.objects.create(domain='example2.com', name='example2.com'),
-        ]
         USERS = [
             self._create_user("staff", is_staff=True, is_active=True),
             self._create_user("staff_2", is_staff=True, is_active=True),
@@ -1160,20 +1160,20 @@ class GlobalPermissionTests(CMSTestCase):
 
         with self.settings(CMS_PERMISSION=True):
             # for all users, they should have access to site 1
-            request = RequestFactory().get(path='/', data={'site__exact': 1})
+            request = RequestFactory().get(path='/', data={'site__exact': site_1.pk})
             # we need a session attribute for current_site(request), which is
-            # used by has_page_add_permission and has_page_change_permission
+            # used by has_page_add_permission_from_request and has_page_change_permission
             request.session = {}
             for user in USERS:
-                # has_page_add_permission and has_page_change_permission both test
+                # has_page_add_permission_from_request and has_page_change_permission both test
                 # for this explicitly, to see if it's a superuser.
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(FuzzyInt(6,7)):
+                with self.assertNumQueries(FuzzyInt(6, 7)):
                     # PageAdmin swaps out the methods called for permissions
                     # if the setting is true, it makes use of cms.utils.permissions
-                    self.assertTrue(has_page_add_permission(request))
+                    self.assertTrue(has_page_add_permission_from_request(request))
                     self.assertTrue(has_page_change_permission(request))
                     # internally this calls PageAdmin.has_[add|change|delete]_permission()
                     self.assertEqual({'add': True, 'change': True, 'delete': False},
@@ -1182,21 +1182,21 @@ class GlobalPermissionTests(CMSTestCase):
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
             # to site 1
-            request = RequestFactory().get('/', data={'site__exact': 2})
+            request = RequestFactory().get('/', data={'site__exact': site_2.pk})
             request.session = {}
             # As before, the query count is inflated by doing additional lookups
             # because there's a site param in the request
             with self.assertNumQueries(FuzzyInt(11, 20)):
                 # this user shouldn't have access to site 2
                 request.user = USERS[1]
-                self.assertTrue(not has_page_add_permission(request))
+                self.assertTrue(not has_page_add_permission_from_request(request))
                 self.assertTrue(not has_page_change_permission(request))
                 self.assertEqual({'add': False, 'change': False, 'delete': False},
                                  site._registry[Page].get_model_perms(request))
                 # but, going back to the first user, they should.
-                request = RequestFactory().get('/', data={'site__exact': 2})
+                request = RequestFactory().get('/', data={'site__exact': site_2.pk})
                 request.user = USERS[0]
-                self.assertTrue(has_page_add_permission(request))
+                self.assertTrue(has_page_add_permission_from_request(request))
                 self.assertTrue(has_page_change_permission(request))
                 self.assertEqual({'add': True, 'change': True, 'delete': False},
                                  site._registry[Page].get_model_perms(request))
@@ -1207,5 +1207,5 @@ class GlobalPermissionTests(CMSTestCase):
         request = RequestFactory().get('/', data={'target': page.pk})
         request.session = {}
         request.user = user
-        has_perm = has_page_add_permission(request)
+        has_perm = has_page_add_permission_from_request(request)
         self.assertFalse(has_perm)

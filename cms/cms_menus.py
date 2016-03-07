@@ -105,9 +105,12 @@ def page_to_node(page, home, cut):
     """
     # Theses are simple to port over, since they are not calculated.
     # Other attributes will be added conditionnally later.
-    attr = {'soft_root': page.soft_root,
-            'auth_required': page.login_required,
-            'reverse_id': page.reverse_id, }
+    attr = {
+        'is_page': True,
+        'soft_root': page.soft_root,
+        'auth_required': page.login_required,
+        'reverse_id': page.reverse_id,
+    }
 
     parent_id = page.parent_id
     # Should we cut the Node from its parents?
@@ -181,6 +184,9 @@ class CMSMenu(Menu):
         }
         if hide_untranslated(lang, site.pk):
             filters['title_set__language'] = lang
+            if not use_draft(request):
+                filters['title_set__published'] = True
+
         if not use_draft(request):
             page_queryset = page_queryset.published()
         pages = page_queryset.filter(**filters).order_by("path")
@@ -204,7 +210,7 @@ class CMSMenu(Menu):
                 home = page
             if first and page.pk != home.pk:
                 home_cut = True
-            if (home_cut and (page.parent_id == home.pk or 
+            if (home_cut and (page.parent_id == home.pk or
                     page.parent_id in home_children)):
                 home_children.append(page.pk)
             if ((page.pk == home.pk and home.in_navigation)

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Q
 from django.contrib.sites.models import Site
+from treebeard.mp_tree import MP_NodeQuerySet
 from cms.publisher.query import PublisherQuerySet
 from cms.exceptions import NoHomeFound
 from django.utils import timezone
 
 
-class PageQuerySet(PublisherQuerySet):
+class PageQuerySet(MP_NodeQuerySet, PublisherQuerySet):
     def on_site(self, site=None):
         if not site:
             try:

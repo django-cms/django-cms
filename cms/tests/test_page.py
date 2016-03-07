@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import datetime
 import os.path
+from unittest import skipIf
 
 from django.conf import settings
 from django.core.cache import cache
@@ -29,11 +29,11 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.signals import pre_save_page, post_save_page
 from cms.sitemaps import CMSSitemap
 from cms.templatetags.cms_tags import get_placeholder_content
-from cms.test_utils.compat import skipIf
-from cms.test_utils.testcases import (CMSTestCase, ClearURLs, URL_CMS_PAGE, URL_CMS_PAGE_ADD)
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
+                                      URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADVANCED_CHANGE,
+                                      URL_CMS_PAGE_MOVE)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_7
 from cms.utils.compat.dj import installed_apps
 from cms.utils.i18n import force_language
 from cms.utils.page_resolver import get_page_from_request, is_valid_url
@@ -52,9 +52,6 @@ class PageMigrationTestCase(CMSTestCase):
         Test correct content type is set for Page object
         """
         from django.contrib.contenttypes.models import ContentType
-        if DJANGO_1_7:
-            # obsolete test for an old bug, can be dropped at any time
-            self.assertFalse(ContentType.objects.filter(model='page', name='', app_label='cms').exists())
         self.assertEqual(ContentType.objects.filter(model='page', app_label='cms').count(), 1)
 
 
@@ -91,6 +88,99 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(page_2.get_absolute_url(), '/fr/french-inner/')
             self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
             self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
+    def test_treebeard_delete(self):
+        """
+        This is a test for #4102
+
+        When deleting a page, parent must be updated too, to reflect the new tree status.
+        This is handled by MP_NodeQuerySet (which was not used before the fix)
+
+        """
+        page1 = create_page('home', 'nav_playground.html', 'en')
+        page2 = create_page('page2', 'nav_playground.html', 'en', parent=page1)
+        page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2)
+        page1.publish('en')
+        page2.publish('en')
+        page3.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 1)
+        self.assertFalse(page1.is_leaf())
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
+
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
+
+        page3.delete()
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 0)
+        self.assertTrue(page2.is_leaf())
+
+        page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2, reverse_id='page3')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
+
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
+
+        page1.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        page2.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+
+        page3.publish('en')
+        page1 = page1.reload().get_draft_object()
+        page2 = page2.reload().get_draft_object()
+        page3 = page3.reload().get_draft_object()
+        page1_p = page1.reload().get_public_object()
+        page2_p = page2.reload().get_public_object()
+        page3_p = page3.reload().get_public_object()
+
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 1)
+        self.assertFalse(page1.is_leaf())
+
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
+
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
+
+        self.assertEqual(page1_p.depth, 1)
+        self.assertEqual(page1_p.numchild, 1)
+        self.assertFalse(page1_p.is_leaf())
+
+        self.assertEqual(page2_p.depth, 2)
+        self.assertEqual(page2_p.numchild, 1)
+        self.assertFalse(page2_p.is_leaf())
+
+        self.assertEqual(page3_p.depth, 3)
+        self.assertEqual(page3_p.numchild, 0)
+        self.assertTrue(page3_p.is_leaf())
 
     def test_create_page_admin(self):
         """
@@ -363,10 +453,10 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-            response = self.client.get('/en/admin/cms/page/%s/' % page.id)
+            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
             self.assertEqual(response.status_code, 200)
             page_data['title'] = 'changed title'
-            response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'changed title')
 
@@ -381,18 +471,18 @@ class PagesTestCase(CMSTestCase):
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertEqual(response.status_code, 302)
             page = Page.objects.get(title_set__slug=page_data['slug'])
-            response = self.client.get('/en/admin/cms/page/%s/' % page.id)
+            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
             self.assertEqual(response.status_code, 200)
             page_data['overwrite_url'] = '/hello/'
             page_data['has_url_overwrite'] = True
-            response = self.client.post('/en/admin/cms/page/%s/advanced-settings/' % page.id, page_data)
+            response = self.client.post(URL_CMS_PAGE_ADVANCED_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_absolute_url(), '/en/hello/')
             Title.objects.all()[0]
             page = page.reload()
             page.publish('en')
             page_data['title'] = 'new title'
-            response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(page.get_title(), 'new title')
@@ -407,10 +497,10 @@ class PagesTestCase(CMSTestCase):
             page_data["meta_description"] = "I am a page"
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-            response = self.client.get('/en/admin/cms/page/%s/' % page.id)
+            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
             self.assertEqual(response.status_code, 200)
             page_data['meta_description'] = 'I am a duck'
-            response = self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
+            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             page = Page.objects.get(title_set__slug=page_data["slug"], publisher_is_draft=True)
             self.assertEqual(page.get_meta_description(), 'I am a duck')
@@ -425,7 +515,7 @@ class PagesTestCase(CMSTestCase):
             page_data["meta_description"] = "I am a page"
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             page = Page.objects.get(title_set__slug=page_data['slug'], publisher_is_draft=True)
-            self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
+            self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %}")
             req = HttpRequest()
@@ -450,7 +540,7 @@ class PagesTestCase(CMSTestCase):
                 title_set__slug=page_data['slug'],
                 publisher_is_draft=True
             )
-            self.client.post('/en/admin/cms/page/%s/' % page.id, page_data)
+            self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
@@ -535,10 +625,10 @@ class PagesTestCase(CMSTestCase):
             self.copy_page(page_b, page_b)
         self.assertEqual(Page.objects.drafts().count(), 5)
         self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
-        page_d = Page.objects.filter(parent=page_b)[1]
+        page_d = Page.objects.filter(parent=page_b)[0]
         page_e = Page.objects.get(parent=page_d)
-        self.assertEqual(page_d.path, '000100010002')
-        self.assertEqual(page_e.path, '0001000100020001')
+        self.assertEqual(page_d.path, '000100010001')
+        self.assertEqual(page_e.path, '0001000100010001')
         page_e.delete()
         page_d.delete()
         with self.login_user_context(self.get_superuser()):
@@ -550,8 +640,7 @@ class PagesTestCase(CMSTestCase):
         page_b = page_b.reload()
         page_c = page_c.reload()
         with self.login_user_context(self.get_superuser()):
-            self.copy_page(page_b, page_c, position="left")
-        self.assertEqual(Page.objects.filter(parent=page_b).count(), 2)
+            self.copy_page(page_b, page_c, position=0)
 
     def test_public_exceptions(self):
         page_a = create_page("page_a", "nav_playground.html", "en", published=True)
@@ -605,9 +694,9 @@ class PagesTestCase(CMSTestCase):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
             pk = Page.objects.all()[0].pk
-            response = self.client.get("/en/admin/cms/page/%s/" % pk, {"language": "en"})
+            response = self.client.get(URL_CMS_PAGE_CHANGE % pk, {"language": "en"})
             self.assertEqual(response.status_code, 200)
-            response = self.client.get("/en/admin/cms/page/%s/" % pk, {"language": "de"})
+            response = self.client.get(URL_CMS_PAGE_CHANGE % pk, {"language": "de"})
             self.assertEqual(response.status_code, 200)
 
     def test_move_page(self):
@@ -627,12 +716,12 @@ class PagesTestCase(CMSTestCase):
             page3 = Page.objects.all()[4]
 
             # move pages
-            response = self.client.post("/en/admin/cms/page/%s/move-page/" % page3.pk,
+            response = self.client.post(URL_CMS_PAGE_MOVE % page3.pk,
                                         {"target": page2.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
 
             page3 = Page.objects.get(pk=page3.pk)
-            response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk,
+            response = self.client.post(URL_CMS_PAGE_MOVE % page2.pk,
                                         {"target": page1.pk, "position": "last-child"})
             self.assertEqual(response.status_code, 200)
             # check page2 path and url
@@ -664,8 +753,8 @@ class PagesTestCase(CMSTestCase):
             self.assertEqual(public_page3.get_absolute_url(),
                              self.get_pages_root() + page_data2['slug'] + "/" + page_data3['slug'] + "/")
             # set page2 as root and check path of 1 and 3
-            response = self.client.post("/en/admin/cms/page/%s/move-page/" % page2.pk,
-                                        {"target": page1.pk, "position": "left"})
+            response = self.client.post(URL_CMS_PAGE_MOVE % page2.pk,
+                                        {"position": "0"})
             self.assertEqual(response.status_code, 200)
             page1 = Page.objects.get(pk=page1.pk)
             self.assertEqual(page1.get_path(), page_data1['slug'])
@@ -774,11 +863,15 @@ class PagesTestCase(CMSTestCase):
         """
         parent = create_page("parent", "nav_playground.html", "en")
         child = create_page("child", "nav_playground.html", "en", parent=parent)
-        grand_child = create_page("child", "nav_playground.html", "en", parent=child)
+        grand_child = create_page("grand child", "nav_playground.html", "en", parent=child)
+        child2 = create_page("child2", "col_two.html", "en", parent=parent)
+        grand_child2 = create_page("grand child2", "nav_playground.html", "en", parent=child2)
         child.template = constants.TEMPLATE_INHERITANCE_MAGIC
         grand_child.template = constants.TEMPLATE_INHERITANCE_MAGIC
         child.save()
         grand_child.save()
+        grand_child2.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child2.save()
 
         # kill template cache
         delattr(grand_child, '_template_cache')
@@ -790,11 +883,22 @@ class PagesTestCase(CMSTestCase):
         with self.assertNumQueries(0):
             grand_child.get_template()
 
+        # kill template cache
+        delattr(grand_child2, '_template_cache')
+        with self.assertNumQueries(1):
+            self.assertEqual(child2.template, 'col_two.html')
+            self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
+
+        # test template cache
+        with self.assertNumQueries(0):
+            grand_child2.get_template()
+
         parent.template = constants.TEMPLATE_INHERITANCE_MAGIC
         parent.save()
         self.assertEqual(parent.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
+
 
     def test_delete_with_plugins(self):
         """
@@ -896,6 +1000,30 @@ class PagesTestCase(CMSTestCase):
         request = self.get_request(
             admin_reverse('cms_page_change', args=(1,)) + 'edit-plugin/42/'
         )
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+
+    def test_ancestor_expired(self):
+        yesterday = tz_now() - datetime.timedelta(days=1)
+        tomorrow = tz_now() + datetime.timedelta(days=1)
+        root = create_page("root", "nav_playground.html", "en", slug="root",
+                           published=True)
+        page_past = create_page("past", "nav_playground.html", "en", slug="past",
+                                publication_end_date=yesterday,
+                                published=True, parent=root)
+        page_test = create_page("test", "nav_playground.html", "en", slug="test",
+                                published=True, parent=page_past)
+        page_future = create_page("future", "nav_playground.html", "en", slug="future",
+                                  publication_date=tomorrow,
+                                  published=True, parent=root)
+        page_test_2 = create_page("test", "nav_playground.html", "en", slug="test",
+                                  published=True, parent=page_future)
+
+        request = self.get_request(page_test.get_absolute_url())
+        page = get_page_from_request(request)
+        self.assertEqual(page, None)
+
+        request = self.get_request(page_test_2.get_absolute_url())
         page = get_page_from_request(request)
         self.assertEqual(page, None)
 
@@ -1150,7 +1278,7 @@ class PagesTestCase(CMSTestCase):
             xframe_options=Page.X_FRAME_OPTIONS_DENY
         )
 
-        page = create_page(
+        child1 = create_page(
             title='subpage',
             template='nav_playground.html',
             language='en',
@@ -1160,8 +1288,36 @@ class PagesTestCase(CMSTestCase):
             xframe_options=Page.X_FRAME_OPTIONS_INHERIT
         )
 
-        resp = self.client.get(page.get_absolute_url('en'))
+        child2 = create_page(
+            title='subpage',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='subpage',
+            parent=child1,
+            xframe_options=Page.X_FRAME_OPTIONS_ALLOW
+        )
+        child3 = create_page(
+            title='subpage',
+            template='nav_playground.html',
+            language='en',
+            published=True,
+            slug='subpage',
+            parent=child2,
+            xframe_options=Page.X_FRAME_OPTIONS_INHERIT
+        )
+
+        resp = self.client.get(parent.get_absolute_url('en'))
         self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+
+        resp = self.client.get(child1.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+
+        resp = self.client.get(child2.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), None)
+
+        resp = self.client.get(child3.get_absolute_url('en'))
+        self.assertEqual(resp.get('X-Frame-Options'), None)
 
     def test_top_level_page_inherited_xframe_options_are_applied(self):
         with self.settings(MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + ['django.middleware.clickjacking.XFrameOptionsMiddleware']):
@@ -1281,7 +1437,7 @@ class PageAdminTest(PageAdminTestBase):
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.noadmin_urls')
-class NoAdminPageTests(ClearURLs, CMSTestCase):
+class NoAdminPageTests(CMSTestCase):
 
     def test_get_page_from_request_fakeadmin_nopage(self):
         noadmin_apps = [app for app in installed_apps() if app != 'django.contrib.admin']

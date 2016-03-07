@@ -17,7 +17,7 @@ admin_preview
 
 Default: ``False``
 
-Should the plugin be previewed in admin when you click on the plugin or save it?
+If ``True``, displays a preview in the admin.
 
 
 allow_children
@@ -29,20 +29,22 @@ Can this plugin have child plugins? Or can other plugins be placed inside this
 plugin? If set to ``True`` you are responsible to render the children in your
 plugin template.
 
-Please use something like this or something similar::
+Please use something like this or something similar:
+
+.. code-block:: html+django
 
     {% load cms_tags %}
     <div class="myplugin">
-    {{ instance.my_content }}
-    {% for plugin in instance.child_plugin_instances %}
-         {% render_plugin plugin %}
-    {% endfor %}
+        {{ instance.my_content }}
+        {% for plugin in instance.child_plugin_instances %}
+            {% render_plugin plugin %}
+        {% endfor %}
     </div>
 
 
 Be sure to access ``instance.child_plugin_instances`` to get all children.
 They are pre-filled and ready to use. To finally render your child plugins use
-the ``{% render_plugin %}`` templatetag.
+the ``{% render_plugin %}`` template tag.
 
 See also: `child_classes`_, `parent_classes`_, `require_parent`_
 
@@ -207,13 +209,21 @@ By default this method will add ``instance`` and ``placeholder`` to the
 context, which means for simple plugins, there is no need to overwrite this
 method.
 
+If you overwrite this method it's recommended to always populate the context
+with default values by calling the render method of the super class::
+
+    def render(self, context, instance, placeholder):
+        context = super(MyPlugin, self).render(context, instance, placeholder)
+        ...
+        return context
+
 
 get_render_template
 -------------------
 
 If you need to determine the plugin render model at render time
 you can implement :meth:`get_render_template` method on the plugin
-class; this method taks the same arguments as ``render``.
+class; this method takes the same arguments as ``render``.
 The method **must** return a valid template file path.
 
 Example::
@@ -292,7 +302,7 @@ fallback icon.
 * ``icon_context``: A dictionary containing information about the needed icon
   like `width`, `height`, `theme`, etc
 
-Usually this method should return the icon url. But, it may depends on the text
+Usually this method should return the icon URL. But, it may depends on the text
 editor because what is needed may differ. Please consult the documentation of
 your text editor plugin.
 
@@ -431,42 +441,89 @@ Example::
 
 See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
 
+
+get_add_url
+-----------
+
+Returns the URL to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_edit_url
+------------
+
+Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_move_url
+------------
+
+Returns the URL to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_delete_url
+--------------
+
+Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+get_copy_url
+------------
+
+Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+
 add_url
 -------
 
-Returns the url to call to add a plugin instance; useful to implement plugin-specific
-logic in a custom view
+Returns the URL to call to add a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_add_url`` method instead.
 
 Default: None (``cms_page_add_plugin`` view is used)
 
 edit_url
 --------
 
-Returns the url to call to edit a plugin instance; useful to implement plugin-specific
-logic in a custom view
+Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_edit_url`` method instead.
 
 Default: None (``cms_page_edit_plugin`` view is used)
 
 move_url
 --------
 
-Returns the url to call to move a plugin instance; useful to implement plugin-specific
-logic in a custom view
+Returns the URL to call to move a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_move_url`` method instead.
 
 Default: None (``cms_page_move_plugin`` view is used)
 
 delete_url
 ----------
 
-Returns the url to call to delete a plugin instance; useful to implement plugin-specific
-logic in a custom view
+Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_delete_url`` method instead.
 
 Default: None (``cms_page_delete_plugin`` view is used)
 
 copy_url
 --------
 
-Returns the url to call to copy a plugin instance; useful to implement plugin-specific
-logic in a custom view
+Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
+logic in a custom view.
+
+This property is now deprecated. Will be removed in 3.4.
+Use the ``get_copy_url`` method instead.
 
 Default: None (``cms_page_copy_plugins`` view is used)

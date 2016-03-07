@@ -21,14 +21,13 @@ integrated django CMS into your project, you should be able to follow the
 Requirements
 ************
 
-* `Python`_ 2.6, 2.7, 3.3 or 3.4.
-* `Django`_ 1.6.9 or later, 1.7.x, 1.8.x
-* `South`_ 1.0.1 or higher (Only required up to Django 1.6)
-* `django-classy-tags`_ 0.6.2 or higher
-* `django-treebeard`_ 3.0
+* `Python`_ 2.7, 3.3, 3.4 or 3.5.
+* `Django`_ 1.8.x, 1.9.x
+* `django-classy-tags`_ 0.7.0 or higher
+* `django-treebeard`_ 4.0
 * `django-sekizai`_ 0.8.2 or higher
-* `html5lib`_ 0.99 or 0.999
-* `djangocms-admin-style`_
+* `html5lib`_ 0.9999999
+* `djangocms-admin-style`_ 1.0 or higher
 * An installed and working instance of one of the databases listed in the
   `Databases`_ section.
 
@@ -37,7 +36,6 @@ Requirements
 
 .. _Python: https://www.python.org
 .. _Django: https://www.djangoproject.com
-.. _South: http://south.aeracode.org/
 .. _django-classy-tags: https://github.com/ojii/django-classy-tags
 .. _django-treebeard: http://code.tabo.pe/django-treebeard/src
 .. _django-sekizai: https://github.com/ojii/django-sekizai
@@ -53,7 +51,7 @@ minimal additional configuration and are well-proven.
 Text Editors
 ------------
 
-* `Django CMS CKEditor`_ for a WYSIWYG editor 2.4.0 or higher
+* `Django CMS CKEditor`_ for a WYSIWYG editor 2.8.1 or higher
 
 .. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
 
@@ -67,7 +65,6 @@ Other Plugins
 * djangocms-grid
 * djangocms-oembed
 * djangocms-table
-* djangocms-flash
 
 
 File and image handling
@@ -84,10 +81,7 @@ File and image handling
 Revision management
 -------------------
 
-* `django-reversion`_ 1.8.X (with Django 1.6.X and Django 1.7.X) to support
-  versions of your content (If using a different Django version it is a good
-  idea to check the page `Compatible-Django-Versions`_ in the django-reversion
-  wiki in order to make sure that the package versions are compatible.)
+* `django-reversion`_ 1.10 to support versions of your content
 
   .. note::
 
@@ -97,7 +91,7 @@ Revision management
     will cause your database size to increase.
 
 .. _django-reversion: https://github.com/etianen/django-reversion
-.. _Compatible-Django-Versions: https://github.com/etianen/django-reversion/wiki/Compatible-Django-Versions
+.. _Compatible Django Versions: http://django-reversion.readthedocs.org/en/latest/django-versions.html
 
 
 .. _installing-in-a-virtualenv-using-pip:
@@ -134,10 +128,9 @@ Next, install the CMS:
 
 This will automatically install all of the `requirements`_ listed above.
 
-While you could install packages one at a time using `pip`_, we recommend
-using a `requirements.txt`_ file. The following is an example
-requirements.txt file that can be used with pip to install django CMS and
-its dependencies:
+While you could install packages one at a time using `pip`_, we recommend using a
+`requirements.txt`_ file. The following is an example file that can be used with pip to install
+django CMS and its dependencies:
 
 ::
 
@@ -146,7 +139,7 @@ its dependencies:
 
     # These dependencies are brought in by django CMS, but if you want to
     # lock-in their version, specify them
-    Django>=1.7
+    Django>=1.8
 
     django-treebeard==3.0
     django-sekizai==0.8.2
@@ -167,7 +160,7 @@ its dependencies:
     those are not mandatory versions; refer to `requirements`_
     for any version-specific restrictions.
 
-If you are using PostgreSQL as your database, add the Python adapter to your
+If you are using PostgreSQL as your database, add the Python adaptor to your
 requirements file:
 
 ::
@@ -184,7 +177,7 @@ For MySQL you would instead add:
 
     While the django CMS is compatible with Python 3.3+, the ``mysql-python`` package is not.
 
-Before you install the Python adapters for your chosen database, you will need to first
+Before you install the Python adaptors for your chosen database, you will need to first
 install the appropriate headers and development libraries. See the platform specific notes below.
 
 .. _virtualenv: http://www.virtualenv.org
@@ -203,7 +196,7 @@ started:
     sudo aptitude install python-pip
     sudo pip install virtualenv
 
-Next, install the appropriate libraries to build the Python adapters
+Next, install the appropriate libraries to build the Python adaptors
 for your selected database. For PostgreSQL:
 
 .. code-block:: bash
@@ -222,7 +215,7 @@ See `Databases`_ below for more information and related links.
 Installing on Mac OSX
 =====================
 
-If you are using the system provided Python (2.6 or later), ensure you have
+If you are using the system provided Python (2.7 or later), ensure you have
 ``pip`` installed.
 
 .. code-block:: bash
@@ -238,7 +231,7 @@ generic package:
     brew install python
     pip install virtualenv
 
-Next, install the appropriate libraries to build the Python adapters
+Next, install the appropriate libraries to build the Python adaptors
 for your selected database. For PostgreSQL:
 
 .. code-block:: bash
@@ -252,7 +245,7 @@ For MySQL:
     brew install mysql
 
 .. note:: Homebrew does not set the databases to run automatically. The software
-          necessary for the Python adapters will be installed but if you wish to
+          necessary for the Python adaptors will be installed but if you wish to
           run the database server locally, follow the Homebrew instructions shown
           in the terminal output after installing.
 
@@ -329,8 +322,7 @@ well as its dependencies and other highly recommended applications/libraries::
     'cms',  # django CMS itself
     'treebeard',  # utilities for implementing a tree
     'menus',  # helper for model independent hierarchical website navigation
-    'south',  # Only needed for Django < 1.7
-    'sekizai',  # for javascript and css management
+    'sekizai',  # for JavaScript and CSS management
     'djangocms_admin_style',  # for the admin skin. You **must** add 'djangocms_admin_style' in the list **before** 'django.contrib.admin'.
     'django.contrib.messages',  # to enable messages framework (see :ref:`Enable messages <enable-messages>`)
 
@@ -338,7 +330,6 @@ Also add any (or all) of the following plugins, depending on your needs (see the
 :ref:`installed_apps` about ordering)::
 
     'djangocms_file',
-    'djangocms_flash',
     'djangocms_googlemap',
     'djangocms_inherit',
     'djangocms_picture',
@@ -383,7 +374,7 @@ for detailed installation information, and then return to this tutorial.
 
 If you opt for the core plugins you should take care that directory to which
 the :setting:`CMS_PAGE_MEDIA_PATH` setting points (by default ``cms_page_media/``
-relative to :setting:`django:MEDIA_ROOT`) is writable by the user under which Django
+relative to :setting:`django:MEDIA_ROOT`) is writeable by the user under which Django
 will be running. If you have opted for django-filer there is a similar requirement
 for its configuration.
 
@@ -413,23 +404,29 @@ Notice that django CMS v3.2 introduces a new middleware:
 ``cms.middleware.utils.ApphookReloadMiddleware``. This should be placed very
 near the top of your middleware classes tuple/list.
 
-You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
-
-    TEMPLATE_CONTEXT_PROCESSORS = (
-        'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages',
-        'django.core.context_processors.i18n',
-        'django.core.context_processors.request',
-        'django.core.context_processors.media',
-        'django.core.context_processors.static',
-        'sekizai.context_processors.sekizai',
-        'cms.context_processors.cms_settings',
-    )
-
 .. note::
 
-    This setting will be missing from automatically generated Django settings
-    files, so you will have to add it.
+    In Django 1.8, the ``TEMPLATE_DIRS``, ``TEMPLATE_LOADERS`` and ``TEMPLATE_CONTEXT_PROCESSORS``
+    settings are rolled into the ``TEMPLATES`` setting.
+
+    For earlier versions, put the ``context_processors`` and items listed into
+    ``TEMPLATE_CONTEXT_PROCESSORS``, the ``DIRS`` items into ``TEMPLATE_DIRS`` and so on.
+
+.. code-block:: python
+   :emphasize-lines: 7,8
+
+    TEMPLATES = [
+        {
+            'DIRS': [os.path.join(BASE_DIR, "templates"),],
+            'OPTIONS': {
+                'context_processors': [
+                    # ...
+                    'sekizai.context_processors.sekizai',
+                    'cms.context_processors.cms_settings',
+                    ],
+                },
+            },
+        ]
 
 .. warning::
 
@@ -451,11 +448,11 @@ You need at least the following :setting:`django:TEMPLATE_CONTEXT_PROCESSORS`::
 
         * ``INSTALLED_APPS``: must contain ``'django.contrib.messages'``
         * ``MIDDLEWARE_CLASSES``: must contain ``'django.contrib.messages.middleware.MessageMiddleware'``
-        * ``TEMPLATE_CONTEXT_PROCESSORS``: must contain ``'django.contrib.messages.context_processors.messages'``
+        * ``TEMPLATES["OPTIONS"]["context_processors"]``: must contain ``'django.contrib.messages.context_processors.messages'``
 
 
 Point your :setting:`django:STATIC_ROOT` to where the static files should live
-(that is, your images, CSS files, Javascript files, etc.)::
+(that is, your images, CSS files, JavaScript files, etc.)::
 
     STATIC_ROOT = os.path.join(BASE_DIR, "static")
     STATIC_URL = "/static/"
@@ -468,16 +465,8 @@ setting::
 
 .. note::
 
-    Please make sure both the ``static`` and ``media`` subfolders exist in your
-    project and are writable.
-
-Now add a little magic to the :setting:`django:TEMPLATE_DIRS` section of the file::
-
-    TEMPLATE_DIRS = (
-        # The docs say it should be absolute path: BASE_DIR is precisely one.
-        # Life is wonderful!
-        os.path.join(BASE_DIR, "templates"),
-    )
+    Please make sure both the ``static`` and ``media`` sub-folders exist in your
+    project and are writeable.
 
 Add at least one template to :setting:`CMS_TEMPLATES`; for example::
 
@@ -503,7 +492,7 @@ translations. Since these are numerous, we'll limit it to English for now::
     ]
 
 Finally, set up the :setting:`django:DATABASES` part of the file to reflect your
-database deployment. If you just want to try out things locally, sqlite3 is the
+database deployment. If you just want to try out things locally, SQLite3 is the
 easiest database to set up, however it should not be used in production. If you
 still wish to use it for now, this is what your :setting:`django:DATABASES`
 setting should look like::
@@ -516,36 +505,36 @@ setting should look like::
     }
 
 
-django CMS, as well as its plugins, supports both Django 1.7 and Django 1.6 migrations.
+django CMS, as well as its plugins, supports both Django 1.7 and Django 1.6
+migrations.
 
-Since version 3.1, migrations are stored in modules compatible with Django 1.7 **and**
-South 1.0.2 without further configuration.
+Since version 3.1, migrations are stored in modules compatible with Django 1.7
+**and** South 1.0.2 without further configuration.
 
-django CMS plugins are being ported to the same structure; in the meantime,
-on Django 1.7, you may need to specify where the migrations are situated using the
-``MIGRATION_MODULES`` setting::
+If you're using Django 1.6 and South earlier then version 1.0.2, you may need to
+add this to settings if you also use any of the following plugins::
 
-    MIGRATION_MODULES = {
-        # Add also the following modules if you're using these plugins:
-        'djangocms_file': 'djangocms_file.migrations_django',
-        'djangocms_flash': 'djangocms_flash.migrations_django',
-        'djangocms_googlemap': 'djangocms_googlemap.migrations_django',
-        'djangocms_inherit': 'djangocms_inherit.migrations_django',
-        'djangocms_link': 'djangocms_link.migrations_django',
-        'djangocms_picture': 'djangocms_picture.migrations_django',
-        'djangocms_snippet': 'djangocms_snippet.migrations_django',
-        'djangocms_teaser': 'djangocms_teaser.migrations_django',
-        'djangocms_video': 'djangocms_video.migrations_django',
-        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations_django',
+    SOUTH_MIGRATION_MODULES = {
+        'djangocms_file': 'djangocms_file.south_migrations',
+        'djangocms_googlemap': 'djangocms_googlemap.south_migrations',
+        'djangocms_inherit': 'djangocms_inherit.south_migrations',
+        'djangocms_link': 'djangocms_link.south_migrations',
+        'djangocms_picture': 'djangocms_picture.south_migrations',
+        'djangocms_snippet': 'djangocms_snippet.south_migrations',
+        'djangocms_teaser': 'djangocms_teaser.south_migrations',
+        'djangocms_video': 'djangocms_video.south_migrations',
+        'djangocms_text_ckeditor': 'djangocms_text_ckeditor.south_migrations',
     }
 
-Please check each plugin configuration option to see how to configure Django 1.7 support.
+Note that older versions of some of the above plugins may use non-standard
+locations for South and Django migrations. Please check each installed plugin
+configuration option to see how to configure Django migrations support.
 
 URL configuration
 =================
 
-You need to include the ``'cms.urls'`` urlpatterns **at the end** of your
-urlpatterns. We suggest starting with the following
+You need to include the ``'cms.urls'`` ``urlpatterns`` **at the end** of your
+``urlpatterns``. We suggest starting with the following
 ``~/workspace/myproject/myproject/urls.py``::
 
     from django.conf import settings
@@ -553,8 +542,6 @@ urlpatterns. We suggest starting with the following
     from django.conf.urls.i18n import i18n_patterns
     from django.conf.urls.static import static
     from django.contrib import admin
-
-    admin.autodiscover() # Not required for Django 1.7.x+
 
     urlpatterns = i18n_patterns('',
         url(r'^admin/', include(admin.site.urls)),
@@ -583,8 +570,8 @@ already be in your settings file.
 
 Now, on with the actual template files!
 
-Fire up your favorite editor and create a file called ``base.html`` in a folder called ``templates``
-in your myproject directory.
+Fire up your favourite editor and create a file called ``base.html`` in a folder called
+``templates`` in your ``myproject`` directory.
 
 Here is a simple example for a base template called ``base.html``:
 
@@ -634,7 +621,7 @@ like "template_2_content".
 Static files handling with sekizai
 ----------------------------------
 
-The django CMS handles media files (css stylesheets and javascript files)
+The django CMS handles media files (CSS stylesheets and JavaScript files)
 required by CMS plugins using `django-sekizai`_. This requires you to define at
 least two sekizai namespaces in your templates: ``js`` and ``css``. You can do
 so using the ``render_block`` template tag from the ``sekizai_tags`` template
@@ -647,33 +634,22 @@ HTML tag.
 Initial database setup
 ======================
 
-django CMS uses Django 1.7's built-in support for database migrations to manage
-creating and altering database tables. django CMS still offers South-style
-migrations for users of Django up to 1.6 but as noted above, strictly requires
-South>=1.0.1 in this case.
+django CMS uses Django's built-in support for database migrations to manage
+creating and altering database tables.
 
 Fresh install
 -------------
 
-If you are using Django 1.7 or later run::
+Run::
 
     python manage.py migrate
     python manage.py createsuperuser
-
-If you are using Django 1.6.x run::
-
-    python manage.py syncdb --all
-    python manage.py migrate --fake
-
-The call to ``syncdb`` will prompt you to create a super user. Choose 'yes' and
-enter appropriate values.
 
 Upgrade
 -------
 
 If you are upgrading your installation of django CMS from a previous version run::
 
-    python manage.py syncdb # Django 1.6.x only
     python manage.py migrate
 
 
@@ -706,12 +682,12 @@ as follows: `http://127.0.0.1:8000/?edit`. This will reveal a login form.
 Log in with the user you created during the database setup.
 
 If this is your first django CMS project, read through the `tutorial`_ for a
-walkthrough of the main features of django CMS.
+walk-through of the main features of django CMS.
 
 For more information on using django CMS for managing web content, see
 :doc:`/user/index`.
 
-To deploy your django CMS project on a production webserver, please refer to the
+To deploy your django CMS project on a production web server, please refer to the
 `Django documentation <http://docs.djangoproject.com/en/dev/howto/deployment/>`_.
 
 .. _official documentation: http://docs.djangoproject.com/en/stable/topics/templates/

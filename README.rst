@@ -17,6 +17,10 @@ django CMS
 
 Open source enterprise content management system based on the django framework.
 
+.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
+   :target: http://demo.django-cms.org/
+   :alt: Try demo with Aldryn Cloud
+
 .. ATTENTION:: To propose features, always open pull requests on the **develop** branch.
    It's the branch for features that will go into the next django CMS feature release.
 
@@ -44,7 +48,7 @@ Features
 * Edit content directly in the frontend on your pages
 * Hierarchical content plugins (columns, style changes etc)
 * Navigation rendering and extending from your apps
-* SEO friendly urls
+* SEO friendly URLs
 * Highly integrative into your own apps
 
 
@@ -62,7 +66,7 @@ More information on `our website <http://www.django-cms.org>`_.
 Requirements
 ************
 
-django CMS requires Django version 1.6.9 or later, 1.7 or 1.8, and Python 2.6, 2.7, 3.3 or 3.4.
+django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
 
 *************
 Documentation
@@ -88,7 +92,7 @@ You can use the `django CMS installer <http://djangocms-installer.readthedocs.or
     $ source env/bin/activate
     (env) $ pip install djangocms-installer
     (env) $ mkdir myproject && cd myproject
-    (env) $ djangocms -p -f . my_demo
+    (env) $ djangocms -f -p . my_demo
     (env) $ python manage.py
 
 
@@ -99,13 +103,16 @@ Getting Help
 Please head over to our IRC channel, #django-cms, on irc.freenode.net or write
 to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
 
+If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
+<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+
 ******************
 Commercial support
 ******************
 
-This project is backed by `Divio <http://divio.ch/en/commercial-support/>`_.
+This project is backed by `Divio <https://www.divio.com/en/commercial-support/>`_.
 If you need help implementing or hosting django CMS, please contact us:
-sales@divio.ch.
+sales@divio.com.
 
 *******
 Credits
@@ -114,7 +121,7 @@ Credits
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* Javascript tree in admin uses `jsTree <http://www.jstree.com>`_.
+* JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
 * Many thanks to the
-  `over 250 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 515 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
   to the django CMS!

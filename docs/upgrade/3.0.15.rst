@@ -1,0 +1,35 @@
+.. _upgrade-to-3.0.15:
+
+####################
+3.0.15 release notes
+####################
+
+********************
+What's new in 3.0.15
+********************
+
+Bug Fixes
+=========
+
+* Relax html5lib versions
+* Fix redirect when deleting a page
+* Correct South migration error
+* Correct validation on numeric fields in modal pop-up dialogs
+* Exclude ``scssc`` from manifest
+* Remove unpublished pages from menu
+* Remove page from menu items for performance reason
+* Fix access to pages with expired ancestors
+* Don't try to modify an immutable QueryDict
+* Only attempt to delete cache keys if there are some to be deleted
+* Update documentation section
+* Fix language chooser template
+* Cast to int cache version
+* Fix extensions copy when using duplicate page/create page type
+
+
+
+Thanks
+======
+
+Many thanks community members who have submitted issue reports and especially to
+these GitHub users who have also submitted pull requests: basilelegal.

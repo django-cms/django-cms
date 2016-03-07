@@ -1,0 +1,54 @@
+.. _upgrade-to-3.2.1:
+
+###################
+3.2.1 release notes
+###################
+
+*******************
+What's new in 3.2.1
+*******************
+
+Improvements
+============
+
+- Add support for Django 1.9 (with some deprecation warnings).
+- Add support for django-reversion 1.10+ (required by Django 1.9+).
+- Add placeholder name to the edit tooltip.
+- Add ``attr['is_page']=True`` to CMS Page navigation nodes.
+- Add Django and Python versions to debug bar info tooltip
+
+Bug Fixes
+=========
+
+- Fix an issue with refreshing the UI when switching CMS language.
+- Fix an issue with sideframe urls not being remembered after reload.
+- Fix breadcrumb in page revision list.
+- Fix clash with Foundation that caused "Add plugin" button to be unusable.
+- Fix a tree corruption when pasting a nested plugin under another plugin.
+- Fix message with CMS version not showing up on hover in debug mode.
+- Fix messages not being positioned correctly in debug mode.
+- Fix an issue where plugin parent restrictions where not respected when pasting a plugin.
+- Fix an issue where "Copy all" menu item could have been clicked on empty placeholder.
+- Fix a bug where page tree styles didn't load from STATIC_URL that pointed to a different host.
+- Fix an issue where the side-frame wouldn't refresh under some circumstances.
+- Honour CMS_RAW_ID_USERS in GlobalPagePermissionAdmin.
+
+
+Treebeard corruption
+====================
+
+Prior to 3.2.1 moving or pasting nested plugins would lead to some non-fatal
+tree corruptions, raising an error when adding plugins under the newly
+pasted plugins.
+
+To fix these problems, upgrade to 3.2.1 and then run ``manage.py cms fix-tree``
+command to repair the tree.
+
+
+DjangoCMS Text CKEditor
+=======================
+
+Action required
+---------------
+CMS 3.2.1 is not compatible with djangocms-text-ckeditor < 2.8.1.
+If you're using djangocms-text-ckeditor, please upgrade to 2.8.1 or up.

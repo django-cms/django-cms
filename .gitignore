@@ -7,12 +7,12 @@
 cms/django
 *.DS_Store
 *.svn
-.*
 *.xml
 /*env*/
+/*docs/env*/
+/*docs/build*/
 *.sqlite
 cms/media/cms_page_media/
-cms/docs/build
 example/run
 example/local_settings.py
 reversion/
@@ -21,6 +21,7 @@ build
 dist
 .ropeproject
 .project
+.coverage
 .pydevproject
 .settings
 /*.egg-info/
@@ -32,7 +33,6 @@ parts
 bin
 /dist
 *~
-/docs/*.html
 distribute-*.tar.gz
 include/
 lib/
@@ -42,6 +42,7 @@ share/
 !.jscsrc
 !.jshintrc
 cms/static/cms/compass_app_log.txt
-cms/static/cms/node_modules
 !cms/static/cms/js/dist
-node_modules/
+node_modules
+.idea
+.better_test.db

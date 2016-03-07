@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import RequestContext
-from django.template.base import Template
+from django.template.engine import Engine
 from django.views.generic import DetailView
 from cms.test_utils.project.placeholderapp.models import (
     Example1, MultilingualExample1, CharPksExample)
@@ -23,8 +23,10 @@ def _base_detail(request, instance, template_name='detail.html',
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(instance)
     if template_string:
-        template = Template(template_string)
-        return HttpResponse(template.render(RequestContext(request=request, dict_=context)))
+        context = RequestContext(request=request, dict_=context)
+        engine = Engine.get_default()
+        template = engine.from_string(template_string)
+        return HttpResponse(template.render(context))
     else:
         return render(request, template_name, context)
 
@@ -48,8 +50,7 @@ def detail_view_multi(request, pk, template_name='detail_multi.html',
 def detail_view_multi_unfiltered(request, pk, template_name='detail_multi.html',
                                  item_name="char_1", template_string='',):
     instance = MultilingualExample1.objects.get(pk=pk)
-    return _base_detail(request, instance, template_name, item_name,
-                        template_string)
+    return _base_detail(request, instance, template_name, item_name, template_string)
 
 
 def list_view(request):
@@ -65,8 +66,7 @@ def detail_view(request, pk, template_name='detail.html', item_name="char_1",
         instance = Example1.objects.get(pk=pk)
     else:
         instance = Example1.objects.get(pk=pk, publish=True)
-    return _base_detail(request, instance, template_name, item_name,
-                        template_string)
+    return _base_detail(request, instance, template_name, item_name, template_string)
 
 
 def detail_view_char(request, pk, template_name='detail.html', item_name="char_1",
@@ -83,8 +83,9 @@ class ClassDetail(DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if self.template_string:
-            context = RequestContext(self.request, context)
-            template = Template(self.template_string)
+            context = RequestContext(request=self.request, dict_=context)
+            engine = Engine.get_default()
+            template = engine.from_string(self.template_string)
             return HttpResponse(template.render(context))
         else:
             return super(ClassDetail, self).render_to_response(context, **response_kwargs)

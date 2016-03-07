@@ -1,12 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load cms_admin admin_static %}
-
-{% block extrastyle %}
-    {{ block.super }}
-    {% if request.GET.modal %}
-        <link rel="stylesheet" type="text/css" href="{% static 'cms/css/cms.toolbar.modal.css' %}">
-    {% endif %}
-{% endblock %}
+{% load cms_admin %}
 
 {% block submit_buttons_bottom %}
     {% submit_row_plugin %}

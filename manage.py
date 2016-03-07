@@ -1,9 +1,9 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
+import sys
 
 import app_manage
-
-from cms.utils.compat import DJANGO_1_6, DJANGO_1_7
 
 gettext = lambda s: s
 
@@ -64,6 +64,19 @@ def install_auth_user_model(settings, value):
     settings['AUTH_USER_MODEL'] = value
 
 
+def _get_migration_modules(apps):
+    modules = {}
+    for module in apps:
+        module_name = '%s.migrations_django' % module
+        try:
+            __import__(module_name)
+        except ImportError:
+            pass
+        else:
+            modules[module] = module_name
+    return modules
+
+
 if __name__ == '__main__':
     os.environ.setdefault(
         'DJANGO_LIVE_TEST_SERVER_ADDRESS',
@@ -72,6 +85,32 @@ if __name__ == '__main__':
     PROJECT_PATH = os.path.abspath(
         os.path.join(os.path.dirname(__file__), 'cms', 'test_utils')
     )
+
+    PLUGIN_APPS = [
+        'djangocms_text_ckeditor',
+        'djangocms_column',
+        'djangocms_picture',
+        'djangocms_file',
+        'djangocms_googlemap',
+        'djangocms_inherit',
+        'djangocms_teaser',
+        'djangocms_video',
+        'djangocms_style',
+        'djangocms_link',
+        'cms.test_utils.project.sampleapp',
+        'cms.test_utils.project.placeholderapp',
+        'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
+        'cms.test_utils.project.pluginapp.plugins.extra_context',
+        'cms.test_utils.project.pluginapp.plugins.meta',
+        'cms.test_utils.project.pluginapp.plugins.one_thing',
+        'cms.test_utils.project.pluginapp.plugins.revdesc',
+        'cms.test_utils.project.fakemlng',
+        'cms.test_utils.project.fileapp',
+        'cms.test_utils.project.objectpermissionsapp',
+        'cms.test_utils.project.bunch_of_plugins',
+        'cms.test_utils.project.extensionapp',
+        'cms.test_utils.project.mti_pluginapp',
+    ]
 
     INSTALLED_APPS = [
         'debug_toolbar',
@@ -86,123 +125,66 @@ if __name__ == '__main__':
         'treebeard',
         'cms',
         'menus',
-        'djangocms_text_ckeditor',
-        'djangocms_column',
-        'djangocms_picture',
-        'djangocms_file',
-        'djangocms_flash',
-        'djangocms_googlemap',
-        'djangocms_teaser',
-        'djangocms_video',
-        'djangocms_inherit',
-        'djangocms_style',
-        'djangocms_link',
-        'cms.test_utils.project.sampleapp',
-        'cms.test_utils.project.placeholderapp',
-        'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
-        'cms.test_utils.project.pluginapp.plugins.extra_context',
-        'cms.test_utils.project.pluginapp.plugins.meta',
-        'cms.test_utils.project.pluginapp.plugins.one_thing',
-        'cms.test_utils.project.fakemlng',
-        'cms.test_utils.project.fileapp',
-        'cms.test_utils.project.objectpermissionsapp',
-        'cms.test_utils.project.bunch_of_plugins',
-        'cms.test_utils.project.extensionapp',
-        'cms.test_utils.project.mti_pluginapp',
         'reversion',
         'sekizai',
         'hvad',
         'better_test',
-    ]
+    ] + PLUGIN_APPS
 
-    dynamic_configs = {}
-
-    if DJANGO_1_7:
-        dynamic_configs.update(dict(
-            TEMPLATE_CONTEXT_PROCESSORS=[
-                "django.contrib.auth.context_processors.auth",
-                'django.contrib.messages.context_processors.messages',
-                "django.core.context_processors.i18n",
-                "django.core.context_processors.debug",
-                "django.core.context_processors.request",
-                "django.core.context_processors.media",
-                'django.core.context_processors.csrf',
-                "cms.context_processors.cms_settings",
-                "sekizai.context_processors.sekizai",
-                "django.core.context_processors.static",
-            ],
-            TEMPLATE_LOADERS=(
-                'django.template.loaders.filesystem.Loader',
-                'django.template.loaders.app_directories.Loader',
-                'django.template.loaders.eggs.Loader',
-            ),
-            TEMPLATE_DIRS=[
-                os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))
-            ],
-            TEMPLATE_DEBUG=True
-        ))
-    else:
-        dynamic_configs['TEMPLATES'] = [
-            {
-                'NAME': 'django',
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'APP_DIRS': True,
-                'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
-                'OPTIONS': {
-                    'context_processors': [
-                        "django.contrib.auth.context_processors.auth",
-                        'django.contrib.messages.context_processors.messages',
-                        "django.template.context_processors.i18n",
-                        "django.template.context_processors.debug",
-                        "django.template.context_processors.request",
-                        "django.template.context_processors.media",
-                        'django.template.context_processors.csrf',
-                        "cms.context_processors.cms_settings",
-                        "sekizai.context_processors.sekizai",
-                        "django.template.context_processors.static",
-                    ],
-                    'debug': True,
-                }
+    dynamic_configs = {
+        'TEMPLATES': [{
+            'NAME': 'django',
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [os.path.abspath(os.path.join(PROJECT_PATH, 'project', 'templates'))],
+            'OPTIONS': {
+                'debug': True,
+                'context_processors': [
+                    "django.contrib.auth.context_processors.auth",
+                    'django.contrib.messages.context_processors.messages',
+                    "django.template.context_processors.i18n",
+                    "django.template.context_processors.debug",
+                    "django.template.context_processors.request",
+                    "django.template.context_processors.media",
+                    'django.template.context_processors.csrf',
+                    "cms.context_processors.cms_settings",
+                    "sekizai.context_processors.sekizai",
+                    "django.template.context_processors.static",
+                ],
+                'loaders': (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    'django.template.loaders.eggs.Loader',
+                )
             }
-        ]
-
-    if DJANGO_1_6:
-        # South overrides the test command, thus insert it before better_test
-        INSTALLED_APPS.insert(0, 'south')
-        dynamic_configs['SOUTH_MIGRATION_MODULES'] = {
-            'cms': 'cms.south_migrations',
-            'menus': 'menus.south_migrations',
-            'djangocms_column': 'djangocms_column.migrations',
-            'djangocms_file': 'djangocms_file.migrations',
-            'djangocms_flash': 'djangocms_flash.migrations',
-            'djangocms_googlemap': 'djangocms_googlemap.migrations',
-            'djangocms_inherit': 'djangocms_inherit.migrations',
-            'djangocms_link': 'djangocms_link.migrations',
-            'djangocms_picture': 'djangocms_picture.migrations',
-            'djangocms_style': 'djangocms_style.migrations',
-            'djangocms_teaser': 'djangocms_teaser.migrations',
-            'djangocms_text_ckeditor': 'djangocms_text_ckeditor.migrations',
-            'djangocms_video': 'djangocms_video.migrations',
-            'meta': 'cms.test_utils.project.pluginapp.plugins.meta.south_migrations',
-            'manytomany_rel': 'cms.test_utils.project.pluginapp.plugins.manytomany_rel.south_migrations',
-            'fileapp': 'cms.test_utils.project.fileapp.south_migrations',
-            'placeholderapp': 'cms.test_utils.project.placeholderapp.south_migrations',
-            'sampleapp': 'cms.test_utils.project.sampleapp.south_migrations',
-            'emailuserapp': 'cms.test_utils.project.emailuserapp.south_migrations',
-            'customuserapp': 'cms.test_utils.project.customuserapp.south_migrations',
-            'fakemlng': 'cms.test_utils.project.fakemlng.south_migrations',
-            'extra_context': 'cms.test_utils.project.pluginapp.plugins.extra_context.south_migrations',
-            'one_thing': 'cms.test_utils.project.pluginapp.plugins.one_thing.south_migrations',
-            'bunch_of_plugins': 'cms.test_utils.project.bunch_of_plugins.south_migrations',
-            'extensionapp': 'cms.test_utils.project.extensionapp.south_migrations',
-            'objectpermissionsapp': 'cms.test_utils.project.objectpermissionsapp.south_migrations',
-            'mti_pluginapp': 'cms.test_utils.project.mti_pluginapp.south_migrations',
         }
+    ]}
+
+    plugins = ('djangocms_column', 'djangocms_googlemap',
+               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
+               'djangocms_teaser', 'djangocms_video')
+
+    migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
+    if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
+        print('Both --migrate and --no-migrations have been provided. --no-migrations is in effect.')
+    if '--migrate' in sys.argv:
+        sys.argv.remove('--migrate')
+
+    dynamic_configs['MIGRATION_MODULES'] = _get_migration_modules(plugins)
+    if not dynamic_configs.get('TESTS_MIGRATE', migrate):
+        # Disable migrations
+        class DisableMigrations(object):
+
+            def __contains__(self, item):
+                return True
+
+            def __getitem__(self, item):
+                return 'notmigrations'
+
+        dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
+    if 'test' in sys.argv:
+        SESSION_ENGINE = "django.contrib.sessions.backends.cache"
     else:
-        dynamic_configs['MIGRATION_MODULES'] = DjangoMigrationsFlag(
-            arg=app_manage.Flag('--migrate'),
-            default=False,
-        )
+        SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
     app_manage.main(
         ['cms', 'menus'],
@@ -220,7 +202,7 @@ if __name__ == '__main__':
                 'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
             }
         },
-        SESSION_ENGINE="django.contrib.sessions.backends.cache",
+        SESSION_ENGINE=SESSION_ENGINE,
         CACHE_MIDDLEWARE_ANONYMOUS_ONLY=True,
         DEBUG=True,
         DATABASE_SUPPORTS_TRANSACTIONS=True,
@@ -234,6 +216,7 @@ if __name__ == '__main__':
             arg=app_manage.Flag('--use-tz'),
             default=False,
         ),
+        TIME_ZONE='UTC',
         SITE_ID=1,
         USE_I18N=True,
         MEDIA_ROOT=app_manage.TempDir(),
@@ -244,6 +227,7 @@ if __name__ == '__main__':
         STATIC_URL='/static/',
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        PLUGIN_APPS=PLUGIN_APPS,
         MIDDLEWARE_CLASSES=[
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.http.ConditionalGetMiddleware',
@@ -345,13 +329,14 @@ if __name__ == '__main__':
         ),
         CMS_PLACEHOLDER_CONF={
             'col_sidebar': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin'),
                 'name': gettext("sidebar column")
             },
             'col_left': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("left column"),
                 'plugin_modules': {
                     'LinkPlugin': 'Different Grouper'
@@ -361,8 +346,9 @@ if __name__ == '__main__':
                 },
             },
             'col_right': {
-                'plugins': ('FilePlugin', 'FlashPlugin', 'LinkPlugin', 'PicturePlugin',
-                'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin', 'MultiColumnPlugin', 'StylePlugin'),
+                'plugins': ('FilePlugin', 'LinkPlugin', 'PicturePlugin',
+                            'TextPlugin', 'SnippetPlugin', 'GoogleMapPlugin',
+                            'MultiColumnPlugin', 'StylePlugin'),
                 'name': gettext("right column")
             },
             'extra_context': {
@@ -374,19 +360,15 @@ if __name__ == '__main__':
         CMS_PERMISSION=True,
         CMS_PUBLIC_FOR='all',
         CMS_CACHE_DURATIONS={
-            'menus': 0,
-            'content': 0,
-            'permissions': 0,
+            'menus': 60,
+            'content': 60,
+            'permissions': 60,
         },
         CMS_APPHOOKS=[],
         CMS_PLUGIN_PROCESSORS=(),
         CMS_PLUGIN_CONTEXT_PROCESSORS=(),
         CMS_SITE_CHOICES_CACHE_KEY='CMS:site_choices',
         CMS_PAGE_CHOICES_CACHE_KEY='CMS:page_choices',
-        SOUTH_TESTS_MIGRATE=app_manage.Config(
-            arg=app_manage.Flag('--migrate'),
-            default=False,
-        ),
         CMS_NAVIGATION_EXTENDERS=[
             ('cms.test_utils.project.sampleapp.menu_extender.get_nodes',
              'SampleApp Menu'),

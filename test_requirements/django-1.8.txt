@@ -1,6 +1,7 @@
 -r requirements_base.txt
 Django>=1.8,<1.9
-django-reversion>=1.8,<1.9
-https://github.com/KristianOellegaard/django-hvad/archive/ec82b2a8e144ffa6f6349f0dbd0e688c84b77af0.zip#egg=django-hvad
-https://github.com/yakky/django-sekizai/archive/further_18.zip
-https://github.com/vad/django-classy-tags/archive/fix/recursion-in-django18.zip
+djangocms-text-ckeditor>=2.8.1
+django-reversion==1.10,<1.11
+django-hvad==1.4
+django-formtools
+django-debug-toolbar

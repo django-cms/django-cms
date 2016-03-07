@@ -40,7 +40,7 @@ file it too, and that means creating a `new issue on GitHub
 
 There's an art to creating a good issue report.
 
-The *Title* needs to be both succint and informative. "show_sub_menu displays incorrect nodes when
+The *Title* needs to be both succinct and informative. "show_sub_menu displays incorrect nodes when
 used with soft_root" is helpful, whereas "Menus are broken" is not.
 
 In the *Description* of your report, we'd like to see:

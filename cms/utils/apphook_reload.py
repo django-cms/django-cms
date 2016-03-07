@@ -10,8 +10,6 @@ from threading import local
 from django.conf import settings
 from django.core.urlresolvers import reverse, clear_url_caches
 
-from cms.appresolver import clear_app_resolvers, get_app_patterns
-
 # Py2 and Py3 compatible reload
 from imp import reload
 
@@ -80,6 +78,8 @@ def mark_urlconf_as_changed():
 
 
 def reload_urlconf(urlconf=None, new_revision=None):
+    from cms.appresolver import clear_app_resolvers, get_app_patterns
+
     if 'cms.urls' in sys.modules:
         reload(sys.modules['cms.urls'])
     if urlconf is None:
