@@ -351,3 +351,4 @@ The toolbar also fires a JavaScript event called **cms-ready** on the document.
 You can listen to this event using jQuery::
 
     CMS.$(document).on('cms-ready', function () { ... });
+

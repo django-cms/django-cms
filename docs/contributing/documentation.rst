@@ -49,10 +49,10 @@ This allows you to review your changes in your local browser using ``http://loca
 
     ``make install`` is roughly the equivalent of::
 
-    	virtualenv env
+        virtualenv env
         source env/bin/activate
         pip install -r requirements.txt
-    	cd docs
+        cd docs
         make html
 
     ``make run`` runs ``make html``, and serves the built documentation on port 8001 (that is, at

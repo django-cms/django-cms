@@ -29,7 +29,7 @@ class PublisherCommandTests(TestCase):
     def test_command_line_should_raise_without_superuser(self):
         with self.assertRaises(CommandError):
             com = PublishCommand()
-            com.handle_noargs()
+            com.handle()
 
     def test_command_line_publishes_zero_pages_on_empty_db(self):
         # we need to create a superuser (the db is empty)
@@ -40,7 +40,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -63,7 +63,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -88,7 +88,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', include_unpublished=True)
+            call_command('cms', 'publisher-publish', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -119,7 +119,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', language='de')
+            call_command('cms', 'publisher-publish', language='de')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -153,7 +153,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', language='de', include_unpublished=True)
+            call_command('cms', 'publisher-publish', language='de', include_unpublished=True)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -192,7 +192,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
         not_drafts = len(Page.objects.filter(publisher_is_draft=False))
         drafts = len(Page.objects.filter(publisher_is_draft=True))
         self.assertEqual(not_drafts, 1)
@@ -222,7 +222,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -258,7 +258,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride():
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
 
         public = Page.objects.public()[0]
         languages = sorted(public.title_set.values_list('language', flat=True))
@@ -280,7 +280,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish', site=siteB.id)
+            call_command('cms', 'publisher-publish', site=siteB.id)
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:
@@ -311,7 +311,7 @@ class PublisherCommandTests(TestCase):
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
-            call_command('cms', 'publisher_publish')
+            call_command('cms', 'publisher-publish')
             lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
 
         for line in lines:

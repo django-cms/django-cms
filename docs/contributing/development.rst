@@ -84,7 +84,7 @@ than one core developer before being accepted.
 
 
 Current core developers
-===============================
+=======================
 
 * Angelo Dini http://github.com/finalangel
 * Daniele Procida http://github.com/evildmp

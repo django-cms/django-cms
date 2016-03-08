@@ -114,7 +114,7 @@ Let's try to run it:
 
 .. code-block:: bash
 
-    python manage.py test cms.SimplePluginTestCase
+    python manage.py test cms.tests.test_plugins.SimplePluginTestCase
 
 This will call the new test case class only and it's handy when creating new tests and iterating
 quickly through the steps. A full test run (``python manage.py test``) is required before opening

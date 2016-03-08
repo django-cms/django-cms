@@ -250,9 +250,9 @@ In this case the template needs to be at
     </form>
 
 
-*******************************************
+******************************************
 Integrate the ``polls_plugin`` application
-*******************************************
+******************************************
 
 The final step is to integrate the ``polls_plugin`` application into the project.
 
