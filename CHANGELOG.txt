@@ -1,3 +1,9 @@
+=== 3.2.3 (2016-03-09) ===
+
+- Fix the display of hyphenated language codes in the page tree
+- Fix a family of issues relating to unescaped translations in the page tree
+
+
 === 3.2.2 (2016-03-02) ===
 
 - Substantial improvements to the page tree and significant reduction of reloads
