@@ -17,6 +17,8 @@ branches:
   only:
     - master
     - develop
+    - release/3.2.x
+    - support/3.1.x
 
 env:
   global:
