@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-/*##################################################|*/
-/* #CMS# */
-/* global CMS */
-(function ($) {
-    'use strict';
-    $(document).ready(function () {
-        /*!
-         * Plugins
-         * for created plugins or generics (static content)
-=======
 /*
  * Copyright https://github.com/divio/django-cms
  */
@@ -76,7 +65,6 @@ var CMS = window.CMS || {};
          * @class Plugin
          * @namespace CMS
          * @uses CMS.API.Helpers
->>>>>>> develop
          */
         CMS.Plugin = new CMS.Class({
 
@@ -109,13 +97,6 @@ var CMS = window.CMS || {};
 
                 // states
                 this.csrf = CMS.config.csrf;
-<<<<<<< HEAD
-                this.timer = function () {
-                };
-                this.timeout = 250;
-                this.focused = false;
-                this.click = (document.ontouchstart !== null) ? 'click.cms' : 'tap.cms click.cms';
-=======
                 this.click = 'click.cms.plugin';
                 this.pointerUp = 'pointerup.cms.plugin';
                 this.pointerDown = 'pointerdown.cms.plugin';
@@ -126,7 +107,6 @@ var CMS = window.CMS || {};
                 this.mouseEvents = 'mousedown.cms.plugin mousemove.cms.plugin mouseup.cms.plugin';
                 this.touchStart = 'touchstart.cms.plugin';
                 this.touchEnd = 'touchend.cms.plugin';
->>>>>>> develop
 
                 // bind data element to the container
                 this.ui.container.data('settings', this.options);
@@ -189,11 +169,8 @@ var CMS = window.CMS || {};
                 this._setSettingsMenu(this.ui.submenu);
                 this._setAddPluginModal(this.ui.dragbar.find('.cms-submenu-add'));
 
-<<<<<<< HEAD
-=======
                 CMS.settings.dragbars = CMS.settings.dragbars || []; // expanded dragbars array
 
->>>>>>> develop
                 // enable expanding/collapsing globally within the placeholder
                 togglerLinks.off(this.click).on(this.click, function (e) {
                     e.preventDefault();
@@ -203,15 +180,12 @@ var CMS = window.CMS || {};
                         that._expandAll(title);
                     }
                 });
-<<<<<<< HEAD
-=======
 
                 if ($.inArray(this.options.placeholder_id, CMS.settings.dragbars) !== -1) {
                     title.addClass(expanded);
                 }
 
                 this._checkIfPasteAllowed();
->>>>>>> develop
             },
 
             /**
@@ -297,25 +271,8 @@ var CMS = window.CMS || {};
                 // attach events for the "Add plugin" modal
                 this._setAddPluginModal(this.ui.dragitem.find('.cms-submenu-add'));
 
-<<<<<<< HEAD
-                    submenus.hide();
-                    submenu.show();
-                });
-
-                // adds double click to edit
-                dragitem.bind('dblclick', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    that.editPlugin(
-                        that.options.urls.edit_plugin,
-                        that.options.plugin_name,
-                        that.options.plugin_breadcrumb)
-                    ;
-                });
-=======
                 // clickability of "Paste" menu item
                 this._checkIfPasteAllowed();
->>>>>>> develop
             },
 
             /**
@@ -396,55 +353,19 @@ var CMS = window.CMS || {};
              * @param {String} parent id of a parent plugin
              */
             addPlugin: function (type, name, parent) {
-<<<<<<< HEAD
                 var params = {
-                    'placeholder_id': this.options.placeholder_id,
-                    'plugin_type': type,
-                    'plugin_language': this.options.plugin_language
+                    placeholder_id: this.options.placeholder_id,
+                    plugin_type: type,
+                    plugin_language: this.options.plugin_language
                 };
                 if (parent) {
                     params.plugin_parent = parent;
                 }
                 var url = this.options.urls.add_plugin + '?' + CMS.$.param(params);
                 var modal = new CMS.Modal({
-                    'newPlugin': this.newPlugin || false,
-                    'onClose': this.options.onClose || false,
-                    'redirectOnClose': this.options.redirectOnClose || false
-=======
-                // cancel request if already in progress
-                if (CMS.API.locked) {
-                    return false;
-                }
-                CMS.API.locked = true;
-
-                var that = this;
-                var data = {
-                    placeholder_id: this.options.placeholder_id,
-                    plugin_type: type,
-                    plugin_parent: parent || '',
-                    plugin_language: this.options.plugin_language,
-                    csrfmiddlewaretoken: this.csrf
-                };
-
-                $.ajax({
-                    type: 'POST',
-                    url: this.options.urls.add_plugin,
-                    data: data,
-                    success: function (data) {
-                        CMS.API.locked = false;
-                        that.newPlugin = data;
-                        that.editPlugin(data.url, name, data.breadcrumb);
-                    },
-                    error: function (jqXHR) {
-                        CMS.API.locked = false;
-                        var msg = CMS.config.lang.error;
-                        // trigger error
-                        CMS.API.Messages.open({
-                            message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
-                            error: true
-                        });
-                    }
->>>>>>> develop
+                    newPlugin: this.newPlugin || false,
+                    onClose: this.options.onClose || false,
+                    redirectOnClose: this.options.redirectOnClose || false
                 });
                 modal.open(url, name);
             },
@@ -535,16 +456,10 @@ var CMS = window.CMS || {};
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
-<<<<<<< HEAD
-                        that._showError(
-                            msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText
-                        );
-=======
                         CMS.API.Messages.open({
                             message: msg + jqXHR.responseText || jqXHR.status + ' ' + jqXHR.statusText,
                             error: true
                         });
->>>>>>> develop
                     }
                 };
 
@@ -683,27 +598,21 @@ var CMS = window.CMS || {};
 
                 // gather the data for ajax request
                 var data = {
-                    'placeholder_id': placeholder_id,
-                    'plugin_id': options.plugin_id,
-                    'plugin_parent': plugin_parent || '',
+                    placeholder_id: placeholder_id,
+                    plugin_id: options.plugin_id,
+                    plugin_parent: plugin_parent || '',
                     // this is a hack: when moving to different languages use the global language
-<<<<<<< HEAD
-                    'plugin_language': options.page_language,
-                    'plugin_order': plugin_order,
-                    'csrfmiddlewaretoken': this.csrf
-=======
                     plugin_language: options.page_language,
                     plugin_order: plugin_order,
                     csrfmiddlewaretoken: this.csrf,
                     move_a_copy: options.move_a_copy
->>>>>>> develop
                 };
 
                 $.ajax({
-                    'type': 'POST',
-                    'url': options.urls.move_plugin,
-                    'data': data,
-                    'success': function (response) {
+                    type: 'POST',
+                    url: options.urls.move_plugin,
+                    data: data,
+                    success: function (response) {
                         // if response is reload
                         if (response.reload) {
                             CMS.API.Helpers.reloadBrowser();
@@ -719,10 +628,10 @@ var CMS = window.CMS || {};
                         // enable actions again
                         CMS.API.locked = false;
 
-                        // TODO: show only if(response.status)
+                        // TODO: show only if (response.status)
                         that._showSuccess(dragitem);
                     },
-                    'error': function (jqXHR) {
+                    error: function (jqXHR) {
                         CMS.API.locked = false;
                         var msg = CMS.config.lang.error;
                         // trigger error
@@ -733,10 +642,6 @@ var CMS = window.CMS || {};
                     }
                 });
 
-<<<<<<< HEAD
-                // show publish button
-                $('.cms-btn-publish').addClass('cms-btn-publish-active').parent().show();
-=======
                 // show publish / save buttons
                 this.ui.publish
                     .addClass('cms-btn-publish-active')
@@ -763,7 +668,6 @@ var CMS = window.CMS || {};
                 // set new setting on instance and plugin data
                 this.options = settings;
                 plugin.data('settings', settings);
->>>>>>> develop
             },
 
             /**
@@ -830,9 +734,6 @@ var CMS = window.CMS || {};
                 }
             },
 
-<<<<<<< HEAD
-            _setSubnav: function (nav) {
-=======
             /**
              * Called after plugin is added through ajax.
              *
@@ -852,7 +753,6 @@ var CMS = window.CMS || {};
              * @param {jQuery} nav
              */
             _setSettingsMenu: function _setSettingsMenu(nav) {
->>>>>>> develop
                 var that = this;
                 this.ui.dropdown = nav.siblings('.cms-submenu-dropdown-settings');
                 var dropdown = this.ui.dropdown;
@@ -874,9 +774,6 @@ var CMS = window.CMS || {};
                     e.stopPropagation();
                 });
 
-<<<<<<< HEAD
-                nav.find('a').bind(this.click, function (e) {
-=======
                 dropdown.on(this.mouseEvents, function (e) {
                     e.stopPropagation();
                 }).on(this.touchStart, function (e) {
@@ -1070,7 +967,6 @@ var CMS = window.CMS || {};
                     e.stopPropagation();
                 });
                 nav.parent().find(items).on(that.click, function (e) {
->>>>>>> develop
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -1089,8 +985,6 @@ var CMS = window.CMS || {};
                                 el.closest('.cms-plugin-picker').data('parentId')
                             );
                             break;
-<<<<<<< HEAD
-=======
                         case 'ajax_add':
                             CMS.API.Toolbar.openAjax({
                                 url: el.attr('href'),
@@ -1100,7 +994,6 @@ var CMS = window.CMS || {};
                                 onSuccess: el.data('on-success')
                             });
                             break;
->>>>>>> develop
                         case 'edit':
                             that.editPlugin(
                                 that.options.urls.edit_plugin,
@@ -1142,43 +1035,6 @@ var CMS = window.CMS || {};
                 });
             },
 
-<<<<<<< HEAD
-            _showSubnav: function (nav) {
-                var that = this;
-                var dropdown = nav.find('.cms-submenu-dropdown');
-                var offset = parseInt(dropdown.data('top'));
-
-                // clearing
-                clearTimeout(this.timer);
-
-                // add small delay before showing submenu
-                this.timer = setTimeout(function () {
-                    // reset z indexes
-                    var reset = $('.cms-submenu').parentsUntil('.cms-dragarea');
-                    var scrollHint = nav.find('.cms-submenu-scroll-hint');
-
-                    reset.css('z-index', 0);
-
-                    var parents = nav.parentsUntil('.cms-dragarea');
-                    parents.css('z-index', 999);
-
-                    // show subnav
-                    nav.find('.cms-submenu-quicksearch').show();
-
-                    // set visible states
-                    nav.find('> .cms-submenu-dropdown').show().on('scroll', function () {
-                        scrollHint.fadeOut(100);
-                        $(this).off('scroll');
-                    });
-
-                    // show scrollHint for FF on OSX
-                    if (nav[0].scrollHeight > 230) {
-                        scrollHint.show();
-                    }
-
-                }, 100);
-
-=======
             /**
              * Sets up keyboard traversing of plugin picker.
              *
@@ -1190,7 +1046,6 @@ var CMS = window.CMS || {};
                 if (!dropdown.length) {
                     return;
                 }
->>>>>>> develop
                 // add key events
                 doc.off(this.keyDown + '.traverse');
                 doc.on(this.keyDown + '.traverse', function (e) {
@@ -1207,13 +1062,8 @@ var CMS = window.CMS || {};
                         }
                     }
 
-<<<<<<< HEAD
-                    // bind arrow up keys
-                    if (e.keyCode === 38) {
-=======
                     // bind arrow up and shift+tab keys
                     if (e.keyCode === CMS.KEYS.UP || (e.keyCode === CMS.KEYS.TAB && e.shiftKey)) {
->>>>>>> develop
                         e.preventDefault();
                         if (anchors.is(':focus')) {
                             anchors.eq(index - 1).focus();
@@ -1222,25 +1072,6 @@ var CMS = window.CMS || {};
                         }
                     }
                 });
-<<<<<<< HEAD
-
-                // calculate subnav bounds
-                var dd_height = dropdown.height();
-                var n_offset = nav.offset().top;
-                var w_height_scroll = $(window).height() + $(window).scrollTop();
-                if (w_height_scroll - n_offset - dd_height <= 10 && n_offset - dd_height >= 0) {
-                    dropdown.css('top', 'auto');
-                    dropdown.css('bottom', offset);
-                    // if parent is within a plugin, add additional offset
-                    if (dropdown.closest('.cms-draggable').length) {
-                        dropdown.css('bottom', offset - 1);
-                    }
-                } else {
-                    dropdown.css('top', offset);
-                    dropdown.css('bottom', 'auto');
-                }
-=======
->>>>>>> develop
             },
 
             /**
@@ -1407,27 +1238,6 @@ var CMS = window.CMS || {};
                 }
 
                 // attach events to draggable
-<<<<<<< HEAD
-                draggable.find('> .cms-dragitem-collapsable').bind(this.click, function () {
-                    var el = $(this);
-                    var id = that._getId($(this).parent());
-
-                    var settings = CMS.settings;
-                    settings.states = settings.states || [];
-
-                    // collapsable function and save states
-                    if (el.hasClass('cms-dragitem-expanded')) {
-                        settings.states.splice($.inArray(id, settings.states), 1);
-                        el.removeClass('cms-dragitem-expanded').parent().find('> .cms-draggables').hide();
-                    } else {
-                        settings.states.push(id);
-                        el.addClass('cms-dragitem-expanded').parent().find('> .cms-draggables').show();
-                    }
-
-                    // save settings
-                    CMS.API.Toolbar.setSettings(settings);
-                });
-=======
                 // debounce here required because on some devices click is not triggered,
                 // so we consolidate latest click and touch event to run the collapse only once
                 dragitem.find('> .cms-dragitem-text').on(
@@ -1440,7 +1250,6 @@ var CMS = window.CMS || {};
                     }, 0)
                 );
 
->>>>>>> develop
                 // adds double click event
                 this.ui.draggable.on(this.doubleClick, function (e) {
                     e.stopPropagation();
@@ -1498,6 +1307,11 @@ var CMS = window.CMS || {};
                 });
 
                 el.addClass('cms-dragbar-title-expanded');
+
+                var settings = CMS.settings;
+                settings.dragbars = settings.dragbars || [];
+                settings.dragbars.push(this.options.placeholder_id);
+                CMS.API.Toolbar.setSettings(settings);
             },
 
             /**
@@ -1518,6 +1332,11 @@ var CMS = window.CMS || {};
                 });
 
                 el.removeClass('cms-dragbar-title-expanded');
+
+                var settings = CMS.settings;
+                settings.dragbars = settings.dragbars || [];
+                settings.dragbars.splice($.inArray(this.options.placeholder_id, settings.states), 1);
+                CMS.API.Toolbar.setSettings(settings);
             },
 
             /**
@@ -1560,10 +1379,6 @@ var CMS = window.CMS || {};
                     $(this).remove();
                     el.removeClass('cms-draggable-success');
                 });
-<<<<<<< HEAD
-            }
-        });
-=======
                 // make sure structurboard gets updated after success
                 this.ui.window.trigger('resize.sideframe');
             }
@@ -1599,7 +1414,6 @@ var CMS = window.CMS || {};
             // reset relativity
             $('.cms-dragbar').css('position', '');
         };
->>>>>>> develop
     });
 
 })(CMS.$);
