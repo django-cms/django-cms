@@ -217,7 +217,7 @@ gulp.task('tests:integration', function (done) {
     });
 
     // npm install -g casper-summoner
-    if (argv && argv.summon) {
+    if (argv && argv.screenshots) {
         child_process.execSync('casper-summoner ' + tests.join(' '));
         tests = tests.map(function (file) {
             return file.replace('.js', '.summoned.js');
