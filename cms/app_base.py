@@ -25,6 +25,14 @@ class CMSApp(object):
                     )
                 )
             cls.app_config.cmsapp = cls
+        # mapping the legacy urls attribute to private attribute
+        # and exposing the new API
+        if hasattr(cls, 'urls'):
+            if not isinstance(cls.urls, property):
+                cls._urls = cls.urls
+                cls.urls = cls.legacy_urls
+        else:
+            cls.urls = cls.legacy_urls
         return super(CMSApp, cls).__new__(cls)
 
     def get_configs(self):
@@ -37,13 +45,13 @@ class CMSApp(object):
         raise NotImplemented('Configurable AppHooks must implement this method')
 
     @property
-    def urls(self):
+    def legacy_urls(self):
         warnings.warn('Accessing CMSApp.urls directly is deprecated, '
                       'and it will be removed in version 3.5; CMSApp.get_urls method',
                       DeprecationWarning)
         return self._urls
 
-    @urls.setter
+    @legacy_urls.setter
     def urls(self, value):
         self._urls = value
 
