@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import warnings
+
+
 class CMSApp(object):
+    _urls = None
     name = None
-    urls = None
     menus = []
     app_name = None
     app_config = None
@@ -32,3 +35,17 @@ class CMSApp(object):
 
     def get_config_add_url(self):
         raise NotImplemented('Configurable AppHooks must implement this method')
+
+    @property
+    def urls(self):
+        warnings.warn('Accessing CMSApp.urls directly is deprecated, '
+                      'and it will be removed in version 3.5; CMSApp.get_urls method',
+                      DeprecationWarning)
+        return self._urls
+
+    @urls.setter
+    def urls(self, value):
+        self._urls = value
+
+    def get_urls(self, page=None):
+        return self._urls
