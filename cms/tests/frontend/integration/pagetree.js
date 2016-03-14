@@ -145,9 +145,18 @@ casper.test.begin('Pages can be reordered', function (test) {
                     'Pages are in correct order after move'
                 );
             }).waitForResource(/move-page/, function () {
-                test.assertExists('.cms-tree-node-success', 'Success icon showed up');
-            }).wait(1050, function () {
-                test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
+                test.assertExists('.jstree-initial-node.jstree-loading', 'Loading tree showed up');
+            }).waitForResource(/get-tree/, function () {
+                test.assertDoesntExist('.jstree-initial-node.jstree-loading', 'Loading tree hides');
+            }).then(function () {
+                this.reload();
+            }).waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    xPath('//li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
+                          '/following-sibling::li' +
+                          '[./a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]]'),
+                    'Pages are in correct order after move'
+                );
             });
         })
         .then(cms.removePage({ title: 'Homepage' }))
@@ -191,14 +200,19 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
                           '[./li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
                     'Second page is now nested into the Homepage'
                 );
-            }).waitForResource(/move-page/, function () {
-                test.assertExists('.cms-tree-node-success', 'Success icon showed up');
-            }).wait(1050, function () {
-                test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
             })
-            // FIXME currently failing
-            .thenBypass(4)
+            .waitForResource(/move-page/)
+            .waitForResource(/get-tree/)
             .then(function () {
+                this.reload();
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    xPath('//a[contains(text(), "Homepage")]' +
+                          '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                          '[./li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                    'Second page is now nested into the Homepage after reload'
+                );
                 drop = this.getElementBounds(
                     xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]')
                 );
@@ -212,10 +226,18 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
                           '/following-sibling::li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
                     'Pages are back in their initial order'
                 );
-            }).waitForResource(/move-page/, function () {
-                test.assertExists('.cms-tree-node-success', 'Success icon showed up');
-            }).wait(1050, function () {
-                test.assertDoesntExist('.cms-tree-node-success', 'Success icon hides after some time');
+            })
+            .waitForResource(/move-page/)
+            .waitForResource(/get-tree/)
+            .then(function () {
+                this.reload();
+            })
+            .waitUntilVisible('.cms-pagetree', function () {
+                test.assertExists(
+                    xPath('//li[./a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]]' +
+                          '/following-sibling::li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                    'Pages are back in their initial order after reload'
+                );
             });
         })
         .then(cms.removePage({ title: 'Second' }))
@@ -251,19 +273,8 @@ casper.test.begin('Pages cannot be published if it does not have a title and slu
             .waitUntilVisible('.cms-tree-tooltip-container', function () {
                 test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
 
-                this.click('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
+                test.assertDoesntExist('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
             })
-            .waitForResource(/publish/)
-            .then(function () {
-                // here should be some kind of error
-                this.reload();
-            })
-            .waitUntilVisible('.cms-pagetree', function () {
-                test.assertExists(
-                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
-                    'Page was not published in German because it does not have a title and slug'
-                );
-            });
         })
         .then(cms.removePage({ title: 'Homepage' }))
         .run(function () {
@@ -303,8 +314,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('input[name="_save"]');
             })
             .waitUntilVisible('.cms-pagetree', function () {
-                // FIXME this shouldn't be empty, should be unpublished
-                this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty');
+                this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished');
             })
             .waitUntilVisible('.cms-tree-tooltip-container', function () {
                 test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
@@ -312,11 +322,12 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
             })
             .waitForResource(/publish/)
-            .then(function () {
-                // FIXME should not do this manually, reload should happen automatically
-                this.reload();
-            })
-            .waitUntilVisible('.cms-pagetree', function () {
+            .waitForResource(/get-tree/);
+        })
+        .wait(1000)
+        .withFrame(0, function () {
+            casper.waitUntilVisible('.cms-pagetree', function () {
+                pageId = cms.getPageId('Homepage');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.published',
                     'Page was published in German because it does have a title and slug'
@@ -329,14 +340,14 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('.cms-tree-tooltip-container-open a[href*="/de/unpublish/"]');
             })
             .waitForResource(/unpublish/)
-            .then(function () {
-                // FIXME should not do this manually, reload should happen automatically
-                this.reload();
-            })
-            .waitUntilVisible('.cms-pagetree', function () {
+            .waitForResource(/get-tree/);
+        })
+        .wait(1000)
+        .withFrame(0, function () {
+            casper.waitUntilVisible('.cms-pagetree', function () {
+                pageId = cms.getPageId('Homepage');
                 test.assertExists(
-                    // FIXME should be "unpublished" not empty
-                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished',
                     'Page in German was unpublished'
                 );
             })
@@ -353,14 +364,14 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.click('.cms-tree-tooltip-container-open a[href*="/en/unpublish/"]');
             })
             .waitForResource(/unpublish/)
-            .then(function () {
-                // FIXME should not do this manually, reload should happen automatically
-                this.reload();
-            })
-            .waitUntilVisible('.cms-pagetree', function () {
+            .waitForResource(/get-tree/);
+        })
+        .wait(1000)
+        .withFrame(0, function () {
+            casper.waitUntilVisible('.cms-pagetree', function () {
+                pageId = cms.getPageId('Homepage');
                 test.assertExists(
-                    // FIXME should be "unpublished" not empty
-                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.empty',
+                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.unpublished',
                     'Page in English was unpublished'
                 );
             });
