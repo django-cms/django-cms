@@ -337,29 +337,6 @@ class ToolbarBasicTests(CMSLiveTests):
         self.wait_page_loaded()
         self.assertTrue(self.driver.find_element_by_class_name('cms-error'))
 
-<<<<<<< HEAD
-    @override_settings(DEBUG=True)
-    def test_basic_add_pages(self):
-        with override_settings(DEBUG=True):
-            User = get_user_model()
-            self.assertEqual(Page.objects.all().count(), 0)
-            self.assertTrue(User.objects.all().count(), 1)
-            driver = self.driver
-            driver.get(self.base_url + "/de/")
-            driver.find_element_by_id("add-page").click()
-            driver.find_element_by_id("id_username").clear()
-            driver.find_element_by_id("id_username").send_keys(getattr(self.user, User.USERNAME_FIELD))
-            driver.find_element_by_id("id_password").clear()
-            driver.find_element_by_id("id_password").send_keys(getattr(self.user, User.USERNAME_FIELD))
-            driver.find_element_by_css_selector("input[type=\"submit\"]").click()
-            driver.find_element_by_name("_save").click()
-            driver.find_element_by_link_text(u"Seite hinzufügen").click()
-            driver.find_element_by_id("id_title").clear()
-            driver.find_element_by_id("id_title").send_keys("SubPage")
-            driver.find_element_by_name("_save").click()
-
-=======
->>>>>>> develop
 
 @override_settings(
     LANGUAGE_CODE='en',
@@ -416,15 +393,8 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
-<<<<<<< HEAD
-        submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu')
-
-        hov = self.chain().move_to_element(submenu)
-        hov.perform()
-=======
         submenu = self.driver.find_element_by_css_selector('.cms-dragbar .cms-submenu-settings')
         submenu.click()
->>>>>>> develop
 
         submenu_link_selector = '.cms-submenu-item a[data-rel="copy-lang"][data-language="en"]'
         WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, submenu_link_selector)))
@@ -446,36 +416,6 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
         self.assertEqual(CMSPlugin.objects.count(), 1)
         self._login()
 
-<<<<<<< HEAD
-        # switch to structure mode
-        self.driver.find_element_by_css_selector(
-            '.cms-toolbar-item-cms-mode-switcher a[href="?{flag}"]'.format(
-                flag=get_cms_setting('CMS_TOOLBAR_URL__BUILD')
-            )
-        ).click()
-
-        # open the plugin submenu
-        cms_draggable = self.driver.find_element_by_css_selector(
-            '.cms-draggable:nth-child(1)'
-        )
-        self.chain().move_to_element(cms_draggable).perform()
-        submenu = cms_draggable.find_element_by_css_selector('.cms-submenu')
-        self.chain().move_to_element(submenu).perform()
-
-        # click copy and wait for clipboard to be available
-        submenu.find_element_by_css_selector('a[data-rel="copy"]').click()
-        self.wait_until(
-            lambda driver: driver.find_element_by_css_selector(
-                '.cms-clipboard'
-            )
-        )
-
-        self.assertEqual(CMSPlugin.objects.count(), 2)
-
-        clipboard = self.driver.find_element_by_css_selector('.cms-clipboard')
-        self.wait_until(
-            lambda _: clipboard.is_displayed()
-=======
         build_button = self.driver.find_element_by_css_selector('.cms-toolbar-item-cms-mode-switcher a[href="?%s"]' % get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
         build_button.click()
 
@@ -503,39 +443,26 @@ class PlaceholderBasicTests(FastLogin, CMSLiveTests):
 
         drag = ActionChains(self.driver).click_and_hold(
             self.driver.find_element_by_css_selector('.cms-clipboard-containers .cms-draggable:nth-child(1)')
->>>>>>> develop
-        )
-        draggable = clipboard.find_element_by_css_selector(
-            '.cms-draggable:nth-child(1)'
-        )
-        dropzone = self.driver.find_element_by_css_selector('.cms-dragarea-1')
-
-        # Move cursor to clipboard and wait for clipboard to open
-        self.chain().move_to_element(clipboard).perform()
-        self.wait_until(
-            lambda _: draggable.value_of_css_property(
-                'margin-left'
-            ) == '0px'
         )
 
-        # click and hold the plugin in the clipboard, wait for the drag'n'drop
-        # to kick in
-        def _dragging(_):
-            # slightly move the cursor until drag'n'drop mode kicks in
-            self.chain().move_by_offset(1, 1).perform()
-            return not draggable.is_displayed()
-        self.chain().click_and_hold(draggable).perform()
-        self.wait_until(_dragging)
+        drag.perform()
 
-        # move to the drop zone and release
-        self.chain().move_to_element(dropzone).release().perform()
+        time.sleep(0.1)
 
-        # wait for dropzone to be gone, aka the drag'n'drop to be done
-        self.wait_until(
-            lambda driver: not driver.find_element_by_css_selector(
-                '.cms-droppable'
-            ).is_displayed()
+        drag = ActionChains(self.driver).move_to_element(
+            self.driver.find_element_by_css_selector('.cms-dragarea-1')
         )
+        drag.perform()
+
+        time.sleep(0.2)
+
+        drag = ActionChains(self.driver).move_by_offset(
+            0, 10
+        ).release()
+
+        drag.perform()
+
+        time.sleep(0.5)
 
         self.assertEqual(CMSPlugin.objects.count(), 3)
 
