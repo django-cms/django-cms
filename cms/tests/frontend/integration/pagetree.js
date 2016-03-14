@@ -18,6 +18,58 @@ var closeWizard = function () {
     };
 };
 
+/**
+ * @function createJSTreeXPathFromTree
+ * @param {Object[]} tree tree object, see example
+ * @param {Object} [opts]
+ * @param {Object} [opts.topLevel=true] is it the top level?
+ * @example tree
+ *
+ *     [
+ *         {
+ *             name: 'Homepage'
+ *             children: [
+ *                 {
+ *                     name: 'Nested'
+ *                 }
+ *             ]
+ *         },
+ *         {
+ *             name: 'Sibling'
+ *         }
+ *     ]
+ */
+var createJSTreeXPathFromTree = function (tree, opts) {
+    var xPath = '';
+    var topLevel = opts && typeof opts.topLevel !== 'undefined' ? topLevel : true;
+
+    tree.forEach(function (node, index) {
+        if (index === 0) {
+            if (topLevel) {
+                xPath += '//';
+            } else {
+                xPath += './';
+            }
+            xPath += 'li[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name + '")]${children}]';
+        } else {
+            xPath += '/following-sibling::li' +
+                '[./a[contains(@class, "jstree-anchor")][contains(text(), "' + node.name + '")]${children}]';
+        }
+
+        if (node.children) {
+            xPath = xPath.replace(
+                '${children}',
+                '/following-sibling::ul[contains(@class, "jstree-children")]' +
+                '[' + createJSTreeXPathFromTree(node.children, { topLevel: false }) + ']'
+            );
+        } else {
+            xPath = xPath.replace('${children}', '');
+        }
+    });
+
+    return xPath;
+}
+
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login())
