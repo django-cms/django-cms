@@ -4,6 +4,8 @@ import re
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
+from django.db.models import Q
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.six.moves.urllib.parse import unquote
@@ -116,6 +118,15 @@ def get_page_from_request(request, use_path=None):
     page = get_page_from_path(path, preview, draft)
     if draft and page and not page.has_change_permission(request):
         page = get_page_from_path(path, preview, draft=False)
+
+    # For public pages we check if any parent is hidden due to published dates
+    # In this case the selected page is not reachable
+    if page and not draft:
+        ancestors = page.get_ancestors().filter(
+            Q(publication_date__gt=timezone.now()) | Q(publication_end_date__lt=timezone.now()),
+        )
+        if ancestors.exists():
+            page = None
 
     request._current_page_cache = page
     return page

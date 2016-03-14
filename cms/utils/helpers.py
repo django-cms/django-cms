@@ -37,18 +37,13 @@ def reversion_register(model_class, fields=None, follow=(), format="json", exclu
 
 
 def make_revision_with_plugins(obj, user=None, message=None):
-    from cms.models.pluginmodel import CMSPlugin
-    # we can safely import reversion - calls here always check for
-    # reversion in installed_applications first
-    import reversion
-    if hasattr(reversion.models, 'VERSION_CHANGE'):
-        from reversion.models import VERSION_CHANGE
     """
     Only add to revision if it is a draft.
     """
-    revision_manager = reversion.revision
-    revision_context = reversion.revision_context_manager
-
+    from cms.models.pluginmodel import CMSPlugin
+    # we can safely import reversion - calls here always check for
+    # reversion in installed_applications first
+    from cms.utils.reversion_hacks import revision_context, revision_manager
     cls = obj.__class__
     if hasattr(revision_manager, '_registration_key_for_model'):
         model_key = revision_manager._registration_key_for_model(cls)
@@ -66,32 +61,20 @@ def make_revision_with_plugins(obj, user=None, message=None):
                 revision_context.set_comment(message)
             # add toplevel object to the revision
             adapter = revision_manager.get_adapter(obj.__class__)
-            if hasattr(reversion.models, 'VERSION_CHANGE'):
-                revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj, VERSION_CHANGE))
-            else:
-                revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj))
+            revision_context.add_to_context(revision_manager, obj, adapter.get_version_data(obj))
             # add placeholders to the revision
             for ph in obj.get_placeholders():
                 phadapter = revision_manager.get_adapter(ph.__class__)
-                if hasattr(reversion.models, 'VERSION_CHANGE'):
-                    revision_context.add_to_context(revision_manager, ph, phadapter.get_version_data(ph, VERSION_CHANGE))
-                else:
-                    revision_context.add_to_context(revision_manager, ph, phadapter.get_version_data(ph))
+                revision_context.add_to_context(revision_manager, ph, phadapter.get_version_data(ph))
             # add plugins and subclasses to the revision
             filters = {'placeholder__%s' % placeholder_relation: obj}
             for plugin in CMSPlugin.objects.filter(**filters):
                 plugin_instance, admin = plugin.get_plugin_instance()
                 if plugin_instance:
                     padapter = revision_manager.get_adapter(plugin_instance.__class__)
-                    if hasattr(reversion.models, 'VERSION_CHANGE'):
-                        revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance, VERSION_CHANGE))
-                    else:
-                        revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance))
+                    revision_context.add_to_context(revision_manager, plugin_instance, padapter.get_version_data(plugin_instance))
                 bpadapter = revision_manager.get_adapter(plugin.__class__)
-                if hasattr(reversion.models, 'VERSION_CHANGE'):
-                    revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin, VERSION_CHANGE))
-                else:
-                    revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin))
+                revision_context.add_to_context(revision_manager, plugin, bpadapter.get_version_data(plugin))
 
 
 def find_placeholder_relation(obj):

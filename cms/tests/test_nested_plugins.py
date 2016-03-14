@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
 import json
 from django.utils.http import urlencode
 
@@ -11,12 +10,11 @@ from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
+from cms.test_utils.testcases import URL_CMS_PLUGIN_PAGE_MOVE, URL_CMS_PLUGIN_PAGE_ADD
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
-
-
-URL_CMS_MOVE_PLUGIN = u'/en/admin/cms/page/%d/move-plugin/'
-URL_CMS_ADD_PLUGIN = u'/en/admin/cms/page/%d/add-plugin/'
+from cms.utils.i18n import force_language
+from cms.utils.plugins import reorder_plugins
 
 
 class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
@@ -134,8 +132,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
     def test_plugin_fix_tree(self):
         """
-        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the position
-        value to Null for all the plugins and then rebuild the tree.
+        Tests CMSPlugin.fix_tree by creating a plugin structure, setting the
+        position value to Null for all the plugins and then rebuild the tree.
 
         The structure below isn't arbitrary, but has been designed to test
         various conditions, including:
@@ -225,11 +223,27 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
 
         original_plugins = (placeholder.get_plugins().order_by('position', 'path'))
 
-        CMSPlugin.objects.update(position=None)
+        CMSPlugin.objects.update(position=0)
         CMSPlugin.fix_tree()
 
         new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
         self.assertSequenceEqual(original_plugins, new_plugins)
+
+        # Now, check to see if the correct order is restored, even if we
+        # re-arrange the plugins so that their natural «pk» order is different
+        # than their «position» order.
+
+        # Move the 2nd top-level plugin to the "left" or before the 1st.
+        reorder_plugins(placeholder, None, u"en", [plugin_5.pk, plugin_1.pk])
+        reordered_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
+        CMSPlugin.fix_tree()
+
+        # Now, they should NOT be in the original order at all. Are they?
+        new_plugins = list(placeholder.get_plugins().order_by('position', 'path'))
+        self.assertSequenceEqual(
+            reordered_plugins, new_plugins,
+            "Plugin order not preserved during fix_tree().")
+
 
     def test_plugin_deep_nesting_and_copying(self):
         """
@@ -865,18 +879,25 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             pre_copy_placeholder_count = Placeholder.objects.filter(page__publisher_is_draft=True).count()
             self.assertEqual(pre_copy_placeholder_count, 6)
             superuser = self.get_superuser()
+
+            with force_language('en'):
+                action_urls = text_plugin_two.get_action_urls()
+
             with self.login_user_context(superuser):
                 # now move the parent text plugin to another placeholder
                 post_data = {
                     'placeholder_id': page_one_ph_three.id,
                     'plugin_id': text_plugin_two.id,
-                    'plugin_language':'en',
-                    'plugin_parent':'',
+                    'plugin_language': 'en',
+                    'plugin_parent': '',
 
                 }
                 plugin_class = text_plugin_two.get_plugin_class_instance()
-                expected = {'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION)}
-                edit_url = URL_CMS_MOVE_PLUGIN % page_one.id
+                expected = {
+                    'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
+                    'urls': action_urls,
+                }
+                edit_url = URL_CMS_PLUGIN_PAGE_MOVE % page_one.id
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(json.loads(response.content.decode('utf8')), expected)
@@ -1036,7 +1057,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
                 'plugin_parent': text_plugin_en.pk,
 
             }
-            add_url = URL_CMS_ADD_PLUGIN % page_one.pk + '?' + urlencode(
+            add_url = URL_CMS_PLUGIN_PAGE_ADD % page_one.pk + '?' + urlencode(
                 get_data
             )
             response = self.client.post(add_url, post_data)

@@ -1,3 +1,6 @@
+// #############################################################################
+// RETINA
+
 @mixin print-and-retina() {
     @media print,
         (-o-min-device-pixel-ratio: 5/4),

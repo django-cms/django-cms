@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 import json
 
+from django.template.loader import render_to_string
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.http import HttpResponse
-from django.shortcuts import render
 from django.utils.encoding import smart_str
 
 from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
 from cms.models import Page, GlobalPagePermission
 from cms.utils import get_language_from_request, get_language_list, get_cms_setting
-from cms.utils.compat import DJANGO_1_7
 
 NOT_FOUND_RESPONSE = "NotFound"
 
@@ -21,10 +20,7 @@ def jsonify_request(response):
          * status: original response status code
          * content: original response content
     """
-    if DJANGO_1_7:
-        content = {'status': response.status_code, 'content': smart_str(response.content, response._charset)}
-    else:
-        content = {'status': response.status_code, 'content': smart_str(response.content, response.charset)}
+    content = {'status': response.status_code, 'content': smart_str(response.content, response.charset)}
     return HttpResponse(json.dumps(content), content_type="application/json")
 
 
@@ -73,6 +69,7 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
         has_add_on_same_level_permission = permissions.has_generic_permission(page.parent_id, request.user, "add",
                                                                               page.site_id)
     context = {
+        'request': request,
         'page': page,
         'site': site,
         'lang': lang,
@@ -90,7 +87,8 @@ def get_admin_menu_item_context(request, page, filtered=False, language=None):
     return context
 
 
-def render_admin_menu_item(request, page, template=None, language=None):
+def render_admin_menu_item(request, page, template=None, language=None,
+                           open_nodes=()):
     """
     Renders requested page item for the tree. This is used in case when item
     must be reloaded over ajax.
@@ -99,15 +97,17 @@ def render_admin_menu_item(request, page, template=None, language=None):
         template = "admin/cms/page/tree/menu_fragment.html"
 
     if not page.pk:
-        return HttpResponse(NOT_FOUND_RESPONSE) # Not found - tree will remove item
+        # Not found - tree will remove item
+        return HttpResponse(NOT_FOUND_RESPONSE)
 
     # languages
     from cms.utils import permissions
     languages = get_language_list(page.site_id)
     context = {
-        'has_add_permission': permissions.has_page_add_permission(request),
+        'has_add_permission': permissions.has_page_add_permission_from_request(request),
         'site_languages': languages,
+        'open_nodes': open_nodes,
     }
-    filtered = 'filtered' in request.REQUEST
+    filtered = 'filtered' in request.GET or 'filtered' in request.POST
     context.update(get_admin_menu_item_context(request, page, filtered, language))
-    return render(request, template, context)
+    return render_to_string(template, context)

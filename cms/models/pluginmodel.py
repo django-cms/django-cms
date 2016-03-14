@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import models
-from django.db.models import signals, Model
+from django.db.models import signals, Model, ManyToManyField
 from django.db.models.base import model_unpickle, ModelBase
 from django.db.models.query_utils import DeferredAttribute
 from django.utils import six, timezone
@@ -75,7 +75,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     '''
     placeholder = models.ForeignKey(Placeholder, editable=False, null=True)
     parent = models.ForeignKey('self', blank=True, null=True, editable=False)
-    position = models.PositiveSmallIntegerField(_("position"), blank=True, null=True, editable=False)
+    position = models.PositiveSmallIntegerField(_("position"), default = 0, editable=False)
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
@@ -163,36 +163,43 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
 
     def render_plugin(self, context=None, placeholder=None, admin=False, processors=None):
         instance, plugin = self.get_plugin_instance()
+        request = None
+        current_app = None
+        if context:
+            request = context.get('request', None)
+            if request:
+                current_app = getattr(request, 'current_app', None)
+            if not current_app:
+                current_app = context.current_app if context else None
+
         if instance and not (admin and not plugin.admin_preview):
             if not placeholder or not isinstance(placeholder, Placeholder):
                 placeholder = instance.placeholder
             placeholder_slot = placeholder.slot
-            current_app = context.current_app if context else None
             context = PluginContext(context, instance, placeholder, current_app=current_app)
             context = plugin.render(context, instance, placeholder_slot)
-            request = context.get('request', None)
             page = None
             if request:
                 page = request.current_page
             plugin.cms_plugin_instance = instance
             context['allowed_child_classes'] = plugin.get_child_classes(placeholder_slot, page)
+            context['allowed_parent_classes'] = plugin.get_parent_classes(placeholder_slot, page)
             if plugin.render_plugin:
                 template = plugin._get_render_template(context, instance, placeholder)
                 if not template:
                     raise ValidationError("plugin has no render_template: %s" % plugin.__class__)
             else:
                 template = None
-            return render_plugin(context, instance, placeholder, template, processors, context.current_app)
+            return render_plugin(context, instance, placeholder, template, processors, current_app)
         else:
             from cms.middleware.toolbar import toolbar_plugin_processor
 
             if processors and toolbar_plugin_processor in processors:
                 if not placeholder:
                     placeholder = self.placeholder
-                current_app = context.current_app if context else None
                 context = PluginContext(context, self, placeholder, current_app=current_app)
                 template = None
-                return render_plugin(context, self, placeholder, template, processors, context.current_app)
+                return render_plugin(context, self, placeholder, template, processors, current_app)
         return ""
 
     def get_media_path(self, filename):
@@ -237,7 +244,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                                                              placeholder_id=self.placeholder_id).count()
                 self.add_root(instance=self)
             return
-        super(CMSPlugin, self).save()
+        super(CMSPlugin, self).save(*args, **kwargs)
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
@@ -334,21 +341,26 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     @classmethod
     def fix_tree(cls, destructive=False):
         """
-        Fixes the plugin tree by first calling treebeard fix_tree and the recalculating
-        the correct position property for each plugin.
+        Fixes the plugin tree by first calling treebeard fix_tree and the
+        recalculating the correct position property for each plugin.
         """
         from cms.utils.plugins import reorder_plugins
 
         super(CMSPlugin, cls).fix_tree(destructive)
         for placeholder in Placeholder.objects.all():
             for language, __ in settings.LANGUAGES:
-                order = CMSPlugin.objects.filter(placeholder_id=placeholder.pk, language=language,
-                                                 parent_id__isnull=True
-                                                 ).values_list('pk', flat=True)
+                order = CMSPlugin.objects.filter(
+                        placeholder_id=placeholder.pk, language=language,
+                        parent_id__isnull=True
+                    ).order_by('position').values_list('pk', flat=True)
                 reorder_plugins(placeholder, None, language, order)
-                for plugin in CMSPlugin.objects.filter(placeholder_id=placeholder.pk,
-                                                       language=language).order_by('depth', 'path'):
-                    order = CMSPlugin.objects.filter(parent_id=plugin.pk).values_list('pk', flat=True)
+
+                for plugin in CMSPlugin.objects.filter(
+                        placeholder_id=placeholder.pk,
+                        language=language).order_by('depth', 'path'):
+                    order = CMSPlugin.objects.filter(
+                            parent_id=plugin.pk
+                        ).order_by('position').values_list('pk', flat=True)
                     reorder_plugins(placeholder, plugin.pk, language, order)
 
     def post_copy(self, old_instance, new_old_ziplist):
@@ -364,6 +376,15 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         have to do this themselves!
         """
         pass
+
+    @classmethod
+    def _get_related_objects(cls):
+        fields = cls._meta._get_fields(
+            forward=False, reverse=True,
+            include_parents=True,
+            include_hidden=False,
+        )
+        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
     def has_change_permission(self, request):
         page = self.placeholder.page if self.placeholder else None
@@ -457,6 +478,83 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         else:
             super(CMSPlugin, self).delete(*args, **kwargs)
 
+    def get_action_urls(self, js_compat=True):
+        if js_compat:
+            # TODO: Remove this condition
+            # once the javascript files have been refactored
+            # to use the new naming schema (ending in _url).
+            data = {
+                'edit_plugin': self.get_edit_url(),
+                'add_plugin': self.get_add_url(),
+                'delete_plugin': self.get_delete_url(),
+                'move_plugin': self.get_move_url(),
+                'copy_plugin': self.get_copy_url(),
+            }
+        else:
+            data = {
+                'edit_url': self.get_edit_url(),
+                'add_url': self.get_add_url(),
+                'delete_url': self.get_delete_url(),
+                'move_url': self.get_move_url(),
+                'copy_url': self.get_copy_url(),
+            }
+        return data
+
+    def get_add_url(self):
+        if self.add_url:
+            warnings.warn(
+                'The add_url property is deprecated, '
+                'and it will be removed in version 3.4; '
+                'please use the get_add_url method instead.',
+                DeprecationWarning
+            )
+            return self.add_url
+        return self.placeholder.get_add_url()
+
+    def get_edit_url(self):
+        if self.edit_url:
+            warnings.warn(
+                'The edit_url property is deprecated, '
+                'and it will be removed in version 3.4; '
+                'please use the get_edit_url method instead.',
+                DeprecationWarning
+            )
+            return self.edit_url
+        return self.placeholder.get_edit_url(self.pk)
+
+    def get_delete_url(self):
+        if self.delete_url:
+            warnings.warn(
+                'The delete_url property is deprecated, '
+                'and it will be removed in version 3.4; '
+                'please use the get_delete_url method instead.',
+                DeprecationWarning
+            )
+            return self.delete_url
+        return self.placeholder.get_delete_url(self.pk)
+
+    def get_move_url(self):
+        if self.move_url:
+            warnings.warn(
+                'The move_url property is deprecated, '
+                'and it will be removed in version 3.4; '
+                'please use the get_move_url method instead.',
+                DeprecationWarning
+            )
+            return self.move_url
+        return self.placeholder.get_move_url()
+
+    def get_copy_url(self):
+        if self.copy_url:
+            warnings.warn(
+                'The copy_url property is deprecated, '
+                'and it will be removed in version 3.4; '
+                'please use the get_copy_url method instead.',
+                DeprecationWarning
+            )
+            return self.copy_url
+        return self.placeholder.get_copy_url()
+
     @property
     def add_url(self):
         """
@@ -497,7 +595,8 @@ reversion_register(CMSPlugin)
 
 def get_plugin_media_path(instance, filename):
     """
-    Django 1.7 requires that unbound function used in fields' definitions are defined outside the parent class
+    Django requires that unbound function used in fields' definitions to be
+    defined outside the parent class.
      (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
     This function is used withing field definition:
 

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-
 from django.core.cache import cache
-from django.template import Template, RequestContext
+from django.template import Template
 from django.test.utils import override_settings
 from sekizai.context import SekizaiContext
 
@@ -72,6 +70,19 @@ class RenderingTestCase(CMSTestCase):
                 'placeholderconf': {'extra_context': {'extra_context': {'extra_var': 'found extra var'}}},
                 'extra': u'found extra var',
             }
+            self.test_data5 = {
+                'title': u'RenderingTestCase-title5',
+                'slug': u'RenderingTestCase-slug5',
+                'reverse_id': u'renderingtestcase-reverse-id5',
+                'text_main': u'RenderingTestCase-main-page5',
+                'text_sub': u'RenderingTestCase-sub5',
+            }
+            self.test_data6 = {
+                'title': u'RenderingTestCase-title6',
+                'slug': u'RenderingTestCase-slug6',
+                'reverse_id': u'renderingtestcase-reverse-id6',
+                'text_sub': u'RenderingTestCase-sub6',
+            }
             self.insert_test_content()
 
     def insert_test_content(self):
@@ -119,15 +130,41 @@ class RenderingTestCase(CMSTestCase):
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
         p4.publish('en')
 
+        # Insert another page that is not the home page
+        p5 = create_page(self.test_data5['title'], TEMPLATE_NAME, 'en',
+                         parent=p, slug=self.test_data5['slug'], published=True,
+                         reverse_id=self.test_data5['reverse_id'])
+        # Placeholders have been inserted on post_save signal:
+        self.test_placeholders5 = {}
+        for placeholder in p5.placeholders.all():
+            self.test_placeholders5[placeholder.slot] = placeholder
+            # # Insert some test Text plugins
+        add_plugin(self.test_placeholders5['sub'], 'TextPlugin', 'en',
+                   body=self.test_data5['text_sub'])
+        add_plugin(self.test_placeholders5['main'], 'TextPlugin', 'en',
+                   body=self.test_data5['text_main'])
+        p5.publish('en')
+
+        # Insert another page that is not the home page
+        p6 = create_page(self.test_data6['title'], TEMPLATE_NAME, 'en',
+                         slug=self.test_data6['slug'], parent=p5,
+                         reverse_id=self.test_data6['reverse_id'], published=True)
+        # Placeholders have been inserted on post_save signal:
+        self.test_placeholders6 = {}
+        for placeholder in p6.placeholders.all():
+            self.test_placeholders6[placeholder.slot] = placeholder
+            # # Insert some test Text plugins
+        add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en',
+                   body=self.test_data6['text_sub'])
+        p6.publish('en')
+
         # Reload test pages
         self.test_page = self.reload(p.publisher_public)
         self.test_page2 = self.reload(p2.publisher_public)
         self.test_page3 = self.reload(p3.publisher_public)
         self.test_page4 = self.reload(p4.publisher_public)
-
-    def get_context(self, page, context_vars={}):
-        request = self.get_request(page)
-        return RequestContext(request, context_vars)
+        self.test_page5 = self.reload(p5.publisher_public)
+        self.test_page6 = self.reload(p6.publisher_public)
 
     def get_request(self, page, *args, **kwargs):
         request = super(RenderingTestCase, self).get_request(*args, **kwargs)
@@ -139,10 +176,9 @@ class RenderingTestCase(CMSTestCase):
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, template, page, context_vars={}):
-        c = self.get_context(page, context_vars)
-        t = Template(template)
-        r = t.render(c)
-        return self.strip_rendered(r)
+        request = self.get_request(page)
+        output = self.render_template_obj(template, context_vars, request)
+        return self.strip_rendered(output)
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def test_details_view(self):
@@ -480,8 +516,13 @@ class RenderingTestCase(CMSTestCase):
     def test_inherit_placeholder(self):
         t = u'{% load cms_tags %}' + \
             u'|{% placeholder "main" inherit %}|{% placeholder "sub" %}'
+        # a page whose parent has no 'main' placeholder inherits from ancestors
         r = self.render(t, self.test_page3)
         self.assertEqual(r, u'|' + self.test_data['text_main'] + '|' + self.test_data3['text_sub'])
+
+        # a page whose parent has 'main' placeholder inherits from the parent, not ancestors
+        r = self.render(t, self.test_page6)
+        self.assertEqual(r, u'|' + self.test_data5['text_main'] + '|' + self.test_data6['text_sub'])
 
     def test_extra_context_isolation(self):
         with ChangeModel(self.test_page, template='extra_context.html'):

@@ -155,7 +155,7 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
     for plugin_type, pks in plugin_types_map.items():
         cls = plugin_pool.get_plugin(plugin_type)
         # get all the plugins of type cls.model
-        plugin_qs = cls.model.objects.filter(pk__in=pks)
+        plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
         if select_placeholder:
             plugin_qs = plugin_qs.select_related('placeholder')
 
@@ -183,7 +183,8 @@ def reorder_plugins(placeholder, parent_id, language, order):
     :param language: language
     :param order: optional custom order (given as list of plugin primary keys)
     """
-    plugins = CMSPlugin.objects.filter(parent=parent_id, placeholder=placeholder,
+    plugins = CMSPlugin.objects.filter(parent=parent_id,
+                                       placeholder=placeholder,
                                        language=language).order_by('position')
     x = 0
     for level_plugin in plugins:

@@ -97,3 +97,4 @@ it or the context provided to its template::
             )
             html = model_instance.render_plugin({})
             self.assertEqual(html, '<strong>Test</strong>')
+

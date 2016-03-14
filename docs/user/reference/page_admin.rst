@@ -90,6 +90,7 @@ are:
   existing page
 * **Edit** |edit| to open the page for editing
 * **Save as draft** |save-as-draft| to update the page and exit editing mode
+* **View published** does the same as "Save as draft"
 
 .. |publish-page-now| image:: /images/publish-page-now.png
    :width: 119
@@ -144,7 +145,7 @@ default you get the basics:
    :figwidth: 300
    :align: right
 
-The page you're currently on is highlighted in gray (in this case,
+The page you're currently on is highlighted in grey (in this case,
 *Journalism*, the last in the list).
 
 From left to right, items in the list have:
@@ -224,7 +225,7 @@ and bookmarks, and in search engine results.
 This is not displayed on the page, but is used for example by search engines for indexing and to
 show a summary of page content. It can also be used by other Django applications for similar
 purposes. Description is restricted to 155 characters, the number of characters search engines
-typcially use to show content.
+typically use to show content.
 
 =================
 Advanced settings

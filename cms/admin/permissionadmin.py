@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.contrib.admin import site
 from django.contrib.auth import get_user_model, get_permission_codename
 from django.contrib.auth.admin import UserAdmin
-from django.utils.translation import ugettext as _
+from django.db import OperationalError
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
@@ -20,6 +21,7 @@ admin_class = UserAdmin
 for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
+
 
 class TabularInline(admin.TabularInline):
     pass
@@ -37,9 +39,18 @@ class PagePermissionInlineAdmin(TabularInline):
     def raw_id_fields(cls):
         # Dynamically set raw_id_fields based on settings
         threshold = get_cms_setting('RAW_ID_USERS')
-        if threshold and get_user_model().objects.count() > threshold:
-            return ['user']
-        return []
+
+        # Given a fresh django-cms install and a django settings with the
+        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+        # django throws an OperationalError when running
+        # ./manage migrate
+        # because auth_user doesn't exists yet
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+
+        return ['user'] if threshold else []
 
     def get_queryset(self, request):
         """
@@ -132,6 +143,34 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_display.append('can_change_advanced_settings')
     list_filter.append('can_change_advanced_settings')
 
+    def get_list_filter(self, request):
+        threshold = get_cms_setting('RAW_ID_USERS')
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+        filter_copy = deepcopy(self.list_filter)
+        if threshold:
+            filter_copy.remove('user')
+        return filter_copy
+
+    @classproperty
+    def raw_id_fields(cls):
+        # Dynamically set raw_id_fields based on settings
+        threshold = get_cms_setting('RAW_ID_USERS')
+
+        # Given a fresh django-cms install and a django settings with the
+        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+        # django throws an OperationalError when running
+        # ./manage migrate
+        # because auth_user doesn't exists yet
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+
+        return ['user'] if threshold else []
+
 
 class GenericCmsPermissionAdmin(object):
     """
@@ -145,9 +184,9 @@ class GenericCmsPermissionAdmin(object):
         """
         fieldsets = deepcopy(self.fieldsets)
         perm_models = (
-            (Page, _('Page permissions')),
-            (PageUser, _('User & Group permissions')),
-            (PagePermission, _('Page permissions management')),
+            (Page, ugettext('Page permissions')),
+            (PageUser, ugettext('User & Group permissions')),
+            (PagePermission, ugettext('Page permissions management')),
         )
         for i, perm_model in enumerate(perm_models):
             model, title = perm_model

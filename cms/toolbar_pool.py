@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
 from cms.utils.django_load import load, iterload_objects
 from django.core.exceptions import ImproperlyConfigured
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from django.utils.datastructures import SortedDict as OrderedDict
 
 
 class ToolbarPool(object):
@@ -41,7 +38,7 @@ class ToolbarPool(object):
         if toolbar.__module__.split('.')[-1] == 'cms_toolbar':
             warnings.warn('cms_toolbar.py filename is deprecated, '
                           'and it will be removed in version 3.4; '
-                          'please rename it to cms_toolbar.py', DeprecationWarning)
+                          'please rename it to cms_toolbars.py', DeprecationWarning)
         if not self.force_register and get_cms_setting('TOOLBARS'):
             return toolbar
         from cms.toolbar_base import CMSToolbar

@@ -1,0 +1,52 @@
+.. _upgrade-to-3.1.3:
+
+###################
+3.1.3 release notes
+###################
+
+*******************
+What's new in 3.1.3
+*******************
+
+Bug Fixes
+=========
+
+* Add missing migration
+* Exclude PageUser manager from migrations
+* Fix check for template instance in Django 1.8.x
+* Fix error in PageField for Django 1.8
+* Fix some Page tree bugs
+* Declare Django 1.6.9 dependency in ``setup.py``
+* Make sure cache version returned is an int
+* Fix issue preventing migrations to run on a new database (django 1.8)
+* Fix get User model in 0010 migration
+* Fix support for unpublished language pages
+* Add documentation for plugins data migration
+* Fix getting request in _show_placeholder_for_page on Django 1.8
+* Fix template inheritance order
+* Fix xframe options inheritance order
+* Fix placeholder inheritance order
+* Fix language chooser template
+* Relax html5lib versions
+* Fix redirect when deleting a page
+* Correct South migration error
+* Correct validation on numeric fields in modal pop-up dialogs
+* Exclude ``scssc`` from manifest
+* Remove unpublished pages from menu
+* Remove page from menu items for performance reason
+* Fix access to pages with expired ancestors
+* Don't try to modify an immutable QueryDict
+* Only attempt to delete cache keys if there are some to be deleted
+* Update documentation section
+* Fix language chooser template
+* Cast to int cache version
+* Fix extensions copy when using duplicate page/create page type
+
+
+
+Thanks
+======
+
+Many thanks community members who have submitted issue reports and especially to
+these GitHub users who have also submitted pull requests: basilelegal, gigaroby, ikudryavtsev,
+jokerejoker, josjevv, tomwardill.
