@@ -231,7 +231,7 @@ gulp.task('tests:integration', function (done) {
     });
 
     casperChild.on('close', function (code) {
-        if (argv && argv.summon) {
+        if (argv && argv.screenshots) {
             child_process.execSync('rm ' + tests.join(' '));
         }
 
