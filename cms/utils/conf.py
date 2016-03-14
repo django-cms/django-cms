@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
 from functools import update_wrapper
 import os
 
@@ -254,6 +255,12 @@ def get_unihandecode_host():
         return host + '/'
 
 
+def get_placeholder_config():
+    name = 'PLACEHOLDER_CONF'
+    placeholder_conf = getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
+    return OrderedDict(placeholder_conf)
+
+
 COMPLEX = {
     'CACHE_DURATIONS': get_cache_durations,
     'MEDIA_ROOT': get_media_root,
@@ -266,6 +273,7 @@ COMPLEX = {
     'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
     'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
     'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
+    'PLACEHOLDER_CONF': get_placeholder_config
 }
 
 DEPRECATED_CMS_SETTINGS = {
