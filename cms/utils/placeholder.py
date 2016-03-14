@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import operator
+import re
 import warnings
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.six import iteritems
 
 from sekizai.helpers import get_varname, is_variable_extend_node
 
@@ -46,30 +48,65 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     CMS_PLACEHOLDER_CONF['placeholder']
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
+    # Ideas: 
+    # 1)using real regex as keys
+    # 2)turn the setting in an orderedict
+    # 3)handling dictionary and list both
+
+    # Use regex or normal string (in this case exact match)
+    # compatibility with old structure
+    # convert all to orderedict
+
     if placeholder:
         keys = []
+        placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
+        # 1st level
         if template:
             keys.append("%s %s" % (template, placeholder))
-        keys.append(placeholder)
+        # 2nd level
+        keys.append(str(placeholder))
+        # 3rd level
         if template:
-            keys.append(template)
+            keys.append(str(template))
+        # 4th level
         keys.append('*')
         for key in keys:
-            conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
-            if not conf:
-                continue
-            value = conf.get(setting)
-            if value is not None:
-                return value
-            inherit = conf.get('inherit')
-            if inherit:
-                if ' ' in inherit:
-                    inherit = inherit.split(' ')
-                else:
-                    inherit = (None, inherit,)
-                value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
-                if value is not None:
-                    return value
+            for regex, conf in iteritems(placeholder_conf):
+                if key == regex:
+                    if not conf:
+                        continue
+                    value = conf.get(setting)
+                    if value is not None:
+                        return value
+                    inherit = conf.get('inherit')
+                    if inherit:
+                        if ' ' in inherit:
+                            inherit = inherit.split(' ')
+                        else:
+                            inherit = (None, inherit,)
+                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                        if value is not None:
+                            return value
+        # turn placeholder confs keys into real regular expressions
+        for key in keys:
+            # turn them in real regex string
+            for regex, conf in iteritems(placeholder_conf):
+                compiled_regex = re.compile(regex)
+                if compiled_regex.match(key):
+                    if not conf:
+                        continue
+                    value = conf.get(setting)
+                    if value is not None:
+                        return value
+                    inherit = conf.get('inherit')
+                    if inherit:
+                        if ' ' in inherit:
+                            inherit = inherit.split(' ')
+                        else:
+                            inherit = (None, inherit,)
+                        value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                        if value is not None:
+                            return value
     return default
 
 
