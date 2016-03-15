@@ -102,7 +102,7 @@ Check spelling
 
 Run::
 
-    ``make spelling``
+    make spelling
 
 in the ``docs`` directory to conduct the checks.
 
@@ -271,4 +271,4 @@ run search-and-replaces when items are moved in the structure.
 
 
 .. _restructuredText: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
-.. _Sphinx: http://sphinx.pocoo.org/
+.. _Sphinx: http://sphinx-doc.org//
