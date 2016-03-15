@@ -142,7 +142,14 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
             .then(function () {
                 var pageId = cms.getPageId('Nested page');
                 test.assertExists(
-                    xPath(createJSTreeXPathFromTree([{ name: 'Homepage', children: [{ name: 'Nested page' }] }])),
+                    xPath(createJSTreeXPathFromTree([
+                        {
+                            name: 'Homepage',
+                            children: [
+                                { name: 'Nested page' }
+                            ]
+                        }
+                    ])),
                     'Newly created page is added'
                 );
                 test.assertExists(
