@@ -123,7 +123,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
             .then(function () {
                 var pageId = cms.getPageId('Homepage');
                 test.assertExists(
-                    xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Homepage")]'),
+                    xPath(createJSTreeXPathFromTree([{ name: 'Homepage' }])),
                     'Page was successfully added'
                 );
                 test.assertExists(
@@ -461,9 +461,12 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
-                        xPath('//a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
                         'Second page is nested into the Homepage'
                     );
 
@@ -500,9 +503,46 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .then(function () {
                     this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
                 })
-                // FIXME should be possible
-                .then(function () {
-                    test.assertVisible('.error', 'Error shown');
+                .waitUntilVisible('.cms-dialog', function () {
+                    test.assertVisible('.cms-dialog', 'Dialog shows up');
+                    test.assertSelectorHasText('.cms-dialog', 'Copy options', 'Copy options dialog shows up');
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second',
+                                children: [{
+                                    name: 'Second'
+                                }]
+                            }]
+                        }])),
+                        'Copy page placeholder is visible in the tree'
+                    );
+                    test.assertElementCount(
+                        xPath('//*[self::div or self::span]' +
+                              '[contains(@class, "cms-tree-item-helpers")]' +
+                              '[not(contains(@class, "cms-hidden"))]' +
+                              '[./a[contains(text(), "Paste")]]'),
+                        0,
+                        'Paste buttons hide when dialog is shown up'
+                    );
+                    this.click('.cms-dialog .default.submit');
+                })
+                .waitForResource(/copy-page/)
+                .waitForUrl(/page/) // need to wait for reload
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second',
+                                children: [{
+                                    name: 'Second'
+                                }]
+                            }]
+                        }])),
+                        'Second page was copied into itself'
+                    );
                 })
                 .then(function () {
                     this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
@@ -515,10 +555,20 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                     test.assertVisible('.cms-dialog', 'Dialog shows up');
                     test.assertSelectorHasText('.cms-dialog', 'Copy options', 'Copy options dialog shows up');
                     test.assertExists(
-                        xPath('//a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
-                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [
+                                {
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                },
+                                {
+                                    name: 'Second'
+                                }
+                            ]
+                        }])),
                         'Copy page placeholder is visible in the tree'
                     );
                     test.assertElementCount(
@@ -537,10 +587,34 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .waitWhileVisible('.cms-dialog', function () {
                     test.assertNotVisible('.cms-dialog', 'Dialog closed');
                     test.assertDoesntExist(
-                        xPath('//a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
-                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage',
+                                children: [{
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                }]
+                            },
+                            {
+                                name: 'Second'
+                            }
+                        ])),
+                        'Copy page placeholder is no longer visible in the tree'
+                    );
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage',
+                                children: [{
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                }]
+                            }
+                        ])),
                         'Copy page placeholder is no longer visible in the tree'
                     );
                 })
@@ -558,33 +632,54 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
+                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
-                        xPath('//a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
-                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [
+                                {
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                },
+                                {
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                }
+                            ]
+                        }])),
                         'Second page was copied into the homepage'
                     );
                 })
-                // FIXME doesn't work
-                .thenBypass(2)
                 .then(function () {
                     this.reload();
                 })
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
-                        xPath('//a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]' +
-                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]'),
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [
+                                {
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                },
+                                {
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Second'
+                                    }]
+                                }
+                            ]
+                        }])),
                         'Second page was copied into the homepage'
                     );
-                })
-                // FIXME should be removed
-                .then(function () {
-                    // click on cancel - nothing should happen
-                    this.click('.cms-dialog .cancel');
                 })
                 // try to copy into root
                 .then(function () {
@@ -600,14 +695,35 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
+                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
-                        xPath(
-                            '//li[./a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
-                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]'
-                        ),
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage',
+                                children: [
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    },
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'Second',
+                                children: [{
+                                    name: 'Second'
+                                }]
+                            }
+                        ])),
                         'Second page was copied into the root'
                     );
                 })
@@ -618,12 +734,31 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
-                        xPath(
-                            '//li[./a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
-                            '/following-sibling::li/a[contains(@class, "jstree-anchor")][contains(text(), "Second")]'
-                        ),
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage',
+                                children: [
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    },
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'Second',
+                                children: [{
+                                    name: 'Second'
+                                }]
+                            }
+                        ])),
                         'Second page was copied into the root'
                     );
                 })
@@ -633,33 +768,61 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
-                    // click on "Paste" to last sibling
+                    // click on "Paste" to top level "second" page
                     var pages = cms._getPageIds('Second');
-                    this.click('.cms-tree-item-helpers a[data-id="' + pages[pages.length - 1] + '"]');
+                    this.click('.cms-tree-item-helpers a[data-id="' + pages[pages.length - 2] + '"]');
                 })
                 .waitUntilVisible('.cms-dialog', function () {
                     this.click('.cms-dialog .default.submit');
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                .waitUntilVisible('.cms-pagetree')
-                .then(cms.expandPageTree())
-                .then(function () {
+                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
-                        // check that tree looks like this
-                        // - Homepage
-                        //     - Second
-                        // - Second
-                        //     - Homepage
-                        //         - Second
-                        xPath(
-                            '//li[./a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
-                            '/following-sibling::li/a[contains(text(), "Second")]' +
-                            '/following-sibling::ul/li/a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul/li/a[contains(text(), "Second")]'
-                        ),
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage',
+                                children: [
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    },
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'Second',
+                                children: [
+                                    { name: 'Second' },
+                                    {
+                                        name: 'Homepage',
+                                        children: [
+                                            {
+                                                name: 'Second',
+                                                children: [{
+                                                    name: 'Second'
+                                                }]
+                                            },
+                                            {
+                                                name: 'Second',
+                                                children: [{
+                                                    name: 'Second'
+                                                }]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ])),
                         'Homepage was copied into last "Second" page'
                     );
                 })
@@ -669,15 +832,66 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .waitUntilVisible('.cms-pagetree')
                 .then(function () {
                     test.assertExists(
-                        xPath(
-                            '//li[./a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul[contains(@class, "jstree-children")]' +
-                            '[./li[./a[contains(@class, "jstree-anchor")][contains(text(), "Second")]]]]' +
-                            '/following-sibling::li/a[contains(text(), "Second")]' +
-                            '/following-sibling::ul/li/a[contains(text(), "Homepage")]' +
-                            '/following-sibling::ul/li/a[contains(text(), "Second")]'
-                        ),
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage',
+                                children: [
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    },
+                                    {
+                                        name: 'Second',
+                                        children: [{
+                                            name: 'Second'
+                                        }]
+                                    }
+                                ]
+                            },
+                            {
+                                name: 'Second',
+                                children: [
+                                    { name: 'Second' },
+                                    {
+                                        name: 'Homepage',
+                                        children: [
+                                            {
+                                                name: 'Second',
+                                                children: [{
+                                                    name: 'Second'
+                                                }]
+                                            },
+                                            {
+                                                name: 'Second',
+                                                children: [{
+                                                    name: 'Second'
+                                                }]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ])),
                         'Homepage was copied into last "Second" page'
+                    );
+                })
+
+                // then try to copy a page into own child
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + cms.getPageId('Homepage') + '"]');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    // click on "Paste" to the Direct child of Homepage
+                    this.click('.cms-tree-item-helpers a[data-id="' + secondPageId + '"]');
+                })
+                .waitUntilVisible('.error', function () {
+                    test.assertSelectorHasText(
+                        '.error',
+                        'Error: Moving parent inside child',
+                        'Error should show up if you try to paste a page into it\'s child'
                     );
                 });
         })
