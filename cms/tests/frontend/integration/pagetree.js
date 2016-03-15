@@ -195,7 +195,7 @@ casper.test.begin('Pages can be reordered', function (test) {
                 );
             }).waitForResource(/move-page/, function () {
                 test.assertExists('.jstree-initial-node.jstree-loading', 'Loading tree showed up');
-            }).waitForResource(/get-tree/, function () {
+            }).waitForResource(/get-tree/).wait(1000, function () {
                 test.assertDoesntExist('.jstree-initial-node.jstree-loading', 'Loading tree hides');
             }).then(function () {
                 this.reload();
