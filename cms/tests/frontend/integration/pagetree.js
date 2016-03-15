@@ -68,7 +68,7 @@ var createJSTreeXPathFromTree = function (tree, opts) {
     });
 
     return xPath;
-}
+};
 
 casper.test.setUp(function (done) {
     casper.start()
@@ -340,7 +340,7 @@ casper.test.begin('Pages cannot be published if it does not have a title and slu
                 test.assertVisible('.cms-tree-tooltip-container', 'Publishing dropdown is open');
 
                 test.assertDoesntExist('.cms-tree-tooltip-container-open a[href*="/de/publish/"]');
-            })
+            });
         })
         .then(cms.removePage({ title: 'Homepage' }))
         .run(function () {
