@@ -73,7 +73,7 @@ var JS_BUNDLES = {
     'bundle.admin.pagetree.min.js': [
         PROJECT_PATH.js + '/libs/jstree/jstree.min.js',
         PROJECT_PATH.js + '/libs/jstree/jstree.grid.min.js',
-        PROJECT_PATH.js + '/modules/cms.pagetree.js',
+        PROJECT_PATH.js + '/modules/cms.pagetree.js'
     ],
     'bundle.toolbar.min.js': [
         PROJECT_PATH.js + '/polyfills/bind.js',
@@ -202,7 +202,8 @@ gulp.task('tests:integration', function (done) {
         'revertLive',
         'narrowScreen',
         'clipboard',
-        'modal'
+        'modal',
+        'pagetree'
     ];
     var pre = ['setup'];
 
@@ -216,7 +217,7 @@ gulp.task('tests:integration', function (done) {
     });
 
     // npm install -g casper-summoner
-    if (argv && argv.summon) {
+    if (argv && argv.screenshots) {
         child_process.execSync('casper-summoner ' + tests.join(' '));
         tests = tests.map(function (file) {
             return file.replace('.js', '.summoned.js');
@@ -230,7 +231,7 @@ gulp.task('tests:integration', function (done) {
     });
 
     casperChild.on('close', function (code) {
-        if (argv && argv.summon) {
+        if (argv && argv.screenshots) {
             child_process.execSync('rm ' + tests.join(' '));
         }
 

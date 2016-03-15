@@ -66,8 +66,7 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
     casper.start()
         .then(cms.addPage({ title: 'Homepage' }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded')
-        .then(function () {
+        .waitUntilVisible('.cms-toolbar-expanded', function () {
             this.click('.cms-btn[href*="cms_wizard/create"]');
         })
         // wait till wizard modal show up

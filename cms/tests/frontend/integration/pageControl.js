@@ -349,6 +349,7 @@ casper.test.begin('Page can be published / unpublished', function (test) {
                 'Page is unpublished'
             );
         })
+        .wait(300)
         .then(cms.logout())
         // check that the page is 404
         .thenOpen(pageUrl, function () {
@@ -370,6 +371,8 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         })
         // wait until it successfully publishes
         .waitForResource(/publish/)
+        // have to wait a bit longer here because .thenOpen doesn't play well with page reloads
+        .wait(2000)
         .then(cms.logout())
         // open a page and check if it's published for non-logged in user
         .thenOpen(pageUrl, function () {
@@ -390,6 +393,8 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         })
         // wait until it successfully unpublishes
         .waitForResource(/publish/)
+        .waitForResource(/admin\/cms\/page/)
+        .waitUntilVisible('.cms-toolbar-expanded')
         .then(cms.logout())
         // check that the page is 404 again
         .thenOpen(pageUrl, function () {
