@@ -672,7 +672,7 @@ var CMS = window.CMS || {};
          * @private
          */
         _checkHelpers: function _checkHelpers() {
-            if (this.cache.type) {
+            if (this.cache.type && this.cache.id) {
                 this._showHelpers(this.cache.type);
             }
 
