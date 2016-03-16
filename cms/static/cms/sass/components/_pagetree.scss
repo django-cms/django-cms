@@ -445,6 +445,9 @@
             color: $gray !important;
         }
     }
+    .cms-tree-node-filtered .jstree-anchor {
+        cursor: default;
+    }
     // style cells afterwards
     .jstree-grid-cell {
         height: $pagetree-cell-height;

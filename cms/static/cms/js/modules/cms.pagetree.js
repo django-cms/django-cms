@@ -171,6 +171,10 @@ var CMS = window.CMS || {};
                     inside_pos: 'last',
                     // disable the multi selection of nodes for now
                     drag_selection: false,
+                    // disable dragging if filtered
+                    is_draggable: function () {
+                        return (that.options.filtered) ? false : true;
+                    },
                     // disable CMD/CTRL copy
                     copy: false
                 },

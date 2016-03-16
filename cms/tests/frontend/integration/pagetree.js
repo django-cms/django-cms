@@ -1203,3 +1203,165 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Pagetree remembers which nodes are opened and which ones are closed', function (test) {
+    casper.start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var secondPageId;
+            casper.waitUntilVisible('.cms-pagetree')
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage'
+                        }])),
+                        'At first nested page is not visible'
+                    );
+                })
+                .then(function () {
+                    this.click('.jstree-closed[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
+                })
+                .waitForResource(/get-tree/)
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Page nodes can be expanded'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Expanded state was restored after reload'
+                    );
+                })
+                .then(function () {
+                    this.click('.jstree-open[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage'
+                        }])),
+                        'Nested page is no longer visible'
+                    );
+                    test.assertDoesntExist(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Markup is for nested page is removed'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage'
+                        }])),
+                        'Collapsed state was restored'
+                    );
+                    test.assertDoesntExist(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Nested page is not in the markup'
+                    );
+                });
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
+casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is filtered', function (test) {
+    casper.start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second but top-level' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var secondPageId;
+            var drop;
+            casper.waitUntilVisible('.cms-pagetree')
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }, {
+                            name: 'Second but top-level'
+                        }])),
+                        'Initial structure is correct'
+                    );
+                })
+                .then(function () {
+                    this.fill('#changelist-search', {
+                        q: 'seco'
+                    }, true);
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            { name: 'Second' },
+                            { name: 'Second but top-level' }
+                        ])),
+                        'Correct pages are shown after filtering'
+                    );
+                })
+                .then(function () {
+                    // usually to drag stuff in the iframe you have to calculate the position of the frame
+                    // and then the position of the thing inside frame, but here sideframe is opened at 0, 0
+                    // so this should be enough
+                    drop = this.getElementBounds(
+                        xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Second")]')
+                    );
+
+                    this.mouse.down(
+                        xPath('//a[contains(@class, "jstree-anchor")][contains(text(), "Second but top-level")]')
+                    );
+                    this.mouse.move(drop.left + drop.width / 2, drop.top + drop.height - 3);
+                }).then(function () {
+                    this.mouse.up(drop.left + drop.width / 2, drop.top + drop.height - 3);
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            { name: 'Second' },
+                            { name: 'Second but top-level' }
+                        ])),
+                        'Pages order was not changed'
+                    );
+                });
+        })
+        .then(cms.removePage())
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
