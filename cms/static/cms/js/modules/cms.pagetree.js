@@ -676,10 +676,14 @@ var CMS = window.CMS || {};
                 this._showHelpers(this.cache.type);
             }
 
-            // hide cut element if it is visible
+            // hide cut element and it's descendants' paste helpers if it is visible
             if (this.cache.type === 'cut' && this.cache.target) {
-                $('.jsgrid_' + this.cache.id + '_col .cms-tree-item-helpers')
-                    .addClass('cms-hidden');
+                var descendantIds = this.ui.tree.jstree(true).get_node(this.cache.id).children_d;
+
+                [this.cache.id].concat(descendantIds).forEach(function (id) {
+                    $('.jsgrid_' + id + '_col .cms-tree-item-helpers')
+                        .addClass('cms-hidden');
+                });
             }
         },
 
