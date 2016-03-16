@@ -15,12 +15,16 @@ HELPER_SETTINGS = dict(
     LANGUAGES=(
         ('en', u'English'),
         ('de', u'Deutsch'),
+        ('it', u'Italien'),
+        ('zh-cn', u'Chinese (Simplified)'),
     ),
     LANGUAGE_CODE='en',
     PARLER_LANGUAGES={
         1: (
             {'code': 'en', 'fallbacks': ['de',]},
             {'code': 'de', 'fallbacks': ['en',]},
+            {'code': 'it', 'fallbacks': ['en',]},
+            {'code': 'zh-cn', 'fallbacks': ['en',]},
         ),
         'default': {
             'fallback': 'en',
@@ -46,6 +50,16 @@ HELPER_SETTINGS = dict(
                 'code': 'de',
                 'name': gettext('German'),
                 'fallbacks': ['en',],
+            },
+            {
+                'code': 'it',
+                'name': gettext('Italian'),
+                'fallbacks': ['en',],
+            },
+            {
+                'code': 'zh-cn',
+                'name': gettext('Chinese Simplified'),
+                'fallbacks': ['en',]
             },
         ],
         'default': {
