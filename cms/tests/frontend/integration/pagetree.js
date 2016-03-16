@@ -1016,3 +1016,190 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Pages can be cut and pasted', function (test) {
+    casper.start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .then(cms.addPage({ title: 'Third', parent: 'Second' }))
+        .then(cms.addPage({ title: 'Fourth', parent: 'Third' }))
+        .then(cms.addPage({ title: 'Top sibling' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var secondPageId;
+            casper.waitUntilVisible('.cms-pagetree')
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second',
+                                children: [{
+                                    name: 'Third',
+                                    children: [{
+                                        name: 'Fourth'
+                                    }]
+                                }]
+                            }]
+                        }, {
+                            name: 'Top sibling'
+                        }])),
+                        'Initial page structure is correct'
+                    );
+
+                    secondPageId = cms.getPageId('Second');
+
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"] ~ .js-cms-tree-item-cut');
+                })
+                // wait until paste buttons show up
+                .waitUntilVisible('.cms-tree-item-helpers', function () {
+                    test.assertDoesntExist('.cms-dialog', 'Dialog does not show up');
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second',
+                                children: [{
+                                    name: 'Third',
+                                    children: [{
+                                        name: 'Fourth'
+                                    }]
+                                }]
+                            }]
+                        }, {
+                            name: 'Top sibling'
+                        }])),
+                        'Tree stays the same'
+                    );
+
+                    this.click('.cms-tree-item-helpers a[href="#root"]');
+                })
+                .then(function () {
+                    test.assertElementCount(
+                        xPath(getPasteHelpersXPath({ visible: true })),
+                        0,
+                        'Cut helpers hidden'
+                    );
+                })
+                .waitForResource(/move-page/)
+                .waitForResource(/get-tree/)
+                // FIXME shouldn't be needed, pagetree should remember it being expanded
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage'
+                            },
+                            {
+                                name: 'Top sibling'
+                            },
+                            {
+                                name: 'Second',
+                                children: [{
+                                    name: 'Third',
+                                    children: [{
+                                        name: 'Fourth'
+                                    }]
+                                }]
+                            }
+                        ])),
+                        'Page was moved into root'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage'
+                            },
+                            {
+                                name: 'Top sibling'
+                            },
+                            {
+                                name: 'Second',
+                                children: [{
+                                    name: 'Third',
+                                    children: [{
+                                        name: 'Fourth'
+                                    }]
+                                }]
+                            }
+                        ])),
+                        'Page was moved into root'
+                    );
+                })
+
+                // then try to cut the page and paste it into sibling
+                .then(function () {
+                    this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"] ~ .js-cms-tree-item-cut');
+                })
+                .then(function () {
+                    this.click('.cms-tree-item-helpers a[data-id="' + cms.getPageId('Top sibling') + '"]');
+                })
+
+                .waitForResource(/move-page/)
+                .waitForResource(/get-tree/)
+                // FIXME shouldn't be needed, pagetree should remember it being expanded
+                .then(cms.expandPageTree())
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage'
+                            },
+                            {
+                                name: 'Top sibling',
+                                children: [{
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Third',
+                                        children: [{
+                                            name: 'Fourth'
+                                        }]
+                                    }]
+                                }]
+                            }
+                        ])),
+                        'Page was moved into sibling'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([
+                            {
+                                name: 'Homepage'
+                            },
+                            {
+                                name: 'Top sibling',
+                                children: [{
+                                    name: 'Second',
+                                    children: [{
+                                        name: 'Third',
+                                        children: [{
+                                            name: 'Fourth'
+                                        }]
+                                    }]
+                                }]
+                            }
+                        ])),
+                        'Page was moved into sibling'
+                    );
+                });
+        })
+        // remove two top level pages
+        .then(cms.removePage())
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
