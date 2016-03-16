@@ -1288,7 +1288,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                         }])),
                         'Nested page is not in the markup'
                     );
-                })
+                });
         })
         .then(cms.removePage())
         .run(function () {
@@ -1357,7 +1357,7 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
                         ])),
                         'Pages order was not changed'
                     );
-                })
+                });
         })
         .then(cms.removePage())
         .then(cms.removePage())
