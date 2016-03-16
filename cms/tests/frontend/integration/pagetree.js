@@ -1203,3 +1203,95 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
             test.done();
         });
 });
+
+casper.test.begin('Pagetree remembers which nodes are opened and which ones are closed', function (test) {
+    casper.start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            var secondPageId;
+            casper.waitUntilVisible('.cms-pagetree')
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage'
+                        }])),
+                        'At first nested page is not visible'
+                    );
+                })
+                .then(function () {
+                    this.click('.jstree-closed[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
+                })
+                .waitForResource(/get-tree/)
+                .then(function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Page nodes can be expanded'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Expanded state was restored after reload'
+                    );
+                })
+                .then(function () {
+                    this.click('.jstree-open[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage'
+                        }])),
+                        'Nested page is no longer visible'
+                    );
+                    test.assertDoesntExist(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Markup is for nested page is removed'
+                    );
+                })
+                .then(function () {
+                    this.reload();
+                })
+                .waitUntilVisible('.cms-pagetree', function () {
+                    test.assertExists(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage'
+                        }])),
+                        'Collapsed state was restored'
+                    );
+                    test.assertDoesntExist(
+                        xPath(createJSTreeXPathFromTree([{
+                            name: 'Homepage',
+                            children: [{
+                                name: 'Second'
+                            }]
+                        }])),
+                        'Nested page is not in the markup'
+                    );
+                })
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
