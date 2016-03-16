@@ -70,6 +70,28 @@ var createJSTreeXPathFromTree = function (tree, opts) {
     return xPath;
 };
 
+/**
+ * @function getPasteHelpersXPath
+ * @public
+ * @param {Object} opts
+ * @param {Boolean} visible get visible or hidden helpers
+ * @param {String|Number} [pageId] optional id of the page to filter helpers
+ */
+var getPasteHelpersXPath = function (opts) {
+    var xpath = '//*[self::div or self::span][contains(@class, "cms-tree-item-helpers")]';
+    if (opts && opts.visible) {
+        xpath += '[not(contains(@class, "cms-hidden"))]';
+    } else {
+        xpath += '[contains(@class, "cms-hidden")]';
+    }
+    xpath += '[./a[contains(text(), "Paste")]';
+    if (opts && opts.pageId) {
+        xpath += '[contains(@data-id, "' + opts.pageId + '")]';
+    }
+    xpath += ']';
+    return xpath;
+};
+
 casper.test.setUp(function (done) {
     casper.start()
         .then(cms.login())
@@ -484,10 +506,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
                     test.assertElementCount(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[not(contains(@class, "cms-hidden"))]' +
-                              '[./a[contains(text(), "Paste")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         3,
                         'Three possible paste targets'
                     );
@@ -496,10 +517,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .then(function () {
                     this.click('.js-cms-tree-item-copy[data-id="' + secondPageId + '"]');
                     test.assertElementCount(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[not(contains(@class, "cms-hidden"))]' +
-                              '[./a[contains(text(), "Paste")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         0,
                         'Paste buttons hide when clicked on copy again'
                     );
@@ -526,10 +546,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         'Copy page placeholder is visible in the tree'
                     );
                     test.assertElementCount(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[not(contains(@class, "cms-hidden"))]' +
-                              '[./a[contains(text(), "Paste")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         0,
                         'Paste buttons hide when dialog is shown up'
                     );
@@ -579,10 +598,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         'Copy page placeholder is visible in the tree'
                     );
                     test.assertElementCount(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[not(contains(@class, "cms-hidden"))]' +
-                              '[./a[contains(text(), "Paste")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         0,
                         'Paste buttons hide when dialog is shown up'
                     );
@@ -950,32 +968,31 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
                 // wait until paste buttons show up
                 .waitUntilVisible('.cms-tree-item-helpers', function () {
                     test.assertElementCount(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[not(contains(@class, "cms-hidden"))]' +
-                              '[./a[contains(text(), "Paste")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         3,
                         'Three possible paste targets'
                     );
                     test.assertExists(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[contains(@class, "cms-hidden")]' +
-                              '[./a[contains(@data-id, "' + secondPageId + '")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: false,
+                            pageId: secondPageId
+                        })),
                         'Paste target is not the page itself'
                     );
                     test.assertExists(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[contains(@class, "cms-hidden")]' +
-                              '[./a[contains(@data-id, "' + cms.getPageId('Third') + '")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: false,
+                            pageId: cms.getPageId('Third')
+                        })),
                         'Paste target is not the child of the page itself'
                     );
                     test.assertExists(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[contains(@class, "cms-hidden")]' +
-                              '[./a[contains(@data-id, "' + cms.getPageId('Fourth') + '")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: false,
+                            pageId: cms.getPageId('Fourth')
+                        })),
                         'Paste target is not the child of the child of the page itself'
                     );
                 })
@@ -984,10 +1001,9 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
                 })
                 .then(function () {
                     test.assertElementCount(
-                        xPath('//*[self::div or self::span]' +
-                              '[contains(@class, "cms-tree-item-helpers")]' +
-                              '[not(contains(@class, "cms-hidden"))]' +
-                              '[./a[contains(text(), "Paste")]]'),
+                        xPath(getPasteHelpersXPath({
+                            visible: true
+                        })),
                         0,
                         'Cut helpers hidden'
                     );
