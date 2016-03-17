@@ -154,6 +154,7 @@ casper.test.begin('Publishing dates', function (test) {
 
             this.click('.cms-btn-publish');
         })
+        .waitForResource(/publish/)
         // logging out through toolbar
         .thenOpen(globals.editUrl)
         .waitForSelector('.cms-toolbar-expanded', function () {
@@ -163,6 +164,7 @@ casper.test.begin('Publishing dates', function (test) {
             this.click('.cms-toolbar-item-navigation-hover a[href$="/admin/logout/"]');
         })
         .waitForResource(/admin/)
+        .wait(1000)
         .waitForSelector('body', function () {
             test.assertDoesntExist('.cms-toolbar', 'Successfully logged out');
         })
