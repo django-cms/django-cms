@@ -324,6 +324,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             })
             .waitForResource(/move-page/)
             .waitForResource(/get-tree/)
+            .wait(1000)
             .then(function () {
                 this.reload();
             })
@@ -357,6 +358,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             })
             .waitForResource(/move-page/)
             .waitForResource(/get-tree/)
+            .wait(1000)
             .then(function () {
                 this.reload();
             })
@@ -1183,6 +1185,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
 
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
+                .wait(1000)
                 // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -1264,6 +1267,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                     this.click('.jstree-closed[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
                 })
                 .waitForResource(/get-tree/)
+                .wait(1000)
                 .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
