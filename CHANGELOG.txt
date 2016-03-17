@@ -5,6 +5,10 @@
 * Refactor language menu to allow for better integration with many languages
 * Management commands has been completely refactored for better consistency
 
+=== 3.2.3 (2016-03-09) ===
+
+- Fix the display of hyphenated language codes in the page tree
+- Fix a family of issues relating to unescaped translations in the page tree
 
 
 === 3.2.2 (2016-03-02) ===

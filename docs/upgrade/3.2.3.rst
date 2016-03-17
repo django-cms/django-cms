@@ -1,0 +1,15 @@
+.. _upgrade-to-3.2.3:
+
+###################
+3.2.3 release notes
+###################
+
+*******************
+What's new in 3.2.3
+*******************
+
+Bug Fixes
+=========
+
+- Fix the display of hyphenated language codes in the page tree
+- Fix a family of issues relating to unescaped translations in the page tree
