@@ -97,9 +97,11 @@ var CMS = window.CMS || {};
                         header: obj.title,
                         value: function (node) {
                             // it needs to have the "colde" format and not "col-de"
-                            // as jstree will convert "col-de" to "colDe"
+                            // as jstree will convert "col-de" to "colde"
+                            // also we strip dashes, in case language code contains it
+                            // e.g. zh-hans, zh-cn etc
                             if (node.data) {
-                                return node.data['col' + obj.key];
+                                return node.data['col' + obj.key.replace('-', '')];
                             } else {
                                 return '';
                             }
