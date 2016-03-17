@@ -30,7 +30,7 @@ casper.test.tearDown(function (done) {
 
 casper.test.begin('Different page template can be applied', function (test) {
     casper.start(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertDoesntExist('h1', 'Page is "fullwidth.html"');
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -137,7 +137,7 @@ casper.test.begin('PageType can be created and used', function (test) {
         })
         .thenOpen(globals.editUrl)
         // create new page through Page > Add Page > New Page
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
         // expand "Templates" menu item
@@ -182,7 +182,7 @@ casper.test.begin('PageType can be created and used', function (test) {
         .waitForResource(/cms\/page\/add/)
         // and we are redirected to a newly created page
         .waitForUrl(/new-shiny-page/)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             test.assertUrlMatch(/new-shiny-page/, 'Page was created');
             test.assertSelectorHasText('.grid-12.alpha', 'Left column', 'Correct page type was used');

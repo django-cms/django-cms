@@ -127,6 +127,41 @@ casper.test.begin('Shows a message when there are no pages', function (test) {
         });
 });
 
+casper.test.begin('Correctly displays languages', function (test) {
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                var pageId = cms.getPageId('Homepage');
+                // check that languages look correct
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span',
+                    'Controls for publishing in EN are visible'
+                );
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span',
+                    'Controls for publishing in DE are visible'
+                );
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/it/preview/"] span',
+                    'Controls for publishing in IT are visible'
+                );
+                test.assertExists(
+                    '.cms-tree-item-lang a[href*="' + pageId + '/zh-cn/preview/"] span',
+                    'Controls for publishing in ZH-CN are visible'
+                );
+            });
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
 casper.test.begin('Pages can be added through the page tree', function (test) {
     casper
         .start(globals.baseUrl)
@@ -289,6 +324,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             })
             .waitForResource(/move-page/)
             .waitForResource(/get-tree/)
+            .wait(1000)
             .then(function () {
                 this.reload();
             })
@@ -322,6 +358,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             })
             .waitForResource(/move-page/)
             .waitForResource(/get-tree/)
+            .wait(1000)
             .then(function () {
                 this.reload();
             })
@@ -1086,6 +1123,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 })
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
+                .wait(1000)
                 // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -1113,6 +1151,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .then(function () {
                     this.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
@@ -1146,6 +1185,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
 
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
+                .wait(1000)
                 // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -1173,6 +1213,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .then(function () {
                     this.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
@@ -1226,6 +1267,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                     this.click('.jstree-closed[data-id="' + cms.getPageId('Homepage') + '"] > .jstree-ocl');
                 })
                 .waitForResource(/get-tree/)
+                .wait(1000)
                 .then(function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{

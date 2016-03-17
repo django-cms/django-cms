@@ -32,7 +32,7 @@ casper.test.tearDown(function (done) {
         casper
             .start(globals.editUrl)
             .viewport(dimensions[0], dimensions[1])
-            .waitUntilVisible('.cms-toolbar-expanded', function () {
+            .waitForSelector('.cms-toolbar-expanded', function () {
                 test.assertExists('.cms-toolbar .cms-form-login', 'The toolbar login form is available');
 
                 this.fill('.cms-form-login', globals.credentials, true);

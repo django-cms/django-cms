@@ -49,7 +49,7 @@ casper.test.begin('Revert History', function (test) {
             }
         }))
         // counts that there are two plugins in the placeholder
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
                 2,
@@ -57,7 +57,7 @@ casper.test.begin('Revert History', function (test) {
             );
         })
         // click on history
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation > li:nth-child(3) > a');
         })
         // clicks on 'revert to live'
@@ -68,7 +68,7 @@ casper.test.begin('Revert History', function (test) {
         // checks if there's only one element again
         .waitForResource(/revert/)
         .waitWhileVisible('.cms-toolbar-expanded')
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
                 1,
@@ -82,7 +82,7 @@ casper.test.begin('Revert History', function (test) {
         })
         .waitForUrl(/edit_off/)
         .waitWhileVisible('.cms-toolbar-expanded')
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertExist('.cms-btn-switch-edit', 'Not in Edit mode');
         })
         .run(function () {
