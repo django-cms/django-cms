@@ -1121,6 +1121,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 })
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
+                .wait(1000)
                 // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
