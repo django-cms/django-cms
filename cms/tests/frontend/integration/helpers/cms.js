@@ -125,7 +125,7 @@ module.exports = function (casperjs) {
 
             return function () {
                 return this.thenOpen(globals.editUrl)
-                    .waitUntilVisible('.cms-toolbar-expanded', function () {
+                    .waitForSelector('.cms-toolbar-expanded', function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
                     // only add to placeholder if no parent specified
@@ -223,7 +223,7 @@ module.exports = function (casperjs) {
                 throw new Error('Invalid arguments passed to cms.switchTo, should be either "structure" or "content"');
             }
             return function () {
-                return this.waitUntilVisible('.cms-toolbar-expanded')
+                return this.waitForSelector('.cms-toolbar-expanded')
                     .then(function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?' + url + '"]');
                     });
@@ -261,7 +261,7 @@ module.exports = function (casperjs) {
          */
         openSideframe: function () {
             return function () {
-                return this.waitUntilVisible('.cms-toolbar-expanded', function () {
+                return this.waitForSelector('.cms-toolbar-expanded', function () {
                     // open "Example.com" menu
                     this.click('.cms-toolbar-item-navigation li:first-child a');
                 })

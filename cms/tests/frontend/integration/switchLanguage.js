@@ -29,7 +29,7 @@ casper.test.begin('Switch language', function (test) {
     casper
         .start(globals.editUrl)
         // click on language bar
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
         })
         // select german language
@@ -38,7 +38,7 @@ casper.test.begin('Switch language', function (test) {
         })
         // no page should be here (warning message instead)
         .wait(300)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertSelectorHasText(
                 '.cms-screenblock-inner h1',
                 noPreviewText,
@@ -67,7 +67,7 @@ casper.test.begin('Switch language', function (test) {
             test.assertSelectorHasText('ul.nav > .child > a[href="/de/"]', randomText, 'New translation page appears');
         })
         // click on language bar
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation > li:nth-child(4) > a');
         })
         // delete german translation

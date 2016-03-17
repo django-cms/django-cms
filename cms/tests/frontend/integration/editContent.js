@@ -40,7 +40,7 @@ casper.test.begin('Edit content', function (test) {
         .then(cms.switchTo('content'))
         // check edit modal window appearance after double click in content mode
         // double click on last added plugin content
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.mouse.doubleclick(
                 // pick a div with class cms-plugin that has a p that has text "Random text"
                 xPath('//div[contains(@class, "cms-plugin ")][.//p[text()[contains(.,"Random text")]]][last()]')
@@ -113,7 +113,7 @@ casper.test.begin('Edit content', function (test) {
         .waitWhileVisible('.cms-modal-open')
         .then(cms.switchTo('content'))
         // check for applied changes
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             // ensure content updated with new one
             test.assertSelectorHasText(
                 '.cms-plugin:last-child',

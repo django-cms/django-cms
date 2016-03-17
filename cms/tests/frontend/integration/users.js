@@ -23,7 +23,7 @@ casper.test.tearDown(function (done) {
 casper.test.begin('Users Management', function (test) {
     casper
         .start(globals.baseUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         .waitForSelector('.cms-toolbar-item-navigation-hover', function () {

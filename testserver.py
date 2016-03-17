@@ -32,11 +32,11 @@ HELPER_SETTINGS = dict(
         },
     },
     PARLER_ENABLE_CACHING=False,
-    CMS_PAGE_CACHE=False,
-    CMS_PLACEHOLDER_CACHE=False,
-    CMS_PLUGIN_CACHE=False,
-    # bug in the CMS
-    MENU_CACHE_DURATION = 0,
+    CMS_CACHE_DURATIONS={
+        'menus': 0,
+        'content': 0,
+        'permissions': 0,
+    },
     # required for integration tests
     LOGIN_URL='/admin/login/?user-login=test',
     CMS_LANGUAGES={

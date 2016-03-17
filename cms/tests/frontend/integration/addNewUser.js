@@ -26,7 +26,7 @@ casper.test.begin('Add New User', function (test) {
     casper
         .start(globals.editUrl)
         // click on example
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-toolbar-item-navigation li:first-child a');
         })
         // click on Users

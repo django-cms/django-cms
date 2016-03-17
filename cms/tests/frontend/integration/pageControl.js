@@ -34,7 +34,7 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             this.thenOpen(pageUrl);
         })
@@ -45,7 +45,7 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
             );
         })
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -115,12 +115,12 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             this.thenOpen(pageUrl);
         })
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -172,7 +172,7 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
             test.assertUrlMatch(/overwritten-url/, 'Url have been overwritten');
             test.assertTitleMatch(new RegExp(SECOND_PAGE_TITLE), 'Title is still the same');
         })
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -217,12 +217,12 @@ casper.test.begin('Page can be deleted', function (test) {
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             this.thenOpen(pageUrl);
         })
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -260,7 +260,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             this.thenOpen(pageUrl);
         })
@@ -272,7 +272,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
             );
         })
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -300,7 +300,7 @@ casper.test.begin('Page can be hidden / shown in navigation', function (test) {
                 'While the first one still is'
             );
         })
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
         })
@@ -337,12 +337,12 @@ casper.test.begin('Page can be published / unpublished', function (test) {
     casper
         .start(globals.editUrl)
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             this.thenOpen(pageUrl);
         })
         // check if publish button is available
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertSelectorHasText(
                 '.cms-publish-page',
                 'Publish page now',
@@ -358,7 +358,7 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
         // wait till toolbar is visible
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -380,7 +380,7 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         })
         .then(cms.login())
         .thenOpen(pageUrl + '?edit')
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(function () {
             // click on "Page" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(2) > a');
@@ -394,7 +394,7 @@ casper.test.begin('Page can be published / unpublished', function (test) {
         // wait until it successfully unpublishes
         .waitForResource(/publish/)
         .waitForResource(/admin\/cms\/page/)
-        .waitUntilVisible('.cms-toolbar-expanded')
+        .waitForSelector('.cms-toolbar-expanded')
         .then(cms.logout())
         // check that the page is 404 again
         .thenOpen(pageUrl, function () {

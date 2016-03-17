@@ -26,7 +26,7 @@ casper.test.begin('Toolbar Visibility', function (test) {
     // in order to check visibility the suite has to grab margin value
     casper
         .start(globals.baseUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertEquals(
                 this.getElementAttribute('.cms-toolbar-item-logo a', 'href'), '/',
                 'The django CMS logo redirects to homepage'

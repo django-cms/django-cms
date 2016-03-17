@@ -66,7 +66,7 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
     casper.start()
         .then(cms.addPage({ title: 'Homepage' }))
         .thenOpen(globals.editUrl)
-        .waitUntilVisible('.cms-toolbar-expanded', function () {
+        .waitForSelector('.cms-toolbar-expanded', function () {
             this.click('.cms-btn[href*="cms_wizard/create"]');
         })
         // wait till wizard modal show up
@@ -127,7 +127,7 @@ casper.test.begin('Add sub page with a wizard (click on next button)', function 
                 var selectedChild = $('.nav .selected');
                 return selectedChild.find('> a').text() === 'Subpage' &&
                     // have to use parents, because closest li is selectedChild itself
-                    selectedChild.parents('li').eq(0).hasClass('ancestor') &&
+                    selectedChild.parents('li').eq(0) &&
                     selectedChild.parents('li').eq(0).find('> a').text() === 'Homepage';
             }, 'Subpage appears in the menu correctly');
         })
