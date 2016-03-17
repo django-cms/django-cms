@@ -15,7 +15,7 @@ HELPER_SETTINGS = dict(
     LANGUAGES=(
         ('en', u'English'),
         ('de', u'Deutsch'),
-        ('it', u'Italien'),
+        ('it', u'Italiano'),
         ('zh-cn', u'Chinese (Simplified)'),
     ),
     LANGUAGE_CODE='en',
