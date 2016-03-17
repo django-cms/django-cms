@@ -1148,6 +1148,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .then(function () {
                     this.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
@@ -1208,6 +1209,7 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .then(function () {
                     this.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
