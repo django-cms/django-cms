@@ -162,6 +162,54 @@ casper.test.begin('Correctly displays languages', function (test) {
         });
 });
 
+casper.test.begin('Info dropdown can be shown', function (test) {
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                var pageId = cms.getPageId('Homepage');
+                // check that languages look correct
+
+                this.click('a[href*="page/' + pageId + '"] .cms-icon-info');
+            })
+            .waitForSelector('.cms-tree-tooltip-container-open', function () {
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'publication date:',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'is restricted',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'last change by',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'template',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'site',
+                    'Info tooltip is shown'
+                );
+            });
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
 casper.test.begin('Pages can be added through the page tree', function (test) {
     casper
         .start(globals.baseUrl)
