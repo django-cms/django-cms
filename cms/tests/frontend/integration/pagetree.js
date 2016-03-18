@@ -1,3 +1,4 @@
+/* global window */
 'use strict';
 
 // #############################################################################
@@ -201,6 +202,53 @@ casper.test.begin('Info dropdown can be shown', function (test) {
                     '.cms-tree-tooltip-container-open',
                     'site',
                     'Info tooltip is shown'
+                );
+            });
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
+casper.test.begin('Settings and advanced settings are accessible', function (test) {
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                var pageId = cms.getPageId('Homepage');
+                // check that languages look correct
+
+                this.click('a[href*="page/' + pageId + '"] .cms-icon-cogs');
+            })
+            .waitForUrl(/page/)
+            .waitForSelector('#content')
+            .then(function () {
+                test.assertExists(
+                    xPath('//h1[contains(text(), "Change page")]'),
+                    'Settings can be accessed from page tree'
+                );
+
+                this.click(xPath('//a[contains(text(), "Pages")][contains(@href, "admin/cms/page")]'));
+            })
+            .waitForUrl(/page/)
+            .waitForSelector('.cms-pagetree')
+            .thenEvaluate(function () {
+                var clickEvent = $.Event('click', { shiftKey: true });
+
+                // here we cheat a bit, it works only if there's only one cogs on the page
+                $('.cms-icon-cogs:visible').trigger(clickEvent);
+            })
+            .waitForUrl(/advanced-settings/)
+            .waitForSelector('h1')
+            .then(function () {
+                test.assertExists(
+                    xPath('//h1[contains(text(), "Advanced Settings")]'),
+                    'Advanced settings can be accessed from page tree'
                 );
             });
         })
