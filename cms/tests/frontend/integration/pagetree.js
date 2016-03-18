@@ -261,8 +261,8 @@ casper.test.begin('Pages can be reordered', function (test) {
                 test.assertExists('.jstree-initial-node.jstree-loading', 'Loading tree showed up');
             }).waitForResource(/get-tree/).wait(1000, function () {
                 test.assertDoesntExist('.jstree-initial-node.jstree-loading', 'Loading tree hides');
-            }).then(function () {
-                this.reload();
+            }).thenEvaluate(function () {
+                window.location.reload();
             }).waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -325,8 +325,8 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             .waitForResource(/move-page/)
             .waitForResource(/get-tree/)
             .wait(1000)
-            .then(function () {
-                this.reload();
+            .thenEvaluate(function () {
+                window.location.reload();
             })
             .waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
@@ -359,8 +359,8 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             .waitForResource(/move-page/)
             .waitForResource(/get-tree/)
             .wait(1000)
-            .then(function () {
-                this.reload();
+            .thenEvaluate(function () {
+                window.location.reload();
             })
             .waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
@@ -718,8 +718,8 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         'Second page was copied into the homepage'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -789,8 +789,8 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         'Second page was copied into the root'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .waitUntilVisible('.cms-pagetree')
                 .then(cms.expandPageTree())
@@ -888,8 +888,8 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                         'Homepage was copied into last "Second" page'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .waitUntilVisible('.cms-pagetree')
                 .then(function () {
@@ -1148,8 +1148,8 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                         'Page was moved into root'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
@@ -1210,8 +1210,8 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                         'Page was moved into sibling'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
@@ -1279,8 +1279,8 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                         'Page nodes can be expanded'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -1311,8 +1311,8 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                         'Markup is for nested page is removed'
                     );
                 })
-                .then(function () {
-                    this.reload();
+                .thenEvaluate(function () {
+                    window.location.reload();
                 })
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
