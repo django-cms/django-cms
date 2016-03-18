@@ -23,7 +23,7 @@ module.exports = function (casperjs) {
 
         logout: function () {
             return function () {
-                return this.thenOpen(globals.adminLogoutUrl)
+                return this.wait(1000).thenOpen(globals.adminLogoutUrl)
                     .waitForSelector('#content');
             };
         },
