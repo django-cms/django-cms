@@ -173,8 +173,8 @@ casper.test.begin('Info dropdown can be shown', function (test) {
         .withFrame(0, function () {
             casper.waitForSelector('.cms-pagetree', function () {
                 var pageId = cms.getPageId('Homepage');
-                // check that languages look correct
 
+                // check that languages look correct
                 this.click('a[href*="page/' + pageId + '"] .cms-icon-info');
             })
             .waitForSelector('.cms-tree-tooltip-container-open', function () {
