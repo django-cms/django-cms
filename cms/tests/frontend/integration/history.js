@@ -59,7 +59,7 @@ casper.test.begin('History', function (test) {
             );
         })
         .waitForResource(/undo/)
-        .wait(200)
+        .wait(1500)
         .waitForSelector('.cms-toolbar-expanded', function () {
             // Clicking again on undo after resource have been loaded
             this.click(
@@ -74,7 +74,7 @@ casper.test.begin('History', function (test) {
             );
         })
         .waitForResource(/undo/)
-        .wait(200)
+        .wait(1500)
         .waitForSelector('.cms-toolbar-expanded', function () {
             // Counts plugins in the first placeholder if there's only one
             test.assertElementCount(
@@ -113,7 +113,7 @@ casper.test.begin('History', function (test) {
         })
         // Counts if there are two plugin in the first placeholder
         .waitForResource(/redo/)
-        .wait(200)
+        .wait(1500)
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount(
                 '.cms-dragarea:nth-child(1) > .cms-draggables > .cms-draggable',
