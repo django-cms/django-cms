@@ -31,11 +31,11 @@ casper.test.begin('Manipulate Modal', function (test) {
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
                 return $('.cms-modal-open').width();
-            }, 1280, 'Modal maximized to corrent width');
+            }, 1280, 'Modal maximized to current width');
             // Page size is 1280x1024
             test.assertEvalEquals(function () {
                 return $('.cms-modal-open').height();
-            }, 1024, 'Modal maximized to corrent height');
+            }, 1024, 'Modal maximized to current height');
         })
         // clicks on the maximize button
         .then(function () {
@@ -50,13 +50,13 @@ casper.test.begin('Manipulate Modal', function (test) {
         // checks width of the minimized windows
         .then(function () {
             // Page size is 1280x1024
-            test.assertEvalEquals(function () {
-                return $('.cms-modal-open').width();
-            }, 396, 'Window is minimized to corrent width');
+            test.assertEval(function () {
+                return $('.cms-modal-open').width() < 430
+            }, 'Window is minimized to current width');
 
             test.assertEvalEquals(function () {
                 return $('.cms-modal-open').height();
-            }, 46, 'Window is minimized to corrent height');
+            }, 46, 'Window is minimized to current height');
         })
         // expands the modal by clicking on the icon
         .then(function () {
