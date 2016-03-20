@@ -522,7 +522,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree', function () {
+            casper.waitForSelector('.cms-pagetree').wait(1000, function () {
                 pageId = cms.getPageId('Homepage');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
@@ -544,7 +544,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.sendKeys('#id_title', 'Startseite');
                 this.click('input[name="_save"]');
             })
-            .waitUntilVisible('.cms-pagetree', function () {
+            .waitUntilVisible('.cms-pagetree .cms-tree-item-lang', function () {
                 this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished');
             })
             .waitUntilVisible('.cms-tree-tooltip-container', function () {
