@@ -264,7 +264,7 @@ is very well documented on the systems' respective websites.
 To use django CMS efficiently, we recommend:
 
 * Creating a separate set of credentials for django CMS.
-* Creating a separate database for django CMS to use.
+* Creating a new database for django CMS, not reusing an existing one.
 
 .. _PostgreSQL: http://www.postgresql.org/
 .. _MySQL: http://www.mysql.com
