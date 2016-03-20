@@ -273,6 +273,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
                 this.click('input[name="_save"]');
             })
             .waitUntilVisible('.success')
+            .wait(1000)
             .then(function () {
                 var pageId = cms.getPageId('Homepage');
                 test.assertExists(

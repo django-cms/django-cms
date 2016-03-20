@@ -51,7 +51,7 @@ casper.test.begin('Manipulate Modal', function (test) {
         .then(function () {
             // Page size is 1280x1024
             test.assertEval(function () {
-                return $('.cms-modal-open').width() < 430
+                return $('.cms-modal-open').width() < 430;
             }, 'Window is minimized to current width');
 
             test.assertEvalEquals(function () {
