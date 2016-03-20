@@ -692,6 +692,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -793,7 +794,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -857,7 +858,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -940,7 +941,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -1080,6 +1081,7 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
         .withFrame(0, function () {
             var secondPageId;
             casper.waitUntilVisible('.cms-pagetree')
+                .wait(1000)
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1226,7 +1228,6 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
                 .wait(1000)
-                // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1288,7 +1289,6 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
                 .wait(1000)
-                // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
