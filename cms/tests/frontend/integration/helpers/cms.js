@@ -76,6 +76,7 @@ module.exports = function (casperjs) {
                 return function () {
                     return this.thenOpen(globals.adminPagesUrl)
                         .waitUntilVisible('.cms-pagetree')
+                        .wait(1000)
                         .then(that.expandPageTree())
                         .then(function () {
                             var pageId = that.getPageId(opts.parent);
