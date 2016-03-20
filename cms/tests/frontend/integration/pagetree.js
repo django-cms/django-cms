@@ -359,7 +359,7 @@ casper.test.begin('Pages can be reordered', function (test) {
                 test.assertDoesntExist('.jstree-initial-node.jstree-loading', 'Loading tree hides');
             }).thenEvaluate(function () {
                 window.location.reload();
-            }).waitUntilVisible('.cms-pagetree', function () {
+            }).wait(1000).waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
                         { name: 'Second' },
@@ -424,6 +424,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             .thenEvaluate(function () {
                 window.location.reload();
             })
+            .wait(1000)
             .waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -458,6 +459,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             .thenEvaluate(function () {
                 window.location.reload();
             })
+            .wait(1000)
             .waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -817,6 +819,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -888,6 +891,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
                 .then(cms.expandPageTree())
                 .then(function () {
@@ -987,6 +991,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
                 .then(function () {
                     test.assertExists(
