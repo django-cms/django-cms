@@ -74,7 +74,7 @@ module.exports = function (casperjs) {
 
             if (opts.parent) {
                 return function () {
-                    return this.thenOpen(globals.adminPagesUrl)
+                    return this.wait(1000).thenOpen(globals.adminPagesUrl)
                         .waitUntilVisible('.cms-pagetree')
                         .wait(1000)
                         .then(that.expandPageTree())
@@ -93,7 +93,7 @@ module.exports = function (casperjs) {
 
             // add page as usual
             return function () {
-                return this.thenOpen(globals.adminPagesUrl + 'add/')
+                return this.wait(1000).thenOpen(globals.adminPagesUrl + 'add/')
                     .waitUntilVisible('#id_title')
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
