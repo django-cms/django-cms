@@ -1384,7 +1384,8 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree')
+                .wait(1000, function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage',
@@ -1416,7 +1417,8 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree')
+                .wait(1000, function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage'
