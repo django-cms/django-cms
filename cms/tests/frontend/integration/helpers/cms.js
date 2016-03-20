@@ -288,7 +288,7 @@ module.exports = function (casperjs) {
                         this.click('.jstree-closed > .jstree-ocl');
                         // there's no clear way to check if the page was loading
                         // or was already in the DOM
-                        return casper.wait(1000).then(that.expandPageTree());
+                        return casper.wait(2000).then(that.expandPageTree());
                     }
                 });
             };
