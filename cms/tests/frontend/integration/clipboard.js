@@ -216,7 +216,8 @@ casper.test.begin('Copy placeholder contents from the structure board', function
                 this.click('.cms-structure .cms-dragarea:nth-child(2) .cms-submenu-item a[data-rel="paste"]');
             }
         )
-        .waitForResource(/copy-plugins/)
+        .waitForResource(/move-plugin/)
+        .wait(2000)
         .waitForSelector('.cms-toolbar-expanded', function () {
             test.assertElementCount('.cms-structure .cms-draggable', 4, 'Four plugins present on the page');
         })
