@@ -269,7 +269,7 @@ cms.plugin_base
 
         .. important:: This attribute is now deprecated and will be removed in a
                        future release. Its functionality is replaced by the much
-                       more capable :meth:`get_expiration`.
+                       more capable :meth:`get_cache_expiration`.
 
         Adding the plugin's class name to the setting :setting:`IGNORE_PLUGIN_CACHE_ATTRIBUTE`
         will disable the effects of setting ``cache`` to False. This makes it
@@ -328,7 +328,7 @@ cms.plugin_base
         Returns the URL to the icon to be used for the given instance when that
         instance is used inside a text plugin.
 
-    .. method:: get_expiration(request, instance)
+    .. method:: get_cache_expiration(request, instance)
 
         Provides expiration value to the placeholder, and in turn to the page
         for determining the appropriate Cache-Control headers to add to the
@@ -377,7 +377,7 @@ cms.plugin_base
 
                            from cms.constants import EXPIRE_NOW
 
-                           def get_expiration(self, **kwargs):
+                           def get_cache_expiration(self, **kwargs):
                                return EXPIRE_NOW
 
         :param request: Relevant ``HTTPRequest`` instance.
