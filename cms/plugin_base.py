@@ -365,13 +365,16 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         # When adding an object, it won't have a position
         if not obj.position:
             if obj.parent_id:
-                obj.position = CMSPlugin.objects.filter(
+                position = CMSPlugin.objects.filter(
                     parent_id=obj.parent_id
                 ).count()
             else:
-                obj.position = CMSPlugin.objects.filter(
-                    placeholder_id=obj.placeholder_id
+                position = CMSPlugin.objects.filter(
+                    parent__isnull=True,
+                    language=obj.language,
+                    placeholder_id=obj.placeholder_id,
                 ).count()
+            obj.position = position
 
         # remember the saved object
         self.saved_object = obj
