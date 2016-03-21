@@ -56,7 +56,9 @@ module.exports = function (casperjs) {
                     .waitUntilVisible('input[type=submit]')
                     .then(function () {
                         this.click('input[type=submit]');
-                    });
+                    })
+                    .wait(1000)
+                    .then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
