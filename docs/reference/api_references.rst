@@ -367,8 +367,10 @@ cms.plugin_base
         future will be treated as :data:`MAX_EXPIRATION_TTL` seconds in the future.
 
         .. important:: If the plugin class still uses the legacy attribute
-                       :attribute:`cache` and it is set to ``False``, this
-                       method will not even be called.
+                       ``cache`` and it is set to ``False``, this method will
+                       not even be called.  This behavior can be disabled by
+                       adding the class name of the plugin as a list item in the
+                       CMS setting :setting:`CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE`.
 
                        Plugins that wish to expire their rendered contents
                        immediately should instead define::
