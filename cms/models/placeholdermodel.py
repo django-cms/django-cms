@@ -305,7 +305,7 @@ class Placeholder(models.Model):
             self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
         return self._actions_cache
 
-    def get_expiration(self, request, response_timestamp):
+    def get_cache_expiration(self, request, response_timestamp):
         """
         Returns the number of seconds (from «response_timestamp») that this
         placeholder can be cached. This is derived from the plugins it contains.
@@ -326,7 +326,7 @@ class Placeholder(models.Model):
                 # This placeholder has a plugin with an effective
                 # `cache = False` setting, so, no point in continuing.
                 return EXPIRE_NOW
-            plugin_expiration = plugin.get_expiration(request, instance)
+            plugin_expiration = plugin.get_cache_expiration(request, instance)
 
             # The plugin_expiration should only ever be either: None, a TZ-aware
             # datetime, or an integer.
@@ -345,7 +345,7 @@ class Placeholder(models.Model):
                         # this plugin.
                         warnings.warn(
                             'Plugin %(plugin_class)s (%(pk)d) returned a naive '
-                            'datetime : %(value)s for get_expiration(), '
+                            'datetime : %(value)s for get_cache_expiration(), '
                             'ignoring.' % {
                                 'plugin_class': plugin.__class__.__name__,
                                 'pk': instance.pk,
@@ -363,8 +363,8 @@ class Placeholder(models.Model):
                     # Looks like it was not very int-ish. Ignore this plugin.
                     warnings.warn(
                         'Plugin %(plugin_class)s (%(pk)d) return '
-                        'unexpected value %(value)s for get_expiration(), '
-                        'ignoring.' % {
+                        'unexpected value %(value)s for '
+                        'get_cache_expiration(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
                             'value': force_text(plugin_expiration),

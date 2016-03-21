@@ -174,7 +174,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def parent(self):
         return self.cms_plugin_instance.parent
 
-    def get_expiration(self, request, instance):
+    def get_cache_expiration(self, request, instance):
         """
         Provides hints to the placeholder, and in turn to the page for
         determining the appropriate Cache-Control headers to add to the

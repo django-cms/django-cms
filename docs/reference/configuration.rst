@@ -185,8 +185,8 @@ default
 
 Setting the ``cache`` to ``False`` on a plugin whose class name is in
 this list will have no effect. This allows plugin developers wishing to provide
-support for :meth:`get_expiration` for CMS 3.3 and later while still supporting
-older CMS versions with ``cache`` set to ``False`` if necessary.
+support for :meth:`get_cache_expiration` for CMS 3.3 and later while still
+supporting older CMS versions with ``cache`` set to ``False`` if necessary.
 
 
 .. setting:: CMS_PLACEHOLDER_CONF
