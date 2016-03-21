@@ -292,6 +292,8 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
                 this.click('input[name="_save"]');
             })
             .waitUntilVisible('.success')
+            .waitUntilVisible('.cms-pagetree')
+            .then(cms.waitUntilAllAjaxCallsFinish())
             .then(cms.expandPageTree())
             .then(function () {
                 var pageId = cms.getPageId('Nested page');
