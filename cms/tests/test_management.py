@@ -11,7 +11,6 @@ from django.test.utils import override_settings
 from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
-from cms.management.commands.cms import Command as CMSCommand
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
@@ -44,17 +43,26 @@ class ManagementTestCase(CMSTestCase):
             out = StringIO()
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
             self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
-            command = CMSCommand()
-            command.stdout = out
-            command.handle("list", "apphooks", interactive=False)
-            self.assertEqual(out.getvalue(), "SampleApp\n")
+            management.call_command(
+                "cms",
+                "list",
+                "apphooks",
+                interactive=False,
+                stdout=out,
+            )
+            self.assertEqual(out.getvalue(), "SampleApp (draft)\n")
 
     def test_uninstall_apphooks_without_apphook(self):
         with apphooks():
             out = StringIO()
-            command = CMSCommand()
-            command.stdout = out
-            command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
+            management.call_command(
+                "cms",
+                "uninstall",
+                "apphooks",
+                APPHOOK,
+                interactive=False,
+                stdout=out,
+            )
             self.assertEqual(out.getvalue(), "no 'SampleApp' apphooks found\n")
 
     def test_fix_tree(self):
@@ -78,9 +86,14 @@ class ManagementTestCase(CMSTestCase):
             out = StringIO()
             create_page('Hello Title', "nav_playground.html", "en", apphook=APPHOOK)
             self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 1)
-            command = CMSCommand()
-            command.stdout = out
-            command.handle("uninstall", "apphooks", APPHOOK, interactive=False)
+            management.call_command(
+                "cms",
+                "uninstall",
+                "apphooks",
+                APPHOOK,
+                interactive=False,
+                stdout=out,
+            )
             self.assertEqual(out.getvalue(), "1 'SampleApp' apphooks uninstalled\n")
             self.assertEqual(Page.objects.filter(application_urls=APPHOOK).count(), 0)
 
