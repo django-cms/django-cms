@@ -51,9 +51,9 @@ def set_page_cache(response):
         # Checks if there's a plugin using the legacy "cache = False"
         if all(ph.cache_placeholder for ph in placeholders):
             placeholder_ttl_list = [
-                # get_expiration() always returns:
+                # get_cache_expiration() always returns:
                 #     EXPIRE_NOW <= int <= MAX_EXPIRATION_IN_SECONDS
-                ph.get_expiration(request, timestamp)
+                ph.get_cache_expiration(request, timestamp)
                 for ph in placeholders
             ]
 

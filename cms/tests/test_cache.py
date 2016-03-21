@@ -354,7 +354,6 @@ class CacheTestCase(CMSTestCase):
 
         plugin_pool.unregister_plugin(LegacyCachePlugin)
 
-
     def test_disable_legacy_cache_plugins(self):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
@@ -379,14 +378,14 @@ class CacheTestCase(CMSTestCase):
         # from django.core.cache import cache; cache.clear()
 
         with self.settings(MIDDLEWARE_CLASSES=mw_classes, CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE=['LegacyCachePlugin', ]):  # noqa
-                page1.publish('en')
-                request = self.get_request('/en/')
-                request.current_page = Page.objects.get(pk=page1.pk)
-                request.toolbar = CMSToolbar(request)
-                with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
-                    response = self.client.get('/en/')
-                self.assertTrue('no-cache' not in response['Cache-Control'], response['Cache-Control'])
-                self.assertTrue('max-age=30' in response['Cache-Control'], response['Cache-Control'])
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(14, 25)):
+                response = self.client.get('/en/')
+            self.assertTrue('no-cache' not in response['Cache-Control'])
+            self.assertTrue('max-age=30' in response['Cache-Control'])
 
         plugin_pool.unregister_plugin(LegacyCachePlugin)
 
