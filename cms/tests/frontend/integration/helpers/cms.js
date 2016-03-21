@@ -292,7 +292,7 @@ module.exports = function (casperjs) {
                             .then(that.waitUntilAllAjaxCallsFinish())
                             .then(that.expandPageTree());
                     } else {
-                        return casper.wait(250);
+                        return casper.wait(1000);
                     }
                 });
             };

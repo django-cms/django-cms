@@ -861,7 +861,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
                 .wait(1000)
-                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .waitUntilVisible('.cms-pagetree')
+                .then(cms.waitUntilAllAjaxCallsFinish())
+                .then(cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
@@ -897,6 +899,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
+                .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
