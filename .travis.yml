@@ -65,7 +65,7 @@ install:
 script:
   - if [ "$FRONTEND" == 1 ] && [ "$UNIT" == 1 ]; then gulp tests:unit; fi;
   - if [ "$FRONTEND" == 1 ] && [ "$LINT" == 1 ]; then gulp lint; fi;
-  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; pip freeze; sh cms/tests/frontend/integration/run_testserver.sh; sleep 30; gulp tests:integration; fi;
+  - if [ "$FRONTEND" == 1 ] && [ "$INTEGRATION" == 1 ]; then pip install -e .; pip freeze; sh cms/tests/frontend/integration/run_testserver.sh; sleep 45; gulp tests:integration; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage run --parallel-mode manage.py test $MIGRATE_OPTION; fi;
   - if [ "$FRONTEND" != 1 ]; then coverage combine; fi;
 
