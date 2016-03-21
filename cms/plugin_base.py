@@ -9,7 +9,6 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, render_to_response
 
 from cms.utils import get_language_list
-from cms.utils.compat.dj import force_unicode
 from cms.exceptions import PluginLimitReached
 from cms.models import Placeholder
 from django import forms
@@ -286,17 +285,27 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         language = request.GET['plugin_language']
         if language not in get_language_list():
-            return HttpResponseBadRequest(force_unicode(
+            return HttpResponseBadRequest(force_text(
                 _("Language must be set to a supported language!")
             ))
 
-        if request.GET.get('plugin_parent', None):
-            get_object_or_404(
-                CMSPlugin, pk=request.GET['plugin_parent']
-            )
+        parent_id = request.GET.get('plugin_parent', None)
+
+        if parent_id:
+            parent = get_object_or_404(CMSPlugin, pk=parent_id)
+
+            if parent.language != language:
+                return HttpResponseBadRequest(force_text(
+                    _("Parent plugin language must be same as language!")
+                ))
+
+            if parent.placeholder_id != placeholder.pk:
+                return HttpResponseBadRequest(force_text(
+                    _("Parent plugin placeholder must be same as placeholder!")
+                ))
 
         if not self.has_add_permission(request):
-            return HttpResponseForbidden(force_unicode(
+            return HttpResponseForbidden(force_text(
                 _('You do not have permission to add a plugin')
             ))
 
