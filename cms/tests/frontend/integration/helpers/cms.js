@@ -288,7 +288,11 @@ module.exports = function (casperjs) {
                         this.click('.jstree-closed > .jstree-ocl');
                         // there's no clear way to check if the page was loading
                         // or was already in the DOM
-                        return casper.wait(2000).then(that.expandPageTree());
+                        return casper
+                            .then(that.waitUntilAllAjaxCallsFinish())
+                            .then(that.expandPageTree());
+                    } else {
+                        return casper.wait(250);
                     }
                 });
             };
@@ -325,6 +329,26 @@ module.exports = function (casperjs) {
                     }
                 }).toArray();
             }, title);
+        },
+
+        /**
+         * Wait a bit and then wait until $.active will become 0.
+         * $.active is not documented, but it shows amount of ongoing
+         * jQuery requests.
+         *
+         * @function waitUntilAllAjaxCallsFinish
+         */
+        waitUntilAllAjaxCallsFinish: function () {
+            return function () {
+                return casper.wait(200)
+                    .waitFor(function () {
+                        var remainingAjaxRequests = this.evaluate(function () {
+                            return $.active;
+                        });
+
+                        return (remainingAjaxRequests === 0);
+                    });
+            };
         }
     };
 };
