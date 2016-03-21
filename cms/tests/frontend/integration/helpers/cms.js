@@ -76,7 +76,7 @@ module.exports = function (casperjs) {
                 return function () {
                     return this.wait(1000).thenOpen(globals.adminPagesUrl)
                         .waitUntilVisible('.cms-pagetree')
-                        .wait(1000)
+                        .then(that.waitUntilAllAjaxCallsFinish())
                         .then(that.expandPageTree())
                         .then(function () {
                             var pageId = that.getPageId(opts.parent);
@@ -125,7 +125,7 @@ module.exports = function (casperjs) {
             var that = this;
 
             return function () {
-                return this.thenOpen(globals.editUrl)
+                return this.then(that.waitUntilAllAjaxCallsFinish()).thenOpen(globals.editUrl)
                     .waitForSelector('.cms-toolbar-expanded', function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
@@ -194,7 +194,7 @@ module.exports = function (casperjs) {
                         }
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
-                    }).waitForResource(/edit-plugin/);
+                    }).waitForResource(/edit-plugin/).then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -343,7 +343,10 @@ module.exports = function (casperjs) {
                 return casper.wait(200)
                     .waitFor(function () {
                         var remainingAjaxRequests = this.evaluate(function () {
-                            return $.active;
+                            var amount = 0;
+                            try {
+                                amount = $.active;
+                            } catch (e) {}
                         });
 
                         return (remainingAjaxRequests === 0);
