@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+
+import time
+
 from django.conf import settings
+
 from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page
@@ -8,7 +12,14 @@ from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.plugin_rendering import render_placeholder
 from cms.test_utils.project.placeholderapp.models import Example1
-from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import NoCachePlugin, SekizaiPlugin
+from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
+    DateTimeCacheExpirationPlugin,
+    LegacyCachePlugin,
+    NoCachePlugin,
+    SekizaiPlugin,
+    TimeDeltaCacheExpirationPlugin,
+    TTLCacheExpirationPlugin,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
@@ -61,7 +72,7 @@ class CacheTestCase(CMSTestCase):
         ]
         middleware = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
         with self.settings(CMS_PAGE_CACHE=False, MIDDLEWARE_CLASSES=middleware):
-            with self.assertNumQueries(FuzzyInt(13, 22)):
+            with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get('/en/')
             with self.assertNumQueries(FuzzyInt(5, 9)):
                 self.client.get('/en/')
@@ -73,51 +84,311 @@ class CacheTestCase(CMSTestCase):
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
 
+        placeholder1 = page1.placeholders.filter(slot='body')[0]
+        placeholder2 = page1.placeholders.filter(slot='right-column')[0]
+        plugin_pool.register_plugin(NoCachePlugin)
+        add_plugin(placeholder1, 'TextPlugin', 'en', body="English")
+        add_plugin(placeholder2, 'TextPlugin', 'en', body="Deutsch")
+        template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware'
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            # Request the page without the 'no-cache' plugin
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(21, 25)):
+                response1 = self.client.get('/en/')
+                content1 = response1.content
+
+            # Fetch it again, it is cached.
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(0):
+                response2 = self.client.get('/en/')
+                content2 = response2.content
+            self.assertEqual(content1, content2)
+
+            # Once again with PAGE_CACHE=False, to prove the cache can
+            # be disabled
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.settings(CMS_PAGE_CACHE=False):
+                with self.assertNumQueries(FuzzyInt(5, 24)):
+                    response3 = self.client.get('/en/')
+                    content3 = response3.content
+            self.assertEqual(content1, content3)
+
+            # Add the 'no-cache' plugin
+            add_plugin(placeholder1, "NoCachePlugin", 'en')
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(4):
+                output = self.render_template_obj(template, {}, request)
+            with self.assertNumQueries(FuzzyInt(14, 24)):  # was 19
+                response = self.client.get('/en/')
+                self.assertTrue("no-cache" in response['Cache-Control'])
+                resp1 = response.content.decode('utf8').split("$$$")[1]
+
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(4):
+                output2 = self.render_template_obj(template, {}, request)
+            with self.settings(CMS_PAGE_CACHE=False):
+                with self.assertNumQueries(FuzzyInt(8, 13)):
+                    response = self.client.get('/en/')
+                    resp2 = response.content.decode('utf8').split("$$$")[1]
+            self.assertNotEqual(output, output2)
+            self.assertNotEqual(resp1, resp2)
+
+            plugin_pool.unregister_plugin(NoCachePlugin)
+
+    def test_timedelta_cache_plugin(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
         placeholder1 = page1.placeholders.filter(slot="body")[0]
         placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(TimeDeltaCacheExpirationPlugin)
+        add_plugin(placeholder1, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
+
+        # Add *CacheExpirationPlugins, one expires in 50s, the other in 40s.
+        # The page should expire in the least of these, or 40s.
+        add_plugin(placeholder1, "TimeDeltaCacheExpirationPlugin", 'en')
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+                response = self.client.get('/en/')
+            self.assertTrue('max-age=45' in response['Cache-Control'], response['Cache-Control'])
+
+            plugin_pool.unregister_plugin(TimeDeltaCacheExpirationPlugin)
+
+    def test_datetime_cache_plugin(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder1 = page1.placeholders.filter(slot="body")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(DateTimeCacheExpirationPlugin)
+        add_plugin(placeholder1, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
+
+        # Add *CacheExpirationPlugins, one expires in 50s, the other in 40s.
+        # The page should expire in the least of these, or 40s.
+        add_plugin(placeholder1, "DateTimeCacheExpirationPlugin", 'en')
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+                response = self.client.get('/en/')
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
+
+            plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
+
+    def TTLCacheExpirationPlugin(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder1 = page1.placeholders.filter(slot="body")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(TTLCacheExpirationPlugin)
+        add_plugin(placeholder1, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
+
+        # Add *CacheExpirationPlugins, one expires in 50s, the other in 40s.
+        # The page should expire in the least of these, or 40s.
+        add_plugin(placeholder1, "TTLCacheExpirationPlugin", 'en')
+
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+                response = self.client.get('/en/')
+            self.assertTrue('max-age=50' in response['Cache-Control'], response['Cache-Control'])
+
+            plugin_pool.unregister_plugin(TTLCacheExpirationPlugin)
+
+    def test_expiration_cache_plugins(self):
+        """
+        Tests that when used in combination, the page is cached to the
+        shortest TTL.
+        """
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder1 = page1.placeholders.filter(slot="body")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(TTLCacheExpirationPlugin)
+        plugin_pool.register_plugin(DateTimeCacheExpirationPlugin)
         plugin_pool.register_plugin(NoCachePlugin)
         add_plugin(placeholder1, "TextPlugin", 'en', body="English")
         add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
 
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(3):
-            self.render_template_obj(template, {}, request)
+        # Add *CacheExpirationPlugins, one expires in 50s, the other in 40s.
+        # The page should expire in the least of these, or 40s.
+        add_plugin(placeholder1, "TTLCacheExpirationPlugin", 'en')
+        add_plugin(placeholder2, "DateTimeCacheExpirationPlugin", 'en')
 
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(1):
-            self.render_template_obj(template, {}, request)
-        add_plugin(placeholder1, "NoCachePlugin", 'en')
-        page1.publish('en')
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(4):
-            output = self.render_template_obj(template, {}, request)
-        with self.assertNumQueries(FuzzyInt(14, 19)):
-            response = self.client.get('/en/')
-            resp1 = response.content.decode('utf8').split("$$$")[1]
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
 
-        request = self.get_request('/en/')
-        request.current_page = Page.objects.get(pk=page1.pk)
-        request.toolbar = CMSToolbar(request)
-        template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(4):
-            output2 = self.render_template_obj(template, {}, request)
-        with self.settings(CMS_PAGE_CACHE=False):
-            with self.assertNumQueries(FuzzyInt(8, 13)):
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+                response = self.client.get('/en/')
+                resp1 = response.content.decode('utf8').split("$$$")[1]
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
+            cache_control1 = response['Cache-Control']
+            expires1 = response['Expires']
+            last_modified1 = response['Last-Modified']
+
+            time.sleep(1)  # This ensures that the cache has aged measurably
+
+            # Request it again, this time, it comes from the cache
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(0):
                 response = self.client.get('/en/')
                 resp2 = response.content.decode('utf8').split("$$$")[1]
-        self.assertNotEqual(output, output2)
-        self.assertNotEqual(resp1, resp2)
+            # Content will be the same
+            self.assertEqual(resp2, resp1)
+            # Cache-Control will be different because the cache has aged
+            self.assertNotEqual(response['Cache-Control'], cache_control1)
+            # However, the Expires timestamp will be the same
+            self.assertEqual(response['Expires'], expires1)
+            # As will the Last-Modified timestamp.
+            self.assertEqual(response['Last-Modified'], last_modified1)
 
-        plugin_pool.unregister_plugin(NoCachePlugin)
+            plugin_pool.unregister_plugin(TTLCacheExpirationPlugin)
+            plugin_pool.unregister_plugin(DateTimeCacheExpirationPlugin)
+            plugin_pool.unregister_plugin(NoCachePlugin)
+
+    def test_enable_legacy_cache_plugins(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder1 = page1.placeholders.filter(slot="body")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(LegacyCachePlugin)
+        add_plugin(placeholder1, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
+        # Adds a no-cache plugin. This will prevent the page from caching.
+        add_plugin(placeholder1, "LegacyCachePlugin", 'en')
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes):
+            page1.publish('en')
+            request = self.get_request('/en/')
+            request.current_page = Page.objects.get(pk=page1.pk)
+            request.toolbar = CMSToolbar(request)
+            with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+                response = self.client.get('/en/')
+            self.assertTrue('no-cache' in response['Cache-Control'])
+
+        plugin_pool.unregister_plugin(LegacyCachePlugin)
+
+
+    def test_disable_legacy_cache_plugins(self):
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+
+        placeholder1 = page1.placeholders.filter(slot="body")[0]
+        placeholder2 = page1.placeholders.filter(slot="right-column")[0]
+        plugin_pool.register_plugin(LegacyCachePlugin)
+        add_plugin(placeholder1, "TextPlugin", 'en', body="English")
+        add_plugin(placeholder2, "TextPlugin", 'en', body="Deutsch")
+        # Adds a no-cache plugin. This would prevent the page from caching,
+        # except we've disabled that with CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE.
+        add_plugin(placeholder1, "LegacyCachePlugin", 'en')
+        # Ensure that we're testing in an environment WITHOUT the MW cache, as
+        # we are testing the internal page cache, not the MW cache.
+        exclude = [
+            'django.middleware.cache.UpdateCacheMiddleware',
+            'django.middleware.cache.CacheMiddleware',
+            'django.middleware.cache.FetchFromCacheMiddleware',
+        ]
+        mw_classes = [mw for mw in settings.MIDDLEWARE_CLASSES if mw not in exclude]
+
+        # from django.core.cache import cache; cache.clear()
+
+        with self.settings(MIDDLEWARE_CLASSES=mw_classes, CMS_IGNORE_PLUGIN_CACHE_ATTRIBUTE=['LegacyCachePlugin', ]):  # noqa
+                page1.publish('en')
+                request = self.get_request('/en/')
+                request.current_page = Page.objects.get(pk=page1.pk)
+                request.toolbar = CMSToolbar(request)
+                with self.assertNumQueries(FuzzyInt(14, 25)):  # was 14, 24
+                    response = self.client.get('/en/')
+                self.assertTrue('no-cache' not in response['Cache-Control'], response['Cache-Control'])
+                self.assertTrue('max-age=30' in response['Cache-Control'], response['Cache-Control'])
+
+        plugin_pool.unregister_plugin(LegacyCachePlugin)
 
     def test_cache_page(self):
         # Ensure that we're testing in an environment WITHOUT the MW cache...
@@ -148,7 +419,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 22)):
+            with self.assertNumQueries(FuzzyInt(1, 24)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
@@ -171,7 +442,7 @@ class CacheTestCase(CMSTestCase):
             # Test that this means the page is actually not cached.
             #
             page1.publish('en')
-            with self.assertNumQueries(FuzzyInt(1, 20)):
+            with self.assertNumQueries(FuzzyInt(1, 21)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
@@ -225,7 +496,7 @@ class CacheTestCase(CMSTestCase):
             self.assertFalse(request.user.is_authenticated())
 
             # Test that the page is initially uncached
-            with self.assertNumQueries(FuzzyInt(1, 20)):
+            with self.assertNumQueries(FuzzyInt(1, 24)):
                 response = self.client.get('/en/')
             self.assertEqual(response.status_code, 200)
 
