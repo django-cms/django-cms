@@ -1,3 +1,4 @@
+/* global window */
 'use strict';
 
 // #############################################################################
@@ -162,6 +163,101 @@ casper.test.begin('Correctly displays languages', function (test) {
         });
 });
 
+casper.test.begin('Info dropdown can be shown', function (test) {
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                var pageId = cms.getPageId('Homepage');
+
+                // check that languages look correct
+                this.click('a[href*="page/' + pageId + '"] .cms-icon-info');
+            })
+            .waitForSelector('.cms-tree-tooltip-container-open', function () {
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'publication date:',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'is restricted',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'last change by',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'template',
+                    'Info tooltip is shown'
+                );
+                test.assertSelectorHasText(
+                    '.cms-tree-tooltip-container-open',
+                    'site',
+                    'Info tooltip is shown'
+                );
+            });
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
+casper.test.begin('Settings and advanced settings are accessible', function (test) {
+    casper
+        .start()
+        .then(cms.addPage({ title: 'Homepage' }))
+        .thenOpen(globals.baseUrl)
+        .then(cms.openSideframe())
+        // switch to sideframe
+        .withFrame(0, function () {
+            casper.waitForSelector('.cms-pagetree', function () {
+                var pageId = cms.getPageId('Homepage');
+                // check that languages look correct
+
+                this.click('a[href*="page/' + pageId + '"] .cms-icon-cogs');
+            })
+            .waitForUrl(/page/)
+            .waitForSelector('#content')
+            .then(function () {
+                test.assertExists(
+                    xPath('//h1[contains(text(), "Change page")]'),
+                    'Settings can be accessed from page tree'
+                );
+
+                this.click(xPath('//a[contains(text(), "Pages")][contains(@href, "admin/cms/page")]'));
+            })
+            .waitForUrl(/page/)
+            .waitForSelector('.cms-pagetree')
+            .thenEvaluate(function () {
+                var clickEvent = $.Event('click', { shiftKey: true });
+
+                // here we cheat a bit, it works only if there's only one cogs on the page
+                $('.cms-icon-cogs:visible').trigger(clickEvent);
+            })
+            .waitForUrl(/advanced-settings/)
+            .waitForSelector('h1')
+            .then(function () {
+                test.assertExists(
+                    xPath('//h1[contains(text(), "Advanced Settings")]'),
+                    'Advanced settings can be accessed from page tree'
+                );
+            });
+        })
+        .then(cms.removePage())
+        .run(function () {
+            test.done();
+        });
+});
+
 casper.test.begin('Pages can be added through the page tree', function (test) {
     casper
         .start(globals.baseUrl)
@@ -177,6 +273,7 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
                 this.click('input[name="_save"]');
             })
             .waitUntilVisible('.success')
+            .wait(1000)
             .then(function () {
                 var pageId = cms.getPageId('Homepage');
                 test.assertExists(
@@ -195,6 +292,8 @@ casper.test.begin('Pages can be added through the page tree', function (test) {
                 this.click('input[name="_save"]');
             })
             .waitUntilVisible('.success')
+            .waitUntilVisible('.cms-pagetree')
+            .then(cms.waitUntilAllAjaxCallsFinish())
             .then(cms.expandPageTree())
             .then(function () {
                 var pageId = cms.getPageId('Nested page');
@@ -263,7 +362,7 @@ casper.test.begin('Pages can be reordered', function (test) {
                 test.assertDoesntExist('.jstree-initial-node.jstree-loading', 'Loading tree hides');
             }).thenEvaluate(function () {
                 window.location.reload();
-            }).waitUntilVisible('.cms-pagetree', function () {
+            }).wait(1000).waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
                         { name: 'Second' },
@@ -328,6 +427,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             .thenEvaluate(function () {
                 window.location.reload();
             })
+            .wait(1000)
             .waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -362,6 +462,7 @@ casper.test.begin('Pages can be nested / unnested', function (test) {
             .thenEvaluate(function () {
                 window.location.reload();
             })
+            .wait(1000)
             .waitUntilVisible('.cms-pagetree', function () {
                 test.assertExists(
                     xPath(createJSTreeXPathFromTree([
@@ -423,7 +524,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function () {
-            casper.waitForSelector('.cms-pagetree', function () {
+            casper.waitForSelector('.cms-pagetree').wait(1000, function () {
                 pageId = cms.getPageId('Homepage');
                 test.assertExists(
                     '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
@@ -445,7 +546,7 @@ casper.test.begin('Pages can be published/unpublished if it does have a title an
                 this.sendKeys('#id_title', 'Startseite');
                 this.click('input[name="_save"]');
             })
-            .waitUntilVisible('.cms-pagetree', function () {
+            .waitUntilVisible('.cms-pagetree .cms-tree-item-lang', function () {
                 this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished');
             })
             .waitUntilVisible('.cms-tree-tooltip-container', function () {
@@ -593,6 +694,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -694,7 +796,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -721,6 +823,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
@@ -757,8 +860,10 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                // FIXME shouldn't be required, pagetree doesn't store the state correctly
-                .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
+                .wait(1000)
+                .waitUntilVisible('.cms-pagetree')
+                .then(cms.waitUntilAllAjaxCallsFinish())
+                .then(cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([
@@ -792,7 +897,9 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
+                .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -839,7 +946,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 })
                 .waitForResource(/copy-page/)
                 .waitForUrl(/page/) // need to wait for reload
-                // FIXME shouldn't be required, pagetree doesn't store the state correctly
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree', cms.expandPageTree())
                 .waitUntilVisible('.cms-pagetree', function () {
                     test.assertExists(
@@ -891,6 +998,7 @@ casper.test.begin('Pages can be copied and pasted', function (test) {
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
+                .wait(1000)
                 .waitUntilVisible('.cms-pagetree')
                 .then(function () {
                     test.assertExists(
@@ -978,6 +1086,7 @@ casper.test.begin('Cut helpers show up correctly', function (test) {
         .withFrame(0, function () {
             var secondPageId;
             casper.waitUntilVisible('.cms-pagetree')
+                .wait(1000)
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1124,7 +1233,6 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
                 .wait(1000)
-                // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1186,7 +1294,6 @@ casper.test.begin('Pages can be cut and pasted', function (test) {
                 .waitForResource(/move-page/)
                 .waitForResource(/get-tree/)
                 .wait(1000)
-                // FIXME shouldn't be needed, pagetree should remember it being expanded
                 .then(cms.expandPageTree())
                 .then(function () {
                     test.assertExists(
@@ -1282,7 +1389,8 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree')
+                .wait(1000, function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage',
@@ -1314,7 +1422,8 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                 .thenEvaluate(function () {
                     window.location.reload();
                 })
-                .waitUntilVisible('.cms-pagetree', function () {
+                .waitUntilVisible('.cms-pagetree')
+                .wait(1000, function () {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{
                             name: 'Homepage'

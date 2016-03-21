@@ -23,7 +23,7 @@ module.exports = function (casperjs) {
 
         logout: function () {
             return function () {
-                return this.thenOpen(globals.adminLogoutUrl)
+                return this.wait(1000).thenOpen(globals.adminLogoutUrl)
                     .waitForSelector('#content');
             };
         },
@@ -56,7 +56,9 @@ module.exports = function (casperjs) {
                     .waitUntilVisible('input[type=submit]')
                     .then(function () {
                         this.click('input[type=submit]');
-                    });
+                    })
+                    .wait(1000)
+                    .then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -74,8 +76,9 @@ module.exports = function (casperjs) {
 
             if (opts.parent) {
                 return function () {
-                    return this.thenOpen(globals.adminPagesUrl)
+                    return this.wait(1000).thenOpen(globals.adminPagesUrl)
                         .waitUntilVisible('.cms-pagetree')
+                        .then(that.waitUntilAllAjaxCallsFinish())
                         .then(that.expandPageTree())
                         .then(function () {
                             var pageId = that.getPageId(opts.parent);
@@ -86,19 +89,21 @@ module.exports = function (casperjs) {
                             this.sendKeys('#id_title', opts.title);
                             this.click('input[name="_save"]');
                         })
-                        .waitUntilVisible('.success');
+                        .waitUntilVisible('.success')
+                        .then(that.waitUntilAllAjaxCallsFinish());
                 };
             }
 
             // add page as usual
             return function () {
-                return this.thenOpen(globals.adminPagesUrl + 'add/')
+                return this.wait(1000).thenOpen(globals.adminPagesUrl + 'add/')
                     .waitUntilVisible('#id_title')
                     .then(function () {
                         this.sendKeys('#id_title', opts.title);
                         this.click('input[name="_save"]');
                     })
-                    .waitUntilVisible('.success');
+                    .waitUntilVisible('.success')
+                    .then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -124,7 +129,7 @@ module.exports = function (casperjs) {
             var that = this;
 
             return function () {
-                return this.thenOpen(globals.editUrl)
+                return this.then(that.waitUntilAllAjaxCallsFinish()).thenOpen(globals.editUrl)
                     .waitForSelector('.cms-toolbar-expanded', function () {
                         this.click('.cms-toolbar-item-cms-mode-switcher .cms-btn[href="?build"]');
                     })
@@ -193,7 +198,7 @@ module.exports = function (casperjs) {
                         }
                     }).then(function () {
                         this.click('.cms-modal-buttons .cms-btn-action.default');
-                    }).waitForResource(/edit-plugin/);
+                    }).waitForResource(/edit-plugin/).then(that.waitUntilAllAjaxCallsFinish());
             };
         },
 
@@ -287,7 +292,11 @@ module.exports = function (casperjs) {
                         this.click('.jstree-closed > .jstree-ocl');
                         // there's no clear way to check if the page was loading
                         // or was already in the DOM
-                        return casper.wait(1000).then(that.expandPageTree());
+                        return casper
+                            .then(that.waitUntilAllAjaxCallsFinish())
+                            .then(that.expandPageTree());
+                    } else {
+                        return casper.wait(1000);
                     }
                 });
             };
@@ -324,6 +333,32 @@ module.exports = function (casperjs) {
                     }
                 }).toArray();
             }, title);
+        },
+
+        /**
+         * Wait a bit and then wait until $.active will become 0.
+         * $.active is not documented, but it shows amount of ongoing
+         * jQuery requests.
+         *
+         * @function waitUntilAllAjaxCallsFinish
+         */
+        waitUntilAllAjaxCallsFinish: function () {
+            return function () {
+                return casper.wait(200)
+                    .waitFor(function () {
+                        var remainingAjaxRequests = this.evaluate(function () {
+                            var amount = 0;
+
+                            try {
+                                amount = $.active;
+                            } catch (e) {}
+
+                            return amount;
+                        });
+
+                        return (remainingAjaxRequests === 0);
+                    }).wait(200);
+            };
         }
     };
 };
