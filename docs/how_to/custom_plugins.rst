@@ -149,7 +149,9 @@ In ``cms_plugins.py``, you place your plugins. For our example, include the foll
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
         render_template = "hello_plugin.html"
-        cache = False
+
+        def get_expiration(self, **kwargs):
+            return 0
 
     plugin_pool.register_plugin(HelloPlugin)
 
@@ -182,11 +184,6 @@ There are two required attributes on those classes:
   good practice to mark this string as translatable using
   :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
-* ``cache``: This is a property that tells the plugin rendering system in django
-  CMS whether to cache the plugin’s output to speed-up subsequent views of the
-  same plugin. By default, the cms caches. Since we want each visitor to see
-  output that is specific to him or her, we need to tell the cms to not cache
-  this plugin.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
 is ``True`` (the default):
@@ -198,9 +195,22 @@ is ``True`` (the default):
 * ``get_render_template``: A method that returns a template path to render the
   plugin with.
 
-In addition to those attributes, you can also define a :meth:`render` method on
-your sub-classes. It is specifically this :ref:`render` method that is the
-**view** for your plugin.
+In addition to those attributes, you can also define a :meth:`render` and/or
+:meth:`get_expiration` method on your sub-classes.
+
+The :ref:`render` method determines the template context variables that are
+used render your plugin.
+
+The :meth:`get_expiration` method is optional and is used to determine the
+period of validity of the content rendered by the plugin. A value of 0 means
+"do not cache". This method can return a future (TZ-aware) date and time or can
+simply return the number of seconds that the content is cache-able.
+
+This method is not required. By default, a plugin will not affect the cache-
+ability of the page it is on. In the `HelloPlugin` above, :meth:`get_expiration`
+was used to return 0 ("no-cache") because we want each visitor to see output
+that is specific to him or her, we need to tell the cms to not cache any pages
+where this plugin is used.
 
 
 ***************

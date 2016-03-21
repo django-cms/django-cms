@@ -12,12 +12,11 @@ from django.utils.translation import ugettext as _
 from cms.exceptions import PluginLimitReached
 from cms.models import Page, CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.utils import get_language_from_request
+from cms.utils import get_cms_setting, get_language_from_request
 from cms.utils.i18n import get_fallback_languages
 from cms.utils.moderator import get_cmsplugin_queryset
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (get_placeholder_conf, get_placeholders)
-
 
 def get_page_from_plugin_or_404(cms_plugin):
     return get_object_or_404(Page, placeholders=cms_plugin.placeholder)
@@ -148,6 +147,7 @@ def build_plugin_tree(plugins):
 def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
+    ignore_plugin_cache_setting = get_cms_setting('IGNORE_PLUGIN_CACHE_ATTRIBUTE')
 
     # make a map of plugin types, needed later for downcasting
     for plugin in queryset:
@@ -168,7 +168,7 @@ def downcast_plugins(queryset, placeholders=None, select_placeholder=False):
                 for pl in placeholders:
                     if instance.placeholder_id == pl.pk:
                         instance.placeholder = pl
-                        if not cls.cache:
+                        if not cls.cache and not cls.__name__ in ignore_plugin_cache_setting:  # noqa
                             pl.cache_placeholder = False
             # make the equivalent list of qs, but with downcasted instances
     return [plugin_lookup.get(plugin.pk, plugin) for plugin in queryset]
